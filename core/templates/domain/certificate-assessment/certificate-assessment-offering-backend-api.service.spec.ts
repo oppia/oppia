@@ -1012,4 +1012,124 @@ describe('Certificate Assessment Offering backend api service', () => {
       'Error occurred while fetching attempts.'
     );
   }));
+
+  it('should successfully start a certificate assessment attempt', fakeAsync(() => {
+    caos
+      .startCertificateAssessmentAttemptAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.START_CERTIFICATE_ASSESSMENT_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual({certificate_id: 'mock_certificate_id'});
+    req.flush({
+      attempt_id: 'mock_attempt_id',
+      questions: [
+        {question_id: 'q1', question_version: 1},
+        {question_id: 'q2', question_version: 2},
+      ],
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        _attemptId: 'mock_attempt_id',
+        _questions: [
+          {questionId: 'q1', questionVersion: 1},
+          {questionId: 'q2', questionVersion: 2},
+        ],
+      })
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if starting a certificate assessment fails', fakeAsync(() => {
+    caos
+      .startCertificateAssessmentAttemptAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.START_CERTIFICATE_ASSESSMENT_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Error occurred while starting the assessment.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while starting the assessment.'
+    );
+  }));
+
+  it('should successfully submit a certificate assessment attempt', fakeAsync(() => {
+    caos
+      .submitCertificateAssessmentAttemptAsync('mock_attempt_id', [
+        {question_id: 'q1', is_correct: true, selected_answer: '8'},
+      ])
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual({
+      answers: [{question_id: 'q1', is_correct: true, selected_answer: '8'}],
+    });
+    req.flush({
+      attempt_id: 'mock_attempt_id',
+      is_submitted: true,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      attempt_id: 'mock_attempt_id',
+      is_submitted: true,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if submitting a certificate assessment fails', fakeAsync(() => {
+    caos
+      .submitCertificateAssessmentAttemptAsync('mock_attempt_id', [])
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Error occurred while submitting the assessment.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while submitting the assessment.'
+    );
+  }));
 });

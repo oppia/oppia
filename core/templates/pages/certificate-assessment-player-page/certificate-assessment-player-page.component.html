@@ -1,30 +1,20 @@
-<div class="certificate-assessment-page-container position-relative">
-  <oppia-assessment-interrupt #interruptCard
-                              *ngIf="showAssessmentInterruptCard"
-                              (retryAssessment)="onRetryAssessment()"
-                              (resumeAssessment)="onResumeAssessment()">
-  </oppia-assessment-interrupt>
-<!-- TODO(#24717-M2.15): Add certificate-assessment-titled-shared-background-banner component. -->
-  <oppia-assessment-introduction-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
-                                      [certificateId]="certificateId"
-                                      (continue)="showInstructions()">
-  </oppia-assessment-introduction-card>
-
-  <oppia-assessment-instruction-panel *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS"
-                                      (startAssessment)="startAssessment()">
-  </oppia-assessment-instruction-panel>
-
-  <oppia-certificate-assessment-conversation-skin #conversationSkin
-                                                  *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
-                                                  [currentQuestion]="getCurrentQuestion()"
-                                                  [currentQuestionIndex]="currentQuestionIndex"
-                                                  [totalQuestions]="mockQuestions.length"
-                                                  [progressPercentage]="getProgressPercentage()"
-                                                  [isLastQuestion]="isCurrentQuestionLast()"
-                                                  [savedResponse]="getSavedResponse()"
-                                                  (previousQuestion)="previousQuestion()"
-                                                  (nextQuestion)="nextQuestion()"
-                                                  (submitAssessment)="submitAssessment()"
-                                                  (responseChange)="updateResponse($event)">
-  </oppia-certificate-assessment-conversation-skin>
+<oppia-titled-background-banner [title]="bannerTitleI18nKey"
+                                [buttonText]="bannerButtonI18nKey"
+                                [buttonRoute]="['/learn', classroomUrlFragment, 'certificate-offering-available']">
+</oppia-titled-background-banner>
+<div *ngIf="isLoadingQuestion" class="text-center py-3 text-muted">
+  <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
 </div>
+<oppia-certificate-assessment-conversation-skin #conversationSkin
+                                                *ngIf="!isLoadingQuestion && getCurrentQuestion()"
+                                                [currentQuestion]="getCurrentQuestion()!"
+                                                [currentQuestionIndex]="currentQuestionIndex"
+                                                [totalQuestions]="getTotalQuestionCount()"
+                                                [progressPercentage]="getProgressPercentage()"
+                                                [isLastQuestion]="isCurrentQuestionLast()"
+                                                [savedResponse]="getSavedResponse()"
+                                                (previousQuestion)="previousQuestion()"
+                                                (nextQuestion)="nextQuestion()"
+                                                (submitAssessment)="submitAssessment()"
+                                                (responseChange)="updateResponse($event)">
+</oppia-certificate-assessment-conversation-skin>

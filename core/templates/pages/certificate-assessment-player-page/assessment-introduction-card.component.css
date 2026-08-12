@@ -76,52 +76,46 @@
 }
 
 .topic-tile {
+  background: #fff;
+  border: 1px solid #dfe3e8;
   border-radius: 4px;
   flex: 1 1 130px;
-  height: 110px;
   max-width: 130px;
   min-width: 130px;
   overflow: hidden;
-  position: relative;
 }
 
-/* Stubbed swatches used instead of topic thumbnail images. Colors below
-   are placeholders only and are not tied to real topic data yet. */
-.topic-tile.topic-color-1 {
-  background: #37474f;
+.recommended-topic-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-.topic-tile.topic-color-2 {
-  background: #455a64;
-}
-
-.topic-tile.topic-color-3 {
-  background: #4e6b72;
-}
-
-.topic-tile.topic-color-4 {
-  background: #56656b;
-}
-
-.topic-tile-info {
-  bottom: 0;
-  padding: 8px 10px;
-  position: absolute;
+.recommended-topic-thumbnail {
+  background: #dbeafe;
+  height: 74px;
+  object-fit: cover;
   width: 100%;
 }
 
-.topic-name {
+.recommended-topic-details {
+  background: #00645c;
+  color: #fff;
+  padding: 8px 10px;
+}
+
+.recommended-topic-title {
   color: #fff;
   font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 1.3;
   margin: 0 0 2px;
 }
 
-.topic-lessons {
-  color: #d4dadb;
+.recommended-topic-lessons-count {
+  color: #fff;
   font-size: 11px;
-  margin: 0;
+  line-height: 1.4;
 }
 
 .cta-row {

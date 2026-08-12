@@ -34,8 +34,8 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     prompt: 'What is 2 + 2?',
     hint: 'Choose one option.',
     options: [
-      {id: 'a', text: '3'},
-      {id: 'b', text: '4'},
+      {id: 'a', text: '3', index: 0},
+      {id: 'b', text: '4', index: 1},
     ],
     correctAnswerText: '4',
   };
@@ -135,9 +135,9 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
       prompt: 'Select all prime numbers.',
       hint: 'Choose all that apply.',
       options: [
-        {id: 'a', text: '2'},
-        {id: 'b', text: '3'},
-        {id: 'c', text: '4'},
+        {id: 'a', text: '2', index: 0},
+        {id: 'b', text: '3', index: 1},
+        {id: 'c', text: '4', index: 2},
       ],
       correctAnswerText: '2,3',
     };

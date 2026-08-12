@@ -17,6 +17,7 @@
  */
 
 import {
+  CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
@@ -162,5 +163,32 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.totalQuestions).toEqual(20);
     expect(offering.timeLimitInMinutes).toEqual(90);
     expect(offering.demonstrates).toEqual(['Learn math']);
+  });
+});
+
+describe('Certificate Assessment Attempt Data Model', () => {
+  it('should correctly create an instance via the constructor', () => {
+    const attempt = new CertificateAssessmentAttemptData('attempt_id_1', [
+      {questionId: 'q1', questionVersion: 1},
+    ]);
+
+    expect(attempt.attemptId).toEqual('attempt_id_1');
+    expect(attempt.questions).toEqual([{questionId: 'q1', questionVersion: 1}]);
+  });
+
+  it('should correctly create an instance from a backend dict', () => {
+    const attempt = CertificateAssessmentAttemptData.createFromBackendDict({
+      attempt_id: 'attempt_id_1',
+      questions: [
+        {question_id: 'q1', question_version: 1},
+        {question_id: 'q2', question_version: 2},
+      ],
+    });
+
+    expect(attempt.attemptId).toEqual('attempt_id_1');
+    expect(attempt.questions).toEqual([
+      {questionId: 'q1', questionVersion: 1},
+      {questionId: 'q2', questionVersion: 2},
+    ]);
   });
 });

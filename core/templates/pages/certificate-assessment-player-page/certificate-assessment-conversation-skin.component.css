@@ -2,7 +2,9 @@
   margin: 0 auto;
   max-width: 925px;
   padding-top: 6vh;
+  position: relative;
   width: min(100%, calc(100vw - 32px));
+  z-index: 1;
 }
 
 .certificate-assessment-progress-card {

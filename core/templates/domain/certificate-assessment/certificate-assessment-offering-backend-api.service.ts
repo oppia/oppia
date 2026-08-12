@@ -22,10 +22,12 @@ import {Injectable} from '@angular/core';
 import {
   AvailableCertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
+  CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
 } from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
+import {StateBackendDict} from 'domain/state/state.model';
 
 interface CreateCertificateOfferingBackendResponse {
   certificate_id: string;
@@ -97,6 +99,32 @@ interface GetCertificateAssessmentAttemptsBackendResponse {
   attempts: CertificateAssessmentAttemptSummaryBackendDict[];
 }
 
+interface CertificateAssessmentQuestionBackendDict {
+  question_id: string;
+  question_version: number;
+}
+
+interface StartCertificateAssessmentBackendResponse {
+  attempt_id: string;
+  questions: CertificateAssessmentQuestionBackendDict[];
+}
+
+export interface SubmitCertificateAssessmentAnswerBackendDict {
+  question_id: string;
+  is_correct: boolean;
+  selected_answer?: string;
+}
+
+interface SubmitCertificateAssessmentBackendResponse {
+  attempt_id: string;
+  is_submitted: boolean;
+}
+
+export interface CertificateAssessmentQuestionBackendResponse {
+  question_id: string;
+  question_state_data: StateBackendDict;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -124,6 +152,23 @@ export class CertificateAssessmentOfferingBackendApiService {
       '<attempt_id>',
       attemptId
     );
+  }
+
+  private getSubmitHandlerUrl(attemptId: string): string {
+    return CertificateAssessmentDomainConstants.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER_URL.replace(
+      '<attempt_id>',
+      attemptId
+    );
+  }
+
+  private getCertificateQuestionHandlerUrl(
+    attemptId: string,
+    questionId: string
+  ): string {
+    return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
+      '<attempt_id>',
+      attemptId
+    ).replace('<question_id>', questionId);
   }
 
   async getCertificateAssessmentOfferingsAsync(): Promise<
@@ -341,6 +386,58 @@ export class CertificateAssessmentOfferingBackendApiService {
         )
         .toPromise();
       return response.attempts;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
+  async startCertificateAssessmentAttemptAsync(
+    certificateId: string
+  ): Promise<CertificateAssessmentAttemptData> {
+    try {
+      const response = await this.http
+        .post<StartCertificateAssessmentBackendResponse>(
+          CertificateAssessmentDomainConstants.START_CERTIFICATE_ASSESSMENT_HANDLER_URL,
+          {certificate_id: certificateId}
+        )
+        .toPromise();
+      return CertificateAssessmentAttemptData.createFromBackendDict({
+        attempt_id: response.attempt_id,
+        questions: response.questions,
+      });
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
+  async submitCertificateAssessmentAttemptAsync(
+    attemptId: string,
+    answers: SubmitCertificateAssessmentAnswerBackendDict[]
+  ): Promise<SubmitCertificateAssessmentBackendResponse> {
+    try {
+      const response = await this.http
+        .post<SubmitCertificateAssessmentBackendResponse>(
+          this.getSubmitHandlerUrl(attemptId),
+          {answers}
+        )
+        .toPromise();
+      return response;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
+  async getCertificateAssessmentQuestionAsync(
+    attemptId: string,
+    questionId: string
+  ): Promise<CertificateAssessmentQuestionBackendResponse> {
+    try {
+      const response = await this.http
+        .get<CertificateAssessmentQuestionBackendResponse>(
+          this.getCertificateQuestionHandlerUrl(attemptId, questionId)
+        )
+        .toPromise();
+      return response;
     } catch (errorResponse) {
       throw errorResponse?.error?.error || errorResponse.message;
     }

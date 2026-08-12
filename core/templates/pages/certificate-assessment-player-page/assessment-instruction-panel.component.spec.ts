@@ -35,14 +35,28 @@ describe('AssessmentInstructionPanelComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should set the default certificate title', () => {
+  it('should default the certificate title to an empty string', () => {
+    expect(component.certificateTitle).toBe('');
+  });
+
+  it('should default the assessment duration in minutes to zero', () => {
+    expect(component.timeLimitInMinutes).toBe(0);
+  });
+
+  it('should default the total questions to zero', () => {
+    expect(component.totalQuestions).toBe(0);
+  });
+
+  it('should allow values to be set via input bindings', () => {
+    component.certificateTitle = 'Everyday Arithmetic & Number Confidence';
+    component.timeLimitInMinutes = 60;
+    component.totalQuestions = 12;
+
     expect(component.certificateTitle).toBe(
       'Everyday Arithmetic & Number Confidence'
     );
-  });
-
-  it('should set the assessment duration in minutes', () => {
-    expect(component.assessmentDurationMinutes).toBe(60);
+    expect(component.timeLimitInMinutes).toBe(60);
+    expect(component.totalQuestions).toBe(12);
   });
 
   it('should have the correct i18n key for the instructions heading', () => {
@@ -54,6 +68,12 @@ describe('AssessmentInstructionPanelComponent', () => {
   it('should have the correct i18n key for the time limit instruction', () => {
     expect(component.timeLimitInstructionI18nKey).toBe(
       'I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT'
+    );
+  });
+
+  it('should have the correct i18n key for the question count instruction', () => {
+    expect(component.questionCountInstructionI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT'
     );
   });
 

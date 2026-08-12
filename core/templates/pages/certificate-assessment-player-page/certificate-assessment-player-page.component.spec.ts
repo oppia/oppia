@@ -25,7 +25,6 @@ import {
   flushMicrotasks,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {
   NgbModal,
@@ -34,8 +33,160 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {
+  CertificateAssessmentOfferingBackendApiService,
+  CertificateAssessmentQuestionBackendResponse,
+} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
+
+const createOutcomeBackendDict = (): OutcomeBackendDict => ({
+  dest: 'final',
+  dest_if_really_stuck: null,
+  feedback: {content_id: 'feedback_1', html: '<p>Correct!</p>'},
+  labelled_as_correct: true,
+  param_changes: [],
+  refresher_exploration_id: null,
+  missing_prerequisite_skill_id: null,
+});
+
+const createMultipleChoiceStateData = (): StateBackendDict => ({
+  classifier_model_id: null,
+  content: {
+    content_id: 'content',
+    html: '<p>Which number completes the sequence: 2, 4, 6, ?</p>',
+  },
+  interaction: {
+    answer_groups: [
+      {
+        rule_specs: [{rule_type: 'Equals', inputs: {x: 1}}],
+        outcome: createOutcomeBackendDict(),
+        training_data: [],
+        tagged_skill_misconception_id: null,
+      },
+    ],
+    confirmed_unclassified_answers: [],
+    customization_args: {
+      choices: {
+        value: [
+          {html: '<p>7</p>', content_id: 'a'},
+          {html: '<p>8</p>', content_id: 'b'},
+          {html: '<p>9</p>', content_id: 'c'},
+        ],
+      },
+      showChoicesInShuffledOrder: {value: false},
+    },
+    default_outcome: createOutcomeBackendDict(),
+    hints: [],
+    id: 'MultipleChoiceInput',
+    solution: null,
+  },
+  param_changes: [],
+  solicit_answer_details: false,
+  card_is_checkpoint: false,
+  linked_skill_id: null,
+  inapplicable_skill_misconception_ids: [],
+});
+
+const createItemSelectionStateData = (): StateBackendDict => ({
+  classifier_model_id: null,
+  content: {
+    content_id: 'content',
+    html: '<p>Select all prime numbers.</p>',
+  },
+  interaction: {
+    answer_groups: [
+      {
+        rule_specs: [{rule_type: 'Equals', inputs: {x: ['a', 'b', 'd']}}],
+        outcome: createOutcomeBackendDict(),
+        training_data: [],
+        tagged_skill_misconception_id: null,
+      },
+    ],
+    confirmed_unclassified_answers: [],
+    customization_args: {
+      choices: {
+        value: [
+          {html: '<p>2</p>', content_id: 'a'},
+          {html: '<p>3</p>', content_id: 'b'},
+          {html: '<p>4</p>', content_id: 'c'},
+          {html: '<p>5</p>', content_id: 'd'},
+        ],
+      },
+      maxAllowableSelectionCount: {value: 4},
+      minAllowableSelectionCount: {value: 1},
+    },
+    default_outcome: createOutcomeBackendDict(),
+    hints: [],
+    id: 'ItemSelectionInput',
+    solution: null,
+  },
+  param_changes: [],
+  solicit_answer_details: false,
+  card_is_checkpoint: false,
+  linked_skill_id: null,
+  inapplicable_skill_misconception_ids: [],
+});
+
+const createTextInputStateData = (): StateBackendDict => ({
+  classifier_model_id: null,
+  content: {
+    content_id: 'content',
+    html: '<p>Type the name of the shape with three sides.</p>',
+  },
+  interaction: {
+    answer_groups: [
+      {
+        rule_specs: [
+          {
+            rule_type: 'Equals',
+            inputs: {x: {normalizedStrSet: ['Triangle']}},
+          },
+        ],
+        outcome: createOutcomeBackendDict(),
+        training_data: [],
+        tagged_skill_misconception_id: null,
+      },
+    ],
+    confirmed_unclassified_answers: [],
+    customization_args: {
+      placeholder: {
+        value: {
+          content_id: 'ca_placeholder_0',
+          unicode_str: 'Enter your answer',
+        },
+      },
+      rows: {value: 1},
+      catchMisspellings: {value: false},
+    },
+    default_outcome: createOutcomeBackendDict(),
+    hints: [],
+    id: 'TextInput',
+    solution: null,
+  },
+  param_changes: [],
+  solicit_answer_details: false,
+  card_is_checkpoint: false,
+  linked_skill_id: null,
+  inapplicable_skill_misconception_ids: [],
+});
+
+const createQuestionResponse = (
+  questionId: string
+): CertificateAssessmentQuestionBackendResponse => {
+  let stateData: StateBackendDict;
+  if (questionId === 'question_1') {
+    stateData = createMultipleChoiceStateData();
+  } else if (questionId === 'question_2') {
+    stateData = createItemSelectionStateData();
+  } else {
+    stateData = createTextInputStateData();
+  }
+  return {question_id: questionId, question_state_data: stateData};
+};
 
 class MockNgbModal {
   open(component: unknown, options: NgbModalOptions): NgbModalRef {
@@ -51,16 +202,9 @@ class MockNgbModal {
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
   let fixture: ComponentFixture<CertificateAssessmentPlayerPageComponent>;
-  let router: Router;
-  let activatedRouteStubValue: {
-    snapshot: {
-      paramMap: {get: (name: string) => string | null};
-      url: {path: string}[];
-    };
-  };
 
   const configureComponent = async (
-    routePath: string | null
+    attempt: CertificateAssessmentAttemptData | null
   ): Promise<void> => {
     const bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
     const windowDimensionsServiceSpy = jasmine.createSpyObj(
@@ -68,29 +212,20 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       ['getWidth']
     );
     windowDimensionsServiceSpy.getWidth.and.returnValue(800);
-    activatedRouteStubValue = {
-      snapshot: {
-        paramMap: {
-          get: (name: string) => {
-            if (name === 'certificate_id') {
-              return 'cert-123';
-            }
-            return null;
-          },
-        },
-        url: routePath ? [{path: routePath}] : [],
-      },
-    };
+    const certificateAssessmentOfferingBackendApiServiceSpy =
+      jasmine.createSpyObj('CertificateAssessmentOfferingBackendApiService', [
+        'getCertificateAssessmentQuestionAsync',
+      ]);
+    certificateAssessmentOfferingBackendApiServiceSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      (_attemptId: string, questionId: string) =>
+        Promise.resolve(createQuestionResponse(questionId))
+    );
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
       imports: [CommonModule],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: activatedRouteStubValue,
-        },
         {
           provide: MatBottomSheet,
           useValue: bottomSheetSpy,
@@ -100,14 +235,12 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: Router,
-          useValue: {
-            navigate: jasmine.createSpy('navigate'),
-          },
-        },
-        {
           provide: WindowDimensionsService,
           useValue: windowDimensionsServiceSpy,
+        },
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: certificateAssessmentOfferingBackendApiServiceSpy,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -115,67 +248,57 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
     fixture = TestBed.createComponent(CertificateAssessmentPlayerPageComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router);
+    component.attempt = attempt;
+  };
+
+  const createAttempt = (): CertificateAssessmentAttemptData =>
+    CertificateAssessmentAttemptData.createFromBackendDict({
+      attempt_id: 'attempt-1234',
+      questions: [
+        {question_id: 'question_1', question_version: 1},
+        {question_id: 'question_2', question_version: 2},
+        {question_id: 'question_3', question_version: 1},
+      ],
+    });
+
+  // Loads all three questions by advancing through the player, since
+  // questions are fetched lazily. The first change detection also triggers
+  // ngOnInit, so this must be called from a fakeAsync test.
+  const loadAllQuestions = (): void => {
+    fixture.detectChanges();
+    flushMicrotasks();
+    component.nextQuestion();
+    flushMicrotasks();
+    component.nextQuestion();
+    flushMicrotasks();
   };
 
   beforeEach(async () => {
-    await configureComponent(null);
+    await configureComponent(createAttempt());
   });
 
-  it('should initialize intro stage for the base route and expose the certificate id', () => {
-    fixture.detectChanges();
+  it('should build questions from the attempt using the real question ids', fakeAsync(() => {
+    loadAllQuestions();
 
-    expect(component.certificateId).toBe('cert-123');
-    expect(component.currentStage).toBe('intro');
-  });
-
-  it('should set current stage to questions when route is session', async () => {
-    await configureComponent('session');
-    fixture.detectChanges();
-    expect(component.currentStage).toBe('questions');
-  });
-
-  it('should keep intro stage when the route path is unrecognized', async () => {
-    await configureComponent('unknown');
-    fixture.detectChanges();
-    expect(component.currentStage).toBe('intro');
-  });
-
-  it('should navigate to the session route on startAssessment', () => {
-    fixture.detectChanges();
-
-    component.startAssessment();
-
-    expect(router.navigate).toHaveBeenCalledWith(['session'], {
-      relativeTo: TestBed.inject(ActivatedRoute),
-    });
-  });
-
-  it('should navigate to the result route on submitAssessment', () => {
-    spyOn(Date, 'now').and.returnValue(1234);
-    fixture.detectChanges();
-
-    component.submitAssessment();
-
-    expect(router.navigate).toHaveBeenCalledWith([
-      '/certificate-assessment',
-      'cert-123',
-      'result',
-      'attempt-1234',
+    expect(component.questions.length).toBe(3);
+    expect(component.questions.map(question => question.id)).toEqual([
+      'question_1',
+      'question_2',
+      'question_3',
     ]);
-  });
+    expect(component.questions[0].prompt).toBe(
+      'Which number completes the sequence: 2, 4, 6, ?'
+    );
+  }));
 
-  it('should switch to the instructions stage on showInstructions', () => {
-    fixture.detectChanges();
-    expect(component.currentStage).toBe('intro');
+  it('should build no questions when the attempt is null', async () => {
+    await configureComponent(null);
 
-    component.showInstructions();
-
-    expect(component.currentStage).toBe('instructions');
+    expect(component.questions.length).toBe(0);
+    expect(component.getCurrentQuestion()).toBeNull();
   });
 
   it('should advance to the next question on nextQuestion when not at the last question', () => {
-    fixture.detectChanges();
     expect(component.currentQuestionIndex).toBe(0);
 
     component.nextQuestion();
@@ -183,43 +306,16 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestionIndex).toBe(1);
   });
 
-  it('should not advance past the last question on nextQuestion', () => {
-    fixture.detectChanges();
-    component.currentQuestionIndex = component.mockQuestions.length - 1;
+  it('should not advance past the last question on nextQuestion', fakeAsync(() => {
+    loadAllQuestions();
+    component.currentQuestionIndex = component.questions.length - 1;
 
     component.nextQuestion();
 
-    expect(component.currentQuestionIndex).toBe(
-      component.mockQuestions.length - 1
-    );
-  });
-
-  it('should reset the assessment state on retry', () => {
-    fixture.detectChanges();
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'questions';
-    component.currentQuestionIndex = 2;
-
-    component.onRetryAssessment();
-
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.currentStage).toBe('intro');
-    expect(component.currentQuestionIndex).toBe(0);
-  });
-
-  it('should resume the assessment on resume', () => {
-    fixture.detectChanges();
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'intro';
-
-    component.onResumeAssessment();
-
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.currentStage).toBe('questions');
-  });
+    expect(component.currentQuestionIndex).toBe(component.questions.length - 1);
+  }));
 
   it('should go back one question when previousQuestion is called away from the start', () => {
-    fixture.detectChanges();
     component.currentQuestionIndex = 2;
 
     component.previousQuestion();
@@ -228,7 +324,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   });
 
   it('should not go back past the first question', () => {
-    fixture.detectChanges();
     component.currentQuestionIndex = 0;
 
     component.previousQuestion();
@@ -236,27 +331,103 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestionIndex).toBe(0);
   });
 
-  it('should compute the progress percentage based on the current question index', () => {
-    fixture.detectChanges();
+  it('should compute the progress percentage based on the current question index', fakeAsync(() => {
+    loadAllQuestions();
     component.currentQuestionIndex = 0;
     expect(component.getProgressPercentage()).toBe(
-      Math.round((1 / component.mockQuestions.length) * 100)
+      Math.round((1 / component.questions.length) * 100)
     );
 
-    component.currentQuestionIndex = component.mockQuestions.length - 1;
+    component.currentQuestionIndex = component.questions.length - 1;
     expect(component.getProgressPercentage()).toBe(100);
-  });
+  }));
 
-  it('should return the question at the current question index', () => {
-    fixture.detectChanges();
+  it('should return the question at the current question index', fakeAsync(() => {
+    loadAllQuestions();
     component.currentQuestionIndex = 1;
 
-    expect(component.getCurrentQuestion()).toEqual(component.mockQuestions[1]);
-  });
+    expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
+  }));
+
+  it('should report whether the current question is the last one', fakeAsync(() => {
+    loadAllQuestions();
+    component.currentQuestionIndex = 0;
+    expect(component.isCurrentQuestionLast()).toBeFalse();
+
+    component.currentQuestionIndex = component.questions.length - 1;
+    expect(component.isCurrentQuestionLast()).toBeTrue();
+  }));
+
+  it('should read and store submitted responses by question id', fakeAsync(() => {
+    loadAllQuestions();
+    expect(component.getSavedResponse()).toBe('');
+
+    component.updateResponse('b');
+    expect(component.getSavedResponse()).toBe('b');
+    expect(component.answers.question_1).toBe('b');
+
+    component.currentQuestionIndex = 1;
+    expect(component.getSavedResponse()).toBe('');
+
+    component.updateResponse('a,c');
+    expect(component.getSavedResponse()).toBe('a,c');
+    expect(component.answers.question_2).toBe('a,c');
+  }));
+
+  it('should emit answers with correctness on submitAssessment', fakeAsync(() => {
+    loadAllQuestions();
+    spyOn(component.assessmentSubmitted, 'emit');
+    // The first question is multiple choice; the correct option is index 1
+    // (the choice with text '8').
+    component.answers.question_1 = 'b';
+    // The second question is multiple select; the correct options are the
+    // choices with content ids 'a', 'b' and 'd'.
+    component.answers.question_2 = 'a,b,d';
+    // The third question is left unanswered.
+
+    component.submitAssessment();
+
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'question_1', is_correct: true, selected_answer: '1'},
+      {
+        question_id: 'question_2',
+        is_correct: true,
+        selected_answer: 'a,b,d',
+      },
+      {question_id: 'question_3', is_correct: false},
+    ]);
+  }));
+
+  it('should emit incorrect answers on submitAssessment when they are wrong', fakeAsync(() => {
+    loadAllQuestions();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.question_1 = 'a';
+    component.answers.question_2 = 'a,c';
+    component.answers.question_3 = 'circle';
+
+    component.submitAssessment();
+
+    const answers = (
+      component.assessmentSubmitted.emit as jasmine.Spy
+    ).calls.mostRecent().args[0];
+    expect(answers[0]).toEqual({
+      question_id: 'question_1',
+      is_correct: false,
+      selected_answer: '0',
+    });
+    expect(answers[1]).toEqual({
+      question_id: 'question_2',
+      is_correct: false,
+      selected_answer: 'a,c',
+    });
+    expect(answers[2]).toEqual({
+      question_id: 'question_3',
+      is_correct: false,
+      selected_answer: 'circle',
+    });
+  }));
 
   it('should not render the time-expired modal inline in the page', () => {
-    fixture.detectChanges();
-
     expect(
       fixture.debugElement.query(By.css('oppia-time-expired-modal'))
     ).toBeNull();
@@ -385,26 +556,5 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(bottomSheet.open).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
-  });
-
-  it('should report whether the current question is the last one', () => {
-    fixture.detectChanges();
-    component.currentQuestionIndex = 0;
-    expect(component.isCurrentQuestionLast()).toBeFalse();
-
-    component.currentQuestionIndex = component.mockQuestions.length - 1;
-    expect(component.isCurrentQuestionLast()).toBeTrue();
-  });
-
-  it('should read and store submitted responses by question index', () => {
-    fixture.detectChanges();
-
-    expect(component.getSavedResponse()).toBe('');
-
-    component.updateResponse('b');
-    expect(component.getSavedResponse()).toBe('b');
-
-    component.currentQuestionIndex = 1;
-    expect(component.getSavedResponse()).toBe('');
   });
 });

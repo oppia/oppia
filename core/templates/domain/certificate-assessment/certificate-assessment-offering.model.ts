@@ -43,6 +43,21 @@ export interface AvailableCertificateAssessmentOfferingBackendDict {
   failed_on_date: number | null;
 }
 
+export interface CertificateAssessmentAttemptQuestionBackendDict {
+  question_id: string;
+  question_version: number;
+}
+
+export interface CertificateAssessmentAttemptBackendDict {
+  attempt_id: string;
+  questions: CertificateAssessmentAttemptQuestionBackendDict[];
+}
+
+export interface CertificateAssessmentAttemptQuestion {
+  questionId: string;
+  questionVersion: number;
+}
+
 export class AvailableCertificateAssessmentOfferingData {
   _certificateId: string;
   _title: string;
@@ -230,6 +245,39 @@ export class CertificateAssessmentOfferingData {
       certificateAssessmentOfferingBackendDict.demonstrates,
       certificateAssessmentOfferingBackendDict.async_status,
       certificateAssessmentOfferingBackendDict.version
+    );
+  }
+}
+
+export class CertificateAssessmentAttemptData {
+  _attemptId: string;
+  _questions: CertificateAssessmentAttemptQuestion[];
+
+  constructor(
+    attemptId: string,
+    questions: CertificateAssessmentAttemptQuestion[]
+  ) {
+    this._attemptId = attemptId;
+    this._questions = questions;
+  }
+
+  get attemptId(): string {
+    return this._attemptId;
+  }
+
+  get questions(): CertificateAssessmentAttemptQuestion[] {
+    return this._questions;
+  }
+
+  static createFromBackendDict(
+    certificateAssessmentAttemptBackendDict: CertificateAssessmentAttemptBackendDict
+  ): CertificateAssessmentAttemptData {
+    return new CertificateAssessmentAttemptData(
+      certificateAssessmentAttemptBackendDict.attempt_id,
+      certificateAssessmentAttemptBackendDict.questions.map(question => ({
+        questionId: question.question_id,
+        questionVersion: question.question_version,
+      }))
     );
   }
 }

@@ -188,6 +188,7 @@
     "I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT": "In that case, you can start the assessment again later, which will begin a new attempt.",
     "I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME": "You'll see one question at a time.",
     "I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED": "If your internet connection drops or you exit the assessment before submitting, your progress will not be saved.",
+    "I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT": "The assessment contains <[questions]> questions.",
     "I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS": "You can review and change your answers at any time before submitting.",
     "I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT": "You'll have <[minutes]> minutes to complete the assessment.",
     "I18N_ASSESSMENT_INSTRUCTION_UNANSWERED_MARKED_INCORRECT": "Unanswered questions will be marked as Incorrect answers.",
