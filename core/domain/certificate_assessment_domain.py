@@ -362,6 +362,18 @@ class CertificateAssessmentAttempt:
         self.finished_at = finished_at
         self.is_submitted = is_submitted
 
+    def get_time_taken_in_minutes(self) -> Optional[int]:
+        """Returns how long the attempt took, in whole minutes.
+
+        Returns:
+            int|None. The elapsed time between the attempt start and
+            finish, in minutes, or None if the attempt has not been
+            finished yet.
+        """
+        if self.finished_at is None:
+            return None
+        return int((self.finished_at - self.started_at).total_seconds() / 60)
+
     def _validate_ids_and_scores(self) -> None:
         """Validates the attempt identity and score fields."""
         if not isinstance(self.attempt_id, str) or not self.attempt_id:
