@@ -933,6 +933,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'hi', updated_opportunity.incomplete_translation_language_codes
         )
 
+    def test_create_translation_suggestion_with_invalid_target_type(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>Hindi</p>',
+            'data_format': 'html',
+        }
+        # A classroom is a translatable entity type but has no fetcher in
+        # get_entity_by_type_and_id, so the lookup raises a ValueError and the
+        # entity is skipped. It is also not an allowed suggestion target type,
+        # so creating a suggestion for it must fail validation.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_CLASSROOM,
+                'classroom_1',
+                1,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
     def test_skill_translation_stats_use_topic_of_the_opportunity(
         self,
     ) -> None:
