@@ -69,6 +69,7 @@ def _create_attempt_model(
     """
     return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
         learner_id=learner_id,
+        certificate_id=certificate_id,
         total_score=total_score,
         attempt_index=attempt_index,
         attempt_data={
