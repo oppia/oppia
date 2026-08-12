@@ -19,7 +19,11 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf
-from core.domain import general_feedback_domain, general_feedback_services
+from core.domain import (
+    general_feedback_domain,
+    general_feedback_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -56,6 +60,13 @@ VALID_SESSION_INFO: Dict[str, object] = {
 class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     """Tests for general feedback services."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = user_services.create_new_user(
+            'user_auth_id',
+            'test@example.com',
+        )
+
     def get_lesson_metadata(
         self,
     ) -> general_feedback_domain.LessonMetadataDict:
@@ -70,12 +81,12 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_create_lesson_feedback_returns_domain_object(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
 
-        self.assertEqual(feedback.author_id, 'user_id')
+        self.assertEqual(feedback.author_id, self.user.user_id)
         self.assertEqual(feedback.feedback_text, 'This lesson helped.')
         self.assertEqual(feedback.status, feconf.STATUS_CHOICES_OPEN)
         self.assertEqual(feedback.lesson_metadata, self.get_lesson_metadata())
@@ -86,7 +97,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='Follow-up feedback.',
             lesson_metadata=self.get_lesson_metadata(),
             parent_feedback_id='parent_id',
@@ -96,7 +107,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_get_learner_feedback_summaries_filters_by_author(self) -> None:
         expected_feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
@@ -107,7 +118,9 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         )
 
         summaries, next_cursor, more = (
-            general_feedback_services.get_learner_feedback_summaries('user_id')
+            general_feedback_services.get_learner_feedback_summaries(
+                self.user.user_id
+            )
         )
 
         self.assertEqual(len(summaries), 1)
@@ -124,7 +137,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_get_lesson_feedback_summaries_applies_filters(self) -> None:
         expected_feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
@@ -171,7 +184,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
@@ -184,7 +197,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_update_lesson_feedback_appends_creator_response(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
@@ -217,7 +230,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_update_lesson_feedback_updates_status_without_reply(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
@@ -260,7 +273,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
-            author_id='user_id',
+            author_id=self.user.user_id,
             feedback_text='This lesson helped.',
             lesson_metadata=self.get_lesson_metadata(),
         )
