@@ -578,7 +578,8 @@ param_changes: []
 solicit_answer_details: false
 """
         ),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""card_is_checkpoint: true
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """card_is_checkpoint: true
 classifier_model_id: null
 content:
   content_id: content_0
@@ -612,7 +613,9 @@ interaction:
 linked_skill_id: null
 param_changes: []
 solicit_answer_details: false
-""") % feconf.DEFAULT_INIT_STATE_NAME,
+"""
+        )
+        % feconf.DEFAULT_INIT_STATE_NAME,
     }
 
     SAMPLE_STATE_STRING = """card_is_checkpoint: false
