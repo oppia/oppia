@@ -110,7 +110,7 @@ test.describe('Logged-In User', function () {
     // TODO(#20563): When a user revisits an exploration after completing it,
     // the exploration should start from the beginning, not from the previous checkpoint.
     // see: https://github.com/oppia/oppia/issues/20563.
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
   });
 
   test.afterAll(async function () {
