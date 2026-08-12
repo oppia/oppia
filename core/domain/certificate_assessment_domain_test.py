@@ -371,6 +371,19 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
     def test_validate_succeeds_for_valid_attempt(self) -> None:
         self._get_sample_attempt().validate()
 
+    def test_get_time_taken_in_minutes_returns_elapsed_time(self) -> None:
+        attempt = self._get_sample_attempt()
+
+        self.assertEqual(attempt.get_time_taken_in_minutes(), 20)
+
+    def test_get_time_taken_in_minutes_returns_none_for_unfinished_attempt(
+        self,
+    ) -> None:
+        attempt = self._get_sample_attempt()
+        attempt.finished_at = None
+
+        self.assertIsNone(attempt.get_time_taken_in_minutes())
+
     def test_validate_succeeds_when_finished_at_is_none(self) -> None:
         attempt = self._get_sample_attempt()
         attempt.finished_at = None
