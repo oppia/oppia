@@ -37,7 +37,6 @@ from typing import List, Optional, Sequence
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
-    'core/templates/components/oppia-angular-root.component.ts',
     'core/tests/build_sources/extensions/plugin.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
@@ -50,14 +49,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
-    'core/templates/pages/exploration-player-page/services/question-player-engine.service.ts',
-    'core/templates/pages/oppia-root/app-error-handler.ts',
-    'core/templates/pages/oppia-root/routing/app.routing.module.ts',
-    'core/templates/pages/skill-editor-page/skill-editor-page.component.ts',
-    'core/templates/pages/splash-page/splash-page.module.ts',
-    'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
-    'core/templates/services/oppia-rte-parser.service.ts',
     'core/templates/services/rte-helper-modal.component.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',

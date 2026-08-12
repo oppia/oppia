@@ -38,6 +38,7 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
@@ -197,7 +198,7 @@ describe('Feedback Tab Component', () => {
     ).and.returnValue(
       Promise.resolve({
         canEdit: true,
-      })
+      } as ExplorationPermissions)
     );
     spyOn(
       threadDataBackendApiService,

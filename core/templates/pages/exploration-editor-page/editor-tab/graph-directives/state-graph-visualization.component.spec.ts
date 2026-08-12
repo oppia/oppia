@@ -467,22 +467,23 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         right: 20,
       });
       flush();
-      let zoomListener: Function = () => {};
+      let zoomListener: (...args: Object[]) => void = () => {};
       const originalCall = d3.selection.prototype.call;
       spyOn(d3.selection.prototype, 'call').and.callFake(function (
-        this: unknown,
-        behavior: unknown,
-        ...args: unknown[]
+        this: Object,
+        behavior: Object,
+        ...args: Object[]
       ) {
-        const zoomBehavior = behavior as {on?: (eventName: string) => Function};
+        const zoomBehavior = behavior as {
+          on?: (eventName: string) => (...args: Object[]) => void;
+        };
         if (zoomBehavior && typeof zoomBehavior.on === 'function') {
           const listener = zoomBehavior.on('zoom');
           if (listener) {
             zoomListener = listener;
           }
         }
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        return originalCall.apply(this, [behavior as Function, ...args]);
+        return originalCall.apply(this, [behavior as Object, ...args]);
       });
 
       component.makeGraphPannable();
@@ -496,12 +497,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         },
       };
       const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
-      const d3WithCustomEvent = d3 as unknown as {customEvent: Function};
-      d3WithCustomEvent.customEvent(
-        mockEvent,
-        zoomListener as Function,
-        pannableRect
-      );
+      const d3WithCustomEvent = d3 as Object as {
+        customEvent: (
+          event: Object,
+          listener: (...args: Object[]) => void,
+          target: Object
+        ) => void;
+      };
+      d3WithCustomEvent.customEvent(mockEvent, zoomListener, pannableRect);
 
       expect(component.innerTransformStr).toBe('translate(10,20)');
     })
@@ -534,22 +537,23 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       };
 
       flush();
-      let zoomListener: Function = () => {};
+      let zoomListener: (...args: Object[]) => void = () => {};
       const originalCall = d3.selection.prototype.call;
       spyOn(d3.selection.prototype, 'call').and.callFake(function (
-        this: unknown,
-        behavior: unknown,
-        ...args: unknown[]
+        this: Object,
+        behavior: Object,
+        ...args: Object[]
       ) {
-        const zoomBehavior = behavior as {on?: (eventName: string) => Function};
+        const zoomBehavior = behavior as {
+          on?: (eventName: string) => (...args: Object[]) => void;
+        };
         if (zoomBehavior && typeof zoomBehavior.on === 'function') {
           const listener = zoomBehavior.on('zoom');
           if (listener) {
             zoomListener = listener;
           }
         }
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        return originalCall.apply(this, [behavior as Function, ...args]);
+        return originalCall.apply(this, [behavior as Object, ...args]);
       });
 
       component.makeGraphPannable();
@@ -563,12 +567,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         },
       };
       const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
-      const d3WithCustomEvent = d3 as unknown as {customEvent: Function};
-      d3WithCustomEvent.customEvent(
-        mockEvent,
-        zoomListener as Function,
-        pannableRect
-      );
+      const d3WithCustomEvent = d3 as Object as {
+        customEvent: (
+          event: Object,
+          listener: (...args: Object[]) => void,
+          target: Object
+        ) => void;
+      };
+      d3WithCustomEvent.customEvent(mockEvent, zoomListener, pannableRect);
 
       expect(mockEvent.transform.x).toBe(0);
       expect(mockEvent.transform.y).toBe(0);
