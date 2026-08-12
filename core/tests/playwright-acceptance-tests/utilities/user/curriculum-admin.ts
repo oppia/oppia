@@ -27,56 +27,6 @@ const curriculumAdminThumbnailImage =
 const classroomBannerImage = testConstants.data.classroomBannerImage;
 
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-
-const topicsTab = 'a.e2e-test-topics-tab';
-const desktopTopicSelector = 'a.e2e-test-topic-name';
-const topicNameField = 'input.e2e-test-new-topic-name-field';
-const topicUrlFragmentField =
-  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
-const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
-const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
-const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
-const saveTopicButton = 'button.e2e-test-save-topic-button';
-const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
-
-const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-subtopic-title-field';
-const subtopicUrlFragmentField =
-  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
-const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
-const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
-const subtopicNameSelector = '.e2e-test-subtopic-name';
-const subtopicReassignHeader = 'div.subtopic-reassign-header';
-const assignSubtopicButton = '.e2e-test-assign-subtopic';
-
-const skillsTab = 'a.e2e-test-skills-tab';
-const desktopSkillSelector = '.e2e-test-skill-description';
-const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
-const skillEditorCollapsibleCard = '.e2e-test-skill-editor-collapsible-card';
-const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
-const addSkillButton = 'button.e2e-test-add-skill-button';
-const confirmSkillCreationButton =
-  'button.e2e-test-confirm-skill-creation-button';
-
-const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
-const confirmSkillAssignationButton =
-  'button.e2e-test-skill-assign-subtopic-confirm';
-
-const addDiagnosticTestSkillButton =
-  'button.e2e-test-add-diagnostic-test-skill';
-const diagnosticTestSkillSelector =
-  'select.e2e-test-diagnostic-test-skill-selector';
-const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
-
-const mobileOptionsSelector = '.e2e-test-mobile-options-base';
-const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
-const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
-
-const mobileSaveTopicDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
-const mobileSaveTopicButton =
-  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
-
 const createNewClassroomModal = '.e2e-test-create-new-classroom-modal';
 const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
 const newClassroomNameInputField = '.e2e-test-new-classroom-name';
