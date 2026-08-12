@@ -140,9 +140,10 @@ describe('Feedback Tab Component', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
 
-  const createWindowWithHash = (): Window => {
+  const createWindowWithHash = (): Window & {triggerHashChange: () => void} => {
     let hash = '';
-    return {
+    let hashChangeListener: (() => void) | null = null;
+    const mockWindow = {
       location: {
         get hash(): string {
           return hash;
@@ -153,9 +154,23 @@ describe('Feedback Tab Component', () => {
         pathname: '',
         search: '',
       },
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    } as Window;
+      addEventListener: (event: string, listener: () => void) => {
+        if (event === 'hashchange') {
+          hashChangeListener = listener;
+        }
+      },
+      removeEventListener: (event: string) => {
+        if (event === 'hashchange') {
+          hashChangeListener = null;
+        }
+      },
+      triggerHashChange: () => {
+        if (hashChangeListener) {
+          hashChangeListener();
+        }
+      },
+    };
+    return mockWindow as unknown as Window & {triggerHashChange: () => void};
   };
 
   class MockNgbModal {
@@ -1307,6 +1322,13 @@ describe('Feedback Tab Component', () => {
   it('should load report feedback detail when report row is clicked', fakeAsync(() => {
     const mockWindow = createWindowWithHash();
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+
+    mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+      true;
+    component.ngOnInit();
+    tick();
+    tick();
+
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
       CreatorFeedbackType.REPORT;
 
@@ -1318,9 +1340,9 @@ describe('Feedback Tab Component', () => {
     spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       'image-url'
     );
-    component.onCreatorFeedbackRowClick('report_id');
 
-    component.syncCreatorFeedbackFromUrl();
+    component.onCreatorFeedbackRowClick('report_id');
+    mockWindow.triggerHashChange();
     tick();
 
     expect(
