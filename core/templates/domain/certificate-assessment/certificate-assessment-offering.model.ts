@@ -35,6 +35,68 @@ export interface CertificateAssessmentOfferingBackendDict {
   version: number;
 }
 
+export interface AvailableCertificateAssessmentOfferingBackendDict {
+  certificate_id: string;
+  title: string;
+  attempt_status: string;
+  passed_on_date: number | null;
+  failed_on_date: number | null;
+}
+
+export class AvailableCertificateAssessmentOfferingData {
+  _certificateId: string;
+  _title: string;
+  _attemptStatus: string;
+  _passedOnDate: number | null;
+  _failedOnDate: number | null;
+
+  constructor(
+    certificateId: string,
+    title: string,
+    attemptStatus: string,
+    passedOnDate: number | null = null,
+    failedOnDate: number | null = null
+  ) {
+    this._certificateId = certificateId;
+    this._title = title;
+    this._attemptStatus = attemptStatus;
+    this._passedOnDate = passedOnDate;
+    this._failedOnDate = failedOnDate;
+  }
+
+  get certificateId(): string {
+    return this._certificateId;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get attemptStatus(): string {
+    return this._attemptStatus;
+  }
+
+  get passedOnDate(): number | null {
+    return this._passedOnDate;
+  }
+
+  get failedOnDate(): number | null {
+    return this._failedOnDate;
+  }
+
+  static createFromBackendDict(
+    availableCertificateAssessmentOfferingBackendDict: AvailableCertificateAssessmentOfferingBackendDict
+  ): AvailableCertificateAssessmentOfferingData {
+    return new AvailableCertificateAssessmentOfferingData(
+      availableCertificateAssessmentOfferingBackendDict.certificate_id,
+      availableCertificateAssessmentOfferingBackendDict.title,
+      availableCertificateAssessmentOfferingBackendDict.attempt_status,
+      availableCertificateAssessmentOfferingBackendDict.passed_on_date,
+      availableCertificateAssessmentOfferingBackendDict.failed_on_date
+    );
+  }
+}
+
 export class CertificateAssessmentOfferingData {
   _certificateId: string;
   _title: string;

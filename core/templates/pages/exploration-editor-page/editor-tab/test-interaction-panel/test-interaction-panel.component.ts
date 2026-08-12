@@ -22,10 +22,12 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './test-interaction-panel.component.css';
 
 @Component({
   selector: 'oppia-test-interaction-panel',
   templateUrl: './test-interaction-panel.component.html',
+  styleUrls: ['./test-interaction-panel.component.css'],
 })
 export class TestInteractionPanel implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

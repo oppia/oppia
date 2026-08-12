@@ -18,16 +18,58 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 
 describe('CertificateAssessmentConversationSkinComponent', () => {
   let component: CertificateAssessmentConversationSkinComponent;
   let fixture: ComponentFixture<CertificateAssessmentConversationSkinComponent>;
+  let urlInterpolationServiceSpy: jasmine.SpyObj<UrlInterpolationService>;
+
+  const multipleChoiceQuestion = {
+    id: 'q1',
+    type: 'multiple_choice' as const,
+    prompt: 'What is 2 + 2?',
+    hint: 'Choose one option.',
+    options: [
+      {id: 'a', text: '3'},
+      {id: 'b', text: '4'},
+    ],
+    correctAnswerText: '4',
+  };
+
+  const numericQuestion = {
+    id: 'q2',
+    type: 'numeric_input' as const,
+    prompt: 'What is 6 + 6?',
+    hint: 'Enter a number.',
+    options: [],
+    placeholder: '0',
+    correctAnswerText: '12',
+  };
 
   beforeEach(async () => {
+    urlInterpolationServiceSpy = jasmine.createSpyObj(
+      'UrlInterpolationService',
+      ['getStaticCopyrightedImageUrl']
+    );
+    urlInterpolationServiceSpy.getStaticCopyrightedImageUrl.and.returnValue(
+      '/static/avatar.svg'
+    );
+
     await TestBed.configureTestingModule({
-      declarations: [CertificateAssessmentConversationSkinComponent],
+      declarations: [
+        CertificateAssessmentConversationSkinComponent,
+        MockTranslatePipe,
+      ],
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useValue: urlInterpolationServiceSpy,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
@@ -35,62 +77,145 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
       CertificateAssessmentConversationSkinComponent
     );
     component = fixture.componentInstance;
-    component.currentQuestion = {
-      prompt: 'What is 2 + 2?',
-      choices: ['3', '4', '5'],
-    };
-    fixture.detectChanges();
+    component.currentQuestion = multipleChoiceQuestion;
   });
 
-  it('should default currentQuestionIndex to 0', () => {
-    expect(component.currentQuestionIndex).toBe(0);
+  it('should initialize the avatar URL and hydrate multiple-choice responses on init', () => {
+    component.savedResponse = 'a,b';
+
+    component.ngOnInit();
+
+    expect(
+      urlInterpolationServiceSpy.getStaticCopyrightedImageUrl
+    ).toHaveBeenCalledWith('/avatar/oppia_avatar_100px.svg');
+    expect(component.OPPIA_AVATAR_IMAGE_URL).toBe('/static/avatar.svg');
+    expect(component.isOptionSelected('a')).toBeTrue();
+    expect(component.isOptionSelected('b')).toBeTrue();
+    expect(component.isOptionSelected('c')).toBeFalse();
   });
 
-  it('should default totalQuestions to 0', () => {
-    expect(component.totalQuestions).toBe(0);
-  });
+  it('should clear response state when savedResponse is empty during ngOnChanges', () => {
+    component.selectedOptionIds = ['a'];
+    component.freeResponse = 'old value';
 
-  it('should default progressPercentage to 0', () => {
-    expect(component.progressPercentage).toBe(0);
-  });
-
-  it('should default isLastQuestion to false', () => {
-    expect(component.isLastQuestion).toBe(false);
-  });
-
-  it('should accept a provided currentQuestion', () => {
-    expect(component.currentQuestion).toEqual({
-      prompt: 'What is 2 + 2?',
-      choices: ['3', '4', '5'],
+    component.ngOnChanges({
+      savedResponse: {
+        currentValue: '',
+        previousValue: 'a',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
     });
+
+    expect(component.selectedOptionIds).toEqual([]);
+    expect(component.freeResponse).toBe('');
   });
 
-  it('should accept provided currentQuestionIndex, totalQuestions, progressPercentage and isLastQuestion', () => {
-    component.currentQuestionIndex = 2;
-    component.totalQuestions = 5;
-    component.progressPercentage = 40;
-    component.isLastQuestion = true;
+  it('should hydrate free response values for non-choice questions', () => {
+    component.currentQuestion = numericQuestion;
+    component.savedResponse = '12';
+
+    component.ngOnChanges({
+      currentQuestion: {
+        currentValue: numericQuestion,
+        previousValue: multipleChoiceQuestion,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.freeResponse).toBe('12');
+    expect(component.selectedOptionIds).toEqual([]);
+  });
+
+  it('should hydrate multiple-select responses on init', () => {
+    component.currentQuestion = {
+      id: 'q3',
+      type: 'multiple_select',
+      prompt: 'Select all prime numbers.',
+      hint: 'Choose all that apply.',
+      options: [
+        {id: 'a', text: '2'},
+        {id: 'b', text: '3'},
+        {id: 'c', text: '4'},
+      ],
+      correctAnswerText: '2,3',
+    };
+    component.savedResponse = 'a,b';
+
+    component.ngOnInit();
+
+    expect(component.isOptionSelected('a')).toBeTrue();
+    expect(component.isOptionSelected('b')).toBeTrue();
+    expect(component.isOptionSelected('c')).toBeFalse();
+  });
+
+  it('should bind the free-response label to a stable input id', () => {
+    component.currentQuestion = numericQuestion;
     fixture.detectChanges();
 
-    expect(component.currentQuestionIndex).toBe(2);
-    expect(component.totalQuestions).toBe(5);
-    expect(component.progressPercentage).toBe(40);
-    expect(component.isLastQuestion).toBe(true);
+    const label = fixture.nativeElement.querySelector(
+      '.certificate-assessment-free-response-label'
+    ) as HTMLLabelElement;
+    const input = fixture.nativeElement.querySelector(
+      '.certificate-assessment-free-response-input'
+    ) as HTMLInputElement;
+
+    expect(label.getAttribute('for')).toBe(
+      'certificate-assessment-free-response-input-q2'
+    );
+    expect(input.getAttribute('id')).toBe(
+      'certificate-assessment-free-response-input-q2'
+    );
   });
 
-  it('should emit nextQuestion when onNextQuestion is called', () => {
+  it('should return the expected input type for each question type', () => {
+    component.currentQuestion = numericQuestion;
+    expect(component.getQuestionInputType()).toBe('number');
+
+    component.currentQuestion = multipleChoiceQuestion;
+    expect(component.getQuestionInputType()).toBe('text');
+  });
+
+  it('should emit selection changes for single-choice answers', () => {
+    spyOn(component.responseChange, 'emit');
+
+    component.selectSingleChoice('b');
+
+    expect(component.selectedOptionIds).toEqual(['b']);
+    expect(component.responseChange.emit).toHaveBeenCalledWith('b');
+  });
+
+  it('should add and remove options for multiple select answers', () => {
+    spyOn(component.responseChange, 'emit');
+
+    component.selectedOptionIds = ['a'];
+    component.toggleMultipleSelect('b');
+
+    expect(component.selectedOptionIds).toEqual(['a', 'b']);
+    expect(component.responseChange.emit).toHaveBeenCalledWith('a,b');
+
+    component.toggleMultipleSelect('a');
+
+    expect(component.selectedOptionIds).toEqual(['b']);
+    expect(component.responseChange.emit).toHaveBeenCalledWith('b');
+  });
+
+  it('should emit free response updates and navigation events', () => {
+    spyOn(component.responseChange, 'emit');
+    spyOn(component.previousQuestion, 'emit');
     spyOn(component.nextQuestion, 'emit');
-
-    component.onNextQuestion();
-
-    expect(component.nextQuestion.emit).toHaveBeenCalled();
-  });
-
-  it('should emit submitAssessment when onSubmitAssessment is called', () => {
     spyOn(component.submitAssessment, 'emit');
 
+    component.updateFreeResponse('Triangle');
+    component.onPreviousQuestion();
+    component.onNextQuestion();
     component.onSubmitAssessment();
 
+    expect(component.freeResponse).toBe('Triangle');
+    expect(component.responseChange.emit).toHaveBeenCalledWith('Triangle');
+    expect(component.previousQuestion.emit).toHaveBeenCalled();
+    expect(component.nextQuestion.emit).toHaveBeenCalled();
     expect(component.submitAssessment.emit).toHaveBeenCalled();
   });
 });
