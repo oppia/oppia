@@ -67,7 +67,7 @@ test.describe('Logged-Out Learner', function () {
       'Algebra',
       'fractions'
     );
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
 
     await curriculumAdmin.openSkillEditor('fractions');
     await curriculumAdmin.navigateToSkillQuestionEditorTab();
@@ -101,7 +101,7 @@ test.describe('Logged-Out Learner', function () {
   });
 
   test('should be able to find list of subjects to learn', async function () {
-    await loggedOutLearner.navigateToSplashPage();
+    await loggedOutLearner.navigateToSplashPageAsLoggedOutUser();
     await loggedOutLearner.expectHomePageTitleToBe(
       'Free Education for Everyone'
     );
