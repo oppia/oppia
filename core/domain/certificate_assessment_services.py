@@ -590,6 +590,37 @@ def get_certificate_assessment_offering(
     return _model_to_domain(certificate_assessment_offering_model)
 
 
+def get_certificate_assessment_offerings_by_ids(
+    certificate_ids: List[str],
+) -> Dict[str, certificate_assessment_domain.CertificateAssessmentOffering]:
+    """Returns a mapping from certificate ID to certificate assessment offering.
+
+    Args:
+        certificate_ids: list(str). The IDs of the certificate assessment
+            offerings to fetch.
+
+    Returns:
+        dict(str, CertificateAssessmentOffering). A mapping from each requested
+        certificate ID to its certificate assessment offering. Only IDs for
+        which an offering exists are included in the mapping.
+    """
+    certificate_assessment_offering_models = (
+        gae_models.CertificateAssessmentOfferingModel.get_multi(certificate_ids)
+    )
+    offerings_by_id: Dict[
+        str, certificate_assessment_domain.CertificateAssessmentOffering
+    ] = {}
+    for certificate_id, certificate_assessment_offering_model in zip(
+        certificate_ids, certificate_assessment_offering_models
+    ):
+        if certificate_assessment_offering_model is None:
+            continue
+        offerings_by_id[certificate_id] = _model_to_domain(
+            certificate_assessment_offering_model
+        )
+    return offerings_by_id
+
+
 def update_certificate_assessment_offering(
     certificate_id: str,
     title: str,
@@ -724,6 +755,97 @@ def get_certificate_assessment_offerings() -> (
         for certificate_assessment_offering_model in (
             certificate_assessment_offering_models
         )
+    ]
+
+
+class CertificateAssessmentAttemptNotFoundException(Exception):
+    """Exception raised when a certificate assessment attempt is missing."""
+
+    pass
+
+
+def _attempt_model_to_domain(
+    attempt_model: gae_models.CertificateAssessmentAttemptModel,
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Converts a certificate assessment attempt storage model to a domain
+    object.
+
+    Args:
+        attempt_model: CertificateAssessmentAttemptModel. The storage model
+            to convert.
+
+    Returns:
+        CertificateAssessmentAttempt. The corresponding domain object.
+    """
+    return certificate_assessment_domain.CertificateAssessmentAttempt(
+        attempt_id=attempt_model.id,
+        learner_id=attempt_model.learner_id,
+        total_score=attempt_model.total_score,
+        attempt_index=attempt_model.attempt_index,
+        attempt_data=attempt_model.attempt_data,
+        version_data=attempt_model.version_data,
+        started_at=attempt_model.started_at,
+        finished_at=attempt_model.finished_at,
+        is_submitted=attempt_model.is_submitted,
+    )
+
+
+def get_certificate_attempt(
+    attempt_id: str,
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Returns a single certificate assessment attempt with full result data.
+
+    Args:
+        attempt_id: str. The ID of the certificate assessment attempt.
+
+    Returns:
+        CertificateAssessmentAttempt. The attempt with the given ID,
+        including its score and per-topic result data.
+
+    Raises:
+        CertificateAssessmentAttemptNotFoundException. The attempt does not
+            exist.
+    """
+    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
+        attempt_id
+    )
+    if attempt_model is None:
+        raise CertificateAssessmentAttemptNotFoundException(
+            'Certificate assessment attempt %s does not exist.' % attempt_id
+        )
+
+    return _attempt_model_to_domain(attempt_model)
+
+
+def get_certificate_attempts(
+    learner_id: str,
+) -> List[certificate_assessment_domain.CertificateAssessmentAttempt]:
+    """Returns all certificate assessment attempts for a learner.
+
+    Args:
+        learner_id: str. The ID of the learner.
+
+    Returns:
+        list(CertificateAssessmentAttempt). All attempts made by the learner,
+        ordered by attempt_index.
+    """
+    attempt_models: List[
+        gae_models.CertificateAssessmentAttemptModel
+        # Here we use cast because the datastore fetch returns a generic sequence and
+        # mypy cannot infer the concrete CertificateAssessmentAttemptModel item
+        # type from this storage-layer API.
+    ] = cast(
+        List[gae_models.CertificateAssessmentAttemptModel],
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id
+        )
+        .order(gae_models.CertificateAssessmentAttemptModel.attempt_index)
+        .fetch(),
+    )
+    return [
+        _attempt_model_to_domain(attempt_model)
+        for attempt_model in attempt_models
     ]
 
 
