@@ -469,6 +469,7 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
         finished_at = started_at + datetime.timedelta(minutes=5)
         gae_models.CertificateAssessmentAttemptModel.create(
+            certificate_id=certificate_ids[0]['certificate_id'],
             learner_id=learner_id,
             total_score=90.0,
             attempt_index=1,
