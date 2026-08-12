@@ -25,6 +25,7 @@ import {
   CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingData,
 } from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
@@ -98,6 +99,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       activatedRouteStubValue as unknown as ActivatedRoute,
       alertsServiceSpy,
       certificateAssessmentOfferingBackendApiServiceSpy,
+      {} as ClassroomBackendApiService,
       {} as PageHeadService,
       routerSpy,
       {} as TranslateService
@@ -136,7 +138,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync
     ).toHaveBeenCalledWith('cert-123');
     expect(component.certificateOffering).toEqual(mockOffering);
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading).toBe(false);
   }));
 
   it('should set current stage to questions when the route is session', fakeAsync(async () => {
@@ -163,8 +165,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.ngOnInit();
     flushMicrotasks();
 
-    expect(component.hasError).toBeTrue();
-    expect(component.isLoading).toBeFalse();
+    expect(component.hasError).toBe(true);
+    expect(component.isLoading).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
@@ -174,15 +176,15 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     (
       certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
-    router.navigate.and.returnValue(
+    (router.navigate as jasmine.Spy).and.returnValue(
       Promise.reject(new Error('Navigation failed'))
     );
 
     component.ngOnInit();
     flushMicrotasks();
 
-    expect(component.hasError).toBeTrue();
-    expect(component.isLoading).toBeFalse();
+    expect(component.hasError).toBe(true);
+    expect(component.isLoading).toBe(false);
   }));
 
   it('should switch to the instructions stage on showInstructions', () => {
@@ -264,7 +266,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     component.onRetryAssessment();
 
-    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.showAssessmentInterruptCard).toBe(false);
     expect(component.currentStage).toBe('intro');
   });
 
@@ -274,7 +276,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     component.onResumeAssessment();
 
-    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.showAssessmentInterruptCard).toBe(false);
     expect(component.currentStage).toBe('questions');
   });
 });
