@@ -37,6 +37,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_domain,
     translation_fetchers,
     translation_services,
     user_services,
@@ -1777,12 +1778,48 @@ def get_categorized_skill_ids_and_descriptions() -> (
     return categorized_skills
 
 
+def _get_up_to_date_translation(
+    entity_translation: translation_domain.EntityTranslation,
+    content_id: str,
+) -> Optional[str]:
+    """Returns the translation of the given content ID, if it is usable.
+
+    Args:
+        entity_translation: EntityTranslation. The entity's translations.
+        content_id: str. The content ID to look up.
+
+    Returns:
+        str or None. The translated value, or None when there is no translation
+        or the translation is stale.
+    """
+    translated_content = entity_translation.translations.get(content_id)
+    # A translation that needs an update is stale because the English content
+    # changed after it was accepted, so it is not shown.
+    if (
+        translated_content is not None
+        and not translated_content.needs_update
+        and isinstance(translated_content.content_value, str)
+    ):
+        return translated_content.content_value
+    return None
+
+
+class ConceptCardDict(skill_domain.SkillContentsDict):
+    """Dictionary representing a concept card shown to a learner. It carries
+    the skill description alongside the skill contents, because both are
+    displayed on the card and both are translatable.
+    """
+
+    skill_description: str
+
+
 def get_concept_card_dicts(
     skills: List[skill_domain.Skill],
     language_code: Optional[str] = None,
-) -> List[skill_domain.SkillContentsDict]:
-    """Returns the concept card dicts for the given skills, with the
-    explanation translated into the given language where a translation exists.
+) -> List[ConceptCardDict]:
+    """Returns the concept card dicts for the given skills, with the skill
+    description and explanation translated into the given language where a
+    translation exists.
 
     Args:
         skills: list(Skill). The skills whose concept cards are required.
@@ -1790,10 +1827,24 @@ def get_concept_card_dicts(
             cards in. If None or English, the original content is returned.
 
     Returns:
-        list(SkillContentsDict). The concept card dicts for the given skills.
+        list(ConceptCardDict). The concept card dicts for the given skills.
         Any content without an up-to-date translation falls back to English.
     """
-    concept_card_dicts = [skill.skill_contents.to_dict() for skill in skills]
+    concept_card_dicts: List[ConceptCardDict] = []
+    for skill in skills:
+        skill_contents_dict = skill.skill_contents.to_dict()
+        concept_card_dicts.append(
+            {
+                'explanation': skill_contents_dict['explanation'],
+                'recorded_voiceovers': skill_contents_dict[
+                    'recorded_voiceovers'
+                ],
+                'written_translations': skill_contents_dict[
+                    'written_translations'
+                ],
+                'skill_description': skill.description,
+            }
+        )
 
     if (
         language_code is None
@@ -1822,18 +1873,16 @@ def get_concept_card_dicts(
         if entity_translation is None:
             continue
 
-        explanation_translation = entity_translation.translations.get(
-            skill.skill_contents.explanation.content_id
+        translated_description = _get_up_to_date_translation(
+            entity_translation, feconf.SKILL_DESCRIPTION_CONTENT_ID
         )
-        # A translation that needs an update is stale because the English
-        # content changed after it was accepted, so it is not shown.
-        if (
-            explanation_translation is not None
-            and not explanation_translation.needs_update
-            and isinstance(explanation_translation.content_value, str)
-        ):
-            concept_card_dict['explanation'][
-                'html'
-            ] = explanation_translation.content_value
+        if translated_description is not None:
+            concept_card_dict['skill_description'] = translated_description
+
+        translated_explanation = _get_up_to_date_translation(
+            entity_translation, skill.skill_contents.explanation.content_id
+        )
+        if translated_explanation is not None:
+            concept_card_dict['explanation']['html'] = translated_explanation
 
     return concept_card_dicts

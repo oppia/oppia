@@ -72,6 +72,25 @@ describe('Concept card component', () => {
     expect(componentInstance.currentConceptCard).toEqual(conceptCard);
   }));
 
+  it('should emit the skill description once the concept card loads', fakeAsync(() => {
+    const translatedConceptCard = new ConceptCard(
+      new SubtitledHtml('', '1'),
+      RecordedVoiceovers.createEmpty(),
+      'nombre de la habilidad'
+    );
+    spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve([translatedConceptCard]));
+    const emitSpy = spyOn(componentInstance.skillDescriptionLoaded, 'emit');
+    componentInstance.index = 0;
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(emitSpy).toHaveBeenCalledWith('nombre de la habilidad');
+  }));
+
   it("should load concept cards in the learner's selected language", fakeAsync(() => {
     spyOn(
       i18nLanguageCodeService,

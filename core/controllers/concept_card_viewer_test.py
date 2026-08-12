@@ -183,6 +183,41 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             json_response['concept_card_dicts'][1]['explanation']['html'],
         )
 
+    def test_get_concept_cards_translates_the_skill_description(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.skill_id)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.SKILL,
+            self.skill_id,
+            skill.version,
+            'es',
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            translation_domain.TranslatedContent(
+                'Descripcion de la habilidad',
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                False,
+            ),
+        )
+
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id, self.skill_id_1]),
+            ),
+            params={'language_code': 'es'},
+        )
+
+        self.assertEqual(
+            'Descripcion de la habilidad',
+            json_response['concept_card_dicts'][0]['skill_description'],
+        )
+        # The second skill has no translated description, so it stays in
+        # English.
+        self.assertEqual(
+            skill_fetchers.get_skill_by_id(self.skill_id_1).description,
+            json_response['concept_card_dicts'][1]['skill_description'],
+        )
+
     def test_get_concept_cards_falls_back_to_english_when_untranslated(
         self,
     ) -> None:
