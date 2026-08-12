@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -491,6 +491,21 @@ const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
 const communityLibraryContainerSelector = '.e2e-test-library-container';
 const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
+
+// Collection library and player selectors.
+const collectionSummaryTileTitleSelector =
+  '.e2e-test-collection-summary-tile-title';
+const collectionExplorationSelector = '.e2e-test-collection-exploration';
+const mobileCollectionExplorationSelector =
+  '.e2e-mobile-test-collection-exploration';
+const mobilePathSegmentLinkSelector = '.mobile-path-segment a';
+const collectionPreviewTileSelector = '.oppia-exploration-summary-tile';
+const collectionPlayerTitleSelector = '.oppia-collection-player-title-font';
+const backToCollectionLinkSelector = '.conversation-skin-back-to-collection';
+const shareCollectionFooterSelector = '.e2e-test-share-collection-footer';
+const collectionPathLinkSelector = '.oppia-collection-path-section > a';
+const collectionPathExplorationLinkSelector =
+  '.oppia-collection-path-section a, .mobile-path-segment a';
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
 
@@ -614,7 +629,8 @@ const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
-const metaDescriptionSelector = 'meta[name="description"]';
+const metaDescriptionSelector =
+  'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
 
@@ -3045,6 +3061,317 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that a collection with the given title is visible
+   * in the community library and returns the anchor element.
+   * @param {string} collectionTitle - The collection title to find.
+   * @returns {Promise<ElementHandle<Element>>} The anchor element wrapping the
+   *   collection tile.
+   */
+  async expectCollectionToBeVisibleInLibrary(
+    collectionTitle: string
+  ): Promise<ElementHandle<Element>> {
+    // The collection-summary-tile-title class is present on both the
+    // library groups page and the search results page.
+    await this.expectElementToBeVisible(collectionSummaryTileTitleSelector);
+
+    const titleElements = await this.page.$$(
+      collectionSummaryTileTitleSelector
+    );
+    for (const titleElement of titleElements) {
+      const title = await titleElement.evaluate(el => el.textContent?.trim());
+      if (title === collectionTitle) {
+        // Get the parent anchor <a> that wraps the tile.
+        const anchorHandle = await titleElement.evaluateHandle(el =>
+          el.closest('a')
+        );
+        const anchor = anchorHandle.asElement();
+        if (!anchor) {
+          throw new Error(
+            `Found collection "${collectionTitle}" but it has no parent anchor.`
+          );
+        }
+        showMessage(
+          `Collection "${collectionTitle}" is visible in library as expected.`
+        );
+        return anchor as ElementHandle<Element>;
+      }
+    }
+
+    const titles = await Promise.all(
+      titleElements.map(el => el.evaluate(e => e.textContent?.trim()))
+    );
+    throw new Error(
+      `Expected collection "${collectionTitle}" to be visible in library, ` +
+        `but found: [${titles.join(', ')}]`
+    );
+  }
+
+  /**
+   * Clicks on a collection with the given title in the community library.
+   * @param {string} collectionName - The name of the collection to click on.
+   */
+  async clickOnCollectionInLibrary(collectionName: string): Promise<void> {
+    const anchor =
+      await this.expectCollectionToBeVisibleInLibrary(collectionName);
+    await this.clickOnElement(anchor);
+    await this.waitForPageToFullyLoad();
+    showMessage(`Clicked on collection: "${collectionName}".`);
+  }
+
+  /**
+   * Verifies that the "Begin [collectionName]:" text is visible on the
+   * collection player page.
+   * @param {string} expectedText - The collection name.
+   */
+  async expectCollectionBeginTextVisible(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(collectionPlayerTitleSelector);
+    const titleText = await this.page.$eval(collectionPlayerTitleSelector, el =>
+      el.textContent?.trim()
+    );
+    if (!titleText || !titleText.includes(expectedText)) {
+      throw new Error(
+        `Expected "${expectedText}" to be visible, but found: "${titleText}".`
+      );
+    }
+    showMessage(`"${expectedText}" is visible on the collection player page.`);
+  }
+
+  /**
+   * Verifies that an exploration with the given name is visible on the
+   * collection player page.
+   * @param {string} explorationName - The exploration name.
+   */
+  async expectExplorationVisibleInCollectionPage(
+    explorationName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, explorations are rendered as SVG circles inside
+      // .mobile-path-segment elements. The exploration name is stored in the
+      // title-data attribute of the parent <a> element, not in textContent.
+      await this.expectElementToBeVisible(mobileCollectionExplorationSelector);
+      const found = await this.page.evaluate(
+        (name: string, selector: string) => {
+          const links = document.querySelectorAll(selector);
+          for (const link of links) {
+            const titleData = link.getAttribute('title-data') || '';
+            if (titleData.includes(name)) {
+              return true;
+            }
+          }
+          return false;
+        },
+        explorationName,
+        mobilePathSegmentLinkSelector
+      );
+
+      if (!found) {
+        throw new Error(
+          `Expected exploration "${explorationName}" to be visible in ` +
+            'collection, but it was not found.'
+        );
+      }
+    } else {
+      // On desktop, exploration titles are rendered in div elements above the
+      // SVG icons and the exploration links are direct children of the
+      // collection path section.
+      await this.expectElementToBeVisible(collectionExplorationSelector);
+      const found = await this.page.evaluate(
+        (name: string, selector: string) => {
+          const elements = document.querySelectorAll(selector);
+          for (const el of elements) {
+            if (el.textContent?.trim().includes(name)) {
+              return true;
+            }
+          }
+          return false;
+        },
+        explorationName,
+        collectionPathExplorationLinkSelector
+      );
+
+      if (!found) {
+        throw new Error(
+          `Expected exploration "${explorationName}" to be visible in ` +
+            'collection, but it was not found.'
+        );
+      }
+    }
+    showMessage(
+      `Exploration "${explorationName}" is visible in the collection.`
+    );
+  }
+
+  /**
+   * Plays an exploration from the collection player page by clicking on it.
+   * @param {string} explorationName - The exploration name to play.
+   */
+  async playExplorationFromCollectionPage(
+    explorationName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, the collection page shows SVG circles for each exploration.
+      // Clicking a circle triggers updateExplorationPreview(), which displays
+      // an exploration summary tile. Clicking the summary tile navigates to
+      // the exploration.
+      const mobileLinkElements = await this.page.$$(
+        mobilePathSegmentLinkSelector
+      );
+      for (const linkElement of mobileLinkElements) {
+        const titleData = await linkElement.evaluate(
+          el => el.getAttribute('title-data') || ''
+        );
+        if (titleData.includes(explorationName)) {
+          // Click the SVG circle to trigger Angular's click handler.
+          const svgElement = await linkElement.waitForSelector(
+            mobileCollectionExplorationSelector,
+            {visible: true}
+          );
+          if (!svgElement) {
+            throw new Error(
+              `Could not find exploration "${explorationName}" to play in the collection.`
+            );
+          }
+          await this.clickOnElement(svgElement);
+
+          // Wait for the exploration summary preview tile to appear.
+          await this.expectElementToBeVisible(collectionPreviewTileSelector);
+
+          await this.clickOnElementWithSelector(
+            `${collectionPreviewTileSelector} a`
+          );
+          await this.expectElementToBeVisible(stateConversationContent);
+          showMessage(`Playing exploration: "${explorationName}".`);
+          return;
+        }
+      }
+      throw new Error(
+        `Could not find exploration "${explorationName}" to play ` +
+          'in the collection.'
+      );
+    } else {
+      // On desktop, the exploration links are direct children of the
+      // collection path section.
+      const explorationLinkElements = await this.page.$$(
+        collectionPathLinkSelector
+      );
+      for (const linkElement of explorationLinkElements) {
+        const text = await linkElement.evaluate(el => el.textContent?.trim());
+        if (text && text.includes(explorationName)) {
+          await this.clickOnElement(linkElement);
+          await this.expectElementToBeVisible(stateConversationContent);
+          showMessage(`Playing exploration: "${explorationName}".`);
+          return;
+        }
+      }
+      throw new Error(
+        `Could not find exploration "${explorationName}" to play ` +
+          'in the collection.'
+      );
+    }
+  }
+
+  /**
+   * Clicks the "Back to Collection" link on the exploration player page.
+   */
+  async clickBackToCollection(): Promise<void> {
+    await this.expectElementToBeVisible(backToCollectionLinkSelector);
+    await this.clickOnElementWithSelector(backToCollectionLinkSelector);
+    await this.waitForPageToFullyLoad();
+
+    // Post-check: verify navigation back to the collection player page.
+    await this.expectElementToBeVisible(collectionPlayerTitleSelector);
+    showMessage('Clicked "Back to Collection".');
+  }
+
+  /**
+   * Verifies that the paw icon is visible for a completed exploration
+   * at the given index in the collection player page.
+   *
+   * Note: This method only works for logged-in users because the backend
+   * only tracks exploration completion for authenticated users. For guests,
+   * completed_exploration_ids is always empty and the paw icon will never
+   * render (see summary_services.get_learner_collection_dict_by_id).
+   *
+   * @param {number} explorationIndex - The 0-based index of the exploration.
+   */
+  async expectPawIconVisibleForExploration(
+    explorationIndex: number
+  ): Promise<void> {
+    // Desktop uses '.oppia-collection-path-section > a' while mobile
+    // uses '.mobile-path-segment' — the desktop section is hidden via
+    // CSS at widths <= 942px.
+    const selector = this.isViewportAtMobileWidth()
+      ? '.mobile-path-segment'
+      : collectionPathLinkSelector;
+
+    const hasPaw = await this.page.evaluate(
+      (index: number, sel: string) => {
+        const explorations = document.querySelectorAll(sel);
+        if (index >= explorations.length) {
+          return false;
+        }
+        const exploration = explorations[index];
+        const images = exploration.querySelectorAll('image');
+        for (const img of images) {
+          const xlinkHref =
+            img.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
+          const href = img.getAttribute('href') || '';
+          if (
+            xlinkHref.includes('collection_paw') ||
+            href.includes('collection_paw')
+          ) {
+            return true;
+          }
+        }
+        return false;
+      },
+      explorationIndex,
+      selector
+    );
+
+    if (!hasPaw) {
+      throw new Error(
+        `Expected paw icon on exploration at index ${explorationIndex}, ` +
+          'but it was not found.'
+      );
+    }
+    showMessage(
+      `Paw icon is visible for exploration at index ${explorationIndex}.`
+    );
+  }
+
+  /**
+   * Verifies the share collection footer text matches the expected value.
+   * On mobile viewports (< 658px), the share collection footer is hidden
+   * via CSS (display: none), so this check is skipped.
+   * @param {string} expectedText - The expected text (case-insensitive).
+   */
+  async expectShareCollectionFooterText(expectedText: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping share collection footer text check on mobile viewport ' +
+          '(element is hidden by CSS at widths below 658px).'
+      );
+      return;
+    }
+    await this.expectElementToBeVisible(shareCollectionFooterSelector);
+    const actualText = await this.page.$eval(
+      shareCollectionFooterSelector,
+      el => el.textContent?.trim()
+    );
+    if (
+      !actualText ||
+      actualText.toLowerCase() !== expectedText.toLowerCase()
+    ) {
+      throw new Error(
+        'Expected share collection footer text to be ' +
+          `"${expectedText}", but found: "${actualText}".`
+      );
+    }
+    showMessage(`Share collection footer text is "${actualText}" as expected.`);
+  }
+
+  /**
    * Function to verify the Features accordion functionality in the About page.
    * It verifies that the expand button opens the corresponding accordion panel content
    * and the close button closes it.
@@ -3502,15 +3829,23 @@ export class LoggedOutUser extends BaseUser {
       practiceQuestionHeaderSelector,
       el => el?.textContent?.trim() ?? ''
     );
-    try {
-      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+    // Wait for either the desktop or mobile next button to be visible.
+    const nextButtonSelector = `${nextCardButton}, ${nextCardArrowButton}`;
+    await this.page.waitForSelector(nextButtonSelector, {visible: true});
+
+    // Determine which button is visible and click it.
+    const isDesktopButtonVisible = await this.page.evaluate(
+      (selector: string) => {
+        const desktopBtn = document.querySelector(selector);
+        return desktopBtn && (desktopBtn as HTMLElement).offsetParent !== null;
+      },
+      nextCardButton
+    );
+
+    if (isDesktopButtonVisible) {
       await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
     }
 
     await this.page.waitForFunction(
@@ -3536,15 +3871,23 @@ export class LoggedOutUser extends BaseUser {
       currentCardContentSelector,
       el => el.textContent
     );
-    try {
-      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+    // Wait for either the desktop or mobile next button to be visible.
+    const nextButtonSelector = `${nextCardButton}, ${nextCardArrowButton}`;
+    await this.page.waitForSelector(nextButtonSelector, {visible: true});
+
+    // Determine which button is visible and click it.
+    const isDesktopButtonVisible = await this.page.evaluate(
+      (selector: string) => {
+        const desktopBtn = document.querySelector(selector);
+        return desktopBtn && (desktopBtn as HTMLElement).offsetParent !== null;
+      },
+      nextCardButton
+    );
+
+    if (isDesktopButtonVisible) {
       await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
     }
 
     // Wait until card content changes.
@@ -7544,13 +7887,14 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // If an expected description is provided, assert meta description matches it.
+    // Some routes populate description via itemprop while others use name.
     if (expected.description !== undefined) {
       const description = await this.page.$eval(metaDescriptionSelector, el =>
         el.getAttribute('content')
       );
       if (description !== expected.description) {
         throw new Error(
-          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+          `meta description mismatch (name/itemprop). Expected: "${expected.description}", Found: "${description}"`
         );
       }
     }

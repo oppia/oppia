@@ -1085,8 +1085,24 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/<feedback_id>' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackDetailHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.LESSON_FEEDBACK_URL,
         general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>/<feedback_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackListHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.PLATFORM_FEEDBACK_URL,
@@ -1457,6 +1473,10 @@ URLS = [
         certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
     get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler,
+    ),
+    get_redirect_route(
         feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
         certificate_assessment.StartCertificateAssessmentHandler,
     ),
@@ -1649,6 +1669,14 @@ URLS.extend(
         get_redirect_route(
             r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
             cron.CronMailReviewerNewSuggestionsHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/lesson_feedback_cleanup',
+            cron.CronLessonFeedbackCleanupHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/platform_feedback_cleanup',
+            cron.CronPlatformFeedbackCleanupHandler,
         ),
     )
 )

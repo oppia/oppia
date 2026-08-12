@@ -21,6 +21,8 @@ import {
   TechnicalTeamType,
   FEEDBACK_STATUS_LABELS,
   TECHNICAL_TEAM_LABELS,
+  CreatorFeedbackType,
+  CREATOR_FEEDBACK_TYPE_LABELS,
 } from 'domain/feedback/feedback.model';
 import type {
   FeedbackFilterConfig,
@@ -39,8 +41,9 @@ export class FeedbackFilterBarComponent {
 
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
-  readonly statusOptions = Object.values(FeedbackStatus);
+  readonly creatorFeedbackTypeLabels = CREATOR_FEEDBACK_TYPE_LABELS;
   readonly teamOptions = Object.values(TechnicalTeamType);
+  readonly creatorFeedbackTypeOptions = Object.values(CreatorFeedbackType);
 
   today: string = new Date().toISOString().split('T')[0];
   selectedStatus: FeedbackStatus = FeedbackStatus.OPEN;
@@ -48,6 +51,12 @@ export class FeedbackFilterBarComponent {
   fromDate: string = '';
   toDate: string = '';
   selectedTechnicalTeam: TechnicalTeamType = TechnicalTeamType.TECH_EXTERNAL;
+  selectedCreatorFeedbackType: CreatorFeedbackType =
+    CreatorFeedbackType.FEEDBACK;
+
+  get statusOptions(): FeedbackStatus[] {
+    return this.config.statusOptions;
+  }
 
   applyFilters(): void {
     const dateRange = {
@@ -58,6 +67,7 @@ export class FeedbackFilterBarComponent {
       searchText: this.searchText,
       status: this.selectedStatus,
       technicalTeam: this.selectedTechnicalTeam,
+      creatorFeedbackType: this.selectedCreatorFeedbackType,
       dateRange,
     });
   }
@@ -68,6 +78,7 @@ export class FeedbackFilterBarComponent {
     this.fromDate = '';
     this.toDate = '';
     this.selectedTechnicalTeam = TechnicalTeamType.TECH_EXTERNAL;
+    this.selectedCreatorFeedbackType = CreatorFeedbackType.FEEDBACK;
     this.applyFilters();
   }
 }

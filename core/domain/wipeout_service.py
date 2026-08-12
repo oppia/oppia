@@ -247,7 +247,12 @@ def pre_delete_user(user_id: str) -> None:
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
-            user_id, False, False, False, False
+            user_id,
+            False,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=False,
         )
         bulk_email_services.permanently_delete_user_from_list(
             user_settings.email
@@ -255,7 +260,7 @@ def pre_delete_user(user_id: str) -> None:
 
     user_services.mark_user_for_deletion(user_id)
 
-    date_now = datetime.datetime.utcnow()
+    date_now = utils.get_current_utc_datetime()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED
     )
