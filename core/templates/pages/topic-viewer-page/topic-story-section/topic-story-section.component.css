@@ -145,63 +145,109 @@
   padding: 0 24px 24px;
 }
 
-.arc-group {
+.adventure-group {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-top: 16px;
   overflow: hidden;
 }
 
-.arc-header {
+.adventure-header {
   align-items: center;
   background: #f5fafa;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   padding: 14px 18px;
+  -webkit-user-select: none;
   user-select: none;
 }
 
-.arc-header:hover {
+.adventure-header:hover {
   background: #eaf6f8;
 }
 
-.arc-header:focus {
+.adventure-header:focus {
   outline: 2px solid #00645c;
   outline-offset: -2px;
 }
 
-.arc-header-left {
+.adventure-header-left {
   align-items: center;
   display: flex;
-  gap: 10px;
+  flex: 1;
+  gap: 16px;
+  min-width: 0;
 }
 
-.arc-chevron {
-  color: #00645c;
-  font-size: 12px;
-  transition: transform 0.2s ease;
+.adventure-flag-icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex: 0 0 52px;
+  height: 52px;
+  justify-content: center;
+  min-width: 52px;
+  width: 52px;
 }
 
-.arc-chevron.expanded {
-  transform: rotate(90deg);
+.adventure-flag-icon .material-icons {
+  font-size: 24px;
+  line-height: 1;
 }
 
-.arc-title {
-  color: #00645c;
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
+.adventure-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
-.arc-lesson-count {
-  color: #777;
+.adventure-title {
+  color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0;
+  overflow-wrap: break-word;
 }
 
-.arc-description {
+.adventure-completion-text {
+  color: #1f2937;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.adventure-chevron-badge {
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid #e8ebef;
+  border-radius: 50%;
+  color: #111;
+  display: inline-flex;
+  flex: 0 0 46px;
+  height: 46px;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  width: 46px;
+}
+
+.adventure-chevron-badge .material-icons {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.adventure-chevron-badge.expanded {
+  transform: rotate(180deg);
+}
+
+.adventure-description {
   border-top: 1px solid #e0e0e0;
   color: #555;
   font-family: Roboto, Arial, sans-serif;
@@ -211,7 +257,7 @@
   padding: 12px 18px;
 }
 
-.arc-lessons {
+.adventure-lessons {
   border-top: 1px solid #e0e0e0;
   padding: 12px 18px;
 }
@@ -219,17 +265,83 @@
 .story-lesson-card-wrapper,
 .story-practice-card-wrapper {
   align-self: center;
-  margin-top: auto;
+  margin-top: 12px;
   max-width: 912px;
   width: 100%;
 }
 
-.arc-lessons .story-lesson-card-wrapper {
+.adventure-lessons .story-lesson-card-wrapper {
   margin-top: 12px;
 }
 
-.arc-lessons .story-lesson-card-wrapper:first-child {
+.adventure-lessons .story-lesson-card-wrapper:first-child {
   margin-top: 0;
+}
+
+.coming-soon-chapters-section {
+  background: #efeafc;
+  border: 1px solid #ddd3f7;
+  border-radius: 10px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.coming-soon-chapters-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.coming-soon-chapters-icon {
+  align-items: center;
+  background: #4f1fc2;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  flex: 0 0 52px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.coming-soon-chapters-icon .material-icons {
+  font-size: 30px;
+}
+
+.coming-soon-chapters-heading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.coming-soon-chapters-title {
+  color: #4600c3;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin: 0;
+}
+
+.coming-soon-chapters-count {
+  color: #1f2937;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.coming-soon-lesson-card-wrapper {
+  margin-top: 10px;
+}
+
+topic-mastery-challenge-card {
+  display: block;
 }
 
 @media (max-width: 768px) {
@@ -277,7 +389,7 @@
 
   .story-card-header {
     min-height: 0;
-    padding: 24px 20px 20px;
+    padding: 20px 16px 16px;
   }
 
   .story-title {
@@ -291,13 +403,104 @@
   }
 
   .study-skills-cta {
-    font-size: 16px;
-    min-height: 40px;
+    font-size: 14px;
+    min-height: 38px;
+    padding: 8px 14px;
   }
 
   .story-card-body {
-    min-height: 300px;
-    padding: 0 12px 12px;
+    min-height: 240px;
+    padding: 0 14px 14px;
+  }
+
+  .adventure-group {
+    margin-top: 12px;
+  }
+
+  .coming-soon-chapters-title {
+    font-size: 20px;
+    line-height: 22px;
+  }
+
+  .coming-soon-chapters-count {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .coming-soon-chapters-section {
+    padding: 14px;
+  }
+
+  .coming-soon-chapters-header {
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .coming-soon-chapters-heading-text {
+    gap: 6px;
+  }
+
+  .coming-soon-chapters-icon {
+    flex: 0 0 44px;
+    height: 44px;
+    width: 44px;
+  }
+
+  .coming-soon-chapters-icon .material-icons {
+    font-size: 26px;
+  }
+
+  .adventure-header {
+    padding: 12px 14px;
+  }
+
+  .adventure-header-left {
+    gap: 12px;
+  }
+
+  .adventure-flag-icon {
+    flex: 0 0 38px;
+    height: 38px;
+    min-width: 38px;
+    width: 38px;
+  }
+
+  .adventure-flag-icon .material-icons {
+    font-size: 18px;
+  }
+
+  .adventure-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .adventure-completion-text {
+    font-size: 12px;
+  }
+
+  .adventure-chevron-badge {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .adventure-chevron-badge .material-icons {
+    font-size: 24px;
+  }
+
+  .adventure-description {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  .adventure-lessons {
+    padding: 10px 14px;
+  }
+
+  .story-lesson-card-wrapper,
+  .story-practice-card-wrapper {
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -327,6 +530,7 @@
     border-radius: 12px;
     border-bottom-left-radius: 0;
     flex: 1;
+
     font-size: 13px;
     line-height: 1.4;
     max-width: none;
@@ -387,11 +591,51 @@
     min-height: 462px;
   }
 
+  .coming-soon-chapters-section {
+    border-radius: 8px;
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  .coming-soon-chapters-header {
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .coming-soon-chapters-icon {
+    flex: 0 0 40px;
+    height: 40px;
+    width: 40px;
+  }
+
+  .coming-soon-chapters-icon .material-icons {
+    font-size: 22px;
+  }
+
+  .coming-soon-chapters-heading-text {
+    gap: 4px;
+  }
+
+  .coming-soon-chapters-title {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .coming-soon-chapters-count {
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  .coming-soon-lesson-card-wrapper {
+    margin-top: 8px;
+  }
+
   .story-lesson-card-wrapper {
-    margin-top: auto;
+    margin-top: 8px;
   }
 
   .story-practice-card-wrapper {
-    margin-top: auto;
+    margin-top: 8px;
   }
 }

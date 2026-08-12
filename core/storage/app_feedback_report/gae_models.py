@@ -41,7 +41,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, user_models
 
-(base_models, user_models) = models.Registry.import_models(
+base_models, user_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.USER]
 )
 
@@ -367,7 +367,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             list(AppFeedbackReportModel). A list of AppFeedbackReportModel
             entities that need to be scrubbed.
         """
-        datetime_now = datetime.datetime.utcnow()
+        datetime_now = utils.get_current_utc_datetime()
         datetime_before_which_to_scrub = datetime_now - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN
             + datetime.timedelta(days=1)
@@ -644,7 +644,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             Exception. If the id generator is producing too many collisions.
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
-            datetime.datetime.utcnow()
+            utils.get_current_utc_datetime()
         )
         for _ in range(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(

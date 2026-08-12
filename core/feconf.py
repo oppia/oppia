@@ -255,10 +255,6 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 
-# The maximum number of activities allowed in the playlist of the learner. This
-# limit applies to both the explorations playlist and the collections playlist.
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
-
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
 
@@ -595,6 +591,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
+SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
+    'sensitive-firebase-auth-read-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
+)
+
 OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
@@ -624,6 +628,9 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = True
+# The default preference for Contributor Dashboard reviewer notification
+# emails when no stored email preference is available.
+DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
@@ -1005,7 +1012,6 @@ LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
 )
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
-LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -1018,6 +1024,7 @@ LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
+MY_FEEDBACK_URL = '/my_feedback'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1151,6 +1158,18 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = '/certificate_assessment_offerings_for_classroom_handler/<classroom_url_fragment>'
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
 )
 
 # Event types.

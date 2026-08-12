@@ -2236,58 +2236,6 @@ class AppEngineTestBase(TestBase):
             'modifying the constants file during tests.'
         )
 
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
-        """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
-
-        Example:
-            import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
-
-        Args:
-            mocked_now: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-
-        Raises:
-            Exception. Given argument is not a datetime.
-        """
-        if not isinstance(mocked_now, datetime.datetime):
-            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
-
-        old_datetime = datetime.datetime
-
-        class MockDatetimeType(type):
-            """Overrides isinstance() behavior."""
-
-            @classmethod
-            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
-                return isinstance(instance, old_datetime)
-
-        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
-            """Always returns mocked_now as the current UTC time."""
-
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
-            @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
-                """Returns the mocked datetime."""
-                return mocked_now
-
-        setattr(datetime, 'datetime', MockDatetime)
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', old_datetime)
-
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -2582,8 +2530,7 @@ class GenericTestBase(AppEngineTestBase):
     # utils.dict_from_yaml can isolate differences quickly.
 
     SAMPLE_YAML_CONTENT: str = (
-        (
-            """author_notes: ''
+        ("""author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -2654,8 +2601,7 @@ states_schema_version: %d
 tags: []
 title: Title
 version: 1
-"""
-        )
+""")
         % (
             feconf.DEFAULT_INIT_STATE_NAME,
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,

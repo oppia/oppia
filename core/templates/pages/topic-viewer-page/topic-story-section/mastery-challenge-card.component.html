@@ -1,0 +1,19 @@
+<div class="mastery-challenge-card" [attr.aria-label]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TITLE' | translate">
+  <div class="mastery-challenge-icon" aria-hidden="true">
+    <img class="mastery-challenge-icon-image"
+         src="/assets/images/icons/mastery-challenge-trophy.svg"
+         alt=""
+         aria-hidden="true">
+  </div>
+  <div class="mastery-challenge-content">
+    <h3 class="mastery-challenge-title">{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TITLE' | translate }}</h3>
+    <p class="mastery-challenge-description">{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_DESCRIPTION' | translate }}</p>
+  </div>
+  <button class="mastery-challenge-button"
+          type="button"
+          [disabled]="!actionUrl"
+          (click)="navigateToAction()">
+    <span class="mastery-challenge-button-icon" aria-hidden="true">★</span>
+    <span>{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_BUTTON' | translate }}</span>
+  </button>
+</div>

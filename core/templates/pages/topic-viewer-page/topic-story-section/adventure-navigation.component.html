@@ -1,0 +1,73 @@
+<div class="adventure-navigation-container" *ngIf="adventureGroups.length > 0">
+  <div class="adventure-navigation-scroll-area">
+    <button class="adventure-navigation-arrow adventure-navigation-arrow--left"
+            *ngIf="showLeftArrow"
+            (click)="scrollLeft()"
+            aria-label="Scroll left"
+            type="button">
+      <i class="material-icons">chevron_left</i>
+    </button>
+
+    <div class="adventure-navigation-wrapper"
+         [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
+         #scrollWrapper
+         (scroll)="onScroll()">
+      <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
+           [ngStyle]="{'border-color': adventureGroup.accentColor}">
+        <topic-adventure-circle-badge *ngFor="let lesson of adventureGroup.lessons"
+                                      [label]="lesson.lessonNumber.toString()"
+                                      [size]="'sm'"
+                            [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : '#fff'"
+                                      [borderColor]="adventureGroup.accentColor"
+                            [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : adventureGroup.accentColor"
+                                      class="adventure-navigation-clickable"
+                                      (click)="onLessonClick(lesson.lessonNumber)"
+                                      [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
+                                      role="button"
+                                      tabindex="0"
+                                      (keydown.enter)="onLessonClick(lesson.lessonNumber)"
+                                      (keydown.space)="onLessonClick(lesson.lessonNumber); $event.preventDefault()">
+        </topic-adventure-circle-badge>
+
+        <topic-adventure-circle-badge *ngIf="adventureGroup.showPractice"
+                            [iconName]="'edit'"
+                                      [size]="'sm'"
+                                      [backgroundColor]="'#fff'"
+                                      [borderColor]="adventureGroup.accentColor"
+                                      [textColor]="adventureGroup.accentColor"
+                                      class="adventure-navigation-clickable"
+                                      (click)="onPracticeClick(adventureIdx)"
+                                      [attr.aria-label]="'Go to practice'"
+                                      role="button"
+                                      tabindex="0"
+                                      (keydown.enter)="onPracticeClick(adventureIdx)"
+                                      (keydown.space)="onPracticeClick(adventureIdx); $event.preventDefault()">
+        </topic-adventure-circle-badge>
+      </div>
+
+      <div class="adventure-navigation-mastery-group">
+        <topic-adventure-circle-badge class="adventure-navigation-mastery"
+                                      [iconName]="'emoji_events'"
+                                      [size]="'sm'"
+                                      [backgroundColor]="'#fff7e8'"
+                                      [borderColor]="'#f5a623'"
+                                      [textColor]="'#f5a623'">
+        </topic-adventure-circle-badge>
+      </div>
+    </div>
+
+    <button class="adventure-navigation-arrow adventure-navigation-arrow--right"
+            *ngIf="showRightArrow"
+            (click)="scrollRight()"
+            aria-label="Scroll right"
+            type="button">
+      <i class="material-icons">chevron_right</i>
+    </button>
+  </div>
+
+  <p *ngIf="hasHorizontalOverflow" class="adventure-navigation-hint">
+    <span class="adventure-navigation-hint-arrow">&#8592;</span>
+    {{ 'I18N_TOPIC_VIEWER_NAVIGATION_HINT' | translate }}
+    <span class="adventure-navigation-hint-arrow">&#8594;</span>
+  </p>
+</div>
