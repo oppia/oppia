@@ -20,10 +20,12 @@ import {Component, OnInit, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {SignupPageBackendApiService} from '../../signup-page/services/signup-page-backend-api.service';
+import './username-input-modal.component.css';
 
 @Component({
   selector: 'oppia-username-input-modal',
   templateUrl: './username-input-modal.component.html',
+  styleUrls: ['./username-input-modal.component.css'],
 })
 export class UsernameInputModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

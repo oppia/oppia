@@ -28,6 +28,7 @@ from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
+    exp_domain,
     exp_fetchers,
     feature_flag_services,
     feedback_services,
@@ -36,6 +37,7 @@ from core.domain import (
     opportunity_services,
     question_domain,
     rte_component_registry,
+    skill_fetchers,
     skill_services,
     state_domain,
     suggestion_registry,
@@ -82,10 +84,8 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-(feedback_models, suggestion_models, user_models) = (
-    models.Registry.import_models(
-        [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
-    )
+feedback_models, suggestion_models, user_models = models.Registry.import_models(
+    [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
 )
 
 transaction_services = models.Registry.import_transaction_services()
@@ -217,10 +217,11 @@ def create_suggestion(
     )
 
     status = suggestion_models.STATUS_IN_REVIEW
-
+    exploration: Optional[exp_domain.Exploration] = None
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        assert exploration is not None
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -241,15 +242,21 @@ def create_suggestion(
                 score_category,
                 language_code,
                 False,
-                datetime.datetime.utcnow(),
-                datetime.datetime.utcnow(),
+                utils.get_current_utc_datetime(),
+                utils.get_current_utc_datetime(),
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        category = (
+            exploration.category
+            if target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            else target_type
+        )
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
+            category,
         )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
@@ -268,8 +275,12 @@ def create_suggestion(
         # It resolves the generic placeholder state name to the correct exploration
         # state name by matching content IDs.
         if (
-            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
-            or state_name not in exploration.states
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            and (
+                state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+                or state_name not in exploration.states
+            )
         ):
             for s_name, state in exploration.states.items():
                 if (
@@ -282,14 +293,31 @@ def create_suggestion(
                     change_cmd = new_change_cmd
                     break
 
-        content_html = exploration.get_content_html(state_name, content_id)
-        if content_html != change_cmd['content_html']:
-
-            raise Exception(
-                'The Exploration content has changed since this translation '
-                'was submitted.'
-            )
-
+        if (
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+        ):
+            content_html = exploration.get_content_html(state_name, content_id)
+            if content_html != change_cmd['content_html']:
+                raise Exception(
+                    'The Exploration content has changed since this translation '
+                    'was submitted.'
+                )
+        elif target_type == feconf.ENTITY_TYPE_SKILL:
+            skill = skill_fetchers.get_skill_by_id(target_id, strict=False)
+            if skill is not None:
+                translatable_contents = (
+                    skill.get_translatable_contents_collection().content_id_to_translatable_content
+                )
+                if content_id in translatable_contents:
+                    content_value = translatable_contents[
+                        content_id
+                    ].content_value
+                    if content_value != change_cmd['content_html']:
+                        raise Exception(
+                            'The Skill content has changed since this translation '
+                            'was submitted.'
+                        )
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
         existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
@@ -304,19 +332,31 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            target_id,
-            exploration.version,
-            language_code,
-        )
-        if content_id in entity_translation.translations:
-            if not entity_translation.translations[content_id].needs_update:
-                raise Exception(
-                    'The content with content_id %s has already been '
-                    'translated to %s and is up-to-date.'
-                    % (content_id, language_code)
+        translatable_entity_types = [
+            e.value for e in feconf.TranslatableEntityType
+        ]
+        if target_type in translatable_entity_types:
+            target_entity = opportunity_services.get_entity_by_type_and_id(
+                target_type, target_id
+            )
+            if target_entity is not None:
+                entity_translation = (
+                    translation_fetchers.get_entity_translation(
+                        feconf.TranslatableEntityType(target_type),
+                        target_id,
+                        target_entity.version,
+                        language_code,
+                    )
                 )
+                if content_id in entity_translation.translations:
+                    if not entity_translation.translations[
+                        content_id
+                    ].needs_update:
+                        raise Exception(
+                            'The content with content_id %s has already been '
+                            'translated to %s and is up-to-date.'
+                            % (content_id, language_code)
+                        )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
@@ -329,8 +369,9 @@ def create_suggestion(
             score_category,
             language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
+            target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -363,8 +404,8 @@ def create_suggestion(
             score_category,
             add_question_language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
@@ -421,6 +462,10 @@ def get_suggestion_from_model(
         suggestion_model.edited_by_reviewer,
         suggestion_model.last_updated,
         suggestion_model.created_on,
+        # A translation suggestion can target any translatable entity type, so
+        # the target type comes from the model rather than the default assumed
+        # by the domain class.
+        target_type=suggestion_model.target_type,
     )
 
 
@@ -888,15 +933,17 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated and is up-to-date. We use the current exploration version
+    # translated and is up-to-date. We use the current entity version
     # (not the version at submission) to match the version used when saving
     # the translation in suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            suggestion.target_type, suggestion.target_id
+        )
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            exploration.version,
+            target_entity.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
@@ -1125,6 +1172,36 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
         feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG,
     )
+
+
+def auto_reject_translation_suggestions_for_skill_ids(
+    skill_ids: List[str],
+) -> None:
+    """Rejects all translation suggestions with target IDs matching the
+    supplied skill IDs. These suggestions are being rejected because
+    their corresponding skill was removed or deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
+
+    Args:
+        skill_ids: list(str). The skill IDs corresponding to the target IDs
+            of the translation suggestions.
+    """
+    for skill_id in skill_ids:
+        suggestions = query_suggestions(
+            [
+                ('suggestion_type', feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                ('target_type', feconf.ENTITY_TYPE_SKILL),
+                ('target_id', skill_id),
+                ('status', suggestion_models.STATUS_IN_REVIEW),
+            ]
+        )
+        if suggestions:
+            suggestion_ids = [s.suggestion_id for s in suggestions]
+            reject_suggestions(
+                suggestion_ids,
+                feconf.SUGGESTION_BOT_USER_ID,
+                suggestion_models.DELETED_SKILL_REJECT_MESSAGE,
+            )
 
 
 def auto_reject_translation_suggestions_for_content_ids(
@@ -3227,6 +3304,54 @@ def _update_question_reviewer_total_stats_models(
     )
 
 
+def _get_topic_id_of_translation_target(
+    suggestion: suggestion_registry.BaseSuggestion,
+) -> str:
+    """Returns the ID of the topic that the target of the given translation
+    suggestion belongs to.
+
+    Args:
+        suggestion: Suggestion. The translation suggestion whose target's topic
+            is required.
+
+    Returns:
+        str. The ID of the topic that the target belongs to, or
+        'uncategorized' if the target is not part of any topic.
+    """
+    # The exploration opportunity summaries are removed once the new
+    # opportunity models are rolled out, so they are only consulted while the
+    # feature flag is off. With the flag on, every entity type resolves its
+    # topic from the new opportunity model.
+    if (
+        suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        and not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        )
+    ):
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+        )
+        # We can confirm that exp_opportunity will not be None since there
+        # should be an assigned opportunity for a given translation. Hence we
+        # can rule out the possibility of None for mypy type checking.
+        assert exp_opportunity is not None
+        return exp_opportunity.topic_id
+
+    opportunity = (
+        opportunity_services.get_translation_opportunities_by_entity_ids(
+            suggestion.target_type, [suggestion.target_id]
+        )[suggestion.target_id]
+    )
+    # An entity such as a skill can be translated before it is assigned to any
+    # topic, in which case the contribution is not attributable to a topic.
+    if opportunity is None or not opportunity.topic_ids:
+        return 'uncategorized'
+    return opportunity.topic_ids[0]
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
 ) -> None:
@@ -3239,16 +3364,7 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3415,16 +3531,7 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3575,16 +3682,7 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
@@ -4454,17 +4552,22 @@ def generate_contributor_certificate_data(
     if user_id is None:
         raise Exception('There is no user for the given username.')
 
+    user_settings = user_services.get_user_settings(user_id)
+    certificate_profile_name = (
+        user_settings.profile_name_for_certificate or username
+    )
+
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         # For the suggestion_type translate_content, there should be a
         # corresponding language_code.
         assert isinstance(language_code, str)
         data = _generate_translation_contributor_certificate_data(
-            language_code, from_date, to_date, user_id
+            language_code, from_date, to_date, user_id, certificate_profile_name
         )
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         data = _generate_question_contributor_certificate_data(
-            from_date, to_date, user_id
+            from_date, to_date, user_id, certificate_profile_name
         )
 
     else:
@@ -4478,6 +4581,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
@@ -4489,6 +4593,7 @@ def _generate_translation_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate translation submitter
@@ -4567,11 +4672,15 @@ def _generate_translation_contributor_certificate_data(
         str(hours_contributed),
         words_count,
         language_description,
+        certificate_profile_name,
     )
 
 
 def _generate_question_contributor_certificate_data(
-    from_date: datetime.datetime, to_date: datetime.datetime, user_id: str
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
@@ -4581,6 +4690,7 @@ def _generate_question_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate question submitter
@@ -4633,4 +4743,5 @@ def _generate_question_contributor_certificate_data(
         str(hours_contributed),
         0,
         None,
+        certificate_profile_name,
     )
