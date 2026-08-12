@@ -21,6 +21,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FeedbackFilterBarComponent} from './feedback-filter-bar.component';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
+  CreatorFeedbackType,
   FeedbackStatus,
   TechnicalTeamType,
 } from '../../../domain/feedback/feedback.model';
@@ -41,8 +42,15 @@ describe('FeedbackFilterBarComponent', () => {
 
     component.config = {
       showTeamFilter: true,
+      showCreatorFeedbackTypeFilter: false,
       showDateRangeFilter: true,
       showSearchBar: true,
+      statusOptions: [
+        FeedbackStatus.COMPLIMENT,
+        FeedbackStatus.FIXED,
+        FeedbackStatus.NOT_ACTIONABLE,
+        FeedbackStatus.OPEN,
+      ],
     };
     spyOn(component.filterChange, 'emit');
 
@@ -65,6 +73,7 @@ describe('FeedbackFilterBarComponent', () => {
       searchText: 'test',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
       dateRange: {
         start: new Date('2021-01-01'),
         end: new Date('2021-01-02'),
@@ -85,6 +94,7 @@ describe('FeedbackFilterBarComponent', () => {
       searchText: '',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
       dateRange: {
         start: null,
         end: null,
