@@ -380,7 +380,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summaries_with_no_query(self) -> None:
         # An empty query should return all explorations.
-        exp_ids, search_offset = (
+        (exp_ids, search_offset) = (
             exp_services.get_exploration_ids_matching_query('', [], [])
         )
         self.assertEqual(
@@ -541,7 +541,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids = []
 
             # Page 1: 3 initial explorations.
-            exp_ids, search_offset = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query('', [], [])
             )
             self.assertEqual(len(exp_ids), 3)
@@ -549,7 +549,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids += exp_ids
 
             # Page 2: 3 more explorations.
-            exp_ids, search_offset = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
                     '', [], [], offset=search_offset
                 )
@@ -559,7 +559,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids += exp_ids
 
             # Page 3: 1 final exploration.
-            exp_ids, search_offset = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
                     '', [], [], offset=search_offset
                 )
@@ -615,7 +615,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
 
         with logging_swap, search_results_page_size_swap, max_iterations_swap:
-            exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+            (exp_ids, _) = exp_services.get_exploration_ids_matching_query(
                 '', [], []
             )
 

@@ -1589,7 +1589,7 @@ class DocstringParameterCheckerTests(CheckerTestBase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_yield_node)
 
-        missing_yield_type_func_node, missing_yield_type_yield_node = (
+        (missing_yield_type_func_node, missing_yield_type_yield_node) = (
             astroid.extract_node(
                 """
         class Test:
@@ -1636,7 +1636,7 @@ class DocstringParameterCheckerTests(CheckerTestBase):
                 missing_yield_type_yield_node
             )
 
-        missing_return_type_func_node, missing_return_type_return_node = (
+        (missing_return_type_func_node, missing_return_type_return_node) = (
             astroid.extract_node(
                 """
         class Test:
@@ -1701,7 +1701,7 @@ class DocstringParameterCheckerTests(CheckerTestBase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        missing_raise_type_func_node, missing_raise_type_raise_node = (
+        (missing_raise_type_func_node, missing_raise_type_raise_node) = (
             astroid.extract_node(
                 """
         def func(test_var_one, test_var_two): #@

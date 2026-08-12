@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import blog_models, blog_stats_models
 
 
-blog_stats_models, blog_models = models.Registry.import_models(
+(blog_stats_models, blog_models) = models.Registry.import_models(
     [models.Names.BLOG_STATISTICS, models.Names.BLOG]
 )
 

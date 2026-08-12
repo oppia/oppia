@@ -97,7 +97,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-base_models, exp_models, stats_models, user_models = (
+(base_models, exp_models, stats_models, user_models) = (
     models.Registry.import_models(
         [
             models.Names.BASE_MODEL,

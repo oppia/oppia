@@ -55,7 +55,7 @@ if MYPY:  # pragma: no cover
     )
 
 datastore_services = models.Registry.import_datastore_services()
-auth_models, user_models, audit_models, suggestion_models = (
+(auth_models, user_models, audit_models, suggestion_models) = (
     models.Registry.import_models(
         [
             models.Names.AUTH,

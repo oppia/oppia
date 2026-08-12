@@ -41,7 +41,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import search_services as gae_search_services
     from mypy_imports import user_models
 
-collection_models, user_models = models.Registry.import_models(
+(collection_models, user_models) = models.Registry.import_models(
     [models.Names.COLLECTION, models.Names.USER]
 )
 
@@ -926,7 +926,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
     def test_get_collection_summaries_with_no_query(self) -> None:
         # An empty query should return all collections.
-        col_ids, search_cursor = (
+        (col_ids, search_cursor) = (
             collection_services.get_collection_ids_matching_query('', [], [])
         )
         self.assertEqual(
@@ -1039,7 +1039,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             found_col_ids = []
 
             # Page 1: 2 initial collections.
-            col_ids, search_offset = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
                     '', [], []
                 )
@@ -1049,7 +1049,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             found_col_ids += col_ids
 
             # Page 2: 2 more collections.
-            col_ids, search_offset = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
                     '', [], [], offset=search_offset
                 )
@@ -1059,7 +1059,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             found_col_ids += col_ids
 
             # Page 3: 1 final collection.
-            col_ids, search_offset = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
                     '', [], [], offset=search_offset
                 )
@@ -2697,7 +2697,7 @@ class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
             collection_id, self.owner_id, objective='The objective'
         )
 
-        collection, collection_rights = (
+        (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
                 collection_id
             )
@@ -2708,7 +2708,7 @@ class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
         self.assertEqual(collection.id, collection_id)
         self.assertEqual(collection_rights.id, collection_id)
 
-        collection, collection_rights = (
+        (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
                 'fake_id'
             )
