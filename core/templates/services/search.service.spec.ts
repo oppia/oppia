@@ -318,7 +318,7 @@ describe('Search Service', () => {
     describe('loadMoreData', () => {
       const MORE_DATA_REQUEST =
         '/searchhandler/data?q=example&category=' +
-        '("exploration")&language_code=("en" OR "hi")&display_in_language_code=en&offset=notempty';
+        '("exploration")&language_code=("en" OR "hi")&offset=notempty&display_in_language_code=en';
       const MORE_DATA_RESPONSE = {
         search_cursor: 'newcursor',
       };
@@ -386,7 +386,7 @@ describe('Search Service', () => {
         );
         const moreDataReq = httpTestingController.expectOne(
           '/searchhandler/data?q=example&category=' +
-            '("exploration")&language_code=("en" OR "hi")&display_in_language_code=en&offset=notempty'
+            '("exploration")&language_code=("en" OR "hi")&offset=notempty&display_in_language_code=en'
         );
         moreDataReq.flush({search_cursor: null});
         flushMicrotasks();
