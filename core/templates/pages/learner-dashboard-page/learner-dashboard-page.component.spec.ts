@@ -38,7 +38,13 @@ import {
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -66,14 +72,14 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
-class MockSlicePipe {
+class MockSlicePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -207,9 +213,7 @@ describe('Learner dashboard page', () => {
     number_of_nonexistent_collections: {
       incomplete_collections: 0,
       completed_collections: 0,
-      collection_playlist: 0,
     },
-    collection_playlist: [] as CollectionSummaryBackendDict[],
   };
 
   let learnerDashboardExplorationsData = {
@@ -219,9 +223,7 @@ describe('Learner dashboard page', () => {
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       completed_explorations: 0,
-      exploration_playlist: 0,
     },
-    exploration_playlist: [] as LearnerExplorationSummaryBackendDict[],
   };
 
   let userInfo = {
@@ -267,7 +269,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
@@ -341,7 +343,7 @@ describe('Learner dashboard page', () => {
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
         return Promise.resolve('sample-csrf-token');
       });
-      // Generate completed explorations and exploration playlist.
+      // Generate completed explorations.
       for (let i = 0; i < 10; i++) {
         learnerDashboardExplorationsData.completed_explorations_list[i] = {
           id: Number(i + 1).toString(),
@@ -361,27 +363,9 @@ describe('Learner dashboard page', () => {
           thumbnail_bg_color: '',
           thumbnail_icon_url: '',
         };
-        learnerDashboardExplorationsData.exploration_playlist[i] = {
-          id: Number(i + 1).toString(),
-          title: '',
-          category: '',
-          community_owned: false,
-          activity_type: 'exploration',
-          last_updated_msec: 0,
-          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
-          created_on_msec: 0,
-          human_readable_contributors_summary: {},
-          language_code: 'en',
-          num_views: 0,
-          objective: '',
-          status: 'public',
-          tags: [],
-          thumbnail_bg_color: '',
-          thumbnail_icon_url: '',
-        };
       }
 
-      // Generate incomplete explorations and incomplete exploration playlist.
+      // Generate incomplete explorations.
       for (let i = 0; i < 12; i++) {
         learnerDashboardExplorationsData.incomplete_explorations_list[i] = {
           // Create ids from 11 to 22.
@@ -405,7 +389,7 @@ describe('Learner dashboard page', () => {
         };
       }
 
-      // Generate completed collections and collection playlist.
+      // Generate completed collections.
       for (let i = 0; i < 8; i++) {
         learnerDashboardCollectionsData.completed_collections_list[i] = {
           id: Number(i + 1).toString(),
@@ -416,19 +400,6 @@ describe('Learner dashboard page', () => {
           created_on: 0,
           language_code: 'en',
           objective: 'an objective',
-          status: 'public',
-          thumbnail_bg_color: '',
-          thumbnail_icon_url: '',
-        };
-        learnerDashboardCollectionsData.collection_playlist[i] = {
-          id: Number(i + 1).toString(),
-          title: '',
-          category: '',
-          community_owned: false,
-          last_updated_msec: 0,
-          created_on: 0,
-          language_code: 'en',
-          objective: '',
           status: 'public',
           thumbnail_bg_color: '',
           thumbnail_icon_url: '',
@@ -531,11 +502,6 @@ describe('Learner dashboard page', () => {
               collectionSummary =>
                 CollectionSummary.createFromBackendDict(collectionSummary)
             ),
-          collectionPlaylist:
-            learnerDashboardCollectionsData.collection_playlist.map(
-              collectionSummary =>
-                CollectionSummary.createFromBackendDict(collectionSummary)
-            ),
           completedToIncompleteCollections:
             learnerDashboardCollectionsData.completed_to_incomplete_collections,
           numberOfNonexistentCollections:
@@ -557,11 +523,6 @@ describe('Learner dashboard page', () => {
             ),
           incompleteExplorationsList:
             learnerDashboardExplorationsData.incomplete_explorations_list.map(
-              expSummary =>
-                LearnerExplorationSummary.createFromBackendDict(expSummary)
-            ),
-          explorationPlaylist:
-            learnerDashboardExplorationsData.exploration_playlist.map(
               expSummary =>
                 LearnerExplorationSummary.createFromBackendDict(expSummary)
             ),
@@ -1081,7 +1042,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
@@ -1252,11 +1213,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1278,11 +1234,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),
@@ -1378,11 +1329,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1404,11 +1350,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),

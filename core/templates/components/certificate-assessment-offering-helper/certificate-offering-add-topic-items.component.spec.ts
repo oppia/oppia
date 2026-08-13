@@ -44,6 +44,7 @@ describe('Certificate Offering Add Topic Items Component', () => {
       'math_classroom_id',
       'Math',
       'math',
+      'user@email.com',
       [
         {
           id: 'topic_1',

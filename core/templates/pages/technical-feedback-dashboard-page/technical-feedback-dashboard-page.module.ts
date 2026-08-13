@@ -18,6 +18,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
 import {TechnicalFeedbackDashboardPageRootComponent} from './technical-feedback-dashboard-page-root.component';
 import {TechnicalFeedbackDashboardPageRoutingModule} from './technical-feedback-dashboard-page-routing.module';
@@ -27,6 +28,7 @@ import {TechnicalFeedbackDashboardPageRoutingModule} from './technical-feedback-
     SharedComponentsModule,
     CommonModule,
     TechnicalFeedbackDashboardPageRoutingModule,
+    FeedbackSharedModule,
   ],
   declarations: [
     TechnicalFeedbackDashboardPageRootComponent,

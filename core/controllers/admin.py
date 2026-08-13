@@ -1987,6 +1987,7 @@ class AdminHandler(
                 classroom_id=classroom_id_1,
                 name='math',
                 url_fragment='math',
+                feedback_recipient_email='user@email.com',
                 course_details='Math course  details',
                 teaser_text='Math teaser text',
                 topic_list_intro='Start with our first topic.',

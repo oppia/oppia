@@ -34,6 +34,7 @@ import {
   LessonFeedbackModel,
   FeedbackModalType,
   LessonFeedbackMetadata,
+  ReportType,
 } from 'domain/feedback/feedback.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
@@ -64,9 +65,10 @@ interface TurnstileWindow extends Window {
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
-  styleUrls: ['feedback-modal.component.css'],
+  styleUrls: ['./feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
+  readonly ReportAnIssueCategory = ReportAnIssueCategory;
   @Input() feedbackModalType!: FeedbackModalType;
   readonly MAX_REPORT_MESSAGE_LENGTH = 2500;
   @ViewChild('turnstileContainer')
@@ -211,7 +213,8 @@ export class FeedbackModalComponent implements OnInit {
     this.category = category;
 
     this.showTechnicalLogsCheckbox =
-      category === 'broken_layout_or_image' || category === 'other_or_not_sure';
+      category === ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE ||
+      category === ReportAnIssueCategory.OTHER_OR_NOT_SURE;
   }
 
   onScreenshotFileReceived(file: File): void {
@@ -313,7 +316,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: this.feedbackText,
       explorationContext: {
         explorationId: lessonFeedbackMetadata.explorationId,
@@ -394,7 +397,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'app',
+      source: ReportType.APP,
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,

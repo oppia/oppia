@@ -1432,5 +1432,40 @@ describe('Contribution and review service', () => {
 
       expect(sortedTranslationCards).toEqual(translationSuggestions);
     });
+
+    it('should prepend generic (metadata) translation suggestions at the beginning', () => {
+      const states = States.createFromBackendDict(statesBackendDict);
+      const suggestionsWithGeneric = [
+        ...translationSuggestions,
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_generic',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: AppConstants.DEFAULT_SUGGESTION_STATE_NAME,
+            content_id: 'exploration_title',
+            new_value: {
+              html: 'translated title',
+            },
+            old_value: {
+              html: 'original title',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+      ] as unknown as SuggestionBackendDict[];
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        suggestionsWithGeneric,
+        states,
+        'First State'
+      );
+
+      expect(sortedTranslationCards.length).toBe(7);
+      expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
+    });
   });
 });

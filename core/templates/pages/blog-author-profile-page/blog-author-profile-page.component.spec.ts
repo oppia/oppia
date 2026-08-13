@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Blog Author Profile Page component.
  */
 
-import {Pipe} from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -52,7 +52,7 @@ import {UserService} from 'services/user.service';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
