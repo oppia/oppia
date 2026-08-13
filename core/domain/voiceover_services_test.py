@@ -21,22 +21,20 @@ from __future__ import annotations
 import json
 import os
 import uuid
+from types import SimpleNamespace
 
-from core import feconf, schema_utils
-from core import constants
-from core.domain import (
-    exp_domain,
-    exp_services,
-    story_domain,
-    story_services,
-    topic_domain,
-    topic_services,
-)
+from core import constants, feconf, schema_utils
+from core.domain import exp_domain, exp_fetchers, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
+    story_domain,
+    story_services,
     suggestion_services,
     taskqueue_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
     translation_domain,
     translation_fetchers,
     voiceover_domain,
@@ -46,7 +44,6 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from types import SimpleNamespace
 from typing import Dict, List, Sequence, Tuple
 
 MYPY = False
@@ -55,6 +52,7 @@ if MYPY:  # pragma: no cover
         cloud_task_models,
         email_models,
         exp_models,
+        opportunity_models,
         translation_models,
         voiceover_models,
     )
@@ -62,6 +60,7 @@ if MYPY:  # pragma: no cover
 (
     cloud_task_models,
     exp_models,
+    opportunity_models,
     email_models,
     voiceover_models,
     translation_models,
@@ -69,6 +68,7 @@ if MYPY:  # pragma: no cover
     [
         models.Names.CLOUD_TASK,
         models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
         models.Names.EMAIL,
         models.Names.VOICEOVER,
         models.Names.TRANSLATION,
@@ -332,7 +332,6 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                 'exp_id_1', 'exploration', 1, 'en'
             )
         )
-
         self.assertEqual(len(retrieved_entity_voiceovers), 2)
 
     def test_should_compute_entity_voiceovers_model_successfully(self) -> None:
@@ -1748,12 +1747,12 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             language_code,
             translations_mapping,
         ).put()
-        TOPIC_ID_1 = 'topic_id_1'
-        STORY_ID_1 = 'story_id_1'
-        CURATED_EXPLORATION_ID_1 = exploration_id
+        topic_id_1 = 'topic_id_1'
+        story_id_1 = 'story_id_1'
+        curated_exploration_1 = exploration_id
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm'
+            topic_id_1, 'topic1', 'abbrev', 'description', 'fragm'
         )
         topic_1.thumbnail_filename = 'thumbnail.svg'
         topic_1.thumbnail_bg_color = '#C6DCDA'
@@ -1772,23 +1771,23 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         topic_1.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(owner_id, topic_1)
-        topic_services.publish_topic(TOPIC_ID_1, self.admin_id)
+        topic_services.publish_topic(topic_id_1, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
-            STORY_ID_1,
+            story_id_1,
             'A story',
             'Description',
-            TOPIC_ID_1,
+            topic_id_1,
             'story-two',
         )
         story_services.save_new_story(owner_id, story_1)
-        topic_services.add_canonical_story(owner_id, TOPIC_ID_1, STORY_ID_1)
+        topic_services.add_canonical_story(owner_id, topic_id_1, story_id_1)
 
-        topic_services.publish_story(TOPIC_ID_1, STORY_ID_1, self.admin_id)
+        topic_services.publish_story(topic_id_1, story_id_1, self.admin_id)
 
         story_services.update_story(
             owner_id,
-            STORY_ID_1,
+            story_id_1,
             [
                 story_domain.StoryChange(
                     {
@@ -1803,7 +1802,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                         'property_name': 'exploration_id',
                         'node_id': 'node_1',
                         'old_value': None,
-                        'new_value': CURATED_EXPLORATION_ID_1,
+                        'new_value': curated_exploration_1,
                     }
                 ),
             ],
@@ -1921,7 +1920,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.swap(
-            voiceover_services.constants.constants,
+            constants.constants,
             'SUPPORTED_CONTENT_LANGUAGES',
             [{'code': 'en', 'description': 123}],
         )
@@ -1934,10 +1933,20 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         class ExploitationWithBrokenTitle:
+            """A mock exploration class that raises an exception when the
+            title is accessed.
+            """
+
             version = 1
 
             @property
             def title(self) -> str:
+                """A mock exploration class method that raises an exception
+                when the title is accessed.
+
+                Raises:
+                    Exception. Always raises an exception to simulate a title lookup failure.
+                """
                 raise Exception('title lookup failed')
 
         exploration = ExploitationWithBrokenTitle()
@@ -1951,12 +1960,13 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             additional_contextual_information: Dict[str, str],
             specific_language_accent_code: str | None = None,
         ) -> None:
+            _ = specific_language_accent_code
             captured_additional_contextual_information.update(
                 additional_contextual_information
             )
 
         with self.swap(
-            voiceover_services.exp_fetchers,
+            exp_fetchers,
             'get_exploration_by_id',
             lambda _exploration_id: exploration,
         ):
@@ -2019,12 +2029,13 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             additional_contextual_information: Dict[str, str],
             specific_language_accent_code: str | None = None,
         ) -> None:
+            _ = specific_language_accent_code
             captured_additional_contextual_information.update(
                 additional_contextual_information
             )
 
         with self.swap(
-            voiceover_services.exp_fetchers,
+            exp_fetchers,
             'get_exploration_summary_by_id',
             lambda _exploration_id: SimpleNamespace(title='Test Exploration'),
         ):
@@ -2055,24 +2066,25 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             additional_contextual_information: Dict[str, str],
             specific_language_accent_code: str | None = None,
         ) -> None:
+            _ = specific_language_accent_code
             captured_additional_contextual_information.update(
                 additional_contextual_information
             )
 
         with self.swap(
-            voiceover_services.exp_fetchers,
+            exp_fetchers,
             'get_exploration_by_id',
             lambda _exploration_id: SimpleNamespace(
                 version=1, title='Curated Exploration'
             ),
         ):
             with self.swap(
-                voiceover_services.opportunity_models.ExplorationOpportunitySummaryModel,
+                opportunity_models.ExplorationOpportunitySummaryModel,
                 'get_by_id',
                 lambda _exploration_id: SimpleNamespace(topic_id='topic_1'),
             ):
                 with self.swap(
-                    voiceover_services.topic_fetchers,
+                    topic_fetchers,
                     'get_topic_by_id',
                     lambda _topic_id: SimpleNamespace(name='Sample Topic'),
                 ):
@@ -2082,7 +2094,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                         lambda _exploration: {},
                     ):
                         with self.swap(
-                            voiceover_services.translation_fetchers,
+                            translation_fetchers,
                             'get_all_entity_translations_for_entity',
                             lambda *_args, **_kwargs: [],
                         ):
@@ -2121,19 +2133,20 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             additional_contextual_information: Dict[str, str],
             specific_language_accent_code: str | None = None,
         ) -> None:
+            _ = specific_language_accent_code
             captured_additional_contextual_information.update(
                 additional_contextual_information
             )
 
         with self.swap(
-            voiceover_services.exp_fetchers,
+            exp_fetchers,
             'get_exploration_by_id',
             lambda _exploration_id: SimpleNamespace(
                 version=1, title='Curated Exploration'
             ),
         ):
             with self.swap(
-                voiceover_services.opportunity_models.ExplorationOpportunitySummaryModel,
+                opportunity_models.ExplorationOpportunitySummaryModel,
                 'get_by_id',
                 lambda _exploration_id: (_ for _ in ()).throw(
                     Exception('topic lookup failed')
@@ -2145,7 +2158,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     lambda _exploration: {},
                 ):
                     with self.swap(
-                        voiceover_services.translation_fetchers,
+                        translation_fetchers,
                         'get_all_entity_translations_for_entity',
                         lambda *_args, **_kwargs: [],
                     ):
@@ -2191,12 +2204,12 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             )
 
         with self.swap(
-            voiceover_services.suggestion_services,
+            suggestion_services,
             'get_suggestion_by_id',
             lambda _suggestion_id: suggestion,
         ):
             with self.swap(
-                voiceover_services.exp_fetchers,
+                exp_fetchers,
                 'get_exploration_summary_by_id',
                 lambda _exploration_id: (_ for _ in ()).throw(
                     Exception('summary lookup failed')
