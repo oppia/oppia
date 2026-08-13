@@ -165,6 +165,12 @@ const historyListOptions = '.e2e-test-history-table-option';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
+const totalPlaysCardSelector = '.e2e-test-creator-dashboard-total-plays';
+const openFeedbackCardSelector = '.e2e-test-creator-dashboard-open-feedback';
+const subscriberCountLabel = '.e2e-test-creator-dashboard-subscriber-count';
+const explorationSummaryTileTitleSelector =
+  '.e2e-test-exploration-dashboard-card-title';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
