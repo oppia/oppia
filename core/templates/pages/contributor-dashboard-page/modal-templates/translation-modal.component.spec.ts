@@ -161,7 +161,7 @@ describe('Translation Modal Component', () => {
       removeEventListener: jasmine.createSpy('removeEventListener'),
       gtag: jasmine.createSpy('gtag'),
       location: {
-        pathname: '/contributor-dashboard',
+        pathname: '/signup',
         href: '',
       },
     };
