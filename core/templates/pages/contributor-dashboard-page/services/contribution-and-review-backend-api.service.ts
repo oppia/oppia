@@ -121,8 +121,8 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
-      // target_type is a path argument of the suggestion list endpoints, so a
-      // concrete value is always required. "All" therefore falls back to
+      // The target_type is a path argument of the suggestion list endpoints,
+      // so a concrete value is always required. "All" therefore falls back to
       // explorations until those endpoints can express every entity type.
       const actualTargetType =
         !targetType ||
@@ -149,8 +149,8 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
-      // target_type is a path argument of the suggestion list endpoints, so a
-      // concrete value is always required. "All" therefore falls back to
+      // The target_type is a path argument of the suggestion list endpoints,
+      // so a concrete value is always required. "All" therefore falls back to
       // explorations until those endpoints can express every entity type.
       const actualTargetType =
         !targetType ||
