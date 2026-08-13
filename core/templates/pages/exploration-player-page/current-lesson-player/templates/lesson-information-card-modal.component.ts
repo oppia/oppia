@@ -21,7 +21,10 @@ import {Component, ViewEncapsulation} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -237,19 +240,36 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
+  // A contributor translation supersedes the hardcoded bundle, because it
+  // covers every exploration rather than the fixed set the bundle was built
+  // for, and it is the value reviewers accepted most recently.
+  private isMetadataFieldTranslatedByBackend(
+    field: TranslatableExplorationMetadataField
+  ): boolean {
+    return (this.expInfo.translated_metadata_fields || []).includes(field);
+  }
+
   isHackyExpTitleTranslationDisplayed(): boolean {
     return (
+      !this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.TITLE
+      ) &&
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.expTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      ) &&
+      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
     return (
+      !this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.OBJECTIVE
+      ) &&
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.expDescTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      ) &&
+      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 

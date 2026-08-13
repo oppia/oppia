@@ -86,6 +86,7 @@ export class LibraryPageComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   translateSubscription!: Subscription;
   resizeSubscription!: Subscription;
+  i18nLanguageCodeSubscription!: Subscription;
   // The following property will be assigned null when user
   // has not selected any active group index.
   activeGroupIndex!: number | null;
@@ -334,7 +335,6 @@ export class LibraryPageComponent {
     this.libraryWindowIsNarrow =
       this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
 
-    this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename =
       this.possibleBannerFilenames[
         Math.floor(Math.random() * this.possibleBannerFilenames.length)
@@ -381,6 +381,31 @@ export class LibraryPageComponent {
     // Keeps track of the state of each library group when in mobile view
     // i.e. if they are in a collapsed state or not.
     this.mobileLibraryGroupsProperties = [];
+
+    this.loadLibraryData();
+
+    this.i18nLanguageCodeSubscription =
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        // The tiles show exploration metadata in the site language, so the
+        // data is fetched again when the learner changes that language. In
+        // search mode the tiles come from the search bar's own query instead.
+        if (this.pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
+          this.loadLibraryData();
+        }
+      });
+
+    this.resizeSubscription = this.windowDimensionsService
+      .getResizeEvent()
+      .subscribe(evt => {
+        this.initCarousels();
+
+        this.libraryWindowIsNarrow =
+          this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
+      });
+  }
+
+  loadLibraryData(): void {
+    this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
 
     if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
       let pathnameArray =
@@ -480,6 +505,7 @@ export class LibraryPageComponent {
           // The following initializes the array so that every group
           // (in mobile view) loads in with a limit on the number of cards
           // displayed, and with the button text being "See More".
+          this.mobileLibraryGroupsProperties = [];
           for (let i = 0; i < this.libraryGroups.length; i++) {
             this.mobileLibraryGroupsProperties.push({
               inCollapsedState: true,
@@ -488,15 +514,6 @@ export class LibraryPageComponent {
           }
         });
     }
-
-    this.resizeSubscription = this.windowDimensionsService
-      .getResizeEvent()
-      .subscribe(evt => {
-        this.initCarousels();
-
-        this.libraryWindowIsNarrow =
-          this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
-      });
   }
 
   moveClassroomCarouselToPreviousSlide(): void {
@@ -568,6 +585,9 @@ export class LibraryPageComponent {
     }
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
+    }
+    if (this.i18nLanguageCodeSubscription) {
+      this.i18nLanguageCodeSubscription.unsubscribe();
     }
   }
 }

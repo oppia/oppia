@@ -35,6 +35,19 @@ UnionSummaryDictType = Union[
     summary_services.DisplayableCollectionSummaryDict,
 ]
 
+# Schema for the language the returned exploration metadata is displayed in.
+# This is the learner's site language, so it is restricted to the languages the
+# site itself is available in.
+DISPLAY_IN_LANGUAGE_CODE_SCHEMA = {
+    'schema': {
+        'type': 'basestring',
+        'choices': [
+            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+        ],
+    },
+    'default_value': None,
+}
+
 
 def get_matching_activity_dicts(
     query_string: str,
@@ -141,16 +154,7 @@ class LibraryIndexHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'display_in_language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        language['id']
-                        for language in constants.SUPPORTED_SITE_LANGUAGES
-                    ],
-                },
-                'default_value': None,
-            },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 
@@ -233,6 +237,7 @@ class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
     """
 
     group_name: str
+    display_in_language_code: Optional[str]
 
 
 class LibraryGroupIndexHandler(
@@ -254,7 +259,8 @@ class LibraryGroupIndexHandler(
                         feconf.LIBRARY_GROUP_TOP_RATED,
                     ],
                 }
-            }
+            },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 
@@ -264,13 +270,17 @@ class LibraryGroupIndexHandler(
         # TODO(sll): Support index pages for other language codes.
         assert self.normalized_request is not None
         group_name = self.normalized_request['group_name']
+        display_in_language_code = self.normalized_request.get(
+            'display_in_language_code'
+        )
         activity_list = []
         header_i18n_id = ''
 
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (
                 summary_services.get_recently_published_exp_summary_dicts(
-                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE,
+                    display_in_language_code=display_in_language_code,
                 )
             )
             if recently_published_summary_dicts:
@@ -282,6 +292,7 @@ class LibraryGroupIndexHandler(
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [constants.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
+                    display_in_language_code=display_in_language_code,
                 )
             )
             if top_rated_activity_summary_dicts:
@@ -356,16 +367,7 @@ class SearchHandler(
             # learner's site language. It is separate from language_code above,
             # which filters which activities are returned by their own
             # language.
-            'display_in_language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        language['id']
-                        for language in constants.SUPPORTED_SITE_LANGUAGES
-                    ],
-                },
-                'default_value': None,
-            },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 
@@ -457,16 +459,7 @@ class ExplorationSummariesHandler(
                 'schema': {'type': 'bool'},
                 'default_value': False,
             },
-            'display_in_language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        language['id']
-                        for language in constants.SUPPORTED_SITE_LANGUAGES
-                    ],
-                },
-                'default_value': None,
-            },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 

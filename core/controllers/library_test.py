@@ -34,6 +34,8 @@ from core.domain import (
     rights_domain,
     rights_manager,
     summary_services,
+    translation_domain,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -762,6 +764,43 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             response_dict['activity_list'][0],
         )
 
+    def test_library_group_index_handler_with_display_in_language_code(
+        self,
+    ) -> None:
+        """Test library group index handler with display_in_language_code."""
+        exp_services.load_demo('0')
+        exp_summary = exp_fetchers.get_exploration_summary_by_id('0')
+
+        translated_title = translation_domain.TranslatedContent(
+            'Hindi Welcome Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={
+                'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
+                'display_in_language_code': 'hi',
+            },
+        )
+        self.assertEqual(len(response_dict['activity_list']), 1)
+        self.assertEqual(
+            response_dict['activity_list'][0]['title'], 'Hindi Welcome Title'
+        )
+        self.assertEqual(
+            response_dict['activity_list'][0]['translated_metadata_fields'],
+            ['title'],
+        )
+
     def test_handler_for_top_rated_library_group_page(self) -> None:
         """Test library handler for top rated group page."""
 
@@ -947,8 +986,6 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_get_translated_exploration_summaries(self) -> None:
-        from core.domain import translation_domain, translation_services
-
         self.login(self.VIEWER_EMAIL)
 
         exp_summary = exp_fetchers.get_exploration_summary_by_id(

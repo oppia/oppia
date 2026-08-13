@@ -22,6 +22,7 @@ import {Injectable} from '@angular/core';
 
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-exploration-summary.model';
+import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 interface LibraryGroupDataBackendDict {
@@ -43,6 +44,7 @@ export interface ActivityDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
+  translated_metadata_fields?: TranslatableExplorationMetadataField[];
 }
 export interface SummaryDict {
   activity_summary_dicts: ActivityDict[];
@@ -87,15 +89,20 @@ export class LibraryPageBackendApiService {
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
-  async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
-    // The cards are displayed in the learner's site language, so that the
-    // exploration metadata matches the rest of the page.
-    const params = {
+  // The cards are displayed in the learner's site language, so that the
+  // exploration metadata matches the rest of the page.
+  private getDisplayLanguageParams(): {display_in_language_code: string} {
+    return {
       display_in_language_code:
         this.i18nLanguageCodeService.getCurrentI18nLanguageCode(),
     };
+  }
+
+  async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
     return this.http
-      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER, {params})
+      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER, {
+        params: this.getDisplayLanguageParams(),
+      })
       .toPromise();
   }
 
@@ -112,6 +119,7 @@ export class LibraryPageBackendApiService {
       .get<LibraryGroupDataBackendDict>(this.LIBRARY_GROUP_HANDLER, {
         params: {
           group_name: groupName,
+          ...this.getDisplayLanguageParams(),
         },
       })
       .toPromise();

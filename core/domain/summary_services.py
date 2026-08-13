@@ -92,6 +92,7 @@ class DisplayableExplorationSummaryDict(TypedDict):
     visited_checkpoints_count: int
     total_checkpoints_count: int
     num_views: int
+    translated_metadata_fields: List[str]
 
 
 class PlaythroughDict(TypedDict):
@@ -547,6 +548,23 @@ def get_displayable_exp_summary_dicts_matching_ids(
     )
 
 
+EXPLORATION_SUMMARY_TITLE_FIELD = 'title'
+EXPLORATION_SUMMARY_OBJECTIVE_FIELD = 'objective'
+EXPLORATION_SUMMARY_CATEGORY_FIELD = 'category'
+EXPLORATION_SUMMARY_TAGS_FIELD = 'tags'
+
+# Maps each single-valued translatable field of a displayable exploration
+# summary dict to the content ID its translation is stored under. Tags are
+# handled separately because each tag has its own content ID.
+EXPLORATION_SUMMARY_FIELD_TO_CONTENT_ID = {
+    EXPLORATION_SUMMARY_TITLE_FIELD: feconf.EXPLORATION_TITLE_CONTENT_ID,
+    EXPLORATION_SUMMARY_OBJECTIVE_FIELD: (
+        feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+    ),
+    EXPLORATION_SUMMARY_CATEGORY_FIELD: feconf.EXPLORATION_CATEGORY_CONTENT_ID,
+}
+
+
 def _get_up_to_date_translation(
     entity_translation: translation_domain.EntityTranslation,
     content_id: str,
@@ -667,32 +685,24 @@ def get_displayable_exp_summary_dicts(
 
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary:
-            title = exploration_summary.title
-            objective = exploration_summary.objective
-            category = exploration_summary.category
+            translated_values: Dict[str, str] = {}
+            translated_metadata_fields: List[str] = []
             tags = list(exploration_summary.tags)
 
             entity_translation = entity_translations_map.get(
                 exploration_summary.id
             )
             if entity_translation is not None:
-                translated_title = _get_up_to_date_translation(
-                    entity_translation, feconf.EXPLORATION_TITLE_CONTENT_ID
-                )
-                if translated_title is not None:
-                    title = translated_title
-
-                translated_objective = _get_up_to_date_translation(
-                    entity_translation, feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
-                )
-                if translated_objective is not None:
-                    objective = translated_objective
-
-                translated_category = _get_up_to_date_translation(
-                    entity_translation, feconf.EXPLORATION_CATEGORY_CONTENT_ID
-                )
-                if translated_category is not None:
-                    category = translated_category
+                for (
+                    field_name,
+                    content_id,
+                ) in EXPLORATION_SUMMARY_FIELD_TO_CONTENT_ID.items():
+                    translated_value = _get_up_to_date_translation(
+                        entity_translation, content_id
+                    )
+                    if translated_value is not None:
+                        translated_values[field_name] = translated_value
+                        translated_metadata_fields.append(field_name)
 
                 # Tag content IDs are index based, matching how they are
                 # generated in Exploration.get_translatable_contents_collection.
@@ -703,16 +713,28 @@ def get_displayable_exp_summary_dicts(
                     )
                     if translated_tag is not None:
                         tags[tag_idx] = translated_tag
+                if tags != exploration_summary.tags:
+                    translated_metadata_fields.append(
+                        EXPLORATION_SUMMARY_TAGS_FIELD
+                    )
 
             summary_dict: DisplayableExplorationSummaryDict = {
                 'id': exploration_summary.id,
-                'title': title,
+                'title': translated_values.get(
+                    EXPLORATION_SUMMARY_TITLE_FIELD, exploration_summary.title
+                ),
                 'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
-                'category': category,
+                'category': translated_values.get(
+                    EXPLORATION_SUMMARY_CATEGORY_FIELD,
+                    exploration_summary.category,
+                ),
                 'created_on_msec': utils.get_time_in_millisecs(
                     exploration_summary.exploration_model_created_on
                 ),
-                'objective': objective,
+                'objective': translated_values.get(
+                    EXPLORATION_SUMMARY_OBJECTIVE_FIELD,
+                    exploration_summary.objective,
+                ),
                 'language_code': exploration_summary.language_code,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     exploration_summary.exploration_model_last_updated
@@ -735,6 +757,10 @@ def get_displayable_exp_summary_dicts(
                 'num_views': view_counts[ind],
                 'visited_checkpoints_count': 0,
                 'total_checkpoints_count': 0,
+                # Clients fall back to their own hardcoded translation bundles
+                # for the fields that are not listed here, so the list has to
+                # say which values actually came back translated.
+                'translated_metadata_fields': translated_metadata_fields,
             }
 
             displayable_exp_summaries.append(summary_dict)
@@ -1126,11 +1152,15 @@ def get_top_rated_exploration_summary_dicts(
 
 def get_recently_published_exp_summary_dicts(
     limit: int,
+    display_in_language_code: Optional[str] = None,
 ) -> List[DisplayableExplorationSummaryDict]:
     """Returns a list of recently published explorations.
 
     Args:
         limit: int. The maximum number of explorations to return.
+        display_in_language_code: str or None. The language code to display
+            translated exploration metadata in. If None, the original metadata
+            is returned.
 
     Returns:
         list(dict). Each dict in this list represents a featured activity in
@@ -1168,4 +1198,6 @@ def get_recently_published_exp_summary_dicts(
         recently_published_exploration_summaries, key=sort_fnc, reverse=True
     )
 
-    return get_displayable_exp_summary_dicts(summaries)
+    return get_displayable_exp_summary_dicts(
+        summaries, display_in_language_code=display_in_language_code
+    )
