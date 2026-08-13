@@ -1530,6 +1530,151 @@ export class ExplorationEditor extends BaseUser {
 
     throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
+
+  /**
+   * Function to create and save a new untitled exploration containing
+   * only the EndExploration interaction.
+   */
+  async createAndSaveAMinimalExploration(): Promise<void> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
+   * Function to check the expected total number of plays.
+   * @param {number} number - The expected total play count.
+   */
+  async expectTotalPlaysToBe(number: number): Promise<void> {
+    await this.expectElementToBeVisible(totalPlaysCardSelector);
+    const totalPlaysElements = await this.page.$$(
+      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
+        `${totalPlaysCardSelector} .stat-value-without-rating`
+    );
+    let numberOfTotalPlays = 0;
+    for (const el of totalPlaysElements) {
+      const rect = await el.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+      const text = await el.evaluate(
+        element => (element as HTMLElement).innerText.trim() || '0'
+      );
+      numberOfTotalPlays = parseInt(text, 10) || 0;
+      break;
+    }
+    if (numberOfTotalPlays !== number) {
+      throw new Error(
+        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected number of open feedback entries.
+   * @param {number} number - The expected count of open feedback entries.
+   */
+  async expectOpenFeedbacksToBe(number: number): Promise<void> {
+    await this.expectElementToBeVisible(openFeedbackCardSelector);
+    const numberOfOpenFeedbacks = await this.page.$eval(
+      openFeedbackCardSelector,
+      card => {
+        const statValue = Array.from(
+          (card as HTMLElement).querySelectorAll(
+            '.stat-value-with-rating, .stat-value-without-rating'
+          )
+        ).find(element => {
+          const htmlElement = element as HTMLElement;
+          const style = window.getComputedStyle(htmlElement);
+          const rect = htmlElement.getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        }) as HTMLElement | undefined;
+        return parseInt(statValue?.innerText.trim() || '0', 10);
+      }
+    );
+    if (numberOfOpenFeedbacks !== number) {
+      throw new Error(
+        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the number of subscribers in the creator dashboard.
+   * @param {number} subscriberCount - The expected number of subscribers.
+   */
+  async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
+    await this.page.waitForSelector(subscriberCountLabel, {visible: true});
+    const currentSubscriberCount = await this.page.$eval(
+      subscriberCountLabel,
+      element => element.textContent?.trim() || '0'
+    );
+    if (parseInt(currentSubscriberCount, 10) === subscriberCount) {
+      showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
+    } else {
+      throw new Error(
+        `Expected ${subscriberCount} subscribers, but found ${currentSubscriberCount}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of explorations.
+   * @param {number} number - The expected count of total explorations.
+   */
+  async expectNumberOfExplorationsToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    if (titlesOnPage.length !== number) {
+      throw new Error(
+        `Expected ${number} explorations, but found ${titlesOnPage.length} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the presence and expected number of occurrences
+   * of an exploration.
+   * @param {string} explorationName - The name of the exploration.
+   * @param {number} numberOfOccurrence - The expected occurrence count.
+   */
+  async expectExplorationNameToAppearNTimes(
+    explorationName: string,
+    numberOfOccurrence: number = 1
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const count = titlesOnPage.filter(
+      title => title === explorationName
+    ).length;
+    if (numberOfOccurrence === 1 && count !== numberOfOccurrence) {
+      throw new Error(`Exploration "${explorationName}" not found.`);
+    } else if (count !== numberOfOccurrence) {
+      throw new Error(
+        `Exploration "${explorationName}" found ${count} times, ` +
+          `but expected ${numberOfOccurrence} times.`
+      );
+    }
+  }
 }
 
 export const ExplorationEditorFactory = (page: Page): ExplorationEditor => {
