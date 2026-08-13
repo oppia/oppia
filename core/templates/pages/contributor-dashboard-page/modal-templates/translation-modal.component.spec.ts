@@ -156,6 +156,10 @@ describe('Translation Modal Component', () => {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
       gtag: jasmine.createSpy('gtag'),
+      location: {
+        pathname: '/contributor-dashboard',
+        href: '',
+      },
     };
 
     TestBed.configureTestingModule({
