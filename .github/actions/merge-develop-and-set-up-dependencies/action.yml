@@ -38,7 +38,7 @@ runs:
       # We need to include install_python_dev_dependencies.py in the cache key
       # because it has the version numbers for pip, pip-tools and setuptools.
       with:
-        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
+        key: ${{ runner.os }}-proddeps-v2-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
         path: |
           /opt/hostedtoolcache/Python/3.10.16/x64
 
