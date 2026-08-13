@@ -311,10 +311,10 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             )
 
         # 1. Test case: No translations.
-        indexed_docs: List[search_services.DomainSearchDict] = []
+        indexed_docs: List[search_services.ExplorationSearchDict] = []
 
         def mock_add_docs(
-            docs: List[search_services.DomainSearchDict], index: str
+            docs: List[search_services.ExplorationSearchDict], index: str
         ) -> None:
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             indexed_docs.extend(docs)
@@ -416,6 +416,27 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             indexed_docs[0]['translated_tags'],
             ['translated tag bn', 'translated tag hi'],
         )
+
+        # 3. Test case: Exploration not found in explorations_dict (defensive check).
+        indexed_docs = []
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+        add_docs_swap = self.swap(
+            gae_search_services, 'add_documents_to_index', add_docs_counter
+        )
+        get_multiple_swap = self.swap(
+            exp_fetchers,
+            'get_multiple_explorations_by_id',
+            lambda *args, **kwargs: {},
+        )
+
+        with add_docs_swap, get_multiple_swap:
+            search_services.index_exploration_summaries([exp_summary])
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(len(indexed_docs), 1)
+        self.assertEqual(indexed_docs[0]['translated_titles'], [])
+        self.assertEqual(indexed_docs[0]['translated_objectives'], [])
+        self.assertEqual(indexed_docs[0]['translated_tags'], [])
 
     def test_index_exploration_summaries_batches_explorations_lookups(
         self,

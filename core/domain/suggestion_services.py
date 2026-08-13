@@ -992,6 +992,8 @@ def accept_suggestion(
             suggestion.target_type,
         )
         if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # We import exp_services locally here to avoid a circular dependency
+            # with exp_services, which imports suggestion_services at the top level.
             from core.domain import exp_services
 
             exp_services.index_explorations_given_ids([suggestion.target_id])

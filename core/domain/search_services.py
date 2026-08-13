@@ -67,7 +67,7 @@ SEARCH_INDEX_BLOG_POSTS: Final = 'blog-posts'
 _DEFAULT_RANK: Final = 20
 
 
-class DomainSearchDict(TypedDict, total=False):
+class DomainSearchDict(TypedDict):
     """Dictionary representing the search dictionary of a domain object."""
 
     id: str
@@ -77,6 +77,11 @@ class DomainSearchDict(TypedDict, total=False):
     tags: List[str]
     objective: str
     rank: int
+
+
+class ExplorationSearchDict(DomainSearchDict):
+    """Dictionary representing the search dictionary of an exploration."""
+
     translated_titles: List[str]
     translated_objectives: List[str]
     translated_tags: List[str]
@@ -183,7 +188,7 @@ def index_exploration_summaries(
         [s.id for s in indexable], strict=False
     )
 
-    documents = []
+    documents: List[ExplorationSearchDict] = []
     for exp_summary in indexable:
         exploration = explorations_dict.get(exp_summary.id)
         if exploration is not None:
@@ -219,7 +224,7 @@ def _exp_summary_to_search_dict(
     translated_titles: List[str],
     translated_objectives: List[str],
     translated_tags: List[str],
-) -> DomainSearchDict:
+) -> ExplorationSearchDict:
     """Updates the dict to be returned, whether the given exploration is to
     be indexed for further queries or not.
 
@@ -233,7 +238,7 @@ def _exp_summary_to_search_dict(
         dict. The representation of the given exploration, in a form that can
         be used by the search index.
     """
-    doc: DomainSearchDict = {
+    doc: ExplorationSearchDict = {
         'id': exp_summary.id,
         'language_code': exp_summary.language_code,
         'title': exp_summary.title,

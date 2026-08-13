@@ -1322,6 +1322,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
             'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
             'language_code': 'hi',
             'content_html': '<p>Actual skill explanation</p>',
