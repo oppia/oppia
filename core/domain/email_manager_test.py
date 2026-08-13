@@ -31,8 +31,6 @@ from core.domain import (
     general_feedback_domain,
     html_cleaner,
     platform_parameter_domain,
-    topic_services,
-    user_services,
 )
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
@@ -44,6 +42,7 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     taskqueue_services,
+    topic_services,
     translation_domain,
     user_services,
 )
