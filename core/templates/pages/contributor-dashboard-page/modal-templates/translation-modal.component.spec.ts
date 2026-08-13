@@ -126,6 +126,10 @@ describe('Translation Modal Component', () => {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
     gtag: jasmine.Spy;
+    location: {
+      pathname: string;
+      href: string;
+    };
   };
 
   const opportunity: TranslationOpportunity = {
