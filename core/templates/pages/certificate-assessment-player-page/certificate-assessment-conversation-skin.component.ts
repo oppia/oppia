@@ -13,28 +13,112 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the assessment conversation skin.
+ * @fileoverview Component for the certificate assessment conversation skin,
+ * i.e. the question-by-question player screen (progress bar, timer,
+ * question card, and navigation actions).
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-
-interface AssessmentQuestion {
-  prompt: string;
-  choices: string[];
-}
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AssessmentQuestion} from './certificate-assessment-player-page.component';
+import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
   selector: 'oppia-certificate-assessment-conversation-skin',
   templateUrl: './certificate-assessment-conversation-skin.component.html',
+  styleUrls: ['./certificate-assessment-conversation-skin.component.css'],
 })
-export class CertificateAssessmentConversationSkinComponent {
+export class CertificateAssessmentConversationSkinComponent
+  implements OnInit, OnChanges
+{
   @Input() currentQuestion!: AssessmentQuestion;
   @Input() currentQuestionIndex = 0;
   @Input() totalQuestions = 0;
   @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
+  @Input() savedResponse = '';
+
+  @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
   @Output() submitAssessment = new EventEmitter<void>();
+  @Output() responseChange = new EventEmitter<string>();
+
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  selectedOptionIds: string[] = [];
+  freeResponse = '';
+
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
+
+  ngOnInit(): void {
+    this.OPPIA_AVATAR_IMAGE_URL =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
+    this.hydrateResponseFromSavedResponse();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.currentQuestion || changes.savedResponse) {
+      this.hydrateResponseFromSavedResponse();
+    }
+  }
+
+  private hydrateResponseFromSavedResponse(): void {
+    this.freeResponse = '';
+    this.selectedOptionIds = [];
+    if (!this.savedResponse) {
+      return;
+    }
+    if (
+      this.currentQuestion?.type === 'multiple_choice' ||
+      this.currentQuestion?.type === 'multiple_select'
+    ) {
+      this.selectedOptionIds = this.savedResponse.split(',').filter(Boolean);
+    } else {
+      this.freeResponse = this.savedResponse;
+    }
+  }
+
+  isOptionSelected(optionId: string): boolean {
+    return this.selectedOptionIds.includes(optionId);
+  }
+
+  selectSingleChoice(optionId: string): void {
+    this.selectedOptionIds = [optionId];
+    this.responseChange.emit(optionId);
+  }
+
+  toggleMultipleSelect(optionId: string): void {
+    if (this.isOptionSelected(optionId)) {
+      this.selectedOptionIds = this.selectedOptionIds.filter(
+        id => id !== optionId
+      );
+    } else {
+      this.selectedOptionIds = [...this.selectedOptionIds, optionId];
+    }
+    this.responseChange.emit(this.selectedOptionIds.join(','));
+  }
+
+  updateFreeResponse(value: string): void {
+    this.freeResponse = value;
+    this.responseChange.emit(value);
+  }
+
+  getQuestionInputType(): string {
+    return this.currentQuestion?.type === 'numeric_input' ? 'number' : 'text';
+  }
+
+  onPreviousQuestion(): void {
+    this.previousQuestion.emit();
+  }
 
   onNextQuestion(): void {
     this.nextQuestion.emit();
