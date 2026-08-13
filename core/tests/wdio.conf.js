@@ -25,20 +25,11 @@ const ALL_VIDEOS = false;
 
 var suites = {
   full: [
-    './core/tests/webdriverio/**/*.js',
     './core/tests/webdriverio_desktop/**/*.js',
-  ],
-
-  collections: [
-    './core/tests/webdriverio_desktop/collections.js'
   ],
 
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
-  ],
-
-  learner: [
-    './core/tests/webdriverio/learnerFlow.js'
   ],
 
   skillEditor: [
