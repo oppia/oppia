@@ -80,11 +80,20 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         }
 
     def test_create_lesson_feedback_returns_domain_object(self) -> None:
-        feedback = general_feedback_services.create_lesson_feedback(
-            author_id=self.user.user_id,
-            feedback_text='This lesson helped.',
-            lesson_metadata=self.get_lesson_metadata(),
+        mock_send_feedback_email = mock.Mock()
+        send_feedback_email_swap = self.swap(
+            general_feedback_services.general_feedback_email_services,
+            'send_feedback_submission_email',
+            mock_send_feedback_email,
         )
+        with send_feedback_email_swap:
+            feedback = general_feedback_services.create_lesson_feedback(
+                author_id=self.user.user_id,
+                feedback_text='This lesson helped.',
+                lesson_metadata=self.get_lesson_metadata(),
+            )
+
+        mock_send_feedback_email.assert_called_once_with(feedback)
 
         self.assertEqual(feedback.author_id, self.user.user_id)
         self.assertEqual(feedback.feedback_text, 'This lesson helped.')
@@ -196,23 +205,48 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         )
 
     def test_update_lesson_feedback_appends_creator_response(self) -> None:
-        feedback = general_feedback_services.create_lesson_feedback(
+        mock_send_status_email = mock.Mock()
+        mock_send_reply_email = mock.Mock()
+        status_email_swap = self.swap(
+            general_feedback_services.general_feedback_email_services,
+            'send_feedback_status_change_email',
+            mock_send_status_email,
+        )
+        reply_email_swap = self.swap(
+            general_feedback_services.general_feedback_email_services,
+            'send_feedback_reply_email',
+            mock_send_reply_email,
+        )
+
+        with status_email_swap, reply_email_swap:
+            feedback = general_feedback_services.create_lesson_feedback(
+                author_id=self.user.user_id,
+                feedback_text='This lesson helped.',
+                lesson_metadata=self.get_lesson_metadata(),
+            )
+
+            updated_feedback = general_feedback_services.update_lesson_feedback(
+                feedback_id=feedback.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                exp_id='exp_id',
+                responder_id='creator_id',
+                reply_text='Thanks, this is fixed.',
+            )
+            feedback_model = (
+                general_feedback_models.LessonFeedbackModel.get_by_id(
+                    feedback.id
+                )
+            )
+
+        mock_send_status_email.assert_called_once_with(
+            updated_feedback,
             author_id=self.user.user_id,
-            feedback_text='This lesson helped.',
-            lesson_metadata=self.get_lesson_metadata(),
         )
-
-        updated_feedback = general_feedback_services.update_lesson_feedback(
-            feedback_id=feedback.id,
-            new_status=feconf.STATUS_CHOICES_FIXED,
-            exp_id='exp_id',
-            responder_id='creator_id',
-            reply_text='Thanks, this is fixed.',
+        mock_send_reply_email.assert_called_once_with(
+            updated_feedback,
+            'Thanks, this is fixed.',
+            author_id=self.user.user_id,
         )
-        feedback_model = general_feedback_models.LessonFeedbackModel.get_by_id(
-            feedback.id
-        )
-
         self.assertIsNotNone(updated_feedback)
         assert updated_feedback is not None
         self.assertEqual(updated_feedback.status, feconf.STATUS_CHOICES_FIXED)
@@ -291,17 +325,26 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_for_lesson_routes_to_creator(
         self,
     ) -> None:
-        report = general_feedback_services.create_platform_report(
-            feedback_text='There is a typo.',
-            source='lesson',
-            category=feconf.CATEGORY_TYPO,
-            lesson_metadata=self.get_lesson_metadata(),
-            session_info=None,
-            screenshot_filename=None,
-            screenshot_entity_id=None,
-            include_technical_logs=False,
-            page_url='https://example.com',
+        mock_send_feedback_email = mock.Mock()
+        send_feedback_email_swap = self.swap(
+            general_feedback_services.general_feedback_email_services,
+            'send_feedback_submission_email',
+            mock_send_feedback_email,
         )
+        with send_feedback_email_swap:
+            report = general_feedback_services.create_platform_report(
+                feedback_text='There is a typo.',
+                source='lesson',
+                category=feconf.CATEGORY_TYPO,
+                lesson_metadata=self.get_lesson_metadata(),
+                session_info=None,
+                screenshot_filename=None,
+                screenshot_entity_id=None,
+                include_technical_logs=False,
+                page_url='https://example.com',
+            )
+
+        mock_send_feedback_email.assert_called_once_with(report)
 
         self.assertEqual(report.report_message, 'There is a typo.')
         self.assertEqual(report.source, feconf.SOURCE_LESSON)

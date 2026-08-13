@@ -19,10 +19,7 @@ from __future__ import annotations
 import urllib.parse
 
 from core import feconf, utils
-from core.domain import (
-    general_feedback_domain,
-    general_feedback_email_services,
-)
+from core.domain import general_feedback_domain, general_feedback_email_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, Union, cast

@@ -51,7 +51,7 @@ def _get_technical_feedback_url(
     """Returns the URL for a technical feedback report.
 
     Args:
-        feedback: The platform feedback report.
+        feedback: PlatformFeedback. The platform feedback report.
 
     Returns:
         str. The URL to the specific technical feedback report.
@@ -72,7 +72,7 @@ def _get_curriculum_feedback_url(
     """Returns the URL for a curriculum feedback report.
 
     Args:
-        feedback: The submitted lesson or curriculum platform feedback.
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson or curriculum platform feedback.
 
     Returns:
         str. The URL to the specific feedback report in the
@@ -100,7 +100,7 @@ def _get_my_suggestions_tab_url(
     """Returns the URL for a curriculum feedback report on the My Suggestions Tab.
 
     Args:
-        feedback: The submitted lesson feedback.
+        feedback: LessonFeedback. The submitted lesson feedback.
 
     Returns:
         str. The URL to the specific feedback report in the
@@ -118,7 +118,7 @@ def _get_classroom_feedback_recipient_email(
     """Returns the feedback recipient email for an exploration's classroom.
 
     Args:
-        exploration_id: The ID of the exploration associated with the
+        exploration_id: str. The ID of the exploration associated with the
             feedback.
 
     Returns:
@@ -147,8 +147,8 @@ def _get_curriculum_feedback_submission_email_body(
     """Returns the email body for curriculum feedback submission.
 
     Args:
-        feedback: The submitted lesson or curriculum platform feedback.
-        feedback_url: URL to the specific feedback entry.
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson or curriculum platform feedback.
+        feedback_url: str. URL to the specific feedback entry.
 
     Returns:
         str. The rendered HTML email body.
@@ -197,10 +197,10 @@ def _get_technical_feedback_submission_email_body(
     """Returns the email body for technical-external and technical-internal feedback submission.
 
     Args:
-        feedback: The submitted platform feedback routed to the
+        feedback: PlatformFeedback. The submitted platform feedback routed to the
             technical-external dashboard.
-        feedback_url: URL to the specific feedback entry.
-        team_name: Name of the team responsible for the destination dashboard.
+        feedback_url: str. URL to the specific feedback entry.
+        team_name: str. Name of the team responsible for the destination dashboard.
 
     Returns:
         str. The rendered HTML email body.
@@ -216,7 +216,7 @@ def _get_technical_feedback_submission_email_body(
             )
         )
     return (
-        'Hi "%s" Team!<br><br>'
+        'Hi %s Team!<br><br>'
         'A new technical feedback report has been submitted on Oppia.<br><br>'
         '<b>Feedback:</b><br>'
         '%s<br><br>'
@@ -246,8 +246,8 @@ def _get_feedback_status_change_email_body(
     """Returns the email body for a lesson feedback status change.
 
     Args:
-        feedback: The lesson feedback whose status was changed.
-        feedback_url: URL to the specific feedback entry.
+        feedback: LessonFeedback. The lesson feedback whose status was changed.
+        feedback_url: str. URL to the specific feedback entry.
 
     Returns:
         str. The rendered HTML email body.
@@ -284,10 +284,10 @@ def _get_feedback_reply_email_body(
     """Returns the email body for a reply to lesson feedback.
 
     Args:
-        feedback: The lesson feedback that received a reply.
-        reply: The reply message from the creator.
-        feedback_url: URL to the feedback in the My Suggestions Tab.
-        author_id: ID of the user who submitted the feedback.
+        feedback: LessonFeedback. The lesson feedback that received a reply.
+        reply: str. The reply message from the creator.
+        feedback_url: str. URL to the feedback in the My Suggestions Tab.
+        author_id: str. ID of the user who submitted the feedback.
 
     Returns:
         str. The rendered HTML email body.
@@ -337,7 +337,7 @@ def send_feedback_submission_email(
     the LEAP team.
 
     Args:
-        feedback: The submitted lesson feedback or platform feedback for
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson feedback or platform feedback for
             which the notification should be sent.
     """
     if isinstance(feedback, general_feedback_domain.LessonFeedback):
@@ -379,7 +379,7 @@ def send_feedback_submission_email(
         email_body = _get_technical_feedback_submission_email_body(
             feedback,
             feedback_url=_get_technical_feedback_url(feedback),
-            team_name="LEAP",
+            team_name='LEAP',
         )
 
     elif (
@@ -392,7 +392,7 @@ def send_feedback_submission_email(
         email_body = _get_technical_feedback_submission_email_body(
             feedback,
             feedback_url=_get_technical_feedback_url(feedback),
-            team_name="CORE",
+            team_name='CORE',
         )
 
     else:
@@ -425,8 +425,8 @@ def send_feedback_status_change_email(
     changes.
 
     Args:
-        feedback: The lesson feedback whose status was changed.
-        author_id: ID of the user who submitted the feedback.
+        feedback: LessonFeedback. The lesson feedback whose status was changed.
+        author_id: str. The ID of the user who submitted the feedback.
     """
     email_subject = (
         'Your Lesson Feedback Status Has Been Updated for %s on Oppia'
@@ -463,9 +463,9 @@ def send_feedback_reply_email(
     a reply.
 
     Args:
-        feedback: The lesson feedback that received a reply.
-        reply: The reply message from the creator.
-        author_id: ID of the user who submitted the feedback.
+        feedback: LessonFeedback. The lesson feedback that received a reply.
+        reply: str. The reply message from the creator.
+        author_id: str. The ID of the user who submitted the feedback.
     """
     assert feedback.lesson_metadata is not None
 
