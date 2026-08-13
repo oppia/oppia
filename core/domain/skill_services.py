@@ -20,11 +20,12 @@ import collections
 import itertools
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
+    feature_flag_services,
     html_cleaner,
     opportunity_services,
     role_services,
@@ -36,6 +37,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -55,21 +57,27 @@ from typing import (
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        opportunity_models,
         question_models,
         skill_models,
         topic_models,
         user_models,
     )
 
-(skill_models, user_models, question_models, topic_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.SKILL,
-            models.Names.USER,
-            models.Names.QUESTION,
-            models.Names.TOPIC,
-        ]
-    )
+(
+    opportunity_models,
+    skill_models,
+    user_models,
+    question_models,
+    topic_models,
+) = models.Registry.import_models(
+    [
+        models.Names.OPPORTUNITY,
+        models.Names.SKILL,
+        models.Names.USER,
+        models.Names.QUESTION,
+        models.Names.TOPIC,
+    ]
 )
 
 
@@ -1222,6 +1230,33 @@ def update_skill(
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill.id}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        if model is not None:
+            content_count = skill.get_content_count()
+            translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.SKILL, skill
+            )
+            compute_models_fn = (
+                opportunity_services.compute_translation_opportunity_models_with_updated_entity
+            )
+            updated_opp_models = compute_models_fn(
+                feconf.ENTITY_TYPE_SKILL,
+                skill.id,
+                content_count,
+                translation_counts,
+            )
+            if updated_opp_models:
+                opp_model_cls = opportunity_models.TranslationOpportunityModel
+                opp_model_cls.update_timestamps_multi(updated_opp_models)
+                opp_model_cls.put_multi(updated_opp_models)
+
     misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         for change in change_list
@@ -1282,7 +1317,13 @@ def delete_skill(
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_SKILL: [skill_id]}
+    )
     suggestion_services.auto_reject_question_suggestions_for_skill_id(skill_id)
+    suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
+        [skill_id]
+    )
 
 
 def delete_skill_summary(skill_id: str) -> None:

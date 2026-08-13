@@ -34,36 +34,76 @@
     </div>
 
     <div class="story-card-body">
-      <ng-container *ngIf="arcGroups.length > 0; else flatLessonList">
-        <div class="arc-group" *ngFor="let arcGroup of arcGroups; index as arcIdx">
-          <div class="arc-header" (click)="toggleArc(arcIdx)" role="button" tabindex="0"
-               [attr.aria-expanded]="isArcExpanded(arcIdx)"
-               (keydown.enter)="toggleArc(arcIdx)"
-               (keydown.space)="toggleArc(arcIdx); $event.preventDefault()">
-            <div class="arc-header-left">
-              <span class="arc-chevron" [class.expanded]="isArcExpanded(arcIdx)">&#9654;</span>
-              <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+      <topic-adventure-navigation
+        [adventureGroups]="adventureNavigationGroups"
+        [activeLessonNumber]="activeLessonNumber"
+        (lessonSelected)="onNavigationLessonSelected($event)"
+        (practiceSelected)="onNavigationPracticeSelected($event)">
+      </topic-adventure-navigation>
+
+      <ng-container *ngIf="adventureGroups.length > 0; else flatLessonList">
+        <div class="adventure-group" *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx"
+             [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
+          <div class="adventure-header" (click)="toggleAdventure(adventureIdx)" role="button" tabindex="0"
+               [attr.aria-expanded]="isAdventureExpanded(adventureIdx)"
+               [ngStyle]="{'background-color': adventureGroup.headerBackgroundColor}"
+               (keydown.enter)="toggleAdventure(adventureIdx)"
+               (keydown.space)="toggleAdventure(adventureIdx); $event.preventDefault()">
+            <div class="adventure-header-left">
+              <div class="adventure-flag-icon" [ngStyle]="{'background-color': adventureGroup.iconBg}">
+                <i class="material-icons">menu_book</i>
+              </div>
+              <div class="adventure-header-text">
+                <h4 class="adventure-title">{{ adventureGroup.adventureTitle }}</h4>
+                <p class="adventure-completion-text">{{ getAdventureCompletionText(adventureIdx) }}</p>
+              </div>
             </div>
-            <span class="arc-lesson-count">{{ arcGroup.lessonCards.length }} lesson{{ arcGroup.lessonCards.length !== 1 ? 's' : '' }}</span>
+            <div class="adventure-chevron-badge" [class.expanded]="isAdventureExpanded(adventureIdx)">
+              <i class="material-icons">expand_more</i>
+            </div>
           </div>
-          <p *ngIf="arcGroup.arcDescription && isArcExpanded(arcIdx)" class="arc-description">
-            {{ arcGroup.arcDescription }}
+          <p *ngIf="adventureGroup.adventureDescription && isAdventureExpanded(adventureIdx)" class="adventure-description">
+            {{ adventureGroup.adventureDescription }}
           </p>
-          <div *ngIf="isArcExpanded(arcIdx)" class="arc-lessons">
+          <div *ngIf="isAdventureExpanded(adventureIdx)" class="adventure-lessons">
             <div class="story-lesson-card-wrapper"
-                 *ngFor="let lessonCard of arcGroup.lessonCards">
+                 [id]="'lesson-' + lessonCard.lessonNumber"
+                 #lessonCardWrapper
+                 *ngFor="let lessonCard of adventureGroup.lessonCards">
               <topic-lesson-card
                 [lessonTitle]="lessonCard.lessonTitle"
                 [lessonDescription]="lessonCard.lessonDescription"
                 [thumbnailUrl]="lessonCard.thumbnailUrl"
                 [startUrl]="lessonCard.startUrl"
+                [studyUrl]="studyGuideUrl"
+                [practiceUrl]="lessonCard.practiceUrl"
+                [lessonNumber]="lessonCard.lessonNumber"
+                [adventureAccentColor]="adventureGroup.accentColor"
+                [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
                 [lessonProgressStatus]="lessonCard.lessonProgressStatus"
                 [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
                 [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
                 [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
                 [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-                [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+                [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+                [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
+                [navigatedLessonNumber]="navigatedLessonNumber">
               </topic-lesson-card>
+            </div>
+
+            <div class="story-practice-card-wrapper"
+                 [id]="'practice-card-' + adventureIdx"
+                 #practiceCardWrapper
+                 *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
+              <topic-adventure-end-test-card
+                [practiceTitle]="practiceCard.practiceTitle"
+                [practiceDescription]="practiceCard.practiceDescription"
+                [thumbnailUrl]="practiceCard.thumbnailUrl"
+                [studyUrl]="practiceCard.studyUrl"
+                [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
+                [cardAccentColor]="adventureGroup.accentColor"
+                [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)">
+              </topic-adventure-end-test-card>
             </div>
           </div>
         </div>
@@ -71,33 +111,94 @@
 
       <ng-template #flatLessonList>
         <div class="story-lesson-card-wrapper"
-             *ngFor="let lessonCard of lessonCards">
+             [id]="'lesson-' + lessonCard.lessonNumber"
+             #lessonCardWrapper
+             *ngFor="let lessonCard of availableLessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
             [lessonDescription]="lessonCard.lessonDescription"
             [thumbnailUrl]="lessonCard.thumbnailUrl"
             [startUrl]="lessonCard.startUrl"
+            [studyUrl]="studyGuideUrl"
+            [practiceUrl]="lessonCard.practiceUrl"
+            [lessonNumber]="lessonCard.lessonNumber"
+            [adventureAccentColor]="'#00645c'"
+            [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
             [lessonProgressStatus]="lessonCard.lessonProgressStatus"
             [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
             [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
             [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
             [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
+            [navigatedLessonNumber]="navigatedLessonNumber">
           </topic-lesson-card>
+        </div>
+
+        <div class="story-practice-card-wrapper"
+             id="practice-card-flat"
+             #practiceCardWrapper
+             *ngIf="isPracticeCardVisible">
+          <topic-adventure-end-test-card
+            [practiceTitle]="practiceCard.practiceTitle"
+            [practiceDescription]="practiceCard.practiceDescription"
+            [thumbnailUrl]="practiceCard.thumbnailUrl"
+            [studyUrl]="practiceCard.studyUrl"
+            [cardBackgroundColor]="'#ecf7f6'"
+            [cardAccentColor]="'#0b776d'"
+            [practiceUrl]="practiceCard.practiceUrl">
+          </topic-adventure-end-test-card>
         </div>
       </ng-template>
 
-      <div class="story-practice-card-wrapper"
-        *ngIf="isPracticeCardVisible">
-        <topic-practice-card
-          [practiceTitle]="practiceCard.practiceTitle"
-          [practiceDescription]="practiceCard.practiceDescription"
-          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
-          [thumbnailUrl]="practiceCard.thumbnailUrl"
-          [studyUrl]="practiceCard.studyUrl"
-          [practiceUrl]="practiceCard.practiceUrl">
-        </topic-practice-card>
-      </div>
+      <section
+               class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
+               *ngIf="comingSoonLessonCards.length > 0"
+               [attr.aria-label]="'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS' | translate">
+        <div class="coming-soon-chapters-header">
+          <div class="coming-soon-chapters-icon" aria-hidden="true">
+            <i class="material-icons">schedule</i>
+          </div>
+          <div class="coming-soon-chapters-heading-text">
+            <h4 class="coming-soon-chapters-title">
+              {{ 'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS' | translate }}
+            </h4>
+            <p class="coming-soon-chapters-count">
+              <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate: {count: comingSoonLessonCards.length, messageFormat: true}"></span>
+            </p>
+          </div>
+        </div>
+        <div
+             class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
+             [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
+             #lessonCardWrapper
+             *ngFor="let lessonCard of comingSoonLessonCards">
+          <topic-lesson-card
+            [lessonTitle]="lessonCard.lessonTitle"
+            [lessonDescription]="lessonCard.lessonDescription"
+            [thumbnailUrl]="lessonCard.thumbnailUrl"
+            [startUrl]="lessonCard.startUrl"
+            [studyUrl]="studyGuideUrl"
+            [practiceUrl]="lessonCard.practiceUrl"
+            [lessonNumber]="lessonCard.lessonNumber"
+            [adventureAccentColor]="'#6b7280'"
+            [isActiveLesson]="false"
+            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+            [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+            [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
+            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
+            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
+            [isComingSoonSectionCard]="true"
+            [navigatedLessonNumber]="navigatedLessonNumber">
+          </topic-lesson-card>
+        </div>
+      </section>
+
+      <topic-mastery-challenge-card
+        [actionUrl]="masteryChallengeUrl">
+      </topic-mastery-challenge-card>
     </div>
   </div>
 </section>

@@ -1,0 +1,40 @@
+<div class="adventure-end-test-card"
+     [ngStyle]="{'background-color': cardBackgroundColor}"
+     [attr.aria-label]="practiceTitle || 'Adventure end test card'">
+  <div class="adventure-end-test-card-thumbnail">
+    <img class="adventure-end-test-card-image"
+         [src]="resolvedThumbnailUrl"
+         alt="{{ getThumbnailAltText() }}"
+         title="{{ getThumbnailAltText() }}">
+  </div>
+
+  <div class="adventure-end-test-card-content">
+    <div class="adventure-end-test-card-header-row">
+      <topic-adventure-circle-badge class="adventure-end-test-card-badge"
+                                    [iconName]="'edit'"
+                                    [size]="'sm'"
+                                    [backgroundColor]="'#fff'"
+                                    [borderColor]="cardAccentColor"
+                                    [textColor]="cardAccentColor">
+      </topic-adventure-circle-badge>
+
+      <div class="adventure-end-test-card-copy">
+        <div class="adventure-end-test-card-title-row">
+          <h3 class="adventure-end-test-card-title">{{ practiceTitle }}</h3>
+        </div>
+
+        <p class="adventure-end-test-card-description">{{ getResolvedDescription() }}</p>
+      </div>
+
+      <div class="adventure-end-test-card-actions">
+        <button class="adventure-end-test-card-practice-button"
+                type="button"
+                [disabled]="!practiceUrl"
+                (click)="navigateTo(practiceUrl)">
+          <i class="material-icons" aria-hidden="true">description</i>
+          {{ 'I18N_TOPIC_VIEWER_PRACTICE_TEST_BUTTON' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
