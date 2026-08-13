@@ -20,6 +20,7 @@ from unittest import mock
 
 from core import feconf
 from core.domain import (
+    email_manager,
     general_feedback_domain,
     general_feedback_services,
     user_services,
@@ -82,7 +83,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_lesson_feedback_returns_domain_object(self) -> None:
         mock_send_feedback_email = mock.Mock()
         send_feedback_email_swap = self.swap(
-            general_feedback_services.general_feedback_email_services,
+            email_manager,
             'send_feedback_submission_email',
             mock_send_feedback_email,
         )
@@ -208,12 +209,12 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         mock_send_status_email = mock.Mock()
         mock_send_reply_email = mock.Mock()
         status_email_swap = self.swap(
-            general_feedback_services.general_feedback_email_services,
+            email_manager,
             'send_feedback_status_change_email',
             mock_send_status_email,
         )
         reply_email_swap = self.swap(
-            general_feedback_services.general_feedback_email_services,
+            email_manager,
             'send_feedback_reply_email',
             mock_send_reply_email,
         )
@@ -327,7 +328,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     ) -> None:
         mock_send_feedback_email = mock.Mock()
         send_feedback_email_swap = self.swap(
-            general_feedback_services.general_feedback_email_services,
+            email_manager,
             'send_feedback_submission_email',
             mock_send_feedback_email,
         )

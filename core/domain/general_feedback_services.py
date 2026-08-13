@@ -19,7 +19,7 @@ from __future__ import annotations
 import urllib.parse
 
 from core import feconf, utils
-from core.domain import general_feedback_domain, general_feedback_email_services
+from core.domain import email_manager, general_feedback_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, Union, cast
@@ -254,7 +254,7 @@ def create_lesson_feedback(
     model = general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
     feedback = _lesson_feedback_model_to_domain(model)
 
-    general_feedback_email_services.send_feedback_submission_email(feedback)
+    email_manager.send_feedback_submission_email(feedback)
     return feedback
 
 
@@ -501,13 +501,13 @@ def update_lesson_feedback(
     feedback = _lesson_feedback_model_to_domain(model)
 
     if old_status != new_status:
-        general_feedback_email_services.send_feedback_status_change_email(
+        email_manager.send_feedback_status_change_email(
             feedback,
             author_id=model.author_id,
         )
 
     if reply_text is not None:
-        general_feedback_email_services.send_feedback_reply_email(
+        email_manager.send_feedback_reply_email(
             feedback,
             reply_text,
             author_id=model.author_id,
@@ -612,7 +612,7 @@ def create_platform_report(
     model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
     feedback = _platform_feedback_model_to_domain(model)
 
-    general_feedback_email_services.send_feedback_submission_email(feedback)
+    email_manager.send_feedback_submission_email(feedback)
     return feedback
 
 
