@@ -16,11 +16,25 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.controllers import acl_decorators, base
-from core.domain import certificate_assessment_services
+from core.domain import certificate_assessment_services, topic_fetchers
 
 from typing import Dict, List, TypedDict
+
+
+def _format_utc_datetime(value: datetime.datetime) -> str:
+    """Formats a naive UTC datetime as an ISO-8601 string with a 'Z' suffix.
+
+    Args:
+        value: datetime.datetime. The naive UTC datetime to format.
+
+    Returns:
+        str. The ISO-8601 string representation of the datetime.
+    """
+    return value.isoformat() + 'Z'
 
 
 class CertificateAssessmentOfferingTopicDict(TypedDict):
@@ -513,7 +527,7 @@ class CertificateAssessmentResultHandler(
         CertificateAssessmentResultHandlerNormalizedRequestDict,
     ]
 ):
-    """Stub handler for fetching a certificate assessment result."""
+    """Handler for fetching a certificate assessment result."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -521,23 +535,51 @@ class CertificateAssessmentResultHandler(
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
-    # TODO(#24717-2.14): Replace open_access with
-    # can_access_certificate_assessment_attempt once real result
-    # fetching logic exists.
-    @acl_decorators.open_access
-    def get(self, attempt_id: str) -> None:  # pylint: disable=unused-argument
-        """Returns a hardcoded result payload."""
+    @acl_decorators.can_access_certificate_assessment_attempt_result
+    def get(self, attempt_id: str) -> None:
+        """Returns the result for the given attempt.
+
+        Args:
+            attempt_id: str. The ID of the certificate assessment attempt.
+        """
+        attempt = certificate_assessment_services.get_certificate_attempt(
+            attempt_id
+        )
+        try:
+            certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
+                attempt.version_data['certificate_id']
+            )
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
+            raise self.NotFoundException(str(e)) from e
+        topics = topic_fetchers.get_topics_by_ids(
+            list(attempt.attempt_data.keys())
+        )
+        topic_names_by_id = {
+            topic.id: topic.name for topic in topics if topic is not None
+        }
+        # Here we use object because attempt_data values are heterogeneous
+        # payloads mixing strings and integers.
+        attempt_data: Dict[str, Dict[str, object]] = {}
+        for topic_id, topic_stats in attempt.attempt_data.items():
+            attempt_data[topic_id] = {
+                'topic_name': topic_names_by_id.get(topic_id, topic_id),
+                'total_related_questions': topic_stats[
+                    'total_related_questions'
+                ],
+                'total_correct_questions': topic_stats[
+                    'total_correct_questions'
+                ],
+            }
         self.render_json(
             {
-                'title': 'Everyday Arithmetic & Number Confidence',
-                'total_score': 80,
-                'attempt_data': {
-                    'dummy_topic_id': {
-                        'total_related_questions': 5,
-                        'total_correct_questions': 4,
-                    },
-                },
-                'is_submitted': True,
+                'certificate_id': certificate_offering.certificate_id,
+                'title': certificate_offering.title,
+                'total_score': attempt.total_score,
+                'time_taken_in_minutes': attempt.get_time_taken_in_minutes(),
+                'attempt_data': attempt_data,
+                'is_submitted': attempt.is_submitted,
             }
         )
 
@@ -545,30 +587,42 @@ class CertificateAssessmentResultHandler(
 class CertificateAssessmentAttemptsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Stub handler for listing a learner's certificate attempts."""
+    """Handler for listing a learner's certificate attempts."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
-    # TODO(#24717-2.14): Replace open_access with
-    # require_user_id_else_redirect_to_homepage once learner_id is
-    # pulled from the session for the real implementation.
-    @acl_decorators.open_access
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self) -> None:
-        """Returns a hardcoded list of attempts."""
-        self.render_json(
-            {
-                'attempts': [
-                    {
-                        'attempt_id': 'dummy_attempt_id',
-                        'classroom_id': 'dummy_classroom_id',
-                        'title': 'Everyday Arithmetic & Number Confidence',
-                        'total_score': 80,
-                        'attempt_index': 1,
-                        'started_at': '2026-07-18T00:00:00Z',
-                        'is_submitted': True,
-                    }
-                ]
-            }
+        """Returns the learner's certificate assessment attempts."""
+        assert self.user_id is not None
+        attempts = certificate_assessment_services.get_certificate_attempts(
+            self.user_id
         )
+        certificate_ids = list(
+            {attempt.version_data['certificate_id'] for attempt in attempts}
+        )
+        offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
+            certificate_ids
+        )
+        # Here we use object because the attempt summary values are
+        # heterogeneous JSON payloads (strings, floats, integers and booleans).
+        attempt_summaries: List[Dict[str, object]] = []
+        for attempt in attempts:
+            certificate_id = attempt.version_data['certificate_id']
+            if certificate_id not in offerings_by_id:
+                continue
+            certificate_offering = offerings_by_id[certificate_id]
+            attempt_summaries.append(
+                {
+                    'attempt_id': attempt.attempt_id,
+                    'classroom_id': certificate_offering.classroom_id,
+                    'title': certificate_offering.title,
+                    'total_score': attempt.total_score,
+                    'attempt_index': attempt.attempt_index,
+                    'started_at': _format_utc_datetime(attempt.started_at),
+                    'is_submitted': attempt.is_submitted,
+                }
+            )
+        self.render_json({'attempts': attempt_summaries})
