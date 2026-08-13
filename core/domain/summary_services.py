@@ -547,6 +547,32 @@ def get_displayable_exp_summary_dicts_matching_ids(
     )
 
 
+def _get_up_to_date_translation(
+    entity_translation: translation_domain.EntityTranslation,
+    content_id: str,
+) -> Optional[str]:
+    """Returns the translation of the given content ID, if it is usable.
+
+    Args:
+        entity_translation: EntityTranslation. The entity's translations.
+        content_id: str. The content ID to look up.
+
+    Returns:
+        str or None. The translated value, or None when there is no translation
+        or the translation is stale.
+    """
+    translated_content = entity_translation.translations.get(content_id)
+    # A translation that needs an update is stale because the English content
+    # changed after it was accepted, so it is not shown.
+    if (
+        translated_content is not None
+        and not translated_content.needs_update
+        and isinstance(translated_content.content_value, str)
+    ):
+        return translated_content.content_value
+    return None
+
+
 def get_displayable_exp_summary_dicts(
     exploration_summaries: List[exp_domain.ExplorationSummary],
     display_in_language_code: Optional[str] = None,
@@ -600,28 +626,42 @@ def get_displayable_exp_summary_dicts(
         display_in_language_code
         and display_in_language_code != constants.DEFAULT_LANGUAGE_CODE
     ):
+        # Translations are stored against the exploration's own version, and a
+        # summary's version can run ahead of it, so the version is read from
+        # the exploration rather than from the summary. This fetch only happens
+        # when a non-English display language is requested.
+        exp_ids = [
+            exp_summary.id
+            for exp_summary in exploration_summaries
+            if exp_summary is not None
+        ]
+        explorations = exp_fetchers.get_multiple_explorations_by_id(
+            exp_ids, strict=False
+        )
+        translated_exp_ids = [
+            exp_id for exp_id in exp_ids if exp_id in explorations
+        ]
         entity_references: List[
             translation_models.EntityTranslationReferenceDict
         ] = [
             {
                 'entity_type': feconf.TranslatableEntityType.EXPLORATION,
-                'entity_id': exp_summary.id,
-                'entity_version': exp_summary.version,
+                'entity_id': exp_id,
+                'entity_version': explorations[exp_id].version,
                 'language_code': display_in_language_code,
             }
-            for exp_summary in exploration_summaries
-            if exp_summary is not None
+            for exp_id in translated_exp_ids
         ]
         entity_translations_list = (
             translation_fetchers.get_multiple_entity_translations(
                 entity_references
             )
         )
-        for exp_summary, entity_translation in zip(
-            exploration_summaries, entity_translations_list
+        for exp_id, entity_translation in zip(
+            translated_exp_ids, entity_translations_list
         ):
-            if exp_summary is not None and entity_translation is not None:
-                entity_translations_map[exp_summary.id] = entity_translation
+            if entity_translation is not None:
+                entity_translations_map[exp_id] = entity_translation
 
     displayable_exp_summaries = []
 
@@ -636,49 +676,33 @@ def get_displayable_exp_summary_dicts(
                 exploration_summary.id
             )
             if entity_translation is not None:
-                title_translation = entity_translation.translations.get(
-                    feconf.EXPLORATION_TITLE_CONTENT_ID
+                translated_title = _get_up_to_date_translation(
+                    entity_translation, feconf.EXPLORATION_TITLE_CONTENT_ID
                 )
-                if (
-                    title_translation is not None
-                    and not title_translation.needs_update
-                    and isinstance(title_translation.content_value, str)
-                ):
-                    title = title_translation.content_value
+                if translated_title is not None:
+                    title = translated_title
 
-                objective_translation = entity_translation.translations.get(
-                    feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+                translated_objective = _get_up_to_date_translation(
+                    entity_translation, feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
                 )
-                if (
-                    objective_translation is not None
-                    and not objective_translation.needs_update
-                    and isinstance(objective_translation.content_value, str)
-                ):
-                    objective = objective_translation.content_value
+                if translated_objective is not None:
+                    objective = translated_objective
 
-                category_translation = entity_translation.translations.get(
-                    feconf.EXPLORATION_CATEGORY_CONTENT_ID
+                translated_category = _get_up_to_date_translation(
+                    entity_translation, feconf.EXPLORATION_CATEGORY_CONTENT_ID
                 )
-                if (
-                    category_translation is not None
-                    and not category_translation.needs_update
-                    and isinstance(category_translation.content_value, str)
-                ):
-                    category = category_translation.content_value
+                if translated_category is not None:
+                    category = translated_category
 
+                # Tag content IDs are index based, matching how they are
+                # generated in Exploration.get_translatable_contents_collection.
                 for tag_idx, _ in enumerate(exploration_summary.tags):
-                    tag_content_id = (
-                        f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{tag_idx}'
+                    translated_tag = _get_up_to_date_translation(
+                        entity_translation,
+                        f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{tag_idx}',
                     )
-                    tag_translation = entity_translation.translations.get(
-                        tag_content_id
-                    )
-                    if (
-                        tag_translation is not None
-                        and not tag_translation.needs_update
-                        and isinstance(tag_translation.content_value, str)
-                    ):
-                        tags[tag_idx] = tag_translation.content_value
+                    if translated_tag is not None:
+                        tags[tag_idx] = translated_tag
 
             summary_dict: DisplayableExplorationSummaryDict = {
                 'id': exploration_summary.id,
@@ -781,13 +805,19 @@ def _get_displayable_collection_summary_dicts(
     return displayable_collection_summaries
 
 
-def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
+def get_library_groups(
+    language_codes: List[str],
+    display_in_language_code: Optional[str] = None,
+) -> List[LibraryGroupDict]:
     """Returns a list of groups for the library index page. Each group has a
     header and a list of dicts representing activity summaries.
 
     Args:
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
+        display_in_language_code: str or None. The language code to display
+            translated exploration metadata in. If None, the original metadata
+            is returned.
 
     Returns:
         list(dict). A list of groups for the library index page. Each group is
@@ -848,7 +878,9 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
 
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in get_displayable_exp_summary_dicts(exp_summaries)
+        for summary_dict in get_displayable_exp_summary_dicts(
+            exp_summaries, display_in_language_code=display_in_language_code
+        )
     }
 
     results: List[LibraryGroupDict] = []
@@ -971,6 +1003,7 @@ def check_activity_id_validity(
 
 def get_featured_activity_summary_dicts(
     language_codes: List[str],
+    display_in_language_code: Optional[str] = None,
 ) -> List[DisplayableSummaryDictsType]:
     """Returns a list of featured activities with the given language codes.
     The return value is sorted according to the list stored in the datastore.
@@ -978,6 +1011,9 @@ def get_featured_activity_summary_dicts(
     Args:
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
+        display_in_language_code: str or None. The language code to display
+            translated exploration metadata in. If None, the original metadata
+            is returned.
 
     Returns:
         list(dict). Each dict in this list represents a featured activity.
@@ -1005,7 +1041,7 @@ def get_featured_activity_summary_dicts(
     )
 
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids
+        exploration_ids, display_in_language_code=display_in_language_code
     )
     col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
         collection_ids
@@ -1032,7 +1068,9 @@ def get_featured_activity_summary_dicts(
 
 
 def get_top_rated_exploration_summary_dicts(
-    language_codes: List[str], limit: int
+    language_codes: List[str],
+    limit: int,
+    display_in_language_code: Optional[str] = None,
 ) -> List[DisplayableExplorationSummaryDict]:
     """Returns a list of top rated explorations with the given language codes.
     The return value is sorted in decreasing order of average rating.
@@ -1041,6 +1079,9 @@ def get_top_rated_exploration_summary_dicts(
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
         limit: int. The maximum number of explorations to return.
+        display_in_language_code: str or None. The language code to display
+            translated exploration metadata in. If None, the original metadata
+            is returned.
 
     Returns:
         list(dict). Each dict in this list represents a exploration summary in
@@ -1078,7 +1119,9 @@ def get_top_rated_exploration_summary_dicts(
         filtered_exp_summaries, key=sort_fnc, reverse=True
     )
 
-    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    return get_displayable_exp_summary_dicts(
+        sorted_exp_summaries, display_in_language_code=display_in_language_code
+    )
 
 
 def get_recently_published_exp_summary_dicts(

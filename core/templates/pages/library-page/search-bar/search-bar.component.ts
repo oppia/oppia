@@ -375,6 +375,22 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         this.refreshSearchBarLabels()
       )
     );
+
+    // Card titles and objectives are rendered in the site language, so the
+    // results are re-fetched when it changes. This listens to the language
+    // code service rather than to onLangChange, because for a logged-in user
+    // the code is only updated after their preference has been saved, and
+    // re-fetching any earlier would send the previous language.
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.searchService.executeSearchQuery(
+          this.searchQuery,
+          this.selectionDetails.categories.selections,
+          this.selectionDetails.languageCodes.selections,
+          () => {}
+        );
+      })
+    );
   }
 
   ngOnDestroy(): void {

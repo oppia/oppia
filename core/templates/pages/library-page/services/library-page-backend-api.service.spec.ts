@@ -50,7 +50,9 @@ describe('Library page backend api service', () => {
 
     lpbas.fetchLibraryIndexDataAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/libraryindexhandler');
+    let req = httpTestingController.expectOne(
+      '/libraryindexhandler?display_in_language_code=en'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 

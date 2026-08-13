@@ -22,6 +22,7 @@ import {Injectable} from '@angular/core';
 
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-exploration-summary.model';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 interface LibraryGroupDataBackendDict {
   activity_list: ActivityDict[];
@@ -81,11 +82,20 @@ export class LibraryPageBackendApiService {
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
   LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
 
   async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
+    // The cards are displayed in the learner's site language, so that the
+    // exploration metadata matches the rest of the page.
+    const params = {
+      display_in_language_code:
+        this.i18nLanguageCodeService.getCurrentI18nLanguageCode(),
+    };
     return this.http
-      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER)
+      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER, {params})
       .toPromise();
   }
 
