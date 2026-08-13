@@ -24,12 +24,15 @@ from unittest import mock
 from core import feconf, utils
 from core.constants import constants
 from core.domain import (
+    classroom_config_services,
     email_manager,
     email_services,
     exp_domain,
     general_feedback_domain,
     html_cleaner,
     platform_parameter_domain,
+    topic_services,
+    user_services,
 )
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
@@ -59,6 +62,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 MYPY = False
@@ -1839,7 +1843,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             )
 
 
-class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
+class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
     """Tests for general feedback emails."""
 
     def setUp(self) -> None:
@@ -1847,6 +1851,16 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
         self.user = user_services.create_new_user(
             'auth_id',
             'test@example.com',
+        )
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
+        )
+        self.can_not_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        )
+        self.log_new_error_counter = test_utils.CallCounter(logging.error)
+        self.log_new_error_ctx = self.swap(
+            logging, 'error', self.log_new_error_counter
         )
 
     def _get_lesson_metadata(
@@ -1921,7 +1935,61 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             'system@example.com',
             **expected_kwargs,
         )
-        return mock_send_email.call_args[0][4]
+        # Here we use cast because the mocked call arguments are not typed,
+        # so that the email body is recognized as a string.
+        return cast(str, mock_send_email.call_args[0][4])
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_submission_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_submission_email(feedback)
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_submission_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -1933,6 +2001,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
         ]
     )
     def test_sends_lesson_feedback_submission_email(self) -> None:
@@ -1943,12 +2015,12 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
         mock_get_classroom = mock.Mock(return_value=classroom)
 
         topic_ids_swap = self.swap(
-            email_manager.topic_services,
+            topic_services,
             'get_topic_ids_for_exploration_id',
             mock_get_topic_ids,
         )
         classroom_swap = self.swap(
-            email_manager.classroom_config_services,
+            classroom_config_services,
             'get_classroom_by_topic_id',
             mock_get_classroom,
         )
@@ -1958,7 +2030,9 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             mock_send_email,
         )
 
-        with topic_ids_swap, classroom_swap, send_email_swap:
+        with (
+            topic_ids_swap
+        ), classroom_swap, send_email_swap, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_submission_email(feedback)
 
         mock_get_topic_ids.assert_called_once_with('exp_id')
@@ -1986,6 +2060,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
         ]
     )
     def test_sends_curriculum_platform_feedback_submission_email(self) -> None:
@@ -1998,7 +2076,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
         mock_get_topic_ids = mock.Mock(return_value=[])
 
         topic_ids_swap = self.swap(
-            email_manager.topic_services,
+            topic_services,
             'get_topic_ids_for_exploration_id',
             mock_get_topic_ids,
         )
@@ -2008,7 +2086,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             mock_send_email,
         )
 
-        with topic_ids_swap, send_email_swap:
+        with topic_ids_swap, send_email_swap, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_submission_email(feedback)
 
         mock_get_topic_ids.assert_called_once_with('exp_id')
@@ -2036,6 +2114,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
         ]
     )
     def test_sends_technical_external_platform_feedback_email(self) -> None:
@@ -2048,7 +2130,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             email_manager,
             '_send_email',
             mock_send_email,
-        ):
+        ), self.can_send_feedback_email_ctx:
             email_manager.send_feedback_submission_email(feedback)
 
         email_body = self._assert_feedback_email_is_sent(
@@ -2076,6 +2158,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
         ]
     )
     def test_sends_technical_internal_platform_feedback_email(self) -> None:
@@ -2090,7 +2176,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             email_manager,
             '_send_email',
             mock_send_email,
-        ):
+        ), self.can_send_feedback_email_ctx:
             email_manager.send_feedback_submission_email(feedback)
 
         email_body = self._assert_feedback_email_is_sent(
@@ -2111,6 +2197,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             email_body,
         )
 
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            )
+        ]
+    )
     def test_submission_email_with_invalid_dashboard_raises_error(
         self,
     ) -> None:
@@ -2121,7 +2215,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             email_manager,
             '_send_email',
             mock_send_email,
-        ):
+        ), self.can_send_feedback_email_ctx:
             with self.assertRaisesRegex(
                 utils.InvalidInputException,
                 'Invalid destination dashboard: invalid-dashboard',
@@ -2129,6 +2223,67 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 email_manager.send_feedback_submission_email(feedback)
 
         mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_status_change_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_status_change_email(
+                    feedback,
+                    self.user.user_id,
+                )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_status_change_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_status_change_email(
+                feedback,
+                self.user.user_id,
+            )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -2140,6 +2295,10 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
         ]
     )
     def test_sends_feedback_status_change_email(self) -> None:
@@ -2148,7 +2307,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
         mock_send_email = mock.Mock()
 
         username_swap = self.swap(
-            email_manager.user_services,
+            user_services,
             'get_username',
             mock.Mock(return_value='learner'),
         )
@@ -2158,7 +2317,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             mock_send_email,
         )
 
-        with username_swap, send_email_swap:
+        with username_swap, send_email_swap, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_status_change_email(
                 feedback, self.user.user_id
             )
@@ -2179,12 +2338,76 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_reply_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_reply_email(
+                    feedback,
+                    'Thanks for the suggestion.',
+                    self.user.user_id,
+                )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_reply_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_reply_email(
+                feedback,
+                'Thanks for the suggestion.',
+                self.user.user_id,
+            )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
                 param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
                 'https://www.oppia.org',
             ),
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
             ),
         ]
     )
@@ -2193,7 +2416,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
         mock_send_email = mock.Mock()
 
         username_swap = self.swap(
-            email_manager.user_services,
+            user_services,
             'get_username',
             mock.Mock(return_value='learner'),
         )
@@ -2203,7 +2426,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.GenericTestBase):
             mock_send_email,
         )
 
-        with username_swap, send_email_swap:
+        with username_swap, send_email_swap, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_reply_email(
                 feedback, 'Thanks for the suggestion.', self.user.user_id
             )

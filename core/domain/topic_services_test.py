@@ -4927,26 +4927,27 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         get_all_topic_summaries_mock.assert_called_once_with()
         self.assertEqual(topic_ids, ['topic_2'])
 
+    def test_get_topic_ids_for_exploration_id_returns_empty_list_when_not_found(
+        self,
+    ) -> None:
+        topic_summary = mock.Mock()
+        topic_summary.id = 'topic_1'
+        topic_summary.published_story_exploration_mapping = {
+            'story_1': ['other_exp_id'],
+        }
 
-def test_get_topic_ids_for_exploration_id_returns_empty_list_when_not_found(
-    self,
-) -> None:
-    topic_summary = mock.Mock()
-    topic_summary.id = 'topic_1'
-    topic_summary.published_story_exploration_mapping = {
-        'story_1': ['other_exp_id'],
-    }
+        get_all_topic_summaries_mock = mock.Mock(return_value=[topic_summary])
 
-    get_all_topic_summaries_mock = mock.Mock(return_value=[topic_summary])
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            get_all_topic_summaries_mock,
+        ):
+            topic_ids = topic_services.get_topic_ids_for_exploration_id(
+                'exp_id'
+            )
 
-    with self.swap(
-        topic_fetchers,
-        'get_all_topic_summaries',
-        get_all_topic_summaries_mock,
-    ):
-        topic_ids = topic_services.get_topic_ids_for_exploration_id('exp_id')
-
-    self.assertEqual(topic_ids, [])
+        self.assertEqual(topic_ids, [])
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
