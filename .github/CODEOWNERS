@@ -697,6 +697,7 @@
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 /core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
 /core/templates/pages/certificate-assessment-player-page @oppia/lace-frontend-reviewers
+/core/templates/pages/certificate-assessment-result-page/ @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
@@ -741,7 +742,6 @@
 /data/ @oppia/lace-backend-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
-/core/tests/webdriverio/ @oppia/dev-workflow-reviewers
 /core/tests/wdio.conf.js @oppia/dev-workflow-reviewers
 /extensions/interactions/*/webdriverio.js @oppia/dev-workflow-reviewers
 /extensions/interactions/webdriverio.js @oppia/dev-workflow-reviewers

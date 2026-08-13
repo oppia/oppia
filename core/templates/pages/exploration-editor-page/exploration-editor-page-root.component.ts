@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import './exploration-editor-page-root.component.css';
 
 @Component({
   selector: 'oppia-exploration-editor-page-root',
   templateUrl: './exploration-editor-page-root.component.html',
+  styleUrls: ['./exploration-editor-page-root.component.css'],
 })
 export class ExplorationEditorPageRootComponent extends BaseRootComponent {
   title: string =
