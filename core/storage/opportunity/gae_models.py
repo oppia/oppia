@@ -386,7 +386,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
         topic and language code.
 
         Args:
-            entity_type: str. The type of the entity.
+            entity_type: str or None. The type of the entity. If None, all
+                entity types are included.
             topic_id: str or None. The ID of the topic to filter by. If None,
                 all topics are included.
             language_code: str. The language code to filter by.

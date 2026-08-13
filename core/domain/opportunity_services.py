@@ -1402,7 +1402,8 @@ def get_translation_opportunities_with_new_models(
     entity type, filtered by topic name and language code.
 
     Args:
-        entity_type: str. The entity type to fetch opportunities for.
+        entity_type: str or None. The entity type to fetch opportunities for.
+            If None, opportunities for all entity types are returned.
         language_code: str. The language code to filter by.
         topic_name: str or None. The name of the topic to filter by.
         cursor: str or None. The datastore cursor for pagination.
@@ -1482,19 +1483,26 @@ def _get_translation_opportunity_cards_from_models(
     exp_summary_map = {}
     in_review_counts = {}
 
-    # Explorations are the only entity type reached through a story, so the
-    # story each one belongs to is resolved first and reused below for both the
-    # card's description and its story title.
-    if exp_entity_ids:
-        for ts in topic_summaries:
-            for (
-                story_id,
-                exp_ids,
-            ) in ts.published_story_exploration_mapping.items():
-                for exp_id in exp_ids:
-                    if exp_id in exp_entity_ids:
-                        exp_id_to_story_id[exp_id] = story_id
+    # Explorations and stories reach learners only through a published story,
+    # so both sets are collected in a single pass here rather than rescanned
+    # for every opportunity in the loop below. The same pass resolves the story
+    # each requested exploration belongs to, which the card uses for its
+    # description and its story title.
+    requested_exp_ids = set(exp_entity_ids)
+    published_exp_ids = set()
+    published_story_ids = set()
+    for ts in topic_summaries:
+        for (
+            story_id,
+            exp_ids,
+        ) in ts.published_story_exploration_mapping.items():
+            published_story_ids.add(story_id)
+            published_exp_ids.update(exp_ids)
+            for exp_id in exp_ids:
+                if exp_id in requested_exp_ids:
+                    exp_id_to_story_id[exp_id] = story_id
 
+    if exp_entity_ids:
         story_ids = list(set(exp_id_to_story_id.values()))
         if story_ids:
             stories = story_fetchers.get_stories_by_ids(story_ids)
@@ -1554,40 +1562,21 @@ def _get_translation_opportunity_cards_from_models(
                     topic_name_val = topic_summary_map[t_id].name
                     break
 
+        # Every field that depends on the entity type is resolved in this one
+        # branch, so each opportunity is classified once.
         currently_available_to_learners = False
-        if model_entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            for ts in topic_summaries:
-                for (
-                    story_id,
-                    exp_ids,
-                ) in ts.published_story_exploration_mapping.items():
-                    if model.entity_id in exp_ids:
-                        currently_available_to_learners = True
-                        break
-                if currently_available_to_learners:
-                    break
-
-        elif model_entity_type == feconf.ENTITY_TYPE_STORY:
-            for ts in topic_summaries:
-                if model.entity_id in ts.published_story_exploration_mapping:
-                    currently_available_to_learners = True
-                    break
-
-        elif model_entity_type == feconf.ENTITY_TYPE_SKILL:
-            if model.topic_ids:
-                currently_available_to_learners = True
-
-        elif model_entity_type == feconf.ENTITY_TYPE_TOPIC:
-            currently_available_to_learners = (
-                model.entity_id in published_topic_ids
-            )
-
         entity_description = ''
+        story_title_val = None
+        reviewer_only_content_count_val = None
+        language_code_val = None
+
         if model_entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id = model.entity_id
+            currently_available_to_learners = exp_id in published_exp_ids
             story_id_val = exp_id_to_story_id.get(exp_id)
             if story_id_val and story_id_val in story_map:
                 story_val = story_map[story_id_val]
+                story_title_val = story_val.title
                 story_node = (
                     story_val.story_contents.get_node_with_corresponding_exp_id(
                         exp_id
@@ -1595,34 +1584,35 @@ def _get_translation_opportunity_cards_from_models(
                 )
                 if story_node:
                     entity_description = story_node.title
-        elif model_entity_type == feconf.ENTITY_TYPE_STORY:
-            story_val_obj = story_map.get(model.entity_id)
-            if story_val_obj:
-                entity_description = story_val_obj.title
-        elif model_entity_type == feconf.ENTITY_TYPE_SKILL:
-            skill_val_obj = skill_map.get(model.entity_id)
-            if skill_val_obj:
-                entity_description = skill_val_obj.description
-        else:
-            topic_val_obj = topic_map.get(model.entity_id)
-            if topic_val_obj:
-                entity_description = topic_val_obj.name
-
-        story_title_val = None
-        reviewer_only_content_count_val = None
-        language_code_val = None
-
-        if model_entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            exp_id = model.entity_id
-            story_id_val = exp_id_to_story_id.get(exp_id)
-            if story_id_val and story_id_val in story_map:
-                story_title_val = story_map[story_id_val].title
             if exp_id in explorations_map:
                 reviewer_only_content_count_val = explorations_map[
                     exp_id
                 ].get_reviewer_only_content_count()
             if exp_id in exp_summary_map:
                 language_code_val = exp_summary_map[exp_id].language_code
+
+        elif model_entity_type == feconf.ENTITY_TYPE_STORY:
+            currently_available_to_learners = (
+                model.entity_id in published_story_ids
+            )
+            story_val_obj = story_map.get(model.entity_id)
+            if story_val_obj:
+                entity_description = story_val_obj.title
+
+        elif model_entity_type == feconf.ENTITY_TYPE_SKILL:
+            # A skill reaches learners as soon as it is assigned to a topic.
+            currently_available_to_learners = bool(model.topic_ids)
+            skill_val_obj = skill_map.get(model.entity_id)
+            if skill_val_obj:
+                entity_description = skill_val_obj.description
+
+        elif model_entity_type == feconf.ENTITY_TYPE_TOPIC:
+            currently_available_to_learners = (
+                model.entity_id in published_topic_ids
+            )
+            topic_val_obj = topic_map.get(model.entity_id)
+            if topic_val_obj:
+                entity_description = topic_val_obj.name
 
         card_info = opportunity_domain.TranslationOpportunityCardInfo(
             topic_ids=model.topic_ids,
