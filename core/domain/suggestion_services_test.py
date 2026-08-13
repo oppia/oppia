@@ -479,7 +479,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id,
                 exp.version,
-                'author_2',
+                self.normal_user_id,
                 change_dict,
                 'test description',
             )
@@ -780,6 +780,177 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.status,
             suggestion_models.STATUS_ACCEPTED,
         )
+
+    def test_create_and_accept_skill_translation_suggestion(self) -> None:
+        """Test creating and accepting a translation suggestion targeting a skill."""
+        skill_id = 'skill_1'
+        self.save_new_skill(
+            skill_id, self.author_id, description='Skill Description'
+        )
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion description',
+        )
+
+        self.assertEqual(suggestion.target_type, feconf.ENTITY_TYPE_SKILL)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(
+            suggestion.score_category,
+            '%s.%s'
+            % (
+                suggestion_models.SCORE_TYPE_TRANSLATION,
+                feconf.ENTITY_TYPE_SKILL,
+            ),
+        )
+
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda *args: None,
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                'UNUSED_COMMIT_MESSAGE',
+                'Accepted skill translation',
+            )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_accepting_skill_translation_updates_translation_counts(
+        self,
+    ) -> None:
+        """Test that accepting a translation targeting a skill updates the
+        translation counts on the skill's translation opportunity.
+        """
+        skill_id = 'skill_3'
+        self.save_new_skill(
+            skill_id, self.author_id, description='Skill Description'
+        )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id='%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id),
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=skill_id,
+            topic_ids=['topic_1'],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion description',
+        )
+
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id,
+            self.reviewer_id,
+            'UNUSED_COMMIT_MESSAGE',
+            'Accepted skill translation',
+        )
+
+        updated_opportunity = (
+            opportunity_models.TranslationOpportunityModel.get(
+                '%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id)
+            )
+        )
+        self.assertEqual(updated_opportunity.translation_counts, {'hi': 1})
+        self.assertNotIn(
+            'hi', updated_opportunity.incomplete_translation_language_codes
+        )
+
+    def test_skill_translation_stats_use_topic_of_the_opportunity(
+        self,
+    ) -> None:
+        """Test that the stats of a translation targeting a skill are
+        attributed to the topic that the skill's opportunity belongs to.
+        """
+        skill_id = 'skill_2'
+        self.save_new_skill(
+            skill_id, self.author_id, description='Skill Description'
+        )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id='%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id),
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=skill_id,
+            topic_ids=['topic_1'],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion description',
+        )
+
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion
+        )
+
+        stats_model = suggestion_models.TranslationContributionStatsModel.get(
+            'hi', self.author_id, 'topic_1'
+        )
+        assert stats_model is not None
+        self.assertEqual(stats_model.submitted_translations_count, 1)
 
     def test_get_submitted_submissions(self) -> None:
         suggestion_services.create_suggestion(
@@ -9381,6 +9552,57 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
         self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'Hindi')
+        self.assertEqual(
+            certificate_data['certificate_profile_name'], self.username
+        )
+
+    def test_generate_certificate_with_custom_profile_name(self) -> None:
+        user_settings = user_services.get_user_settings(self.author_id)
+        user_settings.profile_name_for_certificate = 'Custom Certificate Name'
+        user_services.save_user_settings(user_settings)
+
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+        )
+        change_cmd = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            self.author_id,
+            'reviewer_1',
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_6',
+            'hi',
+        )
+
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+        )
+
+        assert certificate_data is not None
+        self.assertEqual(
+            certificate_data['certificate_profile_name'],
+            'Custom Certificate Name',
+        )
 
     def test_create_translation_contributor_certificate_for_rule_translation(
         self,

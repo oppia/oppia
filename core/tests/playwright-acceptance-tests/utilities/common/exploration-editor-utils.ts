@@ -20,12 +20,36 @@ import {BaseUser} from './playwright-utils';
 import {showMessage} from './show-message';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
+const previousCardButton = '.e2e-test-back-button';
 
-export class ExplorationEditorModal {
+export class ExplorationEditorUtils {
   userInstance: BaseUser;
 
   constructor(userInstance: BaseUser) {
     this.userInstance = userInstance;
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   * @param {boolean} skipVerification - Whether to skip verification of the card content.
+   */
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    try {
+      await this.userInstance.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.userInstance.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    if (skipVerification) {
+      return;
+    }
+    await this.userInstance.expectElementToBeVisible(previousCardButton);
   }
 
   /**
