@@ -225,25 +225,6 @@ export class BaseUser {
   }
 
   /**
-   * Gets the trimmed text content of an element.
-   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   */
-  async getTextContent(
-    selector: string | ElementHandle<Element>
-  ): Promise<string> {
-    if (typeof selector === 'string') {
-      const element = await this.page.$(selector);
-      const text = await this.page.evaluate(
-        (el: Element) => el.textContent,
-        element
-      );
-      return text?.trim() ?? '';
-    }
-    const text = await selector.evaluate(el => el.textContent);
-    return (text ?? '').trim();
-  }
-
-  /**
    * Clicks an element using JavaScript's native click() method.
    * This ensures Angular properly handles the event in its change detection
    * cycle, which is more reliable than Puppeteer's simulated clicks for
