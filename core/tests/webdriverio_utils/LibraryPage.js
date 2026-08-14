@@ -25,14 +25,12 @@ var general = require('./general.js');
 var LibraryPage = function () {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var allExplorationSummaryTileSelector = function () {
     return $$('.e2e-test-exp-summary-tile');
   };
   var explorationObjective = $('.e2e-test-exp-summary-tile-objective');
-  var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
   var homeSection = $('.e2e-test-home-section');
   var mainHeader = $('.e2e-test-library-main-header');
@@ -115,23 +113,6 @@ var LibraryPage = function () {
       homeSection,
       'Home',
       'Library page takes too long to load'
-    );
-  };
-
-  this.addSelectedExplorationToPlaylist = async function () {
-    // We need to wait till the cards are loaded else it will
-    // throw element out of bond error.
-    // eslint-disable-next-line oppia/e2e-practices
-    await browser.pause(5000);
-    await expHoverElement.moveTo();
-
-    await waitFor.elementToBeClickable(
-      addToPlayLaterListButton,
-      "Add to 'Play Later' list Icon taking too long to load"
-    );
-    await action.click(
-      'Add to play later list button',
-      addToPlayLaterListButton
     );
   };
 

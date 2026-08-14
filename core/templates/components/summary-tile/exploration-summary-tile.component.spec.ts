@@ -23,7 +23,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {Component, NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -41,9 +41,6 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {UserInfo} from 'domain/user/user-info.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
-@Component({selector: 'learner-dashboard-icons', template: ''})
-class LearnerDashboardIconsComponentStub {}
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncateAndCapitalizePipe implements PipeTransform {
@@ -174,7 +171,6 @@ describe('Exploration Summary Tile Component', () => {
         MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockTranslatePipe,
-        LearnerDashboardIconsComponentStub,
       ],
       providers: [
         DateTimeFormatService,

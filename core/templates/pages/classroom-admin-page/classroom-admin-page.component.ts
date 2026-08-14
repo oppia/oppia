@@ -49,6 +49,7 @@ import {
   TopicIdToTopicName,
 } from './existing-classroom.model';
 import {ClassroomAdminDataService} from './services/classroom-admin-data.service';
+import './classroom-admin-page.component.css';
 
 export interface TopicNameToPrerequisiteTopicNames {
   [topicName: string]: string[];
@@ -57,6 +58,7 @@ export interface TopicNameToPrerequisiteTopicNames {
 @Component({
   selector: 'oppia-classroom-admin-page',
   templateUrl: './classroom-admin-page.component.html',
+  styleUrls: ['./classroom-admin-page.component.css'],
 })
 export class ClassroomAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

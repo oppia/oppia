@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feature_flag_list, feconf, utils
@@ -1518,7 +1517,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                 )
             elif can_voiceover:
                 exp_services.create_or_update_draft(
@@ -1526,7 +1525,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                     is_by_voice_artist=True,
                 )
         except utils.ValidationError as e:

@@ -36,6 +36,7 @@ const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
+const LESSON_PROGRESS_STATUS_COMING_SOON = 'coming_soon';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -43,10 +44,15 @@ const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   styleUrls: ['./topic-lesson-card.component.css'],
 })
 export class TopicLessonCardComponent implements OnInit, OnChanges {
+  @Input() lessonNumber: number = 1;
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
+  @Input() studyUrl: string = '';
+  @Input() practiceUrl: string = '';
+  @Input() adventureAccentColor: string = '#00645c';
+  @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus:
     | 'not_started'
     | 'in_progress'
@@ -59,10 +65,14 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() availableVoiceoverLanguageAccentDescriptions: {
     [accentCode: string]: string;
   } = {};
+  @Input() isNewLessonLabelVisible: boolean = false;
+  @Input() isComingSoonSectionCard: boolean = false;
+  @Input() navigatedLessonNumber: number | null = null;
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
+  isExpanded: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -76,6 +86,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
+    // Expand the first lesson by default, or the navigated lesson.
+    this.isExpanded =
+      !this.isComingSoonSectionCard &&
+      (this.lessonNumber === 1 ||
+        this.navigatedLessonNumber === this.lessonNumber);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -85,13 +100,26 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     ) {
       this.initializeLanguageSelection();
     }
+    if (changes.navigatedLessonNumber) {
+      // Auto-expand this lesson if it's the navigated lesson from the navbar.
+      if (
+        !this.isComingSoonSectionCard &&
+        this.navigatedLessonNumber === this.lessonNumber
+      ) {
+        this.isExpanded = true;
+      }
+    }
   }
 
   get showCheckpointBar(): boolean {
     return (
-      this.lessonProgressStatus !== 'coming_soon' &&
+      this.lessonProgressStatus !== LESSON_PROGRESS_STATUS_COMING_SOON &&
       this.totalCheckpointsCount > 0
     );
+  }
+
+  get isComingSoonLesson(): boolean {
+    return this.lessonProgressStatus === LESSON_PROGRESS_STATUS_COMING_SOON;
   }
 
   navigateTo(url: string): void {
@@ -101,11 +129,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onStartButtonClick(): void {
-    if (!this.startUrl) {
+    if (!this.startUrl || this.isComingSoonLesson) {
       return;
     }
 
-    if (!this.shouldShowFallbackCta() || !this.selectedTextLanguageCode) {
+    if (!this.selectedTextLanguageCode) {
       this.navigateTo(this.startUrl);
       return;
     }
@@ -116,6 +144,27 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
         this.selectedVoiceoverLanguageCode
       )
     );
+  }
+
+  onPracticeButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
+    this.navigateTo(this.practiceUrl || this.startUrl);
+  }
+
+  onStudyButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
+    this.navigateTo(this.studyUrl || this.startUrl);
+  }
+
+  toggleExpanded(): void {
+    if (this.isComingSoonSectionCard) {
+      return;
+    }
+    this.isExpanded = !this.isExpanded;
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {
