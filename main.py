@@ -1674,6 +1674,14 @@ URLS.extend(
             r'/cron/certificate_assessment_question_pool_sync_check',
             cron.CronCertificateAssessmentQuestionPoolSyncCheckHandler,
         ),
+        get_redirect_route(
+            r'/cron/feedback/lesson_feedback_cleanup',
+            cron.CronLessonFeedbackCleanupHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/platform_feedback_cleanup',
+            cron.CronPlatformFeedbackCleanupHandler,
+        ),
     )
 )
 

@@ -39,6 +39,7 @@ from core.jobs.batch_jobs import (
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
     user_stats_computation_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from typing import DefaultDict, Dict, List
@@ -474,4 +475,40 @@ class CronCertificateAssessmentQuestionPoolSyncCheckHandler(
             job_class=(
                 certificate_assessment_validation_jobs.BlockInvalidCertificateAssessmentOfferingsJob
             )
+        )
+
+
+class CronLessonFeedbackCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for cleaning Feedback text of expired LessonFeedbackModel entries."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=web_feedback_cleanup_jobs.LessonFeedbackCleanupJob
+        )
+
+
+class CronPlatformFeedbackCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for deleting expired PlatformFeedbackModel entries
+    together with their associated FeedbackSessionLogModel
+    entries and uploaded screenshots."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob
         )

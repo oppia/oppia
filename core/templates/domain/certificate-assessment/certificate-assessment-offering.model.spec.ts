@@ -31,6 +31,8 @@ describe('Available Certificate Assessment Offering Data Model', () => {
       certificate_id: 'cert_id_1',
       title: 'Math Assessment',
       attempt_status: 'Not_Attempted',
+      passed_on_date: null,
+      failed_on_date: null,
     };
   });
 
@@ -38,15 +40,32 @@ describe('Available Certificate Assessment Offering Data Model', () => {
     const offering = new AvailableCertificateAssessmentOfferingData(
       'cert_id_1',
       'Math Assessment',
-      'Not_Attempted'
+      'Not_Attempted',
+      1000,
+      2000
     );
 
     expect(offering.certificateId).toEqual('cert_id_1');
     expect(offering.title).toEqual('Math Assessment');
     expect(offering.attemptStatus).toEqual('Not_Attempted');
+    expect(offering.passedOnDate).toEqual(1000);
+    expect(offering.failedOnDate).toEqual(2000);
+  });
+
+  it('should correctly create an instance via the constructor without dates', () => {
+    const offering = new AvailableCertificateAssessmentOfferingData(
+      'cert_id_1',
+      'Math Assessment',
+      'Not_Attempted'
+    );
+
+    expect(offering.passedOnDate).toBeNull();
+    expect(offering.failedOnDate).toBeNull();
   });
 
   it('should correctly create an instance from a backend dictionary', () => {
+    backendDict.passed_on_date = 1000;
+    backendDict.failed_on_date = null;
     const offering =
       AvailableCertificateAssessmentOfferingData.createFromBackendDict(
         backendDict
@@ -55,6 +74,8 @@ describe('Available Certificate Assessment Offering Data Model', () => {
     expect(offering.certificateId).toEqual('cert_id_1');
     expect(offering.title).toEqual('Math Assessment');
     expect(offering.attemptStatus).toEqual('Not_Attempted');
+    expect(offering.passedOnDate).toEqual(1000);
+    expect(offering.failedOnDate).toBeNull();
   });
 });
 

@@ -44,3 +44,9 @@ cron:
 - description: cron job to validate certificate question pools against latest topic/skill data and block invalid certificate offerings
   url: /cron/certificate_assessment_question_pool_sync_check
   schedule: every thursday 9:00
+- description: daily job to clean up expired LessonFeedbackModel entries by clearing their feedback text
+  url: /cron/feedback/lesson_feedback_cleanup
+  schedule: every day 01:00
+- description: daily job to delete expired PlatformFeedbackModel entries together with their associated FeedbackSessionLogModel entries and uploaded screenshots
+  url: /cron/feedback/platform_feedback_cleanup
+  schedule: every day 02:00
