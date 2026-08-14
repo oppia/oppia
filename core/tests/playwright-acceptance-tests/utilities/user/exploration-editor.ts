@@ -170,9 +170,8 @@ const openFeedbackCardSelector = '.e2e-test-creator-dashboard-open-feedback';
 const subscriberCountLabel = '.e2e-test-creator-dashboard-subscriber-count';
 const explorationSummaryTileTitleSelector =
   '.e2e-test-exploration-dashboard-card-title';
-const averageRatingsCardSelector = '.e2e-test-creator-dashboard-average-rating';
-const usersCountInRatingSelector =
-  '.e2e-test-creator-dashboard-rating-user-count';
+const averageRatingsCardSelector = '.average-ratings';
+const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
