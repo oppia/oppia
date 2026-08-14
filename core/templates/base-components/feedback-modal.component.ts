@@ -120,7 +120,7 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional()
     private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
@@ -389,16 +389,16 @@ export class FeedbackModalComponent implements OnInit {
           feedbackPayload,
           this.captchaToken
         );
+      this.siteAnalyticsService.registerLessonIssueSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
+      );
       const successMessage = this.translateService.instant(
         this.category === 'broken_layout_or_image' ||
           this.category === 'other_or_not_sure' ||
           this.category === null
           ? 'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
           : 'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
-      );
-      this.siteAnalyticsService.registerLessonIssueSubmittedEvent(
-        lessonFeedbackMetadata.explorationId,
-        response.id
       );
       this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
