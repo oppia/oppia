@@ -42,7 +42,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   bannerImgPath = '';
   footerImgPath = '';
-  formLink = AppConstants.VOLUNTEER_FORM_LINK;
+  formLink = AppConstants.VOLUNTEER_IDEALIST_LINK;
   art!: {
     images: string[];
     caption: {

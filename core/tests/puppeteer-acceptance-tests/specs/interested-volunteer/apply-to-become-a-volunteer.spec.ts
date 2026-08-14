@@ -44,8 +44,8 @@ describe('Interested Volunteer', function () {
       'Volunteer to make a difference'
     );
 
-    // Apply to become a volunteer at top of the page.
-    await interestedVolunteer.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+    // Explore volunteer openings at the top of the page.
+    await interestedVolunteer.clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage();
 
     // "Why Volunteer with Us?" heading.
     await interestedVolunteer.navigateToVolunteerPage();
@@ -59,8 +59,8 @@ describe('Interested Volunteer', function () {
     );
     await interestedVolunteer.expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage();
 
-    // Open Volunteer Form.
-    await interestedVolunteer.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+    // Open Oppia Idealist page.
+    await interestedVolunteer.clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage();
   });
 
   afterAll(async function () {
