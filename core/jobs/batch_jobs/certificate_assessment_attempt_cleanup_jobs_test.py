@@ -170,6 +170,34 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNotNone(kept_model)
 
+    def test_keeps_in_progress_attempt_past_time_limit_within_grace_period(
+        self,
+    ) -> None:
+        """An in-progress attempt past its time limit but still inside the
+        combined deadline (time limit plus grace period) should be kept.
+        """
+        offering_model = _create_offering_model(self, 'cert_1', 20)
+        active_attempt = _create_attempt_model(
+            self,
+            'attempt_active',
+            'cert_1',
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=70),
+        )
+        self.put_multi([offering_model, active_attempt])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CertificateAssessmentAttemptModels deleted: 0.'
+                ),
+            ]
+        )
+
+        kept_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
+            'attempt_active'
+        )
+        self.assertIsNotNone(kept_model)
+
     def test_keeps_submitted_attempt_even_if_old(self) -> None:
         """A submitted attempt should never be deleted, however old."""
         offering_model = _create_offering_model(self, 'cert_1', 20)
