@@ -25,12 +25,20 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
-  SendALessonFeedbackModel,
-  IssueReportModel,
+  ReportType,
+  LessonFeedbackModel,
+  PlatformFeedbackModel,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {throwError} from 'rxjs';
+import {
+  CreatorFeedbackType,
+  FeedbackStatus,
+  LessonFeedbackDetailResponse,
+  TechnicalTeamType,
+} from './feedback.model';
 
 describe('Feedback backend api service', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
@@ -38,21 +46,21 @@ describe('Feedback backend api service', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let imageUploadHelperService: ImageUploadHelperService;
 
-  const sendALessonFeedbackPayload =
-    SendALessonFeedbackModel.createForSubmission({
-      feedbackText: 'Hello',
-      exploration_context: {
-        explorationId: 'test',
-        explorationVersion: 1,
-        stateName: 'intro',
-        stateIndex: 1,
-        learnerCurrentAnswer: 'test',
-      },
-    });
+  const sendALessonFeedbackPayload = LessonFeedbackModel.createForSubmission({
+    feedbackText: 'Hello',
+    lesson_metadata: {
+      explorationId: 'test',
+      explorationVersion: 1,
+      stateName: 'intro',
+      stateIndex: 1,
+      learnerCurrentAnswer: 'test',
+    },
+  });
 
-  const issueReportPayload = IssueReportModel.createForSubmission({
-    source: 'lesson',
+  const issueReportPayload = PlatformFeedbackModel.createForSubmission({
+    source: ReportType.LESSON,
     reportMessage: 'text',
+    pageUrl: 'http://localhost:8181/explore/test',
     explorationContext: {
       explorationId: 'test',
       explorationVersion: 1,
@@ -60,11 +68,78 @@ describe('Feedback backend api service', () => {
       stateIndex: 1,
       learnerCurrentAnswer: 'test',
     },
-    category: 'broken_layout_or_image',
+    category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
     includeTechnicalLogs: false,
     sessionInfo: null,
     screenshotFilename: null,
   });
+
+  const filterState1 = {
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: new Date('2021-02-01'),
+    },
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
+  };
+
+  const filterState2 = {
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: new Date('2021-02-01'),
+    },
+    technicalTeam: TechnicalTeamType.TECH_INTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
+  };
+
+  const filterState3 = {
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: null,
+    },
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
+  };
+
+  const detailedReportResponse = {
+    id: 'test_report_id',
+    report_message: 'Test report',
+    source: 'lesson',
+    status: 'open',
+    platform: 'web',
+    destination_dashboard: TechnicalTeamType.TECH_EXTERNAL,
+    page_url: 'http://localhost',
+    category: null,
+    lesson_metadata: null,
+    include_technical_logs: false,
+    session_info: null,
+    screenshot_filename: null,
+    screenshot_entity_id: null,
+    created_on_msecs: 123456,
+  };
+
+  const detailLessonFeedbackResponse: LessonFeedbackDetailResponse = {
+    id: 'test_report_id',
+    feedback_text: 'Test report',
+    status: FeedbackStatus.OPEN,
+    lesson_metadata: {
+      exploration_id: 'test',
+      exploration_version: 1,
+      state_name: 'intro',
+      state_index: 1,
+      learner_current_answer: 'test',
+    },
+    parent_feedback_id: null,
+    response_list: [],
+    unread_response_count: 0,
+    created_on_msecs: 123456,
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -148,7 +223,7 @@ describe('Feedback backend api service', () => {
     ]);
     expect(onSuccess).toHaveBeenCalledWith({
       screenshotFilename: 'reply.png',
-      screenshotFile: {'reply.png': 'aW1hZ2UtZGF0YQ=='},
+      screenshotFile: 'aW1hZ2UtZGF0YQ==',
     });
   }));
 
@@ -232,7 +307,7 @@ describe('Feedback backend api service', () => {
       .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
       .then(onSuccess);
     flushMicrotasks();
-    const req = httpTestingController.expectOne('/report');
+    const req = httpTestingController.expectOne('/platform-feedback');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({
       ...issueReportPayload.toBackendDict(),
@@ -245,45 +320,246 @@ describe('Feedback backend api service', () => {
     expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
   }));
 
-  it('should reject with http error when feedback submission fails', fakeAsync(() => {
-    const onFailure = jasmine.createSpy('onFailure');
-
+  it('should fetch LEAP technical dashboard report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
     feedbackBackendApiService
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
-      .catch(onFailure);
-    flushMicrotasks();
+      .fetchTechnicalDashboardFeedbackListAsync(filterState1, 'cursor')
+      .then(onSuccess);
 
-    const req = httpTestingController.expectOne('/report');
-    req.flush(
-      {error: 'Invalid feedback.'},
-      {
-        status: 400,
-        statusText: 'Bad Request',
-      }
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url ===
+          `/platform-feedback/technical/${filterState1.technicalTeam}`
     );
+    expect(req.request.params.get('status')).toBe(filterState1.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState1.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState1.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
     flushMicrotasks();
 
-    expect(
-      onFailure.calls.mostRecent().args[0] instanceof HttpErrorResponse
-    ).toBe(true);
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
   }));
 
-  it('should rethrow non-http errors during feedback submission', fakeAsync(() => {
-    const error = new Error('Unexpected error.');
-    const serviceWithFailingHttp = new FeedbackBackendApiService(
-      {
-        post: () => throwError(error),
-      } as never,
-      imageLocalStorageService,
-      imageUploadHelperService
+  it('should fetch CORE technical dashboard report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchTechnicalDashboardFeedbackListAsync(filterState2, 'cursor')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url ===
+          `/platform-feedback/technical/${filterState2.technicalTeam}`
     );
-    const onFailure = jasmine.createSpy('onFailure');
+    expect(req.request.params.get('status')).toBe(filterState2.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState2.dateRange.start.getTime())
+    );
 
-    serviceWithFailingHttp
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, null)
-      .catch(onFailure);
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState2.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
     flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
 
-    expect(onFailure).toHaveBeenCalledWith(error);
+  it('should fetch creator feedback tab report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchCreatorDashboardFeedbackListAsync(
+        'test_exploration_id',
+        filterState3,
+        'cursor'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/platform-feedback/curriculum/test_exploration_id'
+    );
+    expect(req.request.params.get('status')).toBe(filterState3.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState3.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBeNull();
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch details of a Platform Feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchPlatformFeedbackDetailAsync(
+        'technical',
+        'tech-external',
+        'test_report_id'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url ===
+          '/platform-feedback/technical/tech-external/test_report_id'
+    );
+
+    req.flush(detailedReportResponse);
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(detailedReportResponse);
+  }));
+
+  it('should update status of a Platform Feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .updatePlatformFeedbackStatusAsync(
+        'technical',
+        'tech-external',
+        'test_report_id',
+        'fixed'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'POST' &&
+        request.url ===
+          '/platform-feedback/technical/tech-external/test_report_id'
+    );
+
+    expect(req.request.body).toEqual({
+      status: 'fixed',
+    });
+
+    req.flush({success: true});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({success: true});
+  }));
+
+  it('should fetch creator feedback tab lesson list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchCreatorLessonFeedbackListAsync(
+        'test_exploration_id',
+        filterState2,
+        'cursor'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/feedback/test_exploration_id'
+    );
+    expect(req.request.params.get('status')).toBe(filterState2.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState2.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState2.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch details of a lesson Feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchLessonFeedbackDetailAsync('test_exp_id', 'feedback_1')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/feedback/test_exp_id/feedback_1'
+    );
+
+    req.flush(detailLessonFeedbackResponse);
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(detailLessonFeedbackResponse);
+  }));
+
+  it('should update status of a Lesson Feedback and send reply', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .updateLessonFeedbackAsync(
+        'test_exp_id',
+        'feedback_1',
+        FeedbackStatus.FIXED,
+        'Fixed, thanks'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'POST' &&
+        request.url === '/feedback/test_exp_id/feedback_1'
+    );
+
+    expect(req.request.body).toEqual({
+      status: FeedbackStatus.FIXED,
+      reply_text: 'Fixed, thanks',
+    });
+
+    req.flush({success: true});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({success: true});
   }));
 });

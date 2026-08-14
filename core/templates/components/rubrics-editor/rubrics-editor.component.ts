@@ -27,14 +27,12 @@ import {AppConstants} from 'app.constants';
 import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
 import {Rubric} from 'domain/skill/rubric.model';
 import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {Schema} from 'services/schema-default-value.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import './rubrics-editor.component.css';
 
 interface Explanation {
   [key: string]: string[];
-}
-
-interface ExplanationFormSchema {
-  type: string;
-  ui_config: object;
 }
 
 interface RubricsOptions {
@@ -56,6 +54,7 @@ interface SkillDescriptionStatusValuesInterface {
 @Component({
   selector: 'oppia-rubrics-editor',
   templateUrl: './rubrics-editor.component.html',
+  styleUrls: ['./rubrics-editor.component.css'],
 })
 export class RubricsEditorComponent {
   @Output() saveRubric: EventEmitter<RubricData> = new EventEmitter();
@@ -66,7 +65,7 @@ export class RubricsEditorComponent {
   @Input() rubrics!: Rubric[];
   @Input() newSkillBeingCreated!: boolean;
   selectedRubricIndex!: number;
-  rubricsOptions!: RubricsOptions[];
+  rubricsOptions: RubricsOptions[] = [];
   rubric!: Rubric;
 
   skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface =
@@ -77,12 +76,12 @@ export class RubricsEditorComponent {
   explanationsMemento: Record<string, string[]> = {};
   explanationEditorIsOpen: Record<string, boolean[]> = {};
   editableExplanations: Explanation = {};
-  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {
+  EXPLANATION_FORM_SCHEMA: Schema = {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'ALL_COMPONENTS',
     },
-  };
+  } as Schema;
 
   maximumNumberofExplanations: number = 10;
   maximumCharacterLengthOfExplanation: number = 300;
@@ -97,7 +96,7 @@ export class RubricsEditorComponent {
     return true;
   }
 
-  getSchema(): ExplanationFormSchema {
+  getSchema(): Schema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
@@ -138,11 +137,13 @@ export class RubricsEditorComponent {
     return totalExplanations >= this.maximumNumberofExplanations;
   }
 
-  updateExplanation($event: string, idx: number): void {
+  updateExplanation($event: SchemaDefaultValue | string, idx: number): void {
+    const eventString = String($event);
     if (
-      this.editableExplanations[this.rubric.getDifficulty()][idx] !== $event
+      this.editableExplanations[this.rubric.getDifficulty()][idx] !==
+      eventString
     ) {
-      this.editableExplanations[this.rubric.getDifficulty()][idx] = $event;
+      this.editableExplanations[this.rubric.getDifficulty()][idx] = eventString;
       this.changeDetectorRef.detectChanges();
     }
   }

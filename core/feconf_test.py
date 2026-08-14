@@ -19,9 +19,11 @@
 from __future__ import annotations
 
 import datetime
+import importlib
 import os
 
 from core import feconf
+from core.constants import constants
 from core.tests import test_utils
 
 import bs4
@@ -106,3 +108,13 @@ class FeconfTests(test_utils.GenericTestBase):
                 ).find_all('li')
             )
         self.assertEqual(feconf.TERMS_PAGE_LAST_UPDATED_UTC, max_date)
+
+    def test_prod_mode_frontend_dirs_match_angular_build_output(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            importlib.reload(feconf)
+            self.assertEqual(
+                feconf.FRONTEND_TEMPLATES_DIR, os.path.join('build')
+            )
+            self.assertEqual(feconf.FRONTEND_AOT_DIR, os.path.join('build'))
+
+        importlib.reload(feconf)

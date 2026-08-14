@@ -813,7 +813,7 @@ describe('Tutor card component', () => {
         {} as InteractionCustomizationArgs,
         null,
         [],
-        '',
+        'TextInput',
         null
       )
     );

@@ -15,7 +15,7 @@
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option.contributionType === type}">
             {{option.displayName}}
         </div>
       </div>
@@ -42,7 +42,7 @@
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              *ngFor="let option of options"
              (click)="selectOption(option.contributionType)"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option.contributionType === type}">
           {{option.displayName}}
         </div>
       </div>
@@ -71,19 +71,19 @@
           </td>
           <td *ngIf="type == 'translationReview'"
               class="stats-data">
-            {{translationStat.reviewedCards}}
+            {{translationStat['reviewedCards']}}
           </td>
           <td *ngIf="type == 'translationReview'"
               class="stats-data">
-            {{translationStat.reviewedWordCount}}
+            {{translationStat['reviewedWordCount']}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'"
               class="stats-data">
-            {{translationStat.acceptedCards}}
+            {{translationStat['acceptedCards']}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'"
               class="stats-data">
-            {{translationStat.acceptedWordCount}}
+            {{translationStat['acceptedWordCount']}}
           </td>
         </tr>
       </table>
@@ -111,7 +111,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedCards}}
+              {{translationStat['acceptedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -119,7 +119,7 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedWordCount}}
+              {{translationStat['acceptedWordCount']}}
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@
               <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.reviewedCards}}
+              {{translationStat['reviewedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -157,7 +157,7 @@
               <b>{{COLUMNS[type].reviewedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.reviewedWordCount}}
+              {{translationStat['reviewedWordCount']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -165,7 +165,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedCards}}
+              {{translationStat['acceptedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -173,7 +173,7 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedWordCount}}
+              {{translationStat['acceptedWordCount']}}
             </div>
           </div>
         </div>
@@ -239,14 +239,14 @@
           </td>
           <td *ngIf="type == 'questionReview'"
               class="stats-data">
-            {{questionStat.reviewedQuestions}}
+            {{questionStat['reviewedQuestions']}}
           </td>
           <td class="stats-data">
-            {{questionStat.acceptedQuestions}}
+            {{questionStat['acceptedQuestions']}}
           </td>
           <td *ngIf="type == 'questionContribution'"
               class="stats-data">
-            {{questionStat.acceptedQuestionsWithoutEdits}}
+            {{questionStat['acceptedQuestionsWithoutEdits']}}
           </td>
         </tr>
       </table>
@@ -275,7 +275,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestions}}
+              {{questionStat['acceptedQuestions']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -283,7 +283,7 @@
               <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestionsWithoutEdits}}
+              {{questionStat['acceptedQuestionsWithoutEdits']}}
             </div>
           </div>
         </div>
@@ -313,7 +313,7 @@
               <b>{{COLUMNS[type].reviewedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.reviewedQuestions}}
+              {{questionStat['reviewedQuestions']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -321,7 +321,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestions}}
+              {{questionStat['acceptedQuestions']}}
             </div>
           </div>
         </div>
@@ -364,304 +364,3 @@
      [hidden]="!dataLoading">
   <lazy-loading></lazy-loading>
 </div>
-
-<style>
-  .oppia-lazy-loading-container {
-    height: 500px;
-    margin-bottom: -20px;
-    width: 100%;
-  }
-  .certificate-download-button-container {
-    overflow: hidden;
-  }
-  .certificate-download-button {
-    background-color: #00645c;
-    border-color: #00645c;
-    float: right;
-  }
-  .oppia-contributions-required-message-container {
-    height: 300px;
-  }
-  .oppia-contributions-required-message {
-    align-items: center;
-    color: #4a4a4a;
-    display: flex;
-    font-size: 28px;
-    height: 100%;
-    justify-content: center;
-    text-align: center;
-    vertical-align: middle;
-  }
-  .oppia-pagination-container {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-    width: 100%;
-  }
-  .oppia-pagination-button {
-    background-color: transparent;
-    border: none;
-    box-sizing: border-box;
-    color: #000;
-    font-size: 18px;
-    font-weight: bold;
-    min-height: 40px;
-    min-width: 100px;
-    text-align: center;
-  }
-  .oppia-pagination-button:hover {
-    border: 2px solid #000;
-    border-radius: 5px;
-  }
-  .oppia-pagination-button[disabled] {
-    color: #000;
-    opacity: 0.239;
-  }
-  .oppia-contributions-dropdown-arrow {
-    color: #009688;
-  }
-  .stats-contribution-type-mobile-container {
-    background-color: #fff;
-    display: none;
-    font-size: 20px;
-    margin-bottom: 3%;
-    padding: 0 20px;
-    width: 100%;
-  }
-  .mobile-stats-page {
-    margin-top: 30px;
-  }
-  .mobile-stats-data-container {
-    display: none;
-    font-size: 2.5vw;
-    padding-bottom: 10px;
-    padding-top: 10px;
-    width: 100%;
-  }
-  .mobile-stats-row {
-    display: flex;
-    margin-bottom: 5px;
-  }
-  .mobile-stats-name {
-    width: 50%;
-  }
-  .mobile-stats-data-container:not(:last-child) {
-    border-bottom: 1px solid #bbb;
-  }
-  .stats-column-name-container {
-    margin-left: auto;
-    margin-right: auto;
-    width: 75%;
-  }
-  .stats-data {
-    text-align: center;
-  }
-  .stats-cards-container {
-    margin-top: 30px;
-  }
-  .stats-welcome-text-container {
-    color: #00645c;
-    display: inline-block;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 24px;
-    height: 30%;
-    vertical-align: middle;
-    width: 65%;
-  }
-  .stats-contribution-type-container {
-    display: inline-block;
-    vertical-align: top;
-    width: 35%;
-  }
-  .stats-contribution-type-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 65%;
-  }
-  .list-view-item {
-    background: #fff;
-    border: 1px solid #000;
-    box-shadow: none;
-    margin-top: 10px;
-  }
-  .dashboard-table {
-    font-size: 1.2vw;
-    margin-top: 40px;
-    width: 100%;
-  }
-  .dashboard-table .dashboard-table-headings {
-    border-bottom: 2px solid black;
-    padding-bottom: 0.7em;
-    text-align: center;
-  }
-
-  .dashboard-table .dashboard-table-headings p {
-    display: inline;
-  }
-  .dashboard-table #dashboard-table-headings-details {
-    display: inline-block;
-    text-align: left;
-    width: 100%;
-  }
-  .stats-row {
-    height: 50px;
-    text-align: left;
-    vertical-align: baseline;
-  }
-  .stats-row td {
-    padding-top: 15px;
-  }
-  .stats-row:not(:last-child) {
-    border-bottom: 1px solid #bbb;
-  }
-  .oppia-stats-type-selector-container {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    justify-content: space-between;
-    padding: 10px 20px;
-    position: relative;
-    vertical-align: top;
-  }
-  .oppia-stats-type-selector-inner-container {
-    display: flex;
-    flex: 1;
-    font-size: 16px;
-    justify-content: space-between;
-  }
-
-  .oppia-stats-type-selector-inner-container-arrow {
-    color: #009688;
-    cursor: pointer;
-    padding-top: 3px;
-  }
-  .oppia-stats-type-selector-dropdown-container {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    height: auto;
-    left: 0;
-    overflow-y: scroll;
-    padding: 8px 12px;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    z-index: 1;
-  }
-  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar {
-    width: 7px;
-  }
-  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-track {
-    border-radius: 5px;
-    box-shadow: inset 0 0 3px #808080;
-  }
-  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-thumb {
-    background: #808080;
-    border-radius: 5px;
-    transition: background 0.5s ease;
-  }
-  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-thumb:hover {
-    background: black;
-  }
-  .oppia-stats-type-selector-dropdown-option {
-    color: rgb(104, 104, 104);
-    display: flex;
-    flex: 1;
-    margin-left: 16px;
-    padding: 8px;
-  }
-  .oppia-stats-type-selector-dropdown-option-selected,
-  .oppia-stats-type-selector-dropdown-option:hover {
-    background-color: rgb(238, 238, 238);
-    border-radius: 4px;
-  }
-  @media (min-width: 700px) {
-    .stats-container {
-      margin-left: 50px;
-    }
-    .oppia-lazy-loading-container {
-      margin-left: 50px;
-    }
-  }
-  @media only screen and (max-width: 700px) {
-    .list-view-item {
-      margin-bottom: 30px;
-    }
-    .stats-welcome-text-container {
-      width: 100%;
-    }
-    .stats-contribution-type-label {
-      display: none;
-    }
-    .stats-contribution-type-container {
-      display: none;
-    }
-    .dropdown-label {
-      color: #4a4a4a;
-      font-size: 18px;
-      margin-right: 10px;
-      width: 175px;
-    }
-    .stats-contribution-type-mobile-container {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      margin-left: calc(-50vw + 50% + 0px);
-      padding-bottom: 30px;
-      padding-top: 5px;
-      width: 100vw;
-    }
-    .dashboard-table {
-      display: none;
-    }
-    .mobile-stats-data-container {
-      display: table;
-    }
-    .oppia-contribution-stats-type-selector-mobile-container {
-      background-color: #fff;
-      border-radius: 4px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-      cursor: pointer;
-      display: inline-block;
-      justify-content: space-between;
-      padding: 10px 20px;
-      position: relative;
-      width: 100%;
-    }
-    .stats-column-name-container {
-      font-size: 12px;
-    }
-    .stats-data {
-      font-size: 12px;
-    }
-    .oppia-stats-type-selector-inner-container {
-      font-size: 20px;
-    }
-  }
-  @media only screen and (max-width: 420px) {
-    .dropdown-label {
-      font-size: 18px;
-      margin-right: 2vw;
-      width: 100px;
-    }
-    .oppia-contribution-stats-type-selector-mobile-container {
-      background-color: #fff;
-      border-radius: 4px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-      cursor: pointer;
-      display: inline-block;
-      justify-content: space-between;
-      padding: 10px 20px;
-      position: relative;
-      width: 100%;
-    }
-    .stats-column-name-container {
-      font-size: 10px;
-    }
-    .stats-data {
-      font-size: 10px;
-    }
-  }
-</style>

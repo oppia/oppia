@@ -22,12 +22,6 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 
-declare global {
-  interface Window {
-    Guppy: Guppy;
-  }
-}
-
 class MockGuppy {
   constructor(id: string, config: Object) {}
 

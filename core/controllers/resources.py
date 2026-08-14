@@ -74,7 +74,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
         feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
         feconf.ENTITY_TYPE_CLASSROOM,
-        feconf.ENTITY_TYPE_FEEDBACK_SCREENSHOT,
+        feconf.ENTITY_TYPE_FEEDBACK,
     ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

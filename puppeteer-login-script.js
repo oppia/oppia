@@ -35,6 +35,13 @@ var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 
+var roleOptionLabels = {
+  ADMIN: 'curriculum admin',
+  BLOG_ADMIN: 'blog admin',
+  COLLECTION_EDITOR: 'collection editor',
+  MODERATOR: 'moderator',
+};
+
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
@@ -49,7 +56,22 @@ module.exports = async (browser, context) => {
   } else if (context.url.includes('blog-dashboard')) {
     await setRole(page, 'BLOG_ADMIN');
   }
-  await page.close();
+  await seedBlankPagesForLighthouseRuns(browser, page, context);
+};
+
+const seedBlankPagesForLighthouseRuns = async function (
+  browser,
+  page,
+  context
+) {
+  const numberOfRuns = Number(context.options.numberOfRuns) || 1;
+  await page.goto('about:blank');
+
+  let pages = await browser.pages();
+  for (let i = pages.length; i < numberOfRuns; i++) {
+    const blankPage = await browser.newPage();
+    await blankPage.goto('about:blank');
+  }
 };
 
 // Needed to relogin after lighthouse_setup.js.
@@ -68,6 +90,14 @@ const login = async function (context, page) {
     try {
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
+      await Promise.all([
+        page.waitForResponse(response =>
+          response.url().includes('/usernamehandler/data')
+        ),
+        page.evaluate(selector => {
+          document.querySelector(selector).blur();
+        }, usernameInput),
+      ]);
       await page.click(agreeToTermsCheckBox);
       await page.waitForSelector(registerUser);
       await page.click(registerUser);
@@ -97,8 +127,65 @@ const setRole = async function (page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    var selector = `mat-option[ng-reflect-value="${role}"]`;
-    await page.click(selector);
+    await page.waitForSelector('mat-option');
+    const roleOptionWasSelected = await page.evaluate(
+      (role, roleOptionLabels) => {
+        const roleOptionLabel = roleOptionLabels[role];
+        if (!roleOptionLabel) {
+          throw new Error(`No role option label configured for ${role}.`);
+        }
+
+        const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+        const normalizedRole = role.toLowerCase();
+        const options = Array.from(document.querySelectorAll('mat-option'));
+        const match = options.find(option => {
+          const optionValue = (
+            option.getAttribute('ng-reflect-value') ||
+            option.getAttribute('value') ||
+            option.id ||
+            ''
+          ).toLowerCase();
+          const optionLabel = option.textContent.trim().toLowerCase();
+
+          return (
+            optionValue === normalizedRole ||
+            optionLabel === normalizedRoleOptionLabel ||
+            optionLabel === normalizedRole
+          );
+        });
+
+        if (!match) {
+          return false;
+        }
+
+        match.click();
+        return true;
+      },
+      role,
+      roleOptionLabels
+    );
+
+    if (roleOptionWasSelected) {
+      await page.waitForResponse(response =>
+        response.url().includes('/adminrolehandler')
+      );
+    } else {
+      const roleIsAlreadyAssigned = await page.evaluate(
+        (role, roleOptionLabels, roleEditorContainer) => {
+          const roleOptionLabel = roleOptionLabels[role];
+          const roleEditorText = document
+            .querySelector(roleEditorContainer)
+            .textContent.toLowerCase();
+          return roleEditorText.includes(roleOptionLabel.toLowerCase());
+        },
+        role,
+        roleOptionLabels,
+        roleEditorContainer
+      );
+      if (!roleIsAlreadyAssigned) {
+        throw new Error(`Could not find role option for ${role}.`);
+      }
+    }
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});

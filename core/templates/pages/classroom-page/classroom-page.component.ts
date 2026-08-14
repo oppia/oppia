@@ -65,6 +65,7 @@ export class ClassroomPageComponent implements OnDestroy {
   firstTopicUrl: string = '';
   publicClassroomsCount!: number;
   showPrivateClassroomBanner: boolean = false;
+  isUserLoggedIn: boolean = false;
   classroomThumbnail = '';
   classroomBanner = '';
   classroomTranslationKeys!: ClassroomTranslationKeys;
@@ -86,6 +87,11 @@ export class ClassroomPageComponent implements OnDestroy {
     private userService: UserService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
+
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platformFeatureService.status.EnableCertificateAssessment
+      .isEnabled;
+  }
 
   setClassroomMedia(classroomData: ClassroomData): void {
     const classroomId = classroomData.getClassroomId();
@@ -117,7 +123,7 @@ export class ClassroomPageComponent implements OnDestroy {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromUrl();
     this.bannerImageFileUrl =
@@ -125,82 +131,77 @@ export class ClassroomPageComponent implements OnDestroy {
 
     this.loaderService.showLoadingScreen('Loading');
 
-    this.accessValidationBackendApiService
-      .validateAccessToClassroomPage(this.classroomUrlFragment)
-      .then(
-        () => {
-          this.classroomBackendApiService
-            .fetchClassroomDataAsync(this.classroomUrlFragment)
-            .then(
-              classroomData => {
-                this.classroomData = classroomData;
-                this.classroomDisplayName = this.capitalizePipe.transform(
-                  classroomData.getName()
-                );
-
-                this.setClassroomMedia(classroomData);
-
-                this.publicClassroomsCount =
-                  classroomData.getPublicClassroomsCount();
-
-                this.classroomTranslationKeys =
-                  this.i18nLanguageCodeService.getClassroomTranslationKeys(
-                    classroomData.getName()
-                  );
-                this.setPageTitle();
-                this.subscribeToOnLangChange();
-                this.loaderService.hideLoadingScreen();
-                this.classroomBackendApiService.onInitializeTranslation.emit();
-                this.siteAnalyticsService.registerClassroomPageViewed();
-                if (
-                  classroomData &&
-                  classroomData.getTopicSummaries().length > 0
-                ) {
-                  let firstTopic = classroomData.getTopicSummaries()[0].name;
-                  this.firstTopicUrl =
-                    `/learn/${classroomData.getUrlFragment()}/` +
-                    classroomData.getTopicSummaries()[0].urlFragment;
-
-                  this.beginWithFirstTopicButtonText =
-                    this.translateService.instant(
-                      'I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON',
-                      {
-                        firstTopic: firstTopic,
-                      }
-                    );
-
-                  this.begineWithFirstTopicDescriptionText =
-                    this.translateService.instant(
-                      'I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT',
-                      {
-                        firstTopic: firstTopic,
-                      }
-                    );
-                }
-                this.userService.getUserInfoAsync().then(userInfo => {
-                  this.showPrivateClassroomBanner =
-                    userInfo.isCurriculumAdmin() &&
-                    !this.classroomData.getIsPublished();
-                });
-              },
-              errorResponse => {
-                if (
-                  AppConstants.FATAL_ERROR_CODES.indexOf(
-                    errorResponse.status
-                  ) !== -1
-                ) {
-                  this.alertsService.addWarning('Failed to get classroom data');
-                }
-              }
-            );
-        },
-        err => {
-          // Note to developers:
-          // This callback is triggered when the provided classroom does not exist,
-          // this will raise page not found exception.
-          // No further action is needed.
-        }
+    try {
+      await this.accessValidationBackendApiService.validateAccessToClassroomPage(
+        this.classroomUrlFragment
       );
+      const classroomData =
+        await this.classroomBackendApiService.fetchClassroomDataAsync(
+          this.classroomUrlFragment
+        );
+      this.classroomData = classroomData;
+      this.classroomDisplayName = this.capitalizePipe.transform(
+        classroomData.getName()
+      );
+
+      this.setClassroomMedia(classroomData);
+
+      this.publicClassroomsCount = classroomData.getPublicClassroomsCount();
+
+      this.classroomTranslationKeys =
+        this.i18nLanguageCodeService.getClassroomTranslationKeys(
+          classroomData.getName()
+        );
+      this.setPageTitle();
+      this.subscribeToOnLangChange();
+      this.classroomBackendApiService.onInitializeTranslation.emit();
+      this.siteAnalyticsService.registerClassroomPageViewed();
+      if (classroomData.getTopicSummaries().length > 0) {
+        const firstTopic = classroomData.getTopicSummaries()[0].name;
+        this.firstTopicUrl =
+          `/learn/${classroomData.getUrlFragment()}/` +
+          classroomData.getTopicSummaries()[0].urlFragment;
+
+        this.beginWithFirstTopicButtonText = this.translateService.instant(
+          'I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON',
+          {
+            firstTopic: firstTopic,
+          }
+        );
+
+        this.begineWithFirstTopicDescriptionText =
+          this.translateService.instant(
+            'I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT',
+            {
+              firstTopic: firstTopic,
+            }
+          );
+      }
+      try {
+        const userInfo = await this.userService.getUserInfoAsync();
+        this.isUserLoggedIn = userInfo.isLoggedIn();
+        this.showPrivateClassroomBanner =
+          userInfo.isCurriculumAdmin() && !this.classroomData.getIsPublished();
+      } catch {
+        this.isUserLoggedIn = false;
+        this.showPrivateClassroomBanner = false;
+      }
+      this.loaderService.hideLoadingScreen();
+    } catch (errorResponse) {
+      const status =
+        errorResponse &&
+        typeof errorResponse === 'object' &&
+        'status' in errorResponse
+          ? (errorResponse as {status: 500 | 400 | 401 | 404}).status
+          : null;
+      if (
+        status !== null &&
+        AppConstants.FATAL_ERROR_CODES.indexOf(status) !== -1
+      ) {
+        this.alertsService.addWarning('Failed to get classroom data');
+      }
+      this.loaderService.hideLoadingScreen();
+    }
   }
 
   subscribeToOnLangChange(): void {

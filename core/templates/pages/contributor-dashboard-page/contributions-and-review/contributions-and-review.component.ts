@@ -57,6 +57,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -129,6 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css'],
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
   @Input() activeTopicName: string;
@@ -363,7 +365,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     question: Question,
     misconceptionsBySkill: MisconceptionSkillMap
   ): void {
-    const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
@@ -395,8 +396,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.result.then(
       result => {
         this.contributionAndReviewService.reviewSkillSuggestion(
-          targetId,
-          suggestionId,
+          result.targetId,
+          result.suggestionId,
           result.action,
           result.reviewMessage,
           result.skillDifficulty,
@@ -568,6 +569,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   isActiveTab(tabType: string, subType: string): boolean {
     return this.activeTabType === tabType && this.activeTabSubtype === subType;
+  }
+
+  get activeReviewTab(): boolean {
+    return this.activeTabType === this.TAB_TYPE_REVIEWS;
   }
 
   isReviewTranslationsTab(): boolean {

@@ -16,7 +16,7 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
@@ -38,6 +38,7 @@ import {AccordionPanelData} from './data.model';
   selector: 'about-page',
   templateUrl: './about-page.component.html',
   styleUrls: ['./about-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AboutPageComponent implements OnInit, OnDestroy {
   featuresData: AccordionPanelData[] = [

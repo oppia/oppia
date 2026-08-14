@@ -88,6 +88,10 @@ INVALID_MODAL_MULTIPLE_OPENS_MISSING_BACKDROP_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR,
     'invalid_modal_component_multiple_opens_missing_backdrop.ts',
 )
+INVALID_MODAL_UNRELATED_BACKDROP_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR,
+    'invalid_modal_component_unrelated_backdrop.ts',
+)
 VALID_MODAL_COMPONENT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_modal_component.ts'
 )
@@ -767,6 +771,31 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
                 'to prevent closing on outside clicks.'
                 % INVALID_MODAL_MULTIPLE_OPENS_MISSING_BACKDROP_FILEPATH
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_unrelated_backdrop_static_does_not_mask_missing_backdrop(
+        self,
+    ) -> None:
+        """Regression test for the false-negative reported in issue #26599.
+
+        A file containing two ngbModal.open() calls that both lack
+        backdrop: 'static', but also two unrelated 'backdrop: \'static\''
+        strings elsewhere, must still be flagged.  The old file-wide count
+        approach would incorrectly pass such a file.
+        """
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_MODAL_UNRELATED_BACKDROP_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assert_same_list_elements(
+            [
+                '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
+                'to prevent closing on outside clicks.'
+                % INVALID_MODAL_UNRELATED_BACKDROP_FILEPATH
             ],
             lint_task_report.trimmed_messages,
         )

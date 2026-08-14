@@ -33,6 +33,7 @@ import {ClassroomAdminPageComponent} from 'pages/classroom-admin-page/classroom-
 import {ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExistingClassroomData} from './existing-classroom.model';
+import {ClassroomAdminDataService} from './services/classroom-admin-data.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -66,6 +67,7 @@ let dummyClassroomDict = {
   classroomId: 'classroomId',
   name: 'math',
   urlFragment: 'math',
+  feedbackRecipientEmail: 'user@email.com',
   courseDetails: "Oppia's curated maths lesson.",
   teaserText: 'Learn math',
   topicListIntro: 'Start from the basics with our first topic.',
@@ -82,18 +84,21 @@ let dummyTopicToClassroomRelations = [
     topic_name: 'topic1',
     classroom_name: 'math',
     classroom_url_fragment: 'math',
+    feedback_recipient_email: 'user@email.com',
   },
   {
     topic_id: 'topicid2',
     topic_name: 'topic2',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: null,
   },
   {
     topic_id: 'topicid3',
     topic_name: 'topic3',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: null,
   },
 ];
 
@@ -105,6 +110,7 @@ describe('Classroom Admin Page component ', () => {
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
+  let classroomAdminDataService: ClassroomAdminDataService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -141,6 +147,7 @@ describe('Classroom Admin Page component ', () => {
     );
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
+    classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -487,6 +494,7 @@ describe('Classroom Admin Page component ', () => {
       classroom_id: 'classroomId',
       name: 'math',
       url_fragment: 'math',
+      feedback_recipient_email: 'user@email.com',
       course_details: "Oppia's curated maths lesson.",
       teaser_text: 'Learn math',
       topic_list_intro: 'Start from the basics with our first topic.',
@@ -500,6 +508,7 @@ describe('Classroom Admin Page component ', () => {
       classroomId: 'classroomId',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: "Oppia's curated maths lesson.",
       teaserText: 'Learn math',
       topicListIntro: 'Start from the basics with our first topic.',
@@ -577,6 +586,7 @@ describe('Classroom Admin Page component ', () => {
         classroomId: 'classroomId',
         name: 'math',
         urlFragment: 'math',
+        feedbackRecipientEmail: 'user@email.com',
         courseDetails: "Oppia's curated maths lesson.",
         teaserText: 'Learn math',
         topicListIntro: 'Start from the basics with our first topic.',
@@ -873,6 +883,7 @@ describe('Classroom Admin Page component ', () => {
       classroomId: 'classroomId',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: "Oppia's curated maths lesson.",
       teaserText: 'Learn math',
       topicListIntro: 'Start from the basics with our first topic.',
@@ -1609,5 +1620,46 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(component.existingClassroomNames).toEqual(['Classroom 1']);
+  }));
+
+  it('should return the topics graph validation error from the service', () => {
+    classroomAdminDataService.topicsGraphValidationError =
+      'Cycle detected in topic dependencies.';
+
+    expect(component.topicsGraphValidationError).toBe(
+      'Cycle detected in topic dependencies.'
+    );
+  });
+
+  it('should delegate validateClassroom to the data service', () => {
+    const tempClassroomData =
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
+    const classroomData =
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
+    spyOn(classroomAdminDataService, 'validateClassroom');
+
+    component.validateClassroom(tempClassroomData, classroomData);
+
+    expect(classroomAdminDataService.validateClassroom).toHaveBeenCalledWith(
+      tempClassroomData,
+      classroomData
+    );
+  });
+
+  it('should handle modal dismissal when changing classrooms order', fakeAsync(() => {
+    const modalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+
+    component.changeClassroomsOrder();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UpdateClassroomsOrderModalComponent,
+      {backdrop: 'static'}
+    );
   }));
 });

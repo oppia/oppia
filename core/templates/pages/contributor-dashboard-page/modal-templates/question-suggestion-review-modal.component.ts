@@ -35,6 +35,7 @@ import {ParamDict} from 'services/suggestion-modal.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import './question-suggestion-review.component.css';
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;
@@ -96,6 +97,7 @@ interface ActiveContributionDict {
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
   templateUrl: './question-suggestion-review.component.html',
+  styleUrls: ['./question-suggestion-review.component.css'],
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal
@@ -214,7 +216,7 @@ export class QuestionSuggestionReviewModalComponent
 
   reject(): void {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
-      this.suggestionId,
+      this.currentSuggestionId,
     ]);
     this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
       'Question'
@@ -222,12 +224,14 @@ export class QuestionSuggestionReviewModalComponent
     this.suggestionModalService.rejectSuggestion(this.ngbActiveModal, {
       action: AppConstants.ACTION_REJECT_SUGGESTION,
       reviewMessage: this.reviewMessage,
+      suggestionId: this.currentSuggestionId,
+      targetId: this.suggestion.target_id,
     } as ParamDict);
   }
 
   accept(): void {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
-      this.suggestionId,
+      this.currentSuggestionId,
     ]);
     this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
       'Question'
@@ -236,6 +240,8 @@ export class QuestionSuggestionReviewModalComponent
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessage: this.reviewMessage,
       skillDifficulty: this.skillDifficulty,
+      suggestionId: this.currentSuggestionId,
+      targetId: this.suggestion.target_id,
     });
   }
 

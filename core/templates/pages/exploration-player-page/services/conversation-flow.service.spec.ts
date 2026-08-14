@@ -75,6 +75,7 @@ import {UserService} from '../../../services/user.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Conversation flow service', () => {
   let conversationFlowService: ConversationFlowService;
@@ -110,7 +111,9 @@ describe('Conversation flow service', () => {
   let playerPositionService: PlayerPositionService;
   let explorationEngineService: ExplorationEngineService;
 
-  const createInteraction = (interactionType: string | null): Interaction =>
+  const createInteraction = (
+    interactionType: InteractionSpecsKey | null
+  ): Interaction =>
     new Interaction(
       [],
       [],
@@ -120,9 +123,12 @@ describe('Conversation flow service', () => {
       interactionType,
       null
     );
-  let createCard = function (interactionType: string | null): StateCard {
+  let createCard = function (
+    stateName: string,
+    interactionType: InteractionSpecsKey | null = null
+  ): StateCard {
     return new StateCard(
-      '',
+      stateName,
       '',
       '',
       createInteraction(interactionType),
@@ -224,12 +230,12 @@ describe('Conversation flow service', () => {
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBe(false);
 
-    let textInputCard = createCard('TextInput');
+    let textInputCard = createCard('', 'TextInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(textInputCard)
     ).toBe(false);
 
-    let supplementaryImageInputCard = createCard('ImageClickInput');
+    let supplementaryImageInputCard = createCard('', 'ImageClickInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(
         supplementaryImageInputCard
@@ -896,15 +902,15 @@ describe('Conversation flow service', () => {
       answer: string,
       interactionRulesService: InteractionRulesService,
       successCallback: (
-        nextCard: StateCard,
+        nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string,
-        missingPrerequisiteSkillId: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
         isFinalQuestion: boolean,
         nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
@@ -989,7 +995,7 @@ describe('Conversation flow service', () => {
         ''
       );
       explorationModeSpy.and.returnValue(true);
-      conversationFlowService.displayedCard = createCard('TextInput');
+      conversationFlowService.displayedCard = createCard('', 'TextInput');
       spyOn(
         explorationModeService,
         'isInDiagnosticTestPlayerMode'
@@ -1008,7 +1014,7 @@ describe('Conversation flow service', () => {
         null,
         ''
       );
-      conversationFlowService.displayedCard = createCard('ImageClickInput');
+      conversationFlowService.displayedCard = createCard('', 'ImageClickInput');
       explorationModeSpy.and.returnValue(false);
       successCallback(
         stateCard,
@@ -1078,11 +1084,196 @@ describe('Conversation flow service', () => {
       true
     );
     spyOn(explorationEngineService, 'recordNewCardAdded');
-
     conversationFlowService.explorationActuallyStarted = false;
 
     conversationFlowService.submitAnswer('', mockInteractionRulesService);
     tick(2000);
+  }));
+
+  it('should handle answer response when next card is null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+        nextCard: StateCard | null,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
+        isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
+        focusLabel: string
+      ) => void
+    ) => {
+      successCallback(
+        null,
+        true,
+        'feedback',
+        null,
+        null,
+        false,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    // Spy on _moveToNewCard dependencies to allow full execution of the
+    // isFinalQuestion=true path without crashing on missing state.
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    // Spy on showUpcomingCard which _moveToNewCard calls internally,
+    // to prevent cascade into card rendering with missing dependencies.
+    spyOn(conversationFlowService, 'showUpcomingCard');
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(
+      questionPlayerEngineService.recordAnswerSubmitted
+    ).toHaveBeenCalled();
+  }));
+
+  it('should handle answer response when next card is null and answer is incorrect', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+        nextCard: StateCard | null,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
+        isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
+        focusLabel: string
+      ) => void
+    ) => {
+      successCallback(
+        null,
+        true,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(conversationFlowService, 'showUpcomingCard');
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(
+      questionPlayerEngineService.recordAnswerSubmitted
+    ).toHaveBeenCalledWith(undefined, false, '');
+    expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
+      'feedback'
+    );
+    expect(conversationFlowService.showUpcomingCard).not.toHaveBeenCalled();
   }));
 
   it('should record checkpoint when card is checkpoint and not yet visited', fakeAsync(() => {
@@ -1164,7 +1355,7 @@ describe('Conversation flow service', () => {
   });
 
   it('should initialize directive components and set focus, scroll and emit', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
     );
@@ -1209,7 +1400,7 @@ describe('Conversation flow service', () => {
   }));
 
   it('should set i18nLanguageCode to URL lang if iframe and lang is valid', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
@@ -1232,7 +1423,7 @@ describe('Conversation flow service', () => {
   }));
 
   it('should set i18nLanguageCode to en if iframe and lang is missing or unsupported', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
@@ -1441,7 +1632,7 @@ describe('Conversation flow service', () => {
   });
 
   it('should set and get nextCardIfStuck', () => {
-    const mockCard = createCard('TextInput');
+    const mockCard = createCard('', 'TextInput');
     conversationFlowService.setNextCardIfStuck(mockCard);
     expect(conversationFlowService.getNextCardIfStuck()).toBe(mockCard);
   });
@@ -1469,7 +1660,7 @@ describe('Conversation flow service', () => {
     );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
-      createCard('TextInput')
+      createCard('', 'TextInput')
     );
     spyOn(hintsAndSolutionManagerService, 'releaseSolution');
 
@@ -1508,7 +1699,7 @@ describe('Conversation flow service', () => {
       'CurrentCard',
       '',
       '',
-      createInteraction(''),
+      createInteraction(null),
       [],
       ''
     );

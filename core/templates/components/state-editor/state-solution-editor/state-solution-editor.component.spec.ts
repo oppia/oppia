@@ -135,6 +135,13 @@ describe('State Solution Editor Component', () => {
     expect(component.correctAnswerEditorHtml).toEqual('answerEditorHtml');
   });
 
+  it('should throw error when interaction id is null on init', () => {
+    stateInteractionIdService.savedMemento = null;
+    expect(() => component.ngOnInit()).toThrowError(
+      'Expected interactionId to be non-null.'
+    );
+  });
+
   it('should toggle solution card visibility', () => {
     component.solutionCardIsShown = true;
 
@@ -261,10 +268,25 @@ describe('State Solution Editor Component', () => {
     }).toThrowError('Expected solution to be non-null.');
   });
 
+  it('should throw error when interaction id is null in getSolutionSummary', () => {
+    stateSolutionService.savedMemento = solution;
+    stateInteractionIdService.savedMemento = null;
+    expect(() => component.getSolutionSummary()).toThrowError(
+      'Expected interactionId to be non-null.'
+    );
+  });
+
   it('should check if current interaction is linear or not', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
     expect(component.isCurrentInteractionLinear()).toBeFalse();
+  });
+
+  it('should throw error when saved memento is null in isCurrentInteractionLinear', () => {
+    stateInteractionIdService.savedMemento = null;
+    expect(() => component.isCurrentInteractionLinear()).toThrowError(
+      'Expected savedMemento to be non-null.'
+    );
   });
 
   it(

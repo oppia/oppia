@@ -61,8 +61,9 @@ _PARSER.add_argument(
     default='error',
     choices=['critical', 'error', 'warning', 'info'],
 )
+
 _PARSER.add_argument(
-    '--source_maps', help='Build webpack with source maps.', action='store_true'
+    '--source_maps', help='Build Angular with source maps.', action='store_true'
 )
 
 _PARSER.add_argument(

@@ -135,10 +135,20 @@
 }
 
 .oppia-certificate-offering-topic-thumbnail {
+  align-items: center;
   background: #dbeafe;
+  display: flex;
   flex-shrink: 0;
   height: 78px;
+  justify-content: center;
+  overflow: hidden;
   width: 78px;
+}
+
+.oppia-certificate-offering-topic-thumbnail-image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .oppia-certificate-offering-selected-topic-info {

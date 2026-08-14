@@ -24,7 +24,10 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {Interaction} from 'domain/exploration/interaction.model';
+import {
+  Interaction,
+  InteractionBackendDict,
+} from 'domain/exploration/interaction.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
@@ -231,7 +234,7 @@ describe('Content translation manager service', () => {
       },
     };
 
-    let interactionDict = {
+    let interactionDict: InteractionBackendDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {

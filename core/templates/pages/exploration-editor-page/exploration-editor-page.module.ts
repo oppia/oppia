@@ -19,10 +19,10 @@
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
-import {JoyrideModule, JoyrideService, LoggerService} from 'ngx-joyride';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {StateParamChangesEditorComponent} from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import {DeleteStateSkillModalComponent} from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
@@ -193,8 +193,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    JoyrideModule.forRoot(),
     SharedComponentsModule,
+    FeedbackSharedModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig),
@@ -354,10 +354,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     InteractionDetailsCacheService,
     InteractionRulesRegistryService,
     InternetConnectivityService,
-    JoyrideService,
     LanguageUtilService,
     LocalStorageService,
-    LoggerService,
     ParameterMetadataService,
     PlatformFeatureService,
     PopulateRuleContentIdsService,

@@ -27,7 +27,7 @@ import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {State} from '../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
@@ -259,7 +259,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should return if concept card for the state with the new name exists', fakeAsync(() => {
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -276,7 +276,6 @@ describe('ConceptCardManager service', () => {
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
       inapplicable_skill_misconception_ids: [],
@@ -303,7 +302,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should return false if concept card for state does not exist', () => {
-    const stateWithoutLinkedSkill = {
+    const stateWithoutLinkedSkill: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -327,7 +326,6 @@ describe('ConceptCardManager service', () => {
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: null,
       inapplicable_skill_misconception_ids: [],

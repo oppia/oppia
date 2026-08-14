@@ -50,22 +50,22 @@ export class ReleaseCoordinator extends BaseUser {
       await this.goto(releaseCoordinatorUrl);
 
       if (this.isViewportAtMobileWidth()) {
-        await this.page.waitForSelector(mobileNavBar);
+        await this.expectElementToBeVisible(mobileNavBar);
         await this.clickOnElementWithSelector(mobileNavBar);
-        await this.page.waitForSelector(mobileFeaturesTab);
+        await this.expectElementToBeVisible(mobileFeaturesTab);
         await this.clickOnElementWithSelector(mobileFeaturesTab);
       } else {
-        await this.page.waitForSelector(featuresTab);
+        await this.expectElementToBeVisible(featuresTab);
         await this.clickOnElementWithSelector(featuresTab);
       }
 
-      await this.page.waitForSelector(featureFlagDiv);
+      await this.expectElementToBeVisible(featureFlagDiv);
       const featureFlags = await this.page.$$(featureFlagDiv);
 
       for (let i = 0; i < featureFlags.length; i++) {
-        await featureFlags[i].waitForSelector(featureFlagNameSelector);
-        const featureFlagNameElement = await featureFlags[i].$(
-          featureFlagNameSelector
+        const featureFlagNameElement = await this.getElementInParent(
+          featureFlagNameSelector,
+          featureFlags[i]
         );
         const featureFlagName = await this.page.evaluate(
           element => element?.textContent?.trim() || '',
@@ -73,30 +73,20 @@ export class ReleaseCoordinator extends BaseUser {
         );
 
         if (featureFlagName === featureName) {
-          await featureFlags[i].waitForSelector(enableFeatureSelector);
-          const selectElement = await featureFlags[i].$(enableFeatureSelector);
-          if (selectElement) {
-            await selectElement.selectOption(enable ? '0: true' : '1: false');
-          } else {
-            throw new Error(
-              `Value selector not found for feature flag: "${featureName}"`
-            );
-          }
+          const selectElement = await this.getElementInParent(
+            enableFeatureSelector,
+            featureFlags[i]
+          );
+          await selectElement.selectOption(enable ? '0: true' : '1: false');
 
-          await featureFlags[i].waitForSelector(saveButtonSelector);
-          const saveButton = await featureFlags[i].$(saveButtonSelector);
-          if (saveButton) {
-            await this.waitForElementToBeClickable(saveButton);
-            await saveButton.click();
-          } else {
-            throw new Error(
-              `Save button not found for feature flag: "${featureName}"`
-            );
-          }
+          const saveButton = await this.getElementInParent(
+            saveButtonSelector,
+            featureFlags[i]
+          );
+          await this.clickOnElement(saveButton);
 
-          await featureFlags[i].waitForSelector(
-            `${saveButtonSelector}[disabled]`,
-            {state: 'visible'}
+          await this.expectElementToBeVisible(
+            `${saveButtonSelector}[disabled]`
           );
 
           showMessage(
@@ -117,6 +107,6 @@ export class ReleaseCoordinator extends BaseUser {
   }
 }
 
-export let ReleaseCoordinatorFactory = (page: Page): ReleaseCoordinator => {
+export const ReleaseCoordinatorFactory = (page: Page): ReleaseCoordinator => {
   return new ReleaseCoordinator(page);
 };

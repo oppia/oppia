@@ -17,4 +17,4 @@
  */
 
 window.CKEDITOR_BASEPATH = '/third_party/ckeditor/';
-require('ckeditor4/ckeditor.js');
+import 'ckeditor4';

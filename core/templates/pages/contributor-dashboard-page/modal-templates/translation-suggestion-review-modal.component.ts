@@ -49,9 +49,10 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './translation-suggestion-review-modal.component.css';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -112,6 +113,7 @@ enum ExpansionTabType {
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
+  styleUrls: ['./translation-suggestion-review-modal.component.css'],
 })
 export class TranslationSuggestionReviewModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -421,6 +423,20 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.errorFound = false;
       }
     }
+  }
+
+  get contentHtmlAsString(): string {
+    return typeof this.contentHtml === 'string'
+      ? this.contentHtml
+      : this.contentHtml[0] || '';
+  }
+
+  get explorationContentHtmlAsString(): string {
+    return typeof this.explorationContentHtml === 'string'
+      ? this.explorationContentHtml
+      : this.explorationContentHtml !== null
+        ? this.explorationContentHtml[0] || ''
+        : '';
   }
 
   get updateIsDisabled(): boolean {

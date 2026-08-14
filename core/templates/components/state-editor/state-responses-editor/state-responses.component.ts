@@ -57,12 +57,14 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './state-responses.component.css';
 
 @Component({
   selector: 'oppia-state-responses',
   templateUrl: './state-responses.component.html',
+  styleUrls: ['./state-responses.component.css'],
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -192,7 +194,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       this.responsesService.getActiveAnswerGroupIndex();
   }
 
-  getCurrentInteractionId(): string {
+  getCurrentInteractionId(): InteractionSpecsKey | null {
     return this.stateInteractionIdService.savedMemento;
   }
 
@@ -203,15 +205,15 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return (
-      Boolean(interactionId) &&
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
-    );
+    return interactionId !== null && INTERACTION_SPECS[interactionId].is_linear;
   }
 
   isCurrentInteractionTrivial(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    let array: string[] = [
+    if (interactionId === null) {
+      return false;
+    }
+    let array: InteractionSpecsKey[] = [
       ...AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
     ];
     return array.indexOf(interactionId) !== -1;
@@ -482,7 +484,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     );
   }
 
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices(): AnswerChoice[] | null {
     return this.responsesService.getAnswerChoices();
   }
 
@@ -525,7 +527,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeDefaultOutcome(
     defaultOutcome: Outcome,
-    interactionId: string,
+    interactionId: InteractionSpecsKey | null,
     answerGroupCount: number,
     shortenRule: boolean
   ): string {
@@ -536,13 +538,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let summary = '';
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
-    if (
-      interactionId &&
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
-    ) {
+    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
       let defaultOutcomeHeading =
-        INTERACTION_SPECS[interactionId as InteractionSpecsKey]
-          .default_outcome_heading;
+        INTERACTION_SPECS[interactionId].default_outcome_heading;
       if (defaultOutcomeHeading) {
         summary = defaultOutcomeHeading;
       }
@@ -764,10 +762,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
           // interaction is specified (versus one being deleted).
           if (
             newInteractionId &&
-            !INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-              .is_linear &&
-            !INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-              .is_terminal
+            !INTERACTION_SPECS[newInteractionId].is_linear &&
+            !INTERACTION_SPECS[newInteractionId].is_terminal
           ) {
             this.openAddAnswerGroupModal();
           }

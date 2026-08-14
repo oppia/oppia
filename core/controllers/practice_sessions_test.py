@@ -16,10 +16,21 @@
 
 from __future__ import annotations
 
+import unittest.mock
+
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain, topic_services, user_services
+from core.domain import (
+    story_domain,
+    story_fetchers,
+    story_services,
+    topic_domain,
+    topic_services,
+    user_services,
+)
 from core.tests import test_utils
+
+from typing import List, cast
 
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
@@ -98,6 +109,17 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
+
+    def test_get_returns_all_subtopic_skills_when_no_params(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'],
+            {'skill_id_1': 'Skill 1', 'skill_id_2': 'Skill 2'},
+        )
 
     def test_get_fails_when_skill_ids_dont_exist(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
@@ -191,3 +213,1030 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Extra data: line 1 column 2 (char 1)'
         )
         self.assertEqual(response['error'], error_msg)
+
+    def test_get_succeeds_with_node_id(self) -> None:
+        story_id = 'story_id'
+        exp_id = 'exp_1'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1, self.skill_id2],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 2)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
+        )
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id2],
+            'Skill 2',
+        )
+
+    def test_get_returns_empty_skill_ids_for_nonexistent_node_id(
+        self,
+    ) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/nonexistent_node'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_skill_ids_for_nonexistent_arc_id(
+        self,
+    ) -> None:
+        story_id = 'story_id_2'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_2'
+        exp_id_2 = 'exp_3'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/nonexistent_arc'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_succeeds_with_arc_id(self) -> None:
+        story_id = 'story_id_2'
+        exp_id = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1, self.skill_id2],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 2)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
+        )
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id2],
+            'Skill 2',
+        )
+
+    def test_get_returns_empty_for_zero_node_id(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/0'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_for_large_node_id(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/999'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_for_invalid_arc_number(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/arc/abc'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_for_zero_arc_index(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/arc/0'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_for_large_arc_index(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/arc/999'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_node_skills_with_deleted_story_in_topic(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+
+    def test_get_arc_skills_with_deleted_story_in_topic(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+
+    def test_get_arc_skills_no_matching_arc_in_stories(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            deleted_story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_2,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_arc_skills_deleted_story_before_valid_story(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_2,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+
+    def test_get_arc_skills_non_matching_arc_in_earlier_story(self) -> None:
+        story_a_id = 'story_a'
+        story_b_id = 'story_b'
+        exp_id_a = 'exp_a'
+        exp_id_b = 'exp_b'
+        self.save_new_valid_exploration(exp_id_a, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_a)
+        self.save_new_story(story_a_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_a_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_a_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_a,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(self.topic_id, story_a_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_a_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        self.save_new_valid_exploration(exp_id_b, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_b)
+        self.save_new_story(story_b_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_b_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_b_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 2',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_b,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_2',
+                        'title': 'Arc 2',
+                        'description': 'Second arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(self.topic_id, story_b_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_b_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id2],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
+        )
+
+    def test_get_arc_skills_duplicate_arc_ids_across_stories(self) -> None:
+        story_a_id = 'story_a'
+        story_b_id = 'story_b'
+        exp_id_a = 'exp_a'
+        exp_id_b = 'exp_b'
+        self.save_new_valid_exploration(exp_id_a, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_a)
+        self.save_new_story(story_a_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_a_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_a_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_a,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(self.topic_id, story_a_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_a_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        self.save_new_valid_exploration(exp_id_b, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_b)
+        self.save_new_story(story_b_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_b_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_b_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 2',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id_b,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'Same arc id in second story',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(self.topic_id, story_b_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_b_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id2],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs.',
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/1'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
+        )
+
+    def test_get_arc_skills_arc_not_found_in_any_story(self) -> None:
+        story_id = 'story_id'
+        exp_id = 'exp_1'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+
+        original_get_stories = story_fetchers.get_stories_by_ids
+        call_count = [0]
+
+        def mock_get_stories(
+            story_ids: List[str],
+        ) -> List[story_domain.Story | None]:
+            call_count[0] += 1
+            if call_count[0] == 2:
+                return [None]
+            return list(original_get_stories(story_ids))
+
+        with unittest.mock.patch.object(
+            story_fetchers,
+            'get_stories_by_ids',
+            side_effect=mock_get_stories,
+        ):
+            json_response = self.get_json(
+                '%s/staging/%s/arc/1'
+                % (
+                    feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                    'public-topic-name',
+                ),
+            )
+            self.assertEqual(json_response['topic_name'], 'public_topic_name')
+            self.assertEqual(
+                len(json_response['skill_ids_to_descriptions_map']), 0
+            )

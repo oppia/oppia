@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
-import {EventEmitter, Pipe} from '@angular/core';
+import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -61,7 +61,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {Router, ActivatedRoute} from '@angular/router';
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

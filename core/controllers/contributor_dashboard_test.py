@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import unittest.mock
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -2839,9 +2839,11 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date = utils.get_current_local_datetime() - datetime.timedelta(
+            days=1
+        )
         from_date_str = from_date.strftime('%Y-%m-%d')
-        to_date = datetime.datetime.today()
+        to_date = utils.get_current_local_datetime()
         to_date_str = to_date.strftime('%Y-%m-%d')
 
         self.login(self.OWNER_EMAIL)
@@ -2867,6 +2869,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 'contribution_word_count': 3,
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi',
+                'certificate_profile_name': self.OWNER_USERNAME,
             },
         )
 
@@ -2875,9 +2878,13 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def test_get_contributor_certificate_raises_invalid_date_exception(
         self,
     ) -> None:
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date = utils.get_current_local_datetime() - datetime.timedelta(
+            days=1
+        )
         from_date_str = from_date.strftime('%Y-%m-%d')
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        to_date = utils.get_current_local_datetime() + datetime.timedelta(
+            days=1
+        )
         to_date_str = to_date.strftime('%Y-%m-%d')
 
         self.login(self.OWNER_EMAIL)
@@ -3356,7 +3363,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
         self.assertEqual(response['version'], 1)
-        self.assertEqual(len(response['translatable_contents']), 1)
+        self.assertEqual(len(response['translatable_contents']), 4)
 
         content = response['translatable_contents'][0]
         self.assertEqual(content['content_id'], 'content_0')
@@ -3449,9 +3456,13 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 1)
-        self.assertEqual(
-            response['translatable_contents'][0]['content_id'], content_id
+        self.assertEqual(len(response['translatable_contents']), 4)
+        # Verify content_0 is in the translatable contents.
+        self.assertTrue(
+            any(
+                c['content_id'] == content_id
+                for c in response['translatable_contents']
+            )
         )
 
         # Create suggestion.
@@ -3470,7 +3481,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 0)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
     @test_utils.enable_feature_flags(
         [
@@ -3491,7 +3502,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 1)
+        self.assertEqual(len(response['translatable_contents']), 4)
 
         # Add translation.
         translated_content = translation_domain.TranslatedContent(
@@ -3513,7 +3524,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 0)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
     @test_utils.enable_feature_flags(
         [

@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Callable, Final, List, OrderedDict, Tuple
+from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
 
 email_services = models.Registry.import_email_services()
 
@@ -857,16 +857,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 http_method=invalid_http_method,
             )
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
-    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'mocked_now must be datetime, got: 123'
-        ):
-            with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
-                pass
-
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No file exists for the given file name'
@@ -943,6 +933,13 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             self.mock_set_constants_to_default()
 
+    def test_generate_random_hexa_str_returns_valid_string(self) -> None:
+        """Tests that the generated string is 32 chars and valid hex."""
+        result = test_utils.generate_random_hexa_str()
+        self.assertEqual(len(result), 32)
+        valid_hex_chars = set('0123456789abcdefABCDEF')
+        self.assertTrue(all(c in valid_hex_chars for c in result))
+
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
@@ -992,6 +989,26 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
+
+    def test_mock_search_ignores_duplicate_document_ids(self) -> None:
+        """Tests that mock_search correctly skips documents if their ID is
+        already present in the result set, ensuring branch coverage.
+        """
+        stub = test_utils.ElasticSearchStub()
+        stub._DB['index1'] = [  # pylint: disable=protected-access
+            {'id': 'duplicate_id_1', 'data': 'first_doc'},
+            {'id': 'duplicate_id_1', 'data': 'second_doc'},
+        ]
+        body: Dict[
+            str,
+            Dict[str, Dict[str, List[Dict[str, Union[str, int, float, bool]]]]],
+        ] = {'query': {'bool': {'filter': [], 'must': []}}}
+        result = stub.mock_search(body=body, index='index1', size=10, from_=0)
+
+        hits = result['hits']['hits']
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]['_id'], 'duplicate_id_1')
+        self.assertEqual(hits[0]['_source']['data'], 'first_doc')
 
 
 class EmailMockTests(test_utils.EmailTestBase):

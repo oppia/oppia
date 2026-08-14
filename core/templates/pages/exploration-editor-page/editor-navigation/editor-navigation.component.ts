@@ -162,8 +162,8 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
     return this.routerService.getActiveTabName();
   }
 
-  selectMainTab(value: string): void {
-    this.routerService.navigateToMainTab(value);
+  selectMainTab(value?: string): void {
+    this.routerService.navigateToMainTab(value !== undefined ? value : null);
   }
 
   selectTranslationTab(): void {

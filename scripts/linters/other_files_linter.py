@@ -47,10 +47,15 @@ STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
     os.getcwd(), STRICT_TS_CONFIG_FILE_NAME
 )
 
-WEBPACK_CONFIG_FILE_NAME: Final = 'webpack.common.config.ts'
-WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
-    os.getcwd(), WEBPACK_CONFIG_FILE_NAME
+PLAYWRIGHT_USER_UTILITIES_DIR: Final = os.path.join(
+    os.getcwd(),
+    'core',
+    'tests',
+    'playwright-acceptance-tests',
+    'utilities',
+    'user',
 )
+METHOD_NAME_REGEX: Final = r'async\s+(\w+)\s*\('
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
@@ -101,6 +106,53 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 file content.
         """
         self.file_cache = file_cache
+
+    def check_duplicate_method_names_in_user_utilities(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that no method name is defined in more than one file
+        under the Playwright user utilities directory.
+
+        Since UserFactory composes multiple role classes onto a single
+        user object, two files defining a method with the same name can
+        silently overwrite one another at runtime. This check ensures
+        every method name is unique across all user utility files.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the
+            lint check.
+        """
+        name = 'Duplicate method names in user utilities'
+
+        utility_filenames = {
+            filename
+            for filename in os.listdir(PLAYWRIGHT_USER_UTILITIES_DIR)
+            if filename.endswith('.ts')
+        }
+
+        method_name_to_filenames: Dict[str, List[str]] = {}
+        for filename in utility_filenames:
+            filepath = os.path.join(PLAYWRIGHT_USER_UTILITIES_DIR, filename)
+            file_content = self.file_cache.read(filepath)
+            method_names = re.findall(METHOD_NAME_REGEX, file_content)
+            for method_name in method_names:
+                method_name_to_filenames.setdefault(method_name, []).append(
+                    filename
+                )
+
+        error_messages = []
+        for method_name, filenames in sorted(method_name_to_filenames.items()):
+            if len(filenames) > 1:
+                error_messages.append(
+                    'Method "%s" is defined in multiple user utility '
+                    'files: %s. Rename to disambiguate, following the '
+                    'convention {action}In{PageContext}Page.'
+                    % (method_name, ', '.join(sorted(filenames)))
+                )
+
+        return concurrent_task_utils.TaskResult(
+            name, bool(error_messages), error_messages, error_messages
+        )
 
     def check_skip_files_in_app_dev_yaml(
         self,
@@ -247,64 +299,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
-    def check_webpack_config_file(self) -> concurrent_task_utils.TaskResult:
-        """Check to ensure that the instances of HtmlWebpackPlugin in
-        webpack.common.config.ts contains all needed keys.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Webpack config file'
-
-        failed = False
-        error_messages = []
-        plugins_section_found = False
-        htmlwebpackplugin_section_found = False
-        for line_num, line in enumerate(
-            self.file_cache.readlines(WEBPACK_CONFIG_FILEPATH)
-        ):
-            stripped_line = line.strip()
-            if stripped_line.startswith('plugins:'):
-                plugins_section_found = True
-            if not plugins_section_found:
-                continue
-            if stripped_line.startswith('new HtmlWebpackPlugin('):
-                error_line_num = line_num
-                htmlwebpackplugin_section_found = True
-                keys = [
-                    'chunks',
-                    'filename',
-                    'meta',
-                    'template',
-                    'minify',
-                    'inject',
-                ]
-            elif htmlwebpackplugin_section_found and stripped_line.startswith(
-                '}),'
-            ):
-                htmlwebpackplugin_section_found = False
-                if keys:
-                    error_message = (
-                        'Line %s: The following keys: %s are missing in '
-                        'HtmlWebpackPlugin block in %s'
-                        % (
-                            error_line_num + 1,
-                            ', '.join(keys),
-                            WEBPACK_CONFIG_FILE_NAME,
-                        )
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-            if htmlwebpackplugin_section_found:
-                key = stripped_line.split(':')[0]
-                if key in keys:
-                    keys.remove(key)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
-
     def check_github_workflows_have_name(
         self,
     ) -> concurrent_task_utils.TaskResult:
@@ -372,8 +366,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
-        linter_stdout.append(self.check_webpack_config_file())
         linter_stdout.append(self.check_github_workflows_have_name())
+        linter_stdout.append(
+            self.check_duplicate_method_names_in_user_utilities()
+        )
 
         return linter_stdout
 

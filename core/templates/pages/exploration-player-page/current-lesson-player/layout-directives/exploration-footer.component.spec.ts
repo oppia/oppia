@@ -26,7 +26,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {ExplorationFooterComponent} from './exploration-footer.component';
-import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
@@ -35,10 +35,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PageContextService} from '../../../../services/page-context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryDict,
-} from '../../../../domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from '../../../../domain/summary/exploration-summary-backend-api.service';
 import {EventEmitter} from '@angular/core';
 import {LearnerExplorationSummaryBackendDict} from '../../../../domain/summary/learner-exploration-summary.model';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
@@ -48,12 +45,11 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from '../../../../domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {State} from '../../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../../domain/state/state.model';
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
@@ -104,11 +100,37 @@ class MockWindowRef {
 }
 
 class MockNgbModalRef {
+  static explorationTitle: string = '';
+  static checkpointCount: number = 0;
+  static completedCheckpointsCount: number = 0;
+  static contributorNames: string[] = [];
+  static expInfo: LearnerExplorationSummaryBackendDict | null = null;
+  static userIsLoggedIn: boolean = false;
+
   componentInstance = {
     skillId: null,
     explorationId: null,
   };
 }
+
+const mockExpInfo: LearnerExplorationSummaryBackendDict = {
+  category: 'Algebra',
+  community_owned: false,
+  activity_type: 'exploration',
+  last_updated_msec: 12345678,
+  ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+  id: 'exp1',
+  created_on_msec: 12345678,
+  human_readable_contributors_summary: {},
+  language_code: 'en',
+  num_views: 100,
+  objective: 'Test objective',
+  status: 'public',
+  tags: [],
+  thumbnail_bg_color: '#a33f40',
+  thumbnail_icon_url: '/icon.png',
+  title: 'Test Title',
+};
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -283,7 +305,7 @@ describe('ExplorationFooterComponent', () => {
             objective: 'Solve problem 1 on the Project Euler site',
             thumbnail_icon_url: '/subjects/Lightbulb.svg',
             id: 'exp1',
-          } as ExplorationSummaryDict,
+          },
         ],
       });
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
@@ -349,7 +371,6 @@ describe('ExplorationFooterComponent', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
 
@@ -358,7 +379,7 @@ describe('ExplorationFooterComponent', () => {
       tick();
 
       expect(component.explorationId).toBe('exp1');
-      expect(component.iframed).toBeTrue();
+      expect(component.iframed).toBe(true);
       expect(
         explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
       ).toHaveBeenCalledWith(['exp1']);
@@ -458,14 +479,17 @@ describe('ExplorationFooterComponent', () => {
   it('should open progress reminder modal', fakeAsync(() => {
     const ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        checkpointCount: 0,
-        completedCheckpointsCount: 0,
-        explorationTitle: '',
-      },
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      checkpointCount: 0,
+      completedCheckpointsCount: 0,
+      explorationTitle: '',
+    };
+    modalRef.result = Promise.resolve();
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(
       editableExplorationBackendApiService,
       'resetExplorationProgressAsync'
@@ -474,15 +498,13 @@ describe('ExplorationFooterComponent', () => {
     const stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -505,6 +527,7 @@ describe('ExplorationFooterComponent', () => {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
 
     component.expInfo = sampleExpInfo;
@@ -544,14 +567,17 @@ describe('ExplorationFooterComponent', () => {
   it('should resume exploration if progress reminder modal is canceled', fakeAsync(() => {
     const ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        checkpointCount: 0,
-        completedCheckpointsCount: 0,
-        explorationTitle: '',
-      },
-      result: Promise.reject(),
-    } as NgbModalRef);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      checkpointCount: 0,
+      completedCheckpointsCount: 0,
+      explorationTitle: '',
+    };
+    modalRef.result = Promise.reject();
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(
       editableExplorationBackendApiService,
       'resetExplorationProgressAsync'
@@ -560,15 +586,13 @@ describe('ExplorationFooterComponent', () => {
     const stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -591,6 +615,7 @@ describe('ExplorationFooterComponent', () => {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
 
     component.expInfo = sampleExpInfo;
@@ -641,7 +666,7 @@ describe('ExplorationFooterComponent', () => {
     () => {
       spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
 
       spyOnProperty(
         questionPlayerEngineService,
@@ -651,27 +676,30 @@ describe('ExplorationFooterComponent', () => {
       component.ngOnInit();
       mockResultsLoadedEventEmitter.emit(true);
 
-      expect(component.hintsAndSolutionsAreSupported).toBeFalse();
+      expect(component.hintsAndSolutionsAreSupported).toBe(false);
     }
   );
 
   it('should open the lesson information card', fakeAsync(() => {
     let ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        numberofCheckpoints: 0,
-        completedWidth: 0,
-        contributorNames: [],
-        expInfo: null,
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      numberofCheckpoints: 0,
+      completedWidth: 0,
+      contributorNames: [],
+      expInfo: null,
+    };
+    modalRef.result = {
+      then: (successCallback: () => void, errorCallback: () => void) => {
+        successCallback();
+        errorCallback();
       },
-      result: {
-        then: (successCallback: () => void, errorCallback: () => void) => {
-          successCallback();
-          errorCallback();
-        },
-      },
-    } as NgbModalRef);
+    };
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
       exploration_id: '0',
@@ -682,7 +710,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -690,6 +718,7 @@ describe('ExplorationFooterComponent', () => {
         states: {
           Start: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -762,6 +791,7 @@ describe('ExplorationFooterComponent', () => {
           },
           End: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -786,6 +816,7 @@ describe('ExplorationFooterComponent', () => {
           },
           Mid: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -906,12 +937,10 @@ describe('ExplorationFooterComponent', () => {
     let stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
     spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
@@ -928,11 +957,14 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should open concept card when user clicks on the icon', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
     });
     component.openConceptCardModal();
     expect(modalSpy).toHaveBeenCalled();
@@ -941,14 +973,9 @@ describe('ExplorationFooterComponent', () => {
   it('should trigger function to open concept card modal', fakeAsync(() => {
     spyOn(component, 'openConceptCardModal');
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-        },
-      },
       interaction: {
         solution: null,
         confirmed_unclassified_answers: [],
@@ -963,13 +990,13 @@ describe('ExplorationFooterComponent', () => {
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
     spyOn(explorationEngineService, 'getState').and.returnValue(
       State.createFromBackendDict('End', endState)
@@ -983,7 +1010,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should display lesson information card', fakeAsync(() => {
     component.explorationId = 'exp1';
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    component.expInfo = mockExpInfo;
 
     spyOn(component, 'openInformationCardModal');
     component.showInformationCard();
@@ -1027,8 +1054,7 @@ describe('ExplorationFooterComponent', () => {
       'State A',
       '<p>Content</p>',
       '<interaction></interaction>',
-      null,
-      RecordedVoiceovers.createEmpty(),
+      new Interaction([], [], {}, null, [], 'FractionInput', null),
       'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
@@ -1073,6 +1099,7 @@ describe('ExplorationFooterComponent', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: null,
       })
     );
 
@@ -1113,7 +1140,7 @@ describe('ExplorationFooterComponent', () => {
         init_state_name: 'Introduction',
         next_content_id_index: 5,
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         language_code: 'en',
         objective: 'To learn',
@@ -1128,6 +1155,7 @@ describe('ExplorationFooterComponent', () => {
               html: '',
               content_id: 'content',
             },
+            inapplicable_skill_misconception_ids: null,
             interaction: {
               customization_args: {},
               answer_groups: [],
@@ -1204,7 +1232,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -1220,6 +1248,7 @@ describe('ExplorationFooterComponent', () => {
               html: '',
               content_id: 'content',
             },
+            inapplicable_skill_misconception_ids: null,
             interaction: {
               customization_args: {},
               answer_groups: [],
@@ -1282,7 +1311,7 @@ describe('ExplorationFooterComponent', () => {
     component.setLearnerHasViewedLessonInfoTooltip();
     tick();
 
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
@@ -1290,10 +1319,10 @@ describe('ExplorationFooterComponent', () => {
       editableExplorationBackendApiService,
       'recordLearnerHasViewedLessonInfoModalOnce'
     ).and.returnValue(Promise.resolve());
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
     component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(true);
     expect(
       editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce
     ).toHaveBeenCalled();
@@ -1312,7 +1341,7 @@ describe('ExplorationFooterComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
       expect(
         questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe
       ).toHaveBeenCalled();
@@ -1381,4 +1410,128 @@ describe('ExplorationFooterComponent', () => {
       ).not.toHaveBeenCalled();
     }
   );
+
+  it('should handle null state.name and terminal state in openProgressReminderModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState(null, 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        'content'
+      )
+    );
+    component.checkpointCount = 2;
+    component.completedCheckpointsCount = 0;
+    component.expInfo = null;
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
+    });
+    component.openProgressReminderModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(1);
+    expect(MockNgbModalRef.explorationTitle).toEqual('');
+  }));
+
+  it('should handle null state.name and terminal state in openInformationCardModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState(null, 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'TextInput', null),
+        'content'
+      )
+    );
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      1
+    );
+    component.checkpointCount = 2;
+    component.completedCheckpointsCount = 0;
+    component.expInfo = null;
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
+    });
+    component.openInformationCardModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(0);
+    expect(MockNgbModalRef.expInfo).toEqual({
+      category: '',
+      community_owned: false,
+      activity_type: 'exploration',
+      last_updated_msec: 0,
+      ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+      id: '',
+      created_on_msec: 0,
+      human_readable_contributors_summary: {},
+      language_code: '',
+      num_views: 0,
+      objective: '',
+      status: '',
+      tags: [],
+      thumbnail_bg_color: '',
+      thumbnail_icon_url: '',
+      title: '',
+    });
+  }));
+
+  it('should handle lastCheckpointWasCompleted in openInformationCardModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        'content'
+      )
+    );
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      3
+    );
+    component.checkpointCount = 3;
+    component.lastCheckpointWasCompleted = true;
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
+    });
+    component.openInformationCardModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(3);
+    expect(component.lastCheckpointWasCompleted).toBe(true);
+  }));
 });

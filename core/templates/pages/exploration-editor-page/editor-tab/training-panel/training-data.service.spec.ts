@@ -254,7 +254,7 @@ describe('Training Data Service', () => {
               null
             ),
             [],
-            'id',
+            'TextInput',
             null
           ),
           [],

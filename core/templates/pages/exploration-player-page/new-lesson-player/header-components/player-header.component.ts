@@ -16,7 +16,7 @@
  * @fileoverview Component for the new lesson player header
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -25,7 +25,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-import './player-header.component.css';
 import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
@@ -43,6 +42,7 @@ enum PageContextConstants {
   selector: 'oppia-player-header',
   templateUrl: './player-header.component.html',
   styleUrls: ['./player-header.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PlayerHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks

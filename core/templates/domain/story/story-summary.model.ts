@@ -19,6 +19,13 @@
 
 import {StoryNode, StoryNodeBackendDict} from './story-node.model';
 
+export interface ArcBackendDict {
+  id: string;
+  title: string;
+  description: string;
+  node_ids: string[];
+}
+
 export interface StorySummaryBackendDict {
   id: string;
   title: string;
@@ -30,6 +37,7 @@ export interface StorySummaryBackendDict {
   completed_node_titles: string[];
   url_fragment: string;
   all_node_dicts: StoryNodeBackendDict[];
+  arcs?: ArcBackendDict[];
   published_chapters_count?: number;
   total_chapters_count?: number;
   upcoming_chapters_count?: number;
@@ -65,8 +73,22 @@ export class StorySummary {
     private _upcomingChaptersCount: number | undefined,
     private _upcomingChaptersExpectedDays: number[] | undefined,
     private _overdueChaptersCount: number | undefined,
-    private _visitedChapterTitles: string[] | undefined
+    private _visitedChapterTitles: string[] | undefined,
+    private _arcs: ArcBackendDict[] | undefined
   ) {}
+
+  getArcs(): ArcBackendDict[] {
+    if (!this._arcs) {
+      return [];
+    }
+    // Return deep copies of arc objects so callers cannot mutate internal state.
+    return this._arcs.map(a => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      node_ids: a.node_ids ? a.node_ids.slice() : [],
+    }));
+  }
 
   getId(): string {
     return this._id;
@@ -97,7 +119,7 @@ export class StorySummary {
   }
 
   getCompletedNodeTitles(): string[] {
-    return this._completedNodeTitles;
+    return this._completedNodeTitles.slice();
   }
 
   getTopicName(): string | undefined {
@@ -178,7 +200,8 @@ export class StorySummary {
       storySummaryBackendDict.upcoming_chapters_count,
       storySummaryBackendDict.upcoming_chapters_expected_days,
       storySummaryBackendDict.overdue_chapters_count,
-      storySummaryBackendDict.visited_chapter_titles
+      storySummaryBackendDict.visited_chapter_titles,
+      storySummaryBackendDict.arcs
     );
   }
 }

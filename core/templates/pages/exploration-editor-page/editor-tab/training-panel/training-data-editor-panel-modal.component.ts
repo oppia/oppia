@@ -53,6 +53,7 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import './training-data-editor-panel-modal.component.css';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -78,6 +79,7 @@ interface TrainingData {
 @Component({
   selector: 'training-data-editor-panel',
   templateUrl: './training-data-editor-panel-modal.component.html',
+  styleUrls: ['./training-data-editor-panel-modal.component.css'],
 })
 export class TrainingDataEditorPanelComponent
   extends ConfirmOrCancelModal
@@ -140,9 +142,15 @@ export class TrainingDataEditorPanelComponent
     this.answerGroupHasNonEmptyRules =
       this.responsesService.getAnswerGroup(this.answerGroupIndex).rules.length >
       0;
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error(
+        'Cannot initialize training data editor for a state with no interaction.'
+      );
+    }
     this.inputTemplate =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.FOCUS_LABEL_TEST_INTERACTION_INPUT,
@@ -191,6 +199,11 @@ export class TrainingDataEditorPanelComponent
     ) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
+      if (interactionId === null) {
+        throw new Error(
+          'Cannot open training modal for a state with no interaction.'
+        );
+      }
       this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
         interactionId,
@@ -240,7 +253,9 @@ export class TrainingDataEditorPanelComponent
     this.newAnswerIsAlreadyResolved = false;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
-
+    if (interactionId === null) {
+      throw new Error('Cannot submit answer for a state with no interaction.');
+    }
     let rulesServiceName =
       this.angularNameService.getNameOfInteractionRulesService(interactionId);
 
@@ -253,7 +268,7 @@ export class TrainingDataEditorPanelComponent
 
     let newAnswerTemplate = this.explorationHtmlFormatterService.getAnswerHtml(
       newAnswer,
-      this.stateInteractionIdService.savedMemento,
+      interactionId,
       this.stateCustomizationArgsService.savedMemento
     );
 

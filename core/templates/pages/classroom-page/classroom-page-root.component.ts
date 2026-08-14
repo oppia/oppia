@@ -38,24 +38,22 @@ export class ClassroomPageRootComponent {
   pageIsShown: boolean = false;
   classroomUrlFragment!: string;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromUrl();
 
-    this.accessValidationBackendApiService
-      .validateAccessToClassroomPage(this.classroomUrlFragment)
-      .then(
-        () => {
-          this.errorPageIsShown = false;
-          this.pageIsShown = true;
-          this.pageHeadService.updateTitleAndMetaTags(
-            AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
-            AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META
-          );
-        },
-        () => {
-          this.errorPageIsShown = true;
-        }
+    try {
+      await this.accessValidationBackendApiService.validateAccessToClassroomPage(
+        this.classroomUrlFragment
       );
+      this.errorPageIsShown = false;
+      this.pageIsShown = true;
+      this.pageHeadService.updateTitleAndMetaTags(
+        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
+        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META
+      );
+    } catch {
+      this.errorPageIsShown = true;
+    }
   }
 }

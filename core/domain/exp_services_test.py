@@ -2191,13 +2191,13 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
         )
 
         for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.utcnow()
+            start_time = utils.get_current_utc_datetime()
 
             exp_services.load_demo(exp_id)
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exploration.validate(strict=True)
 
-            duration = datetime.datetime.utcnow() - start_time
+            duration = utils.get_current_utc_datetime() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1e6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)'
@@ -5859,23 +5859,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        original_timestamp = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        original_timestamp = utils.get_current_time_in_millisecs()
 
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End'
         )
 
-        timestamp_after_first_edit = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID,

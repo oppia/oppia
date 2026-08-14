@@ -23,10 +23,11 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TrainingModalComponent} from './training-modal.component';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface FinishTrainingResult {
   answer: InteractionAnswer;
-  interactionId: string;
+  interactionId: InteractionSpecsKey;
   answerIndex: number;
 }
 
@@ -54,7 +55,7 @@ export class TrainingModalService {
   */
   openTrainUnresolvedAnswerModal(
     unhandledAnswer: InteractionAnswer,
-    interactionId: string,
+    interactionId: InteractionSpecsKey,
     answerIndex: number
   ): void {
     this.alertsService.clearWarnings();

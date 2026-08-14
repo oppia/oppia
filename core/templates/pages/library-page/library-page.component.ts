@@ -16,7 +16,12 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component, Renderer2, ElementRef} from '@angular/core';
+import {
+  Component,
+  Renderer2,
+  ElementRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -41,7 +46,6 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-import './library-page.component.css';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface MobileLibraryGroupProperties {
@@ -53,6 +57,7 @@ interface MobileLibraryGroupProperties {
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html',
   styleUrls: ['./library-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LibraryPageComponent {
   possibleBannerFilenames: string[] = [
@@ -465,37 +470,6 @@ export class LibraryPageComponent {
             response.preferred_language_codes
           );
 
-          // Check if actual and expected widths are the same.
-          // If not produce an error that would be caught by e2e tests.
-          setTimeout(() => {
-            let actualWidth = 0;
-            const el = document.querySelector(
-              'oppia-exploration-summary-tile'
-            ) as HTMLElement | null;
-
-            if (el) {
-              actualWidth =
-                el.clientWidth ||
-                el.offsetWidth ||
-                parseFloat(getComputedStyle(el).getPropertyValue('width')) ||
-                0;
-            }
-            if (
-              actualWidth &&
-              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
-              actualWidth !== AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
-            ) {
-              this.loggerService.error(
-                'The actual width of tile is different than either of the ' +
-                  'expected widths. Actual size: ' +
-                  actualWidth +
-                  ', Expected sizes: ' +
-                  AppConstants.LIBRARY_TILE_WIDTH_PX +
-                  '/' +
-                  AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
-              );
-            }
-          }, 3000);
           // The following initializes the tracker to have all
           // elements flush left.
           // Transforms the group names into translation ids.

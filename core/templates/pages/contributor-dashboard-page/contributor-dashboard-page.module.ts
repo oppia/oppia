@@ -16,11 +16,13 @@
  * @fileoverview Module for the contributor dashboard page.
  */
 
+import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
-import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {ToastrModule} from 'ngx-toastr';
@@ -48,9 +50,12 @@ import {RteHelperService} from 'services/rte-helper.service';
 
 @NgModule({
   imports: [
+    CommonModule,
+    FormsModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
     NgbModalModule,
+    NgbTooltipModule,
     SharedFormsModule,
     OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig),

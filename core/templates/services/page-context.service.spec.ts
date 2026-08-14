@@ -587,6 +587,19 @@ describe('PageContext service', () => {
       expect(ecs.getEditorTabContext()).toBe('preview');
     });
 
+    it('should detect editor tab context is editor', () => {
+      let urlServiceGetHash = spyOn(urlService, 'getHash');
+
+      urlServiceGetHash.and.returnValue('#/gui');
+      expect(ecs.getEditorTabContext()).toBe('editor');
+
+      urlServiceGetHash.and.returnValue('');
+      expect(ecs.getEditorTabContext()).toBe('editor');
+
+      urlServiceGetHash.and.returnValue('#/');
+      expect(ecs.getEditorTabContext()).toBe('editor');
+    });
+
     it('should set and get custom entity id and type', () => {
       expect(ecs.getEntityId()).toBe('undefined');
       expect(ecs.getEntityType()).toBeUndefined();

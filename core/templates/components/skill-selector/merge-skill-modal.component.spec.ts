@@ -68,4 +68,11 @@ describe('Merge Skill Modal', () => {
     componentInstance.setSelectedSkillId('skill_id');
     expect(componentInstance.selectedSkillId).toEqual('skill_id');
   });
+
+  it('should get empty grouped skill summaries', () => {
+    expect(componentInstance.groupedSkillSummaries).toEqual({
+      current: [],
+      others: [],
+    });
+  });
 });

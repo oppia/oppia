@@ -21,7 +21,6 @@ import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 
 import {BaseModule} from 'base-components/base.module';
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SplashPageComponent} from './splash-page.component';
 import {SplashPageRootComponent} from './splash-page-root.component';
 import {SplashPageRoutingModule} from './splash-page-routing.module';
@@ -32,7 +31,6 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     BaseModule,
     CommonModule,
     HttpClientModule,
-    RichTextComponentsModule,
     SplashPageRoutingModule,
     CampaignBannerModule,
   ],

@@ -448,13 +448,58 @@ interface StoryNodeOutlineStatusChange {
   new_value: boolean;
 }
 
+interface StoryCreateArcChange {
+  cmd: 'create_arc';
+  arc_id: string;
+  title: string;
+  description: string;
+  node_ids: string[];
+}
+
+interface StoryDeleteArcChange {
+  cmd: 'delete_arc';
+  arc_id: string;
+}
+
+interface StoryRenameArcChange {
+  cmd: 'rename_arc';
+  arc_id: string;
+  new_title: string;
+}
+
+interface StoryRearrangeArcsChange {
+  cmd: 'rearrange_arcs';
+  arc_ids_order: string[];
+}
+
+interface StoryMoveNodeToArcChange {
+  cmd: 'move_node_to_arc';
+  node_id: string;
+  to_arc_id: string;
+  old_position_index: number;
+}
+
+interface StoryUpdateArcPropertyChange {
+  cmd: 'update_arc_property';
+  arc_id: string;
+  property_name: string;
+  new_value: string;
+  old_value: string;
+}
+
 export type StoryChange =
   | StoryPropertyChange
   | StoryContentsChange
   | StoryNodePropertyChange
   | StoryAddNodeChange
   | StoryDeleteNodeChange
-  | StoryNodeOutlineStatusChange;
+  | StoryNodeOutlineStatusChange
+  | StoryCreateArcChange
+  | StoryDeleteArcChange
+  | StoryRenameArcChange
+  | StoryRearrangeArcsChange
+  | StoryMoveNodeToArcChange
+  | StoryUpdateArcPropertyChange;
 
 interface TopicNameChange {
   cmd: 'update_topic_property';

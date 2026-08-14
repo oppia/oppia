@@ -47,10 +47,12 @@ import {InteractionData} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import './state-editor.component.css';
 
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html',
+  styleUrls: ['./state-editor.component.css'],
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveHints = new EventEmitter<Hint[]>();
@@ -162,16 +164,15 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveStateContent.emit($event);
   }
 
-  updateInteractionVisibility(newInteractionId: string): void {
+  updateInteractionVisibility(
+    newInteractionId: InteractionSpecsKey | null
+  ): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-          .can_have_solution
+      newInteractionId && INTERACTION_SPECS[newInteractionId].can_have_solution
     );
     this.currentStateIsTerminal = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
+      newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal
     );
   }
 
@@ -258,7 +259,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           this.stateName as string,
           stateData.interaction.solution
         );
-        this.updateInteractionVisibility(stateData.interaction.id || '');
+        this.updateInteractionVisibility(stateData.interaction.id || null);
         this.servicesInitialized = true;
       })
     );

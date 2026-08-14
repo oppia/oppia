@@ -28,7 +28,10 @@ import {
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {Interaction} from '../../../../../domain/exploration/interaction.model';
+import {
+  Interaction,
+  InteractionBackendDict,
+} from '../../../../../domain/exploration/interaction.model';
 import {StateCard} from '../../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../../../../pages/exploration-player-page/services/exploration-mode.service';
 import {HintAndSolutionModalService} from '../../../../../pages/exploration-player-page/services/hint-and-solution-modal.service';
@@ -61,7 +64,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
   let newCard: StateCard;
 
-  const defaultInteractionBackendDict = {
+  const defaultInteractionBackendDict: InteractionBackendDict = {
     id: 'TextInput',
     answer_groups: [
       {

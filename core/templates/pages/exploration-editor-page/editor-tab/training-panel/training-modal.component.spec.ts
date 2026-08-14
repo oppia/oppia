@@ -86,6 +86,7 @@ describe('Training Modal Component', () => {
   let graphDataService: GraphDataService;
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
+  let stateInteractionIdService: StateInteractionIdService;
   let stateEditorService: StateEditorService;
   let angularNameService: AngularNameService;
 
@@ -143,6 +144,7 @@ describe('Training Modal Component', () => {
     graphDataService = TestBed.inject(GraphDataService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     angularNameService = TestBed.inject(AngularNameService);
     spyOn(ngbActiveModal, 'close').and.stub();
     spyOn(explorationWarningsService, 'updateWarnings').and.stub();
@@ -284,6 +286,13 @@ describe('Training Modal Component', () => {
     }).toThrowError('Expected active state name to be non-null.');
 
     expect(explorationStatesService.getState).not.toHaveBeenCalled();
+  });
+
+  it('should throw in init if interaction id is null', () => {
+    stateInteractionIdService.savedMemento = null;
+    expect(() => {
+      component.init();
+    }).toThrowError('Expected interaction ID to be non-null.');
   });
 
   it('should throw in init if interaction rules service is unmapped', () => {

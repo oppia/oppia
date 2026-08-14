@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {LessonPlayerSidebarComponent} from './lesson-player-sidebar.component';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {
@@ -49,7 +49,7 @@ import {ConversationFlowService} from '../../services/conversation-flow.service'
 import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -100,7 +100,7 @@ describe('LessonPlayerSidebarComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         LessonPlayerSidebarComponent,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockTranslatePipe,
       ],
       providers: [
@@ -156,6 +156,10 @@ describe('LessonPlayerSidebarComponent', () => {
     mockWindowDimensionsService = TestBed.inject(
       WindowDimensionsService
     ) as jasmine.SpyObj<WindowDimensionsService>;
+  });
+
+  afterEach(() => {
+    window.sessionStorage.clear();
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {
@@ -398,5 +402,30 @@ describe('LessonPlayerSidebarComponent', () => {
   it('should get is user logged in', () => {
     spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
     expect(component.isUserLoggedIn()).toBeTrue();
+  });
+
+  it('should reopen the lesson feedback modal when the session storage flag is present', () => {
+    spyOn(window.sessionStorage, 'getItem').and.returnValue('true');
+    const removeItemSpy = spyOn(window.sessionStorage, 'removeItem');
+    const showModalSpy = spyOn(component, 'showSendLessonFeedbackModal');
+
+    component.ngOnInit();
+
+    expect(window.sessionStorage.getItem).toHaveBeenCalledWith(
+      'reopenLessonFeedbackModal'
+    );
+    expect(showModalSpy).toHaveBeenCalled();
+    expect(removeItemSpy).toHaveBeenCalledWith('reopenLessonFeedbackModal');
+  });
+
+  it('should not reopen the lesson feedback modal when the session storage flag is absent', () => {
+    spyOn(window.sessionStorage, 'getItem').and.returnValue(null);
+    const removeItemSpy = spyOn(window.sessionStorage, 'removeItem');
+    const showModalSpy = spyOn(component, 'showSendLessonFeedbackModal');
+
+    component.ngOnInit();
+
+    expect(showModalSpy).not.toHaveBeenCalled();
+    expect(removeItemSpy).not.toHaveBeenCalled();
   });
 });

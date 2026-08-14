@@ -16,7 +16,7 @@
  * @fileoverview Backend API service for web feedback submission and triage.
  */
 
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -26,14 +26,22 @@ import {
 } from 'services/image-local-storage.service';
 import {
   FeedbackCaptchaConfigResponse,
-  SendALessonFeedbackModel,
-  IssueReportModel,
+  LessonFeedbackModel,
+  PlatformFeedbackModel,
   FeedbackSubmitResponse,
+  PlatformFeedbackBackendResponse,
+  DashboardType,
+  FeedbackFilterState,
+  LessonFeedbackBackendResponse,
+  PlatformFeedbackDetailResponse,
+  SuccessResponse,
+  LessonFeedbackDetailResponse,
+  FeedbackStatus,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
   screenshotFilename: string | null;
-  screenshotFile: Record<string, string> | null;
+  screenshotFile: string | null;
 }
 
 @Injectable({
@@ -41,7 +49,7 @@ interface FeedbackScreenshotSubmissionData {
 })
 export class FeedbackBackendApiService {
   private lessonFeedbackUrl = '/feedback';
-  private reportUrl = '/report';
+  private reportUrl = '/platform-feedback';
   private captchaConfigUrl = '/feedback_captcha_config_handler';
 
   constructor(
@@ -82,65 +90,223 @@ export class FeedbackBackendApiService {
     if (imageData === null) {
       throw new Error('No staged feedback screenshot found.');
     }
-
+    const screenshotFile =
+      await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
+        imageData,
+      ]);
     return {
       screenshotFilename,
-      screenshotFile:
-        await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
-          imageData,
-        ]),
+      screenshotFile: screenshotFile[screenshotFilename],
     };
   }
 
   async submitLessonFeedbackAsync(
-    payload: SendALessonFeedbackModel,
+    payload: LessonFeedbackModel,
     captchaToken: string | null
   ): Promise<FeedbackSubmitResponse> {
     const requestPayload = {
       ...payload.toBackendDict(),
       ...(captchaToken ? {captcha_token: captchaToken} : {}),
     };
-    try {
-      return await this.http
-        .post<FeedbackSubmitResponse>(this.lessonFeedbackUrl, requestPayload)
-        .toPromise();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-    } catch (error: unknown) {
-      if (error instanceof HttpErrorResponse) {
-        return Promise.reject(error);
-      }
-      throw error;
-    }
+    return await this.http
+      .post<FeedbackSubmitResponse>(this.lessonFeedbackUrl, requestPayload)
+      .toPromise();
   }
 
   async submitSiteAndLessonIssueReportAsync(
-    payload: IssueReportModel,
+    payload: PlatformFeedbackModel,
     captchaToken: string | null
   ): Promise<FeedbackSubmitResponse> {
-    try {
-      const screenshotData = await this.getStagedScreenshotSubmissionDataAsync(
-        payload.screenshotFilename
-      );
-      return await this.http
-        .post<FeedbackSubmitResponse>(this.reportUrl, {
-          ...payload.toBackendDict(),
-          screenshot_file: screenshotData.screenshotFile,
-          ...(captchaToken ? {captcha_token: captchaToken} : {}),
-        })
-        .toPromise();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-    } catch (error: unknown) {
-      if (error instanceof HttpErrorResponse) {
-        return Promise.reject(error);
-      } else {
-        throw error;
-      }
+    const screenshotData = await this.getStagedScreenshotSubmissionDataAsync(
+      payload.screenshotFilename
+    );
+    return await this.http
+      .post<FeedbackSubmitResponse>(this.reportUrl, {
+        ...payload.toBackendDict(),
+        screenshot_file: screenshotData.screenshotFile,
+        ...(captchaToken ? {captcha_token: captchaToken} : {}),
+      })
+      .toPromise();
+  }
+
+  private async fetchLessonFeedbackListAsync(
+    explorationId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<LessonFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) {
+      params = params.set('cursor', cursor);
     }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs !== null) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs !== null) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    const url = [
+      this.lessonFeedbackUrl,
+      encodeURIComponent(explorationId),
+    ].join('/');
+    return await this.http
+      .get<LessonFeedbackBackendResponse>(url, {
+        params,
+      })
+      .toPromise();
+  }
+
+  async fetchCreatorLessonFeedbackListAsync(
+    explorationId: string,
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<LessonFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    return await this.fetchLessonFeedbackListAsync(
+      explorationId,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchLessonFeedbackDetailAsync(
+    explorationId: string,
+    feedbackId: string
+  ): Promise<LessonFeedbackDetailResponse> {
+    const url = [
+      this.lessonFeedbackUrl,
+      encodeURIComponent(explorationId),
+      encodeURIComponent(feedbackId),
+    ].join('/');
+    return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async updateLessonFeedbackAsync(
+    explorationId: string,
+    feedbackId: string,
+    newStatus: FeedbackStatus,
+    replyText: string | null = null
+  ): Promise<SuccessResponse> {
+    const url = [
+      this.lessonFeedbackUrl,
+      encodeURIComponent(explorationId),
+      encodeURIComponent(feedbackId),
+    ].join('/');
+    return await this.http
+      .post<SuccessResponse>(url, {
+        status: newStatus,
+        reply_text: replyText,
+      })
+      .toPromise();
+  }
+
+  private async fetchPlatformFeedbackListAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+    ].join('/');
+    return await this.http
+      .get<PlatformFeedbackBackendResponse>(url, {
+        params,
+      })
+      .toPromise();
+  }
+
+  async fetchTechnicalDashboardFeedbackListAsync(
+    filterState: FeedbackFilterState,
+    cursor: string | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+    return await this.fetchPlatformFeedbackListAsync(
+      'technical',
+      filterState.technicalTeam,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchCreatorDashboardFeedbackListAsync(
+    explorationId: string,
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    return await this.fetchPlatformFeedbackListAsync(
+      'curriculum',
+      explorationId,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchPlatformFeedbackDetailAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string
+  ): Promise<PlatformFeedbackDetailResponse> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    return await this.http.get<PlatformFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async updatePlatformFeedbackStatusAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string,
+    newStatus: string
+  ): Promise<SuccessResponse> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    return await this.http
+      .post<SuccessResponse>(url, {
+        status: newStatus,
+      })
+      .toPromise();
   }
 }

@@ -29,15 +29,15 @@ var ExplorationEditorTranslationTab = function () {
   );
   var translationWelcomeModal = $('.e2e-test-translation-tab-welcome-modal');
   var buttonsSelector = function () {
-    return $$('.joyride-step__close');
+    return $$('.shepherd-cancel-icon');
   };
   var nextTutorialStageButtonSelector = function () {
-    return $$('.joyride-step__next-container');
+    return $$('.shepherd-button-primary');
   };
   var translationTabStartTutorialElement = $(
     '.e2e-test-translation-tab-start-tutorial'
   );
-  var titleElement = $('.e2e-test-joyride-title');
+  var titleElement = $('.shepherd-title');
 
   this.exitTutorial = async function () {
     // If the translation welcome modal shows up, exit it.
@@ -61,9 +61,9 @@ var ExplorationEditorTranslationTab = function () {
 
   this.finishTutorial = async function () {
     // Finish the tutorial.
-    var finishTutorialButton = await $$('.joyride-button=done');
+    var finishTutorialButton = await $$('.shepherd-button-primary');
     var buttons = finishTutorialButton;
-    if (buttons.length === 1) {
+    if (buttons.length >= 1) {
       await action.click('Finish tutorial stage button', buttons[0]);
     } else {
       throw new Error('There is more than 1 Finish button!');
@@ -80,7 +80,7 @@ var ExplorationEditorTranslationTab = function () {
       'Re-record/Re-upload audio',
     ];
     for (const HEADING of tutorialTabHeadings) {
-      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.shepherd-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement,
         'Tutorial: ' + HEADING + ' is not visible'

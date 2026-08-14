@@ -50,7 +50,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() explorationId!: string;
   @Input() explorationTitle!: string;
   @Input() lastUpdatedMsec!: number;
-  @Input() numViews!: string;
+  @Input() numViews!: number;
   @Input() objective!: string;
   @Input() category!: string;
   @Input() ratings!: ExplorationRatings;

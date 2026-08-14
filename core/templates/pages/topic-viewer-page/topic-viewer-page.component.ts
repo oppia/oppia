@@ -16,7 +16,7 @@
  * @fileoverview Component for the topic viewer.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -53,6 +53,7 @@ interface TopicViewerStorySectionData {
   selector: 'topic-viewer-page',
   templateUrl: './topic-viewer-page.component.html',
   styleUrls: ['./topic-viewer-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

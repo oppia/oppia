@@ -20,12 +20,6 @@ import {TestBed} from '@angular/core/testing';
 
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
-declare global {
-  interface Window {
-    Guppy: Guppy;
-  }
-}
-
 class MockGuppy {
   constructor(id: string, config: Object) {}
 

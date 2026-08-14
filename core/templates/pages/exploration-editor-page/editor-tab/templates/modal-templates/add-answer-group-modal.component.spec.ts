@@ -34,7 +34,6 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {AddAnswerGroupModalComponent} from './add-answer-group-modal.component';
 import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -143,10 +142,13 @@ describe('Add Answer Group Modal Component', () => {
   it('should update answer group feedback', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);
 
-    var feedback = new SubtitledHtml('New feedback', null);
     component.updateAnswerGroupFeedback({
-      feedback: feedback,
-    } as Outcome);
+      feedback: {
+        html: 'New feedback',
+        content_id: null,
+      },
+      labelledAsCorrect: false,
+    });
     component.modalId = Symbol();
     const eventBusGroup = new EventBusGroup(TestBed.inject(EventBusService));
     eventBusGroup.emit(
@@ -156,7 +158,7 @@ describe('Add Answer Group Modal Component', () => {
       })
     );
     expect(component.feedbackEditorIsOpen).toBe(true);
-    expect(component.tmpOutcome.feedback).toBe(feedback);
+    expect(component.tmpOutcome.feedback.html).toBe('New feedback');
   });
 
   it('should update tagged misconception', () => {

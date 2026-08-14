@@ -1,9 +1,9 @@
 <form #hybridForm="ngForm">
   <!-- Choices-based editor -->
-  <schema-based-choices-editor *ngIf="schema['choices']"
+  <schema-based-choices-editor *ngIf="schemaChoices"
                                [(ngModel)]="localValue"
                                [schema]="schema"
-                               [choices]="schema.choices"
+                               [choices]="$any(schemaChoices)"
                                [disabled]="disabled"
                                (ngModelChange)="localValue = $event"
                                (blur)="onInputBlur()"
@@ -13,7 +13,7 @@
   </schema-based-choices-editor>
 
   <!-- Boolean editor -->
-  <schema-based-bool-editor *ngIf="schema.type === 'bool' && !schema['choices']"
+  <schema-based-bool-editor *ngIf="schema.type === 'bool' && !schemaChoices"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
                             [labelForFocusTarget]="labelForFocusTarget"
@@ -25,11 +25,11 @@
   </schema-based-bool-editor>
 
   <!-- Integer editor -->
-  <schema-based-int-editor *ngIf="schema.type === 'int' && !schema.choices"
+  <schema-based-int-editor *ngIf="schema.type === 'int' && !schemaChoices"
                            [(ngModel)]="localValue"
                            [disabled]="disabled"
                            [required]="!notRequired"
-                           [validators]="schema.validators"
+                           [validators]="$any(schemaValidators)"
                            [labelForFocusTarget]="labelForFocusTarget"
                            (ngModelChange)="localValue = $event"
                            (inputBlur)="onInputBlur()"
@@ -39,11 +39,11 @@
   </schema-based-int-editor>
 
   <!-- Float editor -->
-  <schema-based-float-editor *ngIf="schema.type === 'float' && !schema.choices"
+  <schema-based-float-editor *ngIf="schema.type === 'float' && !schemaChoices"
                              [(ngModel)]="localValue"
                              [disabled]="disabled"
-                             [validators]="schema.validators"
-                             [uiConfig]="schema.ui_config"
+                             [validators]="$any(schemaValidators)"
+                             [uiConfig]="$any(schemaUiConfig)"
                              [labelForFocusTarget]="labelForFocusTarget"
                              (ngModelChange)="localValue = $event"
                              (inputBlur)="onInputBlur()"
@@ -53,11 +53,11 @@
   </schema-based-float-editor>
 
   <!-- Unicode/String editor -->
-  <schema-based-unicode-editor *ngIf="schema.type === 'unicode' && !schema.choices"
+  <schema-based-unicode-editor *ngIf="schema.type === 'unicode' && !schemaChoices"
                                [(ngModel)]="localValue"
                                [disabled]="disabled"
-                               [validators]="schema.validators"
-                               [uiConfig]="schema.ui_config"
+                               [validators]="$any(schemaValidators)"
+                               [uiConfig]="$any(schemaUiConfig)"
                                [labelForFocusTarget]="labelForFocusTarget"
                                (ngModelChange)="localValue = $event"
                                (inputBlur)="onInputBlur()"
@@ -67,11 +67,11 @@
   </schema-based-unicode-editor>
 
   <!-- HTML editor -->
-  <schema-based-html-editor *ngIf="schema.type === 'html' && !schema.choices"
+  <schema-based-html-editor *ngIf="schema.type === 'html' && !schemaChoices"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
                             [labelForFocusTarget]="labelForFocusTarget"
-                            [uiConfig]="schema.ui_config"
+                            [uiConfig]="$any(schemaUiConfig)"
                             (ngModelChange)="localValue = $event"
                             (blur)="onInputBlur()"
                             (focus)="onInputFocus()"
@@ -80,14 +80,14 @@
   </schema-based-html-editor>
 
   <!-- List editor -->
-  <schema-based-list-editor *ngIf="schema.type === 'list' && !schema['choices']"
+  <schema-based-list-editor *ngIf="schema.type === 'list' && !schemaChoices"
                             [(ngModel)]="localValue"
-                            [localValue]="localValue"
+                            [localValue]="$any(localValue)"
                             [disabled]="disabled"
-                            [itemSchema]="schema.items"
-                            [len]="schema.len"
-                            [uiConfig]="schema.ui_config"
-                            [validators]="schema.validators"
+                            [itemSchema]="$any(schemaItems)"
+                            [len]="schemaLen"
+                            [uiConfig]="$any(schemaUiConfig)"
+                            [validators]="$any(schemaValidators)"
                             [labelForFocusTarget]="labelForFocusTarget"
                             (ngModelChange)="localValue = $event"
                             (blur)="onInputBlur()"
@@ -97,10 +97,10 @@
   </schema-based-list-editor>
 
   <!-- Dictionary editor -->
-  <schema-based-dict-editor *ngIf="schema.type === 'dict' && !schema['choices']"
+  <schema-based-dict-editor *ngIf="schema.type === 'dict' && !schemaChoices"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
-                            [propertySchemas]="schema.properties"
+                            [propertySchemas]="schemaProperties"
                             [labelForFocusTarget]="labelForFocusTarget"
                             (ngModelChange)="localValue = $event"
                             (blur)="onInputBlur()"
@@ -110,7 +110,7 @@
   </schema-based-dict-editor>
 
   <!-- Custom editor -->
-  <schema-based-custom-editor *ngIf="schema.type === 'custom' && !schema['choices']"
+  <schema-based-custom-editor *ngIf="schema.type === 'custom' && !schemaChoices"
                               [(ngModel)]="localValue"
                               [schema]="schema"
                               [disabled]="disabled"

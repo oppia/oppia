@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["jasmine", "node"],
     "allowJs": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
@@ -45,7 +46,12 @@
       "utility/*": ["core/templates/utility/*"],
       "visualizations/*": ["extensions/visualizations/*"],
       "value_generators/*": ["extensions/value_generators/*"],
-      "third-party-imports/*": ["core/templates/third-party-imports/*"]
+      "third-party-imports/*": ["core/templates/third-party-imports/*"],
+      "actions/*": ["extensions/actions/*"],
+      "answer_summarizers/*": ["extensions/answer_summarizers/*"],
+      "ckeditor_plugins/*": ["extensions/ckeditor_plugins/*"],
+      "issues/*": ["extensions/issues/*"]
+      
     }
   },
   "files": [

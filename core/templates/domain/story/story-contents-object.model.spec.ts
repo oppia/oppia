@@ -19,6 +19,8 @@
 import {
   StoryContents,
   StoryContentsBackendDict,
+  ArcModel,
+  ArcBackendDict,
 } from 'domain/story/story-contents-object.model';
 import {StoryNode} from './story-node.model';
 
@@ -519,5 +521,544 @@ describe('Story contents object factory', () => {
     expect(() => {
       _sampleStoryContents.setNodeUnpublishingReason('node_5', 'Bad Content');
     }).toThrowError("The node with given id doesn't exist");
+  });
+
+  it('should correctly increment node id', () => {
+    expect(_sampleStoryContents.getIncrementedNodeId('node_1')).toEqual(
+      'node_2'
+    );
+    expect(_sampleStoryContents.getIncrementedNodeId('node_5')).toEqual(
+      'node_6'
+    );
+  });
+
+  it('should create ArcModel using createNew and provide correct values', () => {
+    const arc = ArcModel.createNew('arc_1', 'Arc 1', 'Description', [
+      'node_1',
+      'node_2',
+    ]);
+
+    expect(arc.getId()).toBe('arc_1');
+    expect(arc.getTitle()).toBe('Arc 1');
+    expect(arc.getDescription()).toBe('Description');
+    expect(arc.getNodeIds()).toEqual(['node_1', 'node_2']);
+  });
+
+  it('should update ArcModel properties via setters', () => {
+    const arc = ArcModel.createNew('arc_1', 'Arc 1', 'Description', ['node_1']);
+
+    arc.setTitle('Updated Arc');
+    expect(arc.getTitle()).toBe('Updated Arc');
+
+    arc.setDescription('Updated Description');
+    expect(arc.getDescription()).toBe('Updated Description');
+
+    arc.setNodeIds(['node_2', 'node_3']);
+    expect(arc.getNodeIds()).toEqual(['node_2', 'node_3']);
+  });
+
+  it('should create ArcModel from backend dict', () => {
+    const backendDict: ArcBackendDict = {
+      id: 'arc_1',
+      title: 'Arc 1',
+      description: 'Description',
+      node_ids: ['node_1', 'node_2'],
+    };
+    const arc = ArcModel.createFromBackendDict(backendDict);
+
+    expect(arc.getId()).toBe('arc_1');
+    expect(arc.getTitle()).toBe('Arc 1');
+    expect(arc.getDescription()).toBe('Description');
+    expect(arc.getNodeIds()).toEqual(['node_1', 'node_2']);
+  });
+
+  it('should convert ArcModel to backend dict', () => {
+    const backendDict: ArcBackendDict = {
+      id: 'arc_1',
+      title: 'Arc 1',
+      description: 'Description',
+      node_ids: ['node_1', 'node_2'],
+    };
+    const arc = ArcModel.createFromBackendDict(backendDict);
+
+    expect(arc.toBackendDict()).toEqual(backendDict);
+  });
+
+  it('should create StoryContents with arcs from backend dict', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {
+          id: 'arc_1',
+          title: 'Arc 1',
+          description: 'Description 1',
+          node_ids: ['node_1'],
+        },
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    expect(storyContents.getArcs().length).toBe(1);
+    expect(storyContents.getArcs()[0].getId()).toBe('arc_1');
+    expect(storyContents.getArcs()[0].getTitle()).toBe('Arc 1');
+    expect(storyContents.getArcs()[0].getDescription()).toBe('Description 1');
+    expect(storyContents.getArcs()[0].getNodeIds()).toEqual(['node_1']);
+  });
+
+  it('should create StoryContents with empty arcs when arcs is missing', () => {
+    const backendDictWithoutArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+    };
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithoutArcs
+    );
+
+    expect(storyContents.getArcs()).toEqual([]);
+  });
+
+  it('should return arc index when arc is present', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    expect(storyContents.getArcIndex('arc_1')).toBe(0);
+    expect(storyContents.getArcIndex('arc_2')).toBe(1);
+    expect(storyContents.getArcIndex('non_existent')).toBe(-1);
+  });
+
+  it('should add arc to story contents', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const newArc = ArcModel.createNew('arc_2', 'Arc 2', 'Desc 2', []);
+
+    storyContents.addArc(newArc);
+
+    expect(storyContents.getArcs().length).toBe(2);
+    expect(storyContents.getArcs()[1].getId()).toBe('arc_2');
+  });
+
+  it('should delete arc from story contents', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    storyContents.deleteArc('arc_1');
+
+    expect(storyContents.getArcs().length).toBe(1);
+    expect(storyContents.getArcs()[0].getId()).toBe('arc_2');
+  });
+
+  it('should throw error when deleting a non-existent arc', () => {
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+    );
+
+    expect(() => {
+      _sampleStoryContents.deleteArc('non_existent');
+    }).toThrowError('The arc with id non_existent does not exist');
+  });
+
+  it('should rearrange arcs in story contents', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    storyContents.rearrangeArcs(['arc_2', 'arc_1']);
+
+    expect(storyContents.getArcs()[0].getId()).toBe('arc_2');
+    expect(storyContents.getArcs()[1].getId()).toBe('arc_1');
+  });
+
+  it('should throw error when rearranging with an arc not in the story', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    expect(() => {
+      storyContents.rearrangeArcs(['arc_2']);
+    }).toThrowError('Arc with id arc_2 is not part of this story');
+  });
+
+  it('should move node to a different arc', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+        {
+          id: 'node_2',
+          title: 'Title 2',
+          description: 'Description 2',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_3',
+      arcs: [
+        {
+          id: 'arc_1',
+          title: 'Arc 1',
+          description: 'Desc 1',
+          node_ids: ['node_1', 'node_2'],
+        },
+        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    storyContents.moveNodeToArc('node_1', 'arc_2');
+
+    expect(storyContents.getArcs()[0].getNodeIds()).toEqual(['node_2']);
+    expect(storyContents.getArcs()[1].getNodeIds()).toEqual(['node_1']);
+  });
+
+  it('should set exploration id to null without error', () => {
+    expect(_sampleStoryContents._nodes[0]._explorationId).toBeNull();
+
+    _sampleStoryContents.setNodeExplorationId('node_1', null);
+
+    expect(_sampleStoryContents._nodes[0]._explorationId).toBeNull();
+  });
+
+  it('should throw an error when target arc is missing in moveNodeToArc', () => {
+    const backendDictWithArcs: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {
+          id: 'arc_1',
+          title: 'Arc 1',
+          description: 'Desc 1',
+          node_ids: ['node_1'],
+        },
+      ],
+    };
+    const storyContents =
+      StoryContents.createFromBackendDict(backendDictWithArcs);
+
+    expect(() => {
+      storyContents.moveNodeToArc('node_1', 'missing_arc');
+    }).toThrowError('Arc with id missing_arc does not exist');
+  });
+
+  it('should insert arc at the specified index', () => {
+    const backendDict: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {
+          id: 'arc_default',
+          title: 'Default Arc',
+          description: '',
+          node_ids: ['node_1'],
+        },
+      ],
+    };
+    const storyContents = StoryContents.createFromBackendDict(backendDict);
+    const newArc = ArcModel.createNew('arc_new', 'New Arc', '', []);
+    storyContents.insertArcAt(0, newArc);
+
+    expect(storyContents.getArcs().length).toBe(2);
+    expect(storyContents.getArcs()[0].getId()).toBe('arc_new');
+    expect(storyContents.getArcs()[1].getId()).toBe('arc_default');
+  });
+
+  it('should return the initial node id', () => {
+    expect(_sampleStoryContents.getInitialNodeId()).toBe('node_1');
+  });
+
+  it('should return the nodes array from getNodes', () => {
+    const nodes = _sampleStoryContents.getNodes();
+    expect(nodes.length).toBe(2);
+    expect(nodes[0].getId()).toBe('node_1');
+    expect(nodes[1].getId()).toBe('node_2');
+  });
+
+  it('should add node without changing initial node when it is already set', () => {
+    _sampleStoryContents.addNode('Title 3');
+
+    expect(_sampleStoryContents.getInitialNodeId()).toBe('node_1');
+    expect(_sampleStoryContents.getNodes().length).toBe(3);
+    expect(_sampleStoryContents.getNodes()[2].getTitle()).toBe('Title 3');
+  });
+
+  it('should remove destination reference when a node that is a destination is deleted', () => {
+    expect(
+      _sampleStoryContents.getNodes()[0].getDestinationNodeIds()
+    ).toContain('node_2');
+
+    _sampleStoryContents.deleteNode('node_2');
+
+    expect(
+      _sampleStoryContents.getNodes()[0].getDestinationNodeIds()
+    ).not.toContain('node_2');
+  });
+
+  it('should throw error when rearranging arcs with wrong length', () => {
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+    );
+
+    expect(() => {
+      _sampleStoryContents.rearrangeArcs(['arc_1', 'extra_arc']);
+    }).toThrowError('Arc order must include each arc exactly once');
+  });
+
+  it('should throw error when rearranging arcs with duplicate id', () => {
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+    );
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', 'Desc 2', [])
+    );
+
+    expect(() => {
+      _sampleStoryContents.rearrangeArcs(['arc_1', 'arc_1']);
+    }).toThrowError('Duplicate arc id in arc order: arc_1');
   });
 });

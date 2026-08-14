@@ -880,7 +880,7 @@ describe('Conversation display component', () => {
         {} as InteractionCustomizationArgs,
         null,
         [],
-        '',
+        'TextInput',
         null
       )
     );

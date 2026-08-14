@@ -136,4 +136,50 @@ describe('Schema based editor component', function () {
     const result = component.validate(new FormControl(1));
     expect(result).toBeNull();
   });
+
+  it('should return schema metadata getters when present', () => {
+    component.schema = {
+      type: 'list',
+      items: 'unicode',
+      len: 2,
+      properties: [
+        {
+          name: 'prop',
+          schema: {
+            type: 'unicode',
+          },
+        },
+      ],
+      ui_config: {
+        rows: 1,
+      },
+      validators: [],
+    } as unknown as typeof component.schema;
+
+    expect(component.schemaItems).toBe('unicode');
+    expect(component.schemaLen).toBe(2);
+    expect(component.schemaProperties).toEqual([
+      {
+        name: 'prop',
+        schema: {
+          type: 'unicode',
+        },
+      },
+    ]);
+    expect(component.schemaUiConfig).toEqual({
+      rows: 1,
+    });
+    expect(component.schemaValidators).toEqual([]);
+  });
+
+  it('should not subscribe when form has no statusChanges', () => {
+    component.form = {
+      statusChanges: undefined,
+      valid: true,
+    } as unknown as typeof component.form;
+
+    component.ngAfterViewInit();
+
+    expect(component.validate(new FormControl(1))).toBeNull();
+  });
 });

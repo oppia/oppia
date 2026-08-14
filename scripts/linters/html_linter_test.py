@@ -403,3 +403,24 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
             self.assertFalse(parser.failed)
             self.assertEqual([], parser.error_messages)
+
+    def test_handle_data_updates_indentation_level_for_jinja_blocks(
+        self,
+    ) -> None:
+        parser = html_linter.CustomHTMLParser(
+            filepath='dummy.html', file_lines=(), failed=False
+        )
+
+        self.assertEqual(parser.indentation_level, 0)
+
+        parser.handle_data('  {% block some_block %}\n')
+        self.assertEqual(parser.indentation_level, 1)
+
+        parser.handle_data('  {% if some_condition %}\n')
+        self.assertEqual(parser.indentation_level, 2)
+
+        parser.handle_data('  {% endif %}\n')
+        self.assertEqual(parser.indentation_level, 1)
+
+        parser.handle_data('  {% endblock %}\n')
+        self.assertEqual(parser.indentation_level, 0)

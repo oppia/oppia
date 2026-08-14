@@ -262,11 +262,6 @@ class MainTests(unittest.TestCase):
         )
         self.mock_ng_build = self.patcher_servers_managed_ng_build.start()
 
-        self.patcher_servers_managed_webpack = mock.patch(
-            'scripts.start.servers.managed_webpack_compiler'
-        )
-        self.mock_webpack = self.patcher_servers_managed_webpack.start()
-
         self.patcher_servers_managed_firebase = mock.patch(
             'scripts.start.servers.managed_firebase_auth_emulator'
         )
@@ -315,7 +310,6 @@ class MainTests(unittest.TestCase):
             self.mock_redis,
             self.mock_es,
             self.mock_ng_build,
-            self.mock_webpack,
             self.mock_firebase,
             self.mock_datastore,
         ]:
@@ -332,7 +326,6 @@ class MainTests(unittest.TestCase):
         self.patcher_servers_managed_dev_appserver.stop()
         self.patcher_common_write_hashes.stop()
         self.patcher_servers_managed_ng_build.stop()
-        self.patcher_servers_managed_webpack.stop()
         self.patcher_servers_managed_firebase.stop()
         self.patcher_servers_managed_datastore.stop()
         self.patcher_extend_index.stop()

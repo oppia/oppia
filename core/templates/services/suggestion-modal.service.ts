@@ -26,6 +26,8 @@ export interface ParamDict {
   commitMessage?: string;
   reviewMessage: string;
   skillDifficulty?: number;
+  suggestionId?: string;
+  targetId?: string;
 }
 
 @Injectable({

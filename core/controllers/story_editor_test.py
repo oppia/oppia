@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
+    skill_services,
     story_domain,
     story_services,
     topic_domain,
@@ -184,6 +185,78 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
                     reference.story_unpublish_type,
                     topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
                 )
+
+        self.logout()
+
+    def test_put_raises_validation_error_when_skill_has_few_questions(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Skill 1')
+        self.save_new_valid_exploration(
+            '0',
+            self.admin_id,
+            title='Title 1',
+            category='Mathematics',
+            language_code='en',
+        )
+        self.publish_exploration(self.admin_id, '0')
+
+        old_value: List[str] = []
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Title 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': old_value,
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id, self.story_id, change_list, 'Added story node.'
+        )
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {
+                'story_publication_action': (
+                    topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                )
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertIn(
+            'Skill %s has only 0 questions.' % skill_id,
+            response['error'],
+        )
 
         self.logout()
 

@@ -17,10 +17,20 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
 
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
+import {ValidationResponse} from './certificate-offering-review-and-availability.component';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 
 describe('Certificate Offering Review And Availability Component', () => {
   let component: CertificateOfferingReviewAndAvailabilityComponent;
@@ -28,7 +38,28 @@ describe('Certificate Offering Review And Availability Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [CertificateOfferingReviewAndAvailabilityComponent],
+      providers: [
+        {
+          provide: ClassroomBackendApiService,
+          useValue: {
+            getAllClassroomsSummaryAsync: async () => Promise.resolve([]),
+            fetchClassroomDataAsync: async () => Promise.resolve(null),
+          },
+        },
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: {
+            validateCertificateAssessmentOfferingAsync: async () =>
+              Promise.resolve({
+                is_valid: true,
+                validation_errors: {},
+                validation_message: '',
+              }),
+          },
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -42,142 +73,108 @@ describe('Certificate Offering Review And Availability Component', () => {
       CertificateAssessmentOfferingData.createEmpty();
   });
 
-  it('should populate stub data on init when stub mode is enabled', () => {
-    component.useStubData = true;
-    fixture.detectChanges();
+  it('should load validation state on init and emit validity', fakeAsync(() => {
+    const validitySpy = spyOn(component.isCertificateValidChange, 'emit');
+    const classroomBackendApiSpy = spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'math_classroom_id',
+          name: 'Math',
+          url_fragment: 'math',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'fetchClassroomDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        getName: () => 'Math',
+        getTopicSummaries: () => [
+          {
+            getId: () => 'topic_1',
+            getName: () => 'Place Values',
+          },
+        ],
+      } as never)
+    );
+    spyOn(
+      TestBed.inject(CertificateAssessmentOfferingBackendApiService),
+      'validateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        is_valid: true,
+        validation_errors: {},
+        validation_message: 'Looks good.',
+      })
+    );
+    component.certificateAssessmentOffering.classroomId = 'math_classroom_id';
+    component.certificateAssessmentOffering.topicData = {topic_1: 1};
+    component.certificateAssessmentOffering.totalQuestions = 10;
 
-    expect(component.validationErrors).toEqual({
-      topic_adding_numbers: {
-        easy: {required: 5, available: 5},
-        medium: {required: 5, available: 8},
-        hard: {required: 3, available: 4},
-      },
-      topic_fractions: {
-        easy: {required: 5, available: 6},
-        medium: {required: 10, available: 3},
-        hard: {required: 3, available: 0},
-      },
-      topic_percentages: {
-        easy: {required: 5, available: 4},
-        medium: {required: 5, available: 5},
-        hard: {required: 3, available: 2},
-      },
-    });
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(classroomBackendApiSpy).toHaveBeenCalled();
+    expect(component.topicNameMap).toEqual({topic_1: 'Place Values'});
+    expect(component.validationMessage).toEqual('Looks good.');
+    expect(component.isValid).toBeTrue();
+    expect(validitySpy).toHaveBeenCalledWith(true);
+  }));
+
+  it('should fall back to an error state when validation loading fails', fakeAsync(() => {
+    spyOn(component.isCertificateValidChange, 'emit');
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.reject(new Error('boom')));
+
+    component.certificateAssessmentOffering.classroomId = 'math_classroom_id';
+    fixture.detectChanges();
+    flushMicrotasks();
+
     expect(component.isValid).toBeFalse();
-    expect(component.topicNameMap).toEqual({
-      topic_adding_numbers: 'Adding Numbers',
-      topic_fractions: 'Fractions',
-      topic_percentages: 'Percentages',
-    });
-    expect(component.topicReadinessRows).toEqual([
-      {
-        topicId: 'topic_adding_numbers',
-        topicName: 'Adding Numbers',
-        easy: 5,
-        medium: 8,
-        hard: 4,
-        totalQuestions: 17,
-        isReady: true,
-        easySufficient: true,
-        mediumSufficient: true,
-        hardSufficient: true,
-      },
-      {
-        topicId: 'topic_fractions',
-        topicName: 'Fractions',
-        easy: 6,
-        medium: 3,
-        hard: 0,
-        totalQuestions: 9,
-        isReady: false,
-        easySufficient: true,
-        mediumSufficient: false,
-        hardSufficient: false,
-      },
-      {
-        topicId: 'topic_percentages',
-        topicName: 'Percentages',
-        easy: 4,
-        medium: 5,
-        hard: 2,
-        totalQuestions: 11,
-        isReady: false,
-        easySufficient: false,
-        mediumSufficient: true,
-        hardSufficient: false,
-      },
-    ]);
-    expect(component.errorMessages).toEqual([
-      {
-        topicName: 'Fractions',
-        difficulty: 'Medium',
-        available: 3,
-        required: 10,
-        isZero: false,
-      },
-      {
-        topicName: 'Fractions',
-        difficulty: 'Hard',
-        available: 0,
-        required: 3,
-        isZero: true,
-      },
-      {
-        topicName: 'Percentages',
-        difficulty: 'Easy',
-        available: 4,
-        required: 5,
-        isZero: false,
-      },
-      {
-        topicName: 'Percentages',
-        difficulty: 'Hard',
-        available: 2,
-        required: 3,
-        isZero: false,
-      },
-    ]);
-  });
+    expect(component.validationErrors).toEqual({});
+    expect(component.validationMessage).toEqual('boom');
+  }));
 
-  it('should preserve real inputs when stub mode is disabled', () => {
-    component.validationErrors = {
-      topic_fractions: {
-        easy: {required: 5, available: 5},
-        medium: {required: 10, available: 3},
-        hard: {required: 3, available: 0},
-      },
-    };
-    component.topicNameMap = {
-      topic_fractions: 'Fractions',
-    };
+  it('should show an error when the selected classroom is missing', fakeAsync(() => {
+    const validitySpy = spyOn(component.isCertificateValidChange, 'emit');
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'science_classroom_id',
+          name: 'Science',
+          url_fragment: 'science',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
 
+    component.certificateAssessmentOffering.classroomId = 'math_classroom_id';
     fixture.detectChanges();
+    flushMicrotasks();
 
-    expect(component.validationErrors).toEqual({
-      topic_fractions: {
-        easy: {required: 5, available: 5},
-        medium: {required: 10, available: 3},
-        hard: {required: 3, available: 0},
-      },
-    });
-    expect(component.topicNameMap).toEqual({
-      topic_fractions: 'Fractions',
-    });
-    expect(component.topicReadinessRows).toEqual([
-      {
-        topicId: 'topic_fractions',
-        topicName: 'Fractions',
-        easy: 5,
-        medium: 3,
-        hard: 0,
-        totalQuestions: 8,
-        isReady: false,
-        easySufficient: true,
-        mediumSufficient: false,
-        hardSufficient: false,
-      },
-    ]);
-  });
+    expect(component.isValid).toBeFalse();
+    expect(component.validationErrors).toEqual({});
+    expect(component.validationMessage).toEqual(
+      'Selected classroom could not be found.'
+    );
+    expect(validitySpy).toHaveBeenCalledWith(false);
+  }));
 
   it('should format error text for zero and non-zero availability', () => {
     expect(
@@ -224,10 +221,14 @@ describe('Certificate Offering Review And Availability Component', () => {
       {
         topicId: 'topic_fractions',
         topicName: 'Fractions',
-        easy: 5,
-        medium: 3,
-        hard: 0,
+        easyAvailable: 5,
+        mediumAvailable: 3,
+        hardAvailable: 0,
+        easyRequired: 5,
+        mediumRequired: 10,
+        hardRequired: 3,
         totalQuestions: 8,
+        totalRequiredQuestions: 18,
         isReady: false,
         easySufficient: true,
         mediumSufficient: false,
@@ -252,86 +253,6 @@ describe('Certificate Offering Review And Availability Component', () => {
     ]);
   });
 
-  it('should rebuild derived data when validation inputs change', () => {
-    component.validationErrors = {
-      topic_fractions: {
-        easy: {required: 5, available: 5},
-        medium: {required: 10, available: 3},
-        hard: {required: 3, available: 0},
-      },
-    };
-    component.topicNameMap = {
-      topic_fractions: 'Fractions',
-    };
-
-    fixture.detectChanges();
-
-    component.validationErrors = {
-      topic_percentages: {
-        easy: {required: 5, available: 4},
-        medium: {required: 5, available: 5},
-        hard: {required: 3, available: 2},
-      },
-    };
-    component.topicNameMap = {
-      topic_percentages: 'Percentages',
-    };
-
-    component.ngOnChanges({
-      validationErrors: {
-        currentValue: component.validationErrors,
-        previousValue: {},
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-      topicNameMap: {
-        currentValue: component.topicNameMap,
-        previousValue: {},
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    });
-
-    expect(component.topicReadinessRows).toEqual([
-      {
-        topicId: 'topic_percentages',
-        topicName: 'Percentages',
-        easy: 4,
-        medium: 5,
-        hard: 2,
-        totalQuestions: 11,
-        isReady: false,
-        easySufficient: false,
-        mediumSufficient: true,
-        hardSufficient: false,
-      },
-    ]);
-    expect(component.errorMessages).toEqual([
-      {
-        topicName: 'Percentages',
-        difficulty: 'Easy',
-        available: 4,
-        required: 5,
-        isZero: false,
-      },
-      {
-        topicName: 'Percentages',
-        difficulty: 'Hard',
-        available: 2,
-        required: 3,
-        isZero: false,
-      },
-    ]);
-  });
-
-  it('should get correct save button text depending on mode', () => {
-    component.isEditMode = false;
-    expect(component.getSaveButtonText()).toEqual('Save Certificate');
-
-    component.isEditMode = true;
-    expect(component.getSaveButtonText()).toEqual('Update Certificate');
-  });
-
   it('should emit save event when clicking save button', () => {
     const saveSpy = spyOn(component.saveCertificateOffering, 'emit');
 
@@ -347,4 +268,55 @@ describe('Certificate Offering Review And Availability Component', () => {
 
     expect(navigateSpy).toHaveBeenCalled();
   });
+
+  it('should set loading state while refreshing validation', fakeAsync(() => {
+    let resolveValidation: (value: ValidationResponse) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'math_classroom_id',
+          name: 'Math',
+          url_fragment: 'math',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'fetchClassroomDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        getName: () => 'Math',
+        getTopicSummaries: () => [],
+      } as never)
+    );
+    spyOn(
+      TestBed.inject(CertificateAssessmentOfferingBackendApiService),
+      'validateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveValidation = resolve;
+      })
+    );
+
+    component.certificateAssessmentOffering.classroomId = 'math_classroom_id';
+    component.certificateAssessmentOffering.topicData = {topic_1: 1};
+    component.certificateAssessmentOffering.totalQuestions = 3;
+    void component.refreshValidationState();
+
+    expect(component.isLoadingValidation).toBeTrue();
+    resolveValidation({
+      is_valid: true,
+      validation_errors: {},
+      validation_message: '',
+    });
+    flushMicrotasks();
+    expect(component.isLoadingValidation).toBeFalse();
+  }));
 });
