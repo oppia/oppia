@@ -170,6 +170,9 @@ const openFeedbackCardSelector = '.e2e-test-creator-dashboard-open-feedback';
 const subscriberCountLabel = '.e2e-test-creator-dashboard-subscriber-count';
 const explorationSummaryTileTitleSelector =
   '.e2e-test-exploration-dashboard-card-title';
+const averageRatingsCardSelector = '.e2e-test-creator-dashboard-average-rating';
+const usersCountInRatingSelector =
+  '.e2e-test-creator-dashboard-rating-user-count';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -1678,6 +1681,64 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(
         `Exploration "${explorationName}" found ${count} times, ` +
           `but expected ${numberOfOccurrence} times.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the average rating and the number of users who
+   * submitted ratings.
+   * @param {number | string} expectedRating - The expected average rating.
+   * @param {number} expectedUsers - The expected count of users who submitted
+   *   ratings.
+   */
+  async expectAverageRatingAndUsersToBe(
+    expectedRating: number | string,
+    expectedUsers: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(averageRatingsCardSelector);
+    const ratingElements = await this.page.$$(
+      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
+        `${averageRatingsCardSelector} .stat-value-without-rating`
+    );
+    let ratingText = '';
+    for (const element of ratingElements) {
+      const rect = await element.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+      ratingText = await element.evaluate(
+        el => (el as HTMLElement).innerText.trim() || ''
+      );
+      break;
+    }
+    // Handle "N/A" case.
+    if (expectedRating === 'N/A') {
+      if (ratingText !== 'N/A') {
+        throw new Error(
+          `Expected average rating to be "N/A", but found "${ratingText}".`
+        );
+      }
+    } else {
+      const ratingValue = parseFloat(ratingText);
+      if (ratingValue !== expectedRating) {
+        throw new Error(
+          `Expected average rating to be ${expectedRating}, ` +
+            `but found ${ratingValue}.`
+        );
+      }
+    }
+    const totalUsersText = await this.page.$eval(
+      usersCountInRatingSelector,
+      el => (el as HTMLElement).innerText.trim() || ''
+    );
+    // Extract number from text (e.g., "by 3 users" → 3).
+    const totalUsersMatch = totalUsersText.match(/\d+/);
+    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
+    if (totalUsers !== expectedUsers) {
+      throw new Error(
+        `Expected ${expectedUsers} users to have submitted ratings, ` +
+          `but found ${totalUsers} instead.`
       );
     }
   }
