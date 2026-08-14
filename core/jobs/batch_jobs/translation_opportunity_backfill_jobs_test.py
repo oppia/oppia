@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import re
+
 from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import exp_domain, rights_manager, skill_domain, skill_services
@@ -28,13 +30,14 @@ from core.platform import models
 from core.tests import test_utils
 
 import result
-from typing import List, cast
+from typing import Dict, List, cast
 
 MYPY = False
 if MYPY:
     from mypy_imports import (
         exp_models,
         opportunity_models,
+        skill_models,
         story_models,
         topic_models,
         translation_models,
@@ -58,6 +61,28 @@ if MYPY:
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
+
+
+def get_opportunity_model(
+    entity_type: feconf.TranslatableEntityType, entity_id: str
+) -> opportunity_models.TranslationOpportunityModel:
+    """Returns the opportunity model stored for the given entity.
+
+    Args:
+        entity_type: TranslatableEntityType. The type of the entity.
+        entity_id: str. The ID of the entity.
+
+    Returns:
+        TranslationOpportunityModel. The stored opportunity model.
+    """
+    stored_models = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            entity_type.value, [entity_id]
+        )
+    )
+    model = stored_models[0]
+    assert model is not None
+    return model
 
 
 class TranslationOpportunityJobTestBase(
@@ -212,10 +237,8 @@ class BackfillTranslationOpportunityModelJobTests(
             ]
         )
 
-        model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
-            )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.entity_type, 'exploration')
@@ -235,7 +258,7 @@ class BackfillTranslationOpportunityModelJobTests(
                 'exp_es',
                 {
                     'topic_ids': ['topic_id'],
-                    'exp': [exp],
+                    'entity': [exp],
                     'translations': [],
                 },
             )
@@ -305,6 +328,38 @@ class BackfillTranslationOpportunityModelJobTests(
             )
         )
 
+    def test_does_not_delete_opportunities_of_other_entity_types(self) -> None:
+        # A skill opportunity is never produced by this job's pipeline, so it
+        # must not be counted as an orphan and deleted.
+        skill_opportunity = (
+            opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type=feconf.TranslatableEntityType.SKILL.value,
+                entity_id='skill_id',
+                topic_ids=['topic_id'],
+                content_count=2,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'hi': 1},
+            )
+        )
+        skill_opportunity.update_timestamps()
+        skill_opportunity.put()
+
+        # No deletion result is reported, because the only model this job did
+        # not recompute belongs to another entity type.
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        surviving_model = get_opportunity_model(
+            feconf.TranslatableEntityType.SKILL, 'skill_id'
+        )
+        self.assertEqual(surviving_model.content_count, 2)
+        self.assertEqual(surviving_model.translation_counts, {'hi': 1})
+
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
@@ -321,10 +376,8 @@ class BackfillTranslationOpportunityModelJobTests(
             ]
         )
 
-        model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
-            )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.entity_type, 'exploration')
@@ -353,10 +406,8 @@ class BackfillTranslationOpportunityModelJobTests(
             ]
         )
 
-        model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
-            )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
 
@@ -529,10 +580,8 @@ class BackfillTranslationOpportunityModelJobTests(
             ]
         )
 
-        opportunity = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.EXPLORATION.value, exp_id
-            )
+        opportunity = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, exp_id
         )
         self.assertIsNotNone(opportunity)
         # 2 translatable contents + 2 metadata fields (title, tag) = 4.
@@ -937,6 +986,43 @@ class AuditBackfillTranslationOpportunityModelJobTests(
             ]
         )
 
+    def test_audit_ignores_opportunities_of_other_entity_types(self) -> None:
+        # A skill opportunity is never produced by this job's pipeline, so it
+        # must not be reported as orphaned.
+        skill_opportunity = (
+            opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type=feconf.TranslatableEntityType.SKILL.value,
+                entity_id='skill_id',
+                topic_ids=['topic_id'],
+                content_count=2,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'hi': 1},
+            )
+        )
+        skill_opportunity.update_timestamps()
+        skill_opportunity.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 4\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): hi: 1'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
 
 class SkillOpportunityJobTestBase(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
@@ -999,10 +1085,8 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             ]
         )
 
-        model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.SKILL.value, self.skill_id
-            )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.SKILL, self.skill_id
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.entity_type, 'skill')
@@ -1038,10 +1122,8 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             ]
         )
 
-        model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                feconf.TranslatableEntityType.SKILL.value, self.skill_id
-            )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.SKILL, self.skill_id
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.translation_counts, {'hi': 1})
@@ -1049,15 +1131,15 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
     def test_create_skill_translation_opportunity_returns_error_cases(
         self,
     ) -> None:
-        err1 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
-            ('skill_1', {'topic_ids': [], 'skill': [], 'translations': []})
+        err1 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
+            ('skill_1', {'topic_ids': [], 'entity': [], 'translations': []})
         )
         self.assertEqual(err1, result.Err('Missing topic_id'))
 
-        err2 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
+        err2 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
             (
                 'skill_1',
-                {'topic_ids': ['topic_id'], 'skill': [], 'translations': []},
+                {'topic_ids': ['topic_id'], 'entity': [], 'translations': []},
             )
         )
         self.assertEqual(err2, result.Err('Missing SkillModel'))
@@ -1091,12 +1173,12 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             },
         )
 
-        res = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
+        res = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
             (
                 'skill_es',
                 {
                     'topic_ids': ['topic_id'],
-                    'skill': [skill],
+                    'entity': [skill],
                     'translations': [translation_model],
                 },
             )
@@ -1146,38 +1228,256 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
         translation_opportunity_backfill_jobs.AuditBackfillSkillOpportunityModelJob
     )
 
-    def test_audit_job_does_not_modify_datastore(self) -> None:
-        orphaned_model = opportunity_models.TranslationOpportunityModel(
-            id='skill.orphaned_skill_id',
-            entity_type='skill',
-            entity_id='orphaned_skill_id',
-            topic_ids=['topic_id'],
-            content_count=2,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={'hi': 1},
-        )
-        orphaned_model.update_timestamps()
-        orphaned_model.put()
+    def _put_skill_opportunity(
+        self,
+        entity_id: str,
+        content_count: int,
+        translation_counts: Dict[str, int],
+    ) -> None:
+        """Stores a skill opportunity model for the audit job to compare
+        against.
 
+        Args:
+            entity_id: str. The ID of the skill.
+            content_count: int. The stored translatable content count.
+            translation_counts: dict(str, int). The stored translation counts.
+        """
+        model = opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.TranslatableEntityType.SKILL.value,
+            entity_id=entity_id,
+            topic_ids=['topic_id'],
+            content_count=content_count,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts=translation_counts,
+        )
+        model.update_timestamps()
+        model.put()
+
+    def _delete_all_skill_source_models(self) -> None:
+        """Deletes the models the skill opportunities are computed from, so
+        that the pipeline computes nothing.
+        """
+        # Here we use cast because we are narrowing down the type of models.
+        stored_skill_models = cast(
+            List[skill_models.SkillModel],
+            skill_models.SkillModel.get_all().fetch(),
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        stored_topic_models = cast(
+            List[topic_models.TopicModel],
+            topic_models.TopicModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in stored_skill_models]
+            + [model.key for model in stored_topic_models]
+        )
+
+    def test_audit_identifies_missing_model(self) -> None:
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
                 ),
                 job_run_result.JobRunResult(
-                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL DELETION SUCCESS: 1'
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
                 ),
             ]
         )
 
-        # Datastore should not be updated since DATASTORE_UPDATES_ALLOWED is False.
-        self.assertIsNotNone(
-            opportunity_models.TranslationOpportunityModel.get_by_id(
-                'skill.orphaned_skill_id'
+    def test_audit_identifies_matching_model(self) -> None:
+        translation_model = translation_models.EntityTranslationsModel(
+            id=f'skill.{self.skill_id}.1.hi',
+            entity_type=feconf.TranslatableEntityType.SKILL.value,
+            entity_id=self.skill_id,
+            entity_version=1,
+            language_code='hi',
+            translations={
+                'rubric_explanation_0': {
+                    'content_format': 'html',
+                    'content_value': '<p>Hindi explanation</p>',
+                    'needs_update': False,
+                }
+            },
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self._put_skill_opportunity(self.skill_id, 1, {'hi': 1})
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 1\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 1\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
+                        '- Total Translation Counts (Computed): hi: 1'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_identifies_discrepancy_model(self) -> None:
+        self._put_skill_opportunity(self.skill_id, 10, {})
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 1\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 10\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'Discrepancy for model skill.skill_1: '
+                        'Existing (content_count=10, translation_counts={}), '
+                        'Computed (content_count=1, translation_counts={})'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_identifies_orphaned_model(self) -> None:
+        self._put_skill_opportunity('orphaned_skill_id', 2, {'hi': 1})
+        self._delete_all_skill_source_models()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 1\n'
+                        '- Total Content Count (Existing): 2\n'
+                        '- Total Content Count (Computed): 0\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+            ]
+        )
+
+    def test_audit_ignores_opportunities_of_other_entity_types(self) -> None:
+        # An exploration opportunity is never produced by this job's pipeline,
+        # so it must not be reported as orphaned.
+        exp_opportunity = (
+            opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+                entity_id='exp_id',
+                topic_ids=['topic_id'],
+                content_count=4,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'hi': 1},
             )
         )
+        exp_opportunity.update_timestamps()
+        exp_opportunity.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_job_does_not_modify_datastore(self) -> None:
+        self._put_skill_opportunity('orphaned_skill_id', 2, {'hi': 1})
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 1\n'
+                        '- Total Content Count (Existing): 2\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        # The orphan is reported but not deleted, and the missing opportunity
+        # is reported but not created.
+        orphan = get_opportunity_model(
+            feconf.TranslatableEntityType.SKILL, 'orphaned_skill_id'
+        )
+        self.assertEqual(orphan.content_count, 2)
         self.assertIsNone(
-            opportunity_models.TranslationOpportunityModel.get_by_id(
-                'skill.skill_1'
-            )
+            opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+                feconf.TranslatableEntityType.SKILL.value, [self.skill_id]
+            )[0]
         )
+
+
+class BackfillTranslationOpportunityModelJobBaseTests(
+    job_test_utils.PipelinedTestBase
+):
+    """Tests for the base class shared by the backfill and audit jobs."""
+
+    def test_compute_translation_opportunities_raises_not_implemented_error(
+        self,
+    ) -> None:
+        job = translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJobBase(
+            self.pipeline
+        )
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'Subclasses must implement the '
+                '_compute_translation_opportunities() method'
+            ),
+        ):
+            job._compute_translation_opportunities()  # pylint: disable=protected-access
