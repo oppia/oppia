@@ -1,12 +1,15 @@
-<div class="topic-lesson-language-selector-row topic-lesson-language-selector-row--compact">
+<div class="topic-lesson-language-selector-row">
   <div class="topic-lesson-language-selector-select-container">
     <i class="fas fa-file-alt topic-lesson-language-selector-leading-icon"
        aria-hidden="true">
     </i>
     <div class="topic-lesson-language-selector-text-block">
-      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate }}</span>
       <span class="topic-lesson-language-selector-selected-value">
-        {{ selectedTextLanguageCode ? getLanguageDescription(selectedTextLanguageCode) : ('I18N_LANGUAGE_SELECTOR_SELECT' | translate) }}
+        {{
+          selectedTextLanguageCode
+            ? getLanguageDescription(selectedTextLanguageCode)
+            : ('I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate)
+        }}
       </span>
     </div>
 
@@ -32,9 +35,12 @@
        aria-hidden="true">
     </i>
     <div class="topic-lesson-language-selector-text-block">
-      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate }}</span>
       <span class="topic-lesson-language-selector-selected-value">
-        {{ getSelectedVoiceoverLanguageLabel() }}
+        {{
+          getValidSelectedVoiceoverLanguageCode()
+            ? getLanguageDescription(getValidSelectedVoiceoverLanguageCode())
+            : ('I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate)
+        }}
       </span>
     </div>
 

@@ -448,7 +448,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(str). A list of the ids of the suggestions that are stale.
         """
-        threshold_time = datetime.datetime.utcnow() - datetime.timedelta(
+        threshold_time = utils.get_current_utc_datetime() - datetime.timedelta(
             0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS
         )
         suggestion_models: Sequence[GeneralSuggestionModel] = (
@@ -482,7 +482,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.'
             )
-        threshold_time = datetime.datetime.utcnow() - datetime.timedelta(
+        threshold_time = utils.get_current_utc_datetime() - datetime.timedelta(
             days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS
         )
         return (
@@ -2586,7 +2586,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel
         ] = []
-        today = datetime.date.today()
+        today = utils.get_current_utc_date()
 
         if max_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -2997,7 +2997,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[TranslationReviewerTotalContributionStatsModel] = (
             []
         )
-        today = datetime.date.today()
+        today = utils.get_current_utc_date()
 
         if max_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -3343,7 +3343,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             sort_query = cls.get_all().order(sort)
 
         sorted_results: List[QuestionSubmitterTotalContributionStatsModel] = []
-        today = datetime.date.today()
+        today = utils.get_current_utc_date()
 
         if max_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -3621,7 +3621,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         sort_query = cls.get_all().order(sort)
 
         sorted_results: List[QuestionReviewerTotalContributionStatsModel] = []
-        today = datetime.date.today()
+        today = utils.get_current_utc_date()
 
         if max_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(

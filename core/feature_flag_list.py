@@ -140,7 +140,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
-    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -158,8 +157,9 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
-    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
+    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -393,7 +393,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables arc-based chapter groupings in the story editor, '
             'allowing creators to organize chapters into named arcs.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
 }

@@ -31,10 +31,12 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
+import './contributor-dashboard-page.component.css';
 
 @Component({
   selector: 'contributor-dashboard-page',
   templateUrl: './contributor-dashboard-page.component.html',
+  styleUrls: ['./contributor-dashboard-page.component.css'],
 })
 export class ContributorDashboardPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
