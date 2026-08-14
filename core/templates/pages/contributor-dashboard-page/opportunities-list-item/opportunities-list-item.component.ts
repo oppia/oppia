@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './opportunities-list-item.component.css';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -42,7 +43,7 @@ export interface ExplorationOpportunity {
 @Component({
   selector: 'oppia-opportunities-list-item',
   templateUrl: './opportunities-list-item.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list-item.component.css'],
 })
 export class OpportunitiesListItemComponent {
   constructor(private windowDimensionsService: WindowDimensionsService) {}
