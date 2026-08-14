@@ -259,30 +259,21 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     );
   }
 
-  // A contributor translation supersedes the hardcoded bundle, because it
-  // covers every exploration rather than the fixed set the bundle was built
-  // for, and it is the value reviewers accepted most recently.
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      !this.translatedMetadataFields.includes(
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expTitleTranslationKey,
+      this.translatedMetadataFields.includes(
         TranslatableExplorationMetadataField.TITLE
-      ) &&
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expTitleTranslationKey
-      ) &&
-      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      )
     );
   }
 
   isHackyExpObjectiveTranslationDisplayed(): boolean {
-    return (
-      !this.translatedMetadataFields.includes(
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expObjectiveTranslationKey,
+      this.translatedMetadataFields.includes(
         TranslatableExplorationMetadataField.OBJECTIVE
-      ) &&
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expObjectiveTranslationKey
-      ) &&
-      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      )
     );
   }
 

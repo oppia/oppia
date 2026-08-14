@@ -240,9 +240,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
-  // A contributor translation supersedes the hardcoded bundle, because it
-  // covers every exploration rather than the fixed set the bundle was built
-  // for, and it is the value reviewers accepted most recently.
   private isMetadataFieldTranslatedByBackend(
     field: TranslatableExplorationMetadataField
   ): boolean {
@@ -250,26 +247,20 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      !this.isMetadataFieldTranslatedByBackend(
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expTitleTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
         TranslatableExplorationMetadataField.TITLE
-      ) &&
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expTitleTranslationKey
-      ) &&
-      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      )
     );
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
-    return (
-      !this.isMetadataFieldTranslatedByBackend(
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expDescTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
         TranslatableExplorationMetadataField.OBJECTIVE
-      ) &&
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expDescTranslationKey
-      ) &&
-      !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      )
     );
   }
 
