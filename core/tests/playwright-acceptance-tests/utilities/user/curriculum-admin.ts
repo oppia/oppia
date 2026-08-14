@@ -110,7 +110,6 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Created ${classroomName} classroom.`);
   }
 
-
   async createTopicWithSkill(
     topicName: string,
     skillName: string
@@ -122,7 +121,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.createSkillForTopic(skillName, topicName, true);
   }
 
- 
   /**
    * Enables diagnostic test for a classroom.
    * @param {string} classroomName - The name of the classroom.
