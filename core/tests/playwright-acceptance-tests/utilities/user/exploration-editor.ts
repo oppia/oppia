@@ -165,11 +165,10 @@ const historyListOptions = '.e2e-test-history-table-option';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
-const totalPlaysCardSelector = '.e2e-test-creator-dashboard-total-plays';
-const openFeedbackCardSelector = '.e2e-test-creator-dashboard-open-feedback';
-const subscriberCountLabel = '.e2e-test-creator-dashboard-subscriber-count';
-const explorationSummaryTileTitleSelector =
-  '.e2e-test-exploration-dashboard-card-title';
+const totalPlaysCardSelector = '.total-plays';
+const openFeedbackCardSelector = '.total-open-feedback';
+const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
+const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
