@@ -28,6 +28,7 @@ from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
+    exp_domain,
     exp_fetchers,
     feature_flag_services,
     feedback_services,
@@ -216,10 +217,11 @@ def create_suggestion(
     )
 
     status = suggestion_models.STATUS_IN_REVIEW
-
+    exploration: Optional[exp_domain.Exploration] = None
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        assert exploration is not None
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -316,7 +318,6 @@ def create_suggestion(
                             'The Skill content has changed since this translation '
                             'was submitted.'
                         )
-
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
         existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
@@ -370,6 +371,7 @@ def create_suggestion(
             False,
             utils.get_current_utc_datetime(),
             utils.get_current_utc_datetime(),
+            target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -460,6 +462,10 @@ def get_suggestion_from_model(
         suggestion_model.edited_by_reviewer,
         suggestion_model.last_updated,
         suggestion_model.created_on,
+        # A translation suggestion can target any translatable entity type, so
+        # the target type comes from the model rather than the default assumed
+        # by the domain class.
+        target_type=suggestion_model.target_type,
     )
 
 
@@ -927,15 +933,17 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated and is up-to-date. We use the current exploration version
+    # translated and is up-to-date. We use the current entity version
     # (not the version at submission) to match the version used when saving
     # the translation in suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            suggestion.target_type, suggestion.target_id
+        )
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            exploration.version,
+            target_entity.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
@@ -3296,6 +3304,54 @@ def _update_question_reviewer_total_stats_models(
     )
 
 
+def _get_topic_id_of_translation_target(
+    suggestion: suggestion_registry.BaseSuggestion,
+) -> str:
+    """Returns the ID of the topic that the target of the given translation
+    suggestion belongs to.
+
+    Args:
+        suggestion: Suggestion. The translation suggestion whose target's topic
+            is required.
+
+    Returns:
+        str. The ID of the topic that the target belongs to, or
+        'uncategorized' if the target is not part of any topic.
+    """
+    # The exploration opportunity summaries are removed once the new
+    # opportunity models are rolled out, so they are only consulted while the
+    # feature flag is off. With the flag on, every entity type resolves its
+    # topic from the new opportunity model.
+    if (
+        suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        and not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        )
+    ):
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+        )
+        # We can confirm that exp_opportunity will not be None since there
+        # should be an assigned opportunity for a given translation. Hence we
+        # can rule out the possibility of None for mypy type checking.
+        assert exp_opportunity is not None
+        return exp_opportunity.topic_id
+
+    opportunity = (
+        opportunity_services.get_translation_opportunities_by_entity_ids(
+            suggestion.target_type, [suggestion.target_id]
+        )[suggestion.target_id]
+    )
+    # An entity such as a skill can be translated before it is assigned to any
+    # topic, in which case the contribution is not attributable to a topic.
+    if opportunity is None or not opportunity.topic_ids:
+        return 'uncategorized'
+    return opportunity.topic_ids[0]
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
 ) -> None:
@@ -3308,16 +3364,7 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3484,16 +3531,7 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3644,16 +3682,7 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
