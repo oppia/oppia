@@ -19,8 +19,20 @@
  * based on the provided feedback modal type.
  */
 
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+  Optional,
+  Inject,
+} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {FeedbackScreenshotStagingService} from 'domain/feedback/feedback-screenshot-staging.service';
@@ -61,6 +73,10 @@ interface TurnstileApi {
 
 interface TurnstileWindow extends Window {
   turnstile?: TurnstileApi;
+}
+
+interface FeedbackModalData {
+  feedbackModalType: FeedbackModalType;
 }
 
 @Component({
@@ -104,8 +120,13 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal,
     private siteAnalyticsService: SiteAnalyticsService
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data?: FeedbackModalData
   ) {}
 
   get isLessonFeedbackMode(): boolean {
@@ -178,6 +199,16 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.data) {
+      this.feedbackModalType = this.data.feedbackModalType;
+    }
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.feedbackBottomSheetRef?.dismiss();
+        }
+      });
+    }
     this.showTechnicalLogsCheckbox = true;
 
     switch (this.feedbackModalType) {
@@ -529,6 +560,10 @@ export class FeedbackModalComponent implements OnInit {
     this.captchaToken = '';
     this.captchaSubmitError = null;
     this.removeScreenshot();
-    this.ngbActiveModal.dismiss();
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.dismiss();
+    } else {
+      this.ngbActiveModal.dismiss();
+    }
   }
 }
