@@ -37,7 +37,6 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
       'karma-coverage-istanbul-reporter',
       'karma-jasmine',
       'karma-chrome-launcher',
-      'karma-coverage',
       require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
@@ -48,19 +47,28 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
     },
     crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
+    // Angular 11 natively uses `karma-coverage-istanbul-reporter` for code coverage
+    // via the `@angular-devkit/build-angular` plugin. This configuration explicitly directs the output
+    // to the parent directory to maintain compatibility with existing CI scripts.
+    // Also note: In angular.json, `"sourceRoot": ""` allows the Angular CLI to discover files in `core/`
+    // and `extensions/` for instrumentation, since they sit outside a standard `src/` folder.
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
+      fixWebpackSourcePaths: true,
       'report-config': {
         html: {outdir: 'html'},
       },
     },
     autoWatch: true,
     browsers: ['CI_Chrome'],
+    // The capture and activity timeouts are increased to allow the Angular
+    // CLI enough time to generate the heavy coverage bundles.
     // Kill the browser if it does not capture in the given timeout [ms].
-    captureTimeout: 60000,
-    browserNoActivityTimeout: 120000,
-    browserDisconnectTimeout: 60000,
+    captureTimeout: 300000,
+    browserNoActivityTimeout: 300000,
+    browserDisconnectTimeout: 100000,
+    pingTimeout: 100000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
@@ -82,7 +90,9 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=4096',
+          // The memory limit is raised because coverage instrumentation
+          // makes the browser hold more data.
+          '--js-flags=--max-old-space-size=8192',
         ],
       },
     },

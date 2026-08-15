@@ -470,5 +470,24 @@ describe('Teach Oppia Modal Component', () => {
 
       expect(component.showUnresolvedAnswers).toHaveBeenCalled();
     }));
+
+    it('should log an error and show no unresolved answers when fetching fails', fakeAsync(() => {
+      let rejectedResponse = {
+        data: 'Error fetching unresolved answers',
+      };
+
+      spyOn(console, 'error');
+      spyOn(component, 'showUnresolvedAnswers').and.stub();
+      spyOn(
+        teachOppiaModalBackendApiService,
+        'fetchTeachOppiaModalDataAsync'
+      ).and.returnValue(Promise.reject(rejectedResponse));
+
+      component.ngOnInit();
+      tick();
+
+      expect(console.error).toHaveBeenCalled();
+      expect(component.showUnresolvedAnswers).toHaveBeenCalledWith([]);
+    }));
   });
 });

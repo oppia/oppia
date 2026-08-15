@@ -18,7 +18,12 @@
 
 import {ElementRef} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -182,5 +187,11 @@ describe('Subject interests form field Component', () => {
     componentInstance.onInput(inputEvent);
     expect(componentInstance.formCtrl.pristine).toBeTrue();
     expect(componentInstance.onChange).not.toHaveBeenCalled();
+  });
+
+  it('should expose itself as a control value accessor', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      componentInstance,
+    ]);
   });
 });

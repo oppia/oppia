@@ -11,7 +11,7 @@
         }
       },
       "root": "",
-      "sourceRoot": "src",
+      "sourceRoot": "",
       "prefix": "app",
       "architect": {
         "build": {
@@ -161,6 +161,10 @@
             "polyfills": "core/templates/Polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "core/tests/karma.conf.ts",
+            "codeCoverageExclude": [
+              "core/templates/expressions/parser.js",
+              "core/templates/Polyfills.ts"
+            ],
             "assets": [
               "src/favicon.ico",
               {
@@ -208,6 +212,9 @@
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
             ]
+          },
+          "configurations": {
+            "production": {}
           }
         },
         "lint": {

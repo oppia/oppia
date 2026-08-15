@@ -24,7 +24,12 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {FormControl, FormsModule} from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaBasedIntEditorComponent} from './schema-based-int-editor.component';
@@ -136,5 +141,14 @@ describe('Schema Based Int Editor Component', () => {
       invalidType: 'string',
     });
     expect(component.validate(new FormControl(3))).toEqual(null);
+  });
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
   });
 });
