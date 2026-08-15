@@ -1,7 +1,7 @@
 {
   "suites": [
     {
-      "name": "blog-admin",
+      "name": "blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles",
       "module": "core/tests/playwright-acceptance-tests/specs/blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles.spec.ts",
       "framework": "playwright"
     },
