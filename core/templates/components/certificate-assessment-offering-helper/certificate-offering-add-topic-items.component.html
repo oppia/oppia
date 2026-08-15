@@ -5,10 +5,14 @@
       Add topics that need to be covered in the certificate.
     </p>
 
-    <div class="oppia-certificate-offering-selected-topics">
+    <div class="oppia-certificate-offering-selected-topics e2e-test-selected-topics-list">
       <ng-container *ngIf="selectedTopics.length > 0; else noSelectedTopics">
+        <span class="oppia-certificate-offering-selected-topics-summary
+                     e2e-test-selected-topics-summary">
+          All {{ selectedTopics.length }} topics selected.
+        </span>
         <div *ngFor="let topic of selectedTopics"
-             class="oppia-certificate-offering-selected-topic-card">
+             class="oppia-certificate-offering-selected-topic-card e2e-test-selected-topic-card">
           <div class="oppia-certificate-offering-topic-thumbnail">
             <img alt=""
                  class="oppia-certificate-offering-topic-thumbnail-image"
@@ -19,8 +23,8 @@
               <div class="oppia-certificate-offering-topic-title">{{ topic.title }}</div>
             </div>
           </div>
-          <button type="button" class="oppia-certificate-offering-remove-topic" aria-label="Remove topic"
-                  (click)="removeSelectedTopic(topic.id)">
+          <button type="button" class="oppia-certificate-offering-remove-topic e2e-test-remove-topic-button"
+                  aria-label="Remove topic" (click)="removeSelectedTopic(topic.id)">
             &times;
           </button>
         </div>
@@ -51,7 +55,7 @@
       </div>
       <div class="oppia-certificate-offering-topic-list">
         <ng-container *ngIf="filteredTopics.length > 0; else noTopics">
-          <div *ngFor="let topic of filteredTopics" class="oppia-certificate-offering-topic-row">
+          <div *ngFor="let topic of filteredTopics" class="oppia-certificate-offering-topic-row e2e-test-topic-row">
             <div class="oppia-certificate-offering-topic-row-left">
               <div class="oppia-certificate-offering-topic-thumbnail">
                 <img alt=""
@@ -62,7 +66,7 @@
                 <div class="oppia-certificate-offering-topic-title">{{ topic.title }}</div>
               </div>
             </div>
-            <button type="button" class="oppia-certificate-offering-topic-toggle"
+            <button type="button" class="oppia-certificate-offering-topic-toggle e2e-test-add-topic-button"
                     [disabled]="selectedTopicIds.has(topic.id)"
                     [attr.aria-disabled]="selectedTopicIds.has(topic.id)"
                     (click)="toggleTopic(topic)">
@@ -84,7 +88,7 @@
       </button>
       <!-- The Next button is disabled until at least one topic is added, so
       aria-disabled is applied to communicate its disabled state. -->
-      <button type="button" class="oppia-certificate-offering-primary-button"
+      <button type="button" class="oppia-certificate-offering-primary-button e2e-test-topics-next-button"
               [disabled]="selectedTopics.length === 0 || isLoadingTopics"
               [attr.aria-disabled]="selectedTopics.length === 0 || isLoadingTopics"
               (click)="onNextClicked()">

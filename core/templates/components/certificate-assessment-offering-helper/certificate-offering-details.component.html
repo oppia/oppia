@@ -7,7 +7,7 @@
         Certificate Title<span class="oppia-certificate-required">*</span>
       </label>
       <input id="certificate-offering-title" name="certificateOfferingTitle"
-             class="oppia-certificate-input" type="text" required
+             class="oppia-certificate-input e2e-test-certificate-title-input" type="text" required
              [attr.maxlength]="MAX_TITLE_LENGTH" [(ngModel)]="title"
              [disabled]="isLoadingClassrooms"
              placeholder="Enter title" aria-required="true">

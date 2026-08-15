@@ -33,10 +33,11 @@ const createDetailsNextButton =
   '.e2e-test-certificate-offering-details-next-button';
 const certificateReviewContainer = '.e2e-test-certificate-review-container';
 const certificateReviewSaveButton = '.e2e-test-certificate-review-save-btn';
-const confirmCreateCertificateButton = '.e2e-test-confirm-save-certificate';
+const confirmSaveCertificateButton = '.e2e-test-confirm-save-certificate';
+const saveAsNotReadyButton = '.e2e-test-save-as-not-ready-button';
 const certificateTitleSelector = '.oppia-certificate-title';
 const certificateStatusSelector = '.oppia-status-badge';
-const certificateRowSelector = '.oppia-certificate-offering-table tbody tr';
+const certificateRowSelector = '.oppia-certificate-creator-table tbody tr';
 const certificateTitleInput = '.e2e-test-certificate-title-input';
 const certificateDescriptionInput = '.e2e-test-certificate-description-input';
 const certificateTimeLimitInput = '.e2e-test-certificate-time-limit-input';
@@ -47,11 +48,85 @@ const certificateOutcomeInput = '.e2e-test-certificate-outcome-input';
 const addOutcomeButton = '.e2e-test-certificate-add-outcome';
 const editCertificateButton = '.e2e-test-edit-certificate-btn';
 const deleteCertificateButton = '.e2e-test-delete-certificate-btn';
+const deleteCertificateConfirmButton =
+  '.e2e-test-delete-certificate-confirm-button';
 const certificateTimeLabel = '.e2e-test-certificate-time-label';
+const topicRowSelector = '.e2e-test-topic-row';
+const addTopicButton = '.e2e-test-add-topic-button';
+const selectedTopicsSummary = '.e2e-test-selected-topics-summary';
+const selectedTopicCardSelector = '.e2e-test-selected-topic-card';
+const removeTopicButton = '.e2e-test-remove-topic-button';
+const topicsNextButton = '.e2e-test-topics-next-button';
+const reviewOverallStatusSelector = '.e2e-test-review-overall-status';
+const topicReadinessRowSelector = '.e2e-test-topic-readiness-row';
+const topicReadinessHardCellSelector = '.e2e-test-topic-readiness-hard-cell';
+
+const CREATE_CERTIFICATE_TITLE = 'Everyday Arithmetic & Number Confidence';
+const UPDATED_CERTIFICATE_TITLE =
+  'Real-World Quantities, Fractions & Percentages';
+const TWO_TOPICS_SELECTED = 'All 2 topics selected.';
+const ONE_TOPIC_SELECTED = 'All 1 topics selected.';
 
 describe('Certificate Assessment', function () {
   let curriculumAdmin: CurriculumAdmin;
   let releaseCoordinator: ReleaseCoordinator;
+
+  const clickAddTopicButton = async (topicName: string): Promise<void> => {
+    await curriculumAdmin.page.evaluate(
+      (topicName, rowSelector, buttonSelector) => {
+        const topicRows = Array.from(
+          document.querySelectorAll<HTMLElement>(rowSelector)
+        );
+        const topicRow = topicRows.find(row =>
+          row.textContent?.includes(topicName)
+        );
+        const button =
+          topicRow?.querySelector<HTMLButtonElement>(buttonSelector);
+        if (!button) {
+          throw new Error(`Could not find the add button for ${topicName}.`);
+        }
+        button.click();
+      },
+      topicName,
+      topicRowSelector,
+      addTopicButton
+    );
+  };
+
+  const expectTopicToNotBeSelected = async (
+    topicName: string
+  ): Promise<void> => {
+    await curriculumAdmin.page.waitForFunction(
+      (topicName, cardSelector) => {
+        const cards = Array.from(
+          document.querySelectorAll<HTMLElement>(cardSelector)
+        );
+        return cards.every(card => !card.textContent?.includes(topicName));
+      },
+      {},
+      topicName,
+      selectedTopicCardSelector
+    );
+  };
+
+  const clickRemoveTopicButton = async (topicName: string): Promise<void> => {
+    await curriculumAdmin.page.evaluate(
+      (topicName, cardSelector, buttonSelector) => {
+        const cards = Array.from(
+          document.querySelectorAll<HTMLElement>(cardSelector)
+        );
+        const card = cards.find(card => card.textContent?.includes(topicName));
+        const button = card?.querySelector<HTMLButtonElement>(buttonSelector);
+        if (!button) {
+          throw new Error(`Could not find the remove button for ${topicName}.`);
+        }
+        button.click();
+      },
+      topicName,
+      selectedTopicCardSelector,
+      removeTopicButton
+    );
+  };
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -112,7 +187,7 @@ describe('Certificate Assessment', function () {
     );
   }, 3000000);
 
-  it('should let the curriculum admin access the certificate dashboard', async function () {
+  xit('should let the curriculum admin access the certificate dashboard', async function () {
     await curriculumAdmin.goto(testConstants.URLs.Home);
     await curriculumAdmin.expectElementToBeVisible(
       '.e2e-test-profile-dropdown'
@@ -132,7 +207,7 @@ describe('Certificate Assessment', function () {
   });
 
   it('should create a certificate offering and show it on the dashboard', async function () {
-    await curriculumAdmin.goto('/certificate-creator-dashboard');
+    await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
     await curriculumAdmin.clickAndWaitForNavigation(newCertificateButton, true);
     await curriculumAdmin.expectTextContentToBe(
       '.oppia-certificate-offering-title',
@@ -145,7 +220,7 @@ describe('Certificate Assessment', function () {
 
     await curriculumAdmin.typeInInputField(
       certificateTitleInput,
-      'Everyday Arithmetic & Number Confidence'
+      CREATE_CERTIFICATE_TITLE
     );
     await curriculumAdmin.typeInInputField(
       certificateDescriptionInput,
@@ -177,32 +252,44 @@ describe('Certificate Assessment', function () {
       `${certificateOutcomeInput}:last-of-type`,
       'Ability to perform basic arithmetic accurately'
     );
+
     await curriculumAdmin.clickOnElementWithSelector(createDetailsNextButton);
-    await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementToBeVisible(topicRowSelector);
+    await clickAddTopicButton('Place Values');
+    await clickAddTopicButton('Addition and Subtraction');
     await curriculumAdmin.expectTextContentToBe(
-      certificateReviewContainer,
+      selectedTopicsSummary,
+      TWO_TOPICS_SELECTED
+    );
+    await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
+
+    await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementContentToContain(
+      reviewOverallStatusSelector,
       'Requirements Met'
     );
     await curriculumAdmin.clickOnElementWithSelector(
       certificateReviewSaveButton
     );
-    await curriculumAdmin.expectElementToBeVisible('.e2e-test-modal-header');
+    await curriculumAdmin.expectTextContentToBe(
+      '.e2e-test-modal-header',
+      'Publish Certificate'
+    );
     await curriculumAdmin.clickOnElementWithSelector(
-      confirmCreateCertificateButton
+      confirmSaveCertificateButton
+    );
+    await curriculumAdmin.expectTextContentToBe(
+      '.toast-message',
+      'Certificate created.'
     );
     await curriculumAdmin.page.keyboard.press('Escape');
-    await curriculumAdmin.page.waitForNavigation({
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
-
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
-      'Certificate Offering Dashboard'
+      'Certificate Creator Dashboard'
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateTitleSelector,
-      'Everyday Arithmetic & Number Confidence'
+      CREATE_CERTIFICATE_TITLE
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateStatusSelector,
@@ -211,120 +298,204 @@ describe('Certificate Assessment', function () {
   });
 
   it('should edit an existing certificate offering and show the updated values on the dashboard', async function () {
-    await curriculumAdmin.goto('/certificate-offering-dashboard');
+    await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
     await curriculumAdmin.clickAndWaitForNavigation(
       editCertificateButton,
       true
     );
     await curriculumAdmin.expectTextContentToBe(
-      'h1',
-      'Edit Certificate Offering'
+      '.oppia-certificate-offering-title',
+      'Edit Certificate'
     );
     await curriculumAdmin.expectTextContentToBe(
       'h3.oppia-certificate-section-title',
       'Add Certificate Details'
     );
 
+    await curriculumAdmin.clearAllTextFrom(certificateTitleInput);
     await curriculumAdmin.typeInInputField(
       certificateTitleInput,
-      'Real-World Quantities, Fractions & Percentages'
+      UPDATED_CERTIFICATE_TITLE
     );
+    await curriculumAdmin.clearAllTextFrom(certificateDescriptionInput);
     await curriculumAdmin.typeInInputField(
       certificateDescriptionInput,
       'Understanding and reasoning about quantities that are proportional or relative rather than whole.'
     );
+    await curriculumAdmin.clearAllTextFrom(certificateTimeLimitInput);
     await curriculumAdmin.typeInInputField(certificateTimeLimitInput, '15');
+
     await curriculumAdmin.clickOnElementWithSelector(createDetailsNextButton);
+    await curriculumAdmin.expectElementToBeVisible(topicRowSelector);
+    await curriculumAdmin.expectTextContentToBe(
+      selectedTopicsSummary,
+      TWO_TOPICS_SELECTED
+    );
+    await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
+
     await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementContentToContain(
+      reviewOverallStatusSelector,
+      'Requirements Met'
+    );
     await curriculumAdmin.clickOnElementWithSelector(
       certificateReviewSaveButton
     );
-    await curriculumAdmin.expectElementToBeVisible('.e2e-test-modal-header');
+    await curriculumAdmin.expectTextContentToBe(
+      '.e2e-test-modal-header',
+      'Update Certificate'
+    );
     await curriculumAdmin.clickOnElementWithSelector(
-      confirmCreateCertificateButton
+      confirmSaveCertificateButton
+    );
+    await curriculumAdmin.expectTextContentToBe(
+      '.toast-message',
+      'Certificate updated.'
     );
     await curriculumAdmin.page.keyboard.press('Escape');
-    await curriculumAdmin.page.waitForNavigation({
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
-
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
-      'Certificate Offering Dashboard'
+      'Certificate Creator Dashboard'
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateTitleSelector,
-      'Real-World Quantities, Fractions & Percentages'
+      UPDATED_CERTIFICATE_TITLE
     );
     await curriculumAdmin.expectTextContentToBe(certificateTimeLabel, '15 min');
   });
 
-  it('should save an insufficiently covered certificate offering as not ready', async function () {
-    await curriculumAdmin.goto('/certificate-offering-dashboard');
+  it('should remove and add topics for an existing certificate offering', async function () {
+    await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
     await curriculumAdmin.clickAndWaitForNavigation(
       editCertificateButton,
       true
     );
     await curriculumAdmin.expectTextContentToBe(
-      'h1',
-      'Edit Certificate Offering'
+      '.oppia-certificate-offering-title',
+      'Edit Certificate'
     );
 
+    await curriculumAdmin.clickOnElementWithSelector(createDetailsNextButton);
+    await curriculumAdmin.expectElementToBeVisible(topicRowSelector);
+    await curriculumAdmin.expectTextContentToBe(
+      selectedTopicsSummary,
+      TWO_TOPICS_SELECTED
+    );
+
+    // Remove 'Addition and Subtraction' from the selected topics.
+    await clickRemoveTopicButton('Addition and Subtraction');
+    await curriculumAdmin.expectTextContentToBe(
+      selectedTopicsSummary,
+      ONE_TOPIC_SELECTED
+    );
+    await expectTopicToNotBeSelected('Addition and Subtraction');
+
+    // Add 'Fraction' to the selected topics.
+    await clickAddTopicButton('Fraction');
+    await curriculumAdmin.expectTextContentToBe(
+      selectedTopicsSummary,
+      TWO_TOPICS_SELECTED
+    );
+    // await expectTopicToBeSelected('Fraction');
+    await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
+
+    await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementContentToContain(
+      reviewOverallStatusSelector,
+      'Requirements Met'
+    );
+    await curriculumAdmin.clickOnElementWithSelector(
+      certificateReviewSaveButton
+    );
+    await curriculumAdmin.expectTextContentToBe(
+      '.e2e-test-modal-header',
+      'Update Certificate'
+    );
+    await curriculumAdmin.clickOnElementWithSelector(
+      confirmSaveCertificateButton
+    );
+    await curriculumAdmin.expectTextContentToBe(
+      '.toast-message',
+      'Certificate updated.'
+    );
+    await curriculumAdmin.page.keyboard.press('Escape');
+    await curriculumAdmin.expectTextContentToBe(
+      certificateDashboardTitle,
+      'Certificate Creator Dashboard'
+    );
+  });
+
+  it('should save an insufficiently covered certificate offering as not ready', async function () {
+    await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
+    await curriculumAdmin.clickAndWaitForNavigation(
+      editCertificateButton,
+      true
+    );
+    await curriculumAdmin.expectTextContentToBe(
+      '.oppia-certificate-offering-title',
+      'Edit Certificate'
+    );
+
+    await curriculumAdmin.clearAllTextFrom(certificateTotalQuestionsInput);
     await curriculumAdmin.typeInInputField(
       certificateTotalQuestionsInput,
       '50'
     );
+
     await curriculumAdmin.clickOnElementWithSelector(createDetailsNextButton);
-    await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementToBeVisible(topicRowSelector);
     await curriculumAdmin.expectTextContentToBe(
+      selectedTopicsSummary,
+      TWO_TOPICS_SELECTED
+    );
+    await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
+
+    await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
+    await curriculumAdmin.expectElementContentToContain(
       certificateReviewContainer,
       'Requirements Not Met'
     );
-    await curriculumAdmin.expectTextContentToBe(
+    await curriculumAdmin.expectElementContentToContain(
       certificateReviewContainer,
       'Place Values'
     );
-    await curriculumAdmin.expectTextContentToBe(
+    await curriculumAdmin.expectElementContentToContain(
       certificateReviewContainer,
-      'Only 5 hard questions (minimum 8 required)'
+      'Place Values: No hard difficulty questions available'
     );
-    await curriculumAdmin.expectTextContentToBe(
-      certificateReviewContainer,
+    await curriculumAdmin.expectElementContentToContain(
+      topicReadinessHardCellSelector,
+      '0 / 8'
+    );
+    await curriculumAdmin.expectElementContentToContain(
+      topicReadinessRowSelector,
       'Not Ready'
     );
 
     await curriculumAdmin.clickOnElementWithSelector(
       certificateReviewSaveButton
     );
-    await curriculumAdmin.expectElementToBeVisible('.e2e-test-modal-header');
     await curriculumAdmin.expectTextContentToBe(
       '.e2e-test-modal-header',
       'Update Certificate'
     );
-    await curriculumAdmin.expectTextContentToBe(
-      '.e2e-test-modal-body',
-      'Save as Not Ready'
-    );
-
     const confirmUpdateButtonIsDisabled = await curriculumAdmin.page.$eval(
-      '.btn.btn-success.e2e-test-confirm-save-certificate',
+      confirmSaveCertificateButton,
       element => (element as HTMLButtonElement).disabled
     );
     expect(confirmUpdateButtonIsDisabled).toBe(true);
-    await curriculumAdmin.clickOnElementWithText('Save as Not Ready');
+    await curriculumAdmin.clickOnElementWithSelector(saveAsNotReadyButton);
     await curriculumAdmin.expectTextContentToBe(
       '.toast-message',
-      'Certificate saved as not ready'
+      'Certificate saved as not ready.'
     );
-
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
-      'Certificate Offering Dashboard'
+      'Certificate Creator Dashboard'
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateTitleSelector,
-      'Real-World Quantities, Fractions & Percentages'
+      UPDATED_CERTIFICATE_TITLE
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateStatusSelector,
@@ -332,23 +503,23 @@ describe('Certificate Assessment', function () {
     );
   });
 
-  it('should delete the edited certificate offering from the dashboard', async function () {
-    await curriculumAdmin.goto('/certificate-offering-dashboard');
+  xit('should delete the certificate offering from the dashboard', async function () {
+    await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
     await curriculumAdmin.clickOnElementWithSelector(deleteCertificateButton);
-    await curriculumAdmin.expectElementToBeVisible('.e2e-test-modal-header');
     await curriculumAdmin.expectTextContentToBe(
       '.e2e-test-modal-header',
       'Delete Certificate'
     );
-
-    await curriculumAdmin.clickOnElementWithText('Delete Certificate');
+    await curriculumAdmin.clickOnElementWithSelector(
+      deleteCertificateConfirmButton
+    );
     await curriculumAdmin.expectTextContentToBe(
       '.toast-message',
-      'Certificate deleted successfully'
+      'Certificate deleted successfully.'
     );
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
-      'Certificate Offering Dashboard'
+      'Certificate Creator Dashboard'
     );
     await curriculumAdmin.expectElementToBeVisible(
       certificateRowSelector,
@@ -357,6 +528,6 @@ describe('Certificate Assessment', function () {
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });

@@ -52,9 +52,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let row of topicReadinessRows"
+            class="oppia-certificate-offering-review-row e2e-test-topic-readiness-row"
             [class.oppia-certificate-review-row--fail]="!row.isReady">
 
-          <td>{{ row.topicName }}</td>
+          <td class="e2e-test-topic-readiness-name">{{ row.topicName }}</td>
 
           <td [class.oppia-certificate-review-cell--fail]="!row.easySufficient">
             {{ row.easyAvailable }} / {{ row.easyRequired }}
@@ -64,7 +65,8 @@
             {{ row.mediumAvailable }} / {{ row.mediumRequired }}
           </td>
 
-          <td [class.oppia-certificate-review-cell--fail]="!row.hardSufficient">
+          <td class="e2e-test-topic-readiness-hard-cell"
+              [class.oppia-certificate-review-cell--fail]="!row.hardSufficient">
             {{ row.hardAvailable }} / {{ row.hardRequired }}
           </td>
 
@@ -95,7 +97,7 @@
       {{ validationMessage }}
     </p>
     <ng-container *ngIf="!isValid">
-      <p class="oppia-certificate-review-overall-status
+      <p class="oppia-certificate-review-overall-status e2e-test-review-overall-status
                 oppia-certificate-review-overall-status--fail">
         <mat-icon class="oppia-certificate-review-status-icon
                          oppia-certificate-review-status-icon--fail">
@@ -112,7 +114,7 @@
         <strong>What still needs to be fixed:</strong>
       </p>
       <ul class="oppia-certificate-review-errors-list">
-        <li *ngFor="let error of errorMessages" class="oppia-certificate-review-error-item">
+        <li *ngFor="let error of errorMessages" class="oppia-certificate-review-error-item e2e-test-certificate-review-error-item">
           {{ getErrorText(error) }}
         </li>
       </ul>
@@ -150,7 +152,7 @@
     </ng-container>
 
     <ng-container *ngIf="isValid">
-      <p class="oppia-certificate-review-overall-status oppia-certificate-review-overall-status--pass">
+      <p class="oppia-certificate-review-overall-status e2e-test-review-overall-status oppia-certificate-review-overall-status--pass">
         <mat-icon class="oppia-certificate-review-status-icon oppia-certificate-review-status-icon--pass">
           check_circle
         </mat-icon>

@@ -36,6 +36,8 @@ export default {
       'https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-' +
       'in-summer-school-0q6r28fzsrwc',
     CCLicense: 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+    CertificateCreatorDashboard:
+      'http://localhost:8181/certificate-creator-dashboard',
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
