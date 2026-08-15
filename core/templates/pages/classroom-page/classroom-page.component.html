@@ -62,7 +62,7 @@
         </div>
       </div>
       <!-- TODO(#24717-M2.3): Design entry point UI for certificate assessment offering -->
-      <div *ngIf="isCertificateAssessmentEnabled()">
+      <div *ngIf="isCertificateAssessmentEnabled() && isUserLoggedIn">
         <div class="certificate-offering-info">
           <h4>Ready to show what you’ve learned?</h4>
           <p>Take a certificate assessment and earn recognition for what you know.</p>

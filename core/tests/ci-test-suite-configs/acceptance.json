@@ -606,6 +606,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "topic-manager/manage-story-adventures",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/manage-story-adventures.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "topic-manager/create-and-edit-questions-in-skill-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-edit-questions-in-skill-dashboard.spec.ts",
       "framework": "puppeteer"
@@ -713,6 +718,16 @@
     {
       "name": "exploration-editor/delete-lesson-creators-user-profile",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/delete-lesson-creators-user-profile.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "collection-creator/create-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts",
       "framework": "puppeteer"
     }
   ]
