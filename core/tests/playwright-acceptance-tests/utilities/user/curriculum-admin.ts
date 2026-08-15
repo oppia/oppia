@@ -799,8 +799,9 @@ export class CurriculumAdmin extends TopicManager {
     if (reviewMaterial) {
       await this.typeInInputField(richTextAreaField, reviewMaterial);
     }
-    await this.clickOnElementWithText('Save');
-    await this.page.waitForLoadState('networkidle');
+    await this.addWorkedExampleRteComponent('Type the number one', '1');
+    await this.clickOnElementWithSelector(confirmSkillCreationButton);
+    await this.openSkillEditor(description);
     showMessage(`Skill "${description}" created from dashboard.`);
   }
 

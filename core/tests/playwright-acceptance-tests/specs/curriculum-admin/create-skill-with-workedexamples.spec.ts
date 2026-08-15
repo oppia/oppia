@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,30 +16,32 @@
  * @fileoverview Acceptance Test for Creating Skills with multiple workedexamples by a Curriculum Admin.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const ROLES = testConstants.Roles;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
+test.describe.configure({mode: 'serial'});
 
-describe('Curriculum Admin', function () {
+test.describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(DEFAULT_SPEC_TIMEOUT_MSECS);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    // Setup taking longer than 300000 ms.
-  }, 480000);
+  });
 
-  it('should create a skill with multiple workedexamples.', async function () {
+  test('should create a skill with multiple workedexamples.', async function () {
     await curriculumAdmin.createSkillFromTopicsAndSkillsDashboard(
       'Skill 1',
       'hello'
@@ -56,10 +58,7 @@ describe('Curriculum Admin', function () {
       '3'
     );
     await curriculumAdmin.scrollToTopOfPage();
-    await curriculumAdmin.expectScreenshotToMatch(
-      'workedExampleLimitError',
-      __dirname
-    );
+    await curriculumAdmin.expectScreenshotToMatch('workedExampleLimitError');
     await curriculumAdmin.clearRteAndCheckIfErrorDisappears();
     await curriculumAdmin.addWorkedExampleRteComponent(
       'Type the number one',
@@ -76,12 +75,11 @@ describe('Curriculum Admin', function () {
       ['Type the number two', '2'],
     ]);
     await curriculumAdmin.expectScreenshotToMatch(
-      'skillWithWorkedExamplePreview',
-      __dirname
+      'skillWithWorkedExamplePreview'
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
