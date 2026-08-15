@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OpportunityDict} from './contribution-and-review.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';

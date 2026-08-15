@@ -374,6 +374,10 @@ describe('Contributor dashboard page', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('translate_content');
 
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         true;
@@ -386,6 +390,27 @@ describe('Contributor dashboard page', () => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
       expect(component.showEntityTypeSelector()).toBe(false);
+    });
+
+    it('should show the entity type selector on the Translate Text tab whatever was last viewed', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      // The Translate Text tab lists only translation opportunities, so it is
+      // filterable no matter which list the user came from.
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('add_question');
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+
+      component.onTabClick('translateTextTab');
+
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
     });
 
     it('should hide entity type selector for question suggestions', () => {
@@ -408,7 +433,16 @@ describe('Contributor dashboard page', () => {
       activeSuggestionTypeSpy.and.returnValue('translate_content');
       expect(component.showEntityTypeSelector()).toBe(true);
 
+      // The accomplishments pages show contribution stats and badges rather
+      // than a list of suggestions, so there is nothing to filter there.
+      activeSuggestionTypeSpy.and.returnValue('stats');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      activeSuggestionTypeSpy.and.returnValue('badges');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
       // The Submit Question tab has no entity type filter either.
+      activeSuggestionTypeSpy.and.returnValue('translate_content');
       component.onTabClick('submitQuestionTab');
       expect(component.showEntityTypeSelector()).toBe(false);
 

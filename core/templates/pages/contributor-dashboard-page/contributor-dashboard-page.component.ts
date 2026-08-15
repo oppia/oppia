@@ -114,18 +114,18 @@ export class ContributorDashboardPageComponent implements OnInit {
   }
 
   showEntityTypeSelector(): boolean {
-    // Question contributions and reviews live inside the My Contributions tab,
-    // and filtering them by entity type is meaningless, so the selector is
-    // hidden whenever questions are being shown.
-    const userIsViewingQuestionSuggestions =
+    // My Contributions also holds the question lists and the accomplishments
+    // pages, and none of those can be filtered by content type, so the
+    // selector is shown there only while translations are on screen. The
+    // Translate Text tab lists nothing but translation opportunities.
+    const userIsViewingTranslationSuggestions =
       this.contributionAndReviewService.getActiveSuggestionType() ===
-      'add_question';
+      'translate_content';
 
     return (
       (this.activeTabName === 'translateTextTab' ||
-        this.activeTabName === 'myContributionTab' ||
-        !this.activeTabName) &&
-      !userIsViewingQuestionSuggestions &&
+        ((this.activeTabName === 'myContributionTab' || !this.activeTabName) &&
+          userIsViewingTranslationSuggestions)) &&
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     );
