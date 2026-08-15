@@ -67,7 +67,7 @@ const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
-const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const robotsTxtUrl = testConstants.URLs.RobotsTxt;
 const sitemapXmlUrl = testConstants.URLs.SitemapXml;
@@ -217,10 +217,10 @@ const readBlogPostDesktopButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-desktop-button';
 const readBlogPostMobileButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-mobile-button';
-const applyToVolunteerButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
-const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
+const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
 const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
 const tabsPreviousButtonInVolunteerPage =
   '.e2e-test-volunteer-page-tabs-prev-btn';
@@ -2747,28 +2747,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Apply To Volunteer at the top of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the top of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheTopOfVolunteerPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
+      'Explore Volunteer Openings at the top of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
   /**
-   * Function to click the Apply To Volunteer at the bottom of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the bottom of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
-      'Apply To Volunteer at the bottom of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
+      'Explore Volunteer Openings at the bottom of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
@@ -3505,7 +3505,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Volunteer with Oppia on the about page
-   * and check if it opens the Volunteer form.
+   * and check if it opens the Oppia Idealist page.
    */
   async clickVolunteerWithOppiaButtonInAboutPage(): Promise<void> {
     const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
@@ -3513,9 +3513,9 @@ export class LoggedOutUser extends BaseUser {
       : volunteerWithOppiaDesktopButtonInAboutPage;
     await this.clickLinkButtonToNewTab(
       volunteerWithOppiaButtonInAboutPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      'Volunteer with Oppia at the bottom of the About page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
