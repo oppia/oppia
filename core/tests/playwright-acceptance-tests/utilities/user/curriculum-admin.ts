@@ -68,7 +68,8 @@ const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const desktopSkillListItemSelector = '.list-item';
-const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
+const desktopSkillListItemOptions =
+  '.e2e-test-skill-edit-box .skill-edit-box-icon';
 const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const confirmSkillDeletionButton = '.e2e-test-confirm-skill-deletion-button';
 
@@ -526,7 +527,7 @@ export class CurriculumAdmin extends TopicManager {
   async expectToBeInTopicEditor(topicName?: string): Promise<void> {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
     if (topicName) {
-      await this.expectTextContentToBe(oldTopicNameField, topicName);
+      await expect(this.page.locator(oldTopicNameField)).toHaveValue(topicName);
     }
   }
 
@@ -558,7 +559,7 @@ export class CurriculumAdmin extends TopicManager {
       return {
         publishedStoryCount: tds[2]?.textContent?.trim(),
         subtopicCount: tds[3]?.textContent?.trim(),
-        skillsCount: tds[4]?.textContent?.trim(),
+        skillsCount: tds[4]?.textContent?.trim().match(/^\d+/)?.[0],
         topicStatus: tds[5]?.textContent?.trim(),
       };
     }, topicName);
@@ -702,34 +703,24 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(skillsTab);
     await this.expectElementToBeVisible(desktopSkillListItemSelector);
 
-    const skills = await this.page.$$(desktopSkillListItemSelector);
-    for (const skill of skills) {
-      const nameEl = await skill.$(desktopSkillSelector);
-      if (!nameEl) {
-        continue;
-      }
-      const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
-      if (name !== skillName) {
-        continue;
-      }
+    const skillRow = this.page.locator(desktopSkillListItemSelector).filter({
+      has: this.page.locator(desktopSkillSelector, {hasText: skillName}),
+    });
 
-      const editBox = await skill.$(desktopSkillListItemOptions);
-      if (!editBox) {
-        throw new Error('Skill edit button not found.');
-      }
-      await editBox.click();
-
-      await this.expectElementToBeVisible(desktopDeleteSkillButton);
-      await this.clickOnElementWithSelector(desktopDeleteSkillButton);
-
-      await this.expectElementToBeVisible(confirmSkillDeletionButton);
-      await this.clickOnElementWithSelector(confirmSkillDeletionButton);
-      await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
-
-      showMessage(`Skill "${skillName}" has been successfully deleted.`);
-      return;
+    if (!(await skillRow.count())) {
+      throw new Error(`Skill "${skillName}" not found in dashboard.`);
     }
-    throw new Error(`Skill "${skillName}" not found in dashboard.`);
+
+    await skillRow.locator(desktopSkillListItemOptions).click();
+
+    await this.expectElementToBeVisible(desktopDeleteSkillButton);
+    await this.clickOnElementWithSelector(desktopDeleteSkillButton);
+
+    await this.expectElementToBeVisible(confirmSkillDeletionButton);
+    await this.clickOnElementWithSelector(confirmSkillDeletionButton);
+    await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+
+    showMessage(`Skill "${skillName}" has been successfully deleted.`);
   }
 
   async expectSkillNotInTopicsAndSkillsDashboard(

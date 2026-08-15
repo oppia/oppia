@@ -26,6 +26,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const ROLES = testConstants.Roles;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 test.describe.configure({mode: 'serial'});
 
@@ -34,7 +35,7 @@ test.describe('Curriculum Admin', function () {
   let loggedInUser: LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(750000);
+    test.setTimeout(DEFAULT_SPEC_TIMEOUT_MSECS);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
