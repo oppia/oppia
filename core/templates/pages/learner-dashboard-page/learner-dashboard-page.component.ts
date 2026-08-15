@@ -53,6 +53,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './learner-dashboard-page.component.css';
 
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
