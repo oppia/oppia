@@ -35,6 +35,13 @@ const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
+const LESSON_THUMBNAIL_ALT_TEXT_PREFIX = 'Lesson thumbnail for ';
+const DEFAULT_LESSON_THUMBNAIL_ALT_TEXT = 'Lesson thumbnail';
+const STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_PREFIX =
+  'This story is still in ';
+const STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_SUFFIX =
+  ', but you can still play it!';
+const STORY_PLAYBACK_LANGUAGE_MESSAGE_PREFIX = 'The story will be played in ';
 
 export type LessonProgressStatus =
   | 'not_started'
@@ -235,19 +242,21 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
     if (this.isLessonUnavailableInPreferredLanguage()) {
       return (
-        'This story is still in ' +
+        STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_PREFIX +
         selectedLanguageDescription +
-        ', but you can still play it!'
+        STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_SUFFIX
       );
     }
 
-    return 'The story will be played in ' + selectedLanguageDescription + '.';
+    return (
+      STORY_PLAYBACK_LANGUAGE_MESSAGE_PREFIX + selectedLanguageDescription + '.'
+    );
   }
 
   getThumbnailAltText(): string {
     return this.lessonTitle
-      ? 'Lesson thumbnail for ' + this.lessonTitle
-      : 'Lesson thumbnail';
+      ? LESSON_THUMBNAIL_ALT_TEXT_PREFIX + this.lessonTitle
+      : DEFAULT_LESSON_THUMBNAIL_ALT_TEXT;
   }
 
   private initializeLanguageSelection(): void {

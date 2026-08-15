@@ -18,14 +18,11 @@
 
 import {
   Component,
-  ElementRef,
-  HostListener,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   SimpleChanges,
-  ViewChild,
 } from '@angular/core';
 import {Subscription} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
@@ -123,6 +120,10 @@ export class TopicStorySectionComponent
 
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
+  // True when this section is rendered inside the topic editor's preview tab.
+  // Used to offset the sticky adventure navigation below the editor's fixed
+  // header bar.
+  @Input() isInTopicEditorPreview: boolean = false;
 
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
@@ -154,12 +155,6 @@ export class TopicStorySectionComponent
   private pendingNavigationAdventureIndex: number | null = null;
   private completedAdventurePracticeArcIds: Set<string> = new Set();
   private hasHandledArcMasteredQueryParams: boolean = false;
-  private modalFocusRestoreElement: HTMLElement | null = null;
-
-  @ViewChild('arcSkipConfirmationDialog')
-  arcSkipConfirmationDialog!: ElementRef<HTMLElement>;
-  @ViewChild('adventureMasteredDialog')
-  adventureMasteredDialog!: ElementRef<HTMLElement>;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -191,9 +186,7 @@ export class TopicStorySectionComponent
         'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
         {adventureNumber: adventureIndex + 1}
       );
-      this.captureModalFocus();
       this.showArcSkipConfirmationModal = true;
-      this.focusActiveModalDialog();
       return;
     }
 
@@ -205,7 +198,6 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
-    this.restoreModalFocus();
   }
 
   onArcSkipConfirmationProceed(): void {
@@ -226,7 +218,6 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
-    this.restoreModalFocus();
   }
 
   onAdventureMasteredContinue(): void {
@@ -247,91 +238,6 @@ export class TopicStorySectionComponent
     this.showAdventureMasteredModal = false;
     this.masteredAdventureIndex = null;
     this.hasHandledArcMasteredQueryParams = true;
-    this.restoreModalFocus();
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  onDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Escape') {
-      return;
-    }
-    if (this.showArcSkipConfirmationModal) {
-      this.onArcSkipConfirmationCancel();
-    } else if (this.showAdventureMasteredModal) {
-      this.onAdventureMasteredContinue();
-    }
-  }
-
-  onDialogTab(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
-
-    const dialogElement = this.showAdventureMasteredModal
-      ? this.adventureMasteredDialog?.nativeElement
-      : this.arcSkipConfirmationDialog?.nativeElement;
-    if (!dialogElement) {
-      return;
-    }
-
-    const focusableElements = this.getFocusableElements(dialogElement);
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      return;
-    }
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    const activeElement = document.activeElement as HTMLElement | null;
-
-    if (
-      event.shiftKey &&
-      (activeElement === firstFocusable || activeElement === dialogElement)
-    ) {
-      event.preventDefault();
-      lastFocusable.focus();
-    } else if (!event.shiftKey && activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  }
-
-  private getFocusableElements(dialogElement: HTMLElement): HTMLElement[] {
-    const focusableSelector = [
-      'a[href]',
-      'button:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-    ].join(',');
-    return Array.from(
-      dialogElement.querySelectorAll<HTMLElement>(focusableSelector)
-    );
-  }
-
-  private captureModalFocus(): void {
-    this.modalFocusRestoreElement =
-      document.activeElement as HTMLElement | null;
-  }
-
-  private focusActiveModalDialog(): void {
-    // Defer focus so Angular has rendered the dialog into the DOM.
-    setTimeout(() => {
-      const dialogElement = this.showAdventureMasteredModal
-        ? this.adventureMasteredDialog?.nativeElement
-        : this.arcSkipConfirmationDialog?.nativeElement;
-      if (dialogElement) {
-        dialogElement.focus();
-      }
-    }, 0);
-  }
-
-  private restoreModalFocus(): void {
-    if (this.modalFocusRestoreElement) {
-      this.modalFocusRestoreElement.focus();
-    }
-    this.modalFocusRestoreElement = null;
   }
 
   getAdventureMasteredTitle(): string {
@@ -1035,8 +941,6 @@ export class TopicStorySectionComponent
     this.hasHandledArcMasteredQueryParams = true;
     this.showAdventureMasteredModal = true;
     this.masteredAdventureIndex = adventureIndex;
-    this.captureModalFocus();
-    this.focusActiveModalDialog();
   }
 
   private normalizeArcIdFromQueryValue(rawArcId: string): string | null {

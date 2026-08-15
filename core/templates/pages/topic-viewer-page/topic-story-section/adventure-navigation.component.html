@@ -1,4 +1,6 @@
-<div class="adventure-navigation-container" *ngIf="adventureGroups.length > 0">
+<div class="adventure-navigation-container"
+     *ngIf="adventureGroups.length > 0"
+     [style.--adventure-navigation-sticky-top]="isInTopicEditorPreview ? '126px' : null">
   <div class="adventure-navigation-scroll-area">
     <button class="adventure-navigation-arrow adventure-navigation-arrow--left"
             *ngIf="showLeftArrow"

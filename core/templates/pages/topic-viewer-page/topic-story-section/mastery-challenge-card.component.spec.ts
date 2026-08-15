@@ -27,6 +27,9 @@ class MockWindowRef {
     location: {
       assign: (url: string) => {},
     },
+    setTimeout: (callback: () => void, timeout: number): number =>
+      window.setTimeout(callback, timeout),
+    clearTimeout: (timeoutId: number): void => window.clearTimeout(timeoutId),
   };
 }
 

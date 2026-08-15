@@ -286,6 +286,28 @@ describe('Topic Preview Tab Component', () => {
     );
   });
 
+  it('should render the topic viewer content in editor preview mode', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    fixture.detectChanges();
+
+    const viewerContentElement = fixture.nativeElement.querySelector(
+      'topic-viewer-content'
+    );
+    expect(viewerContentElement).not.toBeNull();
+    expect(viewerContentElement.isInTopicEditorPreview).toBeTrue();
+  });
+
+  it('should not render the topic viewer content when the feature is disabled', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      false;
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('topic-viewer-content')
+    ).toBeNull();
+  });
+
   it('should default story description to an empty string when absent', () => {
     const storySummarySpy = jasmine.createSpyObj('StorySummary', [
       'getId',

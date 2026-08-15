@@ -59,6 +59,9 @@ export class TopicViewerContentComponent {
   @Input() activeView: string = this.VIEW_NAMES.STORY;
   @Input() topicIsLoading: boolean = false;
   @Input() subtopics: Subtopic[] = [];
+  // True when this content is rendered inside the topic editor's preview tab,
+  // where the editor's fixed header bar adds height to the header stack.
+  @Input() isInTopicEditorPreview: boolean = false;
 
   trackStoryDataById(
     index: number,

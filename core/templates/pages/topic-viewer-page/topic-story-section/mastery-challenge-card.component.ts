@@ -65,7 +65,7 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   private showHelperTooltip(): void {
     this.showLockedTooltip = true;
     this.clearHelperTooltipTimeout();
-    this.helperTooltipTimeoutId = window.setTimeout(() => {
+    this.helperTooltipTimeoutId = this.windowRef.nativeWindow.setTimeout(() => {
       this.showLockedTooltip = false;
       this.helperTooltipTimeoutId = null;
     }, 5000);
@@ -73,7 +73,7 @@ export class MasteryChallengeCardComponent implements OnDestroy {
 
   private clearHelperTooltipTimeout(): void {
     if (this.helperTooltipTimeoutId !== null) {
-      window.clearTimeout(this.helperTooltipTimeoutId);
+      this.windowRef.nativeWindow.clearTimeout(this.helperTooltipTimeoutId);
       this.helperTooltipTimeoutId = null;
     }
   }

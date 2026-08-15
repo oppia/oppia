@@ -2523,19 +2523,23 @@ div#ng-curtain {
   height: 56px;
 }
 
-/* The topic editor adds a fixed .navbar-helper bar below the global navbar,
-   making the fixed header stack 126px tall. These rules keep the adventure
-   navigation dock below both bars and keep the global navbar visible while
-   scrolling. They are scoped to body.topic-editor-page-active, which is added
-   only when the RedesignedTopicViewerPage feature flag is enabled. */
-@media (min-width: 801px) {
-  /* Keep the topic preview dock below the global and topic editor headers. */
-  body.topic-editor-page-active .e2e-test-topic-preview-tab-container .adventure-navigation-container {
-    top: 126px !important;
+/* The redesigned topic viewer page and the topic editor preview keep the
+   global navbar visible while scrolling instead of letting headroom hide it.
+   The editor preview also adds a fixed .navbar-helper bar below the global
+   navbar, so on mobile headroom would hide the global navbar and leave a gap
+   above the always-visible editor bar. Both rules are scoped to a body class
+   that is added only when the RedesignedTopicViewerPage feature flag is
+   enabled: body.redesigned-topic-viewer-page-active on the learner-facing
+   viewer page (mobile only), and body.topic-editor-page-active in the topic
+   editor. */
+@media (max-width: 768px) {
+  body.redesigned-topic-viewer-page-active
+    topic-viewer-page-root
+    .oppia-navbar.headroom--unpinned {
+    transform: translateY(0%);
   }
 }
 
-/* Keep the global navbar visible while scrolling in topic editor pages. */
 body.topic-editor-page-active .oppia-navbar.headroom--unpinned {
   transform: translateY(0%) !important;
 }

@@ -421,19 +421,19 @@ class PracticeSessionAccessValidationPage(
     ) -> None:
         """Validates that the given node ID exists in the first story.
 
-        The node_id parameter is a 1-based index that maps to the nth node
-        in the first published story of the topic.
+        The node_id parameter maps to a node by its ID suffix (e.g., '1'
+        maps to the node whose id is 'node_1').
 
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID (1-based index) to validate.
+            node_id: str. The node ID suffix (e.g., '1') to validate.
 
         Raises:
             NotFoundException. The node ID was not found.
         """
         all_nodes = self._get_all_nodes_for_topic(topic)
-        valid_indices = {node.id.replace('node_', '') for node in all_nodes}
-        if node_id not in valid_indices:
+        target_node_id = 'node_%s' % node_id
+        if not any(node.id == target_node_id for node in all_nodes):
             raise self.NotFoundException(
                 'Node with id %s is not part of this topic.' % node_id
             )

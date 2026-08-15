@@ -58,6 +58,9 @@ export class AdventureNavigationComponent
 {
   @Input() adventureGroups: AdventureNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
+  // True when this component is rendered inside the topic editor's preview
+  // tab, where the fixed editor header bar adds height to the header stack.
+  @Input() isInTopicEditorPreview: boolean = false;
   @Output() lessonSelected =
     new EventEmitter<AdventureNavigationLessonSelection>();
   @Output() practiceSelected = new EventEmitter<string>();

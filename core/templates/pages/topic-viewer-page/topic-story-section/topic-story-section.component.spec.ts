@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -46,44 +46,8 @@ import {TopicStorySectionComponent} from './topic-story-section.component';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 class MockTranslateService {
-  instant(
-    key: string,
-    params: {[key: string]: string | number | boolean} = {}
-  ): string {
-    const translations: {[key: string]: string} = {
-      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE:
-        "You've mastered all available adventures. Keep the momentum going!",
-      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE:
-        'Keep the momentum going!',
-      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE:
-        'Adventure <[adventureNumber]> Mastered!',
-      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE: 'Adventure Mastered!',
-      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE:
-        "You've unlocked Adventure <[adventureNumber]>. Keep the momentum going!",
-      I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL: 'Adventure <[adventureNumber]>',
-      I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON: 'Resume',
-      I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON: 'Start',
-      I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE:
-        '{count, plural, one{Adventure <[adventureNumbers]> will be marked as skipped, but you can return to it at any time.} other{Adventures <[adventureNumbers]> will be marked as skipped, but you can return to them at any time.}}',
-    };
-
-    let result = translations[key];
-    if (result === undefined) {
-      result = key;
-    }
-
-    if (params.messageFormat === true) {
-      const pluralMatch = result.match(/one\{(.*?)\} other\{(.*?)\}/s);
-      if (pluralMatch) {
-        result = Number(params.count) === 1 ? pluralMatch[1] : pluralMatch[2];
-      }
-    }
-
-    for (const paramName of Object.keys(params)) {
-      result = result.split(`<[${paramName}]>`).join(String(params[paramName]));
-    }
-
-    return result;
+  instant(key: string): string {
+    return key;
   }
 }
 
@@ -113,6 +77,7 @@ describe('TopicStorySectionComponent', () => {
       confirm: jasmine.Spy;
     };
   };
+  let translateService: TranslateService;
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -215,6 +180,8 @@ describe('TopicStorySectionComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicStorySectionComponent);
     component = fixture.componentInstance;
+    translateService = TestBed.inject(TranslateService);
+    spyOn(translateService, 'instant').and.callThrough();
 
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('topic');
@@ -652,6 +619,28 @@ describe('TopicStorySectionComponent', () => {
     expect(component.practiceCard.studyUrl).toBe(
       '/learn/math/topic/studyguide'
     );
+  });
+
+  it('should forward the topic editor preview flag to the adventure navigation', () => {
+    component.isInTopicEditorPreview = true;
+    fixture.detectChanges();
+
+    const navigationElement = fixture.nativeElement.querySelector(
+      'topic-adventure-navigation'
+    );
+    expect(navigationElement).not.toBeNull();
+    expect(navigationElement.isInTopicEditorPreview).toBeTrue();
+  });
+
+  it('should not forward the topic editor preview flag by default', () => {
+    component.isInTopicEditorPreview = false;
+    fixture.detectChanges();
+
+    const navigationElement = fixture.nativeElement.querySelector(
+      'topic-adventure-navigation'
+    );
+    expect(navigationElement).not.toBeNull();
+    expect(navigationElement.isInTopicEditorPreview).toBeFalse();
   });
 
   it('should use fallback practice session url when fragments are missing', () => {
@@ -1602,7 +1591,11 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.showArcSkipConfirmationModal).toBe(true);
     expect(component.getArcSkipConfirmationMessage()).toBe(
-      'Adventure 1 will be marked as skipped, but you can return to it at any time.'
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      {count: 1, adventureNumbers: '1', messageFormat: true}
     );
   });
 
@@ -1616,7 +1609,11 @@ describe('TopicStorySectionComponent', () => {
     component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
 
     expect(component.getArcSkipConfirmationMessage()).toBe(
-      'Adventures 1 and 2 will be marked as skipped, but you can return to them at any time.'
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      {count: 2, adventureNumbers: '1 and 2', messageFormat: true}
     );
   });
 
@@ -1631,7 +1628,11 @@ describe('TopicStorySectionComponent', () => {
     component.onNavigationLessonSelected({lessonNumber: 4, adventureIndex: 3});
 
     expect(component.getArcSkipConfirmationMessage()).toBe(
-      'Adventures 1, 2, and 3 will be marked as skipped, but you can return to them at any time.'
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      {count: 3, adventureNumbers: '1, 2, and 3', messageFormat: true}
     );
   });
 
@@ -1645,7 +1646,11 @@ describe('TopicStorySectionComponent', () => {
     component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
 
     expect(component.getArcSkipConfirmationMessage()).toBe(
-      'Adventure 2 will be marked as skipped, but you can return to it at any time.'
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      {count: 1, adventureNumbers: '2', messageFormat: true}
     );
   });
 
@@ -1673,7 +1678,9 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
     ];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Start');
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+    );
   });
 
   it('should return Resume label for a skipped adventure that was started', () => {
@@ -1681,13 +1688,17 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 1', [createLessonCard(1, 'in_progress')]),
     ];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Resume');
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON'
+    );
   });
 
   it('should return Start label when the adventure group is missing', () => {
     component.visibleAdventureGroups = [];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Start');
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+    );
   });
 
   it('should not persist or restore skipped adventures when story id is missing', () => {
@@ -2537,7 +2548,13 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.showAdventureMasteredModal).toBe(true);
     expect(component.masteredAdventureIndex).toBe(0);
-    expect(component.getAdventureMasteredTitle()).toBe('Adventure 1 Mastered!');
+    expect(component.getAdventureMasteredTitle()).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE',
+      {adventureNumber: 1}
+    );
   }));
 
   it('should handle malformed arc_id query values when showing mastered modal', fakeAsync(() => {
@@ -2645,9 +2662,11 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return default mastered modal text when no adventure is mastered', () => {
-    expect(component.getAdventureMasteredTitle()).toBe('Adventure Mastered!');
+    expect(component.getAdventureMasteredTitle()).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE'
+    );
     expect(component.getAdventureMasteredSubtitle()).toBe(
-      'Keep the momentum going!'
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
     );
   });
 
@@ -2659,7 +2678,11 @@ describe('TopicStorySectionComponent', () => {
     component.masteredAdventureIndex = 0;
 
     expect(component.getAdventureMasteredSubtitle()).toBe(
-      "You've unlocked Adventure 2. Keep the momentum going!"
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE',
+      {adventureNumber: 2}
     );
   });
 
@@ -2670,7 +2693,7 @@ describe('TopicStorySectionComponent', () => {
     component.masteredAdventureIndex = 0;
 
     expect(component.getAdventureMasteredSubtitle()).toBe(
-      "You've mastered all available adventures. Keep the momentum going!"
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
     );
   });
 
@@ -2864,138 +2887,6 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.showAdventureMasteredModal).toBe(false);
   }));
-
-  it('should close the arc skip confirmation modal when Escape is pressed', () => {
-    component.showArcSkipConfirmationModal = true;
-    fixture.detectChanges();
-
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
-
-    expect(component.showArcSkipConfirmationModal).toBe(false);
-  });
-
-  it('should close the adventure mastered modal when Escape is pressed', () => {
-    component.showAdventureMasteredModal = true;
-    fixture.detectChanges();
-
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
-
-    expect(component.showAdventureMasteredModal).toBe(false);
-  });
-
-  it('should ignore Escape when no modal is open and ignore non-Escape keys', () => {
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
-    expect(component.showArcSkipConfirmationModal).toBe(false);
-    expect(component.showAdventureMasteredModal).toBe(false);
-
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
-    expect(component.showArcSkipConfirmationModal).toBe(false);
-    expect(component.showAdventureMasteredModal).toBe(false);
-  });
-
-  it('should move focus into the skip confirmation modal and restore it on close', fakeAsync(() => {
-    const triggerElement = document.createElement('button');
-    document.body.appendChild(triggerElement);
-    triggerElement.focus();
-
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
-    ];
-
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
-
-    expect(component.showArcSkipConfirmationModal).toBe(true);
-
-    fixture.detectChanges();
-    tick();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    expect(document.activeElement).toBe(dialogElement);
-
-    component.onArcSkipConfirmationCancel();
-
-    expect(document.activeElement).toBe(triggerElement);
-    document.body.removeChild(triggerElement);
-  }));
-
-  it('should trap Tab focus within the skip confirmation modal', () => {
-    component.showArcSkipConfirmationModal = true;
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-
-    (buttons[buttons.length - 1] as HTMLElement).focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
-    );
-    expect(document.activeElement).toBe(buttons[0]);
-
-    (buttons[1] as HTMLElement).focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
-    );
-    expect(document.activeElement).toBe(buttons[1]);
-
-    (buttons[0] as HTMLElement).focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true, bubbles: true})
-    );
-    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
-  });
-
-  it('should move focus to the last element on Shift+Tab when the dialog is focused', () => {
-    component.showArcSkipConfirmationModal = true;
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-
-    dialogElement.focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true, bubbles: true})
-    );
-
-    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
-  });
-
-  it('should do nothing on Tab when no dialog is open', () => {
-    const event = new KeyboardEvent('keydown', {key: 'Tab'});
-
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(false);
-  });
-
-  it('should do nothing when a non-Tab key is pressed on the dialog', () => {
-    const event = new KeyboardEvent('keydown', {key: 'Enter'});
-
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(false);
-  });
-
-  it('should prevent Tab navigation when the dialog has no focusable elements', () => {
-    component.showAdventureMasteredModal = true;
-    component.adventureMasteredDialog = new ElementRef(
-      document.createElement('div')
-    );
-
-    const event = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      cancelable: true,
-    });
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(true);
-  });
 
   it('should not show the mastered modal again after it has been handled', fakeAsync(() => {
     const createNode = (nodeId: string, title: string) => {
