@@ -250,7 +250,7 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         """Creates a JobRunResult for a migrated model."""
         verb = 'Migrated' if self.DATASTORE_UPDATES_ALLOWED else 'Would migrate'
         return job_run_result.JobRunResult.as_stdout(
-            '%s legacy feedback thread into lesson feedback: feedback ID=%s'
+            '%s legacy feedback thread into lesson feedback: feedback_id=%s'
             % (verb, feedback_model.id)
         )
 
