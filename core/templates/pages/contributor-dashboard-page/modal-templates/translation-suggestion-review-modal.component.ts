@@ -359,10 +359,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.reviewMessage = '';
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId).then(() => {
-        // No review message and no exploration content means the suggestion
-        // became obsolete and was auto-rejected in a batch job. See issue
-        // #16022.
-        if (!this.reviewMessage && !this.entityContentHtml) {
+        // No review message and no entity content means the suggestion became
+        // obsolete and was auto-rejected in a batch job. See issue #16022.
+        // Only explorations are auto-rejected that way, and only exploration
+        // suggestions carry entity content at all, so the absence of content
+        // says nothing about a suggestion of any other entity type.
+        if (
+          this.activeSuggestion.target_type ===
+            AppConstants.ENTITY_TYPE.EXPLORATION &&
+          !this.reviewMessage &&
+          !this.entityContentHtml
+        ) {
           this.reviewMessage =
             AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG;
         }

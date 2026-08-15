@@ -427,10 +427,18 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     initialSuggestionId: string,
     reviewable: boolean
   ): void {
-    const details = this.contributions[initialSuggestionId]
-      .details as ContributionDetails;
+    const contribution = this.contributions[
+      initialSuggestionId
+    ] as SuggestionDetails;
+    const details = contribution.details as ContributionDetails;
     let subheading = '';
     if (
+      contribution.suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+    ) {
+      // A skill's opportunity carries its description rather than the topic
+      // and chapter that an exploration's opportunity does.
+      subheading = details.skill_description || '';
+    } else if (
       this.featureService.status.EnableTranslationOppsWithNewOppModels.isEnabled
     ) {
       subheading = details.topic_name + ' / ' + details.entity_description;

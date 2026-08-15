@@ -1965,7 +1965,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2110,6 +2110,25 @@ describe('Translation Suggestion Review Modal Component', function () {
         AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG
       );
     }));
+
+    it('should not set Obsolete review message for a suggestion that is not an exploration', fakeAsync(function () {
+      spyOn(threadDataBackendApiService, 'fetchMessagesAsync').and.returnValue(
+        Promise.resolve({messages: []})
+      );
+      // Only exploration suggestions carry entity content and only they are
+      // auto-rejected when their content is deleted, so a skill suggestion
+      // without content must not be reported as obsolete.
+      component.suggestionIdToContribution.suggestion_3.suggestion.target_type =
+        AppConstants.ENTITY_TYPE.SKILL;
+      component.initialSuggestionId = 'suggestion_3';
+
+      component.ngOnInit();
+      component.refreshActiveContributionState();
+      tick();
+
+      expect(component.entityContentHtml).toBeNull();
+      expect(component.reviewMessage).toBe('');
+    }));
   });
 
   describe('when viewing suggestion', function () {
@@ -2175,7 +2194,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {

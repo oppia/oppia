@@ -3452,7 +3452,7 @@ describe('Contributions and review component', () => {
     it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         true;
-      const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      const modalRef = {
         componentInstance: {
           suggestionIdToContribution: null,
           initialSuggestionId: null,
@@ -3462,7 +3462,8 @@ describe('Contributions and review component', () => {
           queuedSuggestionEmit: new EventEmitter(),
         },
         result: Promise.resolve([]),
-      } as NgbModalRef);
+      } as NgbModalRef;
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
       component.contributions = {
         suggestion_1: {
           suggestion: {
@@ -3502,6 +3503,55 @@ describe('Contributions and review component', () => {
       );
 
       expect(modalSpy).toHaveBeenCalled();
+      expect(modalRef.componentInstance.subheading).toBe(
+        'Topic / Entity Description'
+      );
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    }));
+
+    it('should open translation suggestion modal with the skill description as its subheading', fakeAsync(() => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const modalRef = {
+        componentInstance: {
+          suggestionIdToContribution: null,
+          initialSuggestionId: null,
+          reviewable: null,
+          subheading: null,
+          queuedSuggestionSummaryEmit: new EventEmitter(),
+          queuedSuggestionEmit: new EventEmitter(),
+        },
+        result: Promise.resolve([]),
+      } as NgbModalRef;
+      spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      // A skill's opportunity carries a description instead of the topic and
+      // chapter that an exploration's opportunity carries.
+      const skillContribution = {
+        suggestion: {
+          suggestion_id: 'suggestion_1',
+          target_type: AppConstants.ENTITY_TYPE.SKILL,
+          status: 'review',
+          change_cmd: {
+            content_html: 'Content 1',
+            translation_html: 'Translation 1',
+          },
+        } as unknown as Suggestion,
+        details: {
+          skill_description: 'Skill description',
+        } as unknown as ContributionDetails,
+      };
+      component.contributions = {
+        suggestion_1: skillContribution,
+      } as unknown as Record<string, SuggestionDetails>;
+
+      component._showTranslationSuggestionModal(
+        {suggestion_1: skillContribution},
+        'suggestion_1',
+        true
+      );
+
+      expect(modalRef.componentInstance.subheading).toBe('Skill description');
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
     }));
