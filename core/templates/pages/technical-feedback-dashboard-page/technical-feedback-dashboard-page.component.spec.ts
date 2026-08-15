@@ -42,7 +42,10 @@ import {AppConstants} from 'app.constants';
 import {BehaviorSubject} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ReportType} from '../../domain/feedback/feedback.model';
+import {
+  CreatorFeedbackType,
+  ReportType,
+} from '../../domain/feedback/feedback.model';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
@@ -123,6 +126,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
       searchText: '',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
       dateRange: {
         start: null,
         end: null,
