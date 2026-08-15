@@ -173,6 +173,50 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.rearrangeNodeInList(event.previousIndex, event.currentIndex);
   }
 
+  private ensureArcMembershipForNodes(): void {
+    if (
+      !this.isStoryEditorArcsFeatureFlagEnabled() ||
+      !this.storyContents ||
+      this.storyContents.getNodes().length === 0
+    ) {
+      return;
+    }
+
+    const nodeIds = this.storyContents.getNodes().map(node => node.getId());
+    const arcs = this.storyContents.getArcs();
+
+    // Backfill a default arc for stories that predate arc data.
+    if (arcs.length === 0) {
+      this.storyContents.addArc(
+        ArcModel.createNew(
+          'arc_' + Date.now().toString(),
+          'All Chapters',
+          '',
+          nodeIds
+        )
+      );
+      return;
+    }
+
+    const validNodeIdSet = new Set(nodeIds);
+    const coveredNodeIds = new Set<string>();
+
+    arcs.forEach(arc => {
+      // Remove stale node references that are no longer in story contents.
+      const normalizedNodeIds = arc
+        .getNodeIds()
+        .filter(id => validNodeIdSet.has(id));
+      arc.setNodeIds(normalizedNodeIds);
+      normalizedNodeIds.forEach(id => coveredNodeIds.add(id));
+    });
+
+    const missingNodeIds = nodeIds.filter(id => !coveredNodeIds.has(id));
+    if (missingNodeIds.length > 0) {
+      const firstArcNodeIds = arcs[0].getNodeIds();
+      arcs[0].setNodeIds([...firstArcNodeIds, ...missingNodeIds]);
+    }
+  }
+
   moveNodeUpInStory(index: number): void {
     this.toggleChapterEditOptions(-1);
     this.rearrangeNodeInList(index, index - 1);
@@ -297,6 +341,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     const arc = this.storyContents.getArcs()[arcIndex];
     const modalRef = this.ngbModal.open(EditArcModalComponent, {
       backdrop: 'static',
+      windowClass: 'oppia-edit-arc-modal',
     });
     modalRef.componentInstance.arcTitle = arc.getTitle();
     modalRef.componentInstance.arcDescription = arc.getDescription();
@@ -372,6 +417,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.story = this.storyEditorStateService.getStory();
     if (this.story) {
       this.storyContents = this.story.getStoryContents();
+      this.ensureArcMembershipForNodes();
       this.disconnectedNodes = [];
       this.linearNodesList = [];
       this.nodes = [];

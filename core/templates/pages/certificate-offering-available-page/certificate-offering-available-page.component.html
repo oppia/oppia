@@ -73,11 +73,11 @@
               {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_NOT_ATTEMPTED' | translate }}
             </span>
 
-            <p *ngIf="certificate.status === 'passed'"
+            <p *ngIf="certificate.status === 'passed' && certificate.passedOnDate"
                class="oppia-certificate-offering-available-page-status-date">
               {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON' | translate: { date: certificate.passedOnDate } }}
             </p>
-            <p *ngIf="certificate.status === 'failed'"
+            <p *ngIf="certificate.status === 'failed' && certificate.failedOnDate"
                class="oppia-certificate-offering-available-page-status-date">
               {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON' | translate: { date: certificate.failedOnDate } }}
             </p>
