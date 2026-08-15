@@ -18,12 +18,13 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicPreviewTabComponent} from './topic-preview-tab.component';
 import {Subject} from 'rxjs';
@@ -38,29 +39,18 @@ describe('Topic Preview Tab Component', () => {
   let topicUrl = 'topic_1';
   let mockUrl = 'mock_url';
   let storySummaries = [
-    new StorySummary(
-      'id',
-      'title',
-      [],
-      'thumbnailFilename',
-      'thumbnailBgColor',
-      'description',
-      false,
-      [],
-      'url',
-      [],
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0,
-      [],
-      0,
-      [],
-      undefined
-    ),
+    StorySummary.createFromBackendDict({
+      id: 'id',
+      title: 'title',
+      node_titles: [],
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      description: 'description',
+      story_is_published: true,
+      completed_node_titles: [],
+      url_fragment: '',
+      all_node_dicts: [],
+    }),
   ];
 
   class MockTopicEditorStateService {
@@ -130,12 +120,8 @@ describe('Topic Preview Tab Component', () => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
 
     TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        MaterialModule,
-        TranslateModule.forRoot(),
-      ],
-      declarations: [TopicPreviewTabComponent],
+      imports: [BrowserAnimationsModule, MaterialModule],
+      declarations: [TopicPreviewTabComponent, MockTranslatePipe],
       providers: [
         MockTopicEditorStateService,
         {

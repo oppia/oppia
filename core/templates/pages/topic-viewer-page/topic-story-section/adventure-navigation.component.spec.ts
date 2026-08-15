@@ -80,18 +80,11 @@ describe('AdventureNavigationComponent', () => {
     const container = fixture.nativeElement.querySelector(
       '.adventure-navigation-container'
     );
-    // eslint-disable-next-line no-console
-    console.log(
-      'DEBUG-ADVNAV outerHTML:',
-      container.outerHTML,
-      'prop:',
-      container.style.getPropertyValue('--adventure-navigation-sticky-top'),
-      'isInPreview:',
-      component.isInTopicEditorPreview
-    );
     expect(
-      container.style.getPropertyValue('--adventure-navigation-sticky-top')
-    ).toBe('126px');
+      container.classList.contains(
+        'adventure-navigation-container--editor-preview'
+      )
+    ).toBeTrue();
 
     tick(500);
   }));
@@ -113,8 +106,10 @@ describe('AdventureNavigationComponent', () => {
       '.adventure-navigation-container'
     );
     expect(
-      container.style.getPropertyValue('--adventure-navigation-sticky-top')
-    ).toBe('');
+      container.classList.contains(
+        'adventure-navigation-container--editor-preview'
+      )
+    ).toBeFalse();
 
     tick(500);
   }));

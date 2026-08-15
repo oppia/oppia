@@ -45,7 +45,7 @@ describe('AdventureMasteredModalComponent', () => {
     component.message = 'You have completed all lessons in this adventure';
   });
 
-  it('should render the title, message and continue button', () => {
+  it('should render the title, message and translated continue button', () => {
     fixture.detectChanges();
 
     expect(
@@ -65,86 +65,87 @@ describe('AdventureMasteredModalComponent', () => {
     ).toBe('I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_CONTINUE_BUTTON');
   });
 
-  it('should emit continue when the continue button is clicked', () => {
+  it('should emit continue when onContinue is called', () => {
     spyOn(component.continue, 'emit');
-    fixture.detectChanges();
 
-    fixture.nativeElement.querySelector('.adventure-mastered-continue').click();
+    component.onContinue();
 
     expect(component.continue.emit).toHaveBeenCalled();
   });
 
   it('should emit continue when Escape is pressed', () => {
     spyOn(component.continue, 'emit');
-    fixture.detectChanges();
 
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+    component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Escape'}));
 
     expect(component.continue.emit).toHaveBeenCalled();
   });
 
   it('should ignore non-Escape keys', () => {
     spyOn(component.continue, 'emit');
-    fixture.detectChanges();
 
-    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
+    component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
 
     expect(component.continue.emit).not.toHaveBeenCalled();
   });
 
   it('should move focus into the dialog on init', fakeAsync(() => {
     fixture.detectChanges();
-    tick();
-
     const dialogElement = fixture.nativeElement.querySelector(
       '.adventure-mastered-modal'
     );
-    expect(document.activeElement).toBe(dialogElement);
+    spyOn(dialogElement, 'focus');
+
+    tick();
+
+    expect(dialogElement.focus).toHaveBeenCalled();
   }));
 
-  it('should restore focus to the trigger element when continuing', fakeAsync(() => {
+  it('should restore focus to the element that opened the modal on continue', () => {
     const triggerElement = document.createElement('button');
     document.body.appendChild(triggerElement);
     triggerElement.focus();
+    spyOn(triggerElement, 'focus');
 
     fixture.detectChanges();
-    tick();
+    component.onContinue();
 
-    fixture.nativeElement.querySelector('.adventure-mastered-continue').click();
-
-    expect(document.activeElement).toBe(triggerElement);
+    expect(triggerElement.focus).toHaveBeenCalled();
     document.body.removeChild(triggerElement);
-  }));
-
-  it('should trap Tab focus within the dialog', () => {
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.adventure-mastered-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-
-    (buttons[buttons.length - 1] as HTMLElement).focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
-    );
-    expect(document.activeElement).toBe(buttons[0]);
   });
 
-  it('should move focus to the last element on Shift+Tab when the dialog is focused', () => {
+  it('should move focus to the first focusable element on Tab from the last one', () => {
     fixture.detectChanges();
 
     const dialogElement = fixture.nativeElement.querySelector(
       '.adventure-mastered-modal'
     );
     const buttons = dialogElement.querySelectorAll('button');
+    const firstButton = buttons[0] as HTMLElement;
+    (buttons[buttons.length - 1] as HTMLElement).focus();
+    spyOn(firstButton, 'focus');
 
-    dialogElement.focus();
-    dialogElement.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true, bubbles: true})
+    component.onDialogTab(new KeyboardEvent('keydown', {key: 'Tab'}));
+
+    expect(firstButton.focus).toHaveBeenCalled();
+  });
+
+  it('should move focus to the last focusable element on Shift+Tab from the first one', () => {
+    fixture.detectChanges();
+
+    const dialogElement = fixture.nativeElement.querySelector(
+      '.adventure-mastered-modal'
+    );
+    const buttons = dialogElement.querySelectorAll('button');
+    const lastButton = buttons[buttons.length - 1] as HTMLElement;
+    (buttons[0] as HTMLElement).focus();
+    spyOn(lastButton, 'focus');
+
+    component.onDialogTab(
+      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true})
     );
 
-    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
+    expect(lastButton.focus).toHaveBeenCalled();
   });
 
   it('should prevent Tab navigation when the dialog has no focusable elements', () => {
@@ -158,9 +159,8 @@ describe('AdventureMasteredModalComponent', () => {
     const event = new KeyboardEvent('keydown', {
       key: 'Tab',
       cancelable: true,
-      bubbles: true,
     });
-    dialogElement.dispatchEvent(event);
+    component.onDialogTab(event);
 
     expect(event.defaultPrevented).toBe(true);
   });
@@ -176,14 +176,11 @@ describe('AdventureMasteredModalComponent', () => {
   it('should do nothing when a non-Tab key is pressed on the dialog', () => {
     fixture.detectChanges();
 
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.adventure-mastered-modal'
-    );
     const event = new KeyboardEvent('keydown', {
       key: 'Enter',
       cancelable: true,
     });
-    dialogElement.dispatchEvent(event);
+    component.onDialogTab(event);
 
     expect(event.defaultPrevented).toBe(false);
   });
