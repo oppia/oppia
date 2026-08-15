@@ -62,8 +62,9 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
-const navigationDropdownInMobileVisibleSelector =
-  '.oppia-exploration-editor-tabs-dropdown.show';
+// Used by the commented-out block below.
+// const navigationDropdownInMobileVisibleSelector =
+//   '.oppia-exploration-editor-tabs-dropdown.show';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -115,29 +116,29 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Close dropdown if it doesn't automatically close.
-      const isVisible = await this.isElementVisible(
-        navigationDropdownInMobileVisibleSelector
-      );
-      if (isVisible) {
-        // We are using page.click as this button might be overlapped by the
-        // dropdown. Thus, it will fail with onClick.
-        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
-        await this.page.click(mobileNavbarDropdown);
-        try {
-          await this.page.waitForSelector(
-            navigationDropdownInMobileVisibleSelector,
-            {state: 'hidden', timeout: 10000}
-          );
-        } catch (error) {
-          await this.clickOnElementWithSelector(mobileNavbarDropdown);
-          await this.page.waitForSelector(
-            navigationDropdownInMobileVisibleSelector,
-            {state: 'hidden'}
-          );
-        }
-        // Ensure layout fully stabilized.
-        await this.waitForPageToFullyLoad();
-      }
+      // const isVisible = await this.isElementVisible(
+      //   navigationDropdownInMobileVisibleSelector
+      // );
+      // if (isVisible) {
+      //   // We are using page.click as this button might be overlapped by the
+      //   // dropdown. Thus, it will fail with onClick.
+      //   // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+      //   await this.page.click(mobileNavbarDropdown);
+      //   try {
+      //     await this.page.waitForSelector(
+      //       navigationDropdownInMobileVisibleSelector,
+      //       {state: 'hidden', timeout: 10000}
+      //     );
+      //   } catch (error) {
+      //     await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      //     await this.page.waitForSelector(
+      //       navigationDropdownInMobileVisibleSelector,
+      //       {state: 'hidden'}
+      //     );
+      //   }
+      //   // Ensure layout fully stabilized.
+      //   await this.waitForPageToFullyLoad();
+      // }
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
       // Only click on dropdowns that are visible (some may not be visible to certain roles).
@@ -293,7 +294,7 @@ export class VoiceoverAdmin extends BaseUser {
     if (!removeBtn) {
       throw new Error('Remove button not found.');
     }
-    await removeBtn.click();
+    await this.clickOnElement(removeBtn);
 
     // Click confirm button in the "Are you sure?" modal.
     const confirmButtonSelector = '.e2e-test-confirm-action-button';
@@ -366,9 +367,7 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async getAllVoiceoverArtists(): Promise<string[]> {
     // Wait for the list to be attached to DOM (not necessarily visible - it's hidden when empty).
-    await this.page.waitForSelector(allVoiceoverArtistsList, {
-      state: 'attached',
-    });
+    await this.expectElementToBeAttachedInDOM(allVoiceoverArtistsList);
     const voiceoverArtists = await this.page.$$eval(
       updatedVoiceoverArtist,
       (elements: Element[]) =>

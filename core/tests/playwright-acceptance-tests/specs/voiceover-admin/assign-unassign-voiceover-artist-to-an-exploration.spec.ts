@@ -37,14 +37,14 @@ enum INTERACTION_TYPES {
 // voiceover artist (see the Puppeteer version of this spec for reference).
 // The frontend toast message for this case is asserted directly below.
 
-test.describe.configure({mode: 'serial'});
-
 // ConsoleReporter.setConsoleErrorsToIgnore([
 //   new RegExp(
 //     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
 //   ),
 //   new RegExp('Sorry, we could not find the specified user.'),
 // ]);
+
+test.describe.configure({mode: 'serial'});
 
 test.describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
