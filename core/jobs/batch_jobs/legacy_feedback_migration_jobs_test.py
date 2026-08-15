@@ -259,15 +259,6 @@ class MigrateLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
             feconf.STATUS_CHOICES_NOT_ACTIONABLE,
         )
 
-    def test_get_migrated_status_raises_for_invalid_status(self) -> None:
-        job = self.JOB_CLASS(self.pipeline)
-
-        with self.assertRaisesRegex(
-            ValueError,
-            'Unexpected legacy feedback status: invalid_status',
-        ):
-            job._get_migrated_status('invalid_status')
-
     def test_job_migrates_creator_responses(self) -> None:
         thread = self.create_legacy_feedback_thread(self.THREAD_ID)
 

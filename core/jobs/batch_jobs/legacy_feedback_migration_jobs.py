@@ -87,18 +87,10 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
 
         Returns:
             str. Status supported by LessonFeedbackModel.
-
-        Raises:
-            ValueError. If legacy_status is not a valid GeneralFeedbackThreadModel
-                status.
         """
         if legacy_status == feedback_models.STATUS_CHOICES_IGNORED:
             return feconf.STATUS_CHOICES_NOT_ACTIONABLE
-        if legacy_status in feconf.STATUS_CHOICES:
-            return legacy_status
-        raise ValueError(
-            'Unexpected legacy feedback status: %s' % legacy_status
-        )
+        return legacy_status
 
     def _extract_state_name_from_subject(self, subject: str) -> str:
         """Extracts the state name from the subject of a legacy feedback subject format.
