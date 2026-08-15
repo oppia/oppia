@@ -1423,9 +1423,19 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(saveChangesButtonSelector, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
+    await this.clickOnElementWithSelector(saveChangesButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(selector);
+        return Boolean(button) && (button as HTMLButtonElement).disabled;
+      },
+      {},
+      saveChangesButtonSelector
+    );
+
     const isDisabled = await this.page.$eval(
-      `button${saveChangesButtonSelector}`,
+      saveChangesButtonSelector,
       btn => (btn as HTMLButtonElement).disabled
     );
     if (!isDisabled) {
@@ -4488,7 +4498,16 @@ export class LoggedInUser extends BaseUser {
    */
   async openLessonInfoModal(): Promise<void> {
     await this.expectElementToBeVisible(lessonInfoButton, true);
-    await this.clickOnElementWithSelector(lessonInfoButton);
+    const button = await this.page.waitForSelector(lessonInfoButton, {
+      visible: true,
+    });
+    await button?.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      el?.click();
+    }, lessonInfoButton);
     await this.expectElementToBeVisible(lessonInfoCardSelector, true);
   }
 
