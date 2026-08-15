@@ -30,10 +30,12 @@ import {TeachOppiaModalComponent} from '../templates/modal-templates/teach-oppia
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {ExternalSaveService} from 'services/external-save.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './unresolved-answers-overview.component.css';
 
 @Component({
   selector: 'oppia-unresolved-answers-overview',
   templateUrl: './unresolved-answers-overview.component.html',
+  styleUrls: ['./unresolved-answers-overview.component.css'],
 })
 export class UnresolvedAnswersOverviewComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

@@ -809,14 +809,44 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
-    await this.page.keyboard.press('Backspace');
+
+    const isTextInput = await element.evaluate(
+      el => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+    );
+
+    if (isTextInput) {
+      // Click the field to move the pointer (so hover-paused toasts dismiss)
+      // and to focus it before clearing, matching the keyboard-only behavior.
+      await element.click();
+
+      // Clear via the native value setter and an input event to update ngModel
+      // deterministically without depending on focus/selection timing. Do not
+      // dispatch 'change' here: change-bound editors (e.g. the URL fragment
+      // editor) would commit an empty value to their model before the user
+      // types; the native 'change' fires on the next blur with the full value.
+      await element.evaluate(el => {
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          el instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        valueSetter?.call(el, '');
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+      });
+    } else {
+      // Rich-text editors (e.g. CKEditor) expose contenteditable divs, which
+      // cannot be cleared by setting their text directly without desyncing the
+      // editor's internal model. Clear them with real keyboard events instead.
+      await element.click();
+      await this.page.keyboard.down('Control');
+      await this.page.keyboard.press('A');
+      await this.page.keyboard.up('Control');
+      await this.page.keyboard.press('Backspace');
+    }
   }
 
   /**
@@ -881,6 +911,19 @@ export class BaseUser {
     await this.waitForElementToStabilize(selector);
 
     await element.type(text);
+  }
+
+  /**
+   * Checks if the value of text input with the given selector is equal to the given value.
+   * @param selector - The selector of the text input.
+   * @param value - The expected value of the text input.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const element = await this.page.$(selector);
+    expect(await element?.evaluate(el => (el as HTMLInputElement).value)).toBe(
+      value
+    );
   }
 
   /**
@@ -1341,15 +1384,17 @@ export class BaseUser {
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
    * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
-   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
-   * almost all cases and for the page to fully load.
+   * idle within a certain timeframe.
    *
-   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * The default timeout is intentionally short because this helper is best-effort; on busy CI runners, a long default timeout
+   * can significantly inflate total setup time across many calls.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 5000, idleTime: 500}.
    * @param {Page} page The page to wait for network idle. Defaults to the current page.
    */
   async waitForNetworkIdle(
     options: {timeout?: number; idleTime?: number} = {
-      timeout: 30000,
+      timeout: 5000,
       idleTime: 500,
     },
     page: Page = this.page
