@@ -555,11 +555,7 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts",
       "framework": "puppeteer"
     },
-    {
-      "name": "blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles.spec.ts",
-      "framework": "puppeteer"
-    },
+
     {
       "name": "blog-post-writer/register-and-update-blog-profile",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts",
