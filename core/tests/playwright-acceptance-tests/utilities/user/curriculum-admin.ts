@@ -56,6 +56,39 @@ const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const enableDiagnosticTestButton =
   '.e2e-test-toggle-diagnostic-test-status-btn';
 
+const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
+const oldTopicNameField = '.e2e-test-topic-name-field';
+const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
+const topicAndSkillsDashboardSelector = '.e2e-test-topics-and-skills-dashboard';
+const skillEditorSelector = '.e2e-test-skill-editor';
+
+const desktopTopicListItemSelector = '.list-item';
+const desktopTopicListItemOptions = '.e2e-test-topic-edit-box';
+const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
+const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
+
+const desktopSkillListItemSelector = '.list-item';
+const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
+const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
+const confirmSkillDeletionButton = '.e2e-test-confirm-skill-deletion-button';
+
+const removeQuestion = '.link-off-icon';
+const removeQuestionConfirmationButton =
+  '.e2e-test-remove-question-confirmation-button';
+
+const createNewSkillButton = '.e2e-test-create-skill-button';
+const createNewSkillButtonInSkillDashboardSelector =
+  '.e2e-test-create-skill-button-circle';
+
+const errorPageHeading = '.e2e-test-error-page-heading';
+const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
+
+const editConceptCard = '.e2e-test-edit-concept-card';
+const moreThanTwoWorkedExamplesError = '.e2e-test-more-than-2-workedexamples';
+const saveReviewMaterialButton = '.e2e-test-save-concept-card';
+const publishSkillButton = '.e2e-test-publish-skill-changes-button';
+const skillPreviewTabButton = '.e2e-test-question-preview-tab';
+
 const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
 const classroomDetailsSelector = '.e2e-test-classroom-details';
 const classroomNameSelector = '.e2e-test-classroom-name-view';
@@ -488,6 +521,387 @@ export class CurriculumAdmin extends TopicManager {
     }
 
     throw new Error(`${classroomName} classroom does not exist.`);
+  }
+
+  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+    if (topicName) {
+      await this.expectTextContentToBe(oldTopicNameField, topicName);
+    }
+  }
+
+  async expectToBeInTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.expectElementToBeVisible(topicAndSkillsDashboardSelector);
+  }
+
+  async expectTopicToBePublishedInTopicsAndSkillsDashboard(
+    topicName: string,
+    expectedPublishedStoryCount: number,
+    expectedSubtopicCount: number,
+    expectedSkillsCount: number
+  ): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.expectElementToBeVisible('.e2e-test-topics-table');
+
+    const topicDetails = await this.page.evaluate(topicName => {
+      const items = Array.from(document.querySelectorAll('.list-item'));
+      const topicRow = items.find(item => {
+        return (
+          item.querySelector('.e2e-test-topic-name')?.textContent?.trim() ===
+          topicName
+        );
+      });
+      if (!topicRow) {
+        throw new Error(`Topic "${topicName}" not found in dashboard.`);
+      }
+      const tds = Array.from(topicRow.querySelectorAll('td'));
+      return {
+        publishedStoryCount: tds[2]?.textContent?.trim(),
+        subtopicCount: tds[3]?.textContent?.trim(),
+        skillsCount: tds[4]?.textContent?.trim(),
+        topicStatus: tds[5]?.textContent?.trim(),
+      };
+    }, topicName);
+
+    expect(topicDetails.topicStatus).toEqual('Published');
+    expect(topicDetails.publishedStoryCount).toEqual(
+      expectedPublishedStoryCount.toString()
+    );
+    expect(topicDetails.subtopicCount).toEqual(
+      expectedSubtopicCount.toString()
+    );
+    expect(topicDetails.skillsCount).toEqual(expectedSkillsCount.toString());
+    showMessage('Topic has been published successfully!');
+  }
+
+  async expectUnpublishTopicButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(unpublishTopicButton);
+  }
+
+  async navigateToSkillsTab(): Promise<void> {
+    await this.expectElementToBeVisible(skillsTab);
+    await this.clickOnElementWithSelector(skillsTab);
+
+    const skillsVisible = await this.isElementVisible(desktopSkillSelector);
+    const noSkillsVisible = await this.isElementVisible(
+      noSkillsPresentMessageSelector
+    );
+    if (!skillsVisible && !noSkillsVisible) {
+      throw new Error('Skills tab content not loaded.');
+    }
+  }
+
+  async clickOnCreateNewSkillButtonInSkillDashboard(): Promise<void> {
+    await this.expectElementToBeVisible(
+      createNewSkillButtonInSkillDashboardSelector
+    );
+    await this.clickOnElementWithSelector(
+      createNewSkillButtonInSkillDashboardSelector
+    );
+    await this.expectElementToBeVisible(
+      '.e2e-test-new-skill-description-field'
+    );
+  }
+
+  async fillSkillDetailsInNewSkillModal(
+    description: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(skillDescriptionField);
+    await this.typeInInputField(skillDescriptionField, description);
+    await this.expectElementToBeVisible(skillReviewMaterialHeader);
+    await this.clickOnElementWithSelector(skillReviewMaterialHeader);
+    await this.clickOnElementWithSelector(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
+  }
+
+  async clickOnElementAndGetNewPage(text: string): Promise<Page> {
+    const newPagePromise = this.page.context().waitForEvent('page');
+    await this.clickOnElementWithText(text);
+    const newPage = await newPagePromise;
+    await newPage.waitForLoadState('networkidle');
+    return newPage;
+  }
+
+  async expectToBeInSkillEditorPage(page: Page = this.page): Promise<void> {
+    await page.waitForSelector(skillEditorSelector, {state: 'visible'});
+    showMessage('Navigated to skill editor page successfully.');
+  }
+
+  async unpublishTopic(topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.clickOnElementWithSelector(unpublishTopicButton);
+    await this.page.reload({waitUntil: 'networkidle'});
+
+    const isUnpublishPresent =
+      await this.isTextPresentOnPage('Unpublish Topic');
+    if (isUnpublishPresent) {
+      throw new Error('Topic is not unpublished successfully.');
+    }
+    showMessage(`Topic "${topicName}" has been unpublished.`);
+  }
+
+  async deleteTopic(topicName: string): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(topicsTab);
+    await this.expectElementToBeVisible(desktopTopicListItemSelector);
+
+    const topics = await this.page.$$(desktopTopicListItemSelector);
+    for (const topic of topics) {
+      const nameEl = await topic.$(desktopTopicSelector);
+      if (!nameEl) {
+        continue;
+      }
+      const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+      if (name !== topicName) {
+        continue;
+      }
+
+      const editBox = await topic.$(desktopTopicListItemOptions);
+      if (!editBox) {
+        throw new Error('Topic edit button not found.');
+      }
+      await editBox.click();
+
+      await this.expectElementToBeVisible(desktopDeleteTopicButton);
+      await this.clickOnElementWithSelector(desktopDeleteTopicButton);
+
+      await this.expectElementToBeVisible(confirmTopicDeletionButton);
+      await this.clickOnElementWithSelector(confirmTopicDeletionButton);
+      await this.expectElementToBeVisible(confirmTopicDeletionButton, false);
+
+      showMessage(`Topic "${topicName}" has been successfully deleted.`);
+      return;
+    }
+    throw new Error(`Topic "${topicName}" not found in dashboard.`);
+  }
+
+  async expectTopicNotInTopicsAndSkillDashboard(
+    topicName: string
+  ): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    const isEmptyDashboard = await this.isTextPresentOnPage(
+      'No topics or skills have been created yet.'
+    );
+    if (isEmptyDashboard) {
+      showMessage(`Topic "${topicName}" is not present as expected.`);
+      return;
+    }
+    await this.clickOnElementWithSelector(topicsTab);
+    const isPresent = await this.isTextPresentOnPage(topicName);
+    if (isPresent) {
+      throw new Error(
+        `Topic "${topicName}" was found but expected to be absent.`
+      );
+    }
+    showMessage(`Topic "${topicName}" is not present as expected.`);
+  }
+
+  async deleteSkill(skillName: string): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(skillsTab);
+    await this.expectElementToBeVisible(desktopSkillListItemSelector);
+
+    const skills = await this.page.$$(desktopSkillListItemSelector);
+    for (const skill of skills) {
+      const nameEl = await skill.$(desktopSkillSelector);
+      if (!nameEl) {
+        continue;
+      }
+      const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+      if (name !== skillName) {
+        continue;
+      }
+
+      const editBox = await skill.$(desktopSkillListItemOptions);
+      if (!editBox) {
+        throw new Error('Skill edit button not found.');
+      }
+      await editBox.click();
+
+      await this.expectElementToBeVisible(desktopDeleteSkillButton);
+      await this.clickOnElementWithSelector(desktopDeleteSkillButton);
+
+      await this.expectElementToBeVisible(confirmSkillDeletionButton);
+      await this.clickOnElementWithSelector(confirmSkillDeletionButton);
+      await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+
+      showMessage(`Skill "${skillName}" has been successfully deleted.`);
+      return;
+    }
+    throw new Error(`Skill "${skillName}" not found in dashboard.`);
+  }
+
+  async expectSkillNotInTopicsAndSkillsDashboard(
+    skillName: string
+  ): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    const isEmptyDashboard = await this.isTextPresentOnPage(
+      'No topics or skills have been created yet.'
+    );
+    if (isEmptyDashboard) {
+      showMessage(`Skill "${skillName}" is not present as expected.`);
+      return;
+    }
+    await this.clickOnElementWithSelector(skillsTab);
+    const isPresent = await this.isTextPresentOnPage(skillName);
+    if (isPresent) {
+      throw new Error(
+        `Skill "${skillName}" was found but expected to be absent.`
+      );
+    }
+    showMessage(`Skill "${skillName}" is not present as expected.`);
+  }
+
+  async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
+    await this.openSkillEditor(skillName);
+    await this.clickOnElementWithSelector(desktopSkillQuestionTab);
+    await this.page.waitForLoadState('networkidle');
+
+    while (true) {
+      const questionButton = await this.page.$(removeQuestion);
+      if (!questionButton) {
+        break;
+      }
+
+      await questionButton.click();
+      await this.expectElementToBeVisible(removeQuestionConfirmationButton);
+      await this.clickOnElementWithSelector(removeQuestionConfirmationButton);
+      await this.expectElementToBeVisible(
+        removeQuestionConfirmationButton,
+        false
+      );
+      await this.page.reload({waitUntil: 'networkidle'});
+    }
+    showMessage(`All questions removed from skill "${skillName}".`);
+  }
+
+  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
+    await this.page.waitForSelector(errorPageHeading);
+    const errorText = await this.page.$eval(
+      errorPageHeading,
+      el => (el as HTMLElement).textContent
+    );
+    if (!errorText) {
+      throw new Error(
+        `Error page heading not visible. URL: ${this.page.url()}`
+      );
+    }
+    const currentCode = Number(errorText.replace(/\D/g, ''));
+    if (currentCode !== statusCode) {
+      throw new Error(
+        `Expected error page ${statusCode} but found ${currentCode}.`
+      );
+    }
+    showMessage(`Error page ${statusCode} is visible.`);
+  }
+
+  async createSkillFromTopicsAndSkillsDashboard(
+    description: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(createNewSkillButton);
+    await this.clickOnElementWithSelector(createNewSkillButton);
+    await this.typeInInputField(skillDescriptionField, description);
+    await this.clickOnElementWithSelector(skillReviewMaterialHeader);
+    await this.clickOnElementWithSelector(richTextAreaField);
+    if (reviewMaterial) {
+      await this.typeInInputField(richTextAreaField, reviewMaterial);
+    }
+    await this.clickOnElementWithText('Save');
+    await this.page.waitForLoadState('networkidle');
+    showMessage(`Skill "${description}" created from dashboard.`);
+  }
+
+  async clickOnReviewMaterialEditButton(): Promise<void> {
+    await this.expectElementToBeVisible(editConceptCard);
+    await this.clickOnElementWithSelector(editConceptCard);
+    await this.expectElementToBeVisible(richTextAreaField);
+  }
+
+  async addWorkedExampleRteComponent(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(insertWorkedExampleButton);
+    await this.clickOnElementWithSelector(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+      state: 'visible',
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+    await this.typeInInputField(editWorkedExampleModalQuestionRte, question);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      state: 'visible',
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+    await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+    await this.typeInInputField(editWorkedExampleModalAnswerRte, answer);
+    await this.clickOnElementWithSelector(rteComponentSaveButton);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      state: 'hidden',
+    });
+  }
+
+  async saveReviewMaterial(): Promise<void> {
+    await this.expectElementToBeVisible(saveReviewMaterialButton);
+    await this.clickOnElementWithSelector(saveReviewMaterialButton);
+  }
+
+  async clickOnRteAndPressEnter(): Promise<void> {
+    await this.clickOnReviewMaterialEditButton();
+    await this.clickOnElementWithSelector(richTextAreaField);
+    await this.page.keyboard.press('Enter');
+  }
+
+  async clearRteAndCheckIfErrorDisappears(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOnElementWithSelector(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.page.waitForSelector(moreThanTwoWorkedExamplesError, {
+      state: 'hidden',
+    });
+  }
+
+  async publishSkillChanges(): Promise<void> {
+    await this.expectElementToBeVisible(publishSkillButton);
+    await this.clickOnElementWithSelector(publishSkillButton);
+    await this.typeInInputField(
+      saveChangesMessageInput,
+      'Test saving skill as curriculum admin.'
+    );
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(closeSaveModalButton);
+    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
+      state: 'hidden',
+    });
+  }
+
+  async navigateToSkillPreviewTab(): Promise<void> {
+    await this.clickOnElementWithSelector(skillPreviewTabButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  async checkWorkedExamplesExistForSkill(
+    workedExamples: string[][]
+  ): Promise<void> {
+    for (let i = 0; i < workedExamples.length; i++) {
+      const isQuestionPresent = await this.isTextPresentOnPage(
+        workedExamples[i][0]
+      );
+      if (!isQuestionPresent) {
+        throw new Error(
+          `Expected WorkedExample Question ${workedExamples[i][0]} to be present on the page, but it was not found.`
+        );
+      }
+      const isAnswerPresent = await this.isTextPresentOnPage(
+        workedExamples[i][1]
+      );
+      if (!isAnswerPresent) {
+        throw new Error(
+          `Expected WorkedExample Answer ${workedExamples[i][1]} to be present on the page, but it was not found.`
+        );
+      }
+    }
   }
 }
 

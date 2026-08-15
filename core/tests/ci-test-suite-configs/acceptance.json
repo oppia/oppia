@@ -642,8 +642,8 @@
     },
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "curriculum-admin/create-edit-and-delete-a-classroom",

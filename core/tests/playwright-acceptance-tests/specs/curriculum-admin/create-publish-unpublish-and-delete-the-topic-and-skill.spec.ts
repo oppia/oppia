@@ -19,58 +19,49 @@
  * CA. Create, publish, unpublish, and delete a topic and a skill.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-// To ignore console errors that occur when checking if the
-// topic link returns a 404 status upon unpublishing.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /HttpErrorResponse:.*404 Not Found/,
-  /Occurred at http:\/\/localhost:8181\/learn\/staging\/test-topic-one \.?/,
-  /http:\/\/localhost:8181\/learn\/staging\/test-topic-one \.?/,
-  /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-]);
+test.describe.configure({mode: 'serial'});
 
-describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin & TopicManager & LoggedOutUser;
+test.describe('Curriculum Admin', function () {
+  let curriculumAdmin: CurriculumAdmin;
   let loggedInUser: LoggedInUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(750000);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it('should be able to create a topic.', async function () {
+  test('should be able to create a topic.', async function () {
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.expectToBeInTopicEditor('Test Topic 1');
   });
 
-  it('should be able to publish a topic', async function () {
-    // Add Subtopic.
+  test('should be able to publish a topic', async function () {
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
       'test-subtopic-one',
       'Test Topic 1'
     );
 
-    // Create skill, and add it to diagnostic test.
     await curriculumAdmin.createSkillForTopic(
       'Test Skill 1',
       'Test Topic 1',
@@ -87,21 +78,20 @@ describe('Curriculum Admin', function () {
       'Test Topic 1'
     );
 
-    // Publish topic.
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
     await curriculumAdmin.expectToBeInTopicAndSkillsDashboardPage();
     await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
       'Test Topic 1',
-      0, // Story added.
-      1, // Subtopic added.
-      1 // Skill added.
+      0,
+      1,
+      1
     );
 
     await curriculumAdmin.openTopicEditor('Test Topic 1');
     await curriculumAdmin.expectUnpublishTopicButtonToBeVisible();
   });
 
-  it('should be able to create a skill', async function () {
+  test('should be able to create a skill', async function () {
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.navigateToSkillsTab();
 
@@ -114,24 +104,21 @@ describe('Curriculum Admin', function () {
     await curriculumAdmin.expectToBeInSkillEditorPage(newPage);
   });
 
-  it('should be able to unpublish a topic', async function () {
+  test('should be able to unpublish a topic', async function () {
     await curriculumAdmin.unpublishTopic('Test Topic 1');
     await loggedInUser.expectTopicLinkReturns404('test-topic-one');
   });
 
-  it('should be able to delete a topic', async function () {
+  test('should be able to delete a topic', async function () {
     await curriculumAdmin.deleteTopic('Test Topic 1');
     await curriculumAdmin.expectTopicNotInTopicsAndSkillDashboard(
       'Test Topic 1'
     );
   });
 
-  it('should be able to delete a skill', async function () {
-    // Navigate to the skill editor page and copy the URL to check for 404
-    // error afterwards.
+  test('should be able to delete a skill', async function () {
     await curriculumAdmin.openSkillEditor('Test Skill 1');
     const pageURL = curriculumAdmin.page.url();
-    // User must remove all questions from the skill before deleting it.
     await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
     await curriculumAdmin.deleteSkill('Test Skill 1');
     await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
@@ -141,7 +128,7 @@ describe('Curriculum Admin', function () {
     await curriculumAdmin.expectToBeOnErrorPage(404);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
