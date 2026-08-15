@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for CertificateAssessmentResultPageComponent.
  */
 
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {Router} from '@angular/router';
+import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
@@ -60,6 +62,7 @@ describe('CertificateAssessmentResultPageComponent', () => {
         CertificateAssessmentResultPageComponent,
         CertificateAssessmentResultCardComponent,
         AssessmentResultTopicWiseBreakdownComponent,
+        CertificateAssessmentTitledBackgroundBannerComponent,
         MockTranslatePipe,
       ],
       providers: [
@@ -69,6 +72,7 @@ describe('CertificateAssessmentResultPageComponent', () => {
         },
         {provide: Router, useValue: routerSpy},
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CertificateAssessmentResultPageComponent);

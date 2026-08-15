@@ -184,6 +184,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
     fixture.detectChanges();
 
     await fixture.whenStable();
+    fixture.detectChanges();
 
     const timeTakenElement = fixture.nativeElement.querySelector(
       '.result-card-time-taken'
@@ -213,6 +214,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
     fixture.detectChanges();
 
     await fixture.whenStable();
+    fixture.detectChanges();
 
     expect(
       fixture.nativeElement.querySelector('.result-card-time-taken')
@@ -240,6 +242,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
     fixture.detectChanges();
 
     await fixture.whenStable();
+    fixture.detectChanges();
 
     const mascotImage = fixture.nativeElement.querySelector(
       '.result-card-mascot-icon'
@@ -254,6 +257,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
     fixture.detectChanges();
 
     await fixture.whenStable();
+    fixture.detectChanges();
 
     const mascotImage = fixture.nativeElement.querySelector(
       '.result-card-mascot-icon'
@@ -288,17 +292,18 @@ describe('CertificateAssessmentResultCardComponent', () => {
     ]);
   });
 
-  it('should pass the certificate name to the shared banner title', async () => {
+  it('should pass the assessment title, exit button text and route to the shared banner', async () => {
     component.attemptId = 'attempt-1';
     fixture.detectChanges();
 
     await fixture.whenStable();
+    fixture.detectChanges();
 
     const banner = fixture.debugElement.query(
       By.directive(CertificateAssessmentTitledBackgroundBannerComponent)
     ).componentInstance as CertificateAssessmentTitledBackgroundBannerComponent;
 
-    expect(banner.title).toBe('Everyday Arithmetic & Number Confidence');
+    expect(banner.title).toBe('I18N_CERTIFICATE_ASSESSMENT');
     expect(banner.buttonText).toBe('I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON');
     expect(banner.buttonRoute).toEqual(['/learner-dashboard']);
   });
