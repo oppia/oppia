@@ -1066,6 +1066,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * This function waits until a page is fully rendered.
    * It does so via checking every second if the size of the HTML content of the page is stable.
    * If the size is stable for at least 3 checks, it considers the page fully rendered.

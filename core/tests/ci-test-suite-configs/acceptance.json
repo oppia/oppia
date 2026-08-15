@@ -77,8 +77,8 @@
     },
     {
       "name": "curriculum-admin/create-subtopic-study-guide-with-multiple-sections",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "curriculum-admin/create-skill-with-workedexamples",

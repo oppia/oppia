@@ -27,6 +27,97 @@ const curriculumAdminThumbnailImage =
 const classroomBannerImage = testConstants.data.classroomBannerImage;
 
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
+const photoUploadModal = 'edit-thumbnail-modal';
+
+const topicsTab = 'a.e2e-test-topics-tab';
+const desktopTopicSelector = 'a.e2e-test-topic-name';
+const topicNameField = 'input.e2e-test-new-topic-name-field';
+const topicUrlFragmentField =
+  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
+const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
+const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
+const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
+const saveTopicButton = 'button.e2e-test-save-topic-button';
+const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
+
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicTitleField = 'input.e2e-test-subtopic-title-field';
+const subtopicUrlFragmentField =
+  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const subtopicNameSelector = '.e2e-test-subtopic-name';
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const assignSubtopicButton = '.e2e-test-assign-subtopic';
+
+const subtopicStudyGuideHeadingField =
+  '.e2e-test-new-subtopic-study-guide-section-heading-field';
+const subtopicStudyGuideContentField =
+  '.e2e-test-create-subtopic-page-content-rich-text-editor';
+const showSectionsList = '.e2e-test-show-study-guide-sections-list';
+const showSubtopicsList = '.e2e-test-show-subtopics-list';
+const firstSubtopicTile = '.e2e-test-subtopic';
+const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
+const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
+const addStudyGuideSectionModalHeading =
+  '.e2e-test-add-study-guide-section-modal-heading-field';
+const addStudyGuideSectionModalContent =
+  '.e2e-test-add-study-guide-section-modal-content-field';
+const addStudyGuideSectionModalSaveButton =
+  '.e2e-test-add-study-guide-section-modal-save-button';
+const addStudyGuideSectionModalCancelButton =
+  '.e2e-test-add-study-guide-section-modal-cancel-button';
+const addStudyGuideSectionContentLength =
+  '.e2e-test-add-study-guide-section-content-length-error';
+const deleteStudyGuideSectionButton = '.e2e-test-delete-example-button';
+const expandedStudyGuideSectionTileHeading =
+  '.e2e-test-study-guide-section-heading-field';
+const expandedStudyGuideSectionTileContent =
+  '.e2e-test-study-guide-section-content-field';
+const editStudyGuideSectionHeadingIcon = '.e2e-test-section-heading-edit-icon';
+const editStudyGuideSectionContentIcon = '.e2e-test-section-content-edit-icon';
+const editStudyGuideSectionHeadingEditor =
+  '.e2e-test-study-guide-section-heading-plaintext-editor';
+const editStudyGuideSectionContentEditor =
+  '.e2e-test-study-guide-section-content-rich-text-editor';
+const studyGuideSectionDeleteConfirmButton =
+  '.e2e-test-confirm-delete-study-guide-section-button';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const topicPreviewTab = '.e2e-test-topic-preview-tab';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
+
+const skillsTab = 'a.e2e-test-skills-tab';
+const desktopSkillSelector = '.e2e-test-skill-description';
+const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
+const skillEditorCollapsibleCard = '.e2e-test-skill-editor-collapsible-card';
+const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
+const addSkillButton = 'button.e2e-test-add-skill-button';
+const confirmSkillCreationButton =
+  'button.e2e-test-confirm-skill-creation-button';
+
+const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
+const confirmSkillAssignationButton =
+  'button.e2e-test-skill-assign-subtopic-confirm';
+
+const addDiagnosticTestSkillButton =
+  'button.e2e-test-add-diagnostic-test-skill';
+const diagnosticTestSkillSelector =
+  'select.e2e-test-diagnostic-test-skill-selector';
+const desktopSkillQuestionTab = '.e2e-test-questions-tab';
+const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
+const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
+
+const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
+const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
+
+const mobileSaveTopicDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
+const mobileSaveTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+
 const createNewClassroomModal = '.e2e-test-create-new-classroom-modal';
 const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
 const newClassroomNameInputField = '.e2e-test-new-classroom-name';
@@ -893,6 +984,245 @@ export class CurriculumAdmin extends TopicManager {
           `Expected WorkedExample Answer ${workedExamples[i][1]} to be present on the page, but it was not found.`
         );
       }
+    }
+  }
+
+  async createSubtopicWithStudyGuideForTopic(
+    title: string,
+    urlFragment: string,
+    heading: string,
+    content: string,
+    topicName: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(subtopicReassignHeader);
+    }
+    await this.clickOnElementWithSelector(addSubtopicButton);
+    await this.typeInInputField(subtopicTitleField, title);
+    await this.expectElementToBeVisible(subtopicUrlFragmentField);
+    await this.typeInInputField(subtopicUrlFragmentField, urlFragment);
+
+    await this.typeInInputField(subtopicStudyGuideHeadingField, heading);
+    await this.clickOnElementWithSelector(subtopicStudyGuideContentField);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, content);
+    if (addWorkedExample) {
+      await this.clickOnElementWithSelector(insertWorkedExampleButton);
+      await this.expectElementToBeVisible(editWorkedExampleModalQuestionRte);
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
+      await this.expectElementToBeVisible(editWorkedExampleModalAnswerRte);
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOnElementWithSelector(rteComponentSaveButton);
+    }
+
+    await this.clickOnElementWithSelector(subtopicPhotoBoxButton);
+    await this.expectElementToBeVisible(photoUploadModal);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.expectElementToBeVisible(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(uploadPhotoButton);
+
+    await this.expectElementToBeVisible(photoUploadModal, false);
+    await this.clickOnElementWithSelector(createSubtopicButton);
+    await this.expectElementToBeVisible(modalDiv, false);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(showSectionsList);
+      await this.scrollToBottomOfPage();
+    }
+    await this.expectElementToBeVisible(firstStudyGuideSectionTile);
+    showMessage(`Subtopic ${title} is created.`);
+  }
+
+  async checkAddSectionModalShowsLengthError(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(showSubtopicsList);
+      await this.clickOnElementWithSelector(firstSubtopicTile);
+      await this.clickOnElementWithSelector(showSectionsList);
+    }
+    await this.expectElementToBeVisible(addStudyGuideSectionButton);
+    await this.clickOnElementWithSelector(addStudyGuideSectionButton);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      'Section Heading'
+    );
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalContent);
+    await this.expectElementToBeVisible(richTextAreaField);
+    const longText =
+      'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(
+        72
+      );
+    await this.page.evaluate(async textContent => {
+      await navigator.clipboard.writeText(textContent);
+    }, longText);
+
+    const richTextAreaFieldElement =
+      await this.getElementInParent(richTextAreaField);
+    await richTextAreaFieldElement.focus();
+    const pasteModifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+    await this.page.keyboard.down(pasteModifier);
+    await this.page.keyboard.press('KeyV');
+    await this.page.keyboard.up(pasteModifier);
+    await this.expectElementToBeVisible(addStudyGuideSectionContentLength);
+  }
+
+  async clearContentFieldAndCloseAddSectionModal(): Promise<void> {
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.expectElementToBeVisible(
+      addStudyGuideSectionContentLength,
+      false
+    );
+    await this.clickOnElementWithSelector(
+      addStudyGuideSectionModalCancelButton
+    );
+  }
+
+  async addSubtopicStudyGuideSection(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addStudyGuideSectionButton);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalContent);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, sectionContent);
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.expectElementToBeVisible(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`
+    );
+    await this.expectElementToBeVisible(deleteStudyGuideSectionButton);
+  }
+
+  async addSubtopicStudyGuideSectionWithWorkedExample(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number,
+    workedExampleQuestion: string,
+    workedExampleAnswer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addStudyGuideSectionButton);
+    await this.clickOnElementWithSelector(addStudyGuideSectionButton);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalContent);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, sectionContent);
+    await this.clickOnElementWithSelector(insertWorkedExampleButton);
+    await this.expectElementToBeVisible(editWorkedExampleModalQuestionRte);
+    await this.typeInInputField(
+      editWorkedExampleModalQuestionRte,
+      workedExampleQuestion
+    );
+    await this.expectElementToBeVisible(editWorkedExampleModalAnswerRte);
+    await this.typeInInputField(
+      editWorkedExampleModalAnswerRte,
+      workedExampleAnswer
+    );
+    await this.clickOnElementWithSelector(rteComponentSaveButton);
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.expectElementToBeVisible(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`
+    );
+    await this.expectElementToBeVisible(deleteStudyGuideSectionButton);
+  }
+
+  async expandStudyGuideSectionTile(index: number): Promise<void> {
+    await this.clickOnElementWithSelector(
+      `.e2e-test-study-guide-section-${index}`
+    );
+    await this.expectElementToBeVisible(
+      `.e2e-test-study-guide-section-${index}-expanded`
+    );
+    await this.expectElementToBeVisible(expandedStudyGuideSectionTileHeading);
+    await this.expectElementToBeVisible(expandedStudyGuideSectionTileContent);
+  }
+
+  async openSectionHeadingEditor(): Promise<void> {
+    await this.clickOnElementWithSelector(editStudyGuideSectionHeadingIcon);
+    await this.expectElementToBeVisible(editStudyGuideSectionHeadingEditor);
+  }
+
+  async openSectionContentEditor(): Promise<void> {
+    await this.clickOnElementWithSelector(editStudyGuideSectionContentIcon);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.expectElementToBeVisible(editStudyGuideSectionContentEditor);
+  }
+
+  async deleteStudyGuideSection(index: number): Promise<void> {
+    await this.clickOnElementWithSelector(
+      `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
+    );
+    await this.clickOnElementWithSelector(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
+  }
+
+  async previewStudyGuide(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(showSubtopicsList);
+      await this.clickOnElementWithSelector(showSubtopicsList);
+      await this.clickOnElementWithSelector(firstSubtopicTile);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(topicMobilePreviewTab);
+    } else {
+      await this.expectElementToBeVisible(topicPreviewTab);
+      await this.clickOnElementWithSelector(topicPreviewTab);
+    }
+    await this.waitForPageToFullyLoad();
+  }
+
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][],
+    expectWorkedExample: boolean
+  ): Promise<void> {
+    const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
+    if (!isTitlePresent) {
+      throw new Error(
+        'Expected study guide title to be present, but it was not found.'
+      );
+    }
+
+    for (let i = 0; i < studyGuideSections.length; i++) {
+      const [heading, content] = studyGuideSections[i];
+      const isHeadingPresent = await this.isTextPresentOnPage(heading);
+      if (!isHeadingPresent) {
+        throw new Error(
+          `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+        );
+      }
+      const isContentPresent = await this.isTextPresentOnPage(content);
+      if (!isContentPresent) {
+        throw new Error(
+          `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+        );
+      }
+    }
+    if (expectWorkedExample) {
+      await this.expectElementToBeVisible(expandWorkedExampleButton);
     }
   }
 }
