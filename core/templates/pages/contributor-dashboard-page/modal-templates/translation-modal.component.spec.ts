@@ -56,6 +56,7 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UnicodeSchema} from 'services/schema-default-value.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -612,6 +613,13 @@ describe('Translation Modal Component', () => {
       );
       component.ngOnInit();
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
+      expect(component.getUnicodeSchema().ui_config?.languageDirection).toBe(
+        'rtl'
+      );
+      expect(
+        (component.getSetOfStringsSchema().items as UnicodeSchema).ui_config
+          ?.languageDirection
+      ).toBe('rtl');
     }));
 
     it('should get the unicode schema', () => {
