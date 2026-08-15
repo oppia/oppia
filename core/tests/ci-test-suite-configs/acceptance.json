@@ -647,8 +647,8 @@
     },
     {
       "name": "curriculum-admin/create-edit-and-delete-a-classroom",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-coordinator/manage-contributors-translation-review-rights",

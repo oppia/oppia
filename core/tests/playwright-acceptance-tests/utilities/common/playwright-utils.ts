@@ -72,7 +72,7 @@ export class BaseUser {
     // This matches Puppeteer's behavior where goto always triggers
     // a full navigation even to the same URL.
     if (isSamePage) {
-      await this.page.reload();
+      await this.page.reload({waitUntil: 'networkidle'});
     } else {
       await this.page.goto(url, {waitUntil: 'networkidle'});
     }
@@ -439,13 +439,18 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Using Control+A to select all text, then Backspace to delete it.
+    // Using Control+A (Meta+A on macOS) to select all text, then Backspace
+    // to delete it. Chromium honors the OS's native text-editing shortcuts,
+    // and Control+A moves the cursor to line-start on macOS instead of
+    // selecting all, so the modifier must match the host platform.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
     await element.click();
-    await this.page.keyboard.down('Control');
+    const selectAllModifier =
+      process.platform === 'darwin' ? 'Meta' : 'Control';
+    await this.page.keyboard.down(selectAllModifier);
     await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
+    await this.page.keyboard.up(selectAllModifier);
     await this.page.keyboard.press('Backspace');
   }
 

@@ -56,6 +56,24 @@ const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const enableDiagnosticTestButton =
   '.e2e-test-toggle-diagnostic-test-status-btn';
 
+const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
+const classroomDetailsSelector = '.e2e-test-classroom-details';
+const classroomNameSelector = '.e2e-test-classroom-name-view';
+const classroomURLSelector = '.e2e-test-classroom-url-view';
+const classroomFeedbackRecipientEmailSelector =
+  '.e2e-test-classroom-feedback-recipient-view';
+const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
+const classroomTopicListIntroSelector =
+  '.e2e-test-classroom-topic-list-intro-view';
+const classroomCourseDetailsSelector =
+  '.e2e-test-classroom-course-details-view';
+const deleteClassroomButton = '.e2e-test-delete-classroom-button';
+const deleteClassroomModal = '.e2e-test-delete-classroom-modal';
+const confirmDeleteClassroomButton = '.e2e-test-confirm-delete-classroom';
+const topicPrerequisitesContainerSelector =
+  '.e2e-test-topic-prerquisites-container';
+const movableClassroomTileSelector = '.e2e-test-movable-classroom-tile';
+
 export class CurriculumAdmin extends TopicManager {
   /**
    * Creates, updates, and publishes a new classroom with a topic.
@@ -231,6 +249,245 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(saveClassroomButton, false);
 
     showMessage(`Updated ${classroomName} classroom.`);
+  }
+
+  private async openClassroomDetails(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.expectElementToBeVisible(classroomTileContainerSelector);
+
+    const containerElements = await this.page.$$(
+      classroomTileContainerSelector
+    );
+
+    for (const container of containerElements) {
+      const nameSpan = await container.$(classroomTileNameSpan);
+      if (!nameSpan) {
+        continue;
+      }
+
+      const name = await nameSpan.evaluate(el => el.textContent?.trim() ?? '');
+      if (name !== classroomName) {
+        continue;
+      }
+
+      const detailsEl = await container.$(classroomDetailsSelector);
+      if (detailsEl && (await detailsEl.isVisible())) {
+        return;
+      }
+
+      const tileEl = await container.$(classroomTileSelector);
+      if (!tileEl) {
+        throw new Error(
+          `Classroom tile element not found for ${classroomName}.`
+        );
+      }
+
+      await tileEl.click();
+      await this.expectElementToBeVisible(classroomDetailsSelector);
+      return;
+    }
+
+    throw new Error(`Classroom ${classroomName} not found.`);
+  }
+
+  async expectClassroomTileToBePresent(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.expectElementToBeVisible(classroomTileNameSpan);
+    const classroomTiles = await this.page.$$(classroomTileNameSpan);
+
+    for (const tile of classroomTiles) {
+      const text = await tile.evaluate(el => el.textContent?.trim() ?? '');
+      if (text === classroomName) {
+        showMessage(`Classroom ${classroomName} is present.`);
+        return;
+      }
+    }
+
+    throw new Error(`Classroom ${classroomName} not found.`);
+  }
+
+  async expectClassroomDetailsToBe(
+    classroomName: string,
+    classroomURL: string,
+    classroomTeaser: string,
+    classroomTopicListIntro: string,
+    classroomCourseDetails: string,
+    classroomFeedbackRecipientEmail: string = 'user@email.com'
+  ): Promise<void> {
+    await this.openClassroomDetails(classroomName);
+
+    await this.expectTextContentToBe(classroomNameSelector, classroomName);
+    await this.expectTextContentToBe(classroomURLSelector, classroomURL);
+    await this.expectTextContentToBe(
+      classroomFeedbackRecipientEmailSelector,
+      classroomFeedbackRecipientEmail
+    );
+    await this.expectTextContentToBe(classroomTeaserSelector, classroomTeaser);
+    await this.expectTextContentToBe(
+      classroomTopicListIntroSelector,
+      classroomTopicListIntro
+    );
+    await this.expectTextContentToBe(
+      classroomCourseDetailsSelector,
+      classroomCourseDetails
+    );
+  }
+
+  async expectTopicToContainPrerequisiteTopic(
+    topicName: string,
+    prerequisiteTopic: string | null
+  ): Promise<void> {
+    const topicBox = await this.expectClassroomToContainTopic(topicName);
+
+    if (!prerequisiteTopic) {
+      await this.expectTextContentToBe(
+        topicPrerequisitesContainerSelector,
+        'No Prerequisites'
+      );
+    } else {
+      const matChipElements = await topicBox.$$('mat-chip');
+
+      for (const element of matChipElements) {
+        const textContent = await element.evaluate(el => el.textContent);
+        if (textContent?.includes(prerequisiteTopic)) {
+          return;
+        }
+      }
+
+      throw new Error(
+        `Prerequisite topic ${prerequisiteTopic} not found in topic ${topicName}.`
+      );
+    }
+  }
+
+  async moveClassroomInOrder(classroomNames: string[]): Promise<void> {
+    await this.expectElementToBeVisible(movableClassroomTileSelector);
+    let requiredIndex = 0;
+
+    for (const classroomName of classroomNames) {
+      const classroomElementTexts = await this.page.$$eval(
+        movableClassroomTileSelector,
+        elements => elements.map(element => element.textContent?.trim())
+      );
+
+      const currentIndex = classroomElementTexts.indexOf(classroomName);
+      if (currentIndex === requiredIndex) {
+        requiredIndex += 1;
+        continue;
+      }
+
+      const classroomElements = await this.page.$$(
+        movableClassroomTileSelector
+      );
+      const sourceElement = classroomElements[currentIndex];
+      const targetElement = classroomElements[requiredIndex];
+
+      const sourceBoundingBox = await sourceElement.boundingBox();
+      const targetBoundingBox = await targetElement.boundingBox();
+
+      if (!sourceBoundingBox || !targetBoundingBox) {
+        throw new Error('Could not get bounding box for classroom elements');
+      }
+
+      const sourceCenter = {
+        x: sourceBoundingBox.x + sourceBoundingBox.width / 2,
+        y: sourceBoundingBox.y + sourceBoundingBox.height / 2,
+      };
+
+      const targetCenter = {
+        x: targetBoundingBox.x + targetBoundingBox.width / 2,
+        y: targetBoundingBox.y + targetBoundingBox.height / 2,
+      };
+
+      await this.page.mouse.move(sourceCenter.x, sourceCenter.y);
+      await this.page.mouse.down();
+      await this.page.mouse.move(targetCenter.x, targetCenter.y, {
+        steps: 10,
+      });
+      await this.page.mouse.up();
+
+      requiredIndex += 1;
+    }
+
+    const classroomTexts = await this.page.$$eval(
+      movableClassroomTileSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+    expect(classroomTexts).toEqual(classroomNames);
+  }
+
+  async expectClassroomsInOrder(classroomNames: string[]): Promise<void> {
+    await this.page.waitForFunction(
+      ({
+        selector,
+        orderedClassroom,
+      }: {
+        selector: string;
+        orderedClassroom: string[];
+      }) => {
+        const spans = document.querySelectorAll(selector);
+        if (spans.length !== orderedClassroom.length) {
+          return false;
+        }
+        for (let i = 0; i < spans.length; i++) {
+          if (spans[i].textContent?.trim() !== orderedClassroom[i]) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {selector: classroomTileNameSpan, orderedClassroom: classroomNames}
+    );
+  }
+
+  async expectNumberOfClassroomsToBe(classroomsCount: number): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    if (classroomsCount > 0) {
+      await this.expectElementToBeVisible(classroomTileSelector);
+    }
+    const classroomTiles = await this.page.$$(classroomTileSelector);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(`There are ${classroomsCount} classrooms present.`);
+    } else {
+      throw new Error(
+        `Expected ${classroomsCount} classrooms but found ${classroomTiles.length}.`
+      );
+    }
+  }
+
+  async deleteClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.expectElementToBeVisible(classroomTileSelector);
+    const classroomTiles = await this.page.$$(classroomTileSelector);
+
+    if (classroomTiles.length === 0) {
+      throw new Error('No classrooms are present.');
+    }
+
+    for (const classroomTile of classroomTiles) {
+      const currentClassroomName = await classroomTile.$eval(
+        classroomTileNameSpan,
+        el => el.textContent?.trim()
+      );
+
+      if (currentClassroomName !== classroomName) {
+        continue;
+      }
+
+      await classroomTile.click();
+      await this.expectElementToBeVisible(deleteClassroomButton);
+      await this.clickOnElementWithSelector(deleteClassroomButton);
+
+      await this.expectElementToBeVisible(deleteClassroomModal);
+      await this.clickOnElementWithSelector(confirmDeleteClassroomButton);
+      await this.expectElementToBeVisible(deleteClassroomModal, false);
+
+      showMessage(`Deleted ${classroomName} classroom.`);
+      return;
+    }
+
+    throw new Error(`${classroomName} classroom does not exist.`);
   }
 }
 
