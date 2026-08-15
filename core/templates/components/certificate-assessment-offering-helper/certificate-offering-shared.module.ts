@@ -26,6 +26,7 @@ import {CertificateOfferingConfirmationModalComponent} from './certificate-offer
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
 import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
+import {AssessmentInterruptComponent} from './assessment-interrupt.component';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
 import {TimeExpiredModalComponent} from './time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
@@ -39,6 +40,7 @@ import {FormsModule} from '@angular/forms';
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,
+    AssessmentInterruptComponent,
     PostCertificateOfferingResultModalComponent,
     TimeExpiredModalComponent,
     UnansweredQuestionModalComponent,
@@ -49,6 +51,7 @@ import {FormsModule} from '@angular/forms';
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,
+    AssessmentInterruptComponent,
     PostCertificateOfferingResultModalComponent,
     TimeExpiredModalComponent,
     UnansweredQuestionModalComponent,
