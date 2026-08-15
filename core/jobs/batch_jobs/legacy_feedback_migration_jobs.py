@@ -58,7 +58,7 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         thread: feedback_models.GeneralFeedbackThreadModel,
     ) -> bool:
         """Returns whether the legacy thread belongs to an exploration."""
-        return thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION
+        return bool(thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION)
 
     def _get_migrated_feedback_id(
         self,
@@ -78,7 +78,9 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         )
 
     def _get_migrated_status(self, legacy_status: str) -> str:
-        """Returns the LessonfeedbackModel status for a  legacy status.
+        """Returns the LessonfeedbackModel status for a legacy status.
+        LessonFeedbackModel don't have STATUS_CHOICES_IGNORED, thatswhy we are
+        returning STATUS_CHOICES_NOT_ACTIONABLE in its place.
 
         Args:
             legacy_status: str. Legacy GeneralFeedbackThreadModel status.
@@ -87,7 +89,7 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
             str. Status supported by LessonFeedbackModel.
 
         Raises:
-            ValueError: If legacy_status is not a valid GeneralFeedbackThreadModel
+            ValueError. If legacy_status is not a valid GeneralFeedbackThreadModel
                 status.
         """
         if legacy_status == feedback_models.STATUS_CHOICES_IGNORED:
@@ -336,10 +338,16 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
             messages.
         """
         unused_thread_id, grouped_values = grouped_item
+        # Here we use cast because CoGroupByKey stores all grouped PCollection
+        # values under the same dictionary value type, but the 'threads' tag
+        # only contains GeneralFeedbackThreadModel instances.
         threads = cast(
             List[feedback_models.GeneralFeedbackThreadModel],
             grouped_values['threads'],
         )
+        # Here we use cast because CoGroupByKey stores all grouped PCollection
+        # values under the same dictionary value type, but the 'messages' tag
+        # only contains GeneralFeedbackMessageModel instances.
         messages = cast(
             List[feedback_models.GeneralFeedbackMessageModel],
             grouped_values['messages'],
@@ -347,7 +355,7 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         thread = threads[0]
         messages = sorted(
             messages,
-            key=lambda message: message.message_id,
+            key=lambda message: int(message.message_id),
         )
         return (
             self._get_migrated_feedback_id(thread.id),

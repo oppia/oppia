@@ -201,6 +201,212 @@ class MigrateLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
             ]
         )
 
+    def test_job_skips_non_exploration_thread(self) -> None:
+        thread = self.create_legacy_feedback_thread(
+            self.THREAD_ID,
+            entity_type=feconf.ENTITY_TYPE_FEEDBACK,
+        )
+        message = self.create_legacy_feedback_message(
+            self.THREAD_ID, 0, 'Original learner feedback.'
+        )
+        self.put_multi([thread, message])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Skipped legacy feedback thread: '
+                        f'legacy_thread_id={self.THREAD_ID}, '
+                        'reason=Not an exploration thread'
+                    )
+                ),
+            ]
+        )
+
+    def test_job_migrates_ignored_status_as_not_actionable(self) -> None:
+        thread = self.create_legacy_feedback_thread(self.THREAD_ID)
+        thread.status = feedback_models.STATUS_CHOICES_IGNORED
+
+        message = self.create_legacy_feedback_message(
+            self.THREAD_ID, 0, 'Original learner feedback.'
+        )
+        self.put_multi([thread, message])
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Migrated legacy feedback thread into lesson feedback: '
+                        f'feedback_id={feedback_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'migrated_legacy_feedback_thread_count: 1'
+                ),
+            ]
+        )
+
+        migrated_feedback = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
+        self.assertIsNotNone(migrated_feedback)
+        assert migrated_feedback is not None
+
+        self.assertEqual(
+            migrated_feedback.status,
+            feconf.STATUS_CHOICES_NOT_ACTIONABLE,
+        )
+
+    def test_get_migrated_status_raises_for_invalid_status(self) -> None:
+        job = self.JOB_CLASS(self.pipeline)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            'Unexpected legacy feedback status: invalid_status',
+        ):
+            job._get_migrated_status('invalid_status')
+
+    def test_job_migrates_creator_responses(self) -> None:
+        thread = self.create_legacy_feedback_thread(self.THREAD_ID)
+
+        learner_message = self.create_legacy_feedback_message(
+            self.THREAD_ID,
+            0,
+            'Original learner feedback.',
+            author_id=self.AUTHOR_ID,
+        )
+        creator_message = self.create_legacy_feedback_message(
+            self.THREAD_ID,
+            1,
+            'Thanks for reporting this!',
+            author_id='creator_id',
+        )
+
+        self.put_multi([thread, learner_message, creator_message])
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Migrated legacy feedback thread into lesson feedback: '
+                        f'feedback_id={feedback_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'migrated_legacy_feedback_thread_count: 1'
+                ),
+            ]
+        )
+
+        migrated_feedback = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
+        self.assertIsNotNone(migrated_feedback)
+        assert migrated_feedback is not None
+
+        self.assertEqual(
+            migrated_feedback.feedback_text,
+            'Original learner feedback.',
+        )
+        self.assertEqual(
+            migrated_feedback.response_list,
+            [
+                {
+                    'response_text': 'Thanks for reporting this!',
+                    'responded_by': 'creator_id',
+                    'responded_on': utils.get_time_in_millisecs(
+                        self.CREATED_ON
+                    ),
+                }
+            ],
+        )
+
+    def test_job_skips_empty_creator_response(self) -> None:
+        thread = self.create_legacy_feedback_thread(self.THREAD_ID)
+
+        learner_message = self.create_legacy_feedback_message(
+            self.THREAD_ID,
+            0,
+            'Original learner feedback.',
+        )
+        empty_creator_message = self.create_legacy_feedback_message(
+            self.THREAD_ID,
+            1,
+            '',
+            author_id='creator_id',
+        )
+
+        self.put_multi([thread, learner_message, empty_creator_message])
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Migrated legacy feedback thread into lesson feedback: '
+                        f'feedback_id={feedback_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'migrated_legacy_feedback_thread_count: 1'
+                ),
+            ]
+        )
+
+        migrated_feedback = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
+        self.assertIsNotNone(migrated_feedback)
+        assert migrated_feedback is not None
+
+        self.assertEqual(migrated_feedback.response_list, [])
+
+    def test_job_uses_empty_state_name_for_invalid_subject_format(
+        self,
+    ) -> None:
+        thread = self.create_legacy_feedback_thread(
+            self.THREAD_ID,
+            subject='Some other feedback subject',
+        )
+        message = self.create_legacy_feedback_message(
+            self.THREAD_ID,
+            0,
+            'Original learner feedback.',
+        )
+        self.put_multi([thread, message])
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Migrated legacy feedback thread into lesson feedback: '
+                        f'feedback_id={feedback_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'migrated_legacy_feedback_thread_count: 1'
+                ),
+            ]
+        )
+
+        migrated_feedback = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
+        self.assertIsNotNone(migrated_feedback)
+        assert migrated_feedback is not None
+
+        self.assertEqual(
+            migrated_feedback.lesson_metadata['state_name'],
+            '',
+        )
+
 
 class AuditLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
     """Tests for AuditLegacyFeedbackJob."""
