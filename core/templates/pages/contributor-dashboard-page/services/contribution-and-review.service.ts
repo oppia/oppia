@@ -31,6 +31,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {States} from 'domain/exploration/states.model';
 import {Exploration} from 'domain/exploration/exploration.model';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 export interface OpportunityDict {
   skill_id: string;
@@ -133,7 +134,7 @@ export class ContributionAndReviewService {
   private async fetchSuggestionsAsync(
     fetcher: SuggestionFetcher,
     shouldResetOffset: boolean,
-    explorationId: string | null,
+    entityId: string | null,
     topicName: string | null,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
@@ -154,7 +155,7 @@ export class ContributionAndReviewService {
         AppConstants.OPPORTUNITIES_PAGE_SIZE * 2 - currentCacheSize,
         fetcher.offset,
         fetcher.sortKey,
-        explorationId,
+        entityId,
         topicName,
         targetType
       )
@@ -189,77 +190,53 @@ export class ContributionAndReviewService {
   }
 
   async fetchTranslationSuggestionsAsync(
-    explorationId: string,
+    entityId: string,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
-    if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
-      return this.contributionAndReviewBackendApiService
-        .fetchSuggestionsAsync(
-          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
-          null,
-          0,
-          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-          explorationId,
-          null,
-          targetType
-        )
-        .then(fetchSuggestionsResponse => {
-          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
-          fetchSuggestionsResponse.suggestions.forEach(suggestion => {
-            responseSuggestionIdToDetails[suggestion.suggestion_id] = {
-              suggestion: suggestion,
-              details:
-                fetchSuggestionsResponse.target_id_to_opportunity_dict[
-                  suggestion.target_id
-                ],
-            };
-          });
-          return {
-            suggestionIdToDetails: responseSuggestionIdToDetails,
-            more: false,
-          };
-        });
-    }
+    // Suggestions are ordered by the state they belong to, which only an
+    // exploration has, so the exploration is fetched for that entity type
+    // alone. Suggestions of every other entity type keep the order the
+    // backend returned them in.
+    const exploration =
+      targetType === undefined ||
+      targetType === AppConstants.ENTITY_TYPE.EXPLORATION
+        ? Exploration.createFromExplorationBackendResponse(
+            await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
+              entityId,
+              null
+            ),
+            this.loggerService,
+            this.urlInterpolationService
+          )
+        : null;
 
-    const explorationBackendResponse =
-      await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-        explorationId,
-        null
-      );
     return this.contributionAndReviewBackendApiService
       .fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS',
         null,
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        explorationId,
+        entityId,
         null,
         targetType
       )
       .then(fetchSuggestionsResponse => {
-        const exploration: Exploration =
-          Exploration.createFromExplorationBackendResponse(
-            explorationBackendResponse,
-            this.loggerService,
-            this.urlInterpolationService
-          );
-        const sortedTranslationSuggestions =
-          this.sortTranslationSuggestionsByState(
-            fetchSuggestionsResponse.suggestions,
-            exploration.getStates(),
-            exploration.initStateName
-          );
+        const suggestions = exploration
+          ? this.sortTranslationSuggestionsByState(
+              fetchSuggestionsResponse.suggestions,
+              exploration.getStates(),
+              exploration.initStateName
+            )
+          : fetchSuggestionsResponse.suggestions;
         const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
-        sortedTranslationSuggestions.forEach(suggestion => {
-          const suggestionDetails = {
+        suggestions.forEach(suggestion => {
+          responseSuggestionIdToDetails[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details:
               fetchSuggestionsResponse.target_id_to_opportunity_dict[
                 suggestion.target_id
               ],
           };
-          responseSuggestionIdToDetails[suggestion.suggestion_id] =
-            suggestionDetails;
         });
         return {
           suggestionIdToDetails: responseSuggestionIdToDetails,
@@ -428,12 +405,12 @@ export class ContributionAndReviewService {
   async getReviewableTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    explorationId?: string,
+    entityId?: string,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
-    if (explorationId) {
-      return this.fetchTranslationSuggestionsAsync(explorationId, targetType);
+    if (entityId) {
+      return this.fetchTranslationSuggestionsAsync(entityId, targetType);
     }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
@@ -441,6 +418,56 @@ export class ContributionAndReviewService {
       null,
       null,
       targetType
+    );
+  }
+
+  /**
+   * Reviews a translation suggestion through the endpoint that matches its
+   * target type, so that callers do not have to branch on the entity type
+   * themselves.
+   *
+   * A commit message is only sent for explorations. Accepting an exploration
+   * translation writes the translation into a new version of the exploration,
+   * which needs a commit message, while accepting a translation of any other
+   * entity type does not create a version.
+   */
+  reviewTranslationSuggestion(
+    targetType: string,
+    targetId: string,
+    suggestionId: string,
+    action: string,
+    reviewMessage: string,
+    commitMessage: string | null,
+    onSuccess: (suggestionId: string) => void,
+    onFailure: (errorMessage: string) => void
+  ): Promise<void> {
+    // The backend exposes one suggestion action endpoint per target type, and
+    // skills are the only non-exploration type with one so far. Any further
+    // type needs its own endpoint and a branch here.
+    if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
+      return this.reviewSkillSuggestion(
+        targetId,
+        suggestionId,
+        action,
+        reviewMessage,
+        null,
+        onSuccess,
+        // The skill review endpoint reports failures without a message, so a
+        // generic one is supplied to keep the caller's handling uniform.
+        () =>
+          onFailure(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          )
+      );
+    }
+    return this.reviewExplorationSuggestion(
+      targetId,
+      suggestionId,
+      action,
+      reviewMessage,
+      commitMessage,
+      onSuccess,
+      onFailure
     );
   }
 

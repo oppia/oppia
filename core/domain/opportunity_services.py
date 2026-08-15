@@ -1523,7 +1523,7 @@ def _get_translation_opportunity_cards_from_models(
     exp_and_skill_entity_ids = exp_entity_ids + skill_entity_ids
     if exp_and_skill_entity_ids:
         in_review_counts = (
-            _build_exp_id_to_translation_suggestion_in_review_count(
+            _build_entity_id_to_translation_suggestion_in_review_count(
                 exp_and_skill_entity_ids, language_code
             )
         )
@@ -1716,7 +1716,7 @@ def get_translation_opportunities(
     exp_id_to_in_review_count = {}
     if len(opportunity_summary_exp_ids) > 0:
         exp_id_to_in_review_count = (
-            _build_exp_id_to_translation_suggestion_in_review_count(
+            _build_entity_id_to_translation_suggestion_in_review_count(
                 opportunity_summary_exp_ids, language_code
             )
         )
@@ -1739,32 +1739,34 @@ def get_translation_opportunities(
     return opportunity_summaries, cursor, more
 
 
-def _build_exp_id_to_translation_suggestion_in_review_count(
-    exp_ids: List[str], language_code: str
+def _build_entity_id_to_translation_suggestion_in_review_count(
+    entity_ids: List[str], language_code: str
 ) -> Dict[str, int]:
-    """Returns a dict mapping exploration ID to the count of corresponding
-    translation suggestions that are currently in review.
+    """Returns a dict mapping entity ID to the count of corresponding
+    translation suggestions that are currently in review. Suggestions are
+    matched on their target ID alone, so the entity IDs may belong to any
+    translatable entity type.
 
     Args:
-        exp_ids: list(str). List of exploration IDs for which to count
+        entity_ids: list(str). List of entity IDs for which to count
             corresponding translations suggestions.
         language_code: str. The language for which translation suggestions
             should be fetched.
 
     Returns:
-        dict(str, int). Dict of exploration IDs to counts of corresponding
+        dict(str, int). Dict of entity IDs to counts of corresponding
         translation suggestions currently in review.
     """
-    exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
+    entity_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
     suggestions_in_review = (
-        suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
-            exp_ids, language_code
+        suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
+            entity_ids, language_code
         )
     )
     for suggestion in suggestions_in_review:
         if suggestion is not None:
-            exp_id_to_in_review_count[suggestion.target_id] += 1
-    return exp_id_to_in_review_count
+            entity_id_to_in_review_count[suggestion.target_id] += 1
+    return entity_id_to_in_review_count
 
 
 def get_exploration_opportunity_summaries_by_ids(

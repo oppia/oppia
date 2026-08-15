@@ -601,7 +601,12 @@ class ReviewableOpportunitiesHandlerV2(
             list(TranslationOpportunityCardInfo). A list of the matching
             translation opportunities.
         """
-        if topic_name:
+        # The dashboard sends an empty topic name when its topic filter is set
+        # to "all", which means the same thing as sending no topic at all.
+        if not topic_name:
+            topic_name = None
+
+        if topic_name is not None:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(

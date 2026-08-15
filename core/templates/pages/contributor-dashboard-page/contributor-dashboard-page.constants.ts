@@ -32,9 +32,13 @@ export interface ContributorDashboardTabsDetails {
 
 export const ContributorDashboardConstants = {
   // Sentinel used by the entity type filter to mean "do not filter by entity
-  // type". It is never sent to the backend as an entity type, and never
-  // describes an individual opportunity.
+  // type". The suggestion list endpoints accept it as their target_type URL
+  // argument, and it never describes an individual opportunity.
   ENTITY_TYPE_SENTINEL_ALL: 'all',
+
+  // Shown when a suggestion review fails and the endpoint that rejected it
+  // did not report a reason.
+  SUGGESTION_REVIEW_FAILURE_MESSAGE: 'Error updating suggestion',
 
   CONTRIBUTOR_DASHBOARD_TABS_DETAILS: {
     myContributionTab: {

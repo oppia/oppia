@@ -33,7 +33,7 @@ if MYPY:  # pragma: no cover
     from core.domain import change_domain  # pylint: disable=invalid-import
     from mypy_imports import base_models, suggestion_models
 
-base_models, suggestion_models, user_models = models.Registry.import_models(
+(base_models, suggestion_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER]
 )
 
@@ -157,10 +157,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             [created_suggestion_model],
         )
 
-    def test_get_all_in_review_translation_suggestions_by_exp_ids(self) -> None:
+    def test_get_all_in_review_translation_suggestions_by_entity_ids(
+        self,
+    ) -> None:
         model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
+            model.get_in_review_translation_suggestions_by_entity_ids(
                 [self.target_id], 'en'
             ),
             [],
@@ -182,7 +184,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         created_suggestion_model = model.get_by_id(suggestion_id)
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
+            model.get_in_review_translation_suggestions_by_entity_ids(
                 [self.target_id], 'en'
             ),
             [created_suggestion_model],

@@ -31,13 +31,14 @@ import {ContributionAndReviewService} from './services/contribution-and-review.s
 import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
+import {LocalStorageService} from 'services/local-storage.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UserInfo} from 'domain/user/user-info.model';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 class MockPlatformFeatureService {
   status = {
@@ -206,7 +207,7 @@ describe('Contributor dashboard page', () => {
     flush();
 
     expect(component.username).toEqual('');
-    expect(component.userIsLoggedIn).toBe(false);
+    expect(component.userIsLoggedIn).toBeFalse();
     expect(component.profilePicturePngDataUrl).toBe(
       urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
@@ -360,9 +361,13 @@ describe('Contributor dashboard page', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
+      expect(component.activeEntityType).toBe(
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+      );
 
-      component.onChangeEntityType('skill');
-      expect(component.activeEntityType).toBe('skill');
+      component.onChangeEntityType(AppConstants.ENTITY_TYPE.SKILL);
+
+      expect(component.activeEntityType).toBe(AppConstants.ENTITY_TYPE.SKILL);
     });
 
     it('should show entity type selector based on active tab and feature flag', () => {

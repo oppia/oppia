@@ -80,7 +80,7 @@ export interface SuggestionChangeDict {
 export interface ActiveSuggestionDict {
   author_name: string;
   change_cmd: SuggestionChangeDict;
-  exploration_content_html: string | string[] | null;
+  entity_content_html: string | string[] | null;
   language_code: string;
   last_updated_msecs: number;
   status: string;
@@ -127,7 +127,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentHtml!: string | string[];
   editedContent!: EditedContentDict;
   errorMessage!: string;
-  explorationContentHtml!: string | string[] | null;
+  entityContentHtml!: string | string[] | null;
   finalCommitMessage!: string;
   initialSuggestionId!: string;
   languageCode!: string;
@@ -347,8 +347,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.translationHtml = this.activeSuggestion.change_cmd.translation_html;
     this.status = this.activeSuggestion.status;
     this.contentHtml = this.activeSuggestion.change_cmd.content_html;
-    this.explorationContentHtml =
-      this.activeSuggestion.exploration_content_html;
+    this.entityContentHtml = this.activeSuggestion.entity_content_html;
     this.contentTypeIsHtml =
       this.activeSuggestion.change_cmd.data_format === 'html';
     this.contentTypeIsUnicode =
@@ -363,7 +362,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         // No review message and no exploration content means the suggestion
         // became obsolete and was auto-rejected in a batch job. See issue
         // #16022.
-        if (!this.reviewMessage && !this.explorationContentHtml) {
+        if (!this.reviewMessage && !this.entityContentHtml) {
           this.reviewMessage =
             AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG;
         }
@@ -432,12 +431,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       : this.contentHtml[0] || '';
   }
 
-  get explorationContentHtmlAsString(): string {
-    if (typeof this.explorationContentHtml === 'string') {
-      return this.explorationContentHtml;
+  get entityContentHtmlAsString(): string {
+    if (typeof this.entityContentHtml === 'string') {
+      return this.entityContentHtml;
     }
-    if (Array.isArray(this.explorationContentHtml)) {
-      return this.explorationContentHtml[0] || '';
+    if (Array.isArray(this.entityContentHtml)) {
+      return this.entityContentHtml[0] || '';
     }
     return '';
   }
@@ -619,52 +618,35 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   /**
-   * Sends the review of the active suggestion to the service that matches its
-   * target type. Skills are reviewed through the skill endpoint and carry no
-   * commit message, since a skill suggestion is not applied as a versioned
-   * commit the way an exploration suggestion is.
+   * Sends the review of the active suggestion, using the suggestion's own
+   * target type so that every entity type is handled the same way here.
    */
   private _reviewActiveSuggestion(
     action: string,
     reviewMessage: string,
     successMessage: string
   ): void {
-    const onSuccess = (): void => {
-      this.alertsService.clearMessages();
-      this.alertsService.addSuccessMessage(successMessage);
-      this.resolveSuggestionAndUpdateModal();
-    };
-    const onFailure = (errorMessage?: string): void => {
-      this.resolvingSuggestion = false;
-      this.alertsService.clearWarnings();
-      this.alertsService.addWarning(
-        `Invalid Suggestion: ${errorMessage ?? 'Error updating suggestion'}`
-      );
-    };
-
-    if (this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL) {
-      this.contributionAndReviewService.reviewSkillSuggestion(
-        this.activeSuggestion.target_id,
-        this.activeSuggestionId,
-        action,
-        reviewMessage,
-        null,
-        onSuccess,
-        onFailure
-      );
-    } else {
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        this.activeSuggestion.target_id,
-        this.activeSuggestionId,
-        action,
-        reviewMessage,
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION
-          ? this.finalCommitMessage
-          : null,
-        onSuccess,
-        onFailure
-      );
-    }
+    this.contributionAndReviewService.reviewTranslationSuggestion(
+      this.activeSuggestion.target_type,
+      this.activeSuggestion.target_id,
+      this.activeSuggestionId,
+      action,
+      reviewMessage,
+      // A rejected suggestion is not applied, so there is no commit to make.
+      action === AppConstants.ACTION_ACCEPT_SUGGESTION
+        ? this.finalCommitMessage
+        : null,
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage(successMessage);
+        this.resolveSuggestionAndUpdateModal();
+      },
+      errorMessage => {
+        this.resolvingSuggestion = false;
+        this.alertsService.clearWarnings();
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+      }
+    );
   }
 
   rejectAndReviewNext(reviewMessage: string): void {
@@ -701,8 +683,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           'Translation'
         );
 
-        // In case of rejection, the suggestion is not applied, so there is no
-        // commit message. Because there is no commit to make.
         this._reviewActiveSuggestion(
           AppConstants.ACTION_REJECT_SUGGESTION,
           reviewMessage || this.reviewMessage,
@@ -728,13 +708,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  // Returns whether the active suggestion's exploration_content_html
+  // Returns whether the active suggestion's entity_content_html
   // differs from the content_html of the suggestion's change object.
   hasExplorationContentChanged(): boolean {
-    return !this.isHtmlContentEqual(
-      this.contentHtml,
-      this.explorationContentHtml
-    );
+    return !this.isHtmlContentEqual(this.contentHtml, this.entityContentHtml);
   }
 
   isHtmlContentEqual(

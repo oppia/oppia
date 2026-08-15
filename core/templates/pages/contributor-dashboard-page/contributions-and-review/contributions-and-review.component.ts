@@ -74,7 +74,7 @@ export interface Suggestion {
   target_id: string;
   suggestion_id: string;
   author_name: string;
-  exploration_content_html: string | null;
+  entity_content_html: string | null;
 }
 
 export interface ContributionsSummary {
@@ -137,16 +137,10 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 })
 export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   @Input() activeTopicName: string;
-  @Input() activeEntityType: string = AppConstants.ENTITY_TYPE.EXPLORATION;
+  @Input() activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activeEntityType) {
-      this.activeExplorationId = null;
-      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
-    }
-  }
 
   get ENTITY_TYPE_SKILL(): string {
     return AppConstants.ENTITY_TYPE.SKILL;
@@ -296,7 +290,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         labelText:
           // Missing exploration content means the translation suggestion is
           // now obsolete. See issue #16022.
-          suggestion.exploration_content_html === null
+          suggestion.entity_content_html === null
             ? 'Obsolete'
             : this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -524,61 +518,38 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;
 
-    const onSuccess = (): void => {
-      this.alertsService.clearMessages();
-      this.alertsService.addSuccessMessage(
-        `Suggestion ${
-          currentSuggestionSummary.action_status === 'accept'
-            ? 'accepted'
-            : 'rejected'
-        }.`
-      );
-      clearTimeout(this.commitTimeout);
-      this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-        [currentSuggestionSummary.suggestion_id]
-      );
-      delete this.contributions[currentSuggestionSummary.suggestion_id];
-      this.isCommitting = false;
-    };
-    // The skill review callback reports no message, so a generic one is used
-    // when the service does not supply the backend's error.
-    const onFailure = (errorMessage?: string): void => {
-      this.alertsService.clearWarnings();
-      this.alertsService.addWarning(
-        `Invalid Suggestion: ${errorMessage ?? 'Error updating suggestion'}`
-      );
-      this.isCommitting = false;
-    };
+    const suggestionWasAccepted =
+      currentSuggestionSummary.action_status ===
+      AppConstants.ACTION_ACCEPT_SUGGESTION;
 
-    if (
-      currentSuggestionSummary.target_type === AppConstants.ENTITY_TYPE.SKILL
-    ) {
-      // Skills have no commit message, since a skill suggestion is not applied
-      // as a versioned commit the way an exploration suggestion is.
-      this.contributionAndReviewService.reviewSkillSuggestion(
-        currentSuggestionSummary.target_id,
-        currentSuggestionSummary.suggestion_id,
-        currentSuggestionSummary.action_status,
-        currentSuggestionSummary.reviewer_message,
-        null,
-        onSuccess,
-        onFailure
-      );
-    } else {
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        currentSuggestionSummary.target_id,
-        currentSuggestionSummary.suggestion_id,
-        currentSuggestionSummary.action_status,
-        currentSuggestionSummary.reviewer_message,
-        // Only include commit_message for accepted suggestions.
-        currentSuggestionSummary.action_status === 'accept' &&
-          currentSuggestionSummary.commit_message
-          ? currentSuggestionSummary.commit_message
-          : null,
-        onSuccess,
-        onFailure
-      );
-    }
+    this.contributionAndReviewService.reviewTranslationSuggestion(
+      currentSuggestionSummary.target_type,
+      currentSuggestionSummary.target_id,
+      currentSuggestionSummary.suggestion_id,
+      currentSuggestionSummary.action_status,
+      currentSuggestionSummary.reviewer_message,
+      // Only include commit_message for accepted suggestions.
+      suggestionWasAccepted && currentSuggestionSummary.commit_message
+        ? currentSuggestionSummary.commit_message
+        : null,
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage(
+          `Suggestion ${suggestionWasAccepted ? 'accepted' : 'rejected'}.`
+        );
+        clearTimeout(this.commitTimeout);
+        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+          [currentSuggestionSummary.suggestion_id]
+        );
+        delete this.contributions[currentSuggestionSummary.suggestion_id];
+        this.isCommitting = false;
+      },
+      errorMessage => {
+        this.alertsService.clearWarnings();
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        this.isCommitting = false;
+      }
+    );
   }
 
   showUndoSnackbar(): void {
@@ -750,6 +721,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            // The list can mix entity types when the filter is on "All", so
+            // each opportunity carries its own type for the suggestion fetch
+            // that follows a click. Legacy opportunities carry no entity type
+            // and are always explorations.
+            entityType:
+              opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
           };
           opportunitiesDicts.push(opportunityDict);
         });
@@ -793,8 +770,20 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  onClickReviewableTranslations(explorationId: string): void {
-    this.activeExplorationId = explorationId;
+  onClickReviewableTranslations(entityId: string): void {
+    this.activeExplorationId = entityId;
+  }
+
+  /**
+   * Returns the entity type to fetch suggestions for. An opened opportunity
+   * decides its own type, because the "All" filter lists several entity types
+   * side by side and the filter cannot say which one was clicked.
+   */
+  private getEntityTypeForSuggestionFetch(): string {
+    const activeOpportunity = this.opportunities.find(
+      opportunity => opportunity.id === this.activeExplorationId
+    );
+    return activeOpportunity?.entityType || this.activeEntityType;
   }
 
   onClickBackToReviewableLessons(): void {
@@ -862,6 +851,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   setReviewableQuestionsSortKey(sortKey: string): void {
     this.reviewableQuestionsSortKey = sortKey;
     this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // The first change is the initial binding, which arrives before the lists
+    // have loaded anything, so only a later change to the filter needs to
+    // close the open opportunity and reload.
+    if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
+      this.activeExplorationId = null;
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+    }
   }
 
   ngOnInit(): void {
@@ -1037,7 +1036,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
             shouldResetOffset,
             this.reviewableTranslationsSortKey,
             this.activeExplorationId,
-            this.activeEntityType
+            this.getEntityTypeForSuggestionFetch()
           );
         },
       },

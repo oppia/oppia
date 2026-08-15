@@ -34,6 +34,14 @@ export interface EntityTypeOption {
   label: string;
 }
 
+// The option shown when the contributor has not narrowed the list down to a
+// single content type. It is also the label fallback for an unrecognised
+// entity type.
+const ENTITY_TYPE_ALL_OPTION: EntityTypeOption = {
+  id: ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
+  label: 'All',
+};
+
 @Component({
   selector: 'entity-type-selector',
   templateUrl: './entity-type-selector.component.html',
@@ -49,10 +57,7 @@ export class EntityTypeSelectorComponent implements OnInit {
 
   dropdownShown = false;
   entityTypeOptions: EntityTypeOption[] = [
-    {
-      id: ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
-      label: 'All',
-    },
+    ENTITY_TYPE_ALL_OPTION,
     {
       id: AppConstants.ENTITY_TYPE.EXPLORATION,
       label: 'Lessons',
@@ -65,23 +70,16 @@ export class EntityTypeSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.activeEntityType) {
-      this.activeEntityType =
-        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
+      this.activeEntityType = ENTITY_TYPE_ALL_OPTION.id;
     }
     this.setActiveEntityType.emit(this.activeEntityType);
   }
 
-  toggleDropdown(event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
+  toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  selectOption(entityTypeId: string, event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
+  selectOption(entityTypeId: string): void {
     this.activeEntityType = entityTypeId;
     this.setActiveEntityType.emit(this.activeEntityType);
     this.dropdownShown = false;
@@ -91,7 +89,7 @@ export class EntityTypeSelectorComponent implements OnInit {
     const activeOption = this.entityTypeOptions.find(
       option => option.id === this.activeEntityType
     );
-    return activeOption ? activeOption.label : 'All';
+    return activeOption ? activeOption.label : ENTITY_TYPE_ALL_OPTION.label;
   }
 
   /**

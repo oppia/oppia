@@ -67,6 +67,9 @@ const CONTENT_TYPE_METADATA = 'metadata';
 const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
 const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
 const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
+const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill_description';
+const CONTENT_TYPE_SKILL_EXPLANATION = 'skill_explanation';
+const CONTENT_TYPE_MISCONCEPTION_FEEDBACK = 'misconception_feedback';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -91,7 +94,7 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
   reviewerOnlyContentCount: number;
-  entityType?: string;
+  entityType: string;
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -233,12 +236,10 @@ export class TranslationModalComponent {
       this.translationLanguageService.getActiveLanguageDescription();
 
     if (!this.modifyTranslationOpportunity) {
-      const entityType =
-        this.opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION;
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
       this.pageContextService.setCustomEntityContext(
-        entityType,
+        this.opportunity.entityType,
         this.opportunity.id
       );
 
@@ -254,7 +255,7 @@ export class TranslationModalComponent {
             this.opportunity.reviewerOnlyContentCount > 0;
           this.loadingData = false;
         },
-        entityType
+        this.opportunity.entityType
       );
     } else {
       // Initialize the translation modal with the "modify translation" opportunity
@@ -554,6 +555,15 @@ export class TranslationModalComponent {
         return 'label';
       case 'rule':
         return 'input rule';
+      // A skill's content types are named after the field they come from, so
+      // they are spelled out here rather than shown to the contributor as
+      // their raw identifiers.
+      case CONTENT_TYPE_SKILL_DESCRIPTION:
+        return 'skill description';
+      case CONTENT_TYPE_SKILL_EXPLANATION:
+        return 'skill explanation';
+      case CONTENT_TYPE_MISCONCEPTION_FEEDBACK:
+        return 'misconception feedback';
     }
     return contentType;
   }

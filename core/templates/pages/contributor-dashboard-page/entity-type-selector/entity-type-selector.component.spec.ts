@@ -19,6 +19,8 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {EntityTypeSelectorComponent} from './entity-type-selector.component';
 import {ElementRef} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('EntityTypeSelectorComponent', () => {
   let component: EntityTypeSelectorComponent;
@@ -36,45 +38,82 @@ describe('EntityTypeSelectorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize activeEntityType to all if not provided', () => {
-    component.activeEntityType = '';
-    component.ngOnInit();
-    expect(component.activeEntityType).toBe('all');
+  it('should offer one option per selectable content type', () => {
+    expect(component.entityTypeOptions).toEqual([
+      {
+        id: ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
+        label: 'All',
+      },
+      {id: AppConstants.ENTITY_TYPE.EXPLORATION, label: 'Lessons'},
+      {id: AppConstants.ENTITY_TYPE.SKILL, label: 'Skills'},
+    ]);
   });
 
-  it('should toggle dropdown visibility with or without event', () => {
+  it('should default to all and report that to the parent when no entity type is provided', () => {
+    spyOn(component.setActiveEntityType, 'emit');
+    component.activeEntityType = '';
+
+    component.ngOnInit();
+
+    expect(component.activeEntityType).toBe(
+      ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+    );
+    expect(component.setActiveEntityType.emit).toHaveBeenCalledWith(
+      ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+    );
+  });
+
+  it('should keep the provided entity type on init', () => {
+    spyOn(component.setActiveEntityType, 'emit');
+    component.activeEntityType = AppConstants.ENTITY_TYPE.SKILL;
+
+    component.ngOnInit();
+
+    expect(component.activeEntityType).toBe(AppConstants.ENTITY_TYPE.SKILL);
+    expect(component.setActiveEntityType.emit).toHaveBeenCalledWith(
+      AppConstants.ENTITY_TYPE.SKILL
+    );
+  });
+
+  it('should toggle dropdown visibility', () => {
     expect(component.dropdownShown).toBeFalse();
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-    component.toggleDropdown(event);
-    expect(event.stopPropagation).toHaveBeenCalled();
+
+    component.toggleDropdown();
     expect(component.dropdownShown).toBeTrue();
+
     component.toggleDropdown();
     expect(component.dropdownShown).toBeFalse();
   });
 
-  it('should select an option and emit the event with or without event parameter', () => {
+  it('should select an option, emit it and close the dropdown', () => {
     spyOn(component.setActiveEntityType, 'emit');
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-    component.selectOption('skill', event);
-    expect(event.stopPropagation).toHaveBeenCalled();
-    expect(component.activeEntityType).toBe('skill');
-    expect(component.setActiveEntityType.emit).toHaveBeenCalledWith('skill');
+    component.activeEntityType =
+      ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
+    component.dropdownShown = true;
+
+    component.selectOption(AppConstants.ENTITY_TYPE.SKILL);
+
+    expect(component.activeEntityType).toBe(AppConstants.ENTITY_TYPE.SKILL);
+    expect(component.setActiveEntityType.emit).toHaveBeenCalledWith(
+      AppConstants.ENTITY_TYPE.SKILL
+    );
     expect(component.dropdownShown).toBeFalse();
   });
 
-  it('should return correct label for active entity type', () => {
-    component.activeEntityType = 'all';
+  it('should return the label of the active entity type', () => {
+    component.activeEntityType =
+      ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
     expect(component.getActiveEntityTypeLabel()).toBe('All');
 
-    component.activeEntityType = 'exploration';
+    component.activeEntityType = AppConstants.ENTITY_TYPE.EXPLORATION;
     expect(component.getActiveEntityTypeLabel()).toBe('Lessons');
 
-    component.activeEntityType = 'skill';
+    component.activeEntityType = AppConstants.ENTITY_TYPE.SKILL;
     expect(component.getActiveEntityTypeLabel()).toBe('Skills');
 
-    component.activeEntityType = 'unknown';
+    // An entity type with no option of its own falls back to the "All" label
+    // rather than showing an empty selector.
+    component.activeEntityType = AppConstants.ENTITY_TYPE.TOPIC;
     expect(component.getActiveEntityTypeLabel()).toBe('All');
   });
 

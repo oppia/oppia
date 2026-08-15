@@ -194,11 +194,8 @@ export class ContributionOpportunitiesBackendApiService {
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
       };
-      if (
-        entityType &&
-        entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
-      ) {
-        params.entity_type = entityType;
+      if (this.shouldFilterByEntityType(entityType)) {
+        params.entity_type = entityType as string;
       }
 
       return this.http
@@ -261,10 +258,24 @@ export class ContributionOpportunitiesBackendApiService {
       );
   }
 
+  /**
+   * Returns whether the opportunity request should carry an entity_type
+   * parameter. An absent entity type, or the "all" sentinel, both mean that
+   * opportunities of every entity type are wanted, which the handlers express
+   * by the parameter being omitted.
+   */
+  private shouldFilterByEntityType(entityType?: string): boolean {
+    return (
+      entityType !== undefined &&
+      entityType !== '' &&
+      entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+    );
+  }
+
   async fetchReviewableTranslationOpportunitiesAsync(
     topicName: string,
     languageCode?: string,
-    entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    entityType?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: Record<string, string> = {};
 
@@ -280,11 +291,8 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      if (
-        entityType &&
-        entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
-      ) {
-        params.entity_type = entityType;
+      if (this.shouldFilterByEntityType(entityType)) {
+        params.entity_type = entityType as string;
       }
       return this.http
         .get<ReviewableTranslationOpportunitiesBackendDictV2>(

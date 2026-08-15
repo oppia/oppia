@@ -21,11 +21,13 @@ import {
   Injector,
   Input,
   OnChanges,
+  OnInit,
   SimpleChanges,
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {PageContextService} from 'services/page-context.service';
@@ -45,11 +47,12 @@ import {TranslateTextService} from '../services/translate-text.service';
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
-export class TranslationOpportunitiesComponent implements OnChanges {
+export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() activeEntityType: string = 'exploration';
+  @Input() activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};

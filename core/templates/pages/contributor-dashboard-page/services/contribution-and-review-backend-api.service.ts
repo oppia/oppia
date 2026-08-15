@@ -107,7 +107,7 @@ export class ContributionAndReviewBackendApiService {
     limit: number | null,
     offset: number,
     sortKey: string,
-    explorationId: string | null,
+    entityId: string | null,
     topicName: string | null,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
@@ -121,16 +121,8 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
-      // The target_type is a path argument of the suggestion list endpoints,
-      // so a concrete value is always required. "All" therefore falls back to
-      // explorations until those endpoints can express every entity type.
-      const actualTargetType =
-        !targetType ||
-        targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
-          ? AppConstants.ENTITY_TYPE.EXPLORATION
-          : targetType;
       return this.fetchSubmittedSuggestionsAsync(
-        actualTargetType,
+        this.getTargetTypeUrlArgument(targetType),
         'translate_content',
         limit || 0,
         offset,
@@ -149,25 +141,27 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
-      // The target_type is a path argument of the suggestion list endpoints,
-      // so a concrete value is always required. "All" therefore falls back to
-      // explorations until those endpoints can express every entity type.
-      const actualTargetType =
-        !targetType ||
-        targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
-          ? AppConstants.ENTITY_TYPE.EXPLORATION
-          : targetType;
       return this.fetchReviewableSuggestionsAsync(
-        actualTargetType,
+        this.getTargetTypeUrlArgument(targetType),
         'translate_content',
         limit,
         offset,
         sortKey,
-        explorationId,
+        entityId,
         null
       );
     }
     throw new Error('Invalid fetch type');
+  }
+
+  /**
+   * Returns the value to send as the target_type path argument of the
+   * suggestion list endpoints. Those endpoints accept the "all" sentinel to
+   * mean "every target type", so an absent filter is sent as that sentinel
+   * rather than being narrowed to one entity type.
+   */
+  private getTargetTypeUrlArgument(targetType?: string): string {
+    return targetType || ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   }
 
   async fetchSubmittedSuggestionsAsync(
@@ -198,7 +192,7 @@ export class ContributionAndReviewBackendApiService {
     limit: number | null,
     offset: number,
     sortKey: string,
-    explorationId: string | null,
+    entityId: string | null,
     topicName: string | null
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -212,7 +206,7 @@ export class ContributionAndReviewBackendApiService {
       limit?: string;
       offset: string;
       sort_key: string;
-      exploration_id?: string;
+      entity_id?: string;
       topic_name?: string;
     } = {
       offset: offset.toString(),
@@ -234,8 +228,8 @@ export class ContributionAndReviewBackendApiService {
     if (limit) {
       params.limit = limit.toString();
     }
-    if (explorationId) {
-      params.exploration_id = explorationId;
+    if (entityId) {
+      params.entity_id = entityId;
     }
     if (topicName) {
       params.topic_name = topicName;

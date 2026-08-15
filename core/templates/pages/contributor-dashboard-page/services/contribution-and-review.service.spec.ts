@@ -24,6 +24,7 @@ import {
   FetchSuggestionsResponse,
 } from './contribution-and-review.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {
   ContributionAndReviewBackendApiService,
   ContributorCertificateInfo,
@@ -802,6 +803,101 @@ describe('Contribution and review service', () => {
         expect(fetchExplorationSpy).not.toHaveBeenCalled();
       }
     );
+  });
+
+  describe('reviewTranslationSuggestion', () => {
+    let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
+    let onFailure: jasmine.Spy<(errorMessage: string) => void>;
+
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy('onSuccess');
+      onFailure = jasmine.createSpy('onFailure');
+    });
+
+    it('should review an exploration suggestion through the exploration endpoint', fakeAsync(() => {
+      const reviewExplorationSpy = spyOn(
+        cars,
+        'reviewExplorationSuggestion'
+      ).and.returnValue(Promise.resolve());
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        'exp_1',
+        'suggestion_1',
+        'accept',
+        'review message',
+        'commit message',
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      expect(reviewExplorationSpy).toHaveBeenCalledWith(
+        'exp_1',
+        'suggestion_1',
+        'accept',
+        'review message',
+        'commit message',
+        onSuccess,
+        onFailure
+      );
+    }));
+
+    it('should review a skill suggestion through the skill endpoint without a commit message', fakeAsync(() => {
+      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
+        Promise.resolve()
+      );
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'skill_1',
+        'suggestion_1',
+        'accept',
+        'review message',
+        'commit message',
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      // The commit message is dropped, because accepting a skill translation
+      // does not create a new version of the skill.
+      expect(carbas.reviewSkillSuggestionAsync).toHaveBeenCalledWith(
+        'skill_1',
+        'suggestion_1',
+        {
+          action: 'accept',
+          review_message: 'review message',
+        }
+      );
+      expect(onSuccess).toHaveBeenCalledWith('suggestion_1');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should report a generic message when a skill review fails', fakeAsync(() => {
+      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
+        Promise.reject()
+      );
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'skill_1',
+        'suggestion_1',
+        'reject',
+        'review message',
+        null,
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      // The skill endpoint reports no reason for a failure, so the caller is
+      // given a message it can show as is.
+      expect(onFailure).toHaveBeenCalledWith(
+        ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+      );
+      expect(onSuccess).not.toHaveBeenCalled();
+    }));
   });
 
   describe('reviewExplorationSuggestion', () => {

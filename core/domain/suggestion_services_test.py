@@ -2757,13 +2757,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('author_id', self.author_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
-    def test_get_translation_suggestions_in_review_by_exp_ids(self) -> None:
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+    def test_get_translation_suggestions_in_review_by_entity_ids(self) -> None:
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1, self.target_id_2, self.target_id_3], 'en'
         )
         self.assertEqual(len(suggestions), 0)
         self._create_translation_suggestion_with_language_code('en')
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1], 'en'
         )
         # Ruling out the possibility of None for mypy type checking.
@@ -3164,7 +3164,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(  # pylint: disable=line-too-long
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(  # pylint: disable=line-too-long
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )
@@ -3187,7 +3187,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )
