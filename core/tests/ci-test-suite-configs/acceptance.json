@@ -87,8 +87,8 @@
     },
     {
       "name": "curriculum-admin/try-to-paste-invalid-components-and-get-error",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",

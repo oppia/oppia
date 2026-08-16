@@ -1225,6 +1225,36 @@ export class CurriculumAdmin extends TopicManager {
       await this.expectElementToBeVisible(expandWorkedExampleButton);
     }
   }
+
+  async clearRte(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOnElementWithSelector(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+  }
+
+  async typeTextInReviewMaterialEditor(text: string): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOnElementWithSelector(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, text);
+  }
+
+  async copyWorkedExampleFromReviewMaterialRte(): Promise<string> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    const html = await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector);
+      return el ? el.innerHTML : '';
+    }, richTextAreaField);
+    return html;
+  }
+
+  async copyContentFromReviewMaterialRte(): Promise<string> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    const html = await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector);
+      return el ? el.innerHTML : '';
+    }, richTextAreaField);
+    return html;
+  }
 }
 
 export const CurriculumAdminFactory = (page: Page): CurriculumAdmin => {
