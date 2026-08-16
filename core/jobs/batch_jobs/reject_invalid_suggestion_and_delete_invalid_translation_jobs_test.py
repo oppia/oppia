@@ -327,6 +327,119 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
         )
 
+    def test_invalid_suggestion_submitted_on_older_version_is_rejected(
+        self,
+    ) -> None:
+        self.exp_1.title = 'Updated Title'
+        self.exp_1.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Update exploration title',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Updated Title',
+                }
+            ],
+        )
+
+        entity_translation_v2 = (
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.EXP_1_ID,
+                self.exp_1.version,
+                'hi',
+                {
+                    'content_0': TRANSLATED_CONTENT_DICT,
+                },
+            )
+        )
+        self.put_multi([entity_translation_v2])
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        invalid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        invalid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([invalid_suggestion])
+
+        errored_value = (
+            '{'
+            f'\'entity_id\': \'{self.exp_1.id}\', \'entity_version\': '
+            f'{self.exp_1.version}, \'entity_translation_model_id\': '
+            f'\'{entity_translation_v2.id}\', \'content_id\': '
+            f'\'content_0\', \'suggestion_id\': {invalid_suggestion.id}'
+            '}'
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {errored_value}'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+            ]
+        )
+
+        updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            invalid_suggestion.id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+
+    def test_suggestion_for_content_translated_only_at_older_version_is_not_rejected(
+        self,
+    ) -> None:
+        self.exp_1.title = 'Updated Title'
+        self.exp_1.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Update exploration title',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Updated Title',
+                }
+            ],
+        )
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
+
+        self.assert_job_output_is_empty()
+
+        unchanged_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            suggestion.id
+        )
+        self.assertEqual(
+            unchanged_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
 
 class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase

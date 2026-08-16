@@ -436,6 +436,15 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
             and corresponding suggestion id.
         """
         with datastore_services.get_ndb_context():
+            exp_model = exp_models.ExplorationModel.get(
+                entity_translation_model.entity_id, strict=False
+            )
+            if (
+                exp_model is None
+                or exp_model.version != entity_translation_model.entity_version
+            ):
+                return
+
             content_ids_not_needing_update = []
             for content_id in entity_translation_model.translations.keys():
                 if (
@@ -446,14 +455,15 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                 ):
                     content_ids_not_needing_update.append(content_id)
 
+            if not content_ids_not_needing_update:
+                return
+
             suggestions: Sequence[suggestion_models.GeneralSuggestionModel] = (
                 suggestion_models.GeneralSuggestionModel.query(
                     suggestion_models.GeneralSuggestionModel.suggestion_type
                     == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
                     suggestion_models.GeneralSuggestionModel.target_id
                     == entity_translation_model.entity_id,
-                    suggestion_models.GeneralSuggestionModel.target_version_at_submission
-                    == (entity_translation_model.entity_version),
                     suggestion_models.GeneralSuggestionModel.language_code
                     == (entity_translation_model.language_code),
                     suggestion_models.GeneralSuggestionModel.status
