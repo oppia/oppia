@@ -34,6 +34,8 @@ if MYPY:  # pragma: no cover
     [models.Names.BASE_MODEL, models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class CertificateAssessmentOfferingSnapshotContentModelTests(
     test_utils.GenericTestBase
@@ -244,6 +246,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         finished_at = started_at + datetime.timedelta(minutes=7)
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=84.5,
             attempt_index=2,
             attempt_data=self._get_sample_attempt_data(),
@@ -285,6 +288,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         started_at = datetime.datetime.utcnow()
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=60.0,
             attempt_index=1,
             attempt_data=self._get_sample_attempt_data(),
@@ -304,6 +308,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.learner_id, 'learner_id_1')
+        self.assertEqual(fetched_model.certificate_id, 'cert_abc123')
         self.assertEqual(fetched_model.total_score, 60.0)
         self.assertEqual(fetched_model.attempt_index, 1)
         self.assertEqual(
@@ -332,6 +337,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
     def test_apply_deletion_policy_deletes_attempts_for_user(self) -> None:
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=60.0,
             attempt_index=1,
             attempt_data=self._get_sample_attempt_data(),
@@ -371,6 +377,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         ), get_by_id_swap, convert_to_hash_swap:
             certificate_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=0.0,
                 attempt_index=1,
                 attempt_data=self._get_sample_attempt_data(),
@@ -402,6 +409,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         attempt: gae_models.CertificateAssessmentAttemptModel = (
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=1,
                 attempt_data={
@@ -423,6 +431,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
         )
         gae_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt.key,
             attempt_id=attempt.id,
             question_id='question_id_1',
             question_version=1,
@@ -445,6 +454,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         attempt: gae_models.CertificateAssessmentAttemptModel = (
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=1,
                 attempt_data={
@@ -466,6 +476,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
         )
         response = gae_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt.key,
             attempt_id=attempt.id,
             question_id='question_id_1',
             question_version=1,
@@ -477,9 +488,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             'learner_id_1'
         )
 
-        self.assertIsNone(
-            gae_models.CertificateAssessmentResponseModel.get_by_id(response.id)
-        )
+        self.assertIsNone(response.key.get())
 
     def test_apply_deletion_policy_noops_when_user_has_no_attempts(
         self,
@@ -495,6 +504,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         for index in range(31):
             attempt = gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=index + 1,
                 attempt_data={
@@ -516,6 +526,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
             responses.append(
                 gae_models.CertificateAssessmentResponseModel.create(
+                    attempt_key=attempt.key,
                     attempt_id=attempt.id,
                     question_id='question_id_1',
                     question_version=1,
@@ -535,29 +546,25 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
 
         for response in responses:
-            self.assertIsNone(
-                gae_models.CertificateAssessmentResponseModel.get_by_id(
-                    response.id
-                )
-            )
+            self.assertIsNone(response.key.get())
 
     def test_create_and_retrieve_lifecycle(self) -> None:
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
+        )
         response = certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
             attempt_id='attempt_id_1',
             question_id='question_id_1',
             question_version=1,
             selected_answer='Option A',
             is_correct=True,
         )
-        response_id = response.id
 
-        self.assertEqual(len(response_id), 12)
+        self.assertEqual(response.id, 'question_id_1')
+        self.assertEqual(response.key.parent(), attempt_key)
 
-        fetched_model = (
-            certificate_models.CertificateAssessmentResponseModel.get_by_id(
-                response_id
-            )
-        )
+        fetched_model = response.key.get()
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.attempt_id, 'attempt_id_1')
         self.assertEqual(fetched_model.question_id, 'question_id_1')
@@ -566,9 +573,13 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fetched_model.is_correct)
 
     def test_create_multi_and_retrieve_lifecycle(self) -> None:
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
+        )
         responses = (
             certificate_models.CertificateAssessmentResponseModel.create_multi(
-                [
+                attempt_key=attempt_key,
+                response_dicts=[
                     {
                         'attempt_id': 'attempt_id_1',
                         'question_id': 'question_id_1',
@@ -583,18 +594,18 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
                         'selected_answer': 'Option B',
                         'is_correct': False,
                     },
-                ]
+                ],
             )
         )
 
-        self.assertEqual(len(responses), 2)
-        self.assertNotEqual(responses[0].id, responses[1].id)
-
-        fetched_models = (
-            certificate_models.CertificateAssessmentResponseModel.get_multi(
-                [response.id for response in responses]
-            )
+        self.assertEqual(
+            [response.id for response in responses],
+            ['question_id_1', 'question_id_2'],
         )
+        for response in responses:
+            self.assertEqual(response.key.parent(), attempt_key)
+
+        fetched_models = [response.key.get() for response in responses]
         self.assertEqual(
             [fetched_model.attempt_id for fetched_model in fetched_models],
             ['attempt_id_1', 'attempt_id_1'],
@@ -612,28 +623,34 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             [True, False],
         )
 
-    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
-        """Ensures the ID generator raises after exhausting retries."""
-        get_by_id_swap = self.swap(
-            certificate_models.CertificateAssessmentResponseModel,
-            'get_by_id',
-            lambda *args, **kwargs: True,
+    def test_create_overwrites_existing_response_on_retry(self) -> None:
+        """Ensures a retried submission overwrites the same entity."""
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
         )
-        convert_to_hash_swap = self.swap(
-            utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
+        certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
+        )
+        certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option B',
+            is_correct=False,
         )
 
-        with self.assertRaisesRegex(
-            Exception,
-            (
-                'The id generator for CertificateAssessmentResponseModel '
-                'is producing too many collisions.'
-            ),
-        ), get_by_id_swap, convert_to_hash_swap:
-            certificate_models.CertificateAssessmentResponseModel.create(
-                attempt_id='attempt_id_1',
-                question_id='question_id_1',
-                question_version=1,
-                selected_answer='Option A',
-                is_correct=False,
-            )
+        fetched_models = (
+            certificate_models.CertificateAssessmentResponseModel.query(
+                certificate_models.CertificateAssessmentResponseModel.attempt_id
+                == 'attempt_id_1'
+            ).fetch()
+        )
+        self.assertEqual(len(fetched_models), 1)
+        self.assertEqual(fetched_models[0].selected_answer, 'Option B')
+        self.assertFalse(fetched_models[0].is_correct)
