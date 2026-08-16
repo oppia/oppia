@@ -80,11 +80,7 @@ describe('AdventureNavigationComponent', () => {
     const container = fixture.nativeElement.querySelector(
       '.adventure-navigation-container'
     );
-    expect(
-      container.classList.contains(
-        'adventure-navigation-container--editor-preview'
-      )
-    ).toBeTrue();
+    expect(container.style.top).toBe('126px');
 
     tick(500);
   }));
@@ -105,11 +101,7 @@ describe('AdventureNavigationComponent', () => {
     const container = fixture.nativeElement.querySelector(
       '.adventure-navigation-container'
     );
-    expect(
-      container.classList.contains(
-        'adventure-navigation-container--editor-preview'
-      )
-    ).toBeFalse();
+    expect(container.style.top).toBe('56px');
 
     tick(500);
   }));

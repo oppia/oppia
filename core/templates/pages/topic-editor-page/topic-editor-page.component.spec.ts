@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for topic editor page component.
  */
 
-import {DOCUMENT} from '@angular/common';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -77,7 +76,6 @@ describe('Topic editor page', () => {
   let urlService: UrlService;
   let topic: Topic;
   let ngbModal: NgbModal;
-  let platformFeatureService: PlatformFeatureService;
   let runSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -120,7 +118,6 @@ describe('Topic editor page', () => {
     urlService = TestBed.inject(UrlService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     runSpy = jasmine.createSpy('run');
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
@@ -215,36 +212,6 @@ describe('Topic editor page', () => {
 
     component.hideWarnings();
     expect(component.warningsAreShown).toBe(false);
-  });
-
-  it('should not add the redesigned page body class when the feature is disabled', () => {
-    const document = TestBed.inject(DOCUMENT);
-    const classListAddSpy = spyOn(document.body.classList, 'add');
-    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(topicEditorStateService, 'loadTopic');
-
-    component.ngOnInit();
-
-    expect(classListAddSpy).not.toHaveBeenCalled();
-
-    component.ngOnDestroy();
-  });
-
-  it('should add and remove the redesigned page body class for the enabled lifecycle', () => {
-    const document = TestBed.inject(DOCUMENT);
-    const classListAddSpy = spyOn(document.body.classList, 'add');
-    const classListRemoveSpy = spyOn(document.body.classList, 'remove');
-    platformFeatureService.status.RedesignedTopicViewerPage.isEnabled = true;
-    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(topicEditorStateService, 'loadTopic');
-
-    component.ngOnInit();
-
-    expect(classListAddSpy).toHaveBeenCalledWith('topic-editor-page-active');
-
-    component.ngOnDestroy();
-
-    expect(classListRemoveSpy).toHaveBeenCalledWith('topic-editor-page-active');
   });
 
   it('should open modal, clear changes, reset flag and run callback when confirmed', fakeAsync(() => {

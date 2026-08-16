@@ -13,13 +13,6 @@
   z-index: 30;
 }
 
-/* The topic editor's fixed navbar-helper bar (which adds 70px to the header
-   stack) is only fixed on screens wider than 800px, so only the editor
-   preview needs the extra sticky offset. Keep the default 56px below that. */
-.adventure-navigation-container--editor-preview {
-  top: 126px;
-}
-
 @media (max-width: 800px) {
   .adventure-navigation-container {
     top: 56px;
