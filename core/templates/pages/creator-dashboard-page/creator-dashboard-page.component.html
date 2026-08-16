@@ -346,7 +346,7 @@
                              flex="100"
                              class="position-relative w-100"
                              layoutType="row"
-                             layoutAlignType="space-around center"
+                             layoutAlignType="start center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
                              shareType="exploration"
                               [smallFont]="true"
@@ -465,6 +465,12 @@
   }
   .row-two {
     margin-bottom: 12px;
+  }
+  .row-three {
+    margin-left: -5px;
+  }
+  .row-three ::ng-deep .oppia-sharing-links {
+    justify-content: flex-start !important;
   }
   .oppia-mat-card {
     align-items: baseline;
