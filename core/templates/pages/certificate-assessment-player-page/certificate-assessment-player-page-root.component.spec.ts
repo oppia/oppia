@@ -24,7 +24,7 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {
   CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingData,
-} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';

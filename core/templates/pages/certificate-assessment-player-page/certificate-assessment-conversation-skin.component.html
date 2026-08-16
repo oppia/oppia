@@ -25,7 +25,8 @@
         <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
       <div class="certificate-assessment-prompt-pill">
-        {{ currentQuestion.prompt }}
+        <oppia-rte-output-display [rteString]="currentQuestion.prompt">
+        </oppia-rte-output-display>
       </div>
     </div>
 
@@ -33,7 +34,9 @@
       <label *ngFor="let option of currentQuestion.options" class="certificate-assessment-option-row">
         <input type="radio" class="certificate-assessment-radio" [name]="currentQuestion.id" [checked]="isOptionSelected(option.id)"
                (change)="selectSingleChoice(option.id)">
-        <span class="certificate-assessment-option-text">{{ option.text }}</span>
+        <span class="certificate-assessment-option-text">
+          <oppia-rte-output-display [rteString]="option.text"></oppia-rte-output-display>
+        </span>
       </label>
     </div>
 

@@ -28,7 +28,7 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
@@ -51,6 +51,7 @@ export type AssessmentQuestionType =
 
 export interface AssessmentQuestionOption {
   id: string;
+  // The choice's rich-text HTML, rendered via oppia-rte-output-display.
   text: string;
   // The index of the option in the question's stored choice list. This is
   // the value submitted for multiple-choice questions, so it is independent
@@ -61,6 +62,7 @@ export interface AssessmentQuestionOption {
 export interface AssessmentQuestion {
   id: string;
   type: AssessmentQuestionType;
+  // The question's rich-text HTML, rendered via oppia-rte-output-display.
   prompt: string;
   hint: string;
   options: AssessmentQuestionOption[];
@@ -105,6 +107,13 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   // Answers keyed by question id; a null or missing value means the question
   // was not answered yet.
   answers: {[questionId: string]: string | null} = {};
+  // Derived fields bound by the conversation skin template. They are
+  // recomputed whenever the current question index or the answers change.
+  currentQuestion: AssessmentQuestion | null = null;
+  totalQuestionCount = 0;
+  progressPercentage = 0;
+  isLastQuestion = false;
+  savedResponse = '';
 
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
@@ -115,6 +124,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadQuestion(0);
+    this.refreshComputedFields();
     if (this.showTimeExpiredModal) {
       this.openTimeExpiredModal();
     }
@@ -151,6 +161,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
           )
         );
         this.isLoadingQuestion = false;
+        this.refreshComputedFields();
       })
       .catch(() => {
         this.isLoadingQuestion = false;
@@ -173,7 +184,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     return {
       id: questionId,
       type,
-      prompt: this.stripHtml(stateData.content.html),
+      prompt: stateData.content.html,
       hint: '',
       options,
       placeholder: this.extractPlaceholder(interaction.customization_args),
@@ -229,7 +240,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     }
     return (choices as SubtitledHtmlBackendDict[]).map((choice, index) => ({
       id: choice.content_id ?? `option_${index}`,
-      text: this.stripHtml(choice.html),
+      text: choice.html,
       index,
     }));
   }
@@ -339,12 +350,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     return Array.isArray(xInput) ? (xInput as string[]) : undefined;
   }
 
-  private stripHtml(html: string): string {
-    const domParser = new DOMParser();
-    const dom = domParser.parseFromString(html, 'text/html');
-    return dom.querySelector('body')?.innerText || '';
-  }
-
   private isMobileScreenSize(): boolean {
     return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
   }
@@ -387,6 +392,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     }
     this.currentQuestionIndex += 1;
     this.loadQuestion(this.currentQuestionIndex);
+    this.refreshComputedFields();
   }
 
   previousQuestion(): void {
@@ -394,6 +400,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       return;
     }
     this.currentQuestionIndex -= 1;
+    this.refreshComputedFields();
   }
 
   submitAssessment(): void {
@@ -468,12 +475,26 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     return this.answers[question.id] ?? '';
   }
 
+  /**
+   * Recomputes the derived fields bound by the conversation skin template
+   * from the current question, attempt, and answers. This keeps the template
+   * bindings in sync whenever the current question index or answers change.
+   */
+  private refreshComputedFields(): void {
+    this.currentQuestion = this.getCurrentQuestion();
+    this.totalQuestionCount = this.getTotalQuestionCount();
+    this.progressPercentage = this.getProgressPercentage();
+    this.isLastQuestion = this.isCurrentQuestionLast();
+    this.savedResponse = this.getSavedResponse();
+  }
+
   updateResponse(response: string): void {
     const question = this.getCurrentQuestion();
     if (question === null) {
       return;
     }
     this.answers[question.id] = response;
+    this.refreshComputedFields();
   }
 
   private isResponseCorrect(

@@ -18,7 +18,7 @@
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -73,6 +73,10 @@ export class AssessmentIntroductionCardComponent implements OnInit {
         .filter(topicSummary =>
           offeringTopicIds.includes(topicSummary.getId())
         );
+    } catch {
+      // Keep the recommended topics empty so the component renders its
+      // fallback state instead of propagating the failure through ngOnInit.
+      this.recommendedTopicSummaries = [];
     } finally {
       this.isLoadingTopics = false;
     }

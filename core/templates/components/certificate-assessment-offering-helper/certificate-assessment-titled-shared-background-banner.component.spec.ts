@@ -107,4 +107,17 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
       `TRANSLATED:${BACK_BUTTON_KEY}`
     );
   });
+
+  it('should emit buttonClick exactly once when the button is clicked', () => {
+    component.buttonRoute = ['/certificate-assessment'];
+    fixture.detectChanges();
+
+    const clickSpy = jasmine.createSpy('buttonClickSpy');
+    component.buttonClick.subscribe(clickSpy);
+
+    const button = fixture.nativeElement.querySelector('button');
+    button.click();
+
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+  });
 });

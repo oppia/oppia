@@ -37,7 +37,7 @@ import {
   CertificateAssessmentOfferingBackendApiService,
   CertificateAssessmentQuestionBackendResponse,
 } from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -293,9 +293,14 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should build no questions when the attempt is null', async () => {
     await configureComponent(null);
+    fixture.detectChanges();
 
     expect(component.questions.length).toBe(0);
     expect(component.getCurrentQuestion()).toBeNull();
+    expect(
+      TestBed.inject(CertificateAssessmentOfferingBackendApiService)
+        .getCertificateAssessmentQuestionAsync
+    ).not.toHaveBeenCalled();
   });
 
   it('should advance to the next question on nextQuestion when not at the last question', () => {
@@ -356,6 +361,50 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
     component.currentQuestionIndex = component.questions.length - 1;
     expect(component.isCurrentQuestionLast()).toBeTrue();
+  }));
+
+  it('should recompute the derived fields when the first question loads', fakeAsync(() => {
+    expect(component.currentQuestion).toBeNull();
+    expect(component.totalQuestionCount).toBe(0);
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(component.currentQuestion).toEqual(component.questions[0]);
+    expect(component.totalQuestionCount).toBe(3);
+    expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
+    expect(component.isLastQuestion).toBeFalse();
+  }));
+
+  it('should recompute the derived fields when navigating between questions', fakeAsync(() => {
+    loadAllQuestions();
+    component.currentQuestionIndex = 0;
+
+    component.nextQuestion();
+    expect(component.currentQuestion).toEqual(component.questions[1]);
+    expect(component.isLastQuestion).toBeFalse();
+
+    component.nextQuestion();
+    expect(component.currentQuestion).toEqual(component.questions[2]);
+    expect(component.isLastQuestion).toBeTrue();
+    expect(component.progressPercentage).toBe(100);
+
+    component.previousQuestion();
+    expect(component.currentQuestion).toEqual(component.questions[1]);
+    expect(component.isLastQuestion).toBeFalse();
+  }));
+
+  it('should recompute the saved response field when the answer changes', fakeAsync(() => {
+    loadAllQuestions();
+    component.currentQuestionIndex = 0;
+    expect(component.savedResponse).toBe('');
+
+    component.updateResponse('b');
+    expect(component.savedResponse).toBe('b');
+    expect(component.answers.question_1).toBe('b');
+
+    component.nextQuestion();
+    expect(component.savedResponse).toBe('');
   }));
 
   it('should read and store submitted responses by question id', fakeAsync(() => {

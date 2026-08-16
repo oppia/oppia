@@ -557,7 +557,6 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         gae_models.CertificateAssessmentAttemptModel.create(
             certificate_id=certificate_ids[0]['certificate_id'],
             learner_id=learner_id,
-            certificate_id=certificate_ids[0]['certificate_id'],
             total_score=90.0,
             attempt_index=1,
             attempt_data={

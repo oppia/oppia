@@ -99,6 +99,14 @@ describe('AssessmentInstructionPanelComponent', () => {
     expect(component.startAssessment.emit).toHaveBeenCalled();
   });
 
+  it('should emit back exactly once when onBack is called', () => {
+    spyOn(component.back, 'emit');
+
+    component.onBack();
+
+    expect(component.back.emit).toHaveBeenCalledTimes(1);
+  });
+
   it('should have the correct i18n key for the start assessment button', () => {
     expect(component.startAssessmentButtonI18nKey).toBe(
       'I18N_ASSESSMENT_START_BUTTON'

@@ -6,13 +6,13 @@
   <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
 </div>
 <oppia-certificate-assessment-conversation-skin #conversationSkin
-                                                *ngIf="!isLoadingQuestion && getCurrentQuestion()"
-                                                [currentQuestion]="getCurrentQuestion()!"
+                                                *ngIf="!isLoadingQuestion && currentQuestion"
+                                                [currentQuestion]="currentQuestion"
                                                 [currentQuestionIndex]="currentQuestionIndex"
-                                                [totalQuestions]="getTotalQuestionCount()"
-                                                [progressPercentage]="getProgressPercentage()"
-                                                [isLastQuestion]="isCurrentQuestionLast()"
-                                                [savedResponse]="getSavedResponse()"
+                                                [totalQuestions]="totalQuestionCount"
+                                                [progressPercentage]="progressPercentage"
+                                                [isLastQuestion]="isLastQuestion"
+                                                [savedResponse]="savedResponse"
                                                 (previousQuestion)="previousQuestion()"
                                                 (nextQuestion)="nextQuestion()"
                                                 (submitAssessment)="submitAssessment()"

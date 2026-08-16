@@ -23,7 +23,7 @@ import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomData} from 'domain/classroom/classroom-data.model';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
@@ -177,6 +177,22 @@ describe('AssessmentIntroductionCardComponent', () => {
     await fixture.whenStable();
 
     expect(component.isLoadingTopics).toBe(false);
+  });
+
+  it('should keep the topics empty and stop loading when the classroom API request fails', async () => {
+    const certificateOffering = component.certificateOffering;
+    (
+      classroomBackendApiService.getClassroomDataAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject(new Error('Request failed')));
+    fixture = TestBed.createComponent(AssessmentIntroductionCardComponent);
+    component = fixture.componentInstance;
+    component.certificateOffering = certificateOffering;
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.recommendedTopicSummaries).toEqual([]);
+    expect(component.isLoadingTopics).toBeFalse();
   });
 
   it('should expose the correct i18n key for the demonstrates heading', () => {
