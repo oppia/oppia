@@ -127,15 +127,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
-        # Only execute this job if it's possible to send the emails and there
-        # are reviewers to notify.
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
@@ -171,13 +162,6 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to alert the admins that specific suggestions have been waiting too long
         to get reviewed.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN
@@ -235,14 +219,6 @@ class CronMailReviewerNewSuggestionsHandler(
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
-
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
@@ -401,13 +377,6 @@ class CronMailChapterPublicationsNotificationsHandler(
         and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS days)
         chapter launches.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN

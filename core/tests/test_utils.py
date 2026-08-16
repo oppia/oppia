@@ -58,6 +58,7 @@ from core.domain import (
     param_domain,
     platform_parameter_domain,
     platform_parameter_list,
+    platform_parameter_registry,
     platform_parameter_services,
     question_domain,
     question_services,
@@ -497,12 +498,9 @@ def swap_get_platform_parameter_value_function(
             (x.value, y) for x, y in platform_parameter_name_value_tuples
         )
         if parameter_name not in platform_parameter_name_value_dict:
-            raise Exception(
-                'The value for the platform parameter %s was needed in this '
-                'test, but not specified in the set_platform_parameters '
-                'decorator. Please use this information in the decorator.'
-                % parameter_name
-            )
+            return platform_parameter_registry.Registry.get_platform_parameter(
+                parameter_name
+            ).default_value
         return platform_parameter_name_value_dict[parameter_name]
 
     original_get_platform_parameter_value = getattr(

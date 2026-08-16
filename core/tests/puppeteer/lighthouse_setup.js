@@ -150,6 +150,7 @@ const login = async function (browser, page) {
         document.querySelector(selector).blur();
       }, usernameInput),
     ]);
+    await page.click('.e2e-test-email-preferences-radio-no');
     await page.click(agreeToTermsCheckBox);
     await page.waitForSelector(registerUser);
     await page.click(registerUser);

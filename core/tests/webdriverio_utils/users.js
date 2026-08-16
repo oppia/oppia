@@ -129,6 +129,9 @@ var _completeSignup = async function (username) {
   var usernameInput = $('.e2e-test-username-input');
   await action.setValue('Username input', usernameInput, username);
 
+  var emailPreferencesRadioNo = await $('.e2e-test-email-preferences-radio-no');
+  await action.click('Email preferences radio no', emailPreferencesRadioNo);
+
   var agreeToTermsCheckbox = await $('.e2e-test-agree-to-terms-checkbox');
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 

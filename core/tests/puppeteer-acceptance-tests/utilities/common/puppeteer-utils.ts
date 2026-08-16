@@ -383,6 +383,9 @@ export class BaseUser {
     await this.signInWithEmail(email);
     await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
+    await this.clickOnElementWithSelector(
       'input.e2e-test-agree-to-terms-checkbox'
     );
     await this.page.waitForSelector(
