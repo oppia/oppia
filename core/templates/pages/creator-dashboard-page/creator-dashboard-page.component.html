@@ -344,7 +344,7 @@
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
                              flex="100"
-                             class="dashboard-hide-mobile oppia-dashboard-hide-mobile position-relative w-100"
+                             class="position-relative w-100"
                              layoutType="row"
                              layoutAlignType="space-around center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
@@ -452,12 +452,16 @@
   .row-one, .row-two {
     display: flex;
     font-size: 12px;
-    justify-content: space-between;
+    justify-content: flex-start;
     list-style-type: none;
     margin-bottom: 0;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
+  }
+  .row-one li, .row-two li {
+    text-align: left;
+    width: 50%;
   }
   .row-two {
     margin-bottom: 12px;
@@ -869,10 +873,6 @@
       padding-right: 10px;
     }
 
-    sharing-links {
-      display: none;
-    }
-
     .oppia-dashboard-container .oppia-dashboard-tabs {
       justify-content: center;
     }
@@ -886,8 +886,7 @@
       width: 100%;
     }
 
-    .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
-    .oppia-dashboard-container .oppia-dashboard-card-view-item .oppia-sharing-links {
+    .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle {
       display: none;
     }
 
