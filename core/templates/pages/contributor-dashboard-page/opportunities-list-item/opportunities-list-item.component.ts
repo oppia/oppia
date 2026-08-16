@@ -64,6 +64,7 @@ export class OpportunitiesListItemComponent {
   @Input() opportunityType!: string;
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
+  @Input() disableButtonOnComplete: boolean = true;
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
 
@@ -199,15 +200,17 @@ export class OpportunitiesListItemComponent {
           }
 
           this.opportunityButtonDisabled =
+            this.disableButtonOnComplete &&
             this.opportunity.translationsCount +
               this.opportunity.inReviewCount >=
-            maxTranslatableCards;
+              maxTranslatableCards;
 
           if (this.opportunityButtonDisabled) {
             if (
               !this.opportunity.userIsReviewer &&
               this.opportunity.reviewerOnlyContentCount !== undefined &&
-              this.opportunity.reviewerOnlyContentCount > 0
+              this.opportunity.reviewerOnlyContentCount > 0 &&
+              this.cardsAvailable > 0
             ) {
               this.tooltipText =
                 'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.';
