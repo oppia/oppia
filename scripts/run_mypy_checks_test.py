@@ -39,6 +39,17 @@ _MYPY_OUTPUT_WITH_NON_ALLOWLISTED_UNREACHABLE_ERROR: Final = (
     'dir2/bar.py:7: error: Statement is unreachable  [unreachable]\n'
     'Found 1 errors in 1 files (checked 5 source files)\n'
 )
+_MYPY_OUTPUT_WITH_PYI_ERROR: Final = (
+    'dir2/bar.pyi:9: error: Name "NotARealType" is not defined  '
+    '[name-defined]\n'
+    'Found 1 errors in 1 files (checked 5 source files)\n'
+)
+_MYPY_OUTPUT_WITH_ALLOWLISTED_UNREACHABLE_AND_PYI_ERROR: Final = (
+    'dir1/foo.py:12: error: Statement is unreachable  [unreachable]\n'
+    'dir2/bar.pyi:9: error: Name "NotARealType" is not defined  '
+    '[name-defined]\n'
+    'Found 2 errors in 2 files (checked 5 source files)\n'
+)
 _CLEAN_MYPY_OUTPUT: Final = 'Success: no issues found in 5 source files\n'
 
 
@@ -236,3 +247,33 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.assertNotIn('must be removed from', filtered)
         self.assertEqual(remaining_error_count, 0)
         self.assertFalse(suppressed_something)
+
+    def test_filter_unreachable_errors_keeps_pyi_file_error(self) -> None:
+        with self.allowlist_swap:
+            filtered, remaining_error_count, suppressed_something = (
+                run_mypy_checks.filter_unreachable_errors_for_allowlisted_files(
+                    _MYPY_OUTPUT_WITH_PYI_ERROR, check_stale_entries=True
+                )
+            )
+        self.assertIn('dir2/bar.pyi', filtered)
+        # 'dir1/foo.py' never showed up in this run either, so it's
+        # flagged stale on top of dir2/bar.pyi's genuine error - same
+        # pattern as test_filter_unreachable_errors_keeps_non_allowlisted_file.
+        self.assertEqual(remaining_error_count, 2)
+        self.assertFalse(suppressed_something)
+
+    def test_filter_unreachable_errors_pyi_error_not_masked_by_suppressed_allowlisted_error(
+        self,
+    ) -> None:
+        with self.allowlist_swap:
+            filtered, remaining_error_count, suppressed_something = (
+                run_mypy_checks.filter_unreachable_errors_for_allowlisted_files(
+                    _MYPY_OUTPUT_WITH_ALLOWLISTED_UNREACHABLE_AND_PYI_ERROR,
+                    check_stale_entries=True,
+                )
+            )
+        self.assertNotIn('dir1/foo.py', filtered)
+        self.assertIn('dir2/bar.pyi', filtered)
+        self.assertTrue(suppressed_something)
+        self.assertEqual(remaining_error_count, 1)
+        self.assertNotIn('Success: no issues found', filtered)

@@ -93,8 +93,15 @@ CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
 
 # Matches lines like:
 # core/domain/exp_services.py:672: error: ... [unreachable]
+# stubs/yaml/__init__.pyi:9: error: ...
+# Also tolerates optional column and end-line:end-column suffixes
+# (file.py:LINE:COL: error: ... or file.py:LINE:COL:ENDLINE:ENDCOL: error: ...)
+# in case mypy.ini or the invocation ever turns on show_column_numbers/
+# show_error_end - the current config doesn't, but the parser shouldn't
+# silently go blind if that changes.
 _UNREACHABLE_LINE_REGEX: Final = re.compile(
-    r'^(?P<filepath>[^:]+\.py):\d+: error: .* \[unreachable\]\s*$'
+    r'^(?P<filepath>[^:]+\.pyi?):\d+(?::\d+(?::\d+:\d+)?)?: error: '
+    r'.* \[unreachable\]\s*$'
 )
 
 _PARSER: Final = argparse.ArgumentParser(
@@ -147,7 +154,9 @@ def _is_allowlisted(filepath: str) -> bool:
     return normalized in NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE
 
 
-_ERROR_LINE_REGEX: Final = re.compile(r'^[^:]+\.py:\d+: error: ')
+_ERROR_LINE_REGEX: Final = re.compile(
+    r'^[^:]+\.pyi?:\d+(?::\d+(?::\d+:\d+)?)?: error: '
+)
 _SUMMARY_LINE_REGEX: Final = re.compile(r'^Found \d+ errors? in \d+ files?')
 
 
