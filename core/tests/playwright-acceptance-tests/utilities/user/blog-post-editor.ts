@@ -27,7 +27,6 @@ const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
 const mobileBlogBodyInputWithText = 'div.e2e-test-rte p';
-const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
 const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
@@ -36,7 +35,6 @@ const pasteErrorBox = '.e2e-test-oppia-rte-paste-error-box';
 const dismissPasteErrorButton = '.e2e-test-oppia-dismiss-paste-error-button';
 const pasteValidComponentsButton = '.e2e-test-oppia-paste-valid-content-button';
 const cancelPasteButton = '.e2e-test-oppia-cancel-rte-paste-button';
-const editBlogBodySelector = '.e2e-test-ck-editor';
 const editBlogSelector = '.e2e-test-content-button';
 
 export class BlogPostEditor extends BaseUser {

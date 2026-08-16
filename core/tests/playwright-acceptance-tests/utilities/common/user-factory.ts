@@ -36,7 +36,7 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
-import {BlogPostEditor, BlogPostEditorFactory} from '../user/blog-post-editor';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =

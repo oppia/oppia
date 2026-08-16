@@ -1242,6 +1242,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(richTextAreaField);
     const html = await this.page.evaluate((selector: string) => {
       const el = document.querySelector(selector);
+      // eslint-disable-next-line oppia/no-inner-html
       return el ? el.innerHTML : '';
     }, richTextAreaField);
     return html;
@@ -1251,6 +1252,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(richTextAreaField);
     const html = await this.page.evaluate((selector: string) => {
       const el = document.querySelector(selector);
+      // eslint-disable-next-line oppia/no-inner-html
       return el ? el.innerHTML : '';
     }, richTextAreaField);
     return html;
