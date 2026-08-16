@@ -32,6 +32,8 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const cookieBannerAcceptButtonSelector =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
@@ -48,6 +50,8 @@ const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
+const usernameSelector = 'input.e2e-test-username-input';
+const termsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -377,17 +381,31 @@ export class BaseUser {
   }
 
   /**
+   * This function accepts the cookie banner if it is present on the page.
+   */
+  async acceptCookieBannerIfPresent(): Promise<void> {
+    if (await this.page.$(cookieBannerAcceptButtonSelector)) {
+      await this.clickOnElementWithSelector(cookieBannerAcceptButtonSelector);
+      this.userHasAcceptedCookies = true;
+      await this.page.waitForSelector(cookieBannerAcceptButtonSelector, {
+        hidden: true,
+        timeout: 10000,
+      });
+    }
+  }
+
+  /**
    * This function signs up a new user with the given username and email.
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
-    );
+
+    await this.typeInInputField(usernameSelector, username);
+    await this.clickOnElementWithSelector(termsCheckboxSelector);
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
+
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
@@ -1799,6 +1817,23 @@ export class BaseUser {
           `Original Error: ${error.stack}`
       );
     }
+  }
+
+  /**
+   * Verifies that the placeholder attribute of the given input or textarea
+   * element matches the expected value.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {string} expectedPlaceholder - The expected placeholder text.
+   */
+  async expectElementPlaceholderToBe(
+    selector: string,
+    expectedPlaceholder: string
+  ): Promise<void> {
+    const placeholder = await this.page.$eval(
+      selector,
+      el => (el as HTMLInputElement | HTMLTextAreaElement).placeholder
+    );
+    expect(placeholder).toBe(expectedPlaceholder);
   }
 
   /**
