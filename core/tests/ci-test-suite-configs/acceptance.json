@@ -1,6 +1,11 @@
 {
   "suites": [
     {
+      "name": "logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "logged-in-learner/serial-chapter",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts",
       "framework": "puppeteer"

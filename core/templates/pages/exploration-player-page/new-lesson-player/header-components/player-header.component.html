@@ -1,6 +1,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-<div class="oppia-lesson-player-header" [ngClass]="explorationContext !== explorationContextConstants.EXPLORATION_PAGE ? 'question-player-header' : ''">
+<div class="oppia-lesson-player-header e2e-test-mobile-open-options-button" [ngClass]="explorationContext !== explorationContextConstants.EXPLORATION_PAGE ? 'question-player-header' : ''">
   <div class="lesson-player-header-left">
     <p *ngIf="getHeaderTitleText()">{{ getHeaderTitleText() }}</p>
   </div>
