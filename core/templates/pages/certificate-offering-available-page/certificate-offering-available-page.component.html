@@ -1,68 +1,137 @@
-<!-- TODO(#24717-M2.3): Design UI for available certificate assessment offering -->
 <background-banner></background-banner>
-<div class="container position-relative oppia oppia-certificate-offering-available-page">
-  <div>
-    <div>
-      <h1 tabindex="0">
-        Available certificate offering
+<div class="position-relative oppia oppia-certificate-offering-available-page px-3 px-md-5">
+  <div class="oppia-certificate-offering-available-page-header">
+    <div class="col-4">
+      <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
+              [routerLink]="['/learn', classroomUrlFragment]">
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT' | translate }}
+      </button>
+    </div>
+    <div class="text-center">
+      <h1 tabindex="0" class="mb-0">
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_HEADING' | translate }}
       </h1>
     </div>
-    <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
-            [routerLink]="['/learn', classroomUrlFragment]">
-      Exit
-    </button>
+    <!-- Empty column balances the Exit column so the title centers on the
+         page, not just on the remaining space next to the button. -->
+    <div class="col-4"></div>
   </div>
 
-  <section class="oppia-certificate-offering-available-page-panel">
+  <section class="container oppia-certificate-offering-available-page-panel">
+    <p class="oppia-certificate-offering-available-page-intro oppia-certificate-offering-available-page-intro-large">
+      {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_INTRO_TEXT' | translate }}
+    </p>
+
+    <h2>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING' | translate }}</h2>
+    <p class="oppia-certificate-offering-available-page-intro">
+      {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_SUBHEADING_TEXT' | translate }}
+    </p>
+
+    <p class="oppia-certificate-offering-available-page-empty-state"
+       *ngIf="!isLoading && !hasError && availableCertificateOfferings.length === 0">
+      No certificates available yet.
+    </p>
+
+    <p class="oppia-certificate-offering-available-page-empty-state"
+       *ngIf="hasError">
+      Failed to load certificate assessment offerings.
+    </p>
+
     <div class="oppia-certificate-offering-available-page-tiles">
-      <!-- TODO(#24717-M1.19): Wire these CTAs to the learner flow once the
-           available certificate assessment page has real navigation targets. -->
-      <article class="oppia-certificate-offering-available-page-tile">
+      <article class="oppia-certificate-offering-available-page-tile"
+               *ngFor="let certificate of availableCertificates">
         <div class="oppia-certificate-offering-available-page-tile-top">
-          <div>
-            <h3>Everyday Arithmetic</h3>
-            <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
+          <div class="oppia-certificate-offering-available-page-tile-heading">
+            <!-- TODO(#24717-M2.25): Replace this placeholder badge icon with the final design from the mocks.
+                 Mock reference: https://canva.link/iyyjva1dn36ymuc -->
+            <span class="oppia-certificate-offering-available-page-badge-icon"
+                  aria-hidden="true">
+              <svg viewBox="0 0 64 64" width="85" height="85">
+                <circle cx="32" cy="24" r="15" fill="#F1C44C" stroke="#B88914" stroke-width="2"></circle>
+                <circle cx="32" cy="24" r="10" fill="#F9E39B"></circle>
+                <path d="M22 36L15 56L32 47L49 56L42 36Z" fill="#0B7A62"></path>
+                <path d="M27.5 23.5L30.5 26.5L37 20" fill="none" stroke="#B88914" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </span>
+            <div>
+              <h3 class="oppia-certificate-offering-available-page-tile-heading-text">{{ certificate.title }}</h3>
+            </div>
+          </div>
+
+          <div class="oppia-certificate-offering-available-page-status-wrapper"
+               [ngSwitch]="certificate.status">
+            <span *ngSwitchCase="'passed'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED' | translate }}
+            </span>
+            <span *ngSwitchCase="'failed'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--failed">
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED' | translate }}
+            </span>
+            <span *ngSwitchCase="'not_attempted'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--not-attempted">
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_NOT_ATTEMPTED' | translate }}
+            </span>
+
+            <p *ngIf="certificate.status === 'passed'"
+               class="oppia-certificate-offering-available-page-status-date">
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON' | translate: { date: certificate.passedOnDate } }}
+            </p>
+            <p *ngIf="certificate.status === 'failed'"
+               class="oppia-certificate-offering-available-page-status-date">
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON' | translate: { date: certificate.failedOnDate } }}
             </p>
           </div>
-          <span class="oppia-certificate-offering-available-page-status">
-            Not attempted
-          </span>
         </div>
 
-        <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button"
-                  class="btn btn-primary"
-                  [routerLink]="['/certificate-assessment', certificateId]">
-            Continue to assessment
-          </button>
-        </div>
-      </article>
+        <div class="oppia-certificate-offering-available-page-tile-bottom"
+             [ngSwitch]="certificate.status">
+          <ng-container *ngSwitchCase="'passed'">
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_PASSED_DESCRIPTION' | translate }}</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button" class="btn btn-primary">
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
+              </button>
+              <button type="button"
+                      class="btn btn-outline-primary"
+                      [routerLink]="certificate.assessmentRoute">
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
+              </button>
+            </div>
+          </ng-container>
 
-      <article class="oppia-certificate-offering-available-page-tile">
-        <div class="oppia-certificate-offering-available-page-tile-top">
-          <div>
-            <h3>Everyday Arithmetic</h3>
-            <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
-            </p>
-          </div>
-          <span class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
-            Passed
-          </span>
-        </div>
+          <ng-container *ngSwitchCase="'failed'">
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FAILED_DESCRIPTION' | translate }}</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button" class="btn btn-primary">
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
+              </button>
+              <button type="button"
+                      class="btn btn-outline-primary"
+                      [routerLink]="certificate.assessmentRoute">
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
+              </button>
+            </div>
+          </ng-container>
 
-        <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button" class="btn btn-secondary">
-            Check score
-          </button>
-          <button type="button"
-                  class="btn btn-primary"
-                  [routerLink]="['/certificate-assessment', certificateId]">
-            Retry assessment
-          </button>
+          <ng-container *ngSwitchCase="'not_attempted'">
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_NOT_ATTEMPTED_DESCRIPTION' | translate }}</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button"
+                      class="btn btn-primary"
+                      [routerLink]="certificate.assessmentRoute">
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT' | translate }}
+              </button>
+            </div>
+          </ng-container>
         </div>
       </article>
     </div>
+
+    <p class="oppia-certificate-offering-available-page-footnote">
+      <em>
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FOOTNOTE_TEXT' | translate }}
+      </em>
+    </p>
   </section>
 </div>

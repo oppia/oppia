@@ -189,6 +189,9 @@ class BulkEmailWebhookEndpoint(
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
+                can_receive_contributor_dashboard_email=(
+                    user_email_preferences.can_receive_contributor_dashboard_email
+                ),
                 bulk_email_db_already_updated=True,
             )
         elif self.normalized_request['type'] == 'unsubscribe':
@@ -198,6 +201,9 @@ class BulkEmailWebhookEndpoint(
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
+                can_receive_contributor_dashboard_email=(
+                    user_email_preferences.can_receive_contributor_dashboard_email
+                ),
                 bulk_email_db_already_updated=True,
             )
         self.render_json({})
@@ -344,6 +350,9 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'can_receive_subscription_email': (
                     user_email_preferences.can_receive_subscription_email
                 ),
+                'can_receive_contributor_dashboard_email': (
+                    user_email_preferences.can_receive_contributor_dashboard_email
+                ),
                 'subscription_list': subscription_list,
             }
         )
@@ -373,6 +382,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     'can_receive_editor_role_email',
                     'can_receive_feedback_message_email',
                     'can_receive_subscription_email',
+                    'can_receive_contributor_dashboard_email',
                 ]
                 missing_keys = [key for key in required_keys if key not in data]
                 if missing_keys:
@@ -400,6 +410,9 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         data['can_receive_editor_role_email'],
                         data['can_receive_feedback_message_email'],
                         data['can_receive_subscription_email'],
+                        can_receive_contributor_dashboard_email=(
+                            data['can_receive_contributor_dashboard_email']
+                        ),
                     )
                 )
             elif update_type == 'user_bio':
@@ -588,6 +601,9 @@ class SignupHandler(
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=(
+                feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE
+            ),
         )
         # Only block registration if bulk email configuration failed and the
         # user requested bulk emails.

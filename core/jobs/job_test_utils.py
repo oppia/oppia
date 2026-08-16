@@ -23,6 +23,7 @@ import contextlib
 import datetime
 import re
 
+from core import utils
 from core.jobs import base_jobs, job_options
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -52,7 +53,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     RUNTIME_TYPE_CHECK = True
 
     # Helpful constants used by tests to create models.
-    NOW = datetime.datetime.utcnow()
+    NOW = utils.get_current_utc_datetime()
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 

@@ -363,7 +363,7 @@ def get_users_settings(
                     banned=False,
                     username='admin',
                     has_viewed_lesson_info_modal_once=False,
-                    last_agreed_to_terms=datetime.datetime.utcnow(),
+                    last_agreed_to_terms=utils.get_current_utc_datetime(),
                 )
             )
         else:
@@ -802,7 +802,7 @@ def get_reviewer_user_ids_to_notify() -> List[str]:
     users_global_prefs = get_users_email_preferences(reviewer_ids)
     reviewer_ids_to_notify = []
     for index, user_global_pref in enumerate(users_global_prefs):
-        if user_global_pref.can_receive_email_updates:
+        if user_global_pref.can_receive_contributor_dashboard_email:
             reviewer_ids_to_notify.append(reviewer_ids[index])
 
     return reviewer_ids_to_notify
@@ -1636,7 +1636,7 @@ def record_agreement_to_terms(user_id: str) -> None:
         user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
+    user_settings.last_agreed_to_terms = utils.get_current_utc_datetime()
     save_user_settings(user_settings)
 
 
@@ -1814,7 +1814,7 @@ def record_user_started_state_editor_tutorial(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
-        datetime.datetime.utcnow()
+        utils.get_current_utc_datetime()
     )
     save_user_settings(user_settings)
 
@@ -1828,7 +1828,7 @@ def record_user_started_state_translation_tutorial(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_translation_tutorial = (
-        datetime.datetime.utcnow()
+        utils.get_current_utc_datetime()
     )
     save_user_settings(user_settings)
 
@@ -1842,7 +1842,7 @@ def record_user_logged_in(user_id: str) -> None:
     """
 
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.last_logged_in = datetime.datetime.utcnow()
+    user_settings.last_logged_in = utils.get_current_utc_datetime()
     save_user_settings(user_settings)
 
 
@@ -1855,7 +1855,9 @@ def record_user_created_an_exploration(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
-        user_settings.last_created_an_exploration = datetime.datetime.utcnow()
+        user_settings.last_created_an_exploration = (
+            utils.get_current_utc_datetime()
+        )
         save_user_settings(user_settings)
 
 
@@ -1885,6 +1887,7 @@ def update_email_preferences(
     can_receive_editor_role_email: bool,
     can_receive_feedback_email: bool,
     can_receive_subscription_email: bool,
+    can_receive_contributor_dashboard_email: bool,
     bulk_email_db_already_updated: bool = False,
 ) -> bool:
     """Updates whether the user has chosen to receive email updates.
@@ -1902,6 +1905,8 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
+        can_receive_contributor_dashboard_email: bool. Whether the user can receive
+            Contributor Dashboard reviewer notification emails.
         bulk_email_db_already_updated: bool. Whether the bulk email provider's
             database is already updated. This is set to true only when calling
             from the webhook controller since in that case, the external update
@@ -1926,6 +1931,9 @@ def update_email_preferences(
     )
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email
+    )
+    email_preferences_model.contributor_dashboard_notifications = (
+        can_receive_contributor_dashboard_email
     )
     email = get_email_from_user_id(user_id)
     # Mailchimp database should not be updated in servers where sending
@@ -1955,6 +1963,35 @@ def update_email_preferences(
     return False
 
 
+def get_contributor_dashboard_email_preference(
+    email_preferences_model: user_models.UserEmailPreferencesModel,
+) -> bool:
+    """Returns the user's Contributor Dashboard email preference.
+
+    For legacy models that do not contain the new preference, the existing
+    site-updates preference is used to preserve the user's previous reviewer
+    notification behavior.
+
+    Args:
+        email_preferences_model: UserEmailPreferencesModel. The user's stored
+            email preferences.
+
+    Returns:
+        bool. Whether the user should receive Contributor Dashboard reviewer
+        notification emails.
+    """
+    contributor_dashboard_notifications = (
+        email_preferences_model.contributor_dashboard_notifications
+    )
+    if contributor_dashboard_notifications is not None:
+        return bool(contributor_dashboard_notifications)
+
+    if email_preferences_model.site_updates is not None:
+        return bool(email_preferences_model.site_updates)
+
+    return feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE
+
+
 def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
     """Gives email preferences of user with given user_id.
 
@@ -1976,6 +2013,7 @@ def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
             email_preferences_model.editor_role_notifications,
             email_preferences_model.feedback_message_notifications,
             email_preferences_model.subscription_notifications,
+            get_contributor_dashboard_email_preference(email_preferences_model),
         )
 
 
@@ -2007,6 +2045,9 @@ def get_users_email_preferences(
                     email_preferences_model.editor_role_notifications,
                     email_preferences_model.feedback_message_notifications,
                     email_preferences_model.subscription_notifications,
+                    get_contributor_dashboard_email_preference(
+                        email_preferences_model
+                    ),
                 )
             )
 
@@ -2281,7 +2322,7 @@ def get_current_date_as_string() -> str:
     Returns:
         str. Current date as a string of format 'YYYY-MM-DD'.
     """
-    return datetime.datetime.utcnow().strftime(
+    return utils.get_current_utc_datetime().strftime(
         feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT
     )
 

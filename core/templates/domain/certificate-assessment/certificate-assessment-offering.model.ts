@@ -35,6 +35,46 @@ export interface CertificateAssessmentOfferingBackendDict {
   version: number;
 }
 
+export interface AvailableCertificateAssessmentOfferingBackendDict {
+  certificate_id: string;
+  title: string;
+  attempt_status: string;
+}
+
+export class AvailableCertificateAssessmentOfferingData {
+  _certificateId: string;
+  _title: string;
+  _attemptStatus: string;
+
+  constructor(certificateId: string, title: string, attemptStatus: string) {
+    this._certificateId = certificateId;
+    this._title = title;
+    this._attemptStatus = attemptStatus;
+  }
+
+  get certificateId(): string {
+    return this._certificateId;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get attemptStatus(): string {
+    return this._attemptStatus;
+  }
+
+  static createFromBackendDict(
+    availableCertificateAssessmentOfferingBackendDict: AvailableCertificateAssessmentOfferingBackendDict
+  ): AvailableCertificateAssessmentOfferingData {
+    return new AvailableCertificateAssessmentOfferingData(
+      availableCertificateAssessmentOfferingBackendDict.certificate_id,
+      availableCertificateAssessmentOfferingBackendDict.title,
+      availableCertificateAssessmentOfferingBackendDict.attempt_status
+    );
+  }
+}
+
 export class CertificateAssessmentOfferingData {
   _certificateId: string;
   _title: string;

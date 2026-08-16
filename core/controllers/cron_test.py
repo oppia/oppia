@@ -20,7 +20,7 @@ import datetime
 from unittest import mock
 
 import main
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     beam_job_services,
@@ -134,7 +134,7 @@ class CronJobTests(test_utils.GenericTestBase):
             collection_ids=[],
             story_ids=[],
             learnt_topic_ids=[],
-            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+            last_updated=utils.get_current_utc_datetime() - self.NINE_WEEKS,
             deleted=True,
         )
         completed_activities_model.update_timestamps(
@@ -155,8 +155,9 @@ class CronJobTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        with self.mock_datetime_utcnow(
-            datetime.datetime.utcnow() - self.NINE_WEEKS
+        mocked_current_time = utils.get_current_utc_datetime() - self.NINE_WEEKS
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
         ):
             self.save_new_default_exploration('exp_id', admin_user_id)
             exp_services.delete_exploration(admin_user_id, 'exp_id')
@@ -188,7 +189,9 @@ class CronJobTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        report_timestamp = datetime.datetime.utcnow() - self.FOURTEEN_WEEKS
+        report_timestamp = (
+            utils.get_current_utc_datetime() - self.FOURTEEN_WEEKS
+        )
         report_submitted_timestamp = report_timestamp
         ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
         android_report_info = {
@@ -370,7 +373,12 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=True,
         )
         self.save_new_valid_exploration(self.target_id, self.author_id)
         # Give reviewer rights to review translations in the given language
@@ -477,6 +485,16 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        user_services.update_email_preferences(
+            self.reviewer_id,
+            False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=True,
+            bulk_email_db_already_updated=True,
+        )
 
         with self.testapp_swap:
             with self.swap(
@@ -634,7 +652,12 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=True,
         )
         self.save_new_valid_exploration(self.target_id, self.author_id)
         # Give reviewer rights to review translations in the given language

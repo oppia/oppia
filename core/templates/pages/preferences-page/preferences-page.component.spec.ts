@@ -87,6 +87,7 @@ describe('Preferences Page Component', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: false,
       can_receive_subscription_email: true,
+      can_receive_contributor_dashboard_email: true,
       subscription_list: [
         {
           creator_username: 'creator',
@@ -266,6 +267,9 @@ describe('Preferences Page Component', () => {
       expect(formValues.emailPreferences.canReceiveSubscriptionEmail).toEqual(
         preferencesData.can_receive_subscription_email
       );
+      expect(
+        formValues.emailPreferences.canReceiveContributorDashboardEmail
+      ).toEqual(preferencesData.can_receive_contributor_dashboard_email);
       expect(
         formValues.emailPreferences.canReceiveFeedbackMessageEmail
       ).toEqual(preferencesData.can_receive_feedback_message_email);
@@ -451,7 +455,7 @@ describe('Preferences Page Component', () => {
       }));
 
       it('should save email preferences', fakeAsync(() => {
-        spyOn(
+        const updateSpy = spyOn(
           mockUserBackendApiService,
           'updateMultiplePreferencesDataAsync'
         ).and.returnValue(
@@ -473,7 +477,103 @@ describe('Preferences Page Component', () => {
           componentInstance.preferencesForm.controls.emailPreferences.value
             .canReceiveEmailUpdates
         ).toBeFalse();
+
+        const updates = updateSpy.calls.mostRecent().args[0];
+        const emailPreferencesUpdate = updates.find(
+          (update: UpdatePreferenceDict) =>
+            update.update_type === 'email_preferences'
+        );
+        if (emailPreferencesUpdate === undefined) {
+          throw new Error('Expected an email preferences update.');
+        }
+        expect(emailPreferencesUpdate.data).toEqual(
+          jasmine.objectContaining({
+            can_receive_contributor_dashboard_email: true,
+          })
+        );
       }));
+
+      it(
+        'should save Contributor Dashboard emails off when marketing ' +
+          'emails are on',
+        fakeAsync(() => {
+          const updateSpy = spyOn(
+            mockUserBackendApiService,
+            'updateMultiplePreferencesDataAsync'
+          ).and.returnValue(
+            Promise.resolve({
+              bulk_email_signup_message_should_be_shown: false,
+            })
+          );
+
+          const formGrp = componentInstance.preferencesForm.controls
+            .emailPreferences as FormGroup;
+          formGrp.patchValue({
+            canReceiveEmailUpdates: true,
+            canReceiveContributorDashboardEmail: false,
+          });
+          formGrp.markAsDirty();
+          componentInstance.preferencesForm.updateValueAndValidity();
+          componentInstance.savePreferences();
+          tick();
+
+          const updates = updateSpy.calls.mostRecent().args[0];
+          const emailPreferencesUpdate = updates.find(
+            (update: UpdatePreferenceDict) =>
+              update.update_type === 'email_preferences'
+          );
+          if (emailPreferencesUpdate === undefined) {
+            throw new Error('Expected an email preferences update.');
+          }
+          expect(emailPreferencesUpdate.data).toEqual(
+            jasmine.objectContaining({
+              can_receive_email_updates: true,
+              can_receive_contributor_dashboard_email: false,
+            })
+          );
+        })
+      );
+
+      it(
+        'should save Contributor Dashboard emails on when marketing ' +
+          'emails are off',
+        fakeAsync(() => {
+          const updateSpy = spyOn(
+            mockUserBackendApiService,
+            'updateMultiplePreferencesDataAsync'
+          ).and.returnValue(
+            Promise.resolve({
+              bulk_email_signup_message_should_be_shown: false,
+            })
+          );
+
+          const formGrp = componentInstance.preferencesForm.controls
+            .emailPreferences as FormGroup;
+          formGrp.patchValue({
+            canReceiveEmailUpdates: false,
+            canReceiveContributorDashboardEmail: true,
+          });
+          formGrp.markAsDirty();
+          componentInstance.preferencesForm.updateValueAndValidity();
+          componentInstance.savePreferences();
+          tick();
+
+          const updates = updateSpy.calls.mostRecent().args[0];
+          const emailPreferencesUpdate = updates.find(
+            (update: UpdatePreferenceDict) =>
+              update.update_type === 'email_preferences'
+          );
+          if (emailPreferencesUpdate === undefined) {
+            throw new Error('Expected an email preferences update.');
+          }
+          expect(emailPreferencesUpdate.data).toEqual(
+            jasmine.objectContaining({
+              can_receive_email_updates: false,
+              can_receive_contributor_dashboard_email: true,
+            })
+          );
+        })
+      );
     });
 
     it('should validate user popover when username is longer 10 chars', () => {
@@ -639,6 +739,7 @@ describe('Preferences Page Component', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: false,
       can_receive_subscription_email: true,
+      can_receive_contributor_dashboard_email: true,
       subscription_list: [
         {
           creator_username: 'creator',
