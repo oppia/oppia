@@ -87,9 +87,9 @@ class ExplorationSearchDict(DomainSearchDict):
     translated_tags: List[str]
 
 
-# The equivalent check lives in summary_services._get_up_to_date_translation.
-# If a third caller appears, move this into translation_services instead of
-# copying it again.
+# This duplicates the check that #27083 adds as the public
+# translation_services.get_up_to_date_translation. This copy is replaced by a
+# call to that helper once #27083 merges.
 def _get_up_to_date_translation(
     entity_translation: translation_domain.EntityTranslation,
     content_id: str,
