@@ -57,7 +57,6 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict: general_feedback_domain.LessonFeedbackDict = {
             'id': 'feedback_id',
-            'author_id': 'author_id',
             'feedback_text': 'Feedback text',
             'status': 'open',
             'lesson_metadata': LESSON_METADATA,
@@ -80,6 +79,55 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(feedback.to_dict(), expected_dict)
+
+    def test_to_summary_dict(self) -> None:
+        expected_dict: general_feedback_domain.LessonFeedbackSummaryDict = {
+            'id': 'feedback_id',
+            'feedback_text_preview': f'{"N" * 97}...',
+            'status': 'open',
+            'source': 'lesson',
+            'unread_response_count': 0,
+        }
+
+        feedback = general_feedback_domain.LessonFeedback(
+            feedback_id='feedback_id',
+            author_id='author_id',
+            feedback_text='N' * 110,
+            status='open',
+            lesson_metadata=LESSON_METADATA,
+            parent_feedback_id='parent_feedback_id',
+            response_list=RESPONSE_LIST,
+            unread_response_count=0,
+            created_on_msecs=1700000000000.0,
+        )
+
+        self.assertEqual(feedback.to_summary_dict(), expected_dict)
+
+    def test_to_learner_dict(self) -> None:
+        expected_dict: general_feedback_domain.LessonFeedbackDict = {
+            'id': 'feedback_id',
+            'feedback_text': 'Feedback text',
+            'status': 'open',
+            'lesson_metadata': LESSON_METADATA,
+            'parent_feedback_id': 'parent_feedback_id',
+            'response_list': RESPONSE_LIST,
+            'unread_response_count': 0,
+            'created_on_msecs': 1700000000000.0,
+        }
+
+        feedback = general_feedback_domain.LessonFeedback(
+            feedback_id='feedback_id',
+            author_id='author_id',
+            feedback_text='Feedback text',
+            status='open',
+            lesson_metadata=LESSON_METADATA,
+            parent_feedback_id='parent_feedback_id',
+            response_list=RESPONSE_LIST,
+            unread_response_count=0,
+            created_on_msecs=1700000000000.0,
+        )
+
+        self.assertEqual(feedback.to_learner_dict(), expected_dict)
 
 
 class PlatformFeedbackDomainTests(test_utils.GenericTestBase):

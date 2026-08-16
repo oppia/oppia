@@ -81,6 +81,22 @@
               </span>
             </div>
           </div>
+
+          <div class="mb-3 row">
+            <label for="profileNameForCertificate" class="col-lg-4 col-md-4 col-sm-4 form-label">
+              {{ 'I18N_PREFERENCES_CERTIFICATE_NAME' | translate }}
+            </label>
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <input id="profileNameForCertificate"
+                     type="text"
+                     class="form-control e2e-test-profile-name-for-certificate"
+                     formControlName="profileNameForCertificate"
+                     maxlength="50">
+              <span class="form-text d-block oppia-form-text">
+                {{ 'I18N_PREFERENCES_CERTIFICATE_NAME_EXPLAIN_TEXT' | translate }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div class="mb-3 row">
@@ -310,6 +326,16 @@
                        formControlName="canReceiveSubscriptionEmail">
                 <span>
                   {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS' | translate }}
+                </span>
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox"
+                       class="e2e-test-contributor-dashboard-email-checkbox"
+                       formControlName="canReceiveContributorDashboardEmail">
+                <span>
+                  {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_CONTRIBUTOR_DASHBOARD_REVIEW_NOTIFICATIONS' | translate}}
                 </span>
               </label>
             </div>

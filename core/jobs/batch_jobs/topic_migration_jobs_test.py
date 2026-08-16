@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import topic_migration_jobs
@@ -55,8 +53,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=0,
             additional_story_count=0,
             total_skill_count=0,
@@ -77,8 +75,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=0,
             additional_story_count=0,
             total_skill_count=0,
@@ -337,8 +335,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=0,
             additional_story_count=0,
             total_skill_count=0,
@@ -359,8 +357,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=0,
             additional_story_count=0,
             total_skill_count=0,

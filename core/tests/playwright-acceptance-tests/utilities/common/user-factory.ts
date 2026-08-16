@@ -17,9 +17,9 @@
  * Uses prototype-based composition to mix role capabilities onto user instances.
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
-import { BlogAdmin } from '../user/blog-admin';
-import { BlogPostEditor } from '../user/blog-post-editor';
-import {Browser,Page} from '@playwright/test';
+import {BlogAdmin} from '../user/blog-admin';
+import {BlogPostEditor} from '../user/blog-post-editor';
+import {Browser, Page} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -101,11 +101,32 @@ export class UserFactory {
     TUser extends BaseUser,
     TRoles extends BaseUser[],
   >(user: TUser, roles: TRoles): TUser & UnionToIntersection<TRoles[number]> {
+    const userPrototype = Object.getPrototypeOf(user);
+
+    // Track which role (by constructor name) defined which method name
+    // within THIS composition call only. This lets us catch two different
+    // roles genuinely colliding on a name, without falsely flagging the
+    // same role being re-composed onto a prototype it already touched in
+    // an earlier, unrelated createNewUser() call.
+    const namesDefinedInThisCall = new Map<string, string>();
+
     for (const role of roles) {
-      const userPrototype = Object.getPrototypeOf(user);
       const rolePrototype = Object.getPrototypeOf(role);
+      const roleName = rolePrototype.constructor.name;
 
       Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        if (name === 'constructor') {
+          return;
+        }
+
+        const definedByRoleName = namesDefinedInThisCall.get(name);
+        if (definedByRoleName && definedByRoleName !== roleName) {
+          throw new Error(
+            `Method '${name}' is defined by both '${definedByRoleName}' and '${roleName}'. Function name collision detected.`
+          );
+        }
+        namesDefinedInThisCall.set(name, roleName);
+
         Object.defineProperty(
           userPrototype,
           name,
