@@ -52,8 +52,8 @@ describe('CertificateAssessmentResultCardComponent', () => {
           },
           topic_2: {
             topic_name: 'Multiplication',
-            total_related_questions: 3,
-            total_correct_questions: 1,
+            total_related_questions: 4,
+            total_correct_questions: 2,
           },
         },
         is_submitted: true,
@@ -92,7 +92,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
   });
 
   it('should return false when no result is available', () => {
-    expect(component.passed).toBeFalse();
+    expect(component.passed).toBe(false);
   });
 
   it('should return false when the score is below the passing threshold', () => {
@@ -100,9 +100,10 @@ describe('CertificateAssessmentResultCardComponent', () => {
       certificateName: 'Test Certificate',
       scorePercentage: 69,
       topicBreakdown: [],
+      timeTakenMinutes: null,
     };
 
-    expect(component.passed).toBeFalse();
+    expect(component.passed).toBe(false);
   });
 
   it('should return true when the score meets the passing threshold', () => {
@@ -110,9 +111,10 @@ describe('CertificateAssessmentResultCardComponent', () => {
       certificateName: 'Test Certificate',
       scorePercentage: 80,
       topicBreakdown: [],
+      timeTakenMinutes: null,
     };
 
-    expect(component.passed).toBeTrue();
+    expect(component.passed).toBe(true);
   });
 
   it('should fetch the real result and map it for display', async () => {
@@ -137,14 +139,14 @@ describe('CertificateAssessmentResultCardComponent', () => {
         },
         {
           topicName: 'Multiplication',
-          scorePercentage: 33.333333333333336,
-          totalCorrectQuestions: 1,
-          totalRelatedQuestions: 3,
+          scorePercentage: 50,
+          totalCorrectQuestions: 2,
+          totalRelatedQuestions: 4,
         },
       ],
       timeTakenMinutes: 35,
     });
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading).toBe(false);
   });
 
   it('should map a topic with no related questions to a zero score', async () => {
@@ -278,7 +280,8 @@ describe('CertificateAssessmentResultCardComponent', () => {
     await fixture.whenStable();
 
     expect(component.result).toBeNull();
-    expect(component.isLoading).toBeFalse();
+    expect(component.hasError).toBe(true);
+    expect(component.isLoading).toBe(false);
   });
 
   it('should navigate to the assessment introduction when retrying', () => {

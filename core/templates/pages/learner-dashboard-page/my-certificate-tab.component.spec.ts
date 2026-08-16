@@ -218,8 +218,22 @@ describe('MyCertificatesTabComponent', () => {
   it('should derive the passed status from the score threshold', async () => {
     await fixture.whenStable();
 
-    expect(component.isPassed(component.certificateAttempts[0])).toBeTrue();
-    expect(component.isPassed(component.certificateAttempts[2])).toBeFalse();
+    expect(component.isPassed(component.certificateAttempts[0])).toBeFalse();
+    expect(component.isPassed(component.certificateAttempts[2])).toBeTrue();
+  });
+
+  it('should evaluate pass/fail against the passing score threshold', () => {
+    const attemptJustBelowThreshold = {
+      ...mockAttempts[0],
+      total_score: 79,
+    };
+    const attemptAtThreshold = {
+      ...mockAttempts[0],
+      total_score: 80,
+    };
+
+    expect(component.isPassed(attemptJustBelowThreshold)).toBeFalse();
+    expect(component.isPassed(attemptAtThreshold)).toBeTrue();
   });
 
   it('should map classroom ids to subject names', async () => {
@@ -230,14 +244,29 @@ describe('MyCertificatesTabComponent', () => {
     expect(component.getSubjectName('unknown_id')).toBe('');
   });
 
+  it('should map a failed classroom data request to an empty subject name', async () => {
+    await fixture.whenStable();
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      Promise.reject('Error')
+    );
+    component.classroomIdToNameMap = {};
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.getSubjectName('math_classroom_01')).toBe('');
+    expect(component.getSubjectName('science_classroom_01')).toBe('');
+    expect(component.isLoading).toBeFalse();
+  });
+
   it('should derive the status label i18n keys from the score', async () => {
     await fixture.whenStable();
 
     expect(component.getStatusLabel(component.certificateAttempts[0])).toBe(
-      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED'
+      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED'
     );
     expect(component.getStatusLabel(component.certificateAttempts[2])).toBe(
-      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED'
+      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED'
     );
   });
 
@@ -250,10 +279,13 @@ describe('MyCertificatesTabComponent', () => {
     );
     expect(links.length).toBe(3);
     expect(links[0].getAttribute('href')).toBe(
-      '/certificate-assessment-result/attempt_id_1'
+      '/certificate-assessment-result/attempt_id_3'
     );
     expect(links[1].getAttribute('href')).toBe(
       '/certificate-assessment-result/attempt_id_2'
+    );
+    expect(links[2].getAttribute('href')).toBe(
+      '/certificate-assessment-result/attempt_id_1'
     );
   });
 

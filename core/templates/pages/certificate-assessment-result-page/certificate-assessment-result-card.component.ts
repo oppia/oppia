@@ -37,6 +37,7 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   result: AssessmentResult | null = null;
   certificateId = '';
   isLoading = true;
+  hasError = false;
 
   constructor(
     private router: Router,
@@ -47,6 +48,7 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
     this.certificateAssessmentOfferingBackendApiService
       .getCertificateAssessmentResultAsync(this.attemptId)
       .then(resultData => {
+        this.hasError = false;
         this.certificateId = resultData.certificate_id;
         const topicBreakdown = Object.entries(resultData.attempt_data).map(
           ([topicId, topicStats]) => ({
@@ -65,6 +67,9 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
           topicBreakdown,
           timeTakenMinutes: resultData.time_taken_in_minutes,
         };
+      })
+      .catch(() => {
+        this.hasError = true;
       })
       .finally(() => {
         this.isLoading = false;

@@ -923,6 +923,41 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should return null for the time taken of an unfinished result', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentResultAsync('mock_attempt_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      certificate_id: 'mock_certificate_id',
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 80,
+      time_taken_in_minutes: null,
+      attempt_data: {
+        dummy_topic_id: {
+          topic_name: 'Place Values',
+          total_related_questions: 5,
+          total_correct_questions: 4,
+        },
+      },
+      is_submitted: false,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      jasmine.objectContaining({time_taken_in_minutes: null})
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should use rejection handler if fetching certificate assessment result fails', fakeAsync(() => {
     caos
       .getCertificateAssessmentResultAsync('mock_attempt_id')

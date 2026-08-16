@@ -38,15 +38,11 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
     component.topicBreakdown = [
       {
         topicName: 'Place Values',
-        scorePercentage: 88,
-        totalCorrectQuestions: 7,
-        totalRelatedQuestions: 8,
+        scorePercentage: 88.4,
       },
       {
         topicName: 'Addition',
         scorePercentage: 95,
-        totalCorrectQuestions: 19,
-        totalRelatedQuestions: 20,
       },
     ];
     fixture.detectChanges();
@@ -61,9 +57,9 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
     );
     expect(
       rows[0].querySelector('.topic-row-bar').getAttribute('aria-valuenow')
-    ).toBe('88');
+    ).toBe('88.4');
     expect(rows[0].querySelector('.topic-row-bar-fill').style.width).toBe(
-      '88%'
+      '88.4%'
     );
   });
 });

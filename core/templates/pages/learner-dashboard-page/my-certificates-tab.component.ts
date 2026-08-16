@@ -32,7 +32,7 @@ import './my-certificates-tab.component.css';
   styleUrls: ['./my-certificates-tab.component.css'],
 })
 export class MyCertificatesTabComponent implements OnInit {
-  PASSING_SCORE_THRESHOLD = 70;
+  PASSING_SCORE_THRESHOLD = 80;
   selectedFilter: CertificateAttemptStatus = CERTIFICATE_ATTEMPT_STATUSES.ALL;
 
   certificateAttempts: CertificateAttemptSummary[] = [];
@@ -65,6 +65,9 @@ export class MyCertificatesTabComponent implements OnInit {
               })
           )
         );
+      })
+      .catch(() => {
+        this.certificateAttempts = [];
       })
       .finally(() => {
         this.isLoading = false;
