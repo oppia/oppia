@@ -64,19 +64,6 @@
   width: 100%;
 }
 
-oppia-new-audio-bar .mat-slider-horizontal {
-  height: 0;
-  min-width: 120px;
-}
-
-oppia-new-audio-bar .mat-slider {
-  padding: 0;
-}
-
-oppia-new-audio-bar .mat-slider-wrapper {
-  position: static;
-}
-
 .mobile-mode {
   display: none;
 }
