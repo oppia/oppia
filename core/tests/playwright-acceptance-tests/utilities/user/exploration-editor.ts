@@ -20,8 +20,11 @@ import {Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {ExplorationEditorModal} from '../common/exploration-editor';
+import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
 import {RTEEditor} from '../common/rte-editor';
+import * as fs from 'fs';
+import * as path from 'path';
+import {StateEditorUtils} from '../common/state-editor-utils';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -113,18 +116,6 @@ const addNewResponseButton = 'button.e2e-test-add-new-response';
 const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
 const addAnotherResponseButton = 'button.e2e-test-add-another-response';
 
-const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
-const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
-const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
-const destinationWhenStuckSelectorDropdown =
-  '.e2e-test-destination-when-stuck-selector-dropdown';
-const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
-const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
-const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
-const outcomeDestWhenStuckSelector =
-  '.protractor-test-open-outcome-dest-if-stuck-editor';
-
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
@@ -165,9 +156,14 @@ const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
-const nextCardButton = '.e2e-test-next-card-button';
-const nextCardArrowButton = '.e2e-test-next-button';
-const previousCardButton = '.e2e-test-back-button';
+const historyTabButton = '.e2e-test-history-tab';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const historyTabContentContainerSelector = '.e2e-test-exploration-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const historyTableIndex = '.e2e-test-history-table-index';
+const historyListOptions = '.e2e-test-history-table-option';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -608,21 +604,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    * @param {boolean} skipVerification - Whether to skip verification of the card content.
    */
-  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
-    try {
-      await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('Timeout')) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
-    }
-
-    if (skipVerification) {
-      return;
-    }
-    await this.expectElementToBeVisible(previousCardButton);
+  async continueToNextCardAsExplorationEditor(
+    skipVerification: boolean = false
+  ): Promise<void> {
+    const explorationPlayerUtils = new ExplorationEditorUtils(this);
+    await explorationPlayerUtils.continueToNextCard(skipVerification);
   }
 
   /**
@@ -786,13 +772,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorModal(this);
+    const explorationEditor = new ExplorationEditorUtils(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
-  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
-  // To avoid unexpected behavior, ensure that any modifications here are also
-  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
@@ -804,36 +787,12 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(defaultFeedbackTab);
-    await this.clickOnElementWithSelector(defaultFeedbackTab);
-
-    if (defaultResponseFeedback) {
-      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
-        defaultResponseFeedback
-      );
-    }
-
-    if (directToCard) {
-      await this.clickOnElementWithSelector(openOutcomeDestButton);
-      await this.select(destinationSelectorDropdown, directToCard);
-      await this.clickOnElementWithSelector(saveDestinationButtonSelector);
-      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
-    }
-
-    if (directToCardWhenStuck) {
-      await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
-      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
-      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
-      await this.typeInInputField(
-        addDestinationStateWhenStuckInput,
-        directToCardWhenStuck
-      );
-      await this.clickOnElementWithSelector(saveStuckDestinationButtonSelector);
-      await this.expectElementToBeVisible(
-        saveStuckDestinationButtonSelector,
-        false
-      );
-    }
+    const stateEditorUtils = new StateEditorUtils(this);
+    await stateEditorUtils.editDefaultResponseFeedback(
+      defaultResponseFeedback,
+      directToCard,
+      directToCardWhenStuck
+    );
   }
 
   /**
@@ -1480,31 +1439,96 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to update the default response feedback for a state interaction.
-   * @param {string} defaultResponseFeedback - The feedback for the default responses.
-   */
-  async updateDefaultResponseFeedbackInExplorationEditorPage(
-    defaultResponseFeedback: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(openOutcomeFeedBackEditor);
-    await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
-    await this.clickOnElementWithSelector(stateContentInputField);
-    await this.typeInInputField(
-      stateContentInputField,
-      defaultResponseFeedback
-    );
-    await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
-
-    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
-  }
-
-  /**
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponses(): Promise<void> {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileHistoryTabButton);
+      await this.clickOnElementWithSelector(mobileHistoryTabButton);
+    } else {
+      await this.clickOnElementWithSelector(historyTabButton);
+    }
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
+  }
+
+  /**
+   * Function to download a specific version of an Exploration.
+   * Uses Playwright's download event to reliably capture the file,
+   * regardless of the download directory configuration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean,
+    explorationTitle?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
+    const historyItems = await this.page.$$(historyListContent);
+
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await this.getElementInParent(
+        historyTableIndex,
+        historyItem
+      );
+      const versionText = await this.getTextContent(versionNumberElement);
+      if (parseInt(versionText ?? '', 10) !== explorationVersion) {
+        continue;
+      }
+
+      const dropdownButton = await this.getElementInParent(
+        historyListOptions,
+        historyItem
+      );
+      await this.clickOnElement(dropdownButton);
+
+      const downloadButton = await this.getElementInParent(
+        downloadExplorationButton,
+        historyItem
+      );
+
+      // Use Playwright's download event to reliably capture the file.
+      const downloadPromise = this.page.waitForEvent('download');
+      await this.clickOnElement(downloadButton);
+      const download = await downloadPromise;
+
+      const suggestedFilename = download.suggestedFilename();
+      const expectedPrefix = isExplorationPublished
+        ? `oppia-${explorationTitle?.replace(/\s+/g, '')}-v`
+        : 'oppia-unpublished_exploration-v';
+      if (!suggestedFilename.startsWith(expectedPrefix)) {
+        throw new Error(
+          `Expected filename to start with "${expectedPrefix}" ` +
+            `but got "${suggestedFilename}".`
+        );
+      }
+      const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+      if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, {recursive: true});
+      }
+
+      const savePath = path.join(downloadDir, suggestedFilename);
+      await download.saveAs(savePath);
+
+      // Close the dropdown to prevent it from blocking other elements.
+      await this.page.keyboard.press('Escape');
+
+      showMessage(`${suggestedFilename} file is successfully downloaded`);
+      return;
+    }
+
+    throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
 }
 
