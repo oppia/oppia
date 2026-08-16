@@ -1231,3 +1231,13 @@ class FeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
             'Expected featured_translation_languages to be a list',
         ):
             featured_languages.validate()
+
+    def test_non_string_language_code_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            # Here we use MyPy ignore because we intentionally pass a non-string language_code to test runtime validation.
+            [{'language_code': 123, 'explanation': 'x'}]  # type: ignore[typeddict-item]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected language_code to be a string'
+        ):
+            featured_languages.validate()

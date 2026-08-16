@@ -29,6 +29,7 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalContainerSelector = '.e2e-test-modal-container';
 const addRightsButtonSelector = '.e2e-test-add-rights-button';
 const contributorCountSelector = '.e2e-test-contributor-count';
+const contributorHomeSelector = '.e2e-test-oppia-contributor-home';
 const lastDatePickerInputSelector = '.e2e-test-last-date-picker-input';
 const mobileLastDatePickerInputSelector =
   '.e2e-test-mobile-last-date-picker-input';
@@ -44,6 +45,8 @@ const toggleFeaturedLanguagesEditorSelector =
   '.e2e-test-toggle-featured-languages-editor';
 const featuredLanguageSelectSelector = '#featured-language-select';
 const featuredLanguageExplanationSelector = '#featured-language-explanation';
+const featuredTranslationLanguagesSavedMessage =
+  'Featured translation languages saved.';
 const addFeaturedLanguageButtonSelector = '.e2e-test-add-featured-language';
 const saveFeaturedLanguagesButtonSelector = '.e2e-test-save-featured-languages';
 
@@ -211,7 +214,7 @@ export class ContributorAdmin extends BaseUser {
    */
   async saveFeaturedTranslationLanguages(): Promise<void> {
     await this.clickOnElementWithSelector(saveFeaturedLanguagesButtonSelector);
-    await this.expectToastMessage('Featured translation languages saved.');
+    await this.expectToastMessage(featuredTranslationLanguagesSavedMessage);
   }
 
   /**
@@ -256,7 +259,7 @@ export class ContributorAdmin extends BaseUser {
     await this.goto(testConstants.URLs.ContributorDashboard);
     // '.e2e-test-oppia-contributor-home' is the contributor dashboard
     // container (see logged-in-user.ts).
-    await this.expectElementToBeVisible('.e2e-test-oppia-contributor-home');
+    await this.expectElementToBeVisible(contributorHomeSelector);
   }
 }
 

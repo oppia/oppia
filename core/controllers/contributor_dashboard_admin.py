@@ -933,14 +933,4 @@ class FeaturedTranslationLanguagesAdminHandler(
             )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
-        # Return the saved config so the frontend can refresh its table
-        # without a follow-up GET. Returning data from PUT is idiomatic here
-        # (cf. CertificateAssessmentOfferingByIdHandler.put, which returns the
-        # updated entity's id).
-        self.render_json(
-            {
-                'featured_translation_languages': (
-                    translation_services.get_featured_translation_languages()
-                )
-            }
-        )
+        self.render_json({})

@@ -27,7 +27,7 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
 
-from typing import Any, Dict, Final, List, Optional, TypedDict, Union
+from typing import Any, Dict, Final, List, Optional, Set, TypedDict, Union
 
 
 class ContentType(enum.Enum):
@@ -865,11 +865,11 @@ class FeaturedTranslationLanguages:
 
         # Featured translation languages are drawn from the same set as
         # voiceover/audio languages (mirrors WrittenTranslations.validate()).
-        allowed_language_codes = [
+        allowed_language_codes = {
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
-        ]
+        }
 
-        seen_language_codes: List[str] = []
+        seen_language_codes: Set[str] = set()
         for featured_language in self.featured_translation_languages:
             if not isinstance(featured_language, dict):
                 raise utils.ValidationError(
@@ -889,6 +889,12 @@ class FeaturedTranslationLanguages:
             language_code = featured_language['language_code']
             explanation = featured_language['explanation']
 
+            if not isinstance(language_code, str):
+                raise utils.ValidationError(
+                    'Expected language_code to be a string, received: %s'
+                    % language_code
+                )
+
             if language_code not in allowed_language_codes:
                 raise utils.ValidationError(
                     'Invalid language code: %s' % language_code
@@ -898,7 +904,7 @@ class FeaturedTranslationLanguages:
                 raise utils.ValidationError(
                     'Duplicate language code: %s' % language_code
                 )
-            seen_language_codes.append(language_code)
+            seen_language_codes.add(language_code)
 
             if not isinstance(explanation, str) or not explanation.strip():
                 raise utils.ValidationError(

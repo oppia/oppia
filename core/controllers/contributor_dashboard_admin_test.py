@@ -1698,9 +1698,9 @@ class FeaturedTranslationLanguagesAdminHandlerTest(test_utils.GenericTestBase):
             ]
         }
 
-        # PUT echoes back the saved config.
+        # PUT returns an empty response; the config is fetched via GET.
         put_response = self.put_json(self.URL, expected, csrf_token=csrf_token)
-        self.assertEqual(put_response, expected)
+        self.assertEqual(put_response, {})
 
         # A subsequent admin GET returns the same.
         self.assertEqual(self.get_json(self.URL), expected)

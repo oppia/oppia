@@ -101,50 +101,42 @@ export class ContributorDashboardAdminBackendApiService {
   async getFeaturedTranslationLanguagesAsync(): Promise<
     FeaturedTranslationLanguage[]
   > {
-    return new Promise((resolve, reject) => {
-      this.http
+    try {
+      const response = await this.http
         .get<FeaturedTranslationLanguagesBackendResponse>(
           PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL
         )
-        .toPromise()
-        .then(
-          response => {
-            resolve(
-              response.featured_translation_languages.map(backendDict =>
-                FeaturedTranslationLanguage.createFromBackendDict(backendDict)
-              )
-            );
-          },
-          errorResponse => {
-            reject(errorResponse.error.error);
-          }
-        );
-    });
+        .toPromise();
+      return response.featured_translation_languages.map(backendDict =>
+        FeaturedTranslationLanguage.createFromBackendDict(backendDict)
+      );
+    } catch (errorResponse) {
+      const error = errorResponse as {
+        error: {
+          error: string;
+        };
+      };
+      throw error.error.error;
+    }
   }
 
   async updateFeaturedTranslationLanguagesAsync(
     featuredLanguages: FeaturedTranslationLanguageBackendDict[]
-  ): Promise<FeaturedTranslationLanguage[]> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<FeaturedTranslationLanguagesBackendResponse>(
-          PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL,
-          {featured_translation_languages: featuredLanguages}
-        )
-        .toPromise()
-        .then(
-          response => {
-            resolve(
-              response.featured_translation_languages.map(backendDict =>
-                FeaturedTranslationLanguage.createFromBackendDict(backendDict)
-              )
-            );
-          },
-          errorResponse => {
-            reject(errorResponse.error.error);
-          }
-        );
-    });
+  ): Promise<void> {
+    try {
+      await this.http
+        .put(PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL, {
+          featured_translation_languages: featuredLanguages,
+        })
+        .toPromise();
+    } catch (errorResponse) {
+      const error = errorResponse as {
+        error: {
+          error: string;
+        };
+      };
+      throw error.error.error;
+    }
   }
 
   async viewContributionReviewersAsync(

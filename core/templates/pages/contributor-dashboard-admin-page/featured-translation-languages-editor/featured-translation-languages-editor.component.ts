@@ -28,6 +28,13 @@ interface LanguageOption {
   description: string;
 }
 
+export const FEATURED_TRANSLATION_LANGUAGE_MESSAGES = {
+  LOADING: 'Loading featured translation languages...',
+  LOAD_FAILURE: 'Failed to load featured translation languages.',
+  SAVE_FAILURE: 'Failed to save featured translation languages.',
+  SAVE_SUCCESS: 'Featured translation languages saved.',
+} as const;
+
 @Component({
   selector: 'oppia-featured-translation-languages-editor',
   templateUrl: './featured-translation-languages-editor.component.html',
@@ -67,7 +74,7 @@ export class FeaturedTranslationLanguagesEditorComponent implements OnInit {
   }
 
   private loadFeaturedTranslationLanguages(): void {
-    this.loadingMessage = 'Loading featured translation languages...';
+    this.loadingMessage = FEATURED_TRANSLATION_LANGUAGE_MESSAGES.LOADING;
     this.contributorDashboardAdminBackendApiService
       .getFeaturedTranslationLanguagesAsync()
       .then(
@@ -79,18 +86,18 @@ export class FeaturedTranslationLanguagesEditorComponent implements OnInit {
         errorMessage => {
           this.loadingMessage = '';
           this.alertsService.addWarning(
-            errorMessage || 'Failed to load featured translation languages.'
+            errorMessage || FEATURED_TRANSLATION_LANGUAGE_MESSAGES.LOAD_FAILURE
           );
         }
       );
   }
 
   private refreshAvailableLanguageOptions(): void {
-    const selectedCodes = this.featuredLanguages.map(
-      language => language.languageCode
+    const selectedCodes = new Set(
+      this.featuredLanguages.map(language => language.languageCode)
     );
     this.availableLanguageOptions = this.languageOptions.filter(
-      option => !selectedCodes.includes(option.id)
+      option => !selectedCodes.has(option.id)
     );
   }
 
@@ -126,18 +133,17 @@ export class FeaturedTranslationLanguagesEditorComponent implements OnInit {
     this.contributorDashboardAdminBackendApiService
       .updateFeaturedTranslationLanguagesAsync(payload)
       .then(
-        featuredLanguages => {
-          this.featuredLanguages = featuredLanguages;
+        () => {
           this.refreshAvailableLanguageOptions();
           this.saveInProgress = false;
           this.alertsService.addSuccessMessage(
-            'Featured translation languages saved.'
+            FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_SUCCESS
           );
         },
         errorMessage => {
           this.saveInProgress = false;
           this.alertsService.addWarning(
-            errorMessage || 'Failed to save featured translation languages.'
+            errorMessage || FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_FAILURE
           );
         }
       );

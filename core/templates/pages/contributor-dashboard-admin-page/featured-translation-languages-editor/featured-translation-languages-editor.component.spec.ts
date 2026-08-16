@@ -26,7 +26,10 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
 import {AppConstants} from 'app.constants';
-import {FeaturedTranslationLanguagesEditorComponent} from './featured-translation-languages-editor.component';
+import {
+  FEATURED_TRANSLATION_LANGUAGE_MESSAGES,
+  FeaturedTranslationLanguagesEditorComponent,
+} from './featured-translation-languages-editor.component';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
@@ -126,7 +129,7 @@ describe('Featured Translation Languages Editor Component', () => {
     flushMicrotasks();
 
     expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
-      'Failed to load featured translation languages.'
+      FEATURED_TRANSLATION_LANGUAGE_MESSAGES.LOAD_FAILURE
     );
     expect(component.loadingMessage).toBe('');
   }));
@@ -202,7 +205,7 @@ describe('Featured Translation Languages Editor Component', () => {
   it('should save languages and show success', fakeAsync(() => {
     component.featuredLanguages = [HINDI_LANGUAGE];
     backendApiSpy.updateFeaturedTranslationLanguagesAsync.and.returnValue(
-      Promise.resolve([HINDI_LANGUAGE])
+      Promise.resolve()
     );
 
     component.saveFeaturedTranslationLanguages();
@@ -213,7 +216,7 @@ describe('Featured Translation Languages Editor Component', () => {
     ).toHaveBeenCalledWith([{language_code: 'hi', explanation: 'For India.'}]);
     expect(component.saveInProgress).toBeFalse();
     expect(alertsServiceSpy.addSuccessMessage).toHaveBeenCalledWith(
-      'Featured translation languages saved.'
+      FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_SUCCESS
     );
   }));
 
@@ -226,7 +229,9 @@ describe('Featured Translation Languages Editor Component', () => {
     component.saveFeaturedTranslationLanguages();
     flushMicrotasks();
 
-    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith('Save error.');
+    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
+      FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_FAILURE
+    );
     expect(component.saveInProgress).toBeFalse();
   }));
 
@@ -240,14 +245,14 @@ describe('Featured Translation Languages Editor Component', () => {
     flushMicrotasks();
 
     expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
-      'Failed to save featured translation languages.'
+      FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_FAILURE
     );
     expect(component.saveInProgress).toBeFalse();
   }));
 
   it('should not save when a save is already in progress', () => {
     backendApiSpy.updateFeaturedTranslationLanguagesAsync.and.returnValue(
-      Promise.resolve([])
+      Promise.resolve()
     );
     component.saveInProgress = true;
 
