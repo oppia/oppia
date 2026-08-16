@@ -112,7 +112,11 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
 };
 
-const LIGHTHOUSE_MODULES = ['.lighthouserc.js', '.lighthouserc-base.js'];
+const LIGHTHOUSE_MODULES = [
+  '.lighthouserc.js',
+  '.lighthouserc-base.js',
+  '.lighthouserc-desktop.js',
+];
 
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
   ROOT_DIRECTORY,

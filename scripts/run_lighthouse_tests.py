@@ -32,6 +32,7 @@ SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 LIGHTHOUSE_CONFIG_FILENAME: Final = '.lighthouserc.js'
+LIGHTHOUSE_DESKTOP_CONFIG_FILENAME: Final = '.lighthouserc-desktop.js'
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml',
@@ -173,8 +174,8 @@ def _get_lighthouse_environment() -> dict[str, str]:
     return env
 
 
-def run_lighthouse_checks() -> None:
-    """Runs the Lighthouse checks through the Lighthouse config."""
+def _run_lighthouse_checks_for_config(config_filename: str) -> None:
+    """Runs the Lighthouse checks through the given Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
@@ -182,7 +183,7 @@ def run_lighthouse_checks() -> None:
         common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAME,
+        '--config=%s' % config_filename,
         '--max-old-space-size=4096',
     ]
 
@@ -198,16 +199,7 @@ def run_lighthouse_checks() -> None:
     # Standard output is in bytes, we need to decode the line to
     # print it.
     print(stdout.decode('utf-8'))
-    if process.returncode == 0:
-        pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
-        all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
-        print(
-            '\033[1m%s out of %s lighthouse checks run, see '
-            'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
-            'for more information.\033[0m' % (pages_count, all_pages_count)
-        )
-        print('Lighthouse checks completed successfully.')
-    else:
+    if process.returncode != 0:
         print('Return code: %s' % process.returncode)
         print('ERROR:')
         # Error output is in bytes, we need to decode the line to
@@ -215,6 +207,25 @@ def run_lighthouse_checks() -> None:
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
+
+
+def run_lighthouse_checks() -> None:
+    """Runs the Lighthouse checks through the Lighthouse configs."""
+    for config_filename in (
+        LIGHTHOUSE_CONFIG_FILENAME,
+        LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
+    ):
+        print('Running Lighthouse checks for %s.' % config_filename)
+        _run_lighthouse_checks_for_config(config_filename)
+
+    pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
+    all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
+    print(
+        '\033[1m%s out of %s lighthouse checks run, see '
+        'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
+        'for more information.\033[0m' % (pages_count, all_pages_count)
+    )
+    print('Lighthouse checks completed successfully.')
 
 
 def get_lighthouse_pages_config() -> dict[str, str]:

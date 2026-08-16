@@ -173,6 +173,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             'exploration-player/view-exploration.spec.ts'
                         ],
                         '.lighthouserc.js': ['.lighthouserc.js'],
+                        '.lighthouserc-desktop.js': [
+                            '.lighthouserc-desktop.js'
+                        ],
                     }
                 )
             )
@@ -910,6 +913,61 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['.lighthouserc.js'],
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref',
+                                'base',
+                                '--github_head_ref',
+                                'head',
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'e2e': self.all_test_suites['e2e'],
+                                'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'lighthouse': {
+                                    'count': 2,
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '1'
+                                            ],
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '2'
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_desktop_module(
+        self,
+    ) -> None:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: ['.lighthouserc-desktop.js'],
                     ):
                         check_ci_test_suites_to_run.main(
                             [

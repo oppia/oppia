@@ -120,6 +120,9 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
 )
 
 LIGHTHOUSE_PAGES_PER_SHARD: Final = 12
+LIGHTHOUSE_MODULES: Final = ('.lighthouserc.js', '.lighthouserc-desktop.js')
+# The primary Lighthouse module is used as the module identifier for the
+# Lighthouse test suites.
 LIGHTHOUSE_MODULE: Final = '.lighthouserc.js'
 
 
@@ -535,21 +538,21 @@ def get_test_suites_affected_by_root_file(
 
 
 def get_affected_lighthouse_pages(
-    modified_root_files: Set[str], lighthouse_module: str
+    modified_root_files: Set[str], lighthouse_modules: Sequence[str]
 ) -> List[LighthousePageDict]:
     """Gets the affected Lighthouse pages by a list of modified root files.
 
     Args:
         modified_root_files: set(str). The set of modified root files.
-        lighthouse_module: str. The Lighthouse module.
+        lighthouse_modules: list(str). The Lighthouse modules.
 
     Returns:
         list(dict). The affected Lighthouse pages sorted by name.
     """
     lighthouse_pages = get_lighthouse_pages_from_config()
-    # If the Lighthouse module is in the modified root files, then all
+    # If any of the Lighthouse modules is in the modified root files, then all
     # Lighthouse pages should be run.
-    if lighthouse_module in modified_root_files:
+    if modified_root_files.intersection(set(lighthouse_modules)):
         return lighthouse_pages
     affected_lighthouse_pages: List[LighthousePageDict] = []
     for modified_root_file in modified_root_files:
@@ -615,7 +618,7 @@ def get_ci_test_suites_to_run(
 
     lighthouse_test_suites = partition_lighthouse_pages_into_test_suites(
         LIGHTHOUSE_MODULE,
-        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_MODULE),
+        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_MODULES),
     )
 
     return create_ci_test_suites_to_run_dict(

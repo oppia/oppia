@@ -29,6 +29,7 @@ from scripts import build, common, run_lighthouse_tests, servers
 
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_CONFIG_FILENAME = '.lighthouserc.js'
+LIGHTHOUSE_DESKTOP_CONFIG_FILENAME = '.lighthouserc-desktop.js'
 
 
 class MockCompiler:
@@ -75,6 +76,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             lhci_path,
             'autorun',
             '--config=%s' % LIGHTHOUSE_CONFIG_FILENAME,
+            '--max-old-space-size=4096',
+        ]
+        self.lighthouse_desktop_check_bash_command = [
+            common.LIGHTHOUSE_NODE_BIN_PATH,
+            lhci_path,
+            'autorun',
+            '--config=%s' % LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
             '--max-old-space-size=4096',
         ]
         # Arguments to record in lighthouse_setup.js.
@@ -447,7 +455,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess,
             'Popen',
             mock_popen,
-            expected_args=((self.lighthouse_check_bash_command,),),
+            expected_args=(
+                (self.lighthouse_check_bash_command,),
+                (self.lighthouse_desktop_check_bash_command,),
+            ),
         )
 
         os.environ['ALL_LIGHTHOUSE_URLS'] = (
@@ -489,7 +500,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess,
             'Popen',
             mock_popen,
-            expected_args=((self.lighthouse_check_bash_command,),),
+            expected_args=(
+                (self.lighthouse_check_bash_command,),
+                (self.lighthouse_desktop_check_bash_command,),
+            ),
         )
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
