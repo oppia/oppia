@@ -13,9 +13,69 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating and mutating instances of frontend
- * certificate assessment offering domain objects.
+ * @fileoverview Frontend models and interfaces for certificate assessment
+ * domain objects.
  */
+
+// The shape of each attempt summary mirrors the response returned by the
+// CertificateAssessmentAttemptsHandler.
+export interface CertificateAttemptSummary {
+  attempt_id: string;
+  classroom_id: string;
+  title: string;
+  total_score: number;
+  attempt_index: number;
+  started_at: string;
+  is_submitted: boolean;
+}
+
+// The shape of the certificate assessment result, which is derived from the
+// response returned by the certificate assessment result handler.
+export interface AssessmentResult {
+  certificateName: string;
+  scorePercentage: number;
+  topicBreakdown: AssessmentResultTopicWiseBreakdown[];
+  timeTakenMinutes: number;
+}
+
+// The shape of the topic-wise breakdown shown on the certificate assessment
+// result card.
+export interface AssessmentResultTopicWiseBreakdown {
+  topicName: string;
+  scorePercentage: number;
+}
+
+// The shape of each certificate assessment question returned by the assessment
+// player.
+export type AssessmentQuestionType =
+  | 'multiple_choice'
+  | 'multiple_select'
+  | 'text_input'
+  | 'numeric_input';
+
+export interface AssessmentQuestionOption {
+  id: string;
+  text: string;
+}
+
+export interface AssessmentQuestion {
+  id: string;
+  type: AssessmentQuestionType;
+  prompt: string;
+  hint: string;
+  options: AssessmentQuestionOption[];
+  placeholder?: string;
+  correctAnswerText: string;
+}
+
+// The shape of a recommended topic tile shown on the certificate assessment
+// introduction card.
+export interface RecommendedTopicStub {
+  name: string;
+  lessonCount: number;
+  // Placeholder swatch shown instead of a topic thumbnail image.
+  colorClass: string;
+}
 
 export interface CertificateAssessmentOfferingTopicData {
   [topicId: string]: number;
