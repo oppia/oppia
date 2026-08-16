@@ -22,10 +22,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './post-publish-modal.component.css';
 
 @Component({
   selector: 'oppia-post-publish-modal',
   templateUrl: './post-publish-modal.component.html',
+  styleUrls: ['./post-publish-modal.component.css'],
 })
 export class PostPublishModalComponent
   extends ConfirmOrCancelModal
