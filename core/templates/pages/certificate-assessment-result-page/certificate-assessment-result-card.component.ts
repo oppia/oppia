@@ -65,9 +65,8 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
           topicBreakdown,
           timeTakenMinutes: resultData.time_taken_in_minutes,
         };
-        this.isLoading = false;
       })
-      .catch(() => {
+      .finally(() => {
         this.isLoading = false;
       });
   }
@@ -90,6 +89,6 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
     if (totalRelatedQuestions === 0) {
       return 0;
     }
-    return Math.round((totalCorrectQuestions / totalRelatedQuestions) * 100);
+    return (totalCorrectQuestions / totalRelatedQuestions) * 100;
   }
 }

@@ -66,10 +66,7 @@ export class MyCertificatesTabComponent implements OnInit {
           )
         );
       })
-      .then(() => {
-        this.isLoading = false;
-      })
-      .catch(() => {
+      .finally(() => {
         this.isLoading = false;
       });
   }

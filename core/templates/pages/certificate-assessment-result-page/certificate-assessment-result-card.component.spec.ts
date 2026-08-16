@@ -137,7 +137,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
         },
         {
           topicName: 'Multiplication',
-          scorePercentage: 33,
+          scorePercentage: 33.333333333333336,
           totalCorrectQuestions: 1,
           totalRelatedQuestions: 3,
         },
