@@ -268,18 +268,24 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve selected subtopics from url', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
-    } as FeatureStatusChecker);
+    const statusSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    ) as jasmine.Spy<() => Pick<FeatureStatusChecker, 'StoryEditorArcs'>>;
+    statusSpy.and.returnValue({StoryEditorArcs: {isEnabled: true}});
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
   });
 
   it('should throw error for invalid practice session url', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
-    } as FeatureStatusChecker);
+    const statusSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    ) as jasmine.Spy<() => Pick<FeatureStatusChecker, 'StoryEditorArcs'>>;
+    statusSpy.and.returnValue({StoryEditorArcs: {isEnabled: true}});
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(() => {
       urlService.getSelectedSubtopicsFromUrl();
@@ -432,9 +438,12 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve node id from practice url', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
-    } as FeatureStatusChecker);
+    const statusSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    ) as jasmine.Spy<() => Pick<FeatureStatusChecker, 'StoryEditorArcs'>>;
+    statusSpy.and.returnValue({StoryEditorArcs: {isEnabled: true}});
     mockLocation.pathname = '/learn/math/fractions/practice/1';
     expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
 
@@ -443,9 +452,12 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve arc id from url', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      StoryEditorArcs: {isEnabled: true},
-    } as FeatureStatusChecker);
+    const statusSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    ) as jasmine.Spy<() => Pick<FeatureStatusChecker, 'StoryEditorArcs'>>;
+    statusSpy.and.returnValue({StoryEditorArcs: {isEnabled: true}});
     mockLocation.pathname = '/learn/math/fractions/test/arc/1';
     expect(urlService.getArcIdFromUrl()).toBe('1');
 

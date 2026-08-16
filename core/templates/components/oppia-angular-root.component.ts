@@ -104,13 +104,10 @@ import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
 import {NoninteractiveWorkedexample} from 'extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
-interface RteComponentMap {
-  [key: string]: {
-    component_class: Type<Object>;
-  };
-}
-
-const componentMap: RteComponentMap = {
+const componentMap: Record<
+  keyof typeof ServicesConstants.RTE_COMPONENT_SPECS,
+  {component_class: Type<Object>}
+> = {
   Collapsible: {
     component_class: NoninteractiveCollapsible,
   },
@@ -182,11 +179,10 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService: RteHelperService | Object;
+  static rteHelperService: RteHelperServiceLocal;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static ajsValueProvider: (key: string, value: Object) => void;
   static injector: Injector;
 
   constructor(
@@ -227,7 +223,7 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService as RteHelperServiceLocal,
+        OppiaAngularRootComponent.rteHelperService,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone

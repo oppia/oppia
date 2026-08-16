@@ -20,7 +20,11 @@
 import {NgZone} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {CustomizationArgsForRteType} from 'services/rte-helper-modal.component';
+import {
+  CustomizationArgsForRteType,
+  CustomizationArgsSpecsType,
+  RteComponentId,
+} from 'services/rte-helper-modal.component';
 
 export interface CustomizationArgSpec {
   name: string;
@@ -30,12 +34,7 @@ export interface CustomizationArgSpec {
 
 export interface RteComponentSpecs {
   backendId: string;
-  customizationArgSpecs: {
-    name: string;
-    value: string;
-    default_value: string;
-    default_value_obtainable_from_highlight: boolean;
-  }[];
+  customizationArgSpecs: readonly CustomizationArgSpec[];
   id: string;
   iconDataUrl: string;
   isComplex: boolean;
@@ -46,20 +45,15 @@ export interface RteComponentSpecs {
 }
 
 export interface RteHelperService {
-  createCustomizationArgDictFromAttrs: (
-    attrs: Record<string, string>
-  ) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
-  isInlineComponent: (arg0: string) => boolean;
+  isInlineComponent: (richTextComponent: string) => boolean;
   openCustomizationModal: (
     componentIsNewlyCreated: boolean,
-    componentId: string,
-    customizationArgSpecs: CustomizationArgSpec[],
-    attrsCustomizationArgsDict: Partial<CustomizationArgsForRteType>,
-    onSubmitCallback: (
-      customizationArgsDict: Partial<CustomizationArgsForRteType>
-    ) => void,
-    onDismissCallback: (widgetShouldBeRemoved: boolean) => void
+    componentId: RteComponentId,
+    customizationArgSpecs: CustomizationArgsSpecsType,
+    attrsCustomizationArgsDict: CustomizationArgsForRteType,
+    onSubmitCallback?: (arg0: unknown) => void,
+    onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ) => void;
 }
 
@@ -106,7 +100,7 @@ export class CkEditorInitializerService {
         var tagName = 'oppia-noninteractive-ckeditor-' + componentDefn.id;
         var customizationArgSpecs = componentDefn.customizationArgSpecs;
         var isInline = rteHelperService.isInlineComponent(componentDefn.id);
-        var componentId = componentDefn.id;
+        var componentId = componentDefn.id as RteComponentId;
 
         // Inline components will be wrapped in a span, while block components
         // will be wrapped in a div.
@@ -155,8 +149,8 @@ export class CkEditorInitializerService {
                 // Save this for creating the widget later.
                 var container = this.wrapper.getParent(true);
                 var that = this;
-                var customizationArgs: Partial<CustomizationArgsForRteType> =
-                  {};
+                var customizationArgs: CustomizationArgsForRteType =
+                  {} as CustomizationArgsForRteType;
                 customizationArgSpecs.forEach(function (spec) {
                   (
                     customizationArgs as Record<
@@ -171,11 +165,11 @@ export class CkEditorInitializerService {
                 rteHelperService.openCustomizationModal(
                   componentIsNewlyCreated,
                   componentId,
-                  customizationArgSpecs,
+                  customizationArgSpecs as CustomizationArgsSpecsType,
                   customizationArgs,
-                  function (
-                    customizationArgsDict: Partial<CustomizationArgsForRteType>
-                  ) {
+                  function (arg0: unknown) {
+                    const customizationArgsDict =
+                      arg0 as Partial<CustomizationArgsForRteType>;
                     (
                       that.data as Record<
                         string,

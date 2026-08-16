@@ -62,7 +62,14 @@ describe('Beam Jobs Tab Component', () => {
   let component: BeamJobsTabComponent;
   let loader: HarnessLoader;
 
-  let backendApiService: jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
+  const backendApiService: jasmine.SpyObj<ReleaseCoordinatorBackendApiService> =
+    jasmine.createSpyObj('ReleaseCoordinatorBackendApiService', [
+      'getBeamJobs',
+      'getBeamJobRuns',
+      'startNewBeamJob',
+      'cancelBeamJobRun',
+      'getBeamJobRunOutput',
+    ]);
 
   const fooJob = new BeamJob('FooJob');
   const barJob = new BeamJob('BarJob');
@@ -102,16 +109,7 @@ describe('Beam Jobs Tab Component', () => {
       providers: [
         {
           provide: ReleaseCoordinatorBackendApiService,
-          useValue: jasmine.createSpyObj(
-            'ReleaseCoordinatorBackendApiService',
-            [
-              'getBeamJobs',
-              'getBeamJobRuns',
-              'startNewBeamJob',
-              'cancelBeamJobRun',
-              'getBeamJobRunOutput',
-            ]
-          ) as jasmine.SpyObj<ReleaseCoordinatorBackendApiService>,
+          useValue: backendApiService,
         },
       ],
     });
@@ -129,9 +127,6 @@ describe('Beam Jobs Tab Component', () => {
 
     await TestBed.compileComponents();
 
-    backendApiService = TestBed.inject(
-      ReleaseCoordinatorBackendApiService
-    ) as unknown as jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
     backendApiService.getBeamJobs.and.returnValue(of(beamJobs));
     backendApiService.getBeamJobRuns.and.returnValue(of(beamJobRuns));
     backendApiService.startNewBeamJob.and.returnValue(

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Karma spec files accumulator.
+ * @fileoverview Main entry point for the Angular 11 test target.
  *
- * This file initializes the Angular testing environment and sets up
- * the jasmine reporter. The Angular CLI's karma builder handles file
- * discovery and preprocessing automatically.
+ * This file initializes the Angular testing environment, sets up the
+ * jasmine reporter, and explicitly discovers all spec files under
+ * core/templates and extensions via require.context.
  */
 
 // These polyfills are necessary to help the TestBed resolve parameters for
@@ -43,17 +43,25 @@ import {
 // point with require.context so that the builder can discover our tests and initialize
 // our custom Jasmine reporter. Once the codebase is upgraded to Angular 15+, we can
 // safely delete this file and rely on the CLI's auto-discovery.
-// Declare webpack's require.context for dynamic module loading.
-declare var require: {
-  context(
+// NOTE - These types are defined by taking
+// https://webpack.js.org/guides/dependency-management/#context-module-api
+// as a reference.
+interface RequireContext {
+  context: (
     directory: string,
     useSubdirectories: boolean,
     regExp: RegExp
-  ): {
-    keys(): string[];
-    <T>(id: string): T;
-  };
-};
+  ) => Context;
+}
+
+interface Context {
+  (request: Object): void;
+  resolve: () => string;
+  keys: () => Object[];
+  id: string;
+}
+
+declare const require: RequireContext;
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(

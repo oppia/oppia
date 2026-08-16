@@ -312,14 +312,14 @@ jobs:
 
       # Upload other essential files.
       - name: Upload generated test to angular module mapping
-        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test.outcome == 'failure' || steps.mobile-test.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
 
       - name: Upload build artifacts
-        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test.outcome == 'failure' || steps.mobile-test.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: build-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}

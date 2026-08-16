@@ -51,10 +51,12 @@ export class RteHelperService {
     return cloneDeep(_RICH_TEXT_COMPONENTS);
   }
 
-  isInlineComponent(
-    richTextComponent: (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
-  ): boolean {
-    return AppConstants.INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
+  isInlineComponent(richTextComponent: string): boolean {
+    return (
+      (AppConstants.INLINE_RTE_COMPONENTS as readonly string[]).indexOf(
+        richTextComponent
+      ) !== -1
+    );
   }
 
   // The refocusFn arg is a function that restores focus to the text editor
