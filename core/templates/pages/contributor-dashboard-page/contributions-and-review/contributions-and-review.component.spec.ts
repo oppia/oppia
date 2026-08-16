@@ -1890,6 +1890,7 @@ describe('Contributions and review component', () => {
     });
 
     it('should load reviewable translation opportunities correctly', fakeAsync(() => {
+      component.languageCode = 'en';
       let response: GetOpportunitiesResponse | null = null;
       component.loadReviewableTranslationOpportunities().then(result => {
         response = result;
@@ -1904,6 +1905,10 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 1',
+          totalCount: 1,
+          translationsCount: 2,
+          inReviewCount: 2,
+          progressPercentage: '200.00',
           // These opportunities come from V1 dicts, which carry no entity
           // type, so they are treated as explorations.
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
@@ -1915,6 +1920,10 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 2',
+          totalCount: 2,
+          translationsCount: 4,
+          inReviewCount: 4,
+          progressPercentage: '200.00',
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         } as unknown as Opportunity,
       ]);

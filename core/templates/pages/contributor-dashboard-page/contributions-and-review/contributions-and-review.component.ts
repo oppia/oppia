@@ -729,6 +729,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            totalCount: opportunity.getContentCount(),
+            translationsCount: opportunity.getTranslationsCount(
+              this.languageCode
+            ),
+            inReviewCount: opportunity.getTranslationsInReviewCount(
+              this.languageCode
+            ),
+            progressPercentage: opportunity
+              .getTranslationProgressPercentage(this.languageCode)
+              .toFixed(2),
             // The list can mix entity types when the filter is on "All", so
             // each opportunity carries its own type for the suggestion fetch
             // that follows a click. Legacy opportunities carry no entity type

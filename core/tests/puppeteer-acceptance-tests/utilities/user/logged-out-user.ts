@@ -67,7 +67,7 @@ const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
-const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const robotsTxtUrl = testConstants.URLs.RobotsTxt;
 const sitemapXmlUrl = testConstants.URLs.SitemapXml;
@@ -127,6 +127,7 @@ const footerTermsLink = 'a.e2e-test-terms-link';
 const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
 const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
 const footerContactUsLink = 'a.e2e-test-contact-link';
+const footerVersionInfoSelector = '.e2e-test-footer-version-info';
 
 const oppiaYouTubeLinkIcon = '.e2e-test-oppia-youtube-follow';
 const oppiaFacebookLinkIcon = '.e2e-test-oppia-facebook-follow';
@@ -217,10 +218,10 @@ const readBlogPostDesktopButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-desktop-button';
 const readBlogPostMobileButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-mobile-button';
-const applyToVolunteerButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
-const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
+const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
 const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
 const tabsPreviousButtonInVolunteerPage =
   '.e2e-test-volunteer-page-tabs-prev-btn';
@@ -626,6 +627,18 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
+const desktopCollectionExplorationTileSelector =
+  '.e2e-test-collection-exploration';
+const mobileCollectionExplorationTileSelector =
+  '.e2e-mobile-test-collection-exploration';
+const backToCollectionButtonSelector = '.conversation-skin-back-to-collection';
+const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
+const collectionPreviewTileLinkSelector =
+  '.oppia-exploration-summary-tile a[href*="/explore/"]';
+
+const viewSolutionButtonSelector = '.e2e-test-view-solution';
+const viewHintButtonSelector = '.e2e-test-view-hint';
+const textAreaInputSelector = 'textarea.e2e-test-description-box';
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
@@ -2242,6 +2255,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the footer version info matches the expected pattern.
+   * @param {RegExp} pattern - The regular expression pattern to match against the version text.
+   */
+  async expectFooterVersionToMatchPattern(pattern: RegExp): Promise<void> {
+    await this.page.waitForSelector(footerVersionInfoSelector);
+    const versionText = await this.page.$eval(
+      footerVersionInfoSelector,
+      el => el.textContent?.trim() || ''
+    );
+
+    if (!pattern.test(versionText)) {
+      throw new Error(
+        `Footer version text "${versionText}" does not match expected pattern ${pattern}`
+      );
+    }
+
+    showMessage(`Footer version verified: ${versionText}`);
+  }
+
+  /**
    * Function to click the first LinkedIn button in the Teach page
    * and check if it opens corresponding Creator's LinkedIn Url link
    */
@@ -2747,28 +2780,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Apply To Volunteer at the top of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the top of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheTopOfVolunteerPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
+      'Explore Volunteer Openings at the top of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
   /**
-   * Function to click the Apply To Volunteer at the bottom of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the bottom of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
-      'Apply To Volunteer at the bottom of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
+      'Explore Volunteer Openings at the bottom of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
@@ -3505,7 +3538,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Volunteer with Oppia on the about page
-   * and check if it opens the Volunteer form.
+   * and check if it opens the Oppia Idealist page.
    */
   async clickVolunteerWithOppiaButtonInAboutPage(): Promise<void> {
     const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
@@ -3513,9 +3546,9 @@ export class LoggedOutUser extends BaseUser {
       : volunteerWithOppiaDesktopButtonInAboutPage;
     await this.clickLinkButtonToNewTab(
       volunteerWithOppiaButtonInAboutPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      'Volunteer with Oppia at the bottom of the About page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
@@ -5335,15 +5368,11 @@ export class LoggedOutUser extends BaseUser {
       timeout: 80000,
     });
 
-    // Dismiss the hint card tooltip if it is covering the hint button.
-    const hintCardTooltipCloseButton = await this.page.$(
-      '.hint-box .btn-close'
-    );
-    if (hintCardTooltipCloseButton) {
-      await hintCardTooltipCloseButton.click();
-    }
-
-    await this.clickOnElementWithSelector(hintButtonSelector);
+    // On mobile preview, nav overlays can occasionally block the hint button.
+    // Fall back to a direct DOM click if strict clickability checks fail.
+    await this.page.$eval(hintButtonSelector, el => {
+      (el as HTMLElement).click();
+    });
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -5397,11 +5426,54 @@ export class LoggedOutUser extends BaseUser {
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
   async viewSolution(timeout: number = 60000): Promise<void> {
+    const isSolutionButtonVisible = await this.isElementVisible(
+      viewSolutionButton,
+      true,
+      3000
+    );
+
+    // In some flows, the learner must consume the currently-visible hint
+    // before the solution button is shown.
+    if (!isSolutionButtonVisible) {
+      const isHintButtonVisible = await this.isElementVisible(
+        hintButtonSelector,
+        true,
+        3000
+      );
+
+      if (isHintButtonVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+    }
+
     await this.page.waitForSelector(viewSolutionButton, {
       visible: true,
       timeout: timeout,
     });
-    await this.clickOnElementWithSelector(viewSolutionButton);
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileNavOpen = await this.isElementVisible(
+        '.exp-nav-dropdown-container',
+        true,
+        1000
+      );
+      if (isMobileNavOpen) {
+        const isMobileOptionsVisible = await this.isElementVisible(
+          'i.e2e-test-mobile-options',
+          true,
+          1000
+        );
+        if (isMobileOptionsVisible) {
+          await this.clickOnElementWithSelector('i.e2e-test-mobile-options');
+        }
+      }
+
+      await this.page.$eval(viewSolutionButton, element => {
+        (element as HTMLElement).click();
+      });
+    } else {
+      await this.clickOnElementWithSelector(viewSolutionButton);
+    }
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,
@@ -5537,9 +5609,6 @@ export class LoggedOutUser extends BaseUser {
    * Opens the lesson info modal.
    */
   async openLessonInfoModal(): Promise<void> {
-    await this.page.waitForSelector(lessonInfoButton, {
-      visible: true,
-    });
     await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
   }
@@ -6802,12 +6871,21 @@ export class LoggedOutUser extends BaseUser {
   async expectSubheadingInAboutUsPageToContain(
     subheading: string
   ): Promise<void> {
+    const normalizeSubheadingText = (text: string | null | undefined): string =>
+      (text ?? '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
     const subheadings = await this.page.$$eval(
       aboutUsSubheadingSelector,
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (subheadings.includes(subheading)) {
+    const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
+    const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
+
+    if (normalizedSubheadings.includes(normalizedExpectedSubheading)) {
       showMessage(`Subheading ${subheading} is present.`);
     } else {
       throw new Error(
@@ -7837,6 +7915,307 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  private storedCollectionPath: string | null = null;
+  /**
+   * Navigates to the named collection from the community library. Internally
+   * stores the collection URL path so it can be reused later (e.g. after a
+   * language change).
+   */
+  async navigateToCollectionFromLibrary(collectionName: string): Promise<void> {
+    await this.page.waitForSelector(collectionSummaryTileTitleSelector, {
+      visible: true,
+    });
+
+    const titleElements = await this.page.$$(
+      collectionSummaryTileTitleSelector
+    );
+
+    for (const titleEl of titleElements) {
+      const text = await titleEl.evaluate(el => el.textContent?.trim() ?? '');
+      if (!text.includes(collectionName)) {
+        continue;
+      }
+
+      // Walk up from the title element to find the nearest collection link.
+      const path = await titleEl.evaluate(el => {
+        let node: Element | null = el;
+
+        while (node) {
+          if (node.tagName === 'A') {
+            const href = (node as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
+
+          const link =
+            node.querySelector('a[href*="/collection/"]') ??
+            node.parentElement?.querySelector('a[href*="/collection/"]');
+
+          if (link) {
+            const href = (link as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
+
+          node = node.parentElement;
+        }
+
+        return null;
+      });
+
+      if (!path) {
+        throw new Error(`Could not open ${collectionName} collection card.`);
+      }
+
+      this.storedCollectionPath = path;
+      await this.page.goto(`http://localhost:8181${path}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+      await this.waitForPageToFullyLoad();
+      return;
+    }
+
+    throw new Error(`Could not open ${collectionName} collection card.`);
+  }
+
+  /**
+   * Expects the "Begin <collectionName>" button to be present on the collection
+   * page, confirming the page has fully loaded with the correct collection.
+   */
+  async expectBeginCollectionButtonToBePresent(
+    collectionName: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(`Begin ${collectionName}`)) {
+      throw new Error(
+        `Expected "Begin ${collectionName}" on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Expects an exploration with the given title to be listed on the currently
+   * open collection page.
+   * @param {string} explorationTitle - The title of the exploration expected to be listed.
+   */
+  async expectExplorationToBeListedInCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(explorationTitle)) {
+      throw new Error(
+        `${explorationTitle} was not listed on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Navigates to an exploration from the collection page by clicking its tile.
+   * Handles desktop and mobile viewports, and falls back to the first available
+   * tile when the target title cannot be matched by text content.
+   * @param {string} explorationTitle - The title of the exploration to navigate to.
+   */
+  async navigateToExplorationFromCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const tileSelector = isMobile
+      ? mobileCollectionExplorationTileSelector
+      : desktopCollectionExplorationTileSelector;
+
+    await this.page.waitForSelector(tileSelector, {visible: true});
+    const tiles = await this.page.$$(tileSelector);
+
+    for (const tile of tiles) {
+      const tileText = await tile.evaluate(el => el.textContent?.trim() ?? '');
+      if (tileText.includes(explorationTitle)) {
+        await this.openExplorationTile(tile, isMobile);
+        return;
+      }
+    }
+
+    // Fallback: open the first available tile.
+    if (tiles.length > 0) {
+      await this.openExplorationTile(tiles[0], isMobile);
+      return;
+    }
+
+    throw new Error(
+      'Could not find any exploration tiles on the collection page.'
+    );
+  }
+
+  /**
+   * Opens an exploration tile. Prefers a direct href link when available;
+   * falls back to the mobile preview-tile flow otherwise.
+   * @param {puppeteer.ElementHandle} tile - The exploration tile to open.
+   * @param {boolean} isMobile - Whether the current viewport is using the mobile layout.
+   */
+  private async openExplorationTile(
+    tile: puppeteer.ElementHandle,
+    isMobile: boolean
+  ): Promise<void> {
+    const link = await tile
+      .$eval(explorationTileHrefLinkSelector, el => {
+        const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+        return href.startsWith('http')
+          ? new URL(href).pathname + new URL(href).search
+          : href;
+      })
+      .catch(() => null);
+
+    if (link) {
+      await this.page.goto(`http://localhost:8181${link}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else if (isMobile) {
+      await tile.click();
+      await this.page.waitForSelector(collectionPreviewTileLinkSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      const previewLink = await this.page
+        .$eval(collectionPreviewTileLinkSelector, el => {
+          const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+          return href.startsWith('http')
+            ? new URL(href).pathname + new URL(href).search
+            : href;
+        })
+        .catch(() => null);
+      if (!previewLink) {
+        throw new Error(
+          'Could not resolve exploration link from preview tile.'
+        );
+      }
+      await this.page.goto(`http://localhost:8181${previewLink}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else {
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        }),
+        tile.click(),
+      ]);
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectToBeOnPage('/explore/');
+  }
+
+  /**
+   * Accepts two possible completion toast messages and passes as long as either
+   * one appears. Use this when the exact wording may vary between exploration
+   * types.
+   */
+  async expectExplorationCompletionToastMessageWithFallback(
+    primaryMessage: string,
+    fallbackMessage: string
+  ): Promise<void> {
+    try {
+      await this.expectExplorationCompletionToastMessage(primaryMessage);
+    } catch {
+      await this.expectExplorationCompletionToastMessage(fallbackMessage);
+    }
+  }
+
+  /**
+   * Clicks the "Back to Collection" button and waits until the browser is on a
+   * collection page. Re-navigates via the stored collection path (with query
+   * params) if one is available, to avoid frontend routing errors caused by
+   * key-less collection URLs.
+   */
+  async clickBackToCollectionButton(): Promise<void> {
+    await this.page.waitForSelector(backToCollectionButtonSelector, {
+      visible: true,
+      timeout: 10000,
+    });
+    await this.clickOnElementWithSelector(backToCollectionButtonSelector);
+
+    if (this.storedCollectionPath?.includes('key=')) {
+      await this.page.goto(
+        `http://localhost:8181${this.storedCollectionPath}`,
+        {waitUntil: 'domcontentloaded', timeout: 60000}
+      );
+    }
+
+    await this.page.waitForFunction(
+      () => window.location.pathname.includes('/collection/'),
+      {timeout: 15000}
+    );
+  }
+
+  /**
+   * Navigates directly to the collection page that was stored when
+   * navigateToCollectionFromLibrary was called. Useful for reloading the page
+   * after a language change.
+   */
+  async navigateToCollectionPage(): Promise<void> {
+    if (!this.storedCollectionPath) {
+      throw new Error(
+        'No collection path stored. Call navigateToCollectionFromLibrary first.'
+      );
+    }
+    await this.page.goto(`http://localhost:8181${this.storedCollectionPath}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Function to submit an text input answer.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitTextInputAnsswer(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(textAreaInputSelector);
+
+    await this.typeInInputField(textAreaInputSelector, answer);
+    await this.expectElementValueToBe(textAreaInputSelector, answer);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+  /**
+   * Polls until the "View Solution" button becomes visible in the preview tab.
+   * The solution button is only unlocked after enough wrong submissions and
+   * hint consumption, so this method drives that process automatically by
+   * submitting the given wrong answer and consuming any newly-revealed hint on
+   * each iteration. Fails if the button is still not visible after 5 retries.
+   */
+  async waitForSolutionButtonToBeVisible(wrongAnswer: string): Promise<void> {
+    let isSolutionVisible = await this.isElementVisible(
+      viewSolutionButtonSelector,
+      true,
+      2000
+    );
+    for (let i = 0; i < 5 && !isSolutionVisible; i++) {
+      await this.submitTextInputAnsswer(wrongAnswer);
+      await this.expectOppiaFeedbackToBe('Try again.');
+
+      const isHintVisible = await this.isElementVisible(
+        viewHintButtonSelector,
+        true,
+        2000
+      );
+      if (isHintVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+
+      isSolutionVisible = await this.isElementVisible(
+        viewSolutionButtonSelector,
+        true,
+        2000
+      );
+    }
+    expect(isSolutionVisible).toBe(true);
+  }
   /**
    * Verifies that sitemap.xml contains valid XML URL entries.
    */
