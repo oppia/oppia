@@ -270,7 +270,7 @@
             <div class="title-section-mask"></div>
           </div>
         </a>
-        <div section="right-section">
+        <div section="right-section" class="dashboard-card-right-section">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
@@ -608,7 +608,8 @@
     width: 184px;
   }
 
-  .oppia-dashboard-card-view-item [section="right-section"] {
+  .oppia-dashboard-card-view-item .dashboard-card-right-section {
+    float: none;
     height: auto;
     width: 100%;
   }
@@ -893,6 +894,7 @@
     .oppia-dashboard-card-view-item {
       display: block;
       height: auto;
+      margin-bottom: 20px;
       min-height: 125px;
       width: auto;
     }
