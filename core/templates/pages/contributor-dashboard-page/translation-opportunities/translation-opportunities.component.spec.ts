@@ -371,8 +371,8 @@ describe('Translation opportunities component', () => {
   );
 
   it(
-    'should subtract reviewer_only_content_count from totalCount for ' +
-      'non-reviewers',
+    'should subtract reviewer_only_content_count from totalCount and ' +
+      'translationsCount for non-reviewers',
     () => {
       spyOn(
         translationLanguageService,
@@ -406,8 +406,60 @@ describe('Translation opportunities component', () => {
 
       // For non-reviewers, totalCount should be 10 - 4 = 6.
       expect(opportunitiesDicts[0].totalCount).toEqual(6);
-      // ProgressPercentage = (3 / 6) * 100 = 50.00.
-      expect(opportunitiesDicts[0].progressPercentage).toEqual('50.00');
+      // translationsCount should also exclude the 4 translations that
+      // correspond to cards only translatable by reviewers:
+      // max(0, 3 - 4) = 0.
+      expect(opportunitiesDicts[0].translationsCount).toEqual(0);
+      // ProgressPercentage = (0 / 6) * 100 = 0.00.
+      expect(opportunitiesDicts[0].progressPercentage).toEqual('0.00');
+    }
+  );
+
+  it(
+    'should keep a lesson available for translation for non-reviewers when ' +
+      'reviewer-only cards have been translated',
+    () => {
+      // This reproduces issue #23784. Previously, the Translate button used
+      // to get disabled prematurely for non-reviewers because translations
+      // Count included accepted translations of cards that are only
+      // translatable by reviewers, while totalCount was reduced by that same
+      // count. As a result, the lesson was treated as fully handled even
+      // though non-reviewer translatable cards were still pending.
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue('en');
+
+      const opportunitiesWithListContent = [
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '1',
+          topic_name: 'topic_1',
+          story_title: 'Story title 1',
+          chapter_title: 'Chapter title 1',
+          content_count: 10,
+          translation_counts: {
+            en: 8,
+          },
+          translation_in_review_counts: {
+            en: 0,
+          },
+          language_code: 'en',
+          is_pinned: false,
+          reviewer_only_content_count: 4,
+        }),
+      ];
+
+      const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesWithListContent,
+        more: false,
+      });
+
+      // totalCount = 10 - 4 = 6 and translationsCount = max(0, 8 - 4) = 4,
+      // so the lesson must still be considered translatable by the
+      // non-reviewer and should not be moved to the untranslatable bucket.
+      expect(opportunitiesDicts.length).toEqual(1);
+      expect(opportunitiesDicts[0].totalCount).toEqual(6);
+      expect(opportunitiesDicts[0].translationsCount).toEqual(4);
     }
   );
 
@@ -450,8 +502,44 @@ describe('Translation opportunities component', () => {
       expect(opportunitiesDicts[0].totalCount).toEqual(10);
       // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
+      // For reviewers, translationsCount should also remain unchanged.
+      expect(opportunitiesDicts[0].translationsCount).toEqual(3);
     }
   );
+
+  it('should not let translationsCount become negative for non-reviewers', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+
+    // The component defaults to userIsReviewer = false.
+    const opportunitiesWithListContent = [
+      ExplorationOpportunitySummary.createFromBackendDict({
+        id: '1',
+        topic_name: 'topic_1',
+        story_title: 'Story title 1',
+        chapter_title: 'Chapter title 1',
+        content_count: 10,
+        translation_counts: {
+          en: 2,
+        },
+        translation_in_review_counts: {
+          en: 0,
+        },
+        language_code: 'en',
+        is_pinned: false,
+        reviewer_only_content_count: 4,
+      }),
+    ];
+
+    const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
+      opportunities: opportunitiesWithListContent,
+      more: false,
+    });
+
+    // The subtraction is clamped at 0: max(0, 2 - 4) = 0.
+    expect(opportunitiesDicts[0].translationsCount).toEqual(0);
+  });
 
   it('should open translation modal when clicking button', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(

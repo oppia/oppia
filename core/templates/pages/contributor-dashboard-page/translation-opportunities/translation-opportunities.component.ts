@@ -89,6 +89,16 @@ export class TranslationOpportunitiesComponent {
 
       if (!this.userIsReviewer) {
         totalCount -= reviewerOnlyContentCount;
+        // The translationsCount also includes translations of the cards that
+        // are only translatable by reviewers (e.g. cards with 'set_of_strings'
+        // data format). Exclude them so that the count of handled cards does
+        // not reach the total prematurely, which otherwise disables the
+        // Translate button for non-reviewers while translatable cards remain
+        // pending (issue #23784).
+        translationsCount = Math.max(
+          0,
+          translationsCount - reviewerOnlyContentCount
+        );
       }
 
       let progressPercentage = 0;
