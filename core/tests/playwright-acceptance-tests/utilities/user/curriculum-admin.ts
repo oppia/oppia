@@ -179,6 +179,12 @@ const editConceptCard = '.e2e-test-edit-concept-card';
 const moreThanTwoWorkedExamplesError = '.e2e-test-more-than-2-workedexamples';
 const saveReviewMaterialButton = '.e2e-test-save-concept-card';
 const publishSkillButton = '.e2e-test-publish-skill-changes-button';
+const toggleSkillEditOptionsButton =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
+const skillMobileNavDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const skillMobileNavContainer = '.e2e-test-mobile-navigation-bar-container';
+const skillMobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const skillPreviewTabButton = '.e2e-test-question-preview-tab';
 
 const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
@@ -946,8 +952,16 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   async publishSkillChanges(): Promise<void> {
-    await this.expectElementToBeVisible(publishSkillButton);
-    await this.clickOnElementWithSelector(publishSkillButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      const elems = await this.page.$$(toggleSkillEditOptionsButton);
+      await elems[1].click();
+      await this.clickOnElementWithSelector(mobileSaveSkillButton);
+    } else {
+      await this.expectElementToBeVisible(publishSkillButton);
+      await this.clickOnElementWithSelector(publishSkillButton);
+    }
     await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving skill as curriculum admin.'
@@ -960,7 +974,18 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   async navigateToSkillPreviewTab(): Promise<void> {
-    await this.clickOnElementWithSelector(skillPreviewTabButton);
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(skillMobileNavContainer, true, 5000))) {
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
+      }
+      const navDropdownElements = await this.page.$$(skillMobileNavDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await navDropdownElements[1].click();
+      await this.expectElementToBeVisible(skillMobilePreviewTab);
+      await this.clickOnElementWithSelector(skillMobilePreviewTab);
+    } else {
+      await this.clickOnElementWithSelector(skillPreviewTabButton);
+    }
     await this.waitForPageToFullyLoad();
   }
 
