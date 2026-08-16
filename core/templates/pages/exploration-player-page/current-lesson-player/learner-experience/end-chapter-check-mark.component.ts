@@ -17,6 +17,7 @@
  */
 
 import {Component} from '@angular/core';
+import './end-chapter-check-mark.component.css';
 
 @Component({
   selector: 'oppia-end-chapter-check-mark',

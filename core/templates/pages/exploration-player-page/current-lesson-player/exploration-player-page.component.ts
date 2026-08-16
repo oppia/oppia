@@ -31,6 +31,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import './exploration-player-page.component.css';
 
 require('interactions/interactionsRequires.ts');
 

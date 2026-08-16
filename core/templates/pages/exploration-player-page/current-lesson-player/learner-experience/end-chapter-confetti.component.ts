@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import './end-chapter-confetti.component.css';
 
 @Component({
   selector: 'oppia-end-chapter-confetti',

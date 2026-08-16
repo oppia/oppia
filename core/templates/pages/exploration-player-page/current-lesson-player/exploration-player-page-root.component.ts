@@ -17,6 +17,7 @@
  */
 
 import {Component, ViewEncapsulation} from '@angular/core';
+import './exploration-player-page-root.component.css';
 
 @Component({
   selector: 'oppia-exploration-player-page-root',

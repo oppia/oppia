@@ -52,6 +52,7 @@ import {
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
+import './translator-overview.component.css';
 
 @Component({
   selector: 'oppia-translator-overview',

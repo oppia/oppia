@@ -39,6 +39,7 @@ import {ChangeListService} from 'pages/exploration-editor-page/services/change-l
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import './state-translation-editor.component.css';
 
 interface HTMLSchema {
   type: string;

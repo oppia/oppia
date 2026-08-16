@@ -54,6 +54,7 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import './voiceover-card.component.css';
 
 @Component({
   selector: 'oppia-voiceover-card',

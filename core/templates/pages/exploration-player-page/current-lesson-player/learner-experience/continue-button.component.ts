@@ -19,6 +19,7 @@
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './continue-button.component.css';
 
 @Component({
   selector: 'oppia-continue-button',
