@@ -127,11 +127,8 @@ def _get_translated_search_texts(
         num_tags: int. The number of tags in the exploration.
 
     Returns:
-        tuple(list(str), list(str), list(str)). A tuple of three sorted,
-        de-duplicated lists representing:
-        - Translated titles
-        - Translated objectives
-        - Translated tags
+        tuple(list(str), list(str), list(str)). The sorted, de-duplicated
+        translated titles, translated objectives and translated tags.
     """
     entity_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(

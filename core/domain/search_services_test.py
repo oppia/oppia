@@ -292,23 +292,16 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(delete_docs_counter.times_called, 1)
 
     def test_index_exploration_summaries_with_translations(self) -> None:
-        # Create an exploration summary.
-        exp_summary = exp_fetchers.get_exploration_summary_by_id(
-            self.EXP_ID, strict=False
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID,
+            title='Exploration Title',
+            category='Category',
         )
-        if exp_summary is None:
-            exp = exp_domain.Exploration.create_default_exploration(
-                self.EXP_ID,
-                title='Exploration Title',
-                category='Category',
-            )
-            exp.objective = 'Objective'
-            exp.tags = ['algebra', 'math']
-            exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner, self.EXP_ID)
-            exp_summary = exp_fetchers.get_exploration_summary_by_id(
-                self.EXP_ID
-            )
+        exp.objective = 'Objective'
+        exp.tags = ['algebra', 'math']
+        exp_services.save_new_exploration(self.owner_id, exp)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
 
         # 1. Test case: No translations.
         indexed_docs: List[search_services.ExplorationSearchDict] = []
@@ -340,17 +333,17 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             1,
             'hi',
             {
-                'exploration_title': {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
                     'content_value': 'translated title hi',
                     'needs_update': False,
                     'content_format': 'unicode',
                 },
-                'exploration_objective': {
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
                     'content_value': 'translated objective hi',
                     'needs_update': False,
                     'content_format': 'unicode',
                 },
-                'exploration_tag_0': {
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
                     'content_value': 'translated tag hi',
                     'needs_update': False,
                     'content_format': 'unicode',
@@ -365,24 +358,24 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             1,
             'bn',
             {
-                'exploration_title': {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
                     'content_value': 'translated title bn',
                     'needs_update': False,
                     'content_format': 'unicode',
                 },
                 # Stale translation (needs_update=True) for objective.
-                'exploration_objective': {
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
                     'content_value': 'stale objective bn',
                     'needs_update': True,
                     'content_format': 'unicode',
                 },
-                'exploration_tag_0': {
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
                     # Duplicate tag translation.
                     'content_value': 'translated tag hi',
                     'needs_update': False,
                     'content_format': 'unicode',
                 },
-                'exploration_tag_1': {
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_1': {
                     'content_value': 'translated tag bn',
                     'needs_update': False,
                     'content_format': 'unicode',

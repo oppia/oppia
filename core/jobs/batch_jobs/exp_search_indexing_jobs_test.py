@@ -78,6 +78,9 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,
@@ -121,6 +124,9 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,
@@ -176,6 +182,9 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,

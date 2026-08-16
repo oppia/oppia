@@ -1318,16 +1318,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         trigger exploration reindexing.
         """
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')
+        skill_description = 'Skill Description'
+        self.save_new_skill(
+            skill_id, self.author_id, description=skill_description
+        )
 
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-            'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
             'language_code': 'hi',
-            'content_html': '<p>Actual skill explanation</p>',
-            'translation_html': '<p>Translation of explanation</p>',
-            'data_format': 'html',
+            'content_html': skill_description,
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
         }
 
         suggestion_services.create_suggestion(

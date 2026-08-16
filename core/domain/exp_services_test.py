@@ -7256,6 +7256,9 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             'rank': 20,
             'tags': [],
             'title': 'title 0',
+            'translated_titles': [],
+            'translated_objectives': [],
+            'translated_tags': [],
         }
         updated_exp_doc = {
             'category': 'cat1',
@@ -7265,6 +7268,9 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             'rank': 20,
             'tags': [],
             'title': 'title 0',
+            'translated_titles': [],
+            'translated_objectives': [],
+            'translated_tags': [],
         }
 
         def mock_add_documents_to_index(
