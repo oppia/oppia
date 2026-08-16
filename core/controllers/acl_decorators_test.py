@@ -770,6 +770,7 @@ class CertificateAssessmentAttemptResultAccessDecoratorTests(
         )
         self.attempt = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=self.user_id,
+            certificate_id='cert_abc123',
             total_score=80.0,
             attempt_index=1,
             attempt_data={

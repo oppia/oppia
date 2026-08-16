@@ -69,6 +69,7 @@ def _create_attempt_model(
     """
     return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
         learner_id=learner_id,
+        certificate_id=certificate_id,
         total_score=total_score,
         attempt_index=attempt_index,
         attempt_data={
@@ -554,6 +555,7 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
         finished_at = started_at + datetime.timedelta(minutes=5)
         gae_models.CertificateAssessmentAttemptModel.create(
+            certificate_id=certificate_ids[0]['certificate_id'],
             learner_id=learner_id,
             certificate_id=certificate_ids[0]['certificate_id'],
             total_score=90.0,

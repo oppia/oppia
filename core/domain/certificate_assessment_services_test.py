@@ -2683,6 +2683,7 @@ class CertificateAssessmentAttemptServicesTest(test_utils.GenericTestBase):
         """
         return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
+            certificate_id='cert_abc123',
             total_score=total_score,
             attempt_index=attempt_index,
             attempt_data={

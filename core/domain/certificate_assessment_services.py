@@ -1059,23 +1059,6 @@ def _model_to_domain(
     )
 
 
-def _attempt_model_to_domain(
-    attempt_model: gae_models.CertificateAssessmentAttemptModel,
-) -> certificate_assessment_domain.CertificateAssessmentAttempt:
-    """Converts a storage model to a domain object."""
-    return certificate_assessment_domain.CertificateAssessmentAttempt(
-        attempt_id=attempt_model.id,
-        learner_id=attempt_model.learner_id,
-        total_score=attempt_model.total_score,
-        attempt_index=attempt_model.attempt_index,
-        attempt_data=attempt_model.attempt_data,
-        version_data=attempt_model.version_data,
-        started_at=attempt_model.started_at,
-        finished_at=attempt_model.finished_at,
-        is_submitted=attempt_model.is_submitted,
-    )
-
-
 def get_certificate_assessment_attempt(
     attempt_id: str,
 ) -> certificate_assessment_domain.CertificateAssessmentAttempt:
