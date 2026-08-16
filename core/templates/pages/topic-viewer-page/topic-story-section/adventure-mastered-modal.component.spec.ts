@@ -154,7 +154,9 @@ describe('AdventureMasteredModalComponent', () => {
     const dialogElement = fixture.nativeElement.querySelector(
       '.adventure-mastered-modal'
     );
-    dialogElement.querySelectorAll('button').forEach(button => button.remove());
+    dialogElement
+      .querySelectorAll('button')
+      .forEach((button: HTMLElement) => button.remove());
 
     const event = new KeyboardEvent('keydown', {
       key: 'Tab',

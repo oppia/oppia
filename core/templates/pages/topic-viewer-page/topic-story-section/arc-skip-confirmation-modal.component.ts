@@ -28,6 +28,8 @@ import {
   ViewChild,
 } from '@angular/core';
 
+import './arc-skip-confirmation-modal.component.css';
+
 @Component({
   selector: 'arc-skip-confirmation-modal',
   templateUrl: './arc-skip-confirmation-modal.component.html',

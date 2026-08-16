@@ -2534,8 +2534,8 @@ div#ng-curtain {
    editor. */
 @media (max-width: 768px) {
   body.redesigned-topic-viewer-page-active
-    topic-viewer-page-root
-    .oppia-navbar.headroom--unpinned {
+  topic-viewer-page-root
+  .oppia-navbar.headroom--unpinned {
     transform: translateY(0%);
   }
 }

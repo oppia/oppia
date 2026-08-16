@@ -28,6 +28,8 @@ import {
   ViewChild,
 } from '@angular/core';
 
+import './adventure-mastered-modal.component.css';
+
 @Component({
   selector: 'adventure-mastered-modal',
   templateUrl: './adventure-mastered-modal.component.html',

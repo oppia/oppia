@@ -231,16 +231,16 @@
 </section>
 
 <arc-skip-confirmation-modal
-  *ngIf="showArcSkipConfirmationModal"
-  [adventureLabel]="pendingArcSkipTargetLabel"
-  [confirmationMessage]="getArcSkipConfirmationMessage()"
-  (cancel)="onArcSkipConfirmationCancel()"
-  (confirm)="onArcSkipConfirmationProceed()">
+                             *ngIf="showArcSkipConfirmationModal"
+                             [adventureLabel]="pendingArcSkipTargetLabel"
+                             [confirmationMessage]="getArcSkipConfirmationMessage()"
+                             (cancel)="onArcSkipConfirmationCancel()"
+                             (confirm)="onArcSkipConfirmationProceed()">
 </arc-skip-confirmation-modal>
 
 <adventure-mastered-modal
-  *ngIf="showAdventureMasteredModal"
-  [title]="getAdventureMasteredTitle()"
-  [message]="getAdventureMasteredSubtitle()"
-  (continue)="onAdventureMasteredContinue()">
+                          *ngIf="showAdventureMasteredModal"
+                          [title]="getAdventureMasteredTitle()"
+                          [message]="getAdventureMasteredSubtitle()"
+                          (continue)="onAdventureMasteredContinue()">
 </adventure-mastered-modal>
