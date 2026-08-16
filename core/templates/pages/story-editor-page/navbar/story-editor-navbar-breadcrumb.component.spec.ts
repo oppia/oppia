@@ -17,7 +17,7 @@
  */
 
 import {EventEmitter} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {Story} from 'domain/story/story.model';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {StoryEditorNavbarBreadcrumbComponent} from './story-editor-navbar-breadcrumb.component';
@@ -42,7 +42,7 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let undoRedoService: UndoRedoService;
   let windowRef: WindowRef;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StoryEditorNavbarBreadcrumbComponent],
@@ -53,9 +53,9 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
-    storyEditorStateService = TestBed.get(StoryEditorStateService);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
     ngbModal = TestBed.inject(NgbModal);
-    undoRedoService = TestBed.get(UndoRedoService);
+    undoRedoService = TestBed.inject(UndoRedoService);
     windowRef = TestBed.inject(WindowRef) as jasmine.SpyObj<WindowRef>;
 
     story = Story.createFromBackendDict({

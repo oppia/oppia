@@ -325,7 +325,6 @@ describe('NumberWithUnitsValidationService', () => {
       // following properties from type 'Fraction': isNegative, wholeNumber,
       // numerator, denominator, and 6 more." We need to suppress this error
       // because we only need to mock the toFloat function for testing.
-      // @ts-expect-error
       fraction: {
         toFloat: () => {
           return 0.0;

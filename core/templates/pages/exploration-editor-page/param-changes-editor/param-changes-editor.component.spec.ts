@@ -266,6 +266,13 @@ describe('Param Changes Editor Component', () => {
     expect(component.warningText).toBe('');
   });
 
+  it('should return false when displayed param changes is not an array', () => {
+    component.paramChangesService.displayed = {} as ParamChange[];
+
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe('');
+  });
+
   it('should check param changes as invalid when it has an empty parameter name', () => {
     component.paramChangesService.displayed = [ParamChange.createDefault('')];
 

@@ -40,7 +40,7 @@ describe('Search Service', () => {
       imports: [HttpClientTestingModule],
       providers: [SearchService],
     });
-    searchService = TestBed.get(SearchService);
+    searchService = TestBed.inject(SearchService);
   });
 
   describe('updateSearchFieldsBasedOnUrlQuery', () => {
@@ -272,7 +272,7 @@ describe('Search Service', () => {
           initialSearchResultsLoadedSpy
         )
       );
-      httpTestingController = TestBed.get(HttpTestingController);
+      httpTestingController = TestBed.inject(HttpTestingController);
     });
 
     afterEach(() => {

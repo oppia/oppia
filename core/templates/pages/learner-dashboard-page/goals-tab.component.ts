@@ -17,7 +17,12 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {Component, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -28,12 +33,12 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
-import './goals-tab.component.css';
 
 @Component({
   selector: 'oppia-goals-tab',
   templateUrl: './goals-tab.component.html',
   styleUrls: ['./goals-tab.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class GoalsTabComponent implements OnInit {
   constructor(

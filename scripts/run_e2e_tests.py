@@ -94,7 +94,7 @@ _PARSER.add_argument(
     choices=['critical', 'error', 'warning', 'info'],
 )
 _PARSER.add_argument(
-    '--source_maps', help='Build webpack with source maps.', action='store_true'
+    '--source_maps', help='Build ng with source maps.', action='store_true'
 )
 _PARSER.add_argument(
     '--mobile', help='Run e2e test in mobile viewport.', action='store_true'

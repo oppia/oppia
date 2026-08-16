@@ -80,11 +80,11 @@ describe('User Api Service', () => {
         imports: [HttpClientTestingModule],
         providers: [{provide: WindowRef, useValue: windowRef}],
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      userService = TestBed.get(UserService);
-      urlInterpolationService = TestBed.get(UrlInterpolationService);
-      urlService = TestBed.get(UrlService);
-      csrfService = TestBed.get(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      userService = TestBed.inject(UserService);
+      urlInterpolationService = TestBed.inject(UrlInterpolationService);
+      urlService = TestBed.inject(UrlService);
+      csrfService = TestBed.inject(CsrfTokenService);
       userBackendApiService = TestBed.inject(UserBackendApiService);
       imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
 

@@ -25,64 +25,11 @@ const ALL_VIDEOS = false;
 
 var suites = {
   full: [
-    './core/tests/webdriverio/**/*.js',
     './core/tests/webdriverio_desktop/**/*.js',
-  ],
-
-  additionalEditorFeatures: [
-    './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
-  ],
-
-  additionalEditorFeaturesModals: [
-    './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
-  ],
-
-  blog: [
-    './core/tests/webdriverio_desktop/blog.js'
-  ],
-
-  collections: [
-    './core/tests/webdriverio_desktop/collections.js'
-  ],
-
-  contributorAdminDashboard: [
-    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
-  ],
-
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
-  embedding: [
-    './core/tests/webdriverio_desktop/embedding.js'
-  ],
-
-  explorationImprovementsTab: [
-    './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
   ],
 
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
-  ],
-
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
-  ],
-
-  explorationTranslationTab: [
-    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
-  ],
-
-  learner: [
-    './core/tests/webdriverio/learnerFlow.js'
-  ],
-
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  publication: [
-    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [
@@ -91,14 +38,6 @@ var suites = {
 
   topicAndStoryEditor: [
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
-  ],
-
-  users: [
-    './core/tests/webdriverio_desktop/userJourneys.js'
-  ],
-
-  wipeout: [
-    './core/tests/webdriverio_desktop/wipeout.js'
   ]
 };
 

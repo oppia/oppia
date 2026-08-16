@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {
   trigger,
   state,
@@ -52,20 +52,19 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
-
-import './learner-dashboard-page.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   subscriptionList: ProfileSummary[];
-  explorationPlaylist: LearnerExplorationSummary[];
 }
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: ['./learner-dashboard-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideInOut', [
       state(
@@ -160,8 +159,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
   numberOfUnreadThreads!: number;
-  explorationPlaylist!: LearnerExplorationSummary[];
-  collectionPlaylist!: CollectionSummary[];
   activeSection!: string;
 
   profilePicturePngDataUrl!: string;
@@ -177,8 +174,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
-  totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
-    [];
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
   curatedExplorationIds = new Set<string>();
 
@@ -197,7 +192,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platFeatService: PlatformFeatureService
   ) {}
 
   populateCuratedExplorationIds(): void {
@@ -232,7 +228,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptionsList = responseData.subscriptionList;
-    this.explorationPlaylist = responseData.explorationPlaylist;
   }
 
   ngOnInit(): void {
@@ -302,7 +297,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.incompleteCollectionsList = responseData.incompleteCollectionsList;
         this.completedToIncompleteCollections =
           responseData.completedToIncompleteCollections;
-        this.collectionPlaylist = responseData.collectionPlaylist;
       },
       errorResponseStatus => {
         if (
@@ -342,10 +336,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       learnerGroupFeatureIsEnabledPromise,
     ])
       .then(() => {
-        this.totalLessonsInPlaylists = [
-          ...this.explorationPlaylist,
-          ...this.collectionPlaylist,
-        ];
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
           // So that focus is applied after the loading screen has dissapeared.
@@ -396,6 +386,14 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   setActiveSection(newActiveSectionName: string): void {
+    if (
+      newActiveSectionName ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .MY_CERTIFICATES &&
+      !this.isCertificateAssessmentEnabled()
+    ) {
+      return;
+    }
     this.activeSection = newActiveSectionName;
     if (
       this.activeSection ===
@@ -412,7 +410,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
             responseData.incompleteCollectionsList;
           this.completedToIncompleteCollections =
             responseData.completedToIncompleteCollections;
-          this.collectionPlaylist = responseData.collectionPlaylist;
         },
         errorResponseStatus => {
           if (
@@ -503,6 +500,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return decodeURIComponent(base64ImageData);
   }
 
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platFeatService.status.EnableCertificateAssessment.isEnabled;
+  }
+
   getDashboardTabHeading(): string {
     switch (this.activeSection) {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
@@ -514,6 +515,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .GOALS:
         return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .MY_CERTIFICATES:
+        return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }

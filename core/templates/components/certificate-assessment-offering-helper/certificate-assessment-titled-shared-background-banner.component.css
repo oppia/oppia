@@ -1,0 +1,82 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.oppia-titled-background-banner-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 28px 0 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.oppia-titled-background-banner-header .col-4 {
+  flex: 0 0 200px;
+  max-width: 200px;
+  padding: 0;
+}
+
+.oppia-titled-background-banner-header .col-4:last-child {
+  visibility: hidden;
+}
+
+.oppia-titled-background-banner-header .text-center {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+}
+
+/*
+ * These colors fall back to the certificate teal palette when a parent
+ * page hasn't defined --certificate-teal / --certificate-teal-dark, so
+ * this component also works standalone on pages that don't set them.
+ */
+.oppia-titled-background-banner-header h1 {
+  color: var(--certificate-teal-dark, #034339);
+  font-size: 5.5rem;
+  font-weight: 800;
+  margin-top: 30px;
+}
+
+.oppia-titled-background-banner-button.btn-primary {
+  background-color: var(--certificate-teal, #045d51);
+  border-color: var(--certificate-teal, #045d51);
+  border-radius: 5px;
+  font-size: 1.85rem;
+  font-weight: 600;
+  margin-left: 50px;
+  width: 250px;
+}
+
+.oppia-titled-background-banner-button.btn-primary:hover {
+  background-color: var(--certificate-teal-dark, #034339);
+  border-color: var(--certificate-teal-dark, #034339);
+}
+
+@media (max-width: 600px) {
+  .oppia-titled-background-banner-header {
+    flex-wrap: wrap;
+  }
+
+  .oppia-titled-background-banner-header .col-4 {
+    flex: 0 0 auto;
+    max-width: none;
+  }
+
+  .oppia-titled-background-banner-header .col-4:last-child {
+    display: none;
+  }
+
+  .oppia-titled-background-banner-header .text-center {
+    flex: 1 1 100%;
+    margin-bottom: 12px;
+    order: -1;
+  }
+
+  .oppia-titled-background-banner-header h1 {
+    font-size: 1.7rem;
+  }
+}

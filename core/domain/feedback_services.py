@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-import datetime
 import itertools
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     email_manager,
     feedback_domain,
@@ -490,22 +489,33 @@ def delete_threads_for_multiple_entities(
         entity_ids: list(str). The ids of the entities.
     """
     threads = []
+    thread_ids: List[str] = []
+
     for entity_id in entity_ids:
-        threads.extend(get_threads(entity_type, entity_id))
+        entity_threads = get_threads(entity_type, entity_id)
+        threads.extend(entity_threads)
+        thread_ids.extend(thread.id for thread in entity_threads)
 
     model_keys = []
-    for thread in threads:
-        for message in get_messages(thread.id):
-            model_keys.append(
-                datastore_services.Key(
-                    feedback_models.GeneralFeedbackMessageModel, message.id
-                )
-            )
+
+    for thread_id in thread_ids:
+        message_models = (
+            feedback_models.GeneralFeedbackMessageModel.get_messages(thread_id)
+        )
         model_keys.append(
             datastore_services.Key(
-                feedback_models.GeneralFeedbackThreadModel, thread.id
+                feedback_models.GeneralFeedbackThreadModel, thread_id
             )
         )
+        for message_model in message_models:
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel,
+                    message_model.id,
+                )
+            )
+
+    for thread in threads:
         if thread.has_suggestion:
             model_keys.append(
                 datastore_services.Key(
@@ -513,7 +523,7 @@ def delete_threads_for_multiple_entities(
                 )
             )
 
-    model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
+    model_keys.extend(_get_threads_user_info_keys(thread_ids))
 
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
@@ -1182,7 +1192,7 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
-        datetime.datetime.utcnow() - model.created_on
+        utils.get_current_utc_datetime() - model.created_on
     ).seconds
 
     if (

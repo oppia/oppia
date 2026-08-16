@@ -351,16 +351,19 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome
     );
     const expectedWarnings = answerGroups[0].rules.map(
-      (_: AnswerGroup, index: number) => ({
+      (_: Rule, index: number) => ({
         type: WARNING_TYPES.ERROR,
         message:
           `Learner answer ${index + 1} from Oppia response 1 will never be matched` +
           ' because it is not in simplest form',
       })
     );
-    var warningsMessages = warnings.map(warning => warning.message);
-    var expectedWarningsMessages = expectedWarnings.map(
-      warning => warning.message
+    const warningsMessages = warnings.map(
+      warning => (warning as {message: string}).message
+    );
+
+    const expectedWarningsMessages = expectedWarnings.map(
+      warning => (warning as {message: string}).message
     );
     expectedWarningsMessages.forEach(message => {
       expect(warningsMessages).toContain(message);
@@ -770,6 +773,59 @@ describe('FractionInputValidationService', () => {
           'Learner answer 1 from Oppia response 2 will never be ' +
           'matched because it is made redundant by ' +
           'answer 1 from Oppia response 1',
+      },
+    ]);
+  });
+
+  it('should not flag already simplified fractions when requireSimplestForm is true', () => {
+    customizationArgs.requireSimplestForm.value = true;
+    const simplifiedFractionRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsExactlyEqualTo',
+        inputs: {
+          f: createFractionDict(false, 0, 5, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    answerGroups[0].rules = [simplifiedFractionRule];
+
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it('should still flag non-simplified fractions when requireSimplestForm is true', () => {
+    customizationArgs.requireSimplestForm.value = true;
+    const nonSimplifiedFractionRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsExactlyEqualTo',
+        inputs: {
+          f: createFractionDict(false, 0, 4, 6),
+        },
+      },
+      'FractionInput'
+    );
+
+    answerGroups[0].rules = [nonSimplifiedFractionRule];
+
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 1 from Oppia response 1 will never be matched' +
+          ' because it is not in simplest form',
       },
     ]);
   });

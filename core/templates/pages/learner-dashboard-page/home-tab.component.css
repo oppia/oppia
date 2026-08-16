@@ -16,7 +16,7 @@
 }
 
 .home-tab .greeting {
-  color: #00645c;
+  color: #004d45;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
 }
@@ -31,6 +31,9 @@
   padding: 32px 0 30px 40px;
   width: 736px;
 }
+[dir="rtl"] .home-tab .continue-where-you-left-off {
+  padding: 32px 40px 30px 0;
+}
 .home-tab .suggested-for-you .classroom-name {
   color: #333;
   font-size: 19px;
@@ -43,7 +46,7 @@
 }
 .home-tab .suggested-for-you .topic-summary-tile {
   display: inline-block;
-  padding-right: 20px;
+  padding-inline-end: 20px;
 }
 .home-tab .suggested-for-you .untracked-topics {
   width: fit-content;
@@ -51,7 +54,7 @@
 .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
 .home-tab .suggested-for-you .suggested-for-you-heading,
 .home-tab .empty-suggested-for-you .suggested-for-you-heading {
-  color: #00645c;
+  color: #004d45;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
   margin: 0;
@@ -62,7 +65,7 @@
   padding-top: 32px;
 }
 .home-tab .suggested-for-you .classroom-card {
-  background-color: #eee ;
+  background-color: #eee;
   border-radius: 4px;
   float: right;
   height: 210px;
@@ -86,7 +89,7 @@
   display: inline-block;
 }
 #setting-a-goal-link {
-  color: #00645c;
+  color: #004d45;
   font-weight: bold;
 }
 .home-tab .empty-suggested-for-you-section {

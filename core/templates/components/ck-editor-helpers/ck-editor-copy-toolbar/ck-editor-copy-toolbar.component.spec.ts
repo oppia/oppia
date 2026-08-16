@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {
   CkEditorCopyToolbarComponent,
@@ -30,7 +30,7 @@ describe('CkEditor copy toolbar', () => {
   let ckCopyService: CkEditorCopyContentService;
   let dummyRichTextEditor: HTMLElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CkEditorCopyToolbarComponent],
       providers: [

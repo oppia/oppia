@@ -18,7 +18,7 @@
 
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -75,7 +75,7 @@ describe('InteractiveCodeReplComponent', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveCodeReplComponent],
       providers: [
@@ -93,8 +93,8 @@ describe('InteractiveCodeReplComponent', () => {
   }));
 
   beforeEach(() => {
-    playerPositionService = TestBed.get(PlayerPositionService);
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveCodeReplComponent);
     component = fixture.componentInstance;
     component.lastAnswer = null;

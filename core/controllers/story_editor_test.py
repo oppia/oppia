@@ -18,8 +18,10 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
+    skill_services,
     story_domain,
     story_services,
+    topic_domain,
     topic_fetchers,
     user_services,
 )
@@ -70,7 +72,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=404,
         )
@@ -82,14 +86,16 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=404,
         )
 
         self.logout()
 
-    def test_put_can_not_publish_story_with_invalid_new_story_status_value(
+    def test_put_can_not_publish_story_with_invalid_story_publication_action(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -97,7 +103,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': 'Invalid value'},
+            {'story_publication_action': 'invalid_value'},
             csrf_token=csrf_token,
             expected_status_int=400,
         )
@@ -111,7 +117,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
         )
 
@@ -122,7 +130,11 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': False},
+            {
+                'story_publication_action': (
+                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+                )
+            },
             csrf_token=csrf_token,
         )
 
@@ -136,10 +148,117 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         # Check that non-admins cannot publish a story.
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=401,
         )
+
+    def test_story_unpublish_temporarily(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
+            csrf_token=csrf_token,
+        )
+
+        self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {
+                'story_publication_action': (
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+                ),
+            },
+            csrf_token=csrf_token,
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+                )
+
+        self.logout()
+
+    def test_put_raises_validation_error_when_skill_has_few_questions(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Skill 1')
+        self.save_new_valid_exploration(
+            '0',
+            self.admin_id,
+            title='Title 1',
+            category='Mathematics',
+            language_code='en',
+        )
+        self.publish_exploration(self.admin_id, '0')
+
+        old_value: List[str] = []
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Title 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': old_value,
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id, self.story_id, change_list, 'Added story node.'
+        )
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {
+                'story_publication_action': (
+                    topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                )
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertIn(
+            'Skill %s has only 0 questions.' % skill_id,
+            response['error'],
+        )
+
+        self.logout()
 
 
 class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
@@ -184,6 +303,36 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
+
+    def test_get_story_data_when_story_reference_is_not_first(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        first_story_id = story_services.get_new_story_id()
+        second_story_id = story_services.get_new_story_id()
+
+        self.save_new_story(first_story_id, self.admin_id, topic_id)
+        self.save_new_story(second_story_id, self.admin_id, topic_id)
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='Another Name',
+            abbreviated_name='another-name',
+            url_fragment='another-name',
+            description='Another description',
+            canonical_story_ids=[first_story_id, second_story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, second_story_id)
+        )
+        self.assertEqual(json_response['story_dict']['id'], second_story_id)
+        self.assertFalse(json_response['story_is_published'])
+        self.logout()
 
     def test_can_not_get_access_story_handler_with_invalid_story_id(
         self,
@@ -491,7 +640,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.get_json(
             '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id)
         )
-        self.assertEqual(self.story_id, json_response['story']['id'])
+        self.assertEqual(self.story_id, json_response['story_dict']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.assertEqual(len(json_response['skill_summaries']), 0)
         self.logout()
@@ -518,9 +667,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             change_cmd,
             csrf_token=csrf_token,
         )
-        self.assertEqual(self.story_id, json_response['story']['id'])
+        self.assertEqual(self.story_id, json_response['story_dict']['id'])
         self.assertEqual(
-            'New Description', json_response['story']['description']
+            'New Description', json_response['story_dict']['description']
         )
         self.logout()
 

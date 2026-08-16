@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
 
-from typing import Dict, Final, List, Pattern, Tuple, TypedDict
+from typing import Dict, Final, List, Pattern, Set, Tuple, TypedDict
 
 from .. import build, common, concurrent_task_utils
 from . import js_ts_linter, linter_utils, warranted_angular_security_bypasses
@@ -81,7 +82,6 @@ EXCLUDED_PATHS: Final = (
     '*.ico',
     '*.jpg',
     '*.min.js',
-    'backend_prod_files/*',
     'assets/scripts/*',
     'core/domain/proto/*.py',
     'core/tests/data/*',
@@ -91,7 +91,6 @@ EXCLUDED_PATHS: Final = (
     'node_modules/*',
     'typings/*',
     'local_compiled_js/*',
-    'webpack_bundles/*',
     'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
     'scripts/linters/test_files/*',
@@ -103,6 +102,7 @@ EXCLUDED_PATHS: Final = (
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
+    'core/tests/playwright-acceptance-tests/data/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
 )
 
@@ -115,9 +115,23 @@ CONFIG_FILE_PATHS: Final = (
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
     'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts',
+)
+
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'constants.ts'
+)
+RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'rich_text_components_definitions.ts'
+)
+RTE_COMPONENT_CONFIGS_CONTENT_REGEX: Final = re.compile(
+    r'"RTE_COMPONENT_CONFIGS"\s*:\s*\{(?P<configs_content>.*?)\}\s*,?',
+    re.DOTALL,
+)
+RTE_COMPONENT_CONFIG_NAME_REGEX: Final = re.compile(
+    r'"(?P<config_name>[A-Z0-9_]+)"\s*:'
+)
+RTE_COMPONENT_CONFIG_ID_REGEX: Final = re.compile(
+    r'"rte_component_config_id"\s*:\s*"(?P<config_id>[^"]+)"'
 )
 
 BAD_STRINGS_CONSTANTS: Dict[str, BadStringsConstantsDict] = {
@@ -695,6 +709,213 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    @staticmethod
+    def _extract_ngb_modal_open_calls(content: str) -> List[str]:
+        """Extracts the argument text of every ngbModal.open(...) call.
+
+        Instead of a simple regex count across the whole file, this method
+        locates each 'ngbModal.open(' in the content and then walks forward
+        character-by-character, tracking parenthesis depth, to collect the
+        exact substring between the opening and closing parentheses of that
+        call.  This prevents unrelated occurrences of 'backdrop: \'static\''
+        elsewhere in the file from masking a missing backdrop option inside
+        an actual ngbModal.open() call.
+
+        Args:
+            content: str. The file content (with comments removed).
+
+        Returns:
+            list(str). A list of argument substrings, one per ngbModal.open()
+            call found in the content.
+        """
+        calls = []
+        for match in re.finditer(r'\bngbModal\.open\(', content):
+            # Start just after the opening parenthesis.
+            start = match.end()
+            depth = 1
+            idx = start
+            while idx < len(content) and depth > 0:
+                if content[idx] == '(':
+                    depth += 1
+                elif content[idx] == ')':
+                    depth -= 1
+                idx += 1
+            # Slice out the content between the parentheses (excluding them).
+            calls.append(content[start : idx - 1])
+        return calls
+
+    def check_modal_component_patterns(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that modal components follow the standardized pattern.
+
+        This ensures:
+        1. Files using NgbActiveModal must also use MatBottomSheetRef to
+           provide a mobile-friendly bottom sheet view.
+        2. Calls to ngbModal.open() must include backdrop: 'static'
+           to prevent closing the modal when clicking outside.
+        """
+        name = 'Modal component pattern'
+        error_messages: List[str] = []
+        failed = False
+
+        # Load allowlist once before the loop.
+        allowlist_path = os.path.join(
+            os.path.dirname(__file__), 'modal_allowlist.json'
+        )
+        with open(allowlist_path, 'r', encoding='utf-8') as f:
+            allowlist = json.load(f)
+
+        for filepath in self.all_filepaths:
+            if not filepath.endswith('.ts'):
+                continue
+            # Skip test/spec files since they mock modal behavior.
+            if filepath.endswith('.spec.ts'):
+                continue
+
+            if filepath in allowlist:
+                continue
+
+            file_content = self.file_cache.read(filepath)
+
+            # Remove comments to avoid false positives.
+            file_content_without_comments = re.sub(
+                r'//.*?\n|/\*.*?\*/', '', file_content, flags=re.DOTALL
+            )
+
+            # Check 1: Modal Components (inject NgbActiveModal)
+            if bool(
+                re.search(r'\bNgbActiveModal\b', file_content_without_comments)
+            ) and not bool(
+                re.search(
+                    r'\bMatBottomSheetRef\b', file_content_without_comments
+                )
+            ):
+                failed = True
+                error_messages.append(
+                    '%s --> Modal components using NgbActiveModal must also '
+                    'use MatBottomSheetRef to provide a mobile-friendly '
+                    'bottom sheet view.' % filepath
+                )
+
+            # Check 2: Opener Components (call ngbModal.open)
+            modal_open_matches = re.findall(
+                r'\bngbModal\.open\b', file_content_without_comments
+            )
+            if modal_open_matches:
+                if not bool(
+                    re.search(
+                        r'\bMatBottomSheet\b', file_content_without_comments
+                    )
+                ):
+                    failed = True
+                    error_messages.append(
+                        '%s --> Components opening modals with ngbModal.open '
+                        'must also use MatBottomSheet to support mobile '
+                        'views.' % filepath
+                    )
+
+                # Check 3: Backdrop static.
+                # Extract each ngbModal.open(...) call individually and
+                # verify backdrop: 'static' is present within that specific
+                # call.  A file-wide count of 'backdrop: \'static\'' is
+                # insufficient because unrelated occurrences elsewhere in
+                # the file can satisfy the count while the actual open()
+                # calls still lack the option.
+                open_calls = self._extract_ngb_modal_open_calls(
+                    file_content_without_comments
+                )
+                backdrop_re = re.compile(r'backdrop\s*:\s*[\'"]static[\'"]')
+                missing_backdrop = any(
+                    not backdrop_re.search(call) for call in open_calls
+                )
+                if missing_backdrop:
+                    failed = True
+                    error_messages.append(
+                        '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
+                        'to prevent closing on outside clicks.' % filepath
+                    )
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages
+        )
+
+    def check_rte_component_config_ids(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that all RTE component config ids are valid."""
+        name = 'RTE component config ids'
+        error_messages: List[str] = []
+        failed = False
+
+        should_run_check = any(
+            filepath.replace('\\', '/').endswith(
+                (
+                    'assets/constants.ts',
+                    'assets/rich_text_components_definitions.ts',
+                )
+            )
+            for filepath in self.all_filepaths
+        )
+        if not should_run_check:
+            return concurrent_task_utils.TaskResult(
+                name, failed, error_messages, error_messages
+            )
+
+        constants_content = ''.join(
+            self.file_cache.readlines(ASSETS_CONSTANTS_FILEPATH)
+        )
+        configs_match = RTE_COMPONENT_CONFIGS_CONTENT_REGEX.search(
+            constants_content
+        )
+        valid_config_ids: Set[str] = set()
+        if configs_match is not None:
+            valid_config_ids = {
+                config_name_match.group('config_name')
+                for config_name_match in RTE_COMPONENT_CONFIG_NAME_REGEX.finditer(
+                    configs_match.group('configs_content')
+                )
+            }
+
+        if not valid_config_ids:
+            failed = True
+            error_messages.append(
+                '%s --> Could not find valid keys under '
+                '"RTE_COMPONENT_CONFIGS" in constants.ts.'
+                % ASSETS_CONSTANTS_FILEPATH
+            )
+            return concurrent_task_utils.TaskResult(
+                name, failed, error_messages, error_messages
+            )
+
+        for line_num, line in enumerate(
+            self.file_cache.readlines(
+                RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH
+            ),
+            start=1,
+        ):
+            config_id_match = RTE_COMPONENT_CONFIG_ID_REGEX.search(line)
+            if config_id_match is None:
+                continue
+            config_id = config_id_match.group('config_id')
+            if config_id in valid_config_ids:
+                continue
+            failed = True
+            error_messages.append(
+                '%s --> Line %s: The value of "rte_component_config_id" '
+                'in ui_config should match one of the keys in '
+                'assets/constants.ts -> RTE_COMPONENT_CONFIGS. Found "%s".'
+                % (
+                    RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH,
+                    line_num,
+                    config_id,
+                )
+            )
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -718,6 +939,8 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             self.check_newline_at_eof(),
             self.check_extra_js_files(),
             self.check_disallowed_flags(),
+            self.check_rte_component_config_ids(),
+            self.check_modal_component_patterns(),
         ]
         return task_results
 

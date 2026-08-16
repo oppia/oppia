@@ -1,0 +1,92 @@
+.oppia-certificate-offering-title {
+  color: #00609c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 26px;
+  padding-top: 60px;
+}
+
+.oppia-certificate-offering-progress {
+  margin: auto;
+  margin-left: -30px;
+  margin-top: 40px;
+  max-width: 1120px;
+}
+
+.oppia-learner-group-progressbar {
+  counter-reset: step;
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  position: relative;
+}
+
+.oppia-learner-group-progressbar li {
+  border-left: none;
+  color: #9e9e9e;
+  padding: 20px 7px 40px 0;
+  position: relative;
+  text-align: center;
+  width: 33%;
+}
+
+.oppia-learner-group-progressbar li:before {
+  background-color: #9e9e9e;
+  content: '';
+  height: 1px;
+  left: -40%;
+  position: absolute;
+  top: 0;
+  width: 80%;
+  z-index: 1;
+}
+
+.oppia-learner-group-progressbar li:first-child:before {
+  content: none;
+}
+
+/*rtl:begin:ignore*/
+.checkmark:after {
+  border-bottom: 3px solid #fff;
+  border-right: 3px solid #fff;
+  content: '';
+  height: 16px;
+  margin-top: -2px;
+  transform: rotate(45deg);
+  width: 8px;
+}
+/*rtl:end:ignore*/
+
+.oppia-learner-group-progressbar li .indicator {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #9e9e9e;
+  border-radius: 50%;
+  color: #9e9e9e;
+  display: flex;
+  height: 30px;
+  justify-content: center;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -50%);
+  width: 30px;
+}
+
+.oppia-learner-group-progressbar li.active .indicator,
+.oppia-learner-group-progressbar li.completed .indicator {
+  background-color: #27635c;
+  border-color: #27635c;
+  color: #fff;
+}
+
+.oppia-learner-group-progressbar li.active .title,
+.oppia-learner-group-progressbar li.completed .title {
+  color: #27635c;
+}
+
+@media screen and (max-width: 575px) {
+  .oppia-learner-group-progressbar li:before {
+    left: -30%;
+    width: 60%;
+  }
+}

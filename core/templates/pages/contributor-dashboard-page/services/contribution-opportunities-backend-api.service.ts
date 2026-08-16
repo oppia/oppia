@@ -23,6 +23,7 @@ import {Injectable} from '@angular/core';
 import {
   ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict,
+  TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 import {
   SkillOpportunity,
@@ -34,6 +35,7 @@ import {
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {AppConstants} from 'app.constants';
 
@@ -49,8 +51,18 @@ interface TranslationContributionOpportunitiesBackendDict {
   more: boolean;
 }
 
+interface TranslationContributionOpportunitiesBackendDictV2 {
+  opportunities: TranslationOpportunityCardInfoBackendDict[];
+  next_cursor: string;
+  more: boolean;
+}
+
 interface ReviewableTranslationOpportunitiesBackendDict {
   opportunities: ExplorationOpportunitySummaryBackendDict[];
+}
+
+interface ReviewableTranslationOpportunitiesBackendDictV2 {
+  opportunities: TranslationOpportunityCardInfoBackendDict[];
 }
 
 interface SkillContributionOpportunities {
@@ -98,15 +110,20 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   private UPDATE_PINNED_OPPORTUNITY_HANDLER_URL = '/pinned-opportunities';
 
   async fetchSkillOpportunitiesAsync(
-    cursor: string
+    cursor: string,
+    searchQuery: string = ''
   ): Promise<SkillContributionOpportunities> {
-    const params = {cursor};
+    const params: Record<string, string> = {cursor};
+    if (searchQuery) {
+      params.search_query = searchQuery;
+    }
 
     return this.http
       .get<SkillContributionOpportunitiesBackendDict>(
@@ -165,6 +182,45 @@ export class ContributionOpportunitiesBackendApiService {
     topicName: string,
     cursor: string
   ): Promise<TranslationContributionOpportunities> {
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      const params = {
+        language_code: languageCode,
+        topic_name:
+          topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
+        cursor: cursor,
+        entity_type: AppConstants.ENTITY_TYPE.EXPLORATION,
+      };
+
+      return this.http
+        .get<TranslationContributionOpportunitiesBackendDictV2>(
+          '/opportunitieshandlerv2',
+          {params}
+        )
+        .toPromise()
+        .then(
+          data => {
+            const opportunities = data.opportunities.map(dict => {
+              const summary =
+                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+              summary.languageCode = languageCode;
+              return summary;
+            });
+
+            return {
+              opportunities: opportunities,
+              nextCursor: data.next_cursor,
+              more: data.more,
+            };
+          },
+          errorResponse => {
+            throw new Error(errorResponse.error.error);
+          }
+        );
+    }
+
     const params = {
       language_code: languageCode,
       topic_name:
@@ -205,12 +261,46 @@ export class ContributionOpportunitiesBackendApiService {
     const params: {
       topic_name?: string;
       language_code?: string;
+      entity_type?: string;
     } = {};
     if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
+    }
+
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      params.entity_type = AppConstants.ENTITY_TYPE.EXPLORATION;
+      return this.http
+        .get<ReviewableTranslationOpportunitiesBackendDictV2>(
+          '/getreviewableopportunitieshandlerv2',
+          {
+            params,
+          } as Object
+        )
+        .toPromise()
+        .then(
+          data => {
+            const opportunities = data.opportunities.map(dict => {
+              const summary =
+                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+              if (languageCode) {
+                summary.languageCode = languageCode;
+              }
+              return summary;
+            });
+            return {
+              opportunities,
+            };
+          },
+          errorResponse => {
+            throw new Error(errorResponse.error.error);
+          }
+        );
     }
 
     return this.http

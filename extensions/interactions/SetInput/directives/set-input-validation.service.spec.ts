@@ -43,7 +43,7 @@ describe('SetInputValidationService', () => {
       providers: [SetInputValidationService],
     });
 
-    validatorService = TestBed.get(SetInputValidationService);
+    validatorService = TestBed.inject(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
@@ -124,6 +124,33 @@ describe('SetInputValidationService', () => {
         {
           type: WARNING_TYPES.ERROR,
           message: 'Label for this button should not be empty',
+        },
+      ]);
+    });
+
+    it('should generate errors when buttonText exceeds limit', () => {
+      let badCustomizationArgs = {
+        buttonText: {
+          value: new SubtitledUnicode(
+            'a'.repeat(AppConstants.MAX_CHARS_IN_SET_INPUT_BUTTON_TEXT + 1),
+            ''
+          ),
+        },
+      };
+
+      let warnings = validatorService.getAllWarnings(
+        currentState,
+        badCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message:
+            'Label for this button should be at most ' +
+            AppConstants.MAX_CHARS_IN_SET_INPUT_BUTTON_TEXT +
+            ' characters',
         },
       ]);
     });

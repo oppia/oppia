@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -31,7 +31,7 @@ describe('Learner Topic Summary Tile Component', () => {
   let fixture: ComponentFixture<LearnerTopicSummaryTileComponent>;
   let urlInterpolationService: UrlInterpolationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [LearnerTopicSummaryTileComponent, MockTranslatePipe],
@@ -165,7 +165,8 @@ describe('Learner Topic Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: '',
+      classroom_name: '',
+      classroom_url_fragment: '',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {

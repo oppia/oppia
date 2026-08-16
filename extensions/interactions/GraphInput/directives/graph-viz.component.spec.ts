@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -44,7 +44,7 @@ describe('GraphVizComponent', () => {
 
   let mockNewCardAvailableEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [GraphVizComponent, MockTranslatePipe],
       providers: [GraphDetailService, DeviceInfoService],
@@ -55,7 +55,7 @@ describe('GraphVizComponent', () => {
   beforeEach(() => {
     graphDetailService = TestBed.inject(GraphDetailService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    playerPositionService = TestBed.get(PlayerPositionService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
     focusManagerService = TestBed.inject(FocusManagerService);
     fixture = TestBed.createComponent(GraphVizComponent);
     component = fixture.componentInstance;

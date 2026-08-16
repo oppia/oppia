@@ -35,6 +35,9 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
+import {AppConstants} from 'app.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './exploration-modify-translations-modal.component.css';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -43,6 +46,7 @@ interface LanguageCodeToContentTranslations {
 @Component({
   selector: 'oppia-exploration-modify-translations-modal',
   templateUrl: './exploration-modify-translations-modal.component.html',
+  styleUrls: ['./exploration-modify-translations-modal.component.css'],
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
@@ -54,7 +58,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     [languageCode: string]: boolean;
   } = {};
   translationsHaveLoaded: boolean = false;
-  interactionId?: string;
+  interactionId: InteractionSpecsKey | null = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -74,8 +78,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.pageContextService.getExplorationId();
     this.explorationVersion =
       this.pageContextService.getExplorationVersion() as number;
-    this.interactionId = this.stateInteractionIdService.savedMemento;
 
+    this.interactionId = this.stateInteractionIdService.savedMemento;
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
     for (let language in this.entityTranslationsService
@@ -156,6 +160,10 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         ].updateTranslation(this.contentId, updatedTranslatedContent);
       }
     }
+    this.changeListService.markVoiceoversAsNeedingUpdate(
+      this.contentId,
+      AppConstants.DEFAULT_LANGUAGE_CODE
+    );
     this.ngbActiveModal.close();
   }
 

@@ -25,3 +25,11 @@ export interface AccordionPanelData {
   customTitleClassNames: string[];
   panelIsCollapsed: boolean;
 }
+
+export interface AboutPartnerData {
+  title: string;
+  name: string;
+  description: string;
+  label: string;
+  imageUrl: string;
+}

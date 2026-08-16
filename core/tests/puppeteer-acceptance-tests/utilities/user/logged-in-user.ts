@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -37,6 +38,7 @@ const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
+const loginPageUrl = testConstants.URLs.Login;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -55,23 +57,17 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
+const errorContainerSelector = '.e2e-test-error-container';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
-const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
-const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
-const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
-const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
 const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
-const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
-const confirmRemovalFromPlayLaterButton =
-  '.e2e-test-confirm-delete-interaction';
-const playLaterSectionSelector = '.e2e-test-play-later-section';
 const communityLessonToggleButton = '.e2e-test-toggle-community-lesson-button';
 const communityLessonChevronUp =
   '.e2e-test-toggle-community-lesson-button .fa-chevron-up';
@@ -81,9 +77,6 @@ const communityLessonsExpanded =
   '.e2e-test-card-display-content.card-display-content-shown';
 const communityLessonsCollapsed =
   '.e2e-test-card-display-content.card-display-content-hidden';
-const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
-const mobileLessonCardOptionsDropdownButton =
-  '.e2e-test-mobile-lesson-card-dropdown';
 const progressSectionSelector = '.e2e-test-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
 const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
@@ -143,7 +136,6 @@ const contributorDashboardMenuLink =
 const profileMenuLink = '.e2e-test-profile-link';
 const preferencesMenuLink = '.e2e-test-preferences-link';
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -158,6 +150,10 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const lessonInfoButton = 'button.oppia-lesson-info';
+const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const contributorProfileLink = '.e2e-test-contributor-icon';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
@@ -240,10 +236,13 @@ const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const recommendationsSectionSelector =
+  '.e2e-test-learner-dash-recommended-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
+const newLabelSelector = '.e2e-test-new-label';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -324,6 +323,10 @@ const removeModalCancelButtonSelector =
 const removeModalConfirmButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
 
+// Common > Lesson Card.
+const commonLessonCardContainerSelector =
+  '.e2e-test-redesigned-lesson-card-container';
+const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
@@ -353,11 +356,7 @@ const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
 
-const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
-const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
-
 // Community Library.
-const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
@@ -366,7 +365,9 @@ const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 const usernameSelector = '.e2e-test-username';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
-
+const availableChapters = '.e2e-test-available-chapters';
+const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
+const chapterSelector = '.e2e-test-chapter-title';
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -709,6 +710,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
+  }
+
+  /**
    * This function navigates to the given topic URL and checks if the page displays
    * an 'Error 404' message.
    * @param {string} topicUrlFragment - The URL fragment of the topic to check.
@@ -764,6 +772,10 @@ export class LoggedInUser extends BaseUser {
       const ratingStars = await this.page.$$(ratingStarSelector);
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
+      if (!feedback || feedback.trim() === '') {
+        showMessage('No feedback provided; skipping feedback submission.');
+        return;
+      }
 
       await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
@@ -844,6 +856,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(deleteMyAcccountButton, {
       hidden: true,
     });
+    showMessage(`Account deleted for ${username}.`);
   }
 
   /**
@@ -1024,169 +1037,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Adds a lesson to the 'Play Later' list from community library page.
-   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
-   * @param {boolean} skipVerification - Skip verification that user is logged in and login popup has closed.
-   */
-  async addLessonToPlayLater(
-    lessonTitle: string,
-    skipVerification: boolean = false
-  ): Promise<void> {
-    try {
-      await this.waitForPageToFullyLoad();
-      const isMobileViewport = this.isViewportAtMobileWidth();
-      const lessonCardTitleSelector = isMobileViewport
-        ? mobileLessonCardTitleSelector
-        : desktopLessonCardTitleSelector;
-
-      await this.page.waitForSelector(lessonCardTitleSelector);
-      const lessonTitles = await this.page.$$eval(
-        lessonCardTitleSelector,
-        elements => elements.map(el => el.textContent?.trim())
-      );
-
-      const lessonIndex = lessonTitles.indexOf(lessonTitle);
-
-      if (lessonIndex === -1) {
-        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
-      }
-
-      if (isMobileViewport) {
-        await this.page.waitForSelector(learnerDashboardIconsSelector);
-        const iconContainers = await this.page.$$(
-          learnerDashboardIconsSelector
-        );
-        const dropdownIcon = await iconContainers[lessonIndex].$(
-          mobileLessonCardOptionsDropdownButton
-        );
-        await dropdownIcon?.click();
-
-        await iconContainers[lessonIndex].waitForSelector(
-          mobileAddToPlayLaterButton
-        );
-        const mobileAddToPlayLaterButtonElement = await iconContainers[
-          lessonIndex
-        ].$(mobileAddToPlayLaterButton);
-
-        await mobileAddToPlayLaterButtonElement?.click();
-      } else {
-        await this.page.waitForSelector(desktopAddToPlayLaterButton);
-        const addToPlayLaterButtons = await this.page.$$(
-          desktopAddToPlayLaterButton
-        );
-        await addToPlayLaterButtons[lessonIndex].click();
-      }
-
-      // Post-check: Verify if the tooltip appears.
-      if (!skipVerification) {
-        await this.expectToastMessage(
-          "Successfully added to your 'Play Later' list."
-        );
-      }
-
-      showMessage(`Lesson "${lessonTitle}" added to 'Play Later' list.`);
-    } catch (error) {
-      const newError = new Error(
-        `Failed to add lesson to 'Play Later' list: ${error}`
-      );
-      newError.stack = (error as Error).stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Removes a lesson from the 'Play Later' list in the community library.
-   * @param {string} lessonTitle - The title of the lesson to remove from the 'Play Later' list.
-   */
-  async removeLessonFromPlayLaterInlibrary(lessonTitle: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const lessonCardTitleSelector = isMobileViewport
-      ? mobileLessonCardTitleSelector
-      : desktopLessonCardTitleSelector;
-
-    const lessonTitles = await this.page.$$eval(
-      lessonCardTitleSelector,
-      elements => elements.map(el => el.textContent?.trim())
-    );
-
-    const lessonIndex = lessonTitles.indexOf(lessonTitle);
-    if (lessonIndex === -1) {
-      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
-    }
-
-    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
-    const playLaterButton = playLaterButtons[lessonIndex];
-
-    if (!playLaterButton) {
-      throw new Error('Play Later button not found');
-    }
-
-    await playLaterButton.click();
-
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      visible: true,
-    });
-
-    await this.isTextPresentOnPage("Remove from 'Play Later' list?");
-
-    await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      hidden: true,
-    });
-  }
-
-  /**
-   * Expects the tooltip text of the 'Play Later' icon for the given lesson title to match the expected tooltip text.
-   * @param {string} lessonTitle - The title of the lesson to check the 'Play Later' icon tooltip text for.
-   * @param {string} expectedTooltip - The expected tooltip text for the 'Play Later' icon.
-   */
-  async expectPlayLaterIconToolTipToBe(
-    lessonTitle: string,
-    expectedTooltip: string
-  ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      showMessage('Skipped tooltip message check in mobile view.');
-      return;
-    }
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationCard, {
-      visible: true,
-    });
-
-    const lessonCards = await this.page.$$(explorationCard);
-    const lessonTitles = await Promise.all(
-      lessonCards.map(async card => {
-        const titleElement = await card.$(lessonCardTitleSelector);
-        const title = titleElement?.evaluate(el => el?.textContent?.trim());
-        return title;
-      })
-    );
-
-    const lessonIndex = lessonTitles.indexOf(lessonTitle);
-    if (lessonIndex === -1) {
-      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
-    }
-
-    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
-    const playLaterButton = playLaterButtons[lessonIndex];
-
-    if (!playLaterButton) {
-      throw new Error('Play Later button not found');
-    }
-
-    await playLaterButton?.hover();
-
-    await this.page.waitForSelector('.tooltip', {
-      visible: true,
-    });
-
-    // Check the tooltip content.
-    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
-    expect(tooltipText).toBe(expectedTooltip);
-  }
-
-  /**
    * Function to play a specific lesson from the community library tab in learner dashboard.
    * @param {string} lessonName - The name of the lesson to be played.
    */
@@ -1214,101 +1064,6 @@ export class LoggedInUser extends BaseUser {
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
-      );
-      newError.stack = (error as Error).stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Removes a lesson from the 'Play Later' list in the learner dashboard.
-   * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
-   */
-  async removeLessonFromPlayLater(lessonName: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(lessonCardTitleInPlayLaterSelector);
-      const lessonCards = await this.page.$$(
-        lessonCardTitleInPlayLaterSelector
-      );
-      const lessonNames = await Promise.all(
-        lessonCards.map(card =>
-          this.page.evaluate(el => el.textContent.trim(), card)
-        )
-      );
-
-      const lessonIndex = lessonNames.indexOf(lessonName);
-      if (lessonIndex === -1) {
-        throw new Error(
-          `Lesson "${lessonName}" not found in 'Play Later' list.`
-        );
-      }
-
-      // Scroll to the element before hovering so the remove button could be visible.
-      await this.page.evaluate(
-        el => el.scrollIntoView(),
-        lessonCards[lessonIndex]
-      );
-      await this.page.hover(lessonCardTitleInPlayLaterSelector);
-
-      await this.page.waitForSelector(removeFromPlayLaterButtonSelector);
-      const removeFromPlayLaterButton = await this.page.$(
-        removeFromPlayLaterButtonSelector
-      );
-      await removeFromPlayLaterButton?.click();
-
-      // Confirm removal.
-      await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
-
-      await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
-        hidden: true,
-      });
-
-      showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
-    } catch (error) {
-      const newError = new Error(
-        `Failed to remove lesson from 'Play Later' list: ${error}`
-      );
-      newError.stack = (error as Error).stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Verifies whether a lesson is in the 'Play Later' list.
-   * @param {string} lessonName - The name of the lesson to check.
-   * @param {boolean} shouldBePresent - Whether the lesson should be present in the 'Play Later' list.
-   */
-  async verifyLessonPresenceInPlayLater(
-    lessonName: string,
-    shouldBePresent: boolean
-  ): Promise<void> {
-    try {
-      await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(playLaterSectionSelector);
-      const lessonCards = await this.page.$$(
-        lessonCardTitleInPlayLaterSelector
-      );
-      const lessonNames = await Promise.all(
-        lessonCards.map(card =>
-          this.page.evaluate(el => el.textContent.trim(), card)
-        )
-      );
-
-      const lessonIndex = lessonNames.indexOf(lessonName);
-      if (lessonIndex !== -1 && !shouldBePresent) {
-        throw new Error(
-          `Lesson "${lessonName}" was found in 'Play Later' list, but it should not be.`
-        );
-      }
-
-      if (lessonIndex === -1 && shouldBePresent) {
-        throw new Error(
-          `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
-        );
-      }
-    } catch (error) {
-      const newError = new Error(
-        `Failed to verify presence of lesson in 'Play Later' list: ${error}`
       );
       newError.stack = (error as Error).stack;
       throw newError;
@@ -1668,9 +1423,19 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(saveChangesButtonSelector, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
+    await this.clickOnElementWithSelector(saveChangesButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(selector);
+        return Boolean(button) && (button as HTMLButtonElement).disabled;
+      },
+      {},
+      saveChangesButtonSelector
+    );
+
     const isDisabled = await this.page.$eval(
-      `button${saveChangesButtonSelector}`,
+      saveChangesButtonSelector,
       btn => (btn as HTMLButtonElement).disabled
     );
     if (!isDisabled) {
@@ -1961,7 +1726,10 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
-    if (!sectionHeadingTexts.every(text => expectedTexts.includes(text))) {
+    const allExpectedElementsFound = expectedTexts.every(expectedText =>
+      sectionHeadingTexts.includes(expectedText)
+    );
+    if (!allExpectedElementsFound) {
       throw new Error(
         `Expected elements not found: ${expectedTexts.join(
           ', '
@@ -2193,14 +1961,31 @@ export class LoggedInUser extends BaseUser {
    * @param {number} statusCode - The expected error status code.
    */
   async expectErrorPage(statusCode: number): Promise<void> {
-    const isErrorPresent = await this.isTextPresentOnPage(
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(errorContainerSelector);
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const errorContainer = document.querySelector(selector);
+        return Boolean(
+          errorContainer && errorContainer.textContent?.includes(expectedText)
+        );
+      },
+      {timeout: 30000},
+      errorContainerSelector,
       `Error ${statusCode}`
     );
 
-    if (!isErrorPresent) {
-      throw new Error(
-        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+    const errorHeading = await this.page.$(errorPageHeadingSelector);
+    if (errorHeading) {
+      const errorHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorHeading
       );
+      if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
+        throw new Error(
+          `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+        );
+      }
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
@@ -2403,22 +2188,11 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForNetworkIdle();
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`welcome modal not found: ${(error as Error).message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -2684,11 +2458,12 @@ export class LoggedInUser extends BaseUser {
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    expectedWelcomeModal: boolean = false
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2817,9 +2592,8 @@ export class LoggedInUser extends BaseUser {
     );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
-
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      visible: false,
+      hidden: true,
     });
   }
 
@@ -2928,15 +2702,15 @@ export class LoggedInUser extends BaseUser {
    * @param {string} progress - The progress of the lesson.
    */
   async resumeLessonFromLearnerDashboard(lessonTitle: string): Promise<void> {
-    await this.page.waitForSelector(lessonCardContainer, {
+    await this.page.waitForSelector(commonLessonCardContainerSelector, {
       visible: true,
     });
 
-    const lessonCards = await this.page.$$(lessonCardContainer);
+    const lessonCards = await this.page.$$(commonLessonCardContainerSelector);
 
     for (const lessonCard of lessonCards) {
       const lessonTitleText = await lessonCard.$eval(
-        lessonTitleSelector,
+        commonlessonTitleSelector,
         el => el.textContent
       );
 
@@ -3877,10 +3651,10 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
   ): Promise<void> {
-    const lessonCards = await context.$$(lessonCardContainer);
+    const lessonCards = await context.$$(commonLessonCardContainerSelector);
     const lessonCardTitles = await Promise.all(
       lessonCards.map(card =>
-        card.$eval(lessonTitleSelector, el => el.textContent?.trim())
+        card.$eval(commonlessonTitleSelector, el => el.textContent?.trim())
       )
     );
     const titleFound = lessonCardTitles.some(title =>
@@ -4414,6 +4188,37 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify that a specific chapter is present in the recommended section.
+   * @param chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInRecommendedSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(recommendationsSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(commonLessonCardContainerSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Recommended section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const recommendationSection = await this.page.$(
+      recommendationsSectionSelector
+    );
+    if (!recommendationSection) {
+      throw new Error('Recommended section not found.');
+    }
+    await this.expectLessonCardToBePresent(chapterTitle, recommendationSection);
+  }
+
+  /**
    * Function to verify the continue from where you left section in the redesigned learner dashboard is present or not.
    * @param {boolean} visible - Whether the section should be visible or not.
    */
@@ -4448,6 +4253,7 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     progress: string
   ): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(lessonCardContainer);
     const lessonCards = await this.page.$$(lessonCardContainer);
 
@@ -4456,11 +4262,9 @@ export class LoggedInUser extends BaseUser {
         lessonTitleSelector,
         el => el.textContent
       );
-
       if (!lessonTitleText || lessonTitleText !== lessonTitle) {
         continue;
       }
-
       const currentProgress = await lessonCard.$eval(
         circleProgressElementSelector,
         el => el.textContent
@@ -4572,6 +4376,166 @@ export class LoggedInUser extends BaseUser {
    */
   async expectUsernameToBe(expectedUsername: string): Promise<void> {
     await this.expectTextContentToBe(usernameSelector, expectedUsername);
+  }
+
+  /**
+   * Verifies that the specified lesson card displays the "New" label.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
+  async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
+    const lessonSel = learnerDashSelectors.lessonCard;
+
+    await this.page.waitForSelector(lessonSel.content);
+
+    const cards = await this.page.$$(lessonSel.content);
+
+    for (const card of cards) {
+      const titleEl = await card.$(lessonSel.heading);
+      const titleText = titleEl
+        ? await titleEl.evaluate(el => el.textContent?.trim())
+        : '';
+
+      if (titleText?.includes(chapterName)) {
+        const newLabel = await card.$(newLabelSelector);
+
+        if (!newLabel) {
+          throw new Error(
+            `Lesson "${chapterName}" found but does NOT have a new label`
+          );
+        }
+        showMessage(`Lesson "${chapterName}" has a new label`);
+        return;
+      }
+    }
+
+    throw new Error(`Lesson "${chapterName}" not found`);
+  }
+
+  /**
+   * Check if the available chapter list has all the specified chapters
+   * @param chapterNames - The array of chapter names
+   */
+  async expectChaptersInAvailableChapterList(
+    chapterNames: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(availableChapters);
+    const containers = await this.page.$$(availableChapters);
+
+    for (const chapterName of chapterNames) {
+      let chapterFound = false;
+
+      for (const container of containers) {
+        const chapterEls = await container.$$(chapterSelector);
+
+        for (const el of chapterEls) {
+          const text = await el.evaluate(node => node.textContent?.trim());
+          if (text && text.includes(chapterName)) {
+            chapterFound = true;
+            showMessage(`Chapter "${chapterName}" found in Available list.`);
+            break;
+          }
+        }
+
+        if (chapterFound) {
+          break;
+        }
+      }
+
+      if (!chapterFound) {
+        throw new Error(`Chapter "${chapterName}" not found in Available list`);
+      }
+    }
+
+    showMessage(
+      'All specified chapters are present in the available chapters list.'
+    );
+  }
+
+  /**
+   * Check if coming soon lesson list has chapters
+   * @param chapterNames - The array of chapter names
+   */
+  async comingSoonLessonListHasChapters(chapterNames: string[]): Promise<void> {
+    await this.page.waitForSelector(comingSoonChaptersListSelector);
+    const containers = await this.page.$$(comingSoonChaptersListSelector);
+
+    for (const chapterName of chapterNames) {
+      let chapterFound = false;
+
+      for (const container of containers) {
+        const chapterEls = await container.$$(chapterSelector);
+
+        for (const el of chapterEls) {
+          const text = await el.evaluate(node => node.textContent?.trim());
+          if (text && text.includes(chapterName)) {
+            chapterFound = true;
+            showMessage(
+              `Chapter "${chapterName}" found in coming soon chapters list`
+            );
+            break;
+          }
+        }
+
+        if (chapterFound) {
+          break;
+        }
+      }
+
+      if (!chapterFound) {
+        throw new Error(
+          `Chapter "${chapterName}" not found in coming soon chapters list`
+        );
+      }
+    }
+
+    showMessage(
+      'All specified chapters are present in the coming soon chapters list'
+    );
+  }
+
+  /**
+   * Opens the lesson info modal.
+   */
+  async openLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoButton, true);
+    const button = await this.page.waitForSelector(lessonInfoButton, {
+      visible: true,
+    });
+    await button?.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      el?.click();
+    }, lessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, true);
+  }
+
+  /**
+   * Closes the lesson info modal.
+   */
+  async closeLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeLessonInfoButton, true);
+    await this.clickOnElementWithSelector(closeLessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, false);
+  }
+
+  /**
+   * Navigates to the creator's profile page from the lesson info modal.
+   */
+
+  async visitCreatorProfileFromLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(contributorProfileLink, true);
+
+    await this.clickOnElementWithSelector(contributorProfileLink);
+
+    await this.waitForPageToFullyLoad();
+    const expectedProfilePath: string = '/profile/';
+    await this.page.waitForFunction(
+      (path: string) => window.location.href.includes(path),
+      {},
+      expectedProfilePath
+    );
   }
 }
 

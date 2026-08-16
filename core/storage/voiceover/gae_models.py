@@ -43,7 +43,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
-
 assert feconf.VoiceoverType.MANUAL.value == 'manual'
 assert feconf.VoiceoverType.AUTO.value == 'auto'
 
@@ -310,7 +309,7 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
     # voiceovers.
     hash_code = datastore_services.StringProperty(required=True, indexed=True)
     # The plaintext linked to the stored voiceover.
-    plaintext = datastore_services.StringProperty(required=True)
+    plaintext = datastore_services.TextProperty(required=True)
     # The filename of the stored voiceover, saved either in Google Cloud for
     # production or in Datastore for development.
     voiceover_filename = datastore_services.StringProperty(required=True)

@@ -32,6 +32,7 @@ import {FractionInputRulesService} from 'interactions/FractionInput/directives/f
 import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
@@ -41,9 +42,9 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {StateCard} from 'domain/state_card/state-card.model';
 
-type SubmitAnswerFn = () => void;
+export type SubmitAnswerFn = () => void;
 
-type InteractionRulesService =
+export type InteractionRulesService =
   | AlgebraicExpressionInputRulesService
   | CodeReplRulesService
   | ContinueRulesService
@@ -51,6 +52,7 @@ type InteractionRulesService =
   | ImageClickInputRulesService
   | InteractiveMapRulesService
   | MathEquationInputRulesService
+  | MultipleChoiceInputRulesService
   | NumericExpressionInputRulesService
   | NumericInputRulesService
   | PencilCodeEditorRulesService

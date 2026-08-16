@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseNumberWithUnitsComponent} from './oppia-short-response-number-with-units.component';
 
@@ -31,7 +31,7 @@ describe('ShortResponseRatioExpressionInput', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseNumberWithUnitsComponent],
       providers: [

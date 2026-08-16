@@ -32,6 +32,7 @@ import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
@@ -181,7 +182,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -226,7 +227,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion4Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeFalse();
+          expect(response.more).toBe(false);
         });
     }));
 
@@ -256,7 +257,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -277,7 +278,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
     }));
   });
@@ -290,6 +291,7 @@ describe('Contribution and review service', () => {
             from_date: '1 Nov 2022',
             to_date: '1 Dec 2022',
             contribution_hours: 1.0,
+            contribution_word_count: 300,
             team_lead: 'Test User',
             language: 'Hindi',
           },
@@ -314,6 +316,47 @@ describe('Contribution and review service', () => {
           expect(definedData.from_date).toEqual('1 Nov 2022');
           expect(definedData.to_date).toEqual('1 Dec 2022');
           expect(definedData.contribution_hours).toEqual(1.0);
+          expect(definedData.contribution_word_count).toEqual(300);
+          expect(definedData.team_lead).toEqual('Test User');
+          expect(definedData.language).toEqual('Hindi');
+        });
+
+      expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+    });
+
+    it('should download the contributor certificate when contribution time is less than 1 hour', async () => {
+      downloadContributorCertificateAsyncSpy.and.returnValue(
+        Promise.resolve({
+          certificate_data: {
+            from_date: '1 Nov 2022',
+            to_date: '1 Dec 2022',
+            contribution_hours: 0.01,
+            contribution_word_count: 3,
+            team_lead: 'Test User',
+            language: 'Hindi',
+          },
+        })
+      );
+
+      await cars
+        .downloadContributorCertificateAsync(
+          'user',
+          'translate_content',
+          'hi',
+          '2022-01-01',
+          '2022-01-02'
+        )
+        .then(response => {
+          const data = response.certificate_data;
+
+          expect(data).not.toBeNull();
+
+          // Type assertion needed to satisfy type checker.
+          const definedData = data as ContributorCertificateInfo;
+          expect(definedData.from_date).toEqual('1 Nov 2022');
+          expect(definedData.to_date).toEqual('1 Dec 2022');
+          expect(definedData.contribution_hours).toEqual(0.01);
+          expect(definedData.contribution_word_count).toEqual(3);
           expect(definedData.team_lead).toEqual('Test User');
           expect(definedData.language).toEqual('Hindi');
         });
@@ -492,6 +535,7 @@ describe('Contribution and review service', () => {
               id: 'Continue',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: true,
@@ -516,6 +560,7 @@ describe('Contribution and review service', () => {
               id: 'EndExploration',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: false,
@@ -913,7 +958,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    const questionStateData = {
+    const questionStateData: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -958,6 +1003,7 @@ describe('Contribution and review service', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -1207,6 +1253,7 @@ describe('Contribution and review service', () => {
           id: 'Continue',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
@@ -1231,6 +1278,7 @@ describe('Contribution and review service', () => {
           id: 'EndExploration',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -1383,6 +1431,41 @@ describe('Contribution and review service', () => {
       );
 
       expect(sortedTranslationCards).toEqual(translationSuggestions);
+    });
+
+    it('should prepend generic (metadata) translation suggestions at the beginning', () => {
+      const states = States.createFromBackendDict(statesBackendDict);
+      const suggestionsWithGeneric = [
+        ...translationSuggestions,
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_generic',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: AppConstants.DEFAULT_SUGGESTION_STATE_NAME,
+            content_id: 'exploration_title',
+            new_value: {
+              html: 'translated title',
+            },
+            old_value: {
+              html: 'original title',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+      ] as unknown as SuggestionBackendDict[];
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        suggestionsWithGeneric,
+        states,
+        'First State'
+      );
+
+      expect(sortedTranslationCards.length).toBe(7);
+      expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
     });
   });
 });

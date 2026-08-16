@@ -25,7 +25,7 @@ var soundfontPath: string;
 if (AppConstants.DEV_MODE) {
   soundfontPath = '/dist/oppia-angular/midi/examples/soundfont/';
 } else {
-  soundfontPath = '/dist/oppia-angular-prod/midi/examples/soundfont/';
+  soundfontPath = '/build/midi/examples/soundfont/';
 }
 
 const ready = (fn: () => void): void => {

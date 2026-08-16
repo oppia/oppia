@@ -23,7 +23,7 @@ import datetime
 from core import utils
 from core.jobs import base_jobs
 
-from typing import Dict, List, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 
 class BeamJob:
@@ -79,6 +79,8 @@ class BeamJobRun:
             immediately. Asynchronous jobs are similar to JavaScript Promises
             that return nothing immediately but then _eventually_ produce a
             result.
+        dataflow_job_id: str|None. The ID of the Google Cloud Dataflow job.
+            This is None for synchronous jobs.
     """
 
     def __init__(
@@ -89,6 +91,7 @@ class BeamJobRun:
         job_started_on: datetime.datetime,
         job_updated_on: datetime.datetime,
         job_is_synchronous: bool,
+        dataflow_job_id: Optional[str] = None,
     ) -> None:
         """Initializes a new BeamJobRun instance.
 
@@ -103,6 +106,8 @@ class BeamJobRun:
                 updated.
             job_is_synchronous: bool. Whether the job has been run
                 synchronously.
+            dataflow_job_id: str|None. The ID of the Google Cloud Dataflow
+                job. This is None for synchronous jobs.
         """
         self.job_id = job_id
         self.job_name = job_name
@@ -110,8 +115,10 @@ class BeamJobRun:
         self.job_started_on = job_started_on
         self.job_updated_on = job_updated_on
         self.job_is_synchronous = job_is_synchronous
+        self.dataflow_job_id = dataflow_job_id
+        self.validate()
 
-    def to_dict(self) -> Dict[str, Union[bool, float, str, List[str]]]:
+    def to_dict(self) -> Dict[str, Union[bool, float, str, None, List[str]]]:
         """Returns a dict representation of the BeamJobRun.
 
         Returns:
@@ -127,6 +134,8 @@ class BeamJobRun:
                     UTC epoch at which the job's state was last updated.
                 job_is_synchronous: bool. Whether the job has been run
                     synchronously.
+                dataflow_job_id: str|None. The ID of the Google Cloud
+                    Dataflow job. This is None for synchronous jobs.
         """
         return {
             'job_id': self.job_id,
@@ -139,7 +148,19 @@ class BeamJobRun:
                 utils.get_time_in_millisecs(self.job_updated_on)
             ),
             'job_is_synchronous': self.job_is_synchronous,
+            'dataflow_job_id': self.dataflow_job_id,
         }
+
+    def validate(self) -> None:
+        """Validates the BeamJobRun object."""
+        if self.job_is_synchronous and self.dataflow_job_id is not None:
+            raise utils.ValidationError(
+                'Synchronous jobs cannot have a dataflow job ID.'
+            )
+        if not self.job_is_synchronous and self.dataflow_job_id is None:
+            raise utils.ValidationError(
+                'Asynchronous jobs must have a dataflow job ID.'
+            )
 
 
 class AggregateBeamJobRunResult:

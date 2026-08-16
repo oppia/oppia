@@ -44,6 +44,8 @@ describe('Logged-out User', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    loggedOutUser = await UserFactory.createLoggedOutUser();
+
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
@@ -74,10 +76,7 @@ describe('Logged-out User', function () {
       explorationId as string,
       'Algebra I'
     );
-
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-    // Setup taking longer than 300000ms.
-  }, 420000);
+  }, 900000);
 
   it(
     'should be able to select and play a topic from the classroom page',

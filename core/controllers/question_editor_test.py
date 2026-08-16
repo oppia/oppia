@@ -22,6 +22,7 @@ import os
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    question_domain,
     question_fetchers,
     question_services,
     skill_services,
@@ -32,6 +33,8 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
+
+from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -688,6 +691,22 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         )
         self.logout()
 
+    def test_put_with_incorrect_question_id_returns_404_status(self) -> None:
+        question_services_swap = self.swap_to_always_return(
+            question_services, 'get_question_by_id', None
+        )
+        with question_services_swap:
+            self.login(self.CURRICULUM_ADMIN_EMAIL)
+            csrf_token = self.get_new_csrf_token()
+            self.put_json(
+                '%s/%s'
+                % (feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id),
+                {'skill_ids_task_list': []},
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+            self.logout()
+
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
@@ -811,6 +830,61 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         )
         self.logout()
 
+    def test_put_with_incorrect_question_id_returns_404_status(self) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        mock_returns: List[Optional[question_domain.Question]] = [
+            question,
+            question,
+            question,
+            None,
+        ]
+
+        def _mock_get_question_by_id(
+            unused_question_id: str, **unused_kwargs: str
+        ) -> Optional[question_domain.Question]:
+            """Mocks '_get_question_by_id'. Returns None on fourth call."""
+            return mock_returns.pop(0)
+
+        question_services_swap = self.swap(
+            question_services, 'get_question_by_id', _mock_get_question_by_id
+        )
+
+        with question_services_swap:
+            self.login(self.CURRICULUM_ADMIN_EMAIL)
+            csrf_token = self.get_new_csrf_token()
+
+            new_question_data = self._create_valid_question_data(
+                'DEF', self.content_id_generator
+            )
+            change_list = [
+                {
+                    'cmd': 'update_question_property',
+                    'property_name': 'question_state_data',
+                    'new_value': new_question_data.to_dict(),
+                    'old_value': self.question.question_state_data.to_dict(),
+                },
+                {
+                    'cmd': 'update_question_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': self.content_id_generator.next_content_id_index,
+                    'old_value': 0,
+                },
+            ]
+            payload = {
+                'change_list': change_list,
+                'commit_message': 'update question data',
+                'version': 1,
+            }
+
+            self.put_json(
+                '%s/%s'
+                % (feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                payload,
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+            self.logout()
+
     def test_put_with_long_commit_message_fails(self) -> None:
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator
@@ -916,7 +990,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         )
         self.logout()
 
-    def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
+    def test_put_with_topic_manager_email_returns_401_status(self) -> None:
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator
         )
@@ -955,19 +1029,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         ]
         payload['change_list'] = new_change_list
         payload['commit_message'] = 'update question data'
-        response_json = self.put_json(
+        self.put_json(
             '%s/%s'
             % (feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             payload,
             csrf_token=csrf_token,
+            expected_status_int=401,
         )
 
-        self.assertEqual(response_json['question_dict']['language_code'], 'en')
-        self.assertEqual(
-            response_json['question_dict']['question_state_data'],
-            new_question_data.to_dict(),
-        )
-        self.assertEqual(response_json['question_dict']['id'], self.question_id)
         self.logout()
 
     def test_put_with_creating_new_fully_specified_question_returns_400(

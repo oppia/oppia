@@ -6,6 +6,10 @@ interface Window {
   __fixtures__: KarmaFixtures;
   decodeURIComponent: (encodedURIComponent: string) => string;
   encodeURIComponent: (decodedURIComponent: string) => string;
+  logClick: (clickDetails: {
+    position: {x: number; y: number};
+    timeInMilliseconds: number;
+  }) => void;
   gtag: Function;
   Base64Binary: Base64Binary;
   dataLayer: object[];

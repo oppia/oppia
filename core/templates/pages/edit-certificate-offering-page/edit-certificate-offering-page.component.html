@@ -1,0 +1,38 @@
+<div class="oppia-edit-certificate-offering">
+  <oppia-certificate-offering-progress
+    [pageTitle]="'Edit Certificate'"
+    [activeSection]="activeSection">
+  </oppia-certificate-offering-progress>
+
+  <div class="oppia-certificate-offering-tab-container">
+    <div *ngIf="isLoadingCertificateOffering" class="text-center py-5 text-muted">
+      <mat-spinner class="mx-auto mb-3" diameter="28"></mat-spinner>
+      Loading certificate data...
+    </div>
+    <oppia-certificate-offering-details
+      *ngIf="!isLoadingCertificateOffering && isDetailsSection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
+      (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
+      (cancelClicked)="navigateBackToDashboard()">
+    </oppia-certificate-offering-details>
+    <oppia-certificate-offering-add-topic-items
+      *ngIf="!isLoadingCertificateOffering && isAddTopicsSection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [classroomId]="certificateAssessmentOffering.classroomId"
+      (topicDataChange)="updateTopicData($event)"
+      (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
+      (navigateToDetailsSection)="navigateToDetailsSection()">
+    </oppia-certificate-offering-add-topic-items>
+
+    <oppia-certificate-offering-review-and-availability
+      *ngIf="!isLoadingCertificateOffering && isReviewAndAvailabilitySection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [isEditMode]="true"
+      (saveCertificateOffering)="updateCertificateOffering()"
+      (isCertificateValidChange)="isCertificateValid = $event"
+      (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
+    </oppia-certificate-offering-review-and-availability>
+  </div>
+
+</div>

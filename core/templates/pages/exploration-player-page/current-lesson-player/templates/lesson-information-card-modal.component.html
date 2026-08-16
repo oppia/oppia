@@ -105,7 +105,7 @@
             </span>
             {{ lastUpdatedString }}
           </li>
-          <ul tabindex="0" class="oppia-info-card-exploration-contributors-profile row center row-item">
+          <ul tabindex="0" class="oppia-info-card-exploration-contributors-profile row-item">
             <i class="material-icons oppia-contributors-icon"
                [ngbTooltip]="'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate"
                placement="top">
@@ -119,6 +119,7 @@
                   (click)="cancel()"
                   [ngbTooltip]="name"
                   placement="top"
+                  container="body"
                   class="contributor-{{idx}} e2e-test-contributor-icon">
                 <profile-link-image [username]="name"></profile-link-image>
               </li>
@@ -126,7 +127,8 @@
             <li *ngIf="contributorNames.length > 2"
                 class="oppia-contributors-more-circle"
                 [ngbTooltip]="contributorNames.slice(2).join(', ')"
-                placement="top">
+                placement="top"
+                container="body">
                 +{{ contributorNames.length - 2 }}
             </li>
             <li *ngIf="contributorNames.length === 0"

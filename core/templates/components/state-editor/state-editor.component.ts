@@ -47,10 +47,12 @@ import {InteractionData} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import './state-editor.component.css';
 
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html',
+  styleUrls: ['./state-editor.component.css'],
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveHints = new EventEmitter<Hint[]>();
@@ -162,16 +164,15 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveStateContent.emit($event);
   }
 
-  updateInteractionVisibility(newInteractionId: string): void {
+  updateInteractionVisibility(
+    newInteractionId: InteractionSpecsKey | null
+  ): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-          .can_have_solution
+      newInteractionId && INTERACTION_SPECS[newInteractionId].can_have_solution
     );
     this.currentStateIsTerminal = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
+      newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal
     );
   }
 
@@ -211,47 +212,54 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         this.stateData = stateData;
         this.stateName = this.stateEditorService.getActiveStateName();
         this.stateEditorService.setInteraction(stateData.interaction);
-        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        this.stateEditorService.setLinkedSkillId(
+          stateData.linkedSkillId as string
+        );
         if (!this.stateEditorService.isInQuestionMode()) {
           this.stateEditorService.setInapplicableSkillMisconceptionIds(
-            stateData.inapplicableSkillMisconceptionIds
+            stateData.inapplicableSkillMisconceptionIds as string[]
           );
         }
-        this.stateContentService.init(this.stateName, stateData.content);
+        this.stateContentService.init(
+          this.stateName as string,
+          stateData.content
+        );
         this.stateLinkedSkillIdService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.linkedSkillId
         );
         this.stateHintsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.hints
         );
+        // TODO(#25231): InteractionBackendDict.id should use
+        // InteractionSpecsKey instead of string.
         this.stateInteractionIdService.init(
-          this.stateName,
-          stateData.interaction.id
+          this.stateName as string,
+          stateData.interaction.id as InteractionSpecsKey
         );
         this.stateCustomizationArgsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.customizationArgs
         );
         this.stateNameService.init();
         this.stateParamChangesService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.paramChanges
         );
         this.stateSolicitAnswerDetailsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.solicitAnswerDetails
         );
         this.stateCardIsCheckpointService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.cardIsCheckpoint
         );
         this.stateSolutionService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.solution
         );
-        this.updateInteractionVisibility(stateData.interaction.id);
+        this.updateInteractionVisibility(stateData.interaction.id || null);
         this.servicesInitialized = true;
       })
     );

@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import subprocess
@@ -211,14 +212,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'name': 'blog-admin/assign-roles',
                                 'module': 'blog-admin/assign-roles.spec.ts',
+                                'framework': 'puppeteer',
                             },
                             {
                                 'name': 'blog-editor/publish',
                                 'module': 'blog-editor/publish.spec.ts',
+                                'framework': 'puppeteer',
                             },
                             {
                                 'name': 'exploration-player/view-exploration',
                                 'module': 'exploration-player/view-exploration.spec.ts',
+                                'framework': 'playwright',
                             },
                         ],
                     }
@@ -361,14 +365,27 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     {
                         'name': 'blog-admin/assign-roles',
                         'module': 'blog-admin/assign-roles.spec.ts',
+                        'framework': 'puppeteer',
                     },
                     {
                         'name': 'blog-editor/publish',
                         'module': 'blog-editor/publish.spec.ts',
+                        'framework': 'puppeteer',
                     },
                     {
                         'name': 'exploration-player/view-exploration',
                         'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
+                    },
+                ],
+            },
+            'acceptance_playwright': {
+                'count': 1,
+                'suites': [
+                    {
+                        'name': 'exploration-player/view-exploration',
+                        'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
                     },
                 ],
             },
@@ -744,6 +761,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
                                 'lighthouse_accessibility': {
                                     'count': 0,
                                     'suites': [],
@@ -814,6 +835,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                             'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
                                         }
                                     ],
                                 },
@@ -883,6 +915,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                             'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
                                         }
                                     ],
                                 },
@@ -921,6 +964,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -964,6 +1011,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 {
                     'name': 'blog-admin/create-blog-post',
                     'module': 'blog-admin/create-blog-post.spec.ts',
+                    'framework': 'puppeteer',
                 }
             )
 
@@ -996,8 +1044,13 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'blog-admin/create-blog-post',  # pylint: disable=line-too-long
                                             'module': 'blog-admin/create-blog-post.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'puppeteer',
                                         }
                                     ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_accessibility': {
                                     'count': 0,
@@ -1009,3 +1062,25 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 },
                             },
                         )
+
+    def test_output_variable_to_github_workflow_without_github_output(
+        self,
+    ) -> None:
+        """Test output_variable_to_github_workflow when GITHUB_OUTPUT is missing."""
+        output: List[str] = []
+
+        def mock_print(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(os, 'environ', {}):
+            with self.swap(builtins, 'print', mock_print):
+                check_ci_test_suites_to_run.output_variable_to_github_workflow(
+                    'variable', 'value'
+                )
+
+        self.assertEqual(len(output), 2)
+        self.assertEqual(
+            output[0],
+            'Cannot find GITHUB_OUTPUT in os.environ. Outputting to stdout instead:',
+        )
+        self.assertEqual(output[1], 'variable=value')

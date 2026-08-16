@@ -16,7 +16,7 @@
  * @fileoverview Unti tests for the FractionInput response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ResponseFractionInput} from './oppia-response-fraction-input.component';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -29,7 +29,7 @@ describe('ResponseFractionInput', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseFractionInput],
       providers: [

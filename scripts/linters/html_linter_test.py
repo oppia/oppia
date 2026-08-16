@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+from unittest import mock
 
 from core.tests import test_utils
 
@@ -351,3 +352,75 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
         self.assertTrue(parser.failed)
         self.assertTrue(any('class' in msg for msg in parser.error_messages))
+
+    def test_custom_parser_disallows_new_embedded_style_tags(self) -> None:
+        file_content = (
+            '<div>\n'
+            '  <style>\n'
+            '    .test {\n'
+            '      color: red;\n'
+            '    }\n'
+            '  </style>\n'
+            '</div>\n'
+        )
+        parser = html_linter.CustomHTMLParser(
+            filepath='core/templates/test.component.html',
+            file_lines=tuple(file_content.splitlines(keepends=True)),
+        )
+
+        parser.feed(file_content)
+
+        self.assertTrue(parser.failed)
+        self.assertEqual(
+            [
+                'core/templates/test.component.html --> Embedded style tags '
+                'are not allowed in HTML templates. Move the CSS to the '
+                'corresponding .component.css file.'
+            ],
+            parser.error_messages,
+        )
+
+    def test_custom_parser_allows_legacy_embedded_style_tags(self) -> None:
+        file_content = (
+            '<div>\n'
+            '  <style>\n'
+            '    .test {\n'
+            '      color: red;\n'
+            '    }\n'
+            '  </style>\n'
+            '</div>\n'
+        )
+        filepath = 'core/templates/test-legacy-style.component.html'
+        with mock.patch.object(
+            html_linter, 'LEGACY_STYLE_TAG_ALLOWLIST', frozenset([filepath])
+        ):
+            parser = html_linter.CustomHTMLParser(
+                filepath=filepath,
+                file_lines=tuple(file_content.splitlines(keepends=True)),
+            )
+
+            parser.feed(file_content)
+
+            self.assertFalse(parser.failed)
+            self.assertEqual([], parser.error_messages)
+
+    def test_handle_data_updates_indentation_level_for_jinja_blocks(
+        self,
+    ) -> None:
+        parser = html_linter.CustomHTMLParser(
+            filepath='dummy.html', file_lines=(), failed=False
+        )
+
+        self.assertEqual(parser.indentation_level, 0)
+
+        parser.handle_data('  {% block some_block %}\n')
+        self.assertEqual(parser.indentation_level, 1)
+
+        parser.handle_data('  {% if some_condition %}\n')
+        self.assertEqual(parser.indentation_level, 2)
+
+        parser.handle_data('  {% endif %}\n')
+        self.assertEqual(parser.indentation_level, 1)
+
+        parser.handle_data('  {% endblock %}\n')
+        self.assertEqual(parser.indentation_level, 0)

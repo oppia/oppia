@@ -237,7 +237,8 @@
         </mat-card>
 
         <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card oppia-mobile-collapsible-card">
-          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header" (click)="toggleAcquiredSkillsList()">
+          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header e2e-test-section-header-acquired-skills"
+               (click)="toggleAcquiredSkillsList()">
             <span>Acquired Skills</span>
             <i class="fa fa-caret-down"
                *ngIf="!acquiredSkillIsShown"
@@ -248,7 +249,8 @@
                aria-hidden="true">
             </i>
           </div>
-          <div class="story-skill-requirements oppia-mobile-collapsible-card-content" *ngIf="acquiredSkillIsShown">
+          <div class="story-skill-requirements oppia-mobile-collapsible-card-content e2e-test-section-body-acquired-skills"
+               *ngIf="acquiredSkillIsShown">
             <div>
               <span class="oppia-input-box-subtitle">
                 <i>

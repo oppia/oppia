@@ -16,7 +16,7 @@
  * @fileoverview Component for the full expand accordion.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, ViewEncapsulation} from '@angular/core';
 import './full-expand-accordion.component.css';
 import {AccordionPanelData} from '../data.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -25,6 +25,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   selector: 'oppia-full-expand-accordion',
   templateUrl: './full-expand-accordion.component.html',
   styleUrls: ['./full-expand-accordion.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class FullExpandAccordionComponent {
   /**

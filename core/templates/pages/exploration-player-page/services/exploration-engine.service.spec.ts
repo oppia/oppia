@@ -27,6 +27,8 @@ import {
   ExplorationBackendDict,
 } from '../../../domain/exploration/exploration.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
@@ -36,12 +38,15 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateCard} from 'domain/state_card/state-card.model';
+import {State} from 'domain/state/state.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
-import {AnswerClassificationService} from './answer-classification.service';
+import {
+  AnswerClassificationService,
+  InteractionRulesService,
+} from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ExplorationEngineService} from './exploration-engine.service';
@@ -53,6 +58,8 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockPlatformFeatureService {
   status = {
@@ -65,7 +72,7 @@ class MockPlatformFeatureService {
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
-  let answerClassificationResult: AnswerClassificationService;
+  let answerClassificationResult: AnswerClassificationResult;
   let audioPreloaderService: AudioPreloaderService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let pageContextService: PageContextService;
@@ -81,8 +88,9 @@ describe('Exploration engine service ', () => {
   let stateGraphLayoutService: StateGraphLayoutService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let textInputService: TextInputRulesService;
+  let textInputService: jasmine.SpyObj<InteractionRulesService>;
   let translateService: TranslateService;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -157,6 +165,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: true,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: '<p>First Question</p>',
@@ -181,6 +190,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
@@ -253,6 +263,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: '<p>Second Question</p>',
@@ -272,11 +283,11 @@ describe('Exploration engine service ', () => {
       param_changes: [],
       title: 'My Exploration Title',
       draft_change_list_id: 9,
-      is_version_of_draft_valid: null,
+      is_version_of_draft_valid: false,
       language_code: 'en',
       init_state_name: 'Start',
       next_content_id_index: 5,
-      draft_changes: null,
+      draft_changes: [],
       exploration_metadata: {
         title: 'Exploration',
         category: 'Algebra',
@@ -348,23 +359,20 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_exp_version: 1,
     };
 
-    answerClassificationResult = {
-      outcome: {
-        dest: 'Mid',
-        destIfReallyStuck: 'Mid',
-        feedback: {
-          content_id: 'feedback_1',
-          html: 'Answer is correct!',
-        },
-        labelledAsCorrect: true,
-        paramChanges: [],
-        refresherExplorationId: null,
-        missingPrerequisiteSkillId: null,
-      },
-      answerGroupIndex: 1,
-      ruleIndex: 0,
-      classificationCategorization: 'default_outcome',
-    };
+    answerClassificationResult = new AnswerClassificationResult(
+      new Outcome(
+        'Mid',
+        'Mid',
+        new SubtitledHtml('Answer is correct!', 'feedback_1'),
+        true,
+        [],
+        null,
+        null
+      ),
+      1,
+      0,
+      'default_outcome'
+    );
   });
 
   beforeEach(() => {
@@ -406,8 +414,11 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = jasmine.createSpyObj('InteractionRulesService', ['']);
     translateService = TestBed.inject(TranslateService);
+    explorationHtmlFormatterService = TestBed.inject(
+      ExplorationHtmlFormatterService
+    );
   });
 
   beforeEach(() => {
@@ -428,7 +439,7 @@ describe('Exploration engine service ', () => {
       null
     );
     spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-      (html, envs) => html
+      (html: string, envs: Record<string, string>[]) => html
     );
     spyOn(
       readOnlyExplorationBackendApiService,
@@ -532,6 +543,31 @@ describe('Exploration engine service ', () => {
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
+
+  it('should throw error if contentId is null in initial state when calling init', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+
+    const clonedExplorationDict = cloneDeep(explorationDict);
+    clonedExplorationDict.states.Start.content.content_id = null;
+
+    expect(() => {
+      explorationEngineService.init(
+        clonedExplorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        initSuccessCb
+      );
+    }).toThrowError('Content id cannot be null.');
+    expect(initSuccessCb).not.toHaveBeenCalled();
+  });
 
   it("should throw an error if initial state name is null when calling 'init'", () => {
     const mockExploration = {
@@ -654,9 +690,40 @@ describe('Exploration engine service ', () => {
       const maxDepth = explorationEngineService.getMaxStateDepth();
       expect(maxDepth).toBe(3);
     });
+
+    it('should throw error if interaction for initial state is not defined', () => {
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        () => {}
+      );
+      spyOn(
+        explorationEngineService.exploration,
+        'getInteraction'
+      ).and.returnValue(null);
+      expect(() => {
+        explorationEngineService.loadInitialState(() => {});
+      }).toThrowError('Interaction for the initial state is not defined.');
+    });
   });
 
   describe('on submitting answer ', () => {
+    beforeEach(() => {
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
+        'Start'
+      );
+    });
+
     it(
       'should call success callback if the submitted ' + 'answer is correct',
       () => {
@@ -668,17 +735,10 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
 
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
         spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
         spyOn(
           answerClassificationService,
@@ -713,19 +773,12 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.ruleIndex = null;
       answerClassificationResult.answerGroupIndex = 0;
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          null,
-          null,
+          jasmine.createSpyObj('Interaction', ['']),
           'feedback_1'
         )
       );
@@ -760,24 +813,17 @@ describe('Exploration engine service ', () => {
     it('should show warning if interaction id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
-      const mockInteraction = {
-        id: null, // Triggers the branch.
+      const mockInteraction = jasmine.createSpyObj('Interaction', [''], {
+        id: null,
         customizationArgs: {},
-      };
+      });
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
           mockInteraction,
-          null,
           'feedback_1'
         )
       );
@@ -827,19 +873,12 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.answerGroupIndex = 0;
       const successCallback = jasmine.createSpy('successCallback');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          null,
-          null,
+          jasmine.createSpyObj('Interaction', ['']),
           'feedback_1'
         )
       );
@@ -878,25 +917,26 @@ describe('Exploration engine service ', () => {
       expect(result).toBe(false);
     }));
 
-    it('should show warning if content id is null', fakeAsync(() => {
+    it('should throw error if content id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
       answerClassificationResult.answerGroupIndex = 0;
-      answerClassificationResult.outcome.feedback.content_id = null; // Triggers the branch.
+      // Triggers the content-id null branch by mocking the contentId getter.
+      spyOnProperty(
+        answerClassificationResult.outcome.feedback,
+        'contentId',
+        'get'
+      ).and.returnValue(null);
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
-          null,
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
           'feedback_1'
         )
       );
@@ -930,18 +970,13 @@ describe('Exploration engine service ', () => {
         customizationArgs: {},
       });
 
-      spyOn(alertsService, 'addWarning');
-
-      const result = explorationEngineService.submitAnswer(
-        'answer',
-        textInputService,
-        submitAnswerSuccessCb
-      );
-
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Content id cannot be null.'
-      );
-      expect(result).toBe(false);
+      expect(() => {
+        explorationEngineService.submitAnswer(
+          'answer',
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      }).toThrowError('Content id cannot be null.');
     }));
 
     it(
@@ -955,17 +990,10 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
 
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
         spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
         spyOn(
           answerClassificationService,
@@ -1000,18 +1028,15 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
       answerClassificationResult.answerGroupIndex = 0;
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
           'feedback_1'
         )
       );
@@ -1071,60 +1096,75 @@ describe('Exploration engine service ', () => {
       );
     }));
 
-    it(
-      'should show warning message if the feedback ' + 'content is empty',
-      () => {
-        let initSuccessCb = jasmine.createSpy('success');
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let answer = 'answer';
-        answerClassificationResult.outcome.feedback.html = null; // Triggers the branch.
+    it('should return null if content id for next state if stuck is null', fakeAsync(() => {
+      const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
-        let lastCard = StateCard.createNewCard(
-          'Card 1',
-          'Content html',
-          'Interaction text',
-          null,
-          null,
-          'content_id'
-        );
+      answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
+      answerClassificationResult.answerGroupIndex = 0;
 
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
-        spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
-        spyOn(
-          answerClassificationService,
-          'getMatchingClassificationResult'
-        ).and.returnValue(answerClassificationResult);
-        let alertsServiceSpy = spyOn(
-          alertsService,
-          'addWarning'
-        ).and.callThrough();
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+        StateCard.createNewCard(
+          'Start',
+          'Content',
+          '',
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
+          'feedback_1'
+        )
+      );
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
 
-        explorationEngineService.init(
-          explorationDict,
-          1,
-          null,
-          true,
-          ['en'],
-          [],
-          initSuccessCb
-        );
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        submitAnswerSuccessCb
+      );
+      tick();
 
-        explorationEngineService.submitAnswer(
-          answer,
-          textInputService,
-          submitAnswerSuccessCb
-        );
+      spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+        (stateName: string) => {
+          if (stateName === 'StuckState') {
+            const state = State.createDefaultState(
+              'StuckState',
+              'content_id',
+              'default_outcome'
+            );
+            state.content.contentId = null;
+            state.content.html = 'Stuck content';
+            state.interaction.id = 'TextInput';
+            state.interaction.customizationArgs = {};
+            return state;
+          }
+          const state = State.createDefaultState(
+            'Start',
+            'feedback_1',
+            'default_outcome'
+          );
+          state.content.html = 'Start content';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = {};
+          return state;
+        }
+      );
 
-        expect(alertsServiceSpy).toHaveBeenCalledWith(
-          'Feedback content should not be empty.'
-        );
-      }
-    );
+      explorationEngineService.submitAnswer(
+        'test answer',
+        textInputService,
+        submitAnswerSuccessCb
+      );
+
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
+      expect(submitAnswerSuccessCb.calls.mostRecent().args[10]).toBeNull();
+    }));
 
     it('should show warning message if the parameters ' + 'are empty', () => {
       let initSuccessCb = jasmine.createSpy('success');
@@ -1135,17 +1175,10 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
@@ -1188,17 +1221,10 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
@@ -1306,24 +1332,29 @@ describe('Exploration engine service ', () => {
         'Content html',
         'Interaction text',
         lastCardInteraction,
-        null,
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
+      spyOn(lastCard, 'getInteractionCustomizationArgs').and.returnValue({
+        rows: {
+          value: 1,
+        },
+        placeholder: {
+          value: new SubtitledUnicode('', 'ca_placeholder_0'),
+        },
+        catchMisspellings: {
+          value: true,
+        },
+      });
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
-      spyOn(translateService, 'instant').and.callFake(key => {
+      spyOn(translateService, 'instant').and.callFake((key: string) => {
         if (
-          (key as string).startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')
+          typeof key === 'string' &&
+          key.startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')
         ) {
           return 'misspelled feedback';
         }
@@ -1366,6 +1397,119 @@ describe('Exploration engine service ', () => {
       expect(submitAnswerSuccessCb.calls.argsFor(1)[feedbackArgPosition]).toBe(
         'default feedback'
       );
+
+      // Restore default outcome to check misspelling branch, but make `isAnswerOnlyMisspelled` return false.
+      answerClassificationResult.outcome.dest = 'Mid';
+      spyOn(
+        answerClassificationService,
+        'isAnswerOnlyMisspelled'
+      ).and.returnValue(false);
+
+      explorationEngineService.submitAnswer(
+        answer,
+        textInputService,
+        submitAnswerSuccessCb
+      );
+      expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(3);
+      expect(submitAnswerSuccessCb.calls.argsFor(2)[feedbackArgPosition]).toBe(
+        'default feedback'
+      );
+    });
+
+    it('should handle submitAnswer where old state is same as new state and not inline', () => {
+      const submitAnswerSuccessCb = jasmine.createSpy('success');
+      answerClassificationResult.outcome.dest = 'Start';
+
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+        StateCard.createNewCard(
+          'Start',
+          '',
+          '',
+          new Interaction(
+            [],
+            [],
+            Object.create(null),
+            null,
+            [],
+            'TextInput',
+            null
+          ),
+          'content_id'
+        )
+      );
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        submitAnswerSuccessCb
+      );
+      spyOn(
+        explorationEngineService.exploration,
+        'isInteractionInline'
+      ).and.returnValue(false);
+
+      explorationEngineService.submitAnswer(
+        'test answer',
+        textInputService,
+        submitAnswerSuccessCb
+      );
+
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
+      // The refreshInteraction flag is index 1.
+      expect(submitAnswerSuccessCb.calls.mostRecent().args[1]).toBe(false);
+    });
+
+    it('should handle submitAnswer when in exploration editor page', () => {
+      const submitAnswerSuccessCb = jasmine.createSpy('success');
+      (
+        pageContextService.isInExplorationEditorPage as jasmine.Spy
+      ).and.returnValue(true);
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+        StateCard.createNewCard(
+          'Start',
+          '',
+          '',
+          new Interaction(
+            [],
+            [],
+            Object.create(null),
+            null,
+            [],
+            'TextInput',
+            null
+          ),
+          'content_id'
+        )
+      );
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      explorationEngineService.initSettingsFromEditor('Start', []);
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        submitAnswerSuccessCb
+      );
+
+      explorationEngineService.submitAnswer(
+        'test answer',
+        textInputService,
+        submitAnswerSuccessCb
+      );
+
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
     });
   });
 
@@ -1484,8 +1628,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
@@ -1501,7 +1644,7 @@ describe('Exploration engine service ', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
 
-      expect(explorationEngineService.currentStateName).toBe(undefined);
+      expect(explorationEngineService.currentStateName).toBeUndefined();
 
       explorationEngineService.init(
         explorationDict,
@@ -1735,8 +1878,16 @@ describe('Exploration engine service ', () => {
       id: 'TextInput',
     });
     spyOn(
-      explorationEngineService,
-      '_getInteractionHtmlByStateName'
+      explorationEngineService.exploration,
+      'getInteractionId'
+    ).and.returnValue('TextInput');
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteractionCustomizationArgs'
+    ).and.returnValue({});
+    spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
     ).and.returnValue('<div>interaction</div>');
     spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue('');
 
@@ -1816,6 +1967,708 @@ describe('Exploration engine service ', () => {
     }
   );
 
+  it('should return an empty array if the destination state is unreachable in getShortestPathToState', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      initSuccessCb
+    );
+
+    let shortestPathToState = explorationEngineService.getShortestPathToState(
+      explorationDict.states,
+      'NonExistentState'
+    );
+
+    expect(shortestPathToState).toEqual([]);
+  });
+
+  it('should handle interaction with null id in getStateCardByName and getShortestPathToState', () => {
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+
+    spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content_id', 'default_outcome')
+    );
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteraction'
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
+
+    const stateCard = explorationEngineService.getStateCardByName('Start');
+    expect(stateCard).toBeDefined();
+
+    const shortestPath = explorationEngineService.getShortestPathToState(
+      {
+        Start: State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        ).toBackendDict(),
+      },
+      'Start'
+    );
+    expect(shortestPath).toEqual(['Start']);
+  });
+
+  it('should cover setExplorationProperties false branches', () => {
+    const getPathnameSpy = spyOn(urlService, 'getPathname').and.returnValue(
+      '/explore/1'
+    );
+    const isInQuestionPlayerModeSpy = spyOn(
+      pageContextService,
+      'isInQuestionPlayerMode'
+    ).and.returnValue(true);
+    explorationEngineService.setExplorationProperties();
+    expect(pageContextService.isInQuestionPlayerMode).toHaveBeenCalled();
+
+    isInQuestionPlayerModeSpy.and.returnValue(false);
+    getPathnameSpy.and.returnValue('/skill_editor/1');
+    explorationEngineService.setExplorationProperties();
+    expect(urlService.getPathname).toHaveBeenCalled();
+  });
+
+  it('should skip learnerParamsService.init when newParams is null in loadInitialState', () => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    // MakeParams returns the same object (truthy), but we need to cover the
+    // false branch of `if (newParams)`, which means returning undefined/null.
+    // We spy after init so that the initial load still succeeds.
+    const learnerParamsSpy = spyOn(learnerParamsService, 'init');
+    spyOn(explorationEngineService, 'makeParams').and.returnValue(
+      JSON.parse('null')
+    );
+
+    explorationEngineService.loadInitialState(() => {});
+
+    // When makeParams returns falsy, init should NOT be called a second time.
+    expect(learnerParamsSpy).not.toHaveBeenCalled();
+  });
+
+  it('should skip interaction html when interactionId is null in loadInitialState', () => {
+    const successCb = jasmine.createSpy('success');
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+
+    // Override the interaction to have no id.
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteraction'
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(explorationEngineService, 'makeParams').and.returnValue({});
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteractionCustomizationArgs'
+    ).and.returnValue({});
+
+    const htmlFormatterSpy = spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    );
+
+    explorationEngineService.loadInitialState(successCb);
+
+    // HTML formatter should NOT be called when interactionId is null.
+    expect(htmlFormatterSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return empty array when getAuthorRecommendedExpIds returns null', () => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+
+    spyOn(
+      explorationEngineService.exploration,
+      'getAuthorRecommendedExpIds'
+    ).and.returnValue(null);
+
+    const result =
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('End');
+    expect(result).toEqual([]);
+  });
+
+  it('should skip makeParams when newState is falsy in submitAnswer ternary (line 809)', fakeAsync(() => {
+    // Return null only for the first lookup of the destination state so the
+    // ternary takes the falsy branch, then return a valid state for later calls.
+    const submitCb = jasmine.createSpy('success');
+    answerClassificationResult.outcome.dest = 'Mid';
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        'Content',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'feedback_1'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    let midLookupCount = 0;
+    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+      (stateName: string) => {
+        if (stateName === 'Mid' && midLookupCount++ === 0) {
+          return null;
+        }
+        return State.createDefaultState(
+          stateName,
+          'content_id',
+          'default_outcome'
+        );
+      }
+    );
+    spyOn(explorationEngineService, 'makeQuestion').and.returnValue('Question');
+    const makeParamsSpy = spyOn(
+      explorationEngineService,
+      'makeParams'
+    ).and.callThrough();
+
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
+
+    expect(makeParamsSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should skip interaction html when interaction.id is null in submitAnswer (line 852 false branch)', fakeAsync(() => {
+    const submitCb = jasmine.createSpy('success');
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        'Content',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'feedback_1'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    // Return an interaction with no id to hit the false branch.
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteraction'
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
+    spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content_id', 'default_outcome')
+    );
+
+    const htmlFormatterSpy = spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    );
+
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
+
+    expect(htmlFormatterSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should warn about empty params when newParams is null in submitAnswer (line 811)', fakeAsync(() => {
+    // We achieve this by making makeParams throw, then testing the null guard
+    // directly. In the source, the null guard at line 811 covers `=== null`.
+    // We trigger it by mocking getState to return a real object (so newState
+    // is truthy, line 808 calls makeParams), and returning null from makeParams.
+    const submitCb = jasmine.createSpy('success');
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        'Content',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'feedback_1'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+    spyOn(alertsService, 'addWarning');
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    // Spy after init so the init itself still works.
+    // Override makeParams to return null so line 811 triggers.
+    explorationEngineService.makeParams = jasmine
+      .createSpy()
+      .and.returnValue(null);
+
+    const result = explorationEngineService.submitAnswer(
+      'answer',
+      textInputService,
+      submitCb
+    );
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Parameters should not be empty.'
+    );
+    expect(result).toBe(false);
+  }));
+
+  it('should skip makeParams when newStateIfStuck is falsy in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
+    // Return null only for the first stuck-state lookup so the ternary takes
+    // the falsy branch, then return a valid state for later content access.
+    const submitCb = jasmine.createSpy('success');
+    answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
+    answerClassificationResult.answerGroupIndex = 0;
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        '',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'content_id'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    const validCustomizationArgs = {
+      rows: {value: 1},
+      placeholder: {value: {unicode_str: '', content_id: 'ca_0'}},
+      catchMisspellings: {value: false},
+    };
+
+    let stuckStateLookupCount = 0;
+    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+      (stateName: string) => {
+        if (stateName === 'StuckState') {
+          if (stuckStateLookupCount++ === 0) {
+            return null;
+          }
+          const state = State.createDefaultState(
+            'StuckState',
+            'stuck_content_id',
+            'default_outcome'
+          );
+          state.content.html = 'Stuck';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = validCustomizationArgs;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        state.interaction.customizationArgs = validCustomizationArgs;
+        return state;
+      }
+    );
+    spyOn(explorationEngineService, 'makeQuestion').and.callFake(
+      (newState: State | null) => {
+        if (newState === null) {
+          return 'Stuck';
+        }
+        return newState.content.html;
+      }
+    );
+    const makeParamsSpy = spyOn(
+      explorationEngineService,
+      'makeParams'
+    ).and.callThrough();
+    spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
+      (stateName: string) => {
+        return new Interaction(
+          [],
+          [],
+          Object.assign(Object.create(null), validCustomizationArgs),
+          null,
+          [],
+          'TextInput',
+          null
+        );
+      }
+    );
+    spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    ).and.returnValue('<div>html</div>');
+
+    const makeParamsCallCountBeforeSubmit = makeParamsSpy.calls.count();
+    explorationEngineService.submitAnswer(
+      'test answer',
+      textInputService,
+      submitCb
+    );
+
+    // The callback fires and the stuck card arg (index 10) is a StateCard.
+    expect(submitCb).toHaveBeenCalled();
+    const callArgs = submitCb.calls.mostRecent().args;
+    expect(callArgs[10]).not.toBeNull();
+    expect(makeParamsSpy.calls.count() - makeParamsCallCountBeforeSubmit).toBe(
+      1
+    );
+  }));
+
+  it('should skip stuck-state html generation when interaction.id is null (line 959)', fakeAsync(() => {
+    // The _getInteractionHtmlByStateName private method should NOT be called
+    // for the stuck state; instead we verify the stuck card is returned without
+    // html generation for the stuck state.
+    const submitCb = jasmine.createSpy('success');
+    answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
+    answerClassificationResult.answerGroupIndex = 0;
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        '',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'content_id'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+      (stateName: string) => {
+        if (stateName === 'StuckState') {
+          const state = State.createDefaultState(
+            'StuckState',
+            'stuck_content_id',
+            'default_outcome'
+          );
+          state.content.html = 'Stuck';
+          state.interaction.id = null;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        return state;
+      }
+    );
+    spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
+      (stateName: string) => {
+        return stateName === 'StuckState'
+          ? new Interaction([], [], Object.create(null), null, [], null, null)
+          : new Interaction(
+              [],
+              [],
+              Object.create(null),
+              null,
+              [],
+              'TextInput',
+              null
+            );
+      }
+    );
+
+    // Spy on the private method to confirm it was not called for the stuck state.
+    const htmlByStateNameSpy = spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    ).and.returnValue('<div>main-html</div>');
+
+    explorationEngineService.submitAnswer(
+      'test answer',
+      textInputService,
+      submitCb
+    );
+
+    // The private helper should only have been called once (for the main state).
+    // It should NOT have been called a second time for the stuck state.
+    expect(htmlByStateNameSpy.calls.count()).toBe(1);
+  }));
+
+  it('should return null from _getNextCardIfReallyStuck when contentId is null (line 972)', fakeAsync(() => {
+    const submitCb = jasmine.createSpy('success');
+    answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
+    answerClassificationResult.answerGroupIndex = 0;
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Start',
+        '',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
+        'content_id'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+    tick();
+
+    const validCustomizationArgs = {
+      rows: {value: 1},
+      placeholder: {value: {unicode_str: '', content_id: 'ca_0'}},
+      catchMisspellings: {value: false},
+    };
+
+    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+      (stateName: string) => {
+        if (stateName === 'StuckState') {
+          const state = State.createDefaultState(
+            'StuckState',
+            'dummy_content_id',
+            'default_outcome'
+          );
+          state.content.contentId = null;
+          state.content.html = 'Stuck';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = validCustomizationArgs;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        state.interaction.customizationArgs = validCustomizationArgs;
+        return state;
+      }
+    );
+    spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
+      (stateName: string) => {
+        return new Interaction(
+          [],
+          [],
+          Object.assign(Object.create(null), validCustomizationArgs),
+          null,
+          [],
+          'TextInput',
+          null
+        );
+      }
+    );
+    // Spy on private method so html generation doesn't fail on real services.
+    spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    ).and.returnValue('<div>html</div>');
+
+    explorationEngineService.submitAnswer(
+      'test answer',
+      textInputService,
+      submitCb
+    );
+
+    // The main submitAnswer callback still fires even when stuck card is null.
+    expect(submitCb).toHaveBeenCalled();
+    // Arg at index 10 is nextCardIfReallyStuck; it should be null because
+    // the stuck state's contentId is null (line 972 returns null).
+    const callArgs = submitCb.calls.mostRecent().args;
+    expect(callArgs[10]).toBeNull();
+  }));
+
+  it('should return feedback html when interaction is not TextInput (_getFeedback line 205 branch)', () => {
+    const submitCb = jasmine.createSpy('success');
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Mid');
+    // Use a non-TextInput interaction to make shouldCheckForMisspelling false.
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      StateCard.createNewCard(
+        'Mid',
+        '',
+        '',
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'Continue',
+          customizationArgs: {},
+        }),
+        'content_id'
+      )
+    );
+    spyOn(
+      answerClassificationService,
+      'getMatchingClassificationResult'
+    ).and.returnValue(answerClassificationResult);
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      submitCb
+    );
+
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
+
+    expect(submitCb).toHaveBeenCalled();
+  });
+
   describe('on validating parameters ', () => {
     it('should create new parameters successfully', () => {
       paramChangeDict.customization_args.parse_with_jinja = true;
@@ -1838,6 +2691,40 @@ describe('Exploration engine service ', () => {
         []
       );
       expect(newParams).toEqual(expectedParams);
+    });
+
+    it('should fallback to empty string or array if customization args are not provided', () => {
+      let oldParams = {};
+
+      let paramChange1 = ParamChange.createFromBackendDict({
+        name: 'param1',
+        generator_id: 'Copier',
+        customization_args: {
+          parse_with_jinja: false,
+        },
+      });
+      let paramChange2 = ParamChange.createFromBackendDict({
+        name: 'param2',
+        generator_id: 'Copier',
+        customization_args: {
+          parse_with_jinja: true,
+        },
+      });
+      let paramChange3 = ParamChange.createFromBackendDict({
+        name: 'param3',
+        generator_id: 'RandomSelector',
+        customization_args: {},
+      });
+
+      const newParams = explorationEngineService.makeParams(
+        oldParams,
+        [paramChange1, paramChange2, paramChange3],
+        []
+      );
+
+      expect(newParams.param1).toEqual('');
+      expect(newParams.param2).toEqual('');
+      expect(newParams.param3).toBeUndefined();
     });
 
     it(

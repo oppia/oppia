@@ -42,7 +42,7 @@ describe('MultipleChoiceInputValidationService', () => {
       providers: [MultipleChoiceInputValidationService],
     });
 
-    validatorService = TestBed.get(MultipleChoiceInputValidationService);
+    validatorService = TestBed.inject(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     currentState = 'First State';
 

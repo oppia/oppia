@@ -34,10 +34,10 @@ describe('Collection Creation backend service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    collectionCreationBackendService = TestBed.get(
+    collectionCreationBackendService = TestBed.inject(
       CollectionCreationBackendService
     );
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

@@ -33,7 +33,6 @@ describe('Learner Dashboard Backend API Service', () => {
     username: 'test',
     learner_dashboard_activity_ids: {
       completed_exploration_ids: [],
-      exploration_playlist_ids: [],
       completed_collection_ids: [],
       incomplete_exploration_ids: [],
       completed_story_ids: [],
@@ -42,7 +41,6 @@ describe('Learner Dashboard Backend API Service', () => {
       topic_ids_to_learn: [],
       all_topic_ids: [],
       untracked_topic_ids: [],
-      collection_playlist_ids: [],
       incomplete_collection_ids: [],
     },
     user_email: 'test@example.com',
@@ -59,11 +57,11 @@ describe('Learner Dashboard Backend API Service', () => {
       imports: [HttpClientTestingModule],
       providers: [LearnerDashboardIdsBackendApiService],
     });
-    learnerDashboardIdsBackendApiService = TestBed.get(
+    learnerDashboardIdsBackendApiService = TestBed.inject(
       LearnerDashboardIdsBackendApiService
     );
 
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

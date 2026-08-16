@@ -577,3 +577,84 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
                 'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
+
+
+class MachineTranslationPolicyModelTests(test_utils.GenericTestBase):
+    """Tests for the MachineTranslationPolicyModel."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            translation_models.MachineTranslationPolicyModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            translation_models.MachineTranslationPolicyModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'automatic_translation_is_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_to_provider_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            translation_models.MachineTranslationPolicyModel.get_export_policy(),
+            expected_export_policy_dict,
+        )
+
+
+class AutoTranslationCacheModelTests(test_utils.GenericTestBase):
+    """Tests for the AutoTranslationCacheModel."""
+
+    def test_create_and_get_translation(self) -> None:
+        model_id = translation_models.AutoTranslationCacheModel.create(
+            source_language_code='en',
+            target_language_code='es',
+            source_text='hello',
+            translated_text='hola',
+        )
+        self.assertIsNotNone(model_id)
+
+        translation = (
+            translation_models.AutoTranslationCacheModel.get_translation(
+                source_language_code='en',
+                target_language_code='es',
+                source_text='hello',
+            )
+        )
+        self.assertIsNotNone(translation)
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation is not None
+        self.assertEqual(translation.translated_text, 'hola')
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            translation_models.AutoTranslationCacheModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            translation_models.AutoTranslationCacheModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'source_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            translation_models.AutoTranslationCacheModel.get_export_policy(),
+            expected_export_policy_dict,
+        )

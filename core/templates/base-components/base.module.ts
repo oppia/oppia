@@ -54,6 +54,9 @@ import {
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
+import {FeedbackModalComponent} from './feedback-modal.component';
+import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
+import {MatIconModule} from '@angular/material/icon';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
 import {RouterModule} from '@angular/router';
 
@@ -69,6 +72,8 @@ import {RouterModule} from '@angular/router';
     NgBootstrapModule,
     RouterModule,
     SharedPipesModule,
+    MatIconModule,
+    ImageReceiverModule,
   ],
 
   declarations: [
@@ -92,6 +97,7 @@ import {RouterModule} from '@angular/router';
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
+    FeedbackModalComponent,
   ],
 
   entryComponents: [
@@ -109,6 +115,7 @@ import {RouterModule} from '@angular/router';
     ThanksForSubscribingModalComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
+    FeedbackModalComponent,
   ],
 
   exports: [
@@ -117,6 +124,7 @@ import {RouterModule} from '@angular/router';
     DirectivesModule,
     I18nModule,
     SharedPipesModule,
+    MatIconModule,
 
     // Components and Directives.
     AlertMessageComponent,
@@ -136,6 +144,7 @@ import {RouterModule} from '@angular/router';
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
+    FeedbackModalComponent,
   ],
 })
 export class BaseModule {}

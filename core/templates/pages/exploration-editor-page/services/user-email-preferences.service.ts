@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {UserEmailPreferencesBackendApiService} from './user-email-preferences-backend-api.service';
 
 export interface EmailPreferencesData {
-  email_preferences: {
+  email_preferences_dict: {
     mute_feedback_notifications: boolean;
     mute_suggestion_notifications: boolean;
   };
@@ -110,8 +110,8 @@ export class UserEmailPreferencesService {
         let data = response;
         this.alertsService.clearWarnings(),
           this.init(
-            data.email_preferences.mute_feedback_notifications,
-            data.email_preferences.mute_suggestion_notifications
+            data.email_preferences_dict.mute_feedback_notifications,
+            data.email_preferences_dict.mute_suggestion_notifications
           );
       });
   }

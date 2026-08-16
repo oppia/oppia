@@ -91,3 +91,15 @@ oppia-story-viewer-page.oppia-login-or-signup-text {
     display: block;
   }
 }
+
+oppia-story-viewer-page .oppia-chapter-coming-soon {
+  cursor: not-allowed;
+}
+
+oppia-story-viewer-page .oppia-story-viewer-card-coming-soon {
+  opacity: 0.5;
+}
+
+oppia-story-viewer-page .oppia-lesson-icon-coming-soon {
+  background-color: #ccc;
+}

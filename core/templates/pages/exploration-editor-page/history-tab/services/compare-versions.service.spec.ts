@@ -85,7 +85,7 @@ describe('Compare versions service', () => {
       let stateDetail = statesDetails[
         stateName as keyof StatesData
       ] as stateDetails;
-      let newStateData = {
+      let newStateData: StateBackendDict = {
         classifier_model_id: null,
         content: {
           content_id: 'content',
@@ -116,7 +116,7 @@ describe('Compare versions service', () => {
           solution: null,
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,

@@ -1,69 +1,48 @@
-<div class="oppia-topic-viewer-container position-relative e2e-test-topic-viewer-container">
-  <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
-    <div class="topic-viewer-tabs-list">
-      <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}" tabindex="0" (keydown.enter)="setActiveTab('story')">
-          <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
-            <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
-            <a class="tab-title e2e-test-lesson-tab-link"
-               [innerHTML]="'I18N_TOPIC_VIEWER_LEARN' | translate">
-            </a>
-          </div>
-        </li>
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0" (keydown.enter)="setActiveTab('practice')">
-          <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
-            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
-            <a class="tab-title e2e-test-practice-tab-link"
-               [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
-            </a>
-          </div>
-        </li>
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}" tabindex="0" (keydown.enter)="setActiveTab('subtopics')">
-          <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
-            <img *ngIf="!checkTabletView()" alt="revision icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
-            <a class="tab-title e2e-test-study-tab-link"
-               [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate">
-            </a>
-          </div>
-        </li>
-      </ul>
-    </div>
+<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container" [class.studyguide-view-active]="activeView === VIEW_NAMES.STUDYGUIDE">
+  <div class="redesigned-topic-viewer-content">
+    <topic-header
+      [topicName]="topicName"
+      [topicDescription]="topicDescription"
+      [topicId]="topicId"
+      [classroomName]="classroomName"
+      [showStudySkillsBreadcrumb]="activeView === VIEW_NAMES.STUDYGUIDE">
+    </topic-header>
   </div>
-  <background-banner></background-banner>
-  <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
-    <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
-      <stories-list *ngIf="canonicalStorySummaries.length"
-                    [topicName]="topicName"
-                    [topicId]="topicId"
-                    [topicDescription]="topicDescription"
-                    [canonicalStorySummaries]="canonicalStorySummaries"
-                    [classroomUrlFragment]="classroomUrlFragment"
-                    [classroomName]="classroomName"
-                    [topicUrlFragment]="topicUrlFragment">
-      </stories-list>
-      <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
-        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
-        </h2>
-        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">
-        </div>
-      </mat-card>
+  <section *ngIf="activeView === VIEW_NAMES.STORY && canonicalStorySectionData.length"
+           class="redesigned-stories-section"
+           aria-labelledby="redesigned-stories-section-heading">
+    <h2 id="redesigned-stories-section-heading" class="visually-hidden">
+      {{ 'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate }}
+    </h2>
+    <div class="redesigned-stories-list">
+      <topic-story-section
+        *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
+        [storySummary]="storyData.storySummary"
+        [storyTitle]="storyData.storyTitle"
+        [storyDescription]="storyData.storyDescription"
+        [practiceSubtopicIds]="storyData.practiceSubtopicIds"
+        [classroomUrlFragment]="storyData.classroomUrlFragment"
+        [topicUrlFragment]="storyData.topicUrlFragment"
+        [lessonCount]="storyData.lessonCount"
+        [practiceCount]="storyData.practiceCount">
+      </topic-story-section>
     </div>
-    <div *ngIf="activeTab === 'practice'">
-      <practice-tab *ngIf="isPracticeTabEnabled() && topicId"
-                    [subtopicsList]="subtopics"
-                    [topicName]="topicName"
-                    [topicId]="topicId"
-                    [topicUrlFragment]="topicUrlFragment"
-                    [classroomUrlFragment]="classroomUrlFragment">
-      </practice-tab>
-      <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
-        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
-        </h2>
-        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
-        </div>
-      </mat-card>
-    </div>
-    <div *ngIf="activeTab === 'subtopics'" class="e2e-test-topic-viewer-revision-tab">
+  </section>
+
+  <section *ngIf="activeView === VIEW_NAMES.STORY && !canonicalStorySectionData.length"
+           class="redesigned-stories-section"
+           aria-labelledby="redesigned-stories-section-coming-soon-heading">
+    <mat-card dir="auto" class="oppia-page-card practice-tab-not-available-card">
+      <h2 id="redesigned-stories-section-coming-soon-heading" class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+      </h2>
+      <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">
+      </div>
+    </mat-card>
+  </section>
+
+  <section *ngIf="!topicIsLoading && activeView === VIEW_NAMES.STUDYGUIDE"
+           class="redesigned-secondary-section redesigned-studyguide-section">
+    <div class="e2e-test-topic-viewer-revision-tab">
       <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
                       [subtopicsList]="subtopics"
                       [topicId]="topicId"
@@ -71,5 +50,83 @@
                       [topicName]="topicName">
       </subtopics-list>
     </div>
-  </div>
+  </section>
 </div>
+
+<ng-template #legacyTopicViewerContainer>
+  <div class="oppia-topic-viewer-container position-relative e2e-test-topic-viewer-container">
+    <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
+      <div class="topic-viewer-tabs-list">
+        <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
+          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.STORY}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.STORY)">
+            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.STORY)">
+              <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+              <a class="tab-title e2e-test-lesson-tab-link"
+                 [innerHTML]="'I18N_TOPIC_VIEWER_LEARN' | translate">
+              </a>
+            </div>
+          </li>
+          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.PRACTICE}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.PRACTICE)">
+            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.PRACTICE)">
+              <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+              <a class="tab-title e2e-test-practice-tab-link"
+                 [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
+              </a>
+            </div>
+          </li>
+          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.STUDYGUIDE}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.STUDYGUIDE)">
+            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.STUDYGUIDE)">
+              <img *ngIf="!checkTabletView()" alt="revision icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+              <a class="tab-title e2e-test-study-tab-link"
+                 [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate">
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <background-banner></background-banner>
+    <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
+      <div *ngIf="activeView === VIEW_NAMES.STORY" class="e2e-test-lessons-tab-container">
+        <stories-list *ngIf="canonicalStorySummaries.length"
+                      [topicName]="topicName"
+                      [topicId]="topicId"
+                      [topicDescription]="topicDescription"
+                      [canonicalStorySummaries]="canonicalStorySummaries"
+                      [classroomUrlFragment]="classroomUrlFragment"
+                      [classroomName]="classroomName"
+                      [topicUrlFragment]="topicUrlFragment">
+        </stories-list>
+        <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
+          <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+          </h2>
+          <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">
+          </div>
+        </mat-card>
+      </div>
+      <div *ngIf="activeView === VIEW_NAMES.PRACTICE">
+        <practice-tab *ngIf="isPracticeTabEnabled() && topicId"
+                      [subtopicsList]="subtopics"
+                      [topicName]="topicName"
+                      [topicId]="topicId"
+                      [topicUrlFragment]="topicUrlFragment"
+                      [classroomUrlFragment]="classroomUrlFragment">
+        </practice-tab>
+        <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
+          <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+          </h2>
+          <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+          </div>
+        </mat-card>
+      </div>
+      <div *ngIf="activeView === VIEW_NAMES.STUDYGUIDE" class="e2e-test-topic-viewer-revision-tab">
+        <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
+                        [subtopicsList]="subtopics"
+                        [topicId]="topicId"
+                        [topicUrlFragment]="topicUrlFragment"
+                        [topicName]="topicName">
+        </subtopics-list>
+      </div>
+    </div>
+  </div>
+</ng-template>

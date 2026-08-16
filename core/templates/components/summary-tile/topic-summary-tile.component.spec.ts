@@ -44,7 +44,7 @@ describe('TopicSummaryTileCompoennt', () => {
     fixture = TestBed.createComponent(TopicSummaryTileComponent);
     component = fixture.componentInstance;
     abas = TestBed.inject(AssetsBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.topicSummary = CreatorTopicSummary.createFromBackendDict({
@@ -56,6 +56,7 @@ describe('TopicSummaryTileCompoennt', () => {
       total_skill_count: 10,
       total_published_node_count: 3,
       can_edit_topic: true,
+      can_edit_question: false,
       topic_model_last_updated: 1581839492500.852,
       additional_story_count: 0,
       name: 'Alpha',

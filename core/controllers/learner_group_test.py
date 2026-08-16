@@ -1345,13 +1345,20 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for Learner Stories Chapters Progress Handler."""
 
+    LEARNER_EMAIL: Final = 'learner@example.com'
+    LEARNER_USERNAME: Final = 'learner'
+    OUTSIDER_EMAIL: Final = 'outsider@example.com'
+    OUTSIDER_USERNAME: Final = 'outsider'
     NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = '%s2' % story_domain.NODE_ID_PREFIX
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.LEARNER_EMAIL, self.LEARNER_USERNAME)
+        self.signup(self.OUTSIDER_EMAIL, self.OUTSIDER_USERNAME)
         self.USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.LEARNER_ID = self.get_user_id_from_email(self.LEARNER_EMAIL)
 
         self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
@@ -1443,6 +1450,96 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
             'No learner user_id found for the given learner username: '
             'Invalid_username',
         )
+
+    def test_cannot_fetch_another_learners_story_progress(self) -> None:
+        self.login(self.OUTSIDER_EMAIL)
+
+        user_services.update_learner_checkpoint_progress(
+            self.LEARNER_ID, self.exp_id_1, 'Introduction', 1
+        )
+
+        params = {'story_ids': json.dumps([self.story_id])}
+        response = self.get_json(
+            '/user_progress_in_stories_chapters_handler/%s'
+            % (self.LEARNER_USERNAME),
+            params=params,
+            expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'You are not allowed to access this learner progress.',
+        )
+
+        self.logout()
+
+    def test_facilitator_can_fetch_shared_story_progress(self) -> None:
+        learner_group_id = learner_group_fetchers.get_new_learner_group_id()
+        learner_group_services.create_learner_group(
+            learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.USER_ID],
+            [self.LEARNER_ID],
+            [],
+            [self.story_id],
+        )
+        learner_group_services.add_learner_to_learner_group(
+            learner_group_id, self.LEARNER_ID, True
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.LEARNER_ID, self.exp_id_1, 'Introduction', 1
+        )
+
+        params = {'story_ids': json.dumps([self.story_id])}
+        response = self.get_json(
+            '/user_progress_in_stories_chapters_handler/%s'
+            % (self.LEARNER_USERNAME),
+            params=params,
+        )
+
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['exploration_id'], self.exp_id_1)
+        self.assertEqual(response[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(response[0]['total_checkpoints_count'], 1)
+        self.logout()
+
+    def test_facilitator_cannot_fetch_progress_of_learner_not_in_group(
+        self,
+    ) -> None:
+        outsider_id = self.get_user_id_from_email(self.OUTSIDER_EMAIL)
+        learner_group_id = learner_group_fetchers.get_new_learner_group_id()
+        learner_group_services.create_learner_group(
+            learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.USER_ID],
+            [outsider_id],
+            [],
+            [self.story_id],
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.LEARNER_ID, self.exp_id_1, 'Introduction', 1
+        )
+
+        params = {'story_ids': json.dumps([self.story_id])}
+        response = self.get_json(
+            '/user_progress_in_stories_chapters_handler/%s'
+            % (self.LEARNER_USERNAME),
+            params=params,
+            expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'You are not allowed to access this learner progress.',
+        )
+
+        self.logout()
 
 
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):

@@ -29,7 +29,6 @@ import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
@@ -40,7 +39,7 @@ import {StatsReportingService} from 'pages/exploration-player-page/services/stat
 import {HintAndSolutionButtonsComponent} from './hint-and-solution-buttons.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
+import {InteractionBackendDict} from 'domain/exploration/interaction.model';
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
@@ -54,7 +53,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   let newCard: StateCard;
 
-  const defaultInteractionBackendDict = {
+  const defaultInteractionBackendDict: InteractionBackendDict = {
     id: 'TextInput',
     answer_groups: [
       {
@@ -159,7 +158,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       '<p>Content</p>',
       '<interaction></interaction>',
       Interaction.createFromBackendDict(defaultInteractionBackendDict),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
   });
@@ -175,7 +173,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -195,7 +192,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -237,7 +233,6 @@ describe('HintAndSolutionButtonsComponent', () => {
         '<p>Content</p>',
         '<interaction></interaction>',
         {} as Interaction,
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
@@ -253,7 +248,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   );
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it(
@@ -346,7 +341,6 @@ describe('HintAndSolutionButtonsComponent', () => {
           hints: [],
           solution: null,
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
 

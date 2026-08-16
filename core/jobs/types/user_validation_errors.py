@@ -27,7 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(base_models, user_models) = models.Registry.import_models(
+base_models, user_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.USER]
 )
 
@@ -69,14 +69,4 @@ class DraftChangeListLastUpdatedInvalidError(
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated
         )
-        super().__init__(message, model)
-
-
-class ArchivedModelNotMarkedDeletedError(
-    base_validation_errors.BaseValidationError
-):
-    """Error class for models which are archived but not deleted."""
-
-    def __init__(self, model: user_models.UserQueryModel) -> None:
-        message = 'model is archived but not marked as deleted'
         super().__init__(message, model)

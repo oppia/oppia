@@ -19,8 +19,8 @@
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
-import {CopierComponent} from 'value_generators/templates/copier.component';
-import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
+import {CopierComponent} from '../../../../../extensions/value_generators/templates/copier.component';
+import {RandomSelectorComponent} from '../../../../../extensions/value_generators/templates/random-selector.component';
 import {ValueGeneratorEditorComponent} from './value-generator-editor.component';
 
 describe('Value Generator Editor Component', function () {

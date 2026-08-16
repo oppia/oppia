@@ -17,7 +17,7 @@
  * footer.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
@@ -35,12 +35,11 @@ import {
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 
-import './learner-view-info.component.css';
-
 @Component({
   selector: 'oppia-learner-view-info',
   templateUrl: './learner-view-info.component.html',
   styleUrls: ['./learner-view-info.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LearnerViewInfoComponent {
   // These properties are initialized using Angular lifecycle hooks

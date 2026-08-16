@@ -20,15 +20,24 @@ import {ParamType} from 'domain/exploration/param-type.model';
 
 describe('ParamType objects', () => {
   it('should have its registry frozen', () => {
-    expect(Object.isFrozen(ParamType.registry)).toBe(true);
+    expect(
+      Object.isFrozen(
+        (ParamType as unknown as {registry: Record<string, ParamType>}).registry
+      )
+    ).toBe(true);
   });
 
   it('should use UnicodeString as default type', () => {
-    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
+    expect(ParamType.getDefaultType()).toBe(
+      (ParamType as unknown as {registry: Record<string, ParamType>}).registry
+        .UnicodeString
+    );
   });
 
   it('should return correct values for existing types', () => {
-    Object.entries(ParamType.registry).forEach(([backendName, value]) => {
+    Object.entries(
+      (ParamType as unknown as {registry: Record<string, ParamType>}).registry
+    ).forEach(([backendName, value]: [string, ParamType]) => {
       expect(ParamType.getTypeFromBackendName(backendName)).toEqual(value);
     });
   });
@@ -55,7 +64,9 @@ describe('ParamType objects', () => {
     let UnicodeString: ParamType;
 
     beforeEach(() => {
-      UnicodeString = ParamType.registry.UnicodeString;
+      UnicodeString = (
+        ParamType as unknown as {registry: Record<string, ParamType>}
+      ).registry.UnicodeString;
     });
 
     it('should be frozen', () => {

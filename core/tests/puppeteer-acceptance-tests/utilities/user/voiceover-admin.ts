@@ -19,11 +19,10 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const baseURL = testConstants.URLs.BaseURL;
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
-
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
@@ -102,7 +101,22 @@ export class VoiceoverAdmin extends BaseUser {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(mobileNavbarDropdown);
+        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+        await this.page.click(mobileNavbarDropdown);
+        try {
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true, timeout: 10000}
+          );
+        } catch (error) {
+          await this.page.click(mobileNavbarDropdown);
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true}
+          );
+        }
+        // Ensure layout fully stabilized.
+        await this.waitForPageToFullyLoad();
       }
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
@@ -133,18 +147,12 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal.
+   * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-
-    showMessage('Tutorial pop-up is closed.');
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -153,22 +161,10 @@ export class VoiceoverAdmin extends BaseUser {
    * already been dismissed earlier in the test flow.
    */
   async dismissWelcomeModalIfPresent(): Promise<void> {
-    const MODAL_CHECK_TIMEOUT_MS = 2000;
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: MODAL_CHECK_TIMEOUT_MS,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up was present and has been closed.');
-    } catch {
-      // Modal is not present, which is fine - it may have already been
-      // dismissed or not appeared yet.
-      showMessage('Tutorial pop-up was not present, continuing.');
-    }
+    // The existing dismissWelcomeModal() in this class already handles the
+    // case where the modal is not present (via try/catch), so we just
+    // delegate to it.
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -300,7 +296,7 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtistUsername: string
   ): Promise<void> {
     await this.navigateToExplorationEditor(explorationId);
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(false);
     await this.navigateToExplorationSettingsTab();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
   }

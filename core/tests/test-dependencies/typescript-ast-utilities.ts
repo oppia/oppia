@@ -108,25 +108,6 @@ const fallbackResolveModule = (
 };
 
 /**
- * Resolves a module path with Webpack resolution.
- */
-const resolveModuleUsingWebpack = (
-  modulePath: string,
-  containingFile: string
-): ts.ResolvedModuleFull => {
-  const resolved = ts.resolveModuleName(
-    'core/templates/' + modulePath,
-    containingFile,
-    project.getCompilerOptions(),
-    project.getModuleResolutionHost()
-  );
-  if (resolved.resolvedModule === undefined) {
-    return fallbackResolveModule(modulePath, containingFile);
-  }
-  return resolved.resolvedModule;
-};
-
-/**
  *
  * Resolves a module path.
  */
@@ -147,7 +128,7 @@ export const resolveModule = (
     project.getModuleResolutionHost()
   );
   if (resolved.resolvedModule === undefined) {
-    return resolveModuleUsingWebpack(modulePath, containingFile);
+    return fallbackResolveModule(modulePath, containingFile);
   }
   return resolved.resolvedModule;
 };

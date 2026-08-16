@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
-from core import feconf
+import json
+
+from core import feconf, utils
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -367,19 +369,44 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 False,
             ),
         )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            5,
+            'ar',
+            'content_5',
+            translation_domain.TranslatedContent(
+                'Translations in Arabic!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False,
+            ),
+        )
 
         entity_translation_models: Sequence[
             translation_models.EntityTranslationsModel
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
-        self.assertEqual(len(entity_translation_models), 1)
-        entity_translation_model = entity_translation_models[0]
-        self.assertEqual(entity_translation_model.entity_version, 5)
+        self.assertEqual(len(entity_translation_models), 2)
+        entity_translation_model_hi = next(
+            et for et in entity_translation_models if et.language_code == 'hi'
+        )
+        self.assertEqual(entity_translation_model_hi.entity_version, 5)
         self.assertEqual(
             [
                 translation['needs_update']
-                for translation in entity_translation_model.translations.values()
+                for translation in entity_translation_model_hi.translations.values()
             ],
             [False, False],
+        )
+        entity_translation_model_ar = next(
+            et for et in entity_translation_models if et.language_code == 'ar'
+        )
+        self.assertEqual(entity_translation_model_ar.entity_version, 5)
+        self.assertEqual(
+            [
+                translation['needs_update']
+                for translation in entity_translation_model_ar.translations.values()
+            ],
+            [False],
         )
 
         self.exp.version = 6
@@ -399,14 +426,30 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         )
 
-        self.assertEqual(len(entity_translation_models), 1)
-        entity_translation = entity_translation_models[0]
+        self.assertEqual(len(entity_translation_models), 2)
+
+        # Hindi translation should be marked as needs update.
+        entity_translation_hi = next(
+            et for et in entity_translation_models if et.language_code == 'hi'
+        )
         self.assertItemsEqual(
             [
                 translation['needs_update']
-                for translation in entity_translation.translations.values()
+                for translation in entity_translation_hi.translations.values()
             ],
             [False, True],
+        )
+
+        # Arabic translation should NOT be marked as needs update.
+        entity_translation_ar = next(
+            et for et in entity_translation_models if et.language_code == 'ar'
+        )
+        self.assertItemsEqual(
+            [
+                translation['needs_update']
+                for translation in entity_translation_ar.translations.values()
+            ],
+            [False],
         )
 
     def test_compute_translation_related_change_edits_existing_translation(
@@ -798,3 +841,132 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             list(observed_translatable_text['Introduction'].keys()),
             ['default_outcome_1'],
         )
+
+
+class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
+    """Tests for the machine translation policy configuration functions."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.POLICY_ID = translation_models.MACHINE_TRANSLATION_POLICY_ID
+        self.mock_providers_json = json.dumps(
+            {'hi': ['azure', 'gcp'], 'es': ['azure', 'gcp']}
+        )
+        self.swap_get_file_contents = self.swap(
+            utils, 'get_file_contents', lambda x: self.mock_providers_json
+        )
+
+    def test_is_automatic_translation_enabled_returns_false_by_default(
+        self,
+    ) -> None:
+        self.assertFalse(
+            translation_services.is_automatic_translation_enabled()
+        )
+
+    def test_is_automatic_translation_enabled_returns_model_status(
+        self,
+    ) -> None:
+        translation_models.MachineTranslationPolicyModel(
+            id=self.POLICY_ID,
+            automatic_translation_is_enabled=True,
+            language_to_provider_mapping={},
+        ).put()
+
+        self.assertTrue(translation_services.is_automatic_translation_enabled())
+
+    def test_get_machine_translation_provider_mapping_returns_empty_by_default(
+        self,
+    ) -> None:
+        self.assertEqual(
+            translation_services.get_machine_translation_provider_mapping(), {}
+        )
+
+    def test_get_machine_translation_provider_mapping_returns_model_mapping(
+        self,
+    ) -> None:
+        expected_mapping = {'hi': 'azure', 'es': 'gcp'}
+        translation_models.MachineTranslationPolicyModel(
+            id=self.POLICY_ID,
+            automatic_translation_is_enabled=False,
+            language_to_provider_mapping=expected_mapping,
+        ).put()
+
+        self.assertEqual(
+            translation_services.get_machine_translation_provider_mapping(),
+            expected_mapping,
+        )
+
+    def test_update_automatic_translation_status_creates_new_model(
+        self,
+    ) -> None:
+        translation_services.update_automatic_translation_status(True)
+
+        model = translation_models.MachineTranslationPolicyModel.get(
+            self.POLICY_ID
+        )
+        self.assertTrue(model.automatic_translation_is_enabled)
+        self.assertEqual(model.language_to_provider_mapping, {})
+
+    def test_update_automatic_translation_status_updates_existing_model(
+        self,
+    ) -> None:
+        existing_mapping = {'hi': 'azure'}
+        translation_models.MachineTranslationPolicyModel(
+            id=self.POLICY_ID,
+            automatic_translation_is_enabled=False,
+            language_to_provider_mapping=existing_mapping,
+        ).put()
+
+        translation_services.update_automatic_translation_status(True)
+
+        model = translation_models.MachineTranslationPolicyModel.get(
+            self.POLICY_ID
+        )
+        self.assertTrue(model.automatic_translation_is_enabled)
+        self.assertEqual(model.language_to_provider_mapping, existing_mapping)
+
+    def test_save_machine_translation_provider_mapping_creates_new_model(
+        self,
+    ) -> None:
+        new_mapping = {'es': 'gcp'}
+        with self.swap_get_file_contents:
+            translation_services.save_machine_translation_provider_mapping(
+                new_mapping
+            )
+
+        model = translation_models.MachineTranslationPolicyModel.get(
+            self.POLICY_ID
+        )
+        self.assertFalse(model.automatic_translation_is_enabled)
+        self.assertEqual(model.language_to_provider_mapping, new_mapping)
+
+    def test_save_machine_translation_provider_mapping_updates_existing(
+        self,
+    ) -> None:
+        translation_models.MachineTranslationPolicyModel(
+            id=self.POLICY_ID,
+            automatic_translation_is_enabled=True,
+            language_to_provider_mapping={'hi': 'azure'},
+        ).put()
+
+        new_mapping = {'hi': 'azure', 'es': 'gcp'}
+        with self.swap_get_file_contents:
+            translation_services.save_machine_translation_provider_mapping(
+                new_mapping
+            )
+
+        model = translation_models.MachineTranslationPolicyModel.get(
+            self.POLICY_ID
+        )
+        self.assertTrue(model.automatic_translation_is_enabled)
+        self.assertEqual(model.language_to_provider_mapping, new_mapping)
+
+    def test_save_machine_translation_provider_mapping_raises_error(
+        self,
+    ) -> None:
+        invalid_mapping = {'invalid_lang': 'invalid_provider'}
+        with self.swap_get_file_contents:
+            with self.assertRaisesRegex(utils.ValidationError, 'Invalid'):
+                translation_services.save_machine_translation_provider_mapping(
+                    invalid_mapping
+                )

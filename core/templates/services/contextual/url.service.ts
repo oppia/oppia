@@ -20,6 +20,7 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -187,6 +188,62 @@ export class UrlService {
   }
 
   /**
+   * This function is used to construct the classroom URL for learner pages.
+   * @return {string} The classroom URL.
+   */
+  getLearnerClassroomUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    return classroomFragment ? `/learn/${classroomFragment}` : '/learn';
+  }
+
+  /**
+   * This function is used to construct the story URL for learner pages.
+   * @return {string} The story URL.
+   */
+  getLearnerTopicStoryUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
+
+    return classroomFragment && topicFragment
+      ? this.getLearnerTopicUrl(
+          classroomFragment,
+          topicFragment,
+          ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
+        )
+      : '/learn';
+  }
+
+  /**
+   * This function is used to construct the study guide URL for learner pages.
+   * @return {string} The study guide URL.
+   */
+  getLearnerTopicStudyGuideUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
+
+    return classroomFragment && topicFragment
+      ? this.getLearnerTopicUrl(
+          classroomFragment,
+          topicFragment,
+          ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
+        )
+      : '#';
+  }
+
+  private getLearnerTopicUrl(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    urlTemplate: string
+  ): string {
+    return urlTemplate
+      .replace(
+        '<classroom_url_fragment>',
+        encodeURIComponent(classroomUrlFragment)
+      )
+      .replace('<topic_url_fragment>', encodeURIComponent(topicUrlFragment));
+  }
+
+  /**
    * This function is used to find the subtopic name from the learner's URL.
    * @return {string} the subtopic name.
    * @throws Will throw an error if the url for practice session is invalid.
@@ -198,6 +255,32 @@ export class UrlService {
       return decodeURIComponent(queryStrings[1]);
     }
     throw new Error('Invalid URL for practice session');
+  }
+
+  /**
+   * This function returns the node ID from the lesson practice URL.
+   * @return {string} the node ID.
+   */
+  getNodeIdFromPracticeUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/practice\/(\d+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
+  }
+
+  /**
+   * This function returns the arc ID from the end-of-arc URL.
+   * @return {string} the arc ID.
+   */
+  getArcIdFromUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/test\/arc\/(\d+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
   }
 
   /**

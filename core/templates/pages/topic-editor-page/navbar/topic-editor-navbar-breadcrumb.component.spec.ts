@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the navbar breadcrumb of the topic editor.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {EventEmitter} from '@angular/core';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
@@ -34,7 +34,7 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [TopicEditorNavbarBreadcrumbComponent],
@@ -42,7 +42,7 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   }));
 
   beforeEach(() => {
-    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;

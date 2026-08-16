@@ -33,8 +33,8 @@ describe('Learner View Info Backend Api Service', () => {
       imports: [HttpClientTestingModule],
       providers: [LearnerViewInfoBackendApiService],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    lvibas = TestBed.get(LearnerViewInfoBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    lvibas = TestBed.inject(LearnerViewInfoBackendApiService);
   });
   afterEach(() => {
     httpTestingController.verify();

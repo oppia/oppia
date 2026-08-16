@@ -30,7 +30,7 @@ describe('ChapterProgressLoaderService', () => {
   let storyViewerBackendApiService: jasmine.SpyObj<StoryViewerBackendApiService>;
   let userService: jasmine.SpyObj<UserService>;
 
-  const mockChapterProgress = new ChapterProgressSummary(5, 3, false);
+  const mockChapterProgress = new ChapterProgressSummary('exp1', 5, 3, false);
 
   beforeEach(() => {
     const storyViewerSpy = jasmine.createSpyObj(
@@ -87,6 +87,27 @@ describe('ChapterProgressLoaderService', () => {
       ).not.toHaveBeenCalled();
     });
 
+    it('should map chapter progress using exploration id from backend', async () => {
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve({getUsername: () => 'test_user'})
+      );
+
+      const progressForExp2 = new ChapterProgressSummary('exp2', 4, 1, false);
+      const progressForExp1 = new ChapterProgressSummary('exp1', 6, 2, false);
+      storyViewerBackendApiService.fetchProgressInStoriesChapters.and.returnValue(
+        Promise.resolve([progressForExp2, progressForExp1])
+      );
+
+      await service.loadChapterProgressForStory('story1', ['exp1', 'exp2']);
+
+      expect(service.getChapterProgressSummary('exp1')).toEqual(
+        progressForExp1
+      );
+      expect(service.getChapterProgressSummary('exp2')).toEqual(
+        progressForExp2
+      );
+    });
+
     it('should handle missing username', async () => {
       userService.getUserInfoAsync.and.returnValue(
         Promise.resolve({getUsername: () => null})
@@ -107,7 +128,7 @@ describe('ChapterProgressLoaderService', () => {
     it('should return 100 if chapter complete', () => {
       service.chapterProgressByExpId.set(
         'exp2',
-        new ChapterProgressSummary(5, 3, true)
+        new ChapterProgressSummary('exp2', 5, 3, true)
       );
       const progress = service.computeLessonProgress('exp2');
       expect(progress).toBe(100);
@@ -134,7 +155,7 @@ describe('ChapterProgressLoaderService', () => {
     it('should return true if chapter is complete', () => {
       service.chapterProgressByExpId.set(
         'exp1',
-        new ChapterProgressSummary(5, 5, true)
+        new ChapterProgressSummary('exp1', 5, 5, true)
       );
       expect(service.isChapterCompleted('exp1')).toBeTrue();
     });
@@ -142,7 +163,7 @@ describe('ChapterProgressLoaderService', () => {
     it('should return false if chapter is not complete', () => {
       service.chapterProgressByExpId.set(
         'exp1',
-        new ChapterProgressSummary(5, 3, false)
+        new ChapterProgressSummary('exp1', 5, 3, false)
       );
       expect(service.isChapterCompleted('exp1')).toBeFalse();
     });

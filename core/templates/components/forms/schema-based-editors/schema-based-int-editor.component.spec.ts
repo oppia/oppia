@@ -25,6 +25,8 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {FormControl, FormsModule} from '@angular/forms';
+import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaBasedIntEditorComponent} from './schema-based-int-editor.component';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
@@ -39,7 +41,12 @@ describe('Schema Based Int Editor Component', () => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [SchemaBasedIntEditorComponent],
-      providers: [FocusManagerService, SchemaFormSubmittedService],
+      providers: [
+        FocusManagerService,
+        SchemaFormSubmittedService,
+        NumberConversionService,
+        I18nLanguageCodeService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

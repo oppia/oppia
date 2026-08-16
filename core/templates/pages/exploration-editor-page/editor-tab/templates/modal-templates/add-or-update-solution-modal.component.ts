@@ -28,11 +28,9 @@ import {StateCustomizationArgsService} from 'components/state-editor/state-edito
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
-import {
-  InteractionSpecsConstants,
-  InteractionSpecsKey,
-} from 'pages/interaction-specs.constants';
+import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import './add-or-update-solution-modal.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -59,6 +57,7 @@ interface SolutionInterface {
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
   templateUrl: './add-or-update-solution-modal.component.html',
+  styleUrls: ['./add-or-update-solution-modal.component.css'],
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal
@@ -109,8 +108,12 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let interactionId = this.stateInteractionIdService
-      .savedMemento as InteractionSpecsKey;
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error(
+        'Cannot check submit button for a state with no interaction.'
+      );
+    }
     const interactionSpec =
       InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
     return interactionSpec.show_generic_submit_button;
@@ -160,9 +163,13 @@ export class AddOrUpdateSolutionModalComponent
     } else {
       this.savedSolution = null;
     }
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error('Cannot set solution for a state with no interaction.');
+    }
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,

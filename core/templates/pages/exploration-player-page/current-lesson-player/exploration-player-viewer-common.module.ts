@@ -16,7 +16,6 @@
  * @fileoverview Module for the common code between player and viewer.
  */
 
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 import {CommonModule} from '@angular/common';

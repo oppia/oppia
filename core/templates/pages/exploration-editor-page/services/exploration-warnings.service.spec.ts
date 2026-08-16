@@ -164,6 +164,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -295,6 +296,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -377,6 +379,7 @@ describe('Exploration Warnings Service', () => {
             customization_args: {},
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -487,6 +490,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -608,6 +612,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -749,6 +754,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
         },
         false
@@ -870,6 +876,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State: {
             classifier_model_id: null,
@@ -936,6 +943,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
         },
         false
@@ -1059,6 +1067,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -1140,6 +1149,7 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
         End: {
           classifier_model_id: null,
@@ -1182,6 +1192,7 @@ describe('Exploration Warnings Service', () => {
             default_outcome: null,
             hints: [],
           },
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -1291,6 +1302,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State1: {
             classifier_model_id: null,
@@ -1339,6 +1351,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State2: {
             classifier_model_id: null,
@@ -1387,6 +1400,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State3: {
             classifier_model_id: null,
@@ -1435,6 +1449,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State4: {
             classifier_model_id: null,
@@ -1483,6 +1498,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State5: {
             classifier_model_id: null,
@@ -1531,6 +1547,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State6: {
             classifier_model_id: null,
@@ -1579,6 +1596,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State7: {
             classifier_model_id: null,
@@ -1627,6 +1645,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           End: {
             classifier_model_id: null,
@@ -1669,6 +1688,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
         },
         false
@@ -1796,6 +1816,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State1: {
             classifier_model_id: null,
@@ -1844,6 +1865,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State2: {
             classifier_model_id: null,
@@ -1892,6 +1914,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State3: {
             classifier_model_id: null,
@@ -1940,6 +1963,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State4: {
             classifier_model_id: null,
@@ -1988,6 +2012,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State5: {
             classifier_model_id: null,
@@ -2036,6 +2061,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State6: {
             classifier_model_id: null,
@@ -2095,6 +2121,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           State7: {
             classifier_model_id: null,
@@ -2160,6 +2187,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
           End: {
             classifier_model_id: null,
@@ -2202,6 +2230,7 @@ describe('Exploration Warnings Service', () => {
               },
               hints: [],
             },
+            inapplicable_skill_misconception_ids: [],
           },
         },
         false

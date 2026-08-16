@@ -22,6 +22,7 @@ import os
 
 from core import feconf, utils
 from core.constants import constants
+from core.controllers import library as library_controllers
 from core.domain import (
     activity_domain,
     activity_services,
@@ -81,6 +82,50 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('<oppia-root></oppia-root>')
+
+    def test_get_matching_activity_dicts_skips_collection_search_with_offset(
+        self,
+    ) -> None:
+        observed_calls = {'collection_query_called': False}
+
+        def mock_get_collection_ids_matching_query(
+            unused_query_string: str,
+            unused_categories: list[str],
+            unused_language_codes: list[str],
+        ) -> tuple[list[str], None]:
+            observed_calls['collection_query_called'] = True
+            return [], None
+
+        def mock_get_exploration_ids_matching_query(
+            unused_query_string: str,
+            unused_categories: list[str],
+            unused_language_codes: list[str],
+            offset: int,
+        ) -> tuple[list[str], int]:
+            self.assertEqual(offset, 1)
+            return [], 2
+
+        with self.swap(
+            collection_services,
+            'get_collection_ids_matching_query',
+            mock_get_collection_ids_matching_query,
+        ), self.swap(
+            exp_services,
+            'get_exploration_ids_matching_query',
+            mock_get_exploration_ids_matching_query,
+        ):
+            activity_list, new_search_offset = (
+                library_controllers.get_matching_activity_dicts(
+                    query_string='query',
+                    categories=[],
+                    language_codes=[],
+                    search_offset=1,
+                )
+            )
+
+        self.assertEqual(activity_list, [])
+        self.assertEqual(new_search_offset, 2)
+        self.assertFalse(observed_calls['collection_query_called'])
 
     def test_library_handler_for_collection_summaries(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

@@ -30,6 +30,7 @@ import {ChapterEditorTabComponent} from './chapter-editor/chapter-editor-tab.com
 import {StoryEditorComponent} from './editor-tab/story-editor.component';
 import {StoryEditorPageComponent} from './story-editor-page.component';
 import {DeleteChapterModalComponent} from './modal-templates/delete-chapter-modal.component';
+import {EditArcModalComponent} from './modal-templates/edit-arc-modal.component';
 import {NewChapterTitleModalComponent} from './modal-templates/new-chapter-title-modal.component';
 import {StoryEditorPageAuthGuard} from './story-editor-page-auth.guard';
 import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
@@ -58,6 +59,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     ChapterEditorTabComponent,
     StoryEditorComponent,
     NewChapterTitleModalComponent,
+    EditArcModalComponent,
     StoryEditorPageComponent,
     DeleteChapterModalComponent,
     StoryEditorPageRootComponent,
@@ -73,6 +75,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     ChapterEditorTabComponent,
     StoryEditorComponent,
     NewChapterTitleModalComponent,
+    EditArcModalComponent,
     StoryEditorPageComponent,
     DeleteChapterModalComponent,
     StoryEditorNavbarBreadcrumbComponent,

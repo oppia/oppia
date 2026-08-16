@@ -24,9 +24,10 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
 import {AppConstants} from '../../../../app.constants';
@@ -41,6 +42,22 @@ import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav
 import {LearnerLocalNavComponent} from './learner-local-nav.component';
 import {FlagExplorationModalComponent} from '../modals/flag-exploration-modal.component';
 import {UserInfo} from '../../../../domain/user/user-info.model';
+import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
+
+class MockPlatformFeatureService {
+  status = {
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+  };
+}
+
+class MockNgbModal {
+  open = jasmine.createSpy('open').and.returnValue({
+    componentInstance: {},
+    result: Promise.resolve(),
+  });
+}
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;
@@ -50,6 +67,7 @@ describe('Learner Local Nav Component ', () => {
   let pageContextService: PageContextService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
+  let platformFeatureService: MockPlatformFeatureService;
 
   const MockNgbPopover = jasmine.createSpyObj('NgbPopover', [
     'close',
@@ -118,6 +136,14 @@ describe('Learner Local Nav Component ', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -128,10 +154,12 @@ describe('Learner Local Nav Component ', () => {
 
   beforeEach(() => {
     userService = TestBed.inject(UserService);
-    ngbModal = TestBed.inject(NgbModal);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
+    ngbModal = TestBed.inject(NgbModal);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     attributionService = TestBed.inject(AttributionService);
     pageContextService = TestBed.inject(PageContextService);
     spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
@@ -178,18 +206,14 @@ describe('Learner Local Nav Component ', () => {
     'should open a modal to report exploration when ' +
       'clicking on flag button',
     () => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: {},
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      });
-
       component.showFlagExplorationModal();
 
-      expect(modalSpy).toHaveBeenCalledWith(FlagExplorationModalComponent, {
-        backdrop: 'static',
-      });
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        FlagExplorationModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
     }
   );
 
@@ -219,6 +243,28 @@ describe('Learner Local Nav Component ', () => {
     component.toggleAttributionModal();
 
     expect(hideModalSpy).toHaveBeenCalled();
+  });
+
+  it('should check WebfeedbackModal feature flag is enabled', () => {
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = true;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = false;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+  });
+
+  it('should open report an issue modal', () => {
+    component.showReportAnIssueModal();
+    expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+  });
+
+  it('should open send a lesson feedback modal', () => {
+    component.showSendLessonFeedbackModal();
+    expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
   });
 
   it('should show attribution modal', () => {

@@ -16,7 +16,7 @@
  * @fileoverview Unti tests for the GraphInput response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {GraphDetailService} from './graph-detail.service';
 import {ResponseGraphInput} from './oppia-response-graph-input.component';
@@ -103,7 +103,7 @@ describe('ResponseGraphInput', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseGraphInput],
       providers: [

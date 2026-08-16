@@ -47,7 +47,29 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 
-type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
+type PortalTree = (TemplatePortal<object> | PortalTree)[];
+type TemplatePortalName =
+  | 'pTagPortal'
+  | 'h1TagPortal'
+  | 'spanTagPortal'
+  | 'olTagPortal'
+  | 'liTagPortal'
+  | 'ulTagPortal'
+  | 'preTagPortal'
+  | 'strongTagPortal'
+  | 'blockquoteTagPortal'
+  | 'emTagPortal'
+  | 'textTagPortal'
+  | 'collapsibleTagPortal'
+  | 'imageTagPortal'
+  | 'linkTagPortal'
+  | 'mathTagPortal'
+  | 'skillreviewTagPortal'
+  | 'svgdiagramTagPortal'
+  | 'tabsTagPortal'
+  | 'videoTagPortal'
+  | 'workedexampleTagPortal'
+  | 'brTagPortal';
 
 @Component({
   selector: 'oppia-rte-output-display',
@@ -56,38 +78,41 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal!: TemplateRef<object>;
+  @ViewChild('h1') h1TagPortal!: TemplateRef<object>;
+  @ViewChild('span') spanTagPortal!: TemplateRef<object>;
+  @ViewChild('ol') olTagPortal!: TemplateRef<object>;
+  @ViewChild('li') liTagPortal!: TemplateRef<object>;
+  @ViewChild('ul') ulTagPortal!: TemplateRef<object>;
+  @ViewChild('pre') preTagPortal!: TemplateRef<object>;
+  @ViewChild('strong') strongTagPortal!: TemplateRef<object>;
+  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<object>;
+  @ViewChild('em') emTagPortal!: TemplateRef<object>;
+  @ViewChild('text') textTagPortal!: TemplateRef<object>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
-  @Input() rteString: string;
+  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<object>;
+  @ViewChild('image') imageTagPortal!: TemplateRef<object>;
+  @ViewChild('link') linkTagPortal!: TemplateRef<object>;
+  @ViewChild('math') mathTagPortal!: TemplateRef<object>;
+  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<object>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<object>;
+  @ViewChild('tabs') tabsTagPortal!: TemplateRef<object>;
+  @ViewChild('video') videoTagPortal!: TemplateRef<object>;
+  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<object>;
+  @ViewChild('br') brTagPortal!: TemplateRef<object>;
+  @Input() rteString: string = '';
+  @Input() rteStringContext!: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText = {};
+  highlightIdToSentenceText: Record<string, string> = {};
   wrapped = false;
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
+  topLevelHtmlNodename = '';
 
   customOppiaTags = [
     'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
@@ -162,15 +187,32 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
+      if (encodedText === null) {
+        return '';
+      }
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
+      if (encodedMathContent === null) {
+        return '';
+      }
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
+      if (typeof latexText !== 'string') {
+        return '';
+      }
       return this.parseAndConvertLatex(latexText);
+    } else if (node.nodeName === 'SPAN') {
+      let text = '';
+      node.childNodes.forEach(child => {
+        text += this.getReadableTextFromNode(child);
+      });
+      return text;
+    } else {
+      return '';
     }
   }
 
@@ -182,12 +224,22 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
 
+    if (node.nodeName === 'BR') {
+      return [node];
+    }
+
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
-      const sentences = textContent.split(sentenceRegex);
+      // Keep sentence-separating whitespace as independent text nodes so that
+      // the original content spacing is preserved after wrapping.
+      const sentenceSplitRegex = new RegExp(`(${sentenceRegex.source})`, 'g');
+      const sentences = textContent.split(sentenceSplitRegex);
       let textNodesForSentences: Text[] = [];
 
       for (let sentence of sentences) {
+        if (sentence === '') {
+          continue;
+        }
         textNodesForSentences.push(document.createTextNode(sentence));
       }
       return textNodesForSentences;
@@ -216,7 +268,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
-        let currentElementReplicaNodes = [];
+        let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -226,41 +278,102 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       } else {
         // The earliest parent tag that contains texts that should be voiceovered.
         let textContent = '';
+        let nodeTemp = node.cloneNode();
+
+        // Both <P> and <LI> elements are supported for voiceover highlighting.
+        // However, if an <LI> contains a <P> as a child, only the <P> should be
+        // wrapped in a <span>, not the <LI>. Wrapping both elements causes the
+        // text inside the <LI> to be duplicated during highlighting, leading to
+        // incorrect behavior. Therefore, in such cases, we specifically wrap only
+        // the <P> element.
+        if (currentNodeName === 'LI') {
+          const meaningfulChildren = Array.from(node.childNodes).filter(
+            child =>
+              !(
+                child.nodeType === Node.TEXT_NODE &&
+                child.textContent?.trim() === ''
+              )
+          );
+          const hasParagraphChild = meaningfulChildren.some(
+            child => child.nodeName === 'P'
+          );
+          if (hasParagraphChild) {
+            // Just recurse into children without wrapping the LI itself.
+            updatedChildNodes.forEach(child => nodeTemp.appendChild(child));
+            return nodeTemp;
+          }
+        }
+
+        // If a parent node contains a custom Oppia tag as a child, sentence
+        // highlighting should be applied to the entire content of the parent
+        // node, rather than splitting it into individual sentences.
+        let customNodeAsChildInParentNode = false;
+        for (let tempChildNode of updatedChildNodes) {
+          if (this.customOppiaTags.includes(tempChildNode.nodeName)) {
+            customNodeAsChildInParentNode = true;
+            break;
+          }
+        }
+        if (customNodeAsChildInParentNode) {
+          let nodeTemp = node.cloneNode();
+          let spanTagElement = document.createElement('span');
+          updatedChildNodes.forEach(child => spanTagElement.appendChild(child));
+          spanTagElement.classList.add(`highlightBlock${this.index}`);
+          this.highlightIdToSentenceText[`highlightBlock${this.index}`] =
+            this.getReadableTextFromNode(spanTagElement);
+          this.index++;
+          nodeTemp.appendChild(spanTagElement);
+          return nodeTemp;
+        }
 
         for (let tempChildNode of updatedChildNodes) {
-          textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
+          textContent += this.getReadableTextFromNode(tempChildNode);
         }
 
         const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
 
         let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
-
-        let spanNodeList = [];
         let spanTagElement = document.createElement('span');
         let nextSentenceOffset = '';
+        // Whitespace separators between sentences should stay outside
+        // highlight spans to preserve the original rendered content exactly.
+        let pendingWhitespaceNodes: Node[] = [];
 
         for (let childNode of updatedChildNodes) {
           let currentText = this.getReadableTextFromNode(childNode);
 
-          let sentence = nextSentenceOffset + currentText;
+          if (
+            currentText.trim() === '' &&
+            spanTagElement.childNodes.length === 0 &&
+            nextSentenceOffset === ''
+          ) {
+            pendingWhitespaceNodes.push(childNode);
+            continue;
+          }
 
-          // Removing spaces to avoid ambiguity in sentence matching.
-          sentence = sentence.split(' ').join('').trim();
-          currentSentenceToMatch = currentSentenceToMatch
-            ?.split(' ')
-            ?.join('')
-            ?.trim();
+          let sentence = (nextSentenceOffset + currentText).trim();
+          currentSentenceToMatch = currentSentenceToMatch?.trim();
 
           spanTagElement.appendChild(childNode);
 
           if (sentence === currentSentenceToMatch) {
-            if (spanNodeList.length > 0) {
-              let spaceElement = document.createElement('span');
-              // eslint-disable-next-line oppia/no-inner-html
-              spaceElement.innerHTML = ' ';
-              spanNodeList.push(spaceElement);
+            let textInsideSpanTag = '';
+            for (let tempChildNode of spanTagElement.childNodes) {
+              textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
             }
-            spanNodeList.push(spanTagElement);
+
+            pendingWhitespaceNodes.forEach(n => nodeTemp.appendChild(n));
+            pendingWhitespaceNodes = [];
+
+            if (textInsideSpanTag.trim() !== '') {
+              let elementClass = `highlightBlock${this.index}`;
+              spanTagElement.classList.add(elementClass);
+              this.index++;
+              this.highlightIdToSentenceText[elementClass] =
+                textInsideSpanTag.trim();
+            }
+
+            nodeTemp.appendChild(spanTagElement);
             spanTagElement = document.createElement('span');
             nextSentenceOffset = '';
             currentSentenceToMatch = sentencesInEarliestParentTag.shift();
@@ -269,26 +382,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        let nodeTemp = node.cloneNode();
-
-        for (let spanNode of spanNodeList) {
-          let textInsideSpanTag = '';
-
-          for (let tempChildNode of spanNode.childNodes) {
-            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
-          }
-
-          if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode);
-            continue;
-          }
-
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
-
-          nodeTemp.appendChild(spanNode);
-          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+        pendingWhitespaceNodes.forEach(n => nodeTemp.appendChild(n));
+        // Preserve all content even if it did not complete a sentence match.
+        if (spanTagElement.childNodes.length > 0) {
+          Array.from(spanTagElement.childNodes).forEach(n =>
+            nodeTemp.appendChild(n)
+          );
         }
 
         return nodeTemp;
@@ -310,7 +409,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
-    let languageCode =
+    const languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode() ||
       AppConstants.DEFAULT_LANGUAGE_CODE;
 
@@ -319,7 +418,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // The following line retrieves the punctuation marks for the current language.
     const punctuationsForCurrentLanguage =
       AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        languageCode
+        languageCode as keyof typeof AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS
+      ] ||
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        AppConstants.DEFAULT_LANGUAGE_CODE
       ];
 
     // The regex below is used to split sentences from the lesson content.
@@ -332,6 +434,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     const temporaryDivElement = document.createElement('div');
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
+
+    this.topLevelHtmlNodename = temporaryDivElement.childNodes[0]?.nodeName;
 
     const finalDivElement = this.traverseNodeAndWrapSpanTags(
       temporaryDivElement,
@@ -363,8 +467,22 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
-    if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+    if (
+      this.isHighlightSentencesFeatureEnabled() &&
+      this.shouldHighlightContent()
+    ) {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+
+      this.automaticVoiceoverHighlightService.setActiveContentId(
+        this.getActiveContentId()
+      );
+      this.automaticVoiceoverHighlightService.languageCode =
+        this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+        AppConstants.DEFAULT_LANGUAGE_CODE;
+      this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+        this.highlightIdToSentenceText
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
     }
 
     let domparser = new DOMParser();
@@ -377,7 +495,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      node.portal = this._getTemplatePortal(node);
+      const portal = this._getTemplatePortal(node);
+      if (portal !== undefined) {
+        node.portal = portal;
+      }
       if (!('children' in node)) {
         return;
       }
@@ -406,7 +527,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
+              if (preNode.childNodes[i].nodeValue?.replace(/\s/g, '') === '') {
                 preNode.removeChild(preNode.childNodes[i]);
                 i--;
               }
@@ -416,9 +537,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     });
   }
 
-  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+  isHighlightSentencesFeatureEnabled(): boolean {
     return this.platformFeatureService.status
-      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
+      .HighlightSentencesDuringAutomaticVoiceoverPlayback.isEnabled;
   }
 
   updateAutomatedVoiceoversAudioOffsets(): void {
@@ -439,7 +560,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // If the below feature flag is not enabld then the sentence highlighting
     // feature will not work.
-    if (!this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+    if (!this.isHighlightSentencesFeatureEnabled()) {
       return;
     }
 
@@ -477,10 +598,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    let previousHighlightedElement = document.getElementById(
+    if (this.previousHighlightedElementId === undefined) {
+      return;
+    }
+    let previousHighlightedElements = document.getElementsByClassName(
       this.previousHighlightedElementId
     );
-    if (previousHighlightedElement) {
+    for (let i = 0; i < previousHighlightedElements.length; i++) {
+      let previousHighlightedElement = previousHighlightedElements[
+        i
+      ] as HTMLElement;
       previousHighlightedElement.style.backgroundColor = '';
     }
     this.previousHighlightedElementId = undefined;
@@ -508,9 +635,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      let previousHighlightedElement =
+        this.getElementMatchingClassAndTextContent(
+          this.previousHighlightedElementId
+        );
 
       let currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
@@ -522,14 +650,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       if (
         this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
-          this.highlightIdToSentenceText[currentElementIdToHighlight]
+          this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+            currentElementIdToHighlight || ''
+          )
       ) {
         return;
       }
 
-      let currentElementToHighlight = document.getElementById(
-        currentElementIdToHighlight
-      );
+      let currentElementToHighlight =
+        this.getElementMatchingClassAndTextContent(currentElementIdToHighlight);
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
@@ -541,12 +670,35 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           this.backgroundColorOfHighlightedSentence;
 
         this.previousHighlightedElementId = currentElementIdToHighlight;
+      } else {
+        this.removePreviousHighlightedElement();
       }
     } else {
       // Removes the highlight from the previous sentence when the audio is
       // paused.
       this.removePreviousHighlightedElement();
     }
+  }
+
+  getElementMatchingClassAndTextContent(
+    className: string | undefined
+  ): HTMLElement | null {
+    if (className === undefined) {
+      return null;
+    }
+    let elements = document.getElementsByClassName(className);
+    let textContent =
+      this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+        className
+      );
+    for (let i = 0; i < elements.length; i++) {
+      let element = elements[i] as HTMLElement;
+      let readableText = this.getReadableTextFromNode(element as Node)?.trim();
+      if (readableText === textContent) {
+        return element;
+      }
+    }
+    return null;
   }
 
   getActiveContentId(): string {
@@ -558,9 +710,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      return this.voiceoverPlayerService.getActiveContentId();
+      return this.voiceoverPlayerService.getActiveContentId() || '';
     } else {
-      return this.translationTabActiveContentIdService.getActiveContentId();
+      return (
+        this.translationTabActiveContentIdService.getActiveContentId() || ''
+      );
     }
   }
 
@@ -579,26 +733,100 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> {
+  ): TemplatePortal<object> | undefined {
+    const templatePortals: Record<TemplatePortalName, TemplateRef<object>> = {
+      pTagPortal: this.pTagPortal,
+      h1TagPortal: this.h1TagPortal,
+      spanTagPortal: this.spanTagPortal,
+      olTagPortal: this.olTagPortal,
+      liTagPortal: this.liTagPortal,
+      ulTagPortal: this.ulTagPortal,
+      preTagPortal: this.preTagPortal,
+      strongTagPortal: this.strongTagPortal,
+      blockquoteTagPortal: this.blockquoteTagPortal,
+      emTagPortal: this.emTagPortal,
+      textTagPortal: this.textTagPortal,
+      collapsibleTagPortal: this.collapsibleTagPortal,
+      imageTagPortal: this.imageTagPortal,
+      linkTagPortal: this.linkTagPortal,
+      mathTagPortal: this.mathTagPortal,
+      skillreviewTagPortal: this.skillreviewTagPortal,
+      svgdiagramTagPortal: this.svgdiagramTagPortal,
+      tabsTagPortal: this.tabsTagPortal,
+      videoTagPortal: this.videoTagPortal,
+      workedexampleTagPortal: this.workedexampleTagPortal,
+      brTagPortal: this.brTagPortal,
+    };
     if ('value' in node) {
       return new TemplatePortal(this.textTagPortal, this._viewContainerRef, {
         $implicit: node,
       });
     }
     if (node.nodeType === 'component') {
-      return new TemplatePortal(
-        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      const portalName = (node.selector.split('oppia-noninteractive-')[1] +
+        'TagPortal') as TemplatePortalName;
+      if (
+        portalName in templatePortals &&
+        templatePortals[portalName] !== undefined
+      ) {
+        return new TemplatePortal(
+          templatePortals[portalName],
+          this._viewContainerRef,
+          {$implicit: node.attrs}
+        );
+      }
+      return undefined;
     }
-    if (this[node.selector + 'TagPortal'] !== undefined) {
+    const portalName = (node.selector + 'TagPortal') as TemplatePortalName;
+    if (
+      portalName in templatePortals &&
+      templatePortals[portalName] !== undefined
+    ) {
       return new TemplatePortal(
-        this[node.selector + 'TagPortal'],
+        templatePortals[portalName],
         this._viewContainerRef,
         {$implicit: node}
       );
     }
+    return undefined;
+  }
+
+  shouldHighlightContent(): boolean {
+    // In editor mode (i.e., not in player or preview), highlighting is
+    // generally enabled. However, these specific interactive components should
+    // be excluded because they recursively invoke this component and override
+    // highlight-related properties. Therefore, explicitly check for these tags
+    // and disable highlighting for them.
+    if (!this.isInPlayerOrPreviewPage()) {
+      if (
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT' ||
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT' ||
+        this.topLevelHtmlNodename === 'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT'
+      ) {
+        return false;
+      }
+      return true;
+    }
+
+    const currentContentId = this.getActiveContentId();
+
+    // In player/preview mode, learners can only interact with specific sections
+    // (content or feedback). Highlighting should be applied only when:
+    // 1. The active content ID belongs to the same section type, and
+    // 2. The current RTE context matches that section.
+    const isContentSectionActive =
+      currentContentId?.startsWith('content_') &&
+      this.rteStringContext === 'content';
+
+    const isFeedbackSectionActive =
+      (currentContentId?.startsWith('default_outcome') ||
+        currentContentId?.startsWith('feedback_')) &&
+      (this.rteStringContext === 'feedback' ||
+        this.rteStringContext === 'supplemental-card');
+
+    return isContentSectionActive || isFeedbackSectionActive;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -635,24 +863,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
       }
 
-      textNodes.forEach(node => node.parentElement.removeChild(node));
+      textNodes.forEach(node => node.parentElement?.removeChild(node));
 
       this._updateNode();
 
       // If the below feature flag is not enabld then the sentence highlighting
       // feature will not work.
-      if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
-        const activeContentId = this.getActiveContentId();
-        this.automaticVoiceoverHighlightService.setActiveContentId(
-          activeContentId
-        );
-        this.automaticVoiceoverHighlightService.languageCode =
-          this.localStorageService.getLastSelectedTranslationLanguageCode();
-        this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
-          this.highlightIdToSentenceText
-        );
-        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
-      }
       setTimeout(() => (this.show = true), 0);
     }
   }

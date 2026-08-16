@@ -24,7 +24,8 @@
     <p class="panel-title">
       {{ accordionData[activeIndex].title | translate }}
     </p>
-    <button (click)="closePanel()">
+    <button (click)="closePanel()"
+            [attr.aria-label]="'I18N_ABOUT_PAGE_FEATURE_PANEL_CLOSE_BUTTON' | translate">
       <i class="fas fa-minus accordion-icon"></i>
     </button>
   </div>

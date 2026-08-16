@@ -80,7 +80,7 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--source_maps',
-    help='optional; if specified, build webpack with source maps.',
+    help='Optional; if specified, tells the Angular CLI to generate source maps.',
     action='store_true',
 )
 _PARSER.add_argument(
@@ -178,17 +178,16 @@ def start_services(
         )
     )
 
-    # NOTE: When prod_env=True the Webpack compiler is run by build.main().
+    # NOTE: When prod_env=True the ANGULAR CLI compiler is run by build.main().
     if not parsed_args.prod_env:
         # We need to create an empty hashes.json file for the build so that
         # we don't get the error "assets/hashes.json file doesn't exist".
         common.write_hashes_json_file({})
-        stack.enter_context(servers.managed_ng_build(watch_mode=True))
+
+        # We now rely solely on the Angular CLI for the watch-mode dev server.
         stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False,
-                use_source_maps=parsed_args.source_maps,
-                watch_mode=True,
+            servers.managed_ng_build(
+                watch_mode=True, source_maps=parsed_args.source_maps
             )
         )
 
@@ -271,6 +270,8 @@ def _get_ports_in_use_with_names(
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    os.environ['NODE_OPTIONS'] = '--max-old-space-size=8192'
 
     # Verify that none of the ports required by the dev services are in use
     # before starting any service. This avoids partially starting services

@@ -128,21 +128,21 @@ export class QuestionOpportunitiesComponent implements OnInit {
     );
   }
 
-  loadMoreOpportunities(): Promise<{
+  loadMoreOpportunities(searchQuery: string = ''): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
     return this.contributionOpportunitiesService
-      .getMoreSkillOpportunitiesAsync()
+      .getMoreSkillOpportunitiesAsync(searchQuery)
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
-  loadOpportunities(): Promise<{
+  loadOpportunities(searchQuery: string = ''): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
     return this.contributionOpportunitiesService
-      .getSkillOpportunitiesAsync()
+      .getSkillOpportunitiesAsync(searchQuery)
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 

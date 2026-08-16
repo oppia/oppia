@@ -20,11 +20,12 @@ import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
 import {PageContextService} from 'services/page-context.service';
+import './keyboard-shortcut-help-modal.component.css';
 
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./keyboard-shortcut-help-modal.component.css'],
 })
 export class KeyboardShortcutHelpModalComponent implements OnInit {
   constructor(
@@ -43,19 +44,19 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     const continueShortcutDescription = 'Select the continue button';
     const backShortcutDescription = 'Select the back button';
 
-    if (this.urlService.getPathname() === '/community-library') {
-      this.KEYBOARD_SHORTCUTS = {
-        '?': helpShortcutDescription,
-        '/': searchShortcutDescription,
-        s: skipShortcutDescription,
-        c: categoryShortcutDescription,
-      };
-    } else if (this.pageContextService.isInExplorationPlayerPage()) {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
         '?': helpShortcutDescription,
         s: skipShortcutDescription,
         j: continueShortcutDescription,
         k: backShortcutDescription,
+      };
+    } else {
+      this.KEYBOARD_SHORTCUTS = {
+        '?': helpShortcutDescription,
+        '/': searchShortcutDescription,
+        s: skipShortcutDescription,
+        c: categoryShortcutDescription,
       };
     }
   }

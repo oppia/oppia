@@ -202,7 +202,7 @@
             </th>
           </tr>
           <hr>
-          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction()"
               class="exploration-list-item">
             <td>
               <a [href]="getExplorationUrl(exploration.id)"
@@ -253,7 +253,7 @@
 
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
-      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction()"
                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
                 is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
@@ -263,14 +263,14 @@
                  alt=""
                  [src]="getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)">
             <h2 class="activity-title e2e-test-exp-summary-tile-title">
-              <span>{{ (exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40 }}</span>
+              <span>{{ truncate(exploration.title || DEFAULT_EMPTY_TITLE, 40) }}</span>
             </h2>
           </div>
           <div class="mask-wrap e2e-test-title-mask">
             <div class="title-section-mask"></div>
           </div>
         </a>
-        <div [attr.section]="right-section">
+        <div section="right-section">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
@@ -349,7 +349,7 @@
                              layoutAlignType="space-around center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
                              shareType="exploration"
-                             smallFont="true"
+                              [smallFont]="true"
                              [explorationId]="exploration.id">
               </sharing-links>
             </div>
@@ -400,7 +400,7 @@
           <div class="oppia-subscription-name-container">
             <strong class="e2e-test-subscription-name"
                     ngbPopover="showUsernamePopover(subscriber.username)">
-              {{ subscriber.username| truncate:10 }}
+              {{ truncate(subscriber.username, 10) }}
             </strong>
           </div>
           <div class="oppia-impact-text">
@@ -423,7 +423,7 @@
         <oppia-collection-summary-tile [getCollectionId]="collection.id"
                                        [getCollectionTitle]="collection.title"
                                        [getLastUpdatedMsec]="collection.lastUpdatedMsec"
-                                       [getNodeCount]="collection.nodeCount"
+                                       [getNodeCount]="collection.nodeCount.toString()"
                                        [getObjective]="collection.objective"
                                        [getThumbnailIconUrl]="collection.thumbnailIconUrl"
                                        [getThumbnailBgColor]="collection.thumbnailBgColor"

@@ -25,21 +25,8 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {StudyGuideSectionEditorComponent} from './study-guide-section-editor.component';
 import {HtmlLengthService} from 'services/html-length.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-
-class MockHtmlLengthService {
-  computeHtmlLength(html: string, calculationType: string): number {
-    return html.length;
-  }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
-  };
-}
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 
 describe('Study Guide Section editor component', () => {
   let component: StudyGuideSectionEditorComponent;
@@ -47,11 +34,12 @@ describe('Study Guide Section editor component', () => {
   let topicEditorStateService: TopicEditorStateService;
   let topicUpdateService: TopicUpdateService;
   let sampleStudyGuide: StudyGuide;
-  let htmlLengthService: HtmlLengthService;
-  let platformFeatureService: PlatformFeatureService;
+  let htmlLengthService: jasmine.SpyObj<HtmlLengthService>;
 
   beforeEach(waitForAsync(() => {
-    htmlLengthService = new MockHtmlLengthService();
+    htmlLengthService = jasmine.createSpyObj('HtmlLengthService', [
+      'computeHtmlLength',
+    ]);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StudyGuideSectionEditorComponent],
@@ -60,10 +48,6 @@ describe('Study Guide Section editor component', () => {
         {
           provide: HtmlLengthService,
           useValue: htmlLengthService,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
         TopicEditorStateService,
         TopicUpdateService,
@@ -77,47 +61,38 @@ describe('Study Guide Section editor component', () => {
     component = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicUpdateService = TestBed.inject(TopicUpdateService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     sampleStudyGuide = new StudyGuide(
       '10',
       'topic1',
       [
-        {
-          heading: {
-            content_id: 'section_heading_0',
-            unicode_str: 'section heading',
-          },
-          content: {
-            content_id: 'section_content_1',
-            html: '<p>section content</p>',
-          },
-        },
-      ] as StudyGuideSection[],
+        new StudyGuideSection(
+          new SubtitledUnicode('section heading', 'section_heading_0'),
+          new SubtitledHtml('<p>section content</p>', 'section_content_1')
+        ),
+      ],
       2,
       'en'
     );
     spyOn(topicEditorStateService, 'getStudyGuide').and.returnValue(
       sampleStudyGuide
     );
+    const mockSection = jasmine.createSpyObj<StudyGuideSection>(
+      'StudyGuideSection',
+      ['getHeadingText', 'getContentHtml']
+    );
+
+    mockSection.getHeadingText.and.returnValue(
+      new SubtitledUnicode('heading', 'section_heading_0')
+    );
+
+    mockSection.getContentHtml.and.returnValue(
+      new SubtitledHtml('content', 'section_content_1')
+    );
 
     component.isEditable = true;
     component.index = 2;
-    component.section = {
-      getHeadingText(): object {
-        return {
-          unicode_str: 'heading',
-          content_id: 'section_heading_0',
-        };
-      },
-
-      getContentHtml(): object {
-        return {
-          html: 'content',
-          content_id: 'section_content_1',
-        };
-      },
-    } as StudyGuideSection;
+    component.section = mockSection;
     component.ngOnInit();
   });
 
@@ -199,14 +174,8 @@ describe('Study Guide Section editor component', () => {
     expect(sectionUpdateSpy).toHaveBeenCalledWith(
       sampleStudyGuide,
       2,
-      {
-        content_id: 'section_heading_0',
-        unicode_str: 'heading',
-      },
-      {
-        content_id: 'section_content_1',
-        html: 'content',
-      },
+      new SubtitledUnicode('heading', 'section_heading_0'),
+      new SubtitledHtml('content', 'section_content_1'),
       10
     );
 
@@ -215,14 +184,8 @@ describe('Study Guide Section editor component', () => {
     expect(sectionUpdateSpy).toHaveBeenCalledWith(
       sampleStudyGuide,
       2,
-      {
-        content_id: 'section_heading_0',
-        unicode_str: 'heading',
-      },
-      {
-        content_id: 'section_content_1',
-        html: 'content',
-      },
+      new SubtitledUnicode('heading', 'section_heading_0'),
+      new SubtitledHtml('content', 'section_content_1'),
       10
     );
   });
@@ -236,62 +199,29 @@ describe('Study Guide Section editor component', () => {
     );
   });
 
-  it('should get content schema with ALL_COMPONENTS when feature is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-
-    const schema = component.getContentSchema();
-
-    expect(schema).toEqual({
-      type: 'html',
-      ui_config: {
-        rte_component_config_id: 'ALL_COMPONENTS',
-        rows: 100,
-      },
-    });
-  });
-
-  it('should check if EnableWorkedExamplesRteComponent feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      true
-    );
-
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
-    );
-  });
-
   it('should update tempSectionHeadingPlaintext', () => {
     component.container.sectionHeadingPlaintext = 'head';
 
-    let head = 'new head';
-    component.updateLocalHeading(head);
+    component.updateLocalHeading('new head');
 
-    expect(component.container.sectionHeadingPlaintext).toEqual(head);
+    expect(component.container.sectionHeadingPlaintext).toEqual('new head');
   });
 
   it('should update tempSectionContentHtml', () => {
     component.container.sectionContentHtml = 'con';
 
-    let con = 'new con';
-    component.updateLocalContent(con);
+    component.updateLocalContent('new con');
 
-    expect(component.container.sectionContentHtml).toEqual(con);
+    expect(component.container.sectionContentHtml).toEqual('new con');
   });
 
   it('should check if section content length is exceeded', () => {
     component.container.sectionContentHtml = 'short content';
-    let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
-    computeHtmlLengthSpy.and.returnValue(500);
-    let isExceeded = component.isSectionContentLengthExceeded();
-    expect(isExceeded).toBe(false);
 
-    computeHtmlLengthSpy.and.returnValue(6500);
-    isExceeded = component.isSectionContentLengthExceeded();
-    expect(isExceeded).toBe(true);
+    htmlLengthService.computeHtmlLength.and.returnValue(500);
+    expect(component.isSectionContentLengthExceeded()).toBe(false);
+
+    htmlLengthService.computeHtmlLength.and.returnValue(6500);
+    expect(component.isSectionContentLengthExceeded()).toBe(true);
   });
 });

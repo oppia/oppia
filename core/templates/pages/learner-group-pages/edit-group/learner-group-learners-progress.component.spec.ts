@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for learner group preferences tab.
  */
 
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -35,7 +35,7 @@ import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summar
 import {UserService} from 'services/user.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -128,7 +128,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
       declarations: [
         LearnerGroupLearnersProgressComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {
@@ -189,13 +189,13 @@ describe('LearnerGroupLearnersProgressComponent', () => {
   });
 
   it('should manipulate learner specific progress view successfully', () => {
-    expect(component.isLearnerSpecificViewActive()).toBeFalse();
+    expect(component.isLearnerSpecificViewActive()).toBe(false);
 
     component.activateLearnerSpecificView(sampleLearnerGroupUserProg);
-    expect(component.isLearnerSpecificViewActive()).toBeTrue();
+    expect(component.isLearnerSpecificViewActive()).toBe(true);
 
     component.disableLearnerSpecificView();
-    expect(component.isLearnerSpecificViewActive()).toBeFalse();
+    expect(component.isLearnerSpecificViewActive()).toBe(false);
   });
 
   it('should search learner progress with username matching keyword correctly', () => {
@@ -242,6 +242,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
 
   it('should update learner specific progress successfully', fakeAsync(() => {
     const chapterProgressSummaryDict = {
+      exploration_id: 'exp_1',
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
       is_chapter_complete: false,

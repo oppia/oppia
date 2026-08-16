@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import textwrap
 
@@ -31,6 +32,12 @@ if MYPY:  # pragma: no cover
     from mypy_imports import email_services
 
 email_services = models.Registry.import_email_services()
+
+
+class PermanentEmailSendingError(Exception):
+    """Exception raised when an email cannot be sent due to a permanent 4xx error."""
+
+    pass
 
 
 def _is_email_valid(email_address: str) -> bool:
@@ -132,98 +139,50 @@ def send_mail(
     )
     assert isinstance(admin_email_address, str)
     bcc = [admin_email_address] if bcc_admin else None
-    response = email_services.send_email_to_recipients(
-        sender_email,
-        [recipient_email],
-        subject,
-        plaintext_body,
-        html_body,
-        cc_emails,
-        bcc,
-        '',
-        None,
-        attachments,
+
+    logging.info(
+        convert_email_to_loggable_string(
+            sender_email,
+            [recipient_email],
+            subject,
+            plaintext_body,
+            html_body,
+            cc_emails,
+            bcc,
+            '',
+            None,
+            attachments,
+        )
     )
 
-    if not response:
-        raise Exception(
-            (
-                'Email to %s failed to send. Please try again later or '
-                'contact us to report a bug at '
-                'https://www.oppia.org/contact.'
-            )
-            % recipient_email
-        )
-
-
-def send_bulk_mail(
-    sender_email: str,
-    recipient_emails: List[str],
-    subject: str,
-    plaintext_body: str,
-    html_body: str,
-    attachments: Optional[List[Dict[str, str]]] = None,
-) -> None:
-    """Sends emails to all recipients in recipient_emails.
-
-    In general this function should only be called from
-    email_manager._send_bulk_mail().
-
-    Args:
-        sender_email: str. The email address of the sender. This should be in
-            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
-            'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
-        recipient_emails: list(str). List of the email addresses of recipients.
-            Format must be utf-8.
-        subject: str. The subject line of the email. Format must be utf-8.
-        plaintext_body: str. The plaintext body of the email. Format must be
-            utf-8.
-        html_body: str. The HTML body of the email. Must fit in a datastore
-            entity. Format must be utf-8.
-        attachments: list(dict)|None. Optional argument. A list of
-            dictionaries, where each dictionary includes the keys `filename`
-            and `path` with their corresponding values.
-
-    Raises:
-        Exception. The configuration in feconf.py forbids emails from being
-            sent.
-        ValueError. Any recipient email addresses are malformed.
-        ValueError. Any sender email address is malformed.
-        Exception. The emails were not sent correctly. In other words, the
-            send_email_to_recipients() function returned False
-            (signifying API returned bad status code).
-    """
     server_can_send_emails = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if not server_can_send_emails:
-        raise Exception('This app cannot send emails to users.')
-
-    for recipient_email in recipient_emails:
-        if not _is_email_valid(recipient_email):
-            raise ValueError(
-                'Malformed recipient email address: %s' % recipient_email
-            )
-
-    if not _is_sender_email_valid(sender_email):
-        raise ValueError('Malformed sender email address: %s' % sender_email)
-
-    response = email_services.send_email_to_recipients(
-        sender_email,
-        recipient_emails,
-        subject,
-        plaintext_body,
-        html_body,
-        attachments=attachments,
-    )
-
-    if not response:
-        raise Exception(
-            'Bulk email failed to send. Please try again later or contact us '
-            'to report a bug at https://www.oppia.org/contact.'
+    if server_can_send_emails:
+        response = email_services.send_email_to_recipients(
+            sender_email,
+            [recipient_email],
+            subject,
+            plaintext_body,
+            html_body,
+            cc_emails,
+            bcc,
+            '',
+            None,
+            attachments,
         )
+
+        if not response:
+            raise Exception(
+                (
+                    'Email to %s failed to send. Please try again later or '
+                    'contact us to report a bug at '
+                    'https://www.oppia.org/contact.'
+                )
+                % recipient_email
+            )
 
 
 def convert_email_to_loggable_string(

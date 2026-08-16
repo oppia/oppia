@@ -16,7 +16,7 @@
  * @fileoverview Component for the Set Input short response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseSetInputComponent} from './oppia-short-response-set-input.component';
 import {TranslateModule} from '@ngx-translate/core';
@@ -31,7 +31,7 @@ describe('ShortResponseSetInputComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot({

@@ -18,14 +18,14 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NonnegativeIntEditorComponent} from './nonnegative-int-editor.component';
 
 describe('NonnegativeIntEditorComponent', () => {
   let component: NonnegativeIntEditorComponent;
   let fixture: ComponentFixture<NonnegativeIntEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [NonnegativeIntEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

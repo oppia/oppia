@@ -24,7 +24,9 @@
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceover</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
-        <button class="btn btn-secondary audio-button e2e-test-play-voiceover-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
+        <button class="btn btn-secondary audio-button e2e-test-play-voiceover-button"
+                [attr.aria-label]="isManualVoiceoverPlaying ? 'Pause recorded audio' : 'Play recorded audio'"
+                (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
           <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play" class="e2e-test-play">play_arrow</mat-icon>
           <mat-icon *ngIf="isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Pause" class="e2e-test-pause">pause_arrow</mat-icon>
           <mat-spinner class="mx-auto" [diameter]="30" *ngIf="manualVoiceoverIsLoading"></mat-spinner>

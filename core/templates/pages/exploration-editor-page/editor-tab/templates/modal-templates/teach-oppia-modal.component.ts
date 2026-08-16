@@ -42,7 +42,8 @@ import {State} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './teach-oppia-modal.component.css';
 export interface UnresolvedAnswer {
   answer: InteractionAnswer;
   answerTemplate: string;
@@ -53,6 +54,7 @@ export interface UnresolvedAnswer {
 @Component({
   selector: 'oppia-teach-oppia-modal',
   templateUrl: './teach-oppia-modal.component.html',
+  styleUrls: ['./teach-oppia-modal.component.css'],
 })
 export class TeachOppiaModalComponent
   extends ConfirmOrCancelModal
@@ -68,7 +70,7 @@ export class TeachOppiaModalComponent
   unresolvedAnswers!: UnresolvedAnswer[];
   loadingDotsAreShown!: boolean;
   rulesService!: InteractionRulesService;
-  interactionId!: string;
+  interactionId!: InteractionSpecsKey | null;
   // Timeout for the toast that is shown when a response has
   // been confirmed or fixed.
   TOAST_TIMEOUT: number = 2000;
@@ -175,6 +177,11 @@ export class TeachOppiaModalComponent
 
     const classificationType =
       unresolvedAnswer.classificationResult.classificationCategorization;
+    if (this.interactionId === null) {
+      throw new Error(
+        'Cannot confirm answer assignment for a state with no interaction.'
+      );
+    }
     const truncatedAnswer =
       this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
         unresolvedAnswer.answer,
@@ -205,8 +212,12 @@ export class TeachOppiaModalComponent
   openTrainUnresolvedAnswerModal(answerIndex: number): void {
     const unresolvedAnswer = this.unresolvedAnswers[answerIndex];
     const answer = unresolvedAnswer.answer;
-
     let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error(
+        'Cannot open training modal for a state with no interaction.'
+      );
+    }
     this.trainingModalService.openTrainUnresolvedAnswerModal(
       answer,
       interactionId,
@@ -219,6 +230,11 @@ export class TeachOppiaModalComponent
       this.trainingModalService.onFinishTrainingCallback.subscribe(
         finishTrainingResult => {
           this.unresolvedAnswers.splice(finishTrainingResult.answerIndex, 1);
+          if (this.interactionId === null) {
+            throw new Error(
+              'Cannot confirm answer assignment for a state with no interaction.'
+            );
+          }
           const truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
@@ -243,7 +259,11 @@ export class TeachOppiaModalComponent
       this._state = this.explorationStatesService.getState(this._stateName);
       this.interactionId = this.stateInteractionIdService.savedMemento;
     }
-
+    if (this.interactionId === null) {
+      throw new Error(
+        'Cannot initialize rules service for a state with no interaction.'
+      );
+    }
     const rulesServiceName =
       this.angularNameService.getNameOfInteractionRulesService(
         this.interactionId

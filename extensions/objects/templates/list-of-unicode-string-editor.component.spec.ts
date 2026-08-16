@@ -17,14 +17,14 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ListOfUnicodeStringEditorComponent} from './list-of-unicode-string-editor.component';
 
 describe('ListOfUnicodeStringEditorComponent', () => {
   let component: ListOfUnicodeStringEditorComponent;
   let fixture: ComponentFixture<ListOfUnicodeStringEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ListOfUnicodeStringEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

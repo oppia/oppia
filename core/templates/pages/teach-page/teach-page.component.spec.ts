@@ -111,9 +111,9 @@ describe('Teach Page', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    loaderService = TestBed.get(LoaderService);
-    userService = TestBed.get(UserService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    loaderService = TestBed.inject(LoaderService);
+    userService = TestBed.inject(UserService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });

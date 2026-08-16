@@ -95,6 +95,7 @@ describe('Checkpoint celebration utility service', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: [],
       },
       'End State': {
         classifier_model_id: null,
@@ -119,6 +120,7 @@ describe('Checkpoint celebration utility service', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: [],
       },
     };
     const states = States.createFromBackendDict(statesBackendDict);

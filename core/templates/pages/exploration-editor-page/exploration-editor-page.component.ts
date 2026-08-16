@@ -78,6 +78,7 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import './exploration-editor-page.component.css';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -111,30 +112,31 @@ interface ExplorationData extends ExplorationBackendDict {
 @Component({
   selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html',
+  styleUrls: ['./exploration-editor-page.component.css'],
 })
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  explorationIsLinkedToStory: boolean;
-  screenIsLarge: boolean;
-  explorationId: string;
-  explorationUrl: string;
-  revertExplorationUrl: string;
-  checkRevertExplorationValidUrl: string;
-  explorationDownloadUrl: string;
-  improvementsTabIsEnabled: boolean;
+  explorationIsLinkedToStory: boolean = false;
+  screenIsLarge: boolean = false;
+  explorationId: string = '';
+  explorationUrl: string = '';
+  revertExplorationUrl: string = '';
+  checkRevertExplorationValidUrl: string = '';
+  explorationDownloadUrl: string = '';
+  improvementsTabIsEnabled: boolean = false;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
   connectedToInternet: boolean = true;
   explorationEditorPageHasInitialized: boolean = false;
-  activeThread: string;
-  warningsAreShown: boolean;
-  currentUserIsCurriculumAdmin: boolean;
-  currentUserIsModerator: boolean;
-  currentUser: string;
-  currentVersion: number;
-  areExplorationWarningsVisible: boolean;
+  activeThread: string = '';
+  warningsAreShown: boolean = false;
+  currentUserIsCurriculumAdmin: boolean = false;
+  currentUserIsModerator: boolean = false;
+  currentUser: string = '';
+  currentVersion: number = 0;
+  areExplorationWarningsVisible: boolean = false;
   isModalOpenable: boolean = true;
   modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
@@ -245,12 +247,17 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story
       );
+      const version = explorationData.version;
+
+      if (version === undefined || version === null) {
+        throw new Error('Exploration version cannot be null.');
+      }
       this.entityTranslationsService.init(
         this.explorationId,
         'exploration',
-        explorationData.version
+        version
       );
-      this.pageContextService.setExplorationVersion(explorationData.version);
+      this.pageContextService.setExplorationVersion(version);
 
       const languageCode =
         this.entityVoiceoversService.languageCode ||
@@ -258,7 +265,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
-        explorationData.version,
+        version,
         languageCode
       );
       this.entityVoiceoversService.fetchEntityVoiceovers();
@@ -298,7 +305,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.currentUserIsModerator = userInfo.isModerator();
       this.currentUser = (explorationData as ExplorationData).user;
-      this.currentVersion = explorationData.version;
+      this.currentVersion = version;
 
       this.explorationRightsService.init(
         (explorationData as ExplorationData).rights.owner_names,
@@ -328,26 +335,28 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         });
 
-      this.versionHistoryService.init(explorationData.version);
+      this.versionHistoryService.init(version);
 
       this.graphDataService.recompute();
 
+      const activeStateName = this.stateEditorService.getActiveStateName();
+
       if (
-        !this.stateEditorService.getActiveStateName() ||
-        !this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
+        !activeStateName ||
+        !this.explorationStatesService.getState(activeStateName)
       ) {
         this.stateEditorService.setActiveStateName(
           this.explorationInitStateNameService.displayed as string
         );
       }
 
+      const currentStateName =
+        this.routerService.getCurrentStateFromLocationPath();
+
       if (
         !this.routerService.isLocationSetToNonStateEditorTab() &&
-        !explorationData.states.hasOwnProperty(
-          this.routerService.getCurrentStateFromLocationPath()
-        )
+        (!currentStateName ||
+          !explorationData.states.hasOwnProperty(currentStateName))
       ) {
         if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
           this.routerService.navigateToFeedbackTab();
@@ -391,14 +400,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             // if they exist.
             this.populateEntityTranslationsWithDraftChanges(
               explorationData.draft_changes,
-              explorationData.version
+              version
             );
           });
       } else {
         // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
         this.populateEntityTranslationsWithDraftChanges(
           explorationData.draft_changes,
-          explorationData.version
+          version
         );
       }
 
@@ -427,9 +436,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       });
 
       if (
-        this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
+        activeStateName &&
+        this.explorationStatesService.getState(activeStateName)
       ) {
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
       }
@@ -546,9 +554,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       '.exploration-editor-content'
     );
 
-    mainContentElement.tabIndex = -1;
-    mainContentElement.scrollIntoView();
-    mainContentElement.focus();
+    if (mainContentElement) {
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    }
   }
 
   startEditorTutorial(): void {
@@ -808,8 +818,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     ).then(improvementsTabIsEnabledResponse => {
       this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
     });
-
-    this.initExplorationPage();
   }
 
   isImprovementsTabEnabled(): boolean {

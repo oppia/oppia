@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
     exp_fetchers,
+    feature_flag_services,
     fs_services,
     html_cleaner,
     image_validation_services,
@@ -250,9 +251,7 @@ class SuggestionHandler(
             assert isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             )
-            self._copy_images_from_target_exploration_content_to_translation(
-                suggestion
-            )
+            self._copy_images_from_target_content_to_translation(suggestion)
 
             files = self.normalized_payload.get('files')
             new_image_filenames = (
@@ -300,19 +299,19 @@ class SuggestionHandler(
                 image_is_compressible,
             )
 
-    def _copy_images_from_target_exploration_content_to_translation(
+    def _copy_images_from_target_content_to_translation(
         self, suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
-        """Creates copies of images from the suggestion's target exploration
+        """Creates copies of images from the suggestion's target content
         for the translation suggestion to use.
 
         Args:
             suggestion: SuggestionTranslateContent. The translation suggestion
-                to copy its target exploration's images to.
+                to copy its target content's images to.
 
         Raises:
-            Exception. An image in the target exploration's content is not a
-                saved asset belonging to the target exploration.
+            Exception. An image in the target entity's content is not a
+                saved asset belonging to the target entity.
         """
         target_image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -645,22 +644,32 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-            target_entity_html_list = (
-                suggestion.get_target_entity_html_strings()
-            )
-            target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list
+            # Only question suggestions copy images at this point, because they
+            # are stored under the question suggestion image context. Images in
+            # a translation suggestion are copied at submission time instead,
+            # by _copy_images_from_target_content_to_translation, which handles
+            # every target type. This mirrors the exploration action handler,
+            # which does not copy images on accept either.
+            if (
+                suggestion.suggestion_type
+                == feconf.SUGGESTION_TYPE_ADD_QUESTION
+            ):
+                target_entity_html_list = (
+                    suggestion.get_target_entity_html_strings()
                 )
-            )
+                target_image_filenames = (
+                    html_cleaner.get_image_filenames_from_html_strings(
+                        target_entity_html_list
+                    )
+                )
 
-            fs_services.copy_images(
-                suggestion.target_type,
-                suggestion.target_id,
-                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-                suggestion.target_id,
-                target_image_filenames,
-            )
+                fs_services.copy_images(
+                    suggestion.target_type,
+                    suggestion.target_id,
+                    feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+                    suggestion.target_id,
+                    target_image_filenames,
+                )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
@@ -672,6 +681,10 @@ class SuggestionToSkillActionHandler(
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestion_services.update_question_review_stats(suggestion)
+        elif suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
@@ -895,7 +908,7 @@ class ReviewableSuggestionsHandler(
             )
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
-                raise ValueError(
+                raise self.InvalidInputException(
                     'Limit must be provided for question suggestions.'
                 )
             topic_name = self.normalized_request.get('topic_name')
@@ -1214,9 +1227,17 @@ class UpdateQuestionSuggestionHandler(
 def _get_target_id_to_exploration_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[
-    str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
+    str,
+    Optional[
+        Union[
+            opportunity_domain.PartialExplorationOpportunitySummaryDict,
+            opportunity_domain.TranslationOpportunityCardInfoDict,
+        ]
+    ],
 ]:
-    """Returns a dict of target_id to exploration opportunity summary dict.
+    """Returns a dict of target_id to exploration opportunity dict, which can be in
+    ExplorationOpportunitySummary or TranslationOpportunityCardInfo representation
+    depending on the feature flag.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions to retrieve
@@ -1224,17 +1245,48 @@ def _get_target_id_to_exploration_opportunity_dict(
 
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
-        summary dict.
+        dict, which can be in ExplorationOpportunitySummary or
+        TranslationOpportunityCardInfo representation depending on the feature flag.
     """
     target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
-        for opp_id, opp in (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)
-            ).items()
+    opportunity_id_to_opportunity_dict: Dict[
+        str,
+        Optional[
+            Union[
+                opportunity_domain.PartialExplorationOpportunitySummaryDict,
+                opportunity_domain.TranslationOpportunityCardInfoDict,
+            ]
+        ],
+    ] = {}
+
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        language_code = (
+            suggestions[0].language_code
+            if suggestions
+            else constants.DEFAULT_LANGUAGE_CODE
         )
-    }
+        card_infos = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            list(target_ids),
+            language_code,
+        )
+        for card in card_infos:
+            opportunity_id_to_opportunity_dict[card.entity_id] = card.to_dict()
+        for tid in target_ids:
+            if tid not in opportunity_id_to_opportunity_dict:
+                opportunity_id_to_opportunity_dict[tid] = None
+    else:
+        opportunity_id_to_opportunity_dict = {
+            opp_id: (opp.to_dict() if opp is not None else None)
+            for opp_id, opp in (
+                opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                    list(target_ids)
+                ).items()
+            )
+        }
     return opportunity_id_to_opportunity_dict
 
 

@@ -128,7 +128,7 @@ describe('Outcome Destination Editor', () => {
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
     expect(component.canEditRefresherExplorationId).toBeFalse();
-    expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
+    expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s\-]+$/);
     expect(component.destinationChoices).toEqual([
       {
         id: 'Hola',

@@ -26,7 +26,8 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import './review-material-editor.component.css';
 
 interface HtmlSchema {
   type: 'html';
@@ -40,6 +41,7 @@ interface BindableDict {
 @Component({
   selector: 'oppia-review-material-editor',
   templateUrl: './review-material-editor.component.html',
+  styleUrls: ['./review-material-editor.component.css'],
 })
 export class ReviewMaterialEditorComponent implements OnInit {
   @Output() onSaveExplanation: EventEmitter<SubtitledHtml> = new EventEmitter();
@@ -62,10 +64,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   skillEditorWorkedExampleLimit: number =
     AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private platformFeatureService: PlatformFeatureService
-  ) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.COMPONENT_NAME_EXPLANATION = AppConstants.COMPONENT_NAME_EXPLANATION;
@@ -77,20 +76,13 @@ export class ReviewMaterialEditorComponent implements OnInit {
   // Remove this function when the schema-based editor
   // is migrated to Angular 2+.
   getSchema(): HtmlSchema {
-    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
-      this.HTML_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_component_config_id: 'ALL_COMPONENTS',
-        },
-      };
-    }
     return this.HTML_SCHEMA;
   }
 
-  updateLocalExp($event: string): void {
-    if (this.editableExplanation !== $event) {
-      this.editableExplanation = $event;
+  updateLocalExp($event: SchemaDefaultValue | string): void {
+    const eventString = String($event);
+    if (this.editableExplanation !== eventString) {
+      this.editableExplanation = eventString;
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -104,11 +96,6 @@ export class ReviewMaterialEditorComponent implements OnInit {
       matches && matches.length > this.skillEditorWorkedExampleLimit
     );
     return this.workedExampleLimitExceeded;
-  }
-
-  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
-      .isEnabled;
   }
 
   openConceptCardExplanationEditor(): void {

@@ -9,13 +9,13 @@
     <div ng-controller="Base">
       <base-content>
 
-        <content> <!-- Indentation mismatch -->
-          <% if (webpackConfig.mode == 'production') { %>
-            <script src="/build/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-          <% } else { %>
-            <script src="/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-          <% } %>
-      </content> <!-- Indentation mismatch -->
+        <content>
+          <p>
+            Dummy content
+            Dummy content
+            Dummy content
+          </p>
+      </content>
 
         <page-footer></page-footer>
       </base-content>

@@ -52,7 +52,7 @@ import {DiffNodeData} from 'components/version-diff-visualization/version-diff-v
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {PageContextService} from 'services/page-context.service';
-import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
+import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
 import {
   ExplorationChange,
   ExplorationChangeEditStateProperty,
@@ -103,7 +103,7 @@ export class ExplorationSaveService {
     private windowRef: WindowRef,
     private platformFeatureService: PlatformFeatureService,
     private pageContextService: PageContextService,
-    private voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService
+    private voiceoverRegenerationJobService: VoiceoverRegenerationJobService
   ) {}
 
   showCongratulatorySharingModal(): void {
@@ -227,7 +227,7 @@ export class ExplorationSaveService {
 
                 const updatedContentIds =
                   this.getChangeListContentIds(changeList);
-                this.voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks(
+                this.voiceoverRegenerationJobService.updateNewlyAddedRegenerationTasks(
                   updatedContentIds
                 );
               }

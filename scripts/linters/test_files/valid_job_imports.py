@@ -21,18 +21,24 @@ python_linter_test.py. This file contain valid python syntax.
 from __future__ import annotations
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    blog_author_details_migration_jobs,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
+    classroom_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
+    delete_duplicate_content_ids_jobs,
     dummy_jobs,
     email_deletion_jobs,
     exp_migration_jobs,
     exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,
+    firebase_server_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
+    number_with_units_audit_jobs,
     opportunity_management_jobs,
+    pinned_opportunity_backfill_jobs,
     question_migration_jobs,
     skill_inspection_jobs,
     skill_migration_jobs,
@@ -40,11 +46,17 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     subtopic_migration_jobs,
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,
+    synthesize_voiceover_by_language_accent_jobs,
     topic_migration_jobs,
+    translation_audit_jobs,
     translation_migration_jobs,
+    translation_opportunity_backfill_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
+    cloud_task_run_migration_jobs,
+    voiceover_synthesis_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
@@ -73,6 +85,21 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     missing_translation_images_repair_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_stories_with_disconnected_node_ids_job,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_non_existent_threads_messages_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_threads_with_missing_suggestions_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    cleanup_duplicate_translation_suggestions_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    recover_orphaned_translations_jobs,
 )
 
 

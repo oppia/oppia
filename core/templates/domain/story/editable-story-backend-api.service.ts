@@ -26,7 +26,7 @@ import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface FetchStoryBackendResponse {
-  story: StoryBackendDict;
+  story_dict: StoryBackendDict;
   topic_name: string;
   story_is_published: boolean;
   skill_summaries: SkillSummaryBackendDict[];
@@ -44,7 +44,7 @@ interface FetchStoryResponse {
 }
 
 interface UpdateStoryBackendResponse {
-  story: StoryBackendDict;
+  story_dict: StoryBackendDict;
 }
 
 interface StoryUrlFragmentExistsBackendResponse {
@@ -53,6 +53,21 @@ interface StoryUrlFragmentExistsBackendResponse {
 
 interface ValidationExplorationBackendResponse {
   validation_error_messages: string[];
+}
+
+export const STORY_PUBLICATION_ACTION_PUBLISH = 'publish' as const;
+export const STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH =
+  'temporary_unpublish' as const;
+export const STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH =
+  'permanent_unpublish' as const;
+
+export type StoryPublicationAction =
+  | typeof STORY_PUBLICATION_ACTION_PUBLISH
+  | typeof STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+  | typeof STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
+
+interface ChangeStoryPublicationStatusRequest {
+  story_publication_action: StoryPublicationAction;
 }
 
 @Injectable({
@@ -83,7 +98,7 @@ export class EditableStoryBackendApiService {
         response => {
           if (successCallback) {
             successCallback({
-              story: response.story,
+              story: response.story_dict,
               topicName: response.topic_name,
               storyIsPublished: response.story_is_published,
               skillSummaries: response.skill_summaries,
@@ -125,14 +140,14 @@ export class EditableStoryBackendApiService {
       .put<UpdateStoryBackendResponse>(editableStoryDataUrl, putData)
       .toPromise()
       .then(
-        response => successCallback(response.story),
+        response => successCallback(response.story_dict),
         errorResponse => errorCallback(errorResponse.error.error)
       );
   }
 
   private _changeStoryPublicationStatus(
     storyId: string,
-    newStoryStatusIsPublic: boolean,
+    publicationAction: StoryPublicationAction,
     successCallback: (value: void) => void,
     errorCallback: (reason: string) => void
   ): void {
@@ -142,8 +157,8 @@ export class EditableStoryBackendApiService {
         story_id: storyId,
       }
     );
-    const putData = {
-      new_story_status_is_public: newStoryStatusIsPublic,
+    const putData: ChangeStoryPublicationStatusRequest = {
+      story_publication_action: publicationAction,
     };
     this.http
       .put(storyPublishUrl, putData)
@@ -273,12 +288,12 @@ export class EditableStoryBackendApiService {
 
   async changeStoryPublicationStatusAsync(
     storyId: string,
-    newStoryStatusIsPublic: boolean
+    publicationAction: StoryPublicationAction
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this._changeStoryPublicationStatus(
         storyId,
-        newStoryStatusIsPublic,
+        publicationAction,
         resolve,
         reject
       );

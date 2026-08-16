@@ -57,6 +57,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -100,11 +101,12 @@ export interface GetOpportunitiesResponse {
 }
 
 export interface ContributionDetails {
-  skill_description: string;
-  skill_rubrics: Rubric[];
-  chapter_title: string;
-  story_title: string;
+  skill_description?: string;
+  skill_rubrics?: Rubric[];
+  chapter_title?: string;
+  story_title?: string;
   topic_name: string;
+  entity_description?: string;
 }
 
 export interface SuggestionDetails {
@@ -128,6 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css'],
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
   @Input() activeTopicName: string;
@@ -254,12 +257,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading =
           ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
       } else {
-        subheading =
-          details.topic_name +
-          ' / ' +
-          details.story_title +
-          ' / ' +
-          details.chapter_title;
+        if (
+          this.featureService.status.EnableTranslationOppsWithNewOppModels
+            .isEnabled
+        ) {
+          subheading = details.topic_name + ' / ' + details.entity_description;
+        } else {
+          subheading =
+            details.topic_name +
+            ' / ' +
+            details.story_title +
+            ' / ' +
+            details.chapter_title;
+        }
       }
 
       const requiredData = {
@@ -344,6 +354,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
       suggestionId,
     ]);
+    // Reload opportunities to refresh progress bars after accepting suggestion.
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
   _showQuestionSuggestionModal(
@@ -353,7 +365,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     question: Question,
     misconceptionsBySkill: MisconceptionSkillMap
   ): void {
-    const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
@@ -385,8 +396,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.result.then(
       result => {
         this.contributionAndReviewService.reviewSkillSuggestion(
-          targetId,
-          suggestionId,
+          result.targetId,
+          result.suggestionId,
           result.action,
           result.reviewMessage,
           result.skillDifficulty,
@@ -407,12 +418,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   ): void {
     const details = this.contributions[initialSuggestionId]
       .details as ContributionDetails;
-    const subheading =
-      details.topic_name +
-      ' / ' +
-      details.story_title +
-      ' / ' +
-      details.chapter_title;
+    let subheading = '';
+    if (
+      this.featureService.status.EnableTranslationOppsWithNewOppModels.isEnabled
+    ) {
+      subheading = details.topic_name + ' / ' + details.entity_description;
+    } else {
+      subheading =
+        details.topic_name +
+        ' / ' +
+        details.story_title +
+        ' / ' +
+        details.chapter_title;
+    }
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,
       {
@@ -553,6 +571,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.activeTabType === tabType && this.activeTabSubtype === subType;
   }
 
+  get activeReviewTab(): boolean {
+    return this.activeTabType === this.TAB_TYPE_REVIEWS;
+  }
+
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&
@@ -687,6 +709,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            totalCount: opportunity.getContentCount(),
+            translationsCount: opportunity.getTranslationsCount(
+              this.languageCode
+            ),
+            inReviewCount: opportunity.getTranslationsInReviewCount(
+              this.languageCode
+            ),
+            progressPercentage: opportunity
+              .getTranslationProgressPercentage(this.languageCode)
+              .toFixed(2),
           };
           opportunitiesDicts.push(opportunityDict);
         });

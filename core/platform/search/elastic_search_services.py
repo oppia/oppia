@@ -327,6 +327,8 @@ def search(
             {
                 'multi_match': {
                     'query': query_string,
+                    'type': 'bool_prefix',
+                    'fields': ['title^3', 'objective^2'],
                 }
             }
         ]
@@ -412,6 +414,9 @@ def blog_post_summaries_search(
             {
                 'multi_match': {
                     'query': query_string,
+                    'fields': ['title', 'summary'],
+                    'type': 'bool_prefix',
+                    'operator': 'and',
                 }
             }
         ]

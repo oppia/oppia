@@ -16,7 +16,7 @@
  * @fileoverview Root component for get started page.
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -27,7 +27,7 @@ import {PageHeadService} from 'services/page-head.service';
   selector: 'oppia-get-started-page-root',
   templateUrl: './get-started-page-root.component.html',
 })
-export class GetStartedPageRootComponent implements OnDestroy {
+export class GetStartedPageRootComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   constructor(
     private pageHeadService: PageHeadService,

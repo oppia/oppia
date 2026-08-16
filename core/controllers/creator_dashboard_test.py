@@ -90,7 +90,7 @@ class HomePageTests(test_utils.GenericTestBase):
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('</lightweight-oppia-root>', response)
+        self.assertIn('</oppia-root>', response)
 
 
 class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
@@ -437,6 +437,38 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
                 'key_2': {
                     'num_ratings': 2,
                     'average_ratings': 3.11,
+                    'total_plays': 10,
+                }
+            },
+        )
+
+    def test_last_week_stats_without_average_ratings(self) -> None:
+        """Tests the last week stats without the average rating ."""
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {
+                'key_2': {
+                    'num_ratings': 0,
+                    'average_ratings': None,
+                    'total_plays': 10,
+                }
+            },
+        )
+
+        with get_last_week_dashboard_stats_swap:
+            last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
+                'last_week_stats'
+            ]
+
+        self.assertEqual(
+            last_week_stats,
+            {
+                'key_2': {
+                    'num_ratings': 0,
+                    'average_ratings': None,
                     'total_plays': 10,
                 }
             },

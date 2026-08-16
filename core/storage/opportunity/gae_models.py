@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf, utils
 from core.platform import models
 
 from typing import Dict, Optional, Sequence, Tuple
@@ -59,6 +60,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     language_codes_needing_voice_artists = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
+    # The number of content items that are only translatable by reviewers
+    # (e.g. content with 'set_of_strings' data format).
+    reviewer_only_content_count = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -88,6 +94,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_with_assigned_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_needing_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'reviewer_only_content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
@@ -333,14 +340,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         super()._pre_put_hook()
 
         # Check if entity_type is valid.
-        valid_entity_types = {
-            'exploration',
-            'skill',
-            'topic',
-            'story',
-            'classroom',
-        }
-        if self.entity_type not in valid_entity_types:
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
             raise Exception(f'Invalid entity_type: {self.entity_type}')
 
         # Ensure counts are valid.
@@ -348,6 +348,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
             raise Exception('content_count cannot be negative.')
 
         for lang_code, count in self.translation_counts.items():
+            if not utils.is_supported_audio_language_code(lang_code):
+                raise Exception(f'Invalid language code: {lang_code}')
             if not isinstance(count, int) or count < 0:
                 raise Exception(
                     f'Invalid translation count for {lang_code}: {count}'
@@ -370,6 +372,105 @@ class TranslationOpportunityModel(base_models.BaseModel):
             str. A unique string ID in the form: {entity_type}.{entity_id}.
         """
         return f'{entity_type}.{entity_id}'
+
+    @classmethod
+    def get_by_entity_type_and_topic(
+        cls,
+        entity_type: str,
+        topic_id: Optional[str],
+        language_code: str,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+    ) -> Tuple[Sequence[TranslationOpportunityModel], Optional[str], bool]:
+        """Returns a list of translation opportunities filtered by entity type,
+        topic and language code.
+
+        Args:
+            entity_type: str. The type of the entity.
+            topic_id: str or None. The ID of the topic to filter by. If None,
+                all topics are included.
+            language_code: str. The language code to filter by.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. The cursor for pagination.
+
+        Returns:
+            tuple(list(TranslationOpportunityModel), str|None, bool). A 3-tuple
+            of (results, cursor, more).
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor
+            )
+        else:
+            start_cursor = datastore_services.make_cursor()
+
+        query = cls.query(
+            cls.entity_type == entity_type,
+            cls.incomplete_translation_language_codes == language_code,
+        )
+
+        if topic_id:
+            query = query.filter(cls.topic_ids == topic_id)
+
+        # Order by created_on to ensure consistent pagination.
+        query = query.order(cls.created_on)
+
+        fetch_result: Tuple[
+            Sequence[TranslationOpportunityModel],
+            datastore_services.Cursor,
+            bool,
+        ] = query.fetch_page(page_size, start_cursor=start_cursor)
+        results, cursor, _ = fetch_result
+
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        fetch_result = query.fetch_page(
+            page_size + 1, start_cursor=start_cursor
+        )
+        plus_one_query_models, _, _ = fetch_result
+        more_results = len(plus_one_query_models) == page_size + 1
+
+        return (
+            results,
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more_results,
+        )
+
+    @classmethod
+    def get_by_entity_ids(
+        cls, entity_type: str, entity_ids: Sequence[str]
+    ) -> Sequence[Optional[TranslationOpportunityModel]]:
+        """Returns a list of translation opportunities for the given entity IDs.
+
+        This method encapsulates composite ID generation (entity_type.entity_id)
+        within the storage layer, preventing service layers from needing to
+        know how datastore keys are structured.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_ids: list(str). The IDs of the entities.
+
+        Returns:
+            list(TranslationOpportunityModel|None). The models corresponding to
+            the given entity IDs, in the same order.
+        """
+        model_ids = [cls._generate_id(entity_type, eid) for eid in entity_ids]
+        return cls.get_multi(model_ids)
+
+    @classmethod
+    def get_by_topic(
+        cls, topic_id: str
+    ) -> Sequence[TranslationOpportunityModel]:
+        """Returns all the models corresponding to the specific topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            list(TranslationOpportunityModel). A list of
+            TranslationOpportunityModel associated with the given topic_id.
+        """
+        return cls.query(cls.topic_ids == topic_id).fetch()
 
     @classmethod
     def create_new(
@@ -407,3 +508,90 @@ class TranslationOpportunityModel(base_models.BaseModel):
             ),
             translation_counts=translation_counts,
         )
+
+
+class ExplorationOpportunitySummaryAuditModel(base_models.BaseModel):
+    """Audit model for tracking changes to the translation counts in
+    ExplorationOpportunitySummaryModel.
+    """
+
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    action = datastore_services.StringProperty(required=True, indexed=True)
+    old_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    new_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'action': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'old_translation_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'new_translation_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create_new(
+        cls,
+        exploration_id: str,
+        language_code: str,
+        action: str,
+        old_translation_count: int,
+        new_translation_count: int,
+        content_count: int,
+    ) -> 'ExplorationOpportunitySummaryAuditModel':
+        """Creates and returns a new ExplorationOpportunitySummaryAuditModel
+        instance.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            language_code: str. The language code.
+            action: str. The action that caused the count change.
+            old_translation_count: int. Previous translation count.
+            new_translation_count: int. New translation count.
+            content_count: int. Total content count.
+
+        Returns:
+            ExplorationOpportunitySummaryAuditModel. A new model instance.
+        """
+        model_id = cls.get_new_id('')
+        model = cls(
+            id=model_id,
+            exploration_id=exploration_id,
+            language_code=language_code,
+            action=action,
+            old_translation_count=old_translation_count,
+            new_translation_count=new_translation_count,
+            content_count=content_count,
+        )
+        model.update_timestamps()
+        return model

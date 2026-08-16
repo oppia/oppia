@@ -61,8 +61,6 @@ export class ProgressTabComponent {
   @Input() incompleteCollectionsList!: CollectionSummary[];
   @Input() completedExplorationsList!: LearnerExplorationSummary[];
   @Input() completedCollectionsList!: CollectionSummary[];
-  @Input() explorationPlaylist!: LearnerExplorationSummary[];
-  @Input() collectionPlaylist!: CollectionSummary[];
   @Input() subscriptionsList!: ProfileSummary[];
   @Input() completedToIncompleteCollections!: string[];
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
@@ -74,16 +72,12 @@ export class ProgressTabComponent {
   >;
   selectedSection!: string;
   noCommunityLessonActivity: boolean = false;
-  noPlaylistActivity: boolean = false;
   totalIncompleteLessonsList: (
     | LearnerExplorationSummary
     | CollectionSummary
   )[] = [];
 
   totalCompletedLessonsList: (LearnerExplorationSummary | CollectionSummary)[] =
-    [];
-
-  totalLessonsInPlaylist: (LearnerExplorationSummary | CollectionSummary)[] =
     [];
 
   allCommunityLessons: (LearnerExplorationSummary | CollectionSummary)[] = [];
@@ -97,9 +91,6 @@ export class ProgressTabComponent {
     | LearnerExplorationSummary
     | CollectionSummary
   )[] = [];
-
-  displayLessonsInPlaylist: (LearnerExplorationSummary | CollectionSummary)[] =
-    [];
 
   displayInCommunityLessons: (LearnerExplorationSummary | CollectionSummary)[] =
     [];
@@ -118,7 +109,6 @@ export class ProgressTabComponent {
   showMoreInSection: ShowMoreInSectionDict = {
     incomplete: false,
     completed: false,
-    playlist: false,
     subscriptions: false,
   };
 
@@ -126,9 +116,6 @@ export class ProgressTabComponent {
   pageSize: number = 3;
   startIndexInCommunityLessons: number = 0;
   endIndexInCommunityLessons: number = 3;
-  pageNumberInPlaylist: number = 1;
-  startIndexInPlaylist: number = 0;
-  endIndexInPlaylist: number = 3;
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
@@ -149,9 +136,6 @@ export class ProgressTabComponent {
       this.completedExplorationsList.length === 0 &&
       this.incompleteCollectionsList.length === 0 &&
       this.completedCollectionsList.length === 0;
-    this.noPlaylistActivity =
-      this.explorationPlaylist.length === 0 &&
-      this.collectionPlaylist.length === 0;
     tempIncompleteLessonsList.push(
       ...this.incompleteExplorationsList,
       ...this.incompleteCollectionsList
@@ -162,10 +146,6 @@ export class ProgressTabComponent {
       ...this.completedCollectionsList
     );
     this.totalCompletedLessonsList = tempCompletedLessonsList.reverse();
-    this.totalLessonsInPlaylist.push(
-      ...this.explorationPlaylist,
-      ...this.collectionPlaylist
-    );
     this.allCommunityLessons.push(
       ...this.incompleteExplorationsList,
       ...this.incompleteCollectionsList,
@@ -182,12 +162,10 @@ export class ProgressTabComponent {
     );
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.setDisplayLessonsInPlaylist();
 
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-        this.setDisplayLessonsInPlaylist();
       })
     );
 
@@ -208,14 +186,6 @@ export class ProgressTabComponent {
   getProfileImageWebpDataUrl(username: string): string {
     let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
-  }
-
-  setDisplayLessonsInPlaylist(): void {
-    if (this.windowIsNarrow) {
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-    } else {
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(0, 3);
-    }
   }
 
   decodePngURIData(base64ImageData: string): string {
@@ -296,19 +266,6 @@ export class ProgressTabComponent {
         0,
         3
       );
-    } else if (
-      section === 'playlist' &&
-      this.showMoreInSection.playlist === true
-    ) {
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-      this.startIndexInPlaylist = 0;
-      this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
-    } else if (
-      section === 'playlist' &&
-      this.showMoreInSection.playlist === false
-    ) {
-      this.startIndexInPlaylist = 0;
-      this.endIndexInPlaylist = this.pageSize;
     }
   }
 
@@ -342,26 +299,6 @@ export class ProgressTabComponent {
       this.endIndexInCommunityLessons = Math.min(
         this.startIndexInCommunityLessons + this.pageSize,
         this.displayInCommunityLessons.length
-      );
-    } else if (section === 'playlist') {
-      let totalPages = this.displayLessonsInPlaylist.length / this.pageSize;
-      if (direction === this.moveToPrevPage && this.pageNumberInPlaylist > 1) {
-        this.pageNumberInPlaylist -= 1;
-      }
-      if (totalPages > Math.floor(totalPages)) {
-        totalPages = Math.floor(totalPages) + 1;
-      }
-      if (
-        direction === this.moveToNextPage &&
-        this.pageNumberInPlaylist < totalPages
-      ) {
-        this.pageNumberInPlaylist += 1;
-      }
-      this.startIndexInPlaylist =
-        (this.pageNumberInPlaylist - 1) * this.pageSize;
-      this.endIndexInPlaylist = Math.min(
-        this.startIndexInPlaylist + this.pageSize,
-        this.displayLessonsInPlaylist.length
       );
     }
   }
@@ -430,67 +367,15 @@ export class ProgressTabComponent {
             this.startIndexInCommunityLessons = 0;
             this.endIndexInCommunityLessons = 3;
           }
-        } else if (
-          sectionNameI18nId ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
-            .PLAYLIST
-        ) {
-          if (
-            subsectionName ===
-            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-              .EXPLORATIONS
-          ) {
-            let index = this.totalLessonsInPlaylist.findIndex(
-              exp => exp.id === activity.id
-            );
-            if (index !== -1) {
-              this.totalLessonsInPlaylist.splice(index, 1);
-            }
-          } else if (
-            subsectionName ===
-            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-              .COLLECTIONS
-          ) {
-            let index = this.totalLessonsInPlaylist.findIndex(
-              collection => collection.id === activity.id
-            );
-            if (index !== -1) {
-              this.totalLessonsInPlaylist.splice(index, 1);
-            }
-          }
-          if (this.showMoreInSection.playlist === true) {
-            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-          } else if (this.showMoreInSection.playlist === false) {
-            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(
-              0,
-              3
-            );
-          }
-          if (this.windowIsNarrow) {
-            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-          }
-          if (
-            this.displayLessonsInPlaylist.slice(
-              this.startIndexInPlaylist,
-              this.endIndexInPlaylist
-            ).length === 0
-          ) {
-            this.pageNumberInPlaylist = 1;
-            this.startIndexInPlaylist = 0;
-            this.endIndexInPlaylist = 3;
-          }
         }
         this.noCommunityLessonActivity =
           this.totalIncompleteLessonsList.length === 0 &&
           this.totalCompletedLessonsList.length === 0;
-        this.noPlaylistActivity = this.totalLessonsInPlaylist.length === 0;
       });
   }
 
   isLearnerStateEmpty(): boolean {
     return (
-      this.totalIncompleteLessonsList.length === 0 &&
-      this.totalCompletedLessonsList.length === 0 &&
       this.partiallyLearntTopicsList.length === 0 &&
       this.learntTopicsList.length === 0
     );

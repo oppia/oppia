@@ -91,7 +91,6 @@ describe('Skill Concept Card Editor Component', () => {
         'review material',
         AppConstants.COMPONENT_NAME_EXPLANATION
       ),
-      [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           COMPONENT_NAME_EXPLANATION: {},
@@ -203,10 +202,10 @@ describe('Skill Concept Card Editor Component', () => {
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeFalse();
+    expect(component.skillEditorCardIsShown).toBe(false);
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeTrue();
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

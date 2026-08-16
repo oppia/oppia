@@ -226,7 +226,7 @@ describe('Exploration Editor', function () {
 
       // Verify that the lesson is in the selected language.
       await loggedOutUser.expectCardContentToMatch(
-        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण'
+        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
       );
 
       await loggedOutUser.startVoiceover();

@@ -27,7 +27,8 @@ import {
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SaveProgressModalComponent} from './save-progress-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -44,10 +45,9 @@ class MockWindowRef {
       },
     },
     localStorage: {
-      last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {},
-    },
-    gtag: () => {},
+    } as Storage,
+    gtag: (() => {}) as Function,
     history: {
       pushState(data: object, title: string, url?: string | null) {},
     },
@@ -59,6 +59,10 @@ class MockWindowRef {
       },
     },
   };
+}
+
+class MockSignInEventService {
+  onUserSignIn = new EventEmitter<void>();
 }
 
 describe('SaveProgressModalComponent', () => {
@@ -87,6 +91,10 @@ describe('SaveProgressModalComponent', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
+        },
+        {
+          provide: SignInEventService,
+          useClass: MockSignInEventService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

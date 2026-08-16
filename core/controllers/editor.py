@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feature_flag_list, feconf, utils
@@ -768,7 +767,7 @@ class ExplorationModeratorRightsHandler(
 
         self.render_json(
             {
-                'rights': exp_rights.to_dict(),
+                'rights_dict': exp_rights.to_dict(),
             }
         )
 
@@ -839,7 +838,7 @@ class UserExplorationEmailsHandler(
             )
         )
         self.render_json(
-            {'email_preferences': exploration_email_preferences.to_dict()}
+            {'email_preferences_dict': exploration_email_preferences.to_dict()}
         )
 
 
@@ -1518,7 +1517,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                 )
             elif can_voiceover:
                 exp_services.create_or_update_draft(
@@ -1526,7 +1525,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                     is_by_voice_artist=True,
                 )
         except utils.ValidationError as e:

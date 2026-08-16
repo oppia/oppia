@@ -2739,6 +2739,14 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details.state_reference, 'exp_id_1:state_name_1'
         )
 
+    def test_state_reference_valid_for_question(self) -> None:
+        """Test that validation passes for a valid question state reference
+        with a single segment (no colon).
+        """
+        self.learner_answer_details.entity_type = 'question'
+        self.learner_answer_details.state_reference = 'question_id'
+        self.learner_answer_details.validate()
+
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
     # the backend is fully type-annotated. Here ignore[assignment] is used to
     # test that state_reference is str.
@@ -2928,6 +2936,16 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         )
         self.assertNotEqual(learner_answer_info_id, None)
         self.assertTrue(isinstance(learner_answer_info_id, str))
+
+    def test_validate_with_non_empty_dict_answer(self) -> None:
+        """Test that validation passes when the answer is a non-empty dict."""
+        self.learner_answer_info.answer = {'key': 'value'}
+        self.learner_answer_info.validate()
+
+    def test_validate_with_int_answer(self) -> None:
+        """Test that validation passes when the answer is an int."""
+        self.learner_answer_info.answer = 42
+        self.learner_answer_info.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
     # the backend is fully type-annotated. Here ignore[assignment] is used to

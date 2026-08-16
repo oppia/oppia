@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
+    opportunity_services,
     question_domain,
     skill_domain,
     skill_fetchers,
@@ -40,10 +41,22 @@ from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import question_models, skill_models
+    from mypy_imports import (
+        opportunity_models,
+        question_models,
+        skill_models,
+        translation_models,
+    )
 
-(skill_models, question_models) = models.Registry.import_models(
-    [models.Names.SKILL, models.Names.QUESTION]
+opportunity_models, skill_models, question_models, translation_models = (
+    models.Registry.import_models(
+        [
+            models.Names.OPPORTUNITY,
+            models.Names.SKILL,
+            models.Names.QUESTION,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
 
 SuggestionChangeDictType = Dict[
@@ -797,6 +810,65 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(topic_assignments_dict), 0)
 
+    def test_delete_skill_and_remove_it_as_prereq_from_all_skills(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2']
+        )
+        skill_services.delete_skill(self.USER_ID, 'skill_id_2')
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_1'])
+
+    def test_remove_prerequisite_skill_id_from_all_skills(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2']
+        )
+        skill_services.remove_prerequisite_skill_id_from_all_skills(
+            self.USER_ID, 'skill_id_1'
+        )
+        target_skills = skill_models.SkillModel.get_by_prerequisite_skill_id(
+            'skill_id_1'
+        )
+        self.assertEqual(target_skills, [])
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_2'])
+
+    def test_replace_prerequisite_skill_id_from_all_skills(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2']
+        )
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
+            self.USER_ID, 'skill_id_1', 'skill_id_3'
+        )
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_2', 'skill_id_3']
+        )
+
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
+            self.USER_ID, 'skill_id_2', 'skill_id_4'
+        )
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_3', 'skill_id_4']
+        )
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
+            self.USER_ID, 'skill_id_3', 'skill_id_4'
+        )
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_4'])
+
+    def test_replace_prereq_skill_id_from_all_skills_with_nonexistent_id(
+        self,
+    ) -> None:
+        # This should execute without errors even though no
+        # skills have this prerequisite.
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
+            self.USER_ID, 'non_existent_skill_id', 'some_new_skill_id'
+        )
+
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -877,6 +949,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
 
     def test_update_skill(self) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]},
+            topic_ids=['topic_id_1'],
+        )
         changelist = [
             skill_domain.SkillChange(
                 {
@@ -1059,6 +1135,118 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False),
             None,
         )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_skill_deletes_v2_translation_opportunity(self) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_id']
+        )
+        model_id = f'skill.{self.SKILL_ID}'
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                model_id, strict=False
+            )
+        )
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                model_id, strict=False
+            )
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
+        )
+        topic_services.save_new_topic(self.USER_ID, topic)
+        # Use topic_services.add_uncategorized_skill() instead of
+        # topic.add_uncategorized_skill_id() to trigger the opportunity
+        # creation logic that runs when the feature flag is enabled.
+        topic_services.add_uncategorized_skill(
+            self.USER_ID, 'topic_id', self.SKILL_ID
+        )
+
+        model_id = f'skill.{self.SKILL_ID}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id'])
+        self.assertEqual(model.content_count, 3)
+        self.assertEqual(model.translation_counts, {})
+
+        # Create and save an entity translation for the skill to simulate translation progress.
+        translation = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.SKILL, self.SKILL_ID, 'es'
+        )
+        translation.add_translation(
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'descripción',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            False,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            self.SKILL_ID,
+            1,
+            'es',
+            translation.to_dict()['translations'],
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            self.SKILL_ID,
+            2,
+            'es',
+            translation.to_dict()['translations'],
+        ).put()
+
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            self.SKILL_ID, 'es', feconf.ENTITY_TYPE_SKILL
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        assert model is not None
+        self.assertEqual(model.translation_counts, {'es': 1})
+
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
+                    'new_misconception_dict': {
+                        'id': self.skill.next_misconception_id,
+                        'name': 'new misconception',
+                        'notes': '<p>notes</p>',
+                        'feedback': '<p>feedback</p>',
+                        'must_be_addressed': True,
+                    },
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.USER_ID,
+            self.SKILL_ID,
+            changelist,
+            'Added misconception.',
+        )
+        updated_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(updated_model)
+        assert updated_model is not None
+        self.assertEqual(updated_model.content_count, 4)
+        self.assertEqual(updated_model.topic_ids, ['topic_id'])
+        self.assertEqual(updated_model.translation_counts, {'es': 1})
 
     def test_delete_skill_marked_deleted(self) -> None:
         skill_models.SkillModel.delete_multi(

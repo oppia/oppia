@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import datetime
+import importlib
+import os
 
 from core import feconf
 from core.platform.taskqueue import dev_mode_taskqueue_services
@@ -79,6 +81,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     def test_task_handler_will_create_the_correct_post_request(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
+        correct_host = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_HOST
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
             'fn_identifier': (
@@ -112,7 +115,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             timeout: int,
         ) -> None:
             self.assertEqual(
-                url, 'http://localhost:%s%s' % (correct_port, dummy_url)
+                url, 'http://%s:%s%s' % (correct_host, correct_port, dummy_url)
             )
             self.assertEqual(json, correct_payload)
             self.assertEqual(headers, correct_headers)
@@ -129,3 +132,58 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             dev_mode_taskqueue_services._task_handler(  # pylint: disable=protected-access
                 dummy_url, correct_payload, queue_name, task_name=task_name
             )
+
+    def test_task_handler_uses_configured_app_engine_host(self) -> None:
+        queue_name = 'dummy_queue'
+        dummy_url = '/dummy_handler'
+        # Here we use type Any because the payload has no constraints on its
+        # values, so Dict[str, Any] is the appropriate type.
+        correct_payload: Dict[str, Any] = {}
+        configured_host = '0.0.0.0'
+
+        # Here we use type Any because this function mocks requests.post
+        # function where the type of JSON has been defined as Any, hence using
+        # Dict[str, Any] here.
+        def mock_post(
+            url: str,
+            json: Dict[str, Any],
+            headers: Dict[str, str],  # pylint: disable=unused-argument
+            timeout: int,
+        ) -> None:
+            self.assertEqual(
+                url,
+                'http://%s:%s%s'
+                % (
+                    configured_host,
+                    dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT,
+                    dummy_url,
+                ),
+            )
+            self.assertEqual(json, correct_payload)
+            self.assertEqual(timeout, feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
+
+        swap_host = self.swap(
+            dev_mode_taskqueue_services,
+            'GOOGLE_APP_ENGINE_HOST',
+            configured_host,
+        )
+        swap_post = self.swap(requests, 'post', mock_post)
+        with swap_host, swap_post:
+            dev_mode_taskqueue_services._task_handler(  # pylint: disable=protected-access
+                dummy_url, correct_payload, queue_name
+            )
+
+    def test_task_handler_uses_localhost_when_env_var_not_set(self) -> None:
+        original_value = os.environ.pop('APP_ENGINE_HOST', None)
+
+        try:
+            importlib.reload(dev_mode_taskqueue_services)
+            self.assertEqual(
+                dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_HOST,
+                'localhost',
+            )
+        finally:
+            if original_value is not None:
+                os.environ['APP_ENGINE_HOST'] = original_value
+
+        importlib.reload(dev_mode_taskqueue_services)

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
+from core import utils
 from core.constants import constants
 from core.domain import skill_domain
 from core.platform import models
@@ -128,6 +127,50 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.get_by_description('description'), model
         )
 
+    def test_get_skills_by_prerequisite_correctly(self) -> None:
+        commit_cmd = skill_domain.SkillChange(
+            {'cmd': skill_domain.CMD_CREATE_NEW}
+        )
+        model1 = skill_models.SkillModel(
+            id='skill_id_a',
+            description='description1',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=0,
+            superseding_skill_id=None,
+            all_questions_merged=False,
+            prerequisite_skill_ids=[],
+        )
+        model2 = skill_models.SkillModel(
+            id='skill_id_b',
+            description='description2',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=0,
+            superseding_skill_id=None,
+            all_questions_merged=False,
+            prerequisite_skill_ids=['skill_id_a'],
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model1.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts
+        )
+        model2.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts
+        )
+        self.assertEqual(
+            skill_models.SkillModel.get_by_prerequisite_skill_id('skill_id_a'),
+            [model2],
+        )
+
     def test_get_export_policy(self) -> None:
         expected_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -228,8 +271,8 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             misconception_count=1,
             version=1,
             language_code='en',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
         ).put()
         skill_models.SkillSummaryModel(
             id='skill_id2',
@@ -237,8 +280,8 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             misconception_count=1,
             version=1,
             language_code='en',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
         ).put()
 
         skill_summaries, next_cursor, more = (

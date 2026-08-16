@@ -23,6 +23,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {VolunteerPageRootComponent} from './volunteer-page-root.component';
 import {CommonModule} from '@angular/common';
 import {VolunteerPageRoutingModule} from './volunteer-page-routing.module';
+import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import {VolunteerPageRoutingModule} from './volunteer-page-routing.module';
     SharedComponentsModule,
     VolunteerPageRoutingModule,
     NgbModule,
+    CampaignBannerModule,
   ],
   declarations: [VolunteerPageComponent, VolunteerPageRootComponent],
   entryComponents: [VolunteerPageComponent, VolunteerPageRootComponent],

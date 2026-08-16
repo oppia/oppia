@@ -20,12 +20,14 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {Component} from '@angular/core';
+import './login-required-message.component.css';
 
 @Component({
   selector: 'login-required-message',
   templateUrl: './login-required-message.component.html',
-  styleUrls: [],
+  styleUrls: ['./login-required-message.component.css'],
 })
 export class LoginRequiredMessageComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -37,7 +39,8 @@ export class LoginRequiredMessageComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
-    private readonly windowRef: WindowRef
+    private readonly windowRef: WindowRef,
+    private readonly signInEventService: SignInEventService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +53,9 @@ export class LoginRequiredMessageComponent {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
+        this.signInEventService.onUserSignIn.emit();
+        // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
+        // rather than manually being triggered by buttons.
         this.siteAnalyticsService.registerStartLoginEvent('loginButton');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;

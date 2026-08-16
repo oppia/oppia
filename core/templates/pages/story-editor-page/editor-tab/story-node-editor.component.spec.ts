@@ -24,7 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
@@ -43,16 +43,6 @@ import {TopicsAndSkillsDashboardBackendApiService} from '../../../domain/topics_
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
-class MockNgbModalRef {
-  componentInstance: {
-    skillSummaries: null;
-    skillsInSameTopicCount: null;
-    categorizedSkills: null;
-    allowSkillsFromOtherTopics: null;
-    untriagedSkillSummaries: null;
-  };
-}
-
 class MockTopicsAndSkillsDashboardBackendApiService {
   fetchDashboardDataAsync = () => {
     return Promise.resolve({
@@ -67,7 +57,7 @@ class MockTopicsAndSkillsDashboardBackendApiService {
 }
 
 class MockSkillBackendApiService {
-  fetchMultiSkillsAsync = skillIds => {
+  fetchMultiSkillsAsync = (skillIds: string[]) => {
     // The skillId ='2' case is used to test the case when the
     // SkillBackendApiService rejects the request.
     if (skillIds[0] === '2') {
@@ -81,7 +71,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -98,7 +87,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -115,7 +103,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -149,6 +136,10 @@ describe('Story node editor component', () => {
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
   let focusManagerService: FocusManagerService;
+  let modalRef: {
+    componentInstance: Record<string, string>;
+    result: Promise<string | object | void>;
+  };
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockEventEmitterLast = new EventEmitter();
 
@@ -201,7 +192,10 @@ describe('Story node editor component', () => {
       notes: 'Story notes',
       version: 1,
       corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
       url_fragment: 'story_title',
+      meta_tag_content: 'meta',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -215,6 +209,13 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
           {
             id: 'node_1',
@@ -226,7 +227,13 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
+            status: 'Draft',
             planned_publication_date_msecs: 168960000000,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
           {
             id: 'node_2',
@@ -238,6 +245,13 @@ describe('Story node editor component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
           {
             id: 'break',
@@ -249,6 +263,13 @@ describe('Story node editor component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
         ],
         next_node_id: 'node_3',
@@ -278,6 +299,11 @@ describe('Story node editor component', () => {
     component.storyNodeIds = ['node1', 'node_2', 'node_3', 'wroking'];
     component.destinationNodeIds = ['node_2'];
     component.ngOnInit();
+
+    modalRef = {
+      componentInstance: {},
+      result: Promise.resolve('success'),
+    };
   });
 
   afterEach(() => {
@@ -394,7 +420,7 @@ describe('Story node editor component', () => {
 
     component.togglePreview();
 
-    expect(component.chapterPreviewCardIsShown).toBeTrue();
+    expect(component.chapterPreviewCardIsShown).toBe(true);
   });
 
   it('should untoggle chapter preview card', () => {
@@ -402,7 +428,7 @@ describe('Story node editor component', () => {
 
     component.togglePreview();
 
-    expect(component.chapterPreviewCardIsShown).toBeFalse();
+    expect(component.chapterPreviewCardIsShown).toBe(false);
   });
 
   it('should toggle prereq skill list', () => {
@@ -410,7 +436,7 @@ describe('Story node editor component', () => {
 
     component.togglePrerequisiteSkillsList();
 
-    expect(component.prerequisiteSkillIsShown).toBeFalse();
+    expect(component.prerequisiteSkillIsShown).toBe(false);
   });
 
   it('should toggle acquired skill list', () => {
@@ -418,7 +444,7 @@ describe('Story node editor component', () => {
 
     component.toggleAcquiredSkillsList();
 
-    expect(component.acquiredSkillIsShown).toBeFalse();
+    expect(component.acquiredSkillIsShown).toBe(false);
   });
 
   it('should call StoryUpdate service to set story thumbnail filename', () => {
@@ -486,20 +512,20 @@ describe('Story node editor component', () => {
 
     expect(unfinalizeSpy).toHaveBeenCalled();
     expect(finalizeSpy).not.toHaveBeenCalled();
-    expect(component.outlineIsFinalized).toBeFalse();
+    expect(component.outlineIsFinalized).toBe(false);
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
   });
 
   it('should return true from canFinalize if editableOutline has content', () => {
     component.editableOutline = 'Some outline text';
 
-    expect(component.canFinalize()).toBeTrue();
+    expect(component.canFinalize()).toBe(true);
   });
 
   it('should return false from canFinalize if editableOutline has no content', () => {
     component.editableOutline = '';
 
-    expect(component.canFinalize()).toBeFalse();
+    expect(component.canFinalize()).toBe(false);
   });
 
   it('should call StoryUpdate service to update outline', () => {
@@ -547,7 +573,7 @@ describe('Story node editor component', () => {
       storyUpdateService.setStoryNodePlannedPublicationDateMsecs
     ).toHaveBeenCalledTimes(0);
     expect(component.plannedPublicationDate).toBe(null);
-    expect(component.plannedPublicationDateIsInPast).toBeTrue();
+    expect(component.plannedPublicationDateIsInPast).toBe(true);
 
     let futureDateString = '2037-04-20';
     component.updatePlannedPublicationDate(futureDateString);
@@ -558,13 +584,13 @@ describe('Story node editor component', () => {
       futureDate.getTime()
     );
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
-    expect(component.plannedPublicationDateIsInPast).toBeFalse();
+    expect(component.plannedPublicationDateIsInPast).toBe(false);
 
     component.updatePlannedPublicationDate('');
     expect(storySpy).toHaveBeenCalled();
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     expect(component.plannedPublicationDate).toBe(null);
-    expect(component.plannedPublicationDateIsInPast).toBeFalse();
+    expect(component.plannedPublicationDateIsInPast).toBe(false);
 
     component.plannedPublicationDate = new Date();
     component.updatePlannedPublicationDate(oldDateString);
@@ -607,12 +633,7 @@ describe('Story node editor component', () => {
   });
 
   it('should open add skill modal for adding prerequisite skill', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addPrerequisiteSkillId();
 
@@ -631,17 +652,13 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve({
-            summary: {
-              id: 'id',
-              description: 'description',
-            },
-          }),
-        } as NgbModalRef;
+      modalRef.result = Promise.resolve({
+        summary: {
+          id: 'id',
+          description: 'description',
+        },
       });
+      spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
       component.addPrerequisiteSkillId();
       tick();
@@ -657,12 +674,7 @@ describe('Story node editor component', () => {
     spyOn(storyUpdateService, 'addAcquiredSkillIdToNode').and.callFake(
       () => {}
     );
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addAcquiredSkillId();
     tick();
@@ -680,12 +692,7 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
       component.addAcquiredSkillId();
       tick();
@@ -949,26 +956,61 @@ describe('Story node editor component', () => {
     component.nodeId = 'node1';
     component.storyNodeIds = ['node1', 'node_2', 'working', 'duty'];
     component.destinationNodeIds = ['node_2'];
-    component.story = {
-      getStoryContents: () => {
-        return {
-          getLinearNodesList: () => {
-            return [
-              {
-                getId: () => {
-                  return 'NodeID_1';
-                },
-              },
-              {
-                getId: () => {
-                  return 'NodeID_2';
-                },
-              },
-            ];
+    component.story = Story.createFromBackendDict({
+      id: 'story_id',
+      title: '',
+      description: '',
+      notes: '',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      url_fragment: 'url',
+      meta_tag_content: 'meta',
+      story_contents: {
+        initial_node_id: '',
+        next_node_id: '',
+        nodes: [
+          {
+            id: 'NodeID_1',
+            title: '',
+            description: '',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: '',
+            outline_is_finalized: false,
+            exploration_id: null,
+            thumbnail_bg_color: null,
+            thumbnail_filename: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
-        };
+          {
+            id: 'NodeID_2',
+            title: '',
+            description: '',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: '',
+            outline_is_finalized: false,
+            exploration_id: null,
+            thumbnail_bg_color: null,
+            thumbnail_filename: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
+          },
+        ],
       },
-    };
+      language_code: 'en',
+    });
 
     mockEventEmitterLast.emit();
     tick();

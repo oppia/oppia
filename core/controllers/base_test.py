@@ -27,6 +27,8 @@ import logging
 import os
 import re
 import types
+from unittest import mock
+from xml.sax import handler
 
 import main
 from core import feconf, handler_schema_constants, utils
@@ -45,7 +47,7 @@ from core.tests import test_utils
 
 import webapp2
 import webtest
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from typing import Any, Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 from webapp2_extras import routes
 
 MYPY = False
@@ -141,6 +143,24 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         def get(self) -> None:
             """Handles GET requests."""
+            pass
+
+    class MockJsonHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        def get(self) -> None:
+            """Handles GET requests."""
+            self.render_json({'success': True})
+
+    class MockPostHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {'custom_key': {'schema': {'type': 'unicode'}}}
+        }
+
+        def post(self, *args: Any) -> None:
             pass
 
     def setUp(self) -> None:
@@ -477,6 +497,34 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 'http://localhost/logout?redirect_url=/splash',
             )
 
+    def test_partially_logged_in_json_request_returns_json_error(self) -> None:
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock-json',
+                        self.MockJsonHandler,
+                        name='MockJsonHandler',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+        login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_json('/mock-json', expected_status_int=401)
+
+        self.assertEqual(
+            response,
+            {
+                'error': (
+                    'You must complete signup before accessing this resource.'
+                ),
+                'status_code': 401,
+            },
+        )
+
     def test_no_partially_logged_in_redirect_from_logout(self) -> None:
         login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
 
@@ -565,7 +613,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<lightweight-oppia-root></lightweight-oppia-root>',
+                b'<oppia-root></oppia-root>',
                 response.body,
             )
 
@@ -596,6 +644,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assert_matches_regexps(
             logs, ['No email address was found for the user.']
         )
+
+    def test_validate_and_normalize_args_with_empty_payload_string(
+        self,
+    ) -> None:
+        """Test argument normalization when payload is naturally None."""
+        mock_request = mock.Mock()
+        mock_request.environ = {'REQUEST_METHOD': 'POST'}
+        mock_request.route_kwargs = {}
+        mock_request.arguments.return_value = ['payload', 'custom_key']
+
+        def mock_get_side_effect(arg_name: str) -> Optional[str]:
+            if arg_name == 'payload':
+                return ''
+            if arg_name == 'custom_key':
+                return 'some_value'
+            return None
+
+        mock_request.get.side_effect = mock_get_side_effect
+        handler = self.MockPostHandler(mock_request, mock.Mock())
+
+        handler.validate_and_normalize_args()
 
     def test_logs_request_with_invalid_payload(self) -> None:
         with contextlib.ExitStack() as exit_stack:
@@ -1388,7 +1457,8 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                 if 'get' in clazz.__dict__.keys():
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'%s\'' % allowed_class_ending
+                        'ends with \'%s\' or \'%sV2\''
+                        % (allowed_class_ending, allowed_class_ending)
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1397,16 +1467,17 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith(allowed_class_ending),
+                            class_name.endswith(allowed_class_ending)
+                            or class_name.endswith(allowed_class_ending + 'V2'),
                             msg=error_message,
                         )
 
-                # Check that the name of the class ends with 'Handler'
-                # if it does not has a get function.
+                # Check that the name of the class ends with 'Handler' or
+                # 'HandlerV2' if it does not have a get function.
                 else:
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'Handler\''
+                        'ends with \'Handler\' or \'HandlerV2\''
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1415,7 +1486,9 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith('Handler'), msg=error_message
+                            class_name.endswith('Handler')
+                            or class_name.endswith('HandlerV2'),
+                            msg=error_message,
                         )
 
         self.assertGreater(num_handlers_checked, 275)
@@ -2708,7 +2781,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         )
 
     def test_handle_not_logged_in_exception_logs_warning(self) -> None:
-        """Ensures NotLoggedInException logs a warning with the correct format."""
+        """Ensures NotLoggedInException logs a warning with the correct format
+        and without a stack trace."""
         with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotLoggedInException('Unauthenticated user'), False
@@ -2716,9 +2790,6 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = f"""
 
 NotLoggedInException: Unauthenticated user
-
-Stack Trace: 
-NoneType: None
 
 URL requested: {self.handler.request.uri}
 Request method: POST
@@ -2729,9 +2800,14 @@ Handler class name: BaseHandler
             self.logged_warnings,
             msg='NotLoggedInException message not match',
         )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='NotLoggedInException should not log a stack trace.',
+        )
 
     def test_not_found_exception_logs_warning(self) -> None:
-        """Ensures NotFoundException logs a warning with the correct format."""
+        """Ensures NotFoundException logs a warning with the correct format
+        and without a stack trace."""
         with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotFoundException('Invalid URL requested'), False
@@ -2739,9 +2815,6 @@ Handler class name: BaseHandler
         expected_log_message = f"""
 
 NotFoundException: Invalid URL requested
-
-Stack Trace: 
-NoneType: None
 
 URL requested: {self.handler.request.uri}
 Request method: POST
@@ -2752,55 +2825,89 @@ Handler class name: BaseHandler
             self.logged_warnings,
             msg='NotFoundException message not match',
         )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='NotFoundException should not log a stack trace.',
+        )
+
+    def test_not_found_exception_suppresses_stack_trace_with_active_traceback(
+        self,
+    ) -> None:
+        """Ensures NotFoundException does not log a stack trace even when
+        raised inside an active exception context (i.e. a real traceback is
+        available via traceback.format_exc())."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            try:
+                raise self.handler.NotFoundException('Invalid URL requested')
+            except self.handler.NotFoundException as e:
+                self.handler.handle_exception(e, False)
+
+        self.assertTrue(
+            all('Traceback' not in log for log in self.logged_warnings),
+            msg=(
+                'NotFoundException must not produce a traceback in the logs '
+                'even when raised inside an active exception context.'
+            ),
+        )
 
     def test_unauthorized_user_exception_logs_warning(self) -> None:
-        """Ensures UnauthorizedUserException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        """Ensures UnauthorizedUserException logs a warning with the correct
+        format.
+        """
+        with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.UnauthorizedUserException('Unauthorized User'),
                 False,
             )
+
         expected_log_message = f"""
 
-UnauthorizedUserException: Exception raised
-
-Stack Trace: 
-NoneType: None
+UnauthorizedUserException: Unauthorized user
 
 URL requested: {self.handler.request.uri}
 Request method: POST
 Handler class name: BaseHandler
 """
+
         self.assertIn(
             expected_log_message,
-            self.logged_exceptions,
+            self.logged_warnings,
             msg='UnauthorizedUserException message not match',
+        )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='UnauthorizedUserException should not log a stack trace.',
         )
 
     def test_invalid_input_exception_logs_warning(self) -> None:
-        """Ensures InvalidInputException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        """Ensures InvalidInputException logs a warning with the correct
+        format.
+        """
+        with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.InvalidInputException('Invalid Input'), False
             )
+
         expected_log_message = f"""
 
-InvalidInputException: Exception raised
-
-Stack Trace: 
-NoneType: None
+InvalidInputException: Invalid input
 
 URL requested: {self.handler.request.uri}
 Request method: POST
 Handler class name: BaseHandler
 """
+
         self.assertIn(
             expected_log_message,
-            self.logged_exceptions,
+            self.logged_warnings,
             msg='InvalidInputException message not match',
         )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='InvalidInputException should not log a stack trace.',
+        )
 
-    def test_internal_error_exception_logs_warning(self) -> None:
+    def test_internal_error_exception_logs_exception(self) -> None:
         """Ensures InternalErrorException logs an exception with the correct format."""
         with self.swap(logging, 'exception', self.mock_logging_exception):
             self.handler.handle_exception(
@@ -2808,7 +2915,7 @@ Handler class name: BaseHandler
             )
         expected_log_message = f"""
 
-InternalErrorException: Exception raised
+InternalErrorException: Internal error raised
 
 Stack Trace: 
 NoneType: None
@@ -2821,6 +2928,28 @@ Handler class name: BaseHandler
             expected_log_message,
             self.logged_exceptions,
             msg='InternalErrorException message not match',
+        )
+
+    def test_type_error_logs_exception(self) -> None:
+        """Ensures TypeError logs an exception and returns a 405 response."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(TypeError('Invalid method'), False)
+
+        expected_log_message = f"""
+
+TypeError: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='TypeError exception message does not match.',
         )
 
     def test_invalid_log_type_raises_exception(self) -> None:

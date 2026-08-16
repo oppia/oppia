@@ -55,7 +55,11 @@ export class SchemaBasedDictEditorComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   localValue!: Record<string, SchemaDefaultValue>;
   @Input() disabled!: boolean;
-  @Input() propertySchemas!: {name: string; schema: Schema}[];
+  @Input() propertySchemas!: {
+    name: string;
+    description?: string;
+    schema: Schema;
+  }[];
   @Input() labelForFocusTarget!: string;
   /**
    * Mapping of propertySchemaName to corresponding fieldIds.
@@ -114,7 +118,7 @@ export class SchemaBasedDictEditorComponent
   }
 
   getHumanReadablePropertyDescription(property: {
-    description: string;
+    description?: string;
     name: string;
   }): string {
     return property.description || '[' + property.name + ']';

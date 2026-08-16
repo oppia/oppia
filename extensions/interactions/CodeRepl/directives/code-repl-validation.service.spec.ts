@@ -36,7 +36,7 @@ describe('CodeReplValidationService', () => {
       providers: [CodeReplValidationService],
     });
 
-    validatorService = TestBed.get(CodeReplValidationService);
+    validatorService = TestBed.inject(CodeReplValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';

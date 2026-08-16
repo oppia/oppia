@@ -1,11 +1,11 @@
 <div *ngIf="!conceptCardExplanationEditorIsShown" class="review-material">
-  <div [ngClass]="oppia-editable-section"
+  <div [ngClass]="'oppia-editable-section'"
        (click)="openConceptCardExplanationEditor()">
     <i class="material-icons oppia-editor-edit-icon float-end e2e-test-edit-concept-card"
        title="Edit Concept Card Explanation">&#xE254;
     </i>
     <div class="oppia-state-content-display oppia-transition-200 e2e-test-concept-card-explanation"
-         [ngClass]="oppia-prevent-selection"
+         [ngClass]="'oppia-prevent-selection'"
          title="Concept Card Explanation">
       <span class="oppia-placeholder" [hidden]="!(editableExplanation === '')">
           Give a review or explanation of the skill.
@@ -39,17 +39,3 @@
     <div class="oppia-clear"></div>
   </div>
 </div>
-<style>
-  .review-material {
-    padding-bottom: 36px;
-    padding-top: 0.5em;
-  }
-
-  .editor-buttons {
-    margin-top: 2px;
-  }
-
-  .oppia-editor-edit-icon {
-    position: inherit;
-  }
-</style>

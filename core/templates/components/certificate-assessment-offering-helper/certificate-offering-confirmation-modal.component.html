@@ -1,0 +1,33 @@
+<div class="modal-header e2e-test-modal-header">
+  <h3 tabindex="0" class="m-0 p-0">{{modalTitle}}</h3>
+</div>
+
+<div class="modal-body oppia-long-text e2e-test-modal-body" tabindex="0">
+  <p class="m-0">Choose how you want to save this certificate:</p>
+
+  <div class="save-certificate-option">
+    <p class="mb-2"><strong>{{confirmButtonText}} (Available)</strong></p>
+    <p class="m-0">The certificate will be published and visible to learners immediately.</p>
+  </div>
+
+  <div class="save-certificate-option">
+    <p class="mb-2"><strong>Save as Not Ready</strong></p>
+    <p class="m-0 mb-2">The certificate will be saved but will not be visible to learners.</p>
+    <p class="m-0">You can make it available later once everything is complete.</p>
+  </div>
+
+  <p class="mb-0">
+    Note: Certificates can only be made available when the question pool meets the required criteria.
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+  <button class="btn btn-success e2e-test-confirm-save-certificate" [disabled]="!isCertificateValid"
+          (click)="confirm()" type="button">
+    {{confirmButtonText}}
+  </button>
+  <button class="btn btn-warning" (click)="saveAsNotReady()" type="button">
+    Save as Not Ready
+  </button>
+</div>

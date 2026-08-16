@@ -24,6 +24,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  ViewEncapsulation,
 } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
@@ -39,10 +40,11 @@ import {BlogPostSearchService} from 'services/blog-search.service';
 import {BlogHomePageConstants} from '../blog-home-page.constants';
 import isEqual from 'lodash/isEqual';
 
-import '../blog-home-page.component.css';
 @Component({
   selector: 'oppia-tag-filter',
   templateUrl: './tag-filter.component.html',
+  styleUrls: ['../blog-home-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TagFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -52,6 +54,7 @@ export class TagFilterComponent implements OnInit {
   @Input() smallScreenViewIsActive: boolean = false;
   @Input() selectedTags: string[] = [];
   @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
+  @Output() tagFilterInputChange: EventEmitter<string> = new EventEmitter();
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   tagFilter = new FormControl('');
@@ -109,6 +112,17 @@ export class TagFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
+
+    this.tagFilter.valueChanges
+      .pipe(
+        startWith(this.tagFilter.value),
+        map(value => value.trim() ?? ''),
+        distinctUntilChanged()
+      )
+      .subscribe(value => {
+        this.tagFilterInputChange.emit(value);
+      });
+
     this.filteredTags
       .pipe(
         debounceTime(BlogHomePageConstants.DEBOUNCE_TIME),

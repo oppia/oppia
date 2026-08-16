@@ -25,13 +25,13 @@ import {
   ExplorationBackendDict,
 } from 'domain/exploration/exploration.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {PageContextService} from 'services/page-context.service';
@@ -199,12 +199,13 @@ export class ExplorationEngineService {
     envs: Record<string, string>[]
   ): string {
     const oldInteractionId = oldStateCard.getInteractionId();
-    const oldInteractionArgs =
-      oldStateCard.getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+    const oldInteractionArgs = oldStateCard.getInteractionCustomizationArgs();
     const defaultOutcome = oldStateCard.getInteraction()?.defaultOutcome;
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
-      oldInteractionArgs.catchMisspellings &&
+      oldInteractionArgs !== null &&
+      'catchMisspellings' in oldInteractionArgs &&
+      oldInteractionArgs.catchMisspellings.value &&
       isEqual(outcome, defaultOutcome);
 
     if (shouldCheckForMisspelling) {
@@ -379,10 +380,13 @@ export class ExplorationEngineService {
     let interaction = this.exploration.getInteraction(
       this.exploration.initStateName
     );
+    if (!interaction) {
+      throw new Error('Interaction for the initial state is not defined.');
+    }
     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
     let interactionId = interaction.id;
-    let interactionHtml = null;
+    let interactionHtml = '';
     let interactionCustomizationArgs =
       this.exploration.getInteractionCustomizationArgs(this.currentStateName);
     if (interactionCustomizationArgs === null) {
@@ -414,18 +418,23 @@ export class ExplorationEngineService {
       );
     }
 
+    let contentId = initialState.content.contentId;
+    if (contentId === null) {
+      throw new Error('Content id cannot be null.');
+    }
+
     let initialCard = StateCard.createNewCard(
       this.currentStateName,
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId
+      contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
 
   getInitialStateName(): string {
-    return this.exploration.getInitialState().name;
+    return this.exploration.getInitialState().name ?? '';
   }
 
   /**
@@ -439,10 +448,14 @@ export class ExplorationEngineService {
    *   (used in preview mode).
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams = {};
-    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue();
-    });
+    let baseParams: ExplorationParams = {};
+    this.exploration.paramSpecs.forEach(
+      (paramName: string, paramSpec: ParamSpec) => {
+        baseParams[paramName] = String(
+          paramSpec.getType().createDefaultValue()
+        );
+      }
+    );
 
     let startingParams = this.makeParams(
       baseParams,
@@ -789,11 +802,6 @@ export class ExplorationEngineService {
       classificationResult.outcome,
       [oldParams]
     );
-    if (feedbackHtml === null) {
-      this.answerIsBeingProcessed = false;
-      this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
-    }
     let newParams = newState
       ? this.makeParams(oldParams, newState.paramChanges, [oldParams])
       : oldParams;
@@ -854,8 +862,7 @@ export class ExplorationEngineService {
     let contentId = this.exploration.getState(this.nextStateName).content
       .contentId;
     if (contentId === null) {
-      this.alertsService.addWarning('Content id cannot be null.');
-      return false;
+      throw new Error('Content id cannot be null.');
     }
 
     let nextCard = StateCard.createNewCard(
@@ -878,9 +885,9 @@ export class ExplorationEngineService {
       refreshInteraction,
       feedbackHtml,
       refresherExplorationId,
-      missingPrerequisiteSkillId,
+      missingPrerequisiteSkillId ?? '',
       onSameCard,
-      null,
+      '',
       oldStateName === this.exploration.initStateName,
       isFirstHit,
       false,
@@ -954,6 +961,9 @@ export class ExplorationEngineService {
 
     let contentId = this.exploration.getState(this.nextStateIfStuckName).content
       .contentId;
+    if (contentId === null) {
+      return null;
+    }
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -1051,7 +1061,7 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string> | null = {};
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
@@ -1081,11 +1091,15 @@ export class ExplorationEngineService {
       }
     }
 
+    if (!visitedNodes[destStateName]) {
+      return [];
+    }
+
     // Reconstruct the shortest path from node to parent map.
-    let currStateName = destStateName;
+    let currStateName: string | null = destStateName;
     while (currStateName !== null) {
       shortestPathToStateInReverse.push(currStateName);
-      currStateName = nodeToParentMap[currStateName];
+      currStateName = nodeToParentMap[currStateName] ?? null;
     }
     // Actual shortest path in order is reverse of the path retrieved
     // from parent map, hence we return the reversed path that goes

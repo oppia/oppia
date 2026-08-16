@@ -16,7 +16,13 @@
  * @fileoverview Component for hint and solution buttons.
  */
 
-import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
@@ -35,6 +41,7 @@ import './hint-and-solution-buttons.component.css';
   selector: 'oppia-hint-and-solution-buttons',
   templateUrl: './hint-and-solution-buttons.component.html',
   styleUrls: ['./hint-and-solution-buttons.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
