@@ -536,13 +536,22 @@ def main() -> None:
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n',
     )
-    # The --ignore-engines flag is required because Lighthouse 12 requires
-    # Node 18.20 or newer, but the dependencies are installed using Node 16.
-    # Lighthouse is a pure-JS package that is only run under the Node 20
-    # runtime (see LIGHTHOUSE_NODE_BIN_PATH in common.py), so the engine check
-    # is a false positive for the install step.
+    # The install runs under the same Node 20 installation that is used for
+    # the Playwright acceptance tests (see PLAYWRIGHT_NODE_PATH in common.py).
+    # This satisfies the engines requirement of Lighthouse 12 (Node 18.20 or
+    # newer), so no --ignore-engines flag is needed. This can be simplified
+    # when the default Node version is upgraded to 20 (see TODO(#26264)).
+    install_env = {
+        **os.environ,
+        'PATH': os.pathsep.join(
+            [
+                os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
+                os.environ['PATH'],
+            ]
+        ),
+    }
     subprocess.check_call(
-        ['yarn', 'install', '--pure-lockfile', '--ignore-engines']
+        ['yarn', 'install', '--pure-lockfile'], env=install_env
     )
 
 

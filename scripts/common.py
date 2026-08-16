@@ -59,7 +59,10 @@ PLAYWRIGHT_NODE_VERSION = '20.11.1'
 # from NODE_VERSION so existing frontend tooling remains unchanged, because
 # Lighthouse 12+ requires Node 18.20 or newer. It matches
 # PLAYWRIGHT_NODE_VERSION so that the same Node 20 toolchain already installed
-# for the Playwright acceptance tests can be reused.
+# for the Playwright acceptance tests can be reused. This Node version is also
+# used to run the repo-wide `yarn install` (see install_third_party_libs.py),
+# so that the engines requirement of Lighthouse is satisfied at install time
+# without an --ignore-engines flag.
 LIGHTHOUSE_NODE_VERSION = '20.11.1'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
