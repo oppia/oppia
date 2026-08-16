@@ -171,7 +171,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
     def test_inject_entities_into_url_with_repeated_entity(self) -> None:
         entities = {'topic_id': '4'}
-        url = 'http://localhost:8181/topic_editor/{{topic_id}}/' '{{topic_id}}'
+        url = 'http://localhost:8181/topic_editor/{{topic_id}}/{{topic_id}}'
         expected_injected_url = 'http://localhost:8181/topic_editor/4/4'
         self.assertEqual(
             run_lighthouse_tests.inject_entities_into_url(url, entities),

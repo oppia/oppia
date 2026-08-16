@@ -539,8 +539,9 @@ def main() -> None:
     # The install runs under the same Node 20 installation that is used for
     # the Playwright acceptance tests (see PLAYWRIGHT_NODE_PATH in common.py).
     # This satisfies the engines requirement of Lighthouse 12 (Node 18.20 or
-    # newer), so no --ignore-engines flag is needed. This can be simplified
-    # when the default Node version is upgraded to 20 (see TODO(#26264)).
+    # newer), so no --ignore-engines flag is needed.
+    # TODO(#26264): Simplify this install step by using the default Node
+    # version once it is upgraded to 20.
     install_env = {
         **os.environ,
         'PATH': os.pathsep.join(
