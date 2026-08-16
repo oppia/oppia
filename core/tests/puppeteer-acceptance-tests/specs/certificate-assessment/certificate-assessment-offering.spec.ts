@@ -187,7 +187,7 @@ describe('Certificate Assessment', function () {
     );
   }, 3000000);
 
-  xit('should let the curriculum admin access the certificate dashboard', async function () {
+  it('should let the curriculum admin access the certificate dashboard', async function () {
     await curriculumAdmin.goto(testConstants.URLs.Home);
     await curriculumAdmin.expectElementToBeVisible(
       '.e2e-test-profile-dropdown'
@@ -503,7 +503,7 @@ describe('Certificate Assessment', function () {
     );
   });
 
-  xit('should delete the certificate offering from the dashboard', async function () {
+  it('should delete the certificate offering from the dashboard', async function () {
     await curriculumAdmin.goto(testConstants.URLs.CertificateCreatorDashboard);
     await curriculumAdmin.clickOnElementWithSelector(deleteCertificateButton);
     await curriculumAdmin.expectTextContentToBe(
@@ -528,6 +528,6 @@ describe('Certificate Assessment', function () {
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
