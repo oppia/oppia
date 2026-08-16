@@ -39,7 +39,6 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   topicTitle!: string;
   thumbnailBgColor!: string;
   openInNewWindow = false;
-  @Input() redesignFeatureFlag!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

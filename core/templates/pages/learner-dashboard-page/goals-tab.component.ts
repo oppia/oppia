@@ -17,19 +17,10 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {Subscription} from 'rxjs';
@@ -47,7 +38,6 @@ import './goals-tab.component.css';
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private deviceInfoService: DeviceInfoService,
@@ -63,22 +53,9 @@ export class GoalsTabComponent implements OnInit {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
-  @Input() learnerDashboardRedesignFeatureFlag!: boolean;
-  // Child dropdown is undefined because initially it is in closed state using
-  // the following property: {'static' = false}.
-  @ViewChild('dropdown', {static: false}) dropdownRef: ElementRef | undefined;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
-  currentGoalsStoryIsShown!: boolean[];
-  showThreeDotsDropdown!: boolean[];
-  pawImageUrl: string = '';
-  bookImageUrl: string = '';
-  starImageUrl: string = '';
   topicBelongToCurrentGoals: boolean[] = [];
-  topicIdsInCompletedGoals: string[] = [];
-  topicIdsInCurrentGoals: string[] = [];
-  topicIdsInEditGoals: string[] = [];
-  topicIdsInPartiallyLearntTopics: string[] = [];
   checkedTopics: Set<string> = new Set();
   completedTopics: Set<string> = new Set();
   topicToIndexMapping = {
@@ -87,52 +64,19 @@ export class GoalsTabComponent implements OnInit {
     NEITHER: 2,
   };
 
-  indexOfSelectedTopic: number = -1;
   activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
-  editGoalsTopicPageUrl: string[] = [];
-  completedGoalsTopicPageUrl: string[] = [];
-  editGoalsTopicClassification: number[] = [];
-  editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
-    this.currentGoalsStoryIsShown = [];
-    this.showThreeDotsDropdown = [];
-    this.currentGoalsStoryIsShown[0] = true;
-    this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
-    this.bookImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/book_icon.png'
-    );
-    this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
     let topic: LearnerTopicSummary;
 
     for (topic of this.currentGoals) {
-      this.topicIdsInCurrentGoals.push(topic.id);
       this.checkedTopics.add(topic.id);
     }
     for (topic of this.completedGoals) {
-      this.topicIdsInCompletedGoals.push(topic.id);
-      this.completedGoalsTopicPageUrl.push(
-        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
-      );
       this.completedTopics.add(topic.id);
-    }
-    for (topic of this.editGoals) {
-      this.topicIdsInEditGoals.push(topic.id);
-      this.editGoalsTopicPageUrl.push(
-        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
-      );
-      this.editGoalsTopicClassification.push(
-        this.getTopicClassification(topic.id)
-      );
-      this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
-        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name)
-      );
-    }
-    for (topic of this.partiallyLearntTopicsList) {
-      this.topicIdsInPartiallyLearntTopics.push(topic.id);
     }
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -140,161 +84,6 @@ export class GoalsTabComponent implements OnInit {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       })
     );
-  }
-
-  getTopicPageUrl(
-    topicUrlFragment: string,
-    classroomUrlFragment: string
-  ): string {
-    return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
-      {
-        topic_url_fragment: topicUrlFragment,
-        classroom_url_fragment: classroomUrlFragment,
-      }
-    );
-  }
-
-  getTopicClassification(topicId: string): number {
-    if (this.topicIdsInCurrentGoals.includes(topicId)) {
-      return this.topicToIndexMapping.CURRENT;
-    } else if (this.topicIdsInCompletedGoals.includes(topicId)) {
-      return this.topicToIndexMapping.COMPLETED;
-    } else {
-      return this.topicToIndexMapping.NEITHER;
-    }
-  }
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  doesTopicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
-    if (this.learntToPartiallyLearntTopics.includes(topicName)) {
-      return true;
-    }
-    return false;
-  }
-
-  toggleStory(index: number): void {
-    this.currentGoalsStoryIsShown[index] =
-      !this.currentGoalsStoryIsShown[index];
-  }
-
-  async addToLearnerGoals(
-    topic: LearnerTopicSummary,
-    topicId: string,
-    index: number,
-    event?: Event
-  ): Promise<void> {
-    if (event) {
-      event.preventDefault();
-    }
-    var activityId = topicId;
-    var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
-    if (!this.topicIdsInCurrentGoals.includes(activityId)) {
-      var isSuccessfullyAdded =
-        await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
-          activityId,
-          activityType
-        );
-      if (
-        isSuccessfullyAdded &&
-        this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&
-        !this.topicIdsInCompletedGoals.includes(activityId)
-      ) {
-        this.currentGoalsStoryIsShown.push(false);
-        this.currentGoals.push(topic);
-        this.topicIdsInCurrentGoals.push(activityId);
-        this.editGoalsTopicClassification.splice(
-          index,
-          1,
-          this.getTopicClassification(topic.id)
-        );
-        if (this.untrackedTopics[topic.classroomUrlFragment]) {
-          let indexInNewTopics = this.untrackedTopics[
-            topic.classroomUrlFragment
-          ].findIndex(topic => topic.id === topicId);
-          if (indexInNewTopics !== -1) {
-            this.untrackedTopics[topic.classroomUrlFragment].splice(
-              indexInNewTopics,
-              1
-            );
-            if (this.untrackedTopics[topic.classroomUrlFragment].length === 0) {
-              delete this.untrackedTopics[topic.classroomUrlFragment];
-            }
-          }
-        }
-      }
-    } else {
-      const goalIndex = this.topicIdsInCurrentGoals.indexOf(activityId);
-      this.removeFromLearnerGoals(topic, topicId, topic.name, goalIndex);
-    }
-  }
-
-  toggleThreeDotsDropdown(index: number): void {
-    this.showThreeDotsDropdown[index] = !this.showThreeDotsDropdown[index];
-    if (this.indexOfSelectedTopic !== index) {
-      this.indexOfSelectedTopic = index;
-    } else {
-      this.indexOfSelectedTopic = -1;
-    }
-    return;
-  }
-
-  /**
-   * Close dropdown when outside elements are clicked
-   * @param event mouse click event
-   */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const targetElement = event.target as HTMLElement;
-    for (let i = 0; i < this.currentGoals.length; i++) {
-      if (targetElement && this.showThreeDotsDropdown[i]) {
-        this.showThreeDotsDropdown[i] = false;
-      }
-    }
-  }
-
-  removeFromLearnerGoals(
-    topic: LearnerTopicSummary,
-    topicId: string,
-    topicName: string,
-    index: number
-  ): void {
-    var activityId = topicId;
-    var activityTitle = topicName;
-    this.learnerDashboardActivityBackendApiService
-      .removeActivityModalAsync(
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
-          .CURRENT_GOALS,
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-          .LEARN_TOPIC,
-        activityId,
-        activityTitle
-      )
-      .then(() => {
-        this.currentGoalsStoryIsShown.splice(index, 1);
-        this.currentGoals.splice(index, 1);
-        this.topicIdsInCurrentGoals.splice(index, 1);
-        let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
-        this.editGoalsTopicClassification.splice(
-          indexOfTopic,
-          1,
-          this.getTopicClassification(topicId)
-        );
-        if (
-          !this.topicIdsInCompletedGoals.includes(topicId) &&
-          !this.topicIdsInCurrentGoals.includes(topicId) &&
-          !this.topicIdsInPartiallyLearntTopics.includes(topicId)
-        ) {
-          if (this.untrackedTopics[topic.classroomUrlFragment]) {
-            this.untrackedTopics[topic.classroomUrlFragment].push(topic);
-          } else {
-            this.untrackedTopics[topic.classroomUrlFragment] = [topic];
-          }
-        }
-      });
   }
 
   // TODO(#18384): Change how current goals is being modified with event emitter, currently directly modfiying parent input (original implementation).

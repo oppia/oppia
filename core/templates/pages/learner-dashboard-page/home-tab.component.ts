@@ -49,7 +49,6 @@ export class HomeTabComponent {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
-  @Input() redesignFeatureFlag!: boolean;
   @Input() totalLessonsInPlaylists!: (
     | LearnerExplorationSummary
     | CollectionSummary

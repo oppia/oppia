@@ -27,9 +27,7 @@ import {ClassroomButtonComponent} from './classroom-button/classroom-button.comp
 import {ContentToggleButtonComponent} from './content-toggle-button/content-toggle-button.component';
 import {GoalListComponent} from './goal-list/goal-list.component';
 import {SkillCardModule} from './skill-card/skill-card.module';
-import {LearnerStorySummaryTileComponent} from 'components/summary-tile/learner-story-summary-tile.component';
 import {LearnerTopicGoalsSummaryTileComponent} from 'components/summary-tile/learner-topic-goals-summary-tile.component';
-import {OldProgressTabComponent} from './old-progress-tab.component';
 import {GoalsTabComponent} from './goals-tab.component';
 import {ProgressTabComponent} from './progress-tab.component';
 import {LearnerTopicSummaryTileComponent} from 'components/summary-tile/learner-topic-summary-tile.component';
@@ -83,9 +81,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
     GoalListComponent,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
-    LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,
-    OldProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
@@ -104,9 +100,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
     ContentToggleButtonComponent,
     GoalListComponent,
     LearnerDashboardPageComponent,
-    LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,
-    OldProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
