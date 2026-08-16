@@ -89,9 +89,9 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
       urlInterpolationServiceSpy.getStaticCopyrightedImageUrl
     ).toHaveBeenCalledWith('/avatar/oppia_avatar_100px.svg');
     expect(component.OPPIA_AVATAR_IMAGE_URL).toBe('/static/avatar.svg');
-    expect(component.isOptionSelected('a')).toBeTrue();
-    expect(component.isOptionSelected('b')).toBeTrue();
-    expect(component.isOptionSelected('c')).toBeFalse();
+    expect(component.isOptionSelected('a')).toBe(true);
+    expect(component.isOptionSelected('b')).toBe(true);
+    expect(component.isOptionSelected('c')).toBe(false);
   });
 
   it('should clear response state when savedResponse is empty during ngOnChanges', () => {
@@ -135,9 +135,9 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
       prompt: 'Select all prime numbers.',
       hint: 'Choose all that apply.',
       options: [
-        {id: 'a', text: '2', index: 0},
-        {id: 'b', text: '3', index: 1},
-        {id: 'c', text: '4', index: 2},
+        {id: 'a', text: '2'},
+        {id: 'b', text: '3'},
+        {id: 'c', text: '4'},
       ],
       correctAnswerText: '2,3',
     };
@@ -145,9 +145,9 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isOptionSelected('a')).toBeTrue();
-    expect(component.isOptionSelected('b')).toBeTrue();
-    expect(component.isOptionSelected('c')).toBeFalse();
+    expect(component.isOptionSelected('a')).toBe(true);
+    expect(component.isOptionSelected('b')).toBe(true);
+    expect(component.isOptionSelected('c')).toBe(false);
   });
 
   it('should bind the free-response label to a stable input id', () => {
