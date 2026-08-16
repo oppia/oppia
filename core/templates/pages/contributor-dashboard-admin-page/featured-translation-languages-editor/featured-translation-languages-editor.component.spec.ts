@@ -229,9 +229,7 @@ describe('Featured Translation Languages Editor Component', () => {
     component.saveFeaturedTranslationLanguages();
     flushMicrotasks();
 
-    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
-      FEATURED_TRANSLATION_LANGUAGE_MESSAGES.SAVE_FAILURE
-    );
+    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith('Save error.');
     expect(component.saveInProgress).toBeFalse();
   }));
 
