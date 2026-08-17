@@ -2964,4 +2964,71 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.showAdventureMasteredModal).toBe(false);
   }));
+
+  it('should forward the topic editor preview flag to the adventure navigation', () => {
+    component.isInTopicEditorPreview = true;
+    fixture.detectChanges();
+
+    const navigationElement = fixture.nativeElement.querySelector(
+      'topic-adventure-navigation'
+    );
+    expect(navigationElement).not.toBeNull();
+    expect(navigationElement.isInTopicEditorPreview).toBeTrue();
+  });
+
+  it('should not forward the topic editor preview flag by default', () => {
+    component.isInTopicEditorPreview = false;
+    fixture.detectChanges();
+
+    const navigationElement = fixture.nativeElement.querySelector(
+      'topic-adventure-navigation'
+    );
+    expect(navigationElement).not.toBeNull();
+    expect(navigationElement.isInTopicEditorPreview).toBeFalse();
+  });
+
+  it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
+    const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
+      null
+    );
+
+    component.onNavigationPracticeSelected('1');
+    tick(300);
+
+    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-1');
+  }));
+
+  it('should scroll to lesson element when found by getElementById', fakeAsync(() => {
+    const lessonElement = jasmine.createSpyObj<HTMLElement>('lessonElement', [
+      'scrollIntoView',
+    ]);
+    spyOn(document, 'getElementById').and.returnValue(lessonElement);
+
+    component.onNavigationLessonSelected({
+      lessonNumber: 1,
+      adventureIndex: 0,
+    });
+    tick(300);
+
+    expect(lessonElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }));
+
+  it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
+    const practiceElement = jasmine.createSpyObj<HTMLElement>(
+      'practiceElement',
+      ['scrollIntoView']
+    );
+    spyOn(document, 'getElementById').and.returnValue(practiceElement);
+
+    component.onNavigationPracticeSelected('1');
+    tick(300);
+
+    expect(practiceElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }));
 });

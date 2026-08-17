@@ -24,6 +24,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
+import {By} from '@angular/platform-browser';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -38,10 +39,14 @@ describe('ArcSkipConfirmationModalComponent', () => {
   ): HTMLElement => {
     const dialogElement = document.createElement('div');
     spyOn(dialogElement, 'focus');
-    spyOn(dialogElement, 'querySelectorAll').and.returnValue(
-      focusableElements as NodeListOf<HTMLElement>
-    );
+    focusableElements.forEach(element => dialogElement.appendChild(element));
     return dialogElement;
+  };
+
+  const createMockFocusableElement = (): HTMLElement => {
+    const element = document.createElement('button');
+    spyOn(element, 'focus');
+    return element;
   };
 
   beforeEach(waitForAsync(() => {
@@ -97,7 +102,7 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(component.cancel.emit).not.toHaveBeenCalled();
   });
 
-  it('should save active element and focus dialog on init', fakeAsync(() => {
+  it('should move focus into the dialog on init', fakeAsync(() => {
     const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
       'previouslyFocusedElement',
       ['focus']
@@ -106,29 +111,33 @@ describe('ArcSkipConfirmationModalComponent', () => {
     spyOnProperty(document, 'activeElement', 'get').and.returnValue(
       previouslyFocusedElement
     );
-    component['dialog'] = new ElementRef(dialogElement);
+    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
 
     component.ngOnInit();
     tick(0);
 
     expect(dialogElement.focus).toHaveBeenCalled();
-    expect(component['modalFocusRestoreElement']).toBe(
+    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBe(
       previouslyFocusedElement
     );
   }));
 
-  it('should restore focus on cancel', () => {
+  it('should restore focus to the element that opened the modal on cancel', () => {
     const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
       'previouslyFocusedElement',
       ['focus']
     );
-    component['modalFocusRestoreElement'] = previouslyFocusedElement;
+    Reflect.set(
+      component,
+      'modalFocusRestoreElement',
+      previouslyFocusedElement
+    );
     spyOn(component.cancel, 'emit');
 
     component.onCancel();
 
     expect(previouslyFocusedElement.focus).toHaveBeenCalled();
-    expect(component['modalFocusRestoreElement']).toBeNull();
+    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 
   it('should restore focus on confirm', () => {
@@ -136,29 +145,27 @@ describe('ArcSkipConfirmationModalComponent', () => {
       'previouslyFocusedElement',
       ['focus']
     );
-    component['modalFocusRestoreElement'] = previouslyFocusedElement;
+    Reflect.set(
+      component,
+      'modalFocusRestoreElement',
+      previouslyFocusedElement
+    );
     spyOn(component.confirm, 'emit');
 
     component.onConfirm();
 
     expect(previouslyFocusedElement.focus).toHaveBeenCalled();
-    expect(component['modalFocusRestoreElement']).toBeNull();
+    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 
-  it('should focus dialog on Tab when active element is last focusable', () => {
-    const firstFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'firstFocusableElement',
-      ['focus']
-    );
-    const lastFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'lastFocusableElement',
-      ['focus']
-    );
+  it('should move focus to the first focusable element on Tab from the last one', () => {
+    const firstFocusableElement = createMockFocusableElement();
+    const lastFocusableElement = createMockFocusableElement();
     const dialogElement = createMockDialog([
       firstFocusableElement,
       lastFocusableElement,
     ]);
-    component['dialog'] = new ElementRef(dialogElement);
+    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
     spyOnProperty(document, 'activeElement', 'get').and.returnValue(
       lastFocusableElement
     );
@@ -175,20 +182,14 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(tabEvent.preventDefault).toHaveBeenCalled();
   });
 
-  it('should focus last element on Shift+Tab when active element is first focusable', () => {
-    const firstFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'firstFocusableElement',
-      ['focus']
-    );
-    const lastFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'lastFocusableElement',
-      ['focus']
-    );
+  it('should move focus to the last focusable element on Shift+Tab from the first one', () => {
+    const firstFocusableElement = createMockFocusableElement();
+    const lastFocusableElement = createMockFocusableElement();
     const dialogElement = createMockDialog([
       firstFocusableElement,
       lastFocusableElement,
     ]);
-    component['dialog'] = new ElementRef(dialogElement);
+    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
     spyOnProperty(document, 'activeElement', 'get').and.returnValue(
       firstFocusableElement
     );
@@ -206,20 +207,14 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
   });
 
-  it('should focus last element on Shift+Tab when active element is the dialog', () => {
-    const firstFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'firstFocusableElement',
-      ['focus']
-    );
-    const lastFocusableElement = jasmine.createSpyObj<HTMLElement>(
-      'lastFocusableElement',
-      ['focus']
-    );
+  it('should move focus to the last focusable element on Shift+Tab when the dialog is focused', () => {
+    const firstFocusableElement = createMockFocusableElement();
+    const lastFocusableElement = createMockFocusableElement();
     const dialogElement = createMockDialog([
       firstFocusableElement,
       lastFocusableElement,
     ]);
-    component['dialog'] = new ElementRef(dialogElement);
+    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
     spyOnProperty(document, 'activeElement', 'get').and.returnValue(
       dialogElement
     );
@@ -237,8 +232,8 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
   });
 
-  it('should do nothing on Tab when dialog element is not set', () => {
-    component['dialog'] = undefined!;
+  it('should do nothing on Tab when no dialog is rendered', () => {
+    Reflect.deleteProperty(component, 'dialog');
 
     const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
     spyOn(tabEvent, 'preventDefault');
@@ -248,8 +243,8 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(tabEvent.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('should prevent default on Tab when no focusable elements exist', () => {
-    component['dialog'] = new ElementRef(createMockDialog());
+  it('should prevent Tab navigation when the dialog has no focusable elements', () => {
+    Reflect.set(component, 'dialog', new ElementRef(createMockDialog()));
 
     const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
     spyOn(tabEvent, 'preventDefault');
@@ -259,8 +254,8 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(tabEvent.preventDefault).toHaveBeenCalled();
   });
 
-  it('should ignore non-Tab key in onDialogTab', () => {
-    component['dialog'] = new ElementRef(createMockDialog());
+  it('should do nothing when a non-Tab key is pressed on the dialog', () => {
+    Reflect.set(component, 'dialog', new ElementRef(createMockDialog()));
 
     const enterEvent = new KeyboardEvent('keydown', {key: 'Enter'});
     spyOn(enterEvent, 'preventDefault');
@@ -271,12 +266,12 @@ describe('ArcSkipConfirmationModalComponent', () => {
   });
 
   it('should emit cancel without restoring focus when no element was saved', () => {
-    component['modalFocusRestoreElement'] = null;
+    Reflect.set(component, 'modalFocusRestoreElement', null);
     spyOn(component.cancel, 'emit');
 
     component.onCancel();
 
     expect(component.cancel.emit).toHaveBeenCalled();
-    expect(component['modalFocusRestoreElement']).toBeNull();
+    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 });
