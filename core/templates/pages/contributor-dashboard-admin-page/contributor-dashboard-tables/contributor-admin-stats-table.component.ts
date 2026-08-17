@@ -31,9 +31,11 @@ import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-a
 import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
 import isEqual from 'lodash/isEqual';
+import './contributor-admin-stats-table.component.css';
 @Component({
   selector: 'contributor-admin-stats-table',
   templateUrl: './contributor-admin-stats-table.component.html',
+  styleUrls: ['./contributor-admin-stats-table.component.css'],
   animations: [
     trigger('detailExpand', [
       state(

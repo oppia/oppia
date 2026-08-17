@@ -27,6 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
+import pytest
 from typing import List, Optional, TypedDict
 
 MYPY = False
@@ -336,6 +337,31 @@ class UserSettingsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected display_alias to be a string,'
             ' received %s' % self.user_settings.display_alias,
+        ):
+            self.user_settings.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_str_profile_name_for_certificate_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = 0  # type: ignore[assignment]
+        with pytest.raises(
+            utils.ValidationError,
+            match=f'Expected profile_name_for_certificate to be a string, received {self.user_settings.profile_name_for_certificate}',
+        ):
+            self.user_settings.validate()
+
+    def test_validate_long_profile_name_for_certificate_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = 'a' * (
+            constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE + 1
+        )
+        with pytest.raises(
+            utils.ValidationError,
+            match=f'Profile name for certificates should be at most {constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE} characters long.',
         ):
             self.user_settings.validate()
 
@@ -724,13 +750,16 @@ class UserGlobalPrefsTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Testing init method."""
         user_global_prefs = user_domain.UserGlobalPrefs(
-            True, False, True, False
+            True, False, True, False, True
         )
 
         self.assertTrue(user_global_prefs.can_receive_email_updates)
         self.assertFalse(user_global_prefs.can_receive_editor_role_email)
         self.assertTrue(user_global_prefs.can_receive_feedback_message_email)
         self.assertFalse(user_global_prefs.can_receive_subscription_email)
+        self.assertTrue(
+            user_global_prefs.can_receive_contributor_dashboard_email
+        )
 
     def test_create_default_prefs(self) -> None:
         """Testing create_default_prefs."""
@@ -753,6 +782,10 @@ class UserGlobalPrefsTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_user_global_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+        )
+        self.assertEqual(
+            default_user_global_prefs.can_receive_contributor_dashboard_email,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
 
@@ -817,7 +850,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_initialization(self) -> None:
         """Testing init method."""
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )
@@ -830,7 +863,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_update_last_played_information(self) -> None:
         """Testing update_last_played_information."""
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )
@@ -1213,107 +1246,6 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         learner_goals.remove_topic_id_from_learn('topic_id0')
 
         self.assertListEqual(learner_goals.topic_ids_to_learn, [])
-
-
-class LearnerPlaylistTests(test_utils.GenericTestBase):
-    """Testing domain object for the learner playlist."""
-
-    def test_initialization(self) -> None:
-        """Testing init method."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertEqual(learner_playlist.id, 'user_id0')
-        self.assertListEqual(learner_playlist.exploration_ids, ['exp_id0'])
-        self.assertListEqual(learner_playlist.collection_ids, ['collect_id0'])
-
-    def test_insert_exploration_id_at_given_position(self) -> None:
-        """Testing inserting the given exploration id at the given position."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.exploration_ids, ['exp_id0'])
-
-        learner_playlist.insert_exploration_id_at_given_position('exp_id1', 1)
-        learner_playlist.insert_exploration_id_at_given_position('exp_id2', 1)
-
-        self.assertListEqual(
-            learner_playlist.exploration_ids, ['exp_id0', 'exp_id2', 'exp_id1']
-        )
-
-    def test_add_exploration_id_to_list(self) -> None:
-        """Testing add_exploration_id_to_list."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.exploration_ids, ['exp_id0'])
-
-        learner_playlist.add_exploration_id_to_list('exp_id1')
-
-        self.assertListEqual(
-            learner_playlist.exploration_ids, ['exp_id0', 'exp_id1']
-        )
-
-    def test_insert_collection_id_at_given_position(self) -> None:
-        """Testing insert_exploration_id_at_given_position."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.collection_ids, ['collect_id0'])
-
-        learner_playlist.insert_collection_id_at_given_position(
-            'collect_id1', 1
-        )
-        learner_playlist.insert_collection_id_at_given_position(
-            'collect_id2', 1
-        )
-
-        self.assertListEqual(
-            learner_playlist.collection_ids,
-            ['collect_id0', 'collect_id2', 'collect_id1'],
-        )
-
-    def test_add_collection_id_list(self) -> None:
-        """Testing add_collection_id."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.collection_ids, ['collect_id0'])
-
-        learner_playlist.add_collection_id_to_list('collect_id1')
-
-        self.assertListEqual(
-            learner_playlist.collection_ids, ['collect_id0', 'collect_id1']
-        )
-
-    def test_remove_exploration_id(self) -> None:
-        """Testing remove_exploration_id."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.exploration_ids, ['exp_id0'])
-
-        learner_playlist.remove_exploration_id('exp_id0')
-
-        self.assertListEqual(learner_playlist.exploration_ids, [])
-
-    def test_remove_collection_id(self) -> None:
-        """Testing remove_collection_id."""
-        learner_playlist = user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']
-        )
-
-        self.assertListEqual(learner_playlist.collection_ids, ['collect_id0'])
-
-        learner_playlist.remove_collection_id('collect_id0')
-
-        self.assertListEqual(learner_playlist.collection_ids, [])
 
 
 class UserContributionProficiencyTests(test_utils.GenericTestBase):
