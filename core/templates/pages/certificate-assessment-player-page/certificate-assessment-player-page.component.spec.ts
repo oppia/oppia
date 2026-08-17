@@ -33,11 +33,11 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
-  CertificateAssessmentOfferingBackendApiService,
-  CertificateAssessmentQuestionBackendResponse,
-} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
+  CertificateAssessmentAttemptData,
+  CertificateAssessmentQuestionData,
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -176,7 +176,7 @@ const createTextInputStateData = (): StateBackendDict => ({
 
 const createQuestionResponse = (
   questionId: string
-): CertificateAssessmentQuestionBackendResponse => {
+): CertificateAssessmentQuestionData => {
   let stateData: StateBackendDict;
   if (questionId === 'question_1') {
     stateData = createMultipleChoiceStateData();
@@ -185,7 +185,10 @@ const createQuestionResponse = (
   } else {
     stateData = createTextInputStateData();
   }
-  return {question_id: questionId, question_state_data: stateData};
+  return CertificateAssessmentQuestionData.createFromBackendDict({
+    question_id: questionId,
+    question_state_data: stateData,
+  });
 };
 
 class MockNgbModal {
@@ -612,7 +615,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       CertificateAssessmentOfferingBackendApiService
     ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
     let resolveFirst: (
-      value: CertificateAssessmentQuestionBackendResponse
+      value: CertificateAssessmentQuestionData
     ) => void = () => {};
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       new Promise(r => {
@@ -639,9 +642,8 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     const apiSpy = TestBed.inject(
       CertificateAssessmentOfferingBackendApiService
     ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
-    const deferreds: ((
-      value: CertificateAssessmentQuestionBackendResponse
-    ) => void)[] = [];
+    const deferreds: ((value: CertificateAssessmentQuestionData) => void)[] =
+      [];
     apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
       () =>
         new Promise(r => {
@@ -659,20 +661,16 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       2
     );
 
-    (
-      deferreds[1] as (
-        value: CertificateAssessmentQuestionBackendResponse
-      ) => void
-    )(createQuestionResponse('question_2'));
+    (deferreds[1] as (value: CertificateAssessmentQuestionData) => void)(
+      createQuestionResponse('question_2')
+    );
     flushMicrotasks();
     expect(component.questions[1]).toBeDefined();
     expect(component.questions[0]).toBeUndefined();
 
-    (
-      deferreds[0] as (
-        value: CertificateAssessmentQuestionBackendResponse
-      ) => void
-    )(createQuestionResponse('question_1'));
+    (deferreds[0] as (value: CertificateAssessmentQuestionData) => void)(
+      createQuestionResponse('question_1')
+    );
     flushMicrotasks();
     expect(component.questions[0]).toBeDefined();
     expect(component.questions[1]).toBeDefined();

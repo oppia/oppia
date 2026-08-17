@@ -25,9 +25,10 @@ import {
   CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
+  CertificateAssessmentQuestionStateBackendDict,
+  CertificateAssessmentQuestionData,
 } from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
-import {StateBackendDict} from 'domain/state/state.model';
 
 interface CreateCertificateOfferingBackendResponse {
   certificate_id: string;
@@ -104,11 +105,9 @@ interface CertificateAssessmentQuestionBackendDict {
   question_version: number;
 }
 
-export interface CertificateAssessmentQuestionBackendResponse {
-  question_id: string;
-  question_state_data: StateBackendDict;
-}
-
+// Response for starting a new assessment attempt. The question list is
+// represented by CertificateAssessmentQuestionBackendDict entries; the full
+// question state is fetched separately via the question handler.
 interface StartCertificateAssessmentBackendResponse {
   attempt_id: string;
   questions: CertificateAssessmentQuestionBackendDict[];
@@ -430,14 +429,14 @@ export class CertificateAssessmentOfferingBackendApiService {
   async getCertificateAssessmentQuestionAsync(
     attemptId: string,
     questionId: string
-  ): Promise<CertificateAssessmentQuestionBackendResponse> {
+  ): Promise<CertificateAssessmentQuestionData> {
     try {
       const response = await this.http
-        .get<CertificateAssessmentQuestionBackendResponse>(
+        .get<CertificateAssessmentQuestionStateBackendDict>(
           this.getCertificateQuestionHandlerUrl(attemptId, questionId)
         )
         .toPromise();
-      return response;
+      return CertificateAssessmentQuestionData.createFromBackendDict(response);
     } catch (errorResponse) {
       throw errorResponse?.error?.error || errorResponse.message;
     }

@@ -1157,13 +1157,13 @@ describe('Certificate Assessment Offering backend api service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      question_id: 'q1',
-      question_state_data: {
-        content: {
-          content_id: 'content',
-          html: '<p>What is 5 + 3?</p>',
-        },
+    expect(successHandler).toHaveBeenCalled();
+    const result = successHandler.calls.mostRecent().args[0];
+    expect(result.questionId).toBe('q1');
+    expect(result.questionStateData).toEqual({
+      content: {
+        content_id: 'content',
+        html: '<p>What is 5 + 3?</p>',
       },
     });
     expect(failHandler).not.toHaveBeenCalled();

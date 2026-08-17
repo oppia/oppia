@@ -143,8 +143,8 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       )
       .then(response => {
         this.questions[index] = this.convertStateDataToAssessmentQuestion(
-          response.question_id,
-          response.question_state_data
+          response.questionId,
+          response.questionStateData
         );
         this.isLoadingQuestion = false;
         this.loadError = false;

@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+import {StateBackendDict} from 'domain/state/state.model';
+
 // The shape of each attempt summary mirrors the response returned by the
 // CertificateAssessmentAttemptsHandler.
 export interface CertificateAttemptSummary {
@@ -138,6 +140,41 @@ export interface CertificateAssessmentAttemptBackendDict {
 export interface CertificateAssessmentAttemptQuestion {
   questionId: string;
   questionVersion: number;
+}
+
+/** Backend response shape for the question handler. */
+export interface CertificateAssessmentQuestionStateBackendDict {
+  question_id: string;
+  question_state_data: StateBackendDict;
+}
+
+/** Domain representation of a single assessment question returned by the
+ *  question handler. */
+export class CertificateAssessmentQuestionData {
+  _questionId: string;
+  _questionStateData: StateBackendDict;
+
+  constructor(questionId: string, questionStateData: StateBackendDict) {
+    this._questionId = questionId;
+    this._questionStateData = questionStateData;
+  }
+
+  get questionId(): string {
+    return this._questionId;
+  }
+
+  get questionStateData(): StateBackendDict {
+    return this._questionStateData;
+  }
+
+  static createFromBackendDict(
+    dict: CertificateAssessmentQuestionStateBackendDict
+  ): CertificateAssessmentQuestionData {
+    return new CertificateAssessmentQuestionData(
+      dict.question_id,
+      dict.question_state_data
+    );
+  }
 }
 
 export class AvailableCertificateAssessmentOfferingData {
