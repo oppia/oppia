@@ -42,7 +42,7 @@
       <div class="result-card-score-block">
         <h2 class="result-card-score">
           {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL' | translate }}:
-          {{ result.scorePercentage }}%
+          {{ result.scorePercentage | number: '1.0-0' }}%
         </h2>
 
         <oppia-assessment-result-topic-wise-breakdown
