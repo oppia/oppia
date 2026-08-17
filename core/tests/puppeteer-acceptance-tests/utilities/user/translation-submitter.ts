@@ -68,6 +68,11 @@ const translationInstructionSelector =
 const translationErrorSectionSelector = '.oppia-translation-error-section';
 const saveTranslationButtonSelector = '.e2e-test-save-button';
 
+// How long to wait when checking whether the current item still offers a Skip
+// link. The link's presence is decided by the item already on screen rather
+// than by a pending request, so this only has to cover a render.
+const skipLinkProbeTimeoutMsecs = 2000;
+
 // Number of times a translate button click is attempted before giving up, and
 // how long each attempt waits for the translation modal to open. The product of
 // the two is kept at the default 30 second selector timeout.
@@ -608,7 +613,12 @@ export class TranslationSubmitter extends BaseUser {
     contentType: string,
     maxSkips: number
   ): Promise<void> {
+    const instructionsSeen: (string | undefined)[] = [];
     for (let skips = 0; skips <= maxSkips; skips++) {
+      // The modal renders its header before it has fetched the item, so the
+      // instruction line only appears once there is an item to name. Waiting
+      // for it here is what keeps the first read off an empty modal.
+      await this.expectElementToBeVisible(translationInstructionSelector);
       const instruction = await this.page.$eval(
         translationInstructionSelector,
         el => el.textContent?.trim()
@@ -619,10 +629,30 @@ export class TranslationSubmitter extends BaseUser {
         showMessage(`Reached the ${contentType} item after ${skips} skips.`);
         return;
       }
+      instructionsSeen.push(instruction);
+
+      // The last item carries no Skip link, so running out of items is
+      // reported as such rather than as a selector timeout.
+      const skipLinkIsShown = await this.isElementVisible(
+        skipTranslationButtonSelector,
+        true,
+        skipLinkProbeTimeoutMsecs
+      );
+      if (!skipLinkIsShown) {
+        throw new Error(
+          `Ran out of items before reaching a ${contentType} item. ` +
+            `Items seen: ${instructionsSeen.join(' | ')}.`
+        );
+      }
       await this.clickOnSkipTranslationButton();
+      // The source text block is hidden while the next item is being fetched,
+      // so waiting for it back guarantees the instruction line read at the top
+      // of the next pass belongs to the new item and not the skipped one.
+      await this.expectElementToBeVisible(textToTranslateContainerSelector);
     }
     throw new Error(
-      `No ${contentType} item was reached within ${maxSkips} skips.`
+      `No ${contentType} item was reached within ${maxSkips} skips. ` +
+        `Items seen: ${instructionsSeen.join(' | ')}.`
     );
   }
 

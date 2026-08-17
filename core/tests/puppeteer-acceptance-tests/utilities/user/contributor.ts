@@ -71,6 +71,12 @@ const entityTypeSelector = '.e2e-test-entity-type-selector';
 const selectedEntityTypeSelector = '.e2e-test-entity-type-selector-selected';
 const entityTypeOptionSelector = '.e2e-test-entity-type-selector-option';
 
+// How long to wait when checking whether the "Content Type" dropdown is
+// already open. The dropdown is toggled by a local click with no network call
+// behind it, so this only has to cover a render, and keeping it well below the
+// default probe timeout keeps the common closed case cheap.
+const dropdownStateProbeTimeoutMsecs = 2000;
+
 /**
  * The options offered by the "Content Type" filter on the "Translate Text" and
  * "Review Translations" tabs.
@@ -723,8 +729,7 @@ export class Contributor extends ExplorationEditor {
   async selectContentTypeFilter(
     contentType: CONTENT_TYPE_FILTER
   ): Promise<void> {
-    await this.expectElementToBeVisible(selectedEntityTypeSelector);
-    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+    await this.openContentTypeFilterDropdown();
 
     await this.expectElementToBeVisible(entityTypeOptionSelector);
     let optionElement: ElementHandle<Element> | null = null;
@@ -747,16 +752,33 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
+   * Opens the "Content Type" dropdown, unless it is already open. The control
+   * toggles, so clicking it when the options are already showing would close
+   * them again.
+   */
+  private async openContentTypeFilterDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(selectedEntityTypeSelector);
+    const dropdownIsOpen = await this.isElementVisible(
+      entityTypeOptionSelector,
+      true,
+      dropdownStateProbeTimeoutMsecs
+    );
+    if (dropdownIsOpen) {
+      return;
+    }
+    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+  }
+
+  /**
    * Checks that the "Content Type" filter offers exactly the expected options.
-   * The dropdown is left open by this check, so callers that do not go on to
-   * select an option should close it themselves.
+   * The dropdown is closed again afterwards, so that the filter is left as it
+   * was found.
    * @param expectedOptions - The options the dropdown should offer, in order.
    */
   async expectContentTypeFilterOptionsToBe(
     expectedOptions: CONTENT_TYPE_FILTER[]
   ): Promise<void> {
-    await this.expectElementToBeVisible(selectedEntityTypeSelector);
-    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+    await this.openContentTypeFilterDropdown();
 
     await this.expectElementToBeVisible(entityTypeOptionSelector);
     const options = await this.page.$$eval(entityTypeOptionSelector, elements =>
@@ -777,6 +799,8 @@ export class Contributor extends ExplorationEditor {
         );
       }
     }
+    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+    await this.expectElementToBeVisible(entityTypeOptionSelector, false);
     showMessage(
       `Success: The content type filter offers exactly ${expectedOptions}.`
     );
