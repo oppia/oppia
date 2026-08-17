@@ -244,6 +244,90 @@ export class TranslationReviewer extends BaseUser {
     await this.clickOnElementWithSelector(updateTranslationBtnSelector);
     await this.expectElementToBeVisible(updateTranslationBtnSelector, false);
   }
+
+  /**
+   * Checks the label on an opportunity card's action button.
+   * @param heading - The heading of the opportunity card.
+   * @param subheading - The subheading of the opportunity card.
+   * @param label - The label the action button is expected to carry.
+   */
+  async expectOpportunityActionButtonToBe(
+    heading: string,
+    subheading: string,
+    label: string
+  ): Promise<void> {
+    const opportunityItem = await this.getTranslationOpportunityCard(
+      heading,
+      subheading
+    );
+    const buttonText = await opportunityItem.evaluate(
+      (el: Element, sel: string) => el.querySelector(sel)?.textContent?.trim(),
+      opportunityTranslateButtonSelector
+    );
+    if (buttonText !== label) {
+      throw new Error(
+        `Expected the action button on "${heading}" to read "${label}", but ` +
+          `it read "${buttonText}".`
+      );
+    }
+  }
+
+  /**
+   * Checks whether the "Back to lessons" control is shown. It sits above the
+   * suggestion list on the lesson path only, so its absence is what
+   * distinguishes the skills path, where the suggestions are listed without an
+   * opportunity card to click through first.
+   * @param visible - Whether the control should be shown.
+   */
+  async expectBackToLessonsControlToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(backToLessonButtonSelector, visible);
+  }
+
+  /**
+   * Submits a review and checks the toast it raises. The toast is short-lived,
+   * so it is checked immediately after the click rather than after waiting for
+   * the next suggestion to load.
+   * @param reviewType - Whether to accept or reject the suggestion.
+   * @param expectedToastMessage - The toast the review is expected to raise.
+   * @param reviewMessage - The comment to leave, required to reject.
+   */
+  async submitTranslationReviewAndExpectToast(
+    reviewType: 'accept' | 'reject',
+    expectedToastMessage: string,
+    reviewMessage?: string
+  ): Promise<void> {
+    const buttonSelector =
+      reviewType === 'accept'
+        ? acceptTranslationButtonSelector
+        : rejectTranslationButtonSelector;
+    if (reviewMessage) {
+      await this.expectElementToBeVisible(reviewCommentInputSelector);
+      await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
+    }
+
+    await this.clickOnElementWithSelector(buttonSelector);
+    await this.expectToastMessage(expectedToastMessage);
+  }
+
+  /**
+   * Checks the label on the accept or reject button, which names the next
+   * suggestion while more remain and drops that mention on the last one.
+   * @param reviewType - Whether to check the accept or the reject button.
+   * @param label - The label the button is expected to carry.
+   */
+  async expectReviewButtonLabelToBe(
+    reviewType: 'accept' | 'reject',
+    label: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      reviewType === 'accept'
+        ? acceptTranslationButtonSelector
+        : rejectTranslationButtonSelector,
+      label
+    );
+  }
 }
 
 export let TranslationReviewerFactory = (): TranslationReviewer =>

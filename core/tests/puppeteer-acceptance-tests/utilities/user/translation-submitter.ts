@@ -59,6 +59,15 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
 
+// The instruction line naming the content type being translated, the block
+// listing the validation errors for the current translation, and the single
+// save button whose label depends on whether more items remain. None of the
+// three carries an e2e class, so they are matched on their layout classes.
+const translationInstructionSelector =
+  '.oppia-translatable-text-section strong';
+const translationErrorSectionSelector = '.oppia-translation-error-section';
+const saveTranslationButtonSelector = '.e2e-test-save-button';
+
 // Number of times a translate button click is attempted before giving up, and
 // how long each attempt waits for the translation modal to open. The product of
 // the two is kept at the default 30 second selector timeout.
@@ -568,6 +577,112 @@ export class TranslationSubmitter extends BaseUser {
       `${selectedSkillSelector} label`,
       skill
     );
+  }
+
+  /**
+   * Checks the instruction line at the top of the translation modal, which
+   * names the content type of the item currently being translated.
+   * @param contentType - The content type as it is spelled out to the
+   *     contributor, for example "title" or "skill description".
+   * @param languageDescription - The target language as it is shown in the
+   *     language filter, for example "हिन्दी (Hindi)".
+   */
+  async expectTranslationInstructionToBe(
+    contentType: string,
+    languageDescription: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      translationInstructionSelector,
+      `Please translate the given ${contentType} in ${languageDescription}:`
+    );
+  }
+
+  /**
+   * Steps through the translation modal until the instruction line names the
+   * given content type, so that a test can reach a specific item without
+   * depending on the order the items are served in.
+   * @param contentType - The content type to stop on.
+   * @param maxSkips - How many items to step past before giving up.
+   */
+  async skipToTranslationItemOfContentType(
+    contentType: string,
+    maxSkips: number
+  ): Promise<void> {
+    for (let skips = 0; skips <= maxSkips; skips++) {
+      const instruction = await this.page.$eval(
+        translationInstructionSelector,
+        el => el.textContent?.trim()
+      );
+      if (
+        instruction?.startsWith(`Please translate the given ${contentType} `)
+      ) {
+        showMessage(`Reached the ${contentType} item after ${skips} skips.`);
+        return;
+      }
+      await this.clickOnSkipTranslationButton();
+    }
+    throw new Error(
+      `No ${contentType} item was reached within ${maxSkips} skips.`
+    );
+  }
+
+  /**
+   * Checks the source text shown for the item currently being translated.
+   * @param text - The expected source text.
+   */
+  async expectTextToTranslateToBe(text: string): Promise<void> {
+    await this.expectTextContentToBe(textToTranslateContainerSelector, text);
+  }
+
+  /**
+   * Checks that the translation modal is reporting the given validation error.
+   * @param message - The expected error message.
+   */
+  async expectTranslationErrorToBe(message: string): Promise<void> {
+    await this.expectTextContentToContain(
+      translationErrorSectionSelector,
+      message
+    );
+  }
+
+  /**
+   * Checks that the translation modal is reporting no validation error. The
+   * error block is always in the DOM, so it is its text that is checked rather
+   * than its presence.
+   */
+  async expectNoTranslationErrors(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element !== null && element.textContent?.trim() === '';
+      },
+      {},
+      translationErrorSectionSelector
+    );
+    showMessage('Success: The translation modal reports no errors.');
+  }
+
+  /**
+   * Checks whether the save button in the translation modal can be clicked.
+   * @param enabled - Whether the button should be enabled.
+   */
+  async expectSaveTranslationButtonToBeEnabled(
+    enabled: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(saveTranslationButtonSelector);
+    await this.expectElementToBeClickable(
+      saveTranslationButtonSelector,
+      enabled
+    );
+  }
+
+  /**
+   * Checks the label on the save button, which reads "Save and translate
+   * another" while items remain and "Save and close" on the last one.
+   * @param label - The expected button label.
+   */
+  async expectSaveTranslationButtonLabelToBe(label: string): Promise<void> {
+    await this.expectTextContentToBe(saveTranslationButtonSelector, label);
   }
 }
 

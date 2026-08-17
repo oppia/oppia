@@ -67,6 +67,20 @@ const featuredLanguageExplainationSelector =
 const languageDropdownToggleArrowSelector =
   '.e2e-test-language-dropdown-toggle-arrow';
 
+const entityTypeSelector = '.e2e-test-entity-type-selector';
+const selectedEntityTypeSelector = '.e2e-test-entity-type-selector-selected';
+const entityTypeOptionSelector = '.e2e-test-entity-type-selector-option';
+
+/**
+ * The options offered by the "Content Type" filter on the "Translate Text" and
+ * "Review Translations" tabs.
+ */
+export enum CONTENT_TYPE_FILTER {
+  ALL = 'All',
+  LESSONS = 'Lessons',
+  SKILLS = 'Skills',
+}
+
 export class Contributor extends ExplorationEditor {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -700,6 +714,92 @@ export class Contributor extends ExplorationEditor {
    */
   async expectQuestionInReviewModalToBe(question: string): Promise<void> {
     await this.expectTextContentToBe(rteDisplaySelector, question);
+  }
+
+  /**
+   * Selects an option in the "Content Type" filter.
+   * @param contentType - The content type to filter the opportunity list by.
+   */
+  async selectContentTypeFilter(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selectedEntityTypeSelector);
+    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    for (const option of await this.page.$$(entityTypeOptionSelector)) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contentType) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Content type option ${contentType} not found.`);
+    }
+
+    await optionElement.click();
+
+    // Verify the option is selected.
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
+  }
+
+  /**
+   * Checks that the "Content Type" filter offers exactly the expected options.
+   * The dropdown is left open by this check, so callers that do not go on to
+   * select an option should close it themselves.
+   * @param expectedOptions - The options the dropdown should offer, in order.
+   */
+  async expectContentTypeFilterOptionsToBe(
+    expectedOptions: CONTENT_TYPE_FILTER[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selectedEntityTypeSelector);
+    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    const options = await this.page.$$eval(entityTypeOptionSelector, elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+
+    if (options.length !== expectedOptions.length) {
+      throw new Error(
+        `Expected the content type filter to offer ${expectedOptions.length} ` +
+          `options, but it offered ${options.length}: ${options}.`
+      );
+    }
+    for (let i = 0; i < expectedOptions.length; i++) {
+      if (options[i] !== expectedOptions[i]) {
+        throw new Error(
+          `Expected content type option ${i} to be "${expectedOptions[i]}", ` +
+            `but it was "${options[i]}".`
+        );
+      }
+    }
+    showMessage(
+      `Success: The content type filter offers exactly ${expectedOptions}.`
+    );
+  }
+
+  /**
+   * Checks whether the "Content Type" filter is shown on the active tab.
+   * @param visible - Whether the filter should be shown.
+   */
+  async expectContentTypeFilterToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(entityTypeSelector, visible);
+  }
+
+  /**
+   * Checks that the "Content Type" filter currently shows the given option.
+   * @param contentType - The option the filter is expected to show.
+   */
+  async expectSelectedContentTypeFilterToBe(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
   }
 }
 
