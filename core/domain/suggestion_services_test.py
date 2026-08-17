@@ -1283,32 +1283,34 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         index_counter = test_utils.CallCounter(mock_index_explorations)
 
-        with self.swap(
-            suggestion_registry.SuggestionTranslateContent,
-            'pre_accept_validate',
-            lambda self: None,
-        ):
-            with self.swap(
+        with (
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'pre_accept_validate',
+                lambda self: None,
+            ),
+            self.swap(
                 suggestion_registry.SuggestionTranslateContent,
                 'accept',
                 lambda self, unused_commit_message: None,
-            ):
-                with self.swap(
-                    opportunity_services,
-                    'update_translation_opportunity_with_accepted_suggestion',
-                    lambda *args: None,
-                ):
-                    with self.swap(
-                        exp_services,
-                        'index_explorations_given_ids',
-                        index_counter,
-                    ):
-                        suggestion_services.accept_suggestion(
-                            suggestion.suggestion_id,
-                            self.reviewer_id,
-                            self.COMMIT_MESSAGE,
-                            'review message',
-                        )
+            ),
+            self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda *args: None,
+            ),
+            self.swap(
+                exp_services,
+                'index_explorations_given_ids',
+                index_counter,
+            ),
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                self.COMMIT_MESSAGE,
+                'review message',
+            )
 
         self.assertEqual(index_counter.times_called, 1)
         self.assertEqual(reindexed_ids, [self.target_id])
@@ -1353,32 +1355,34 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         index_counter = test_utils.CallCounter(mock_index_explorations)
 
-        with self.swap(
-            suggestion_registry.SuggestionTranslateContent,
-            'pre_accept_validate',
-            lambda self: None,
-        ):
-            with self.swap(
+        with (
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'pre_accept_validate',
+                lambda self: None,
+            ),
+            self.swap(
                 suggestion_registry.SuggestionTranslateContent,
                 'accept',
                 lambda self, unused_commit_message: None,
-            ):
-                with self.swap(
-                    opportunity_services,
-                    'update_translation_opportunity_with_accepted_suggestion',
-                    lambda *args: None,
-                ):
-                    with self.swap(
-                        exp_services,
-                        'index_explorations_given_ids',
-                        index_counter,
-                    ):
-                        suggestion_services.accept_suggestion(
-                            suggestion.suggestion_id,
-                            self.reviewer_id,
-                            self.COMMIT_MESSAGE,
-                            'review message',
-                        )
+            ),
+            self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda *args: None,
+            ),
+            self.swap(
+                exp_services,
+                'index_explorations_given_ids',
+                index_counter,
+            ),
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                self.COMMIT_MESSAGE,
+                'review message',
+            )
 
         self.assertEqual(index_counter.times_called, 0)
         self.assertEqual(reindexed_ids, [])
