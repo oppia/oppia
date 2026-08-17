@@ -129,9 +129,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     cmd = [
         common.NODE_BIN_PATH,
-        # The memory limit is raised because coverage instrumentation makes
-        # the bundle generation memory-intensive.
-        '--max-old-space-size=8192',
+        '--max-old-space-size=5120',
         os.path.join(common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'),
         'test',
         '--karma-config=core/tests/karma.conf.ts',

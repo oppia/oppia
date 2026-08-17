@@ -62,13 +62,10 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
     },
     autoWatch: true,
     browsers: ['CI_Chrome'],
-    // The capture and activity timeouts are increased to allow the Angular
-    // CLI enough time to generate the heavy coverage bundles.
     // Kill the browser if it does not capture in the given timeout [ms].
-    captureTimeout: 300000,
-    browserNoActivityTimeout: 300000,
-    browserDisconnectTimeout: 100000,
-    pingTimeout: 100000,
+    captureTimeout: 60000,
+    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 60000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
@@ -90,9 +87,7 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          // The memory limit is raised because coverage instrumentation
-          // makes the browser hold more data.
-          '--js-flags=--max-old-space-size=8192',
+          '--js-flags=--max-old-space-size=5120',
         ],
       },
     },
