@@ -86,8 +86,7 @@ export class CertificateAssessmentPlayerPageRootComponent
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
-      this.currentStage =
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+      await this.startAssessment();
     }
     await this.loadCertificateOffering();
   }
@@ -157,7 +156,9 @@ export class CertificateAssessmentPlayerPageRootComponent
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
     } catch {
       this.alertsService.addWarning(
-        'Failed to start the certificate assessment.'
+        this.translateService.instant(
+          'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+        )
       );
     }
   }
@@ -174,12 +175,14 @@ export class CertificateAssessmentPlayerPageRootComponent
         answers
       );
       await this.router.navigate([
-        '/certificate-assessment-result',
+        `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
         this.attempt.attemptId,
       ]);
     } catch {
       this.alertsService.addWarning(
-        'Failed to submit the certificate assessment.'
+        this.translateService.instant(
+          'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+        )
       );
     }
   }

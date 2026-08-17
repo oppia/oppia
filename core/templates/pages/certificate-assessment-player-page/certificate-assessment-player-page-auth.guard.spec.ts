@@ -121,6 +121,27 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
     );
   });
 
+  it('should redirect to 404 when the user info request fails', async () => {
+    userService.getUserInfoAsync.and.rejectWith(new Error('network error'));
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+    const replaceStateSpy = spyOn(location, 'replaceState');
+
+    const canActivateResult = await guard.canActivate(
+      {} as never,
+      {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
+    );
+
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
+    expect(replaceStateSpy).toHaveBeenCalledWith(
+      '/certificate-assessment/cert-1'
+    );
+  });
+
   it('should redirect to 404 when feature flag is disabled', async () => {
     platformFeatureService.status.EnableCertificateAssessment.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(

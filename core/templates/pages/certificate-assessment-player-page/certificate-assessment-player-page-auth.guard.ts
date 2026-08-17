@@ -42,16 +42,17 @@ export class CertificateAssessmentPlayerPageAuthGuard implements CanActivate {
     private userService: UserService
   ) {}
 
-  //  Returns true if the EnableCertificateAssessment feature flag is
-  //  enabled and the user is logged in, allowing navigation to proceed to
-  //  the requested route.
-
-  //  Returns false if the feature flag is disabled or the user is logged
-  //  out. In this case the user is redirected to the 404 page and the
-  //  browser URL is replaced with the originally requested state.url, so
-  //  that navigation to the blocked route does not appear in browser
-  //  history.
-
+  /**
+   * Returns true if the EnableCertificateAssessment feature flag is
+   * enabled and the user is logged in, allowing navigation to proceed
+   * to the requested route.
+   *
+   * Returns false if the feature flag is disabled, the user is logged
+   * out, or the user-info request fails. In this case the user is
+   * redirected to the 404 page and the browser URL is replaced with
+   * the originally requested state.url, so that navigation to the
+   * blocked route does not appear in browser history.
+   */
   async canActivate(
     _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -62,8 +63,12 @@ export class CertificateAssessmentPlayerPageAuthGuard implements CanActivate {
       return this.redirectToNotFound(state.url);
     }
 
-    const userInfo = await this.userService.getUserInfoAsync();
-    if (!userInfo.isLoggedIn()) {
+    try {
+      const userInfo = await this.userService.getUserInfoAsync();
+      if (!userInfo.isLoggedIn()) {
+        return this.redirectToNotFound(state.url);
+      }
+    } catch {
       return this.redirectToNotFound(state.url);
     }
 

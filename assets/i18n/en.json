@@ -290,6 +290,8 @@
     "I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL": "Score",
     "I18N_CERTIFICATE_ASSESSMENT_RESULT_TIME_TAKEN_LABEL": "Time Taken",
     "I18N_CERTIFICATE_ASSESSMENT_TOPICS_HEADING": "Recommended topics",
+    "I18N_CERTIFICATE_ASSESSMENT_START_WARNING": "Failed to start the certificate assessment.",
+    "I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING": "Failed to submit the certificate assessment.",
     "I18N_CERTIFICATE_ASSESSMENT_TOPICS_SUBTEXT": "Learners who are comfortable with the topics below are well prepared for this certificate. You do not need to complete every lesson to attempt the assessment.",
     "I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING": "Available Certificates",
     "I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT": "Check Score",

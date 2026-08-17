@@ -1,9 +1,12 @@
 <oppia-titled-background-banner [title]="bannerTitleI18nKey"
                                 [buttonText]="bannerButtonI18nKey"
-                                [buttonRoute]="['/learn', classroomUrlFragment, 'certificate-offering-available']">
+                                [buttonRoute]="classroomUrlFragment ? ['/learn', classroomUrlFragment, 'certificate-offering-available'] : ['/learn']">
 </oppia-titled-background-banner>
 <div *ngIf="isLoadingQuestion" class="text-center py-3 text-muted">
   <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
+</div>
+<div *ngIf="loadError" class="text-center py-3 text-danger">
+  <p>Failed to load the question. Please try again later.</p>
 </div>
 <oppia-certificate-assessment-conversation-skin #conversationSkin
                                                 *ngIf="!isLoadingQuestion && currentQuestion"

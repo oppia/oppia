@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageRootComponent.
  */
 
-import {fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
@@ -35,6 +35,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let router: Router;
+  let translateService: jasmine.SpyObj<TranslateService>;
 
   const mockOffering = new CertificateAssessmentOfferingData(
     'cert-123',
@@ -95,19 +96,30 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       'addWarning',
     ]);
 
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [{provide: ActivatedRoute, useValue: activatedRouteStubValue}],
+    });
+
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', [
+      'instant',
+    ]);
+    translateServiceSpy.instant.and.callFake((key: string) => key);
+
     component = new CertificateAssessmentPlayerPageRootComponent(
-      activatedRouteStubValue as unknown as ActivatedRoute,
+      TestBed.inject(ActivatedRoute),
       alertsServiceSpy,
       certificateAssessmentOfferingBackendApiServiceSpy,
       {} as ClassroomBackendApiService,
       {} as PageHeadService,
       routerSpy,
-      {} as TranslateService
+      translateServiceSpy
     );
     alertsService = alertsServiceSpy;
     certificateAssessmentOfferingBackendApiService =
       certificateAssessmentOfferingBackendApiServiceSpy;
     router = routerSpy;
+    translateService = translateServiceSpy;
   };
 
   beforeEach(async () => {
@@ -141,11 +153,15 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.isLoading).toBe(false);
   }));
 
-  it('should set current stage to questions when the route is session', fakeAsync(async () => {
+  it('should start an attempt and switch to questions when the route is session', fakeAsync(async () => {
     await configureComponent('session');
     component.ngOnInit();
     flushMicrotasks();
 
+    expect(
+      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync
+    ).toHaveBeenCalledWith('cert-123');
+    expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
   }));
 
@@ -155,6 +171,22 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
+  }));
+
+  it('should stay on the intro stage when the session route fails to start an attempt', fakeAsync(async () => {
+    await configureComponent('session');
+    (
+      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.attempt).toBeNull();
+    expect(component.currentStage).toBe('intro');
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to start the certificate assessment.'
+    );
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -213,8 +245,11 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to start the certificate assessment.'
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
     );
   }));
 
@@ -231,7 +266,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
     ).toHaveBeenCalledWith('attempt-1234', answers);
     expect(router.navigate).toHaveBeenCalledWith([
-      '/certificate-assessment-result',
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
       'attempt-1234',
     ]);
   }));
@@ -255,8 +290,11 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(router.navigate).not.toHaveBeenCalled();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+    );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to submit the certificate assessment.'
+      'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
     );
   }));
 

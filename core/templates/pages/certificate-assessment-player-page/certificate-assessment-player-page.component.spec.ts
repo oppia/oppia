@@ -606,4 +606,93 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       UnansweredQuestionModalComponent
     );
   });
+
+  it('should not fire a second request when loadQuestion is called for the same in-flight index', fakeAsync(() => {
+    const apiSpy = TestBed.inject(
+      CertificateAssessmentOfferingBackendApiService
+    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+    let resolveFirst: (
+      value: CertificateAssessmentQuestionBackendResponse
+    ) => void;
+    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
+      new Promise(r => {
+        resolveFirst = r;
+      })
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
+      1
+    );
+    expect(component.isLoadingQuestion).toBeTrue();
+
+    resolveFirst!(createQuestionResponse('question_1'));
+    flushMicrotasks();
+
+    expect(component.isLoadingQuestion).toBeFalse();
+    expect(component.questions[0]).toBeDefined();
+  }));
+
+  it('should store questions at the correct index for sparse loading', fakeAsync(() => {
+    const apiSpy = TestBed.inject(
+      CertificateAssessmentOfferingBackendApiService
+    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+    const deferreds: Array<
+      (value: CertificateAssessmentQuestionBackendResponse) => void
+    > = [];
+    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      () =>
+        new Promise(r => {
+          deferreds.push(r);
+        })
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    component.nextQuestion();
+    flushMicrotasks();
+
+    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
+      2
+    );
+
+    deferreds[1]!(createQuestionResponse('question_2'));
+    flushMicrotasks();
+    expect(component.questions[1]).toBeDefined();
+    expect(component.questions[0]).toBeUndefined();
+
+    deferreds[0]!(createQuestionResponse('question_1'));
+    flushMicrotasks();
+    expect(component.questions[0]).toBeDefined();
+    expect(component.questions[1]).toBeDefined();
+  }));
+
+  it('should set loadError when a question fetch fails and clear it on success', fakeAsync(() => {
+    const apiSpy = TestBed.inject(
+      CertificateAssessmentOfferingBackendApiService
+    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
+      Promise.reject(new Error('network error'))
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(component.loadError).toBeTrue();
+    expect(component.isLoadingQuestion).toBeFalse();
+    expect(component.getCurrentQuestion()).toBeNull();
+
+    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
+      Promise.resolve(createQuestionResponse('question_1'))
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(component.loadError).toBeFalse();
+    expect(component.getCurrentQuestion()).not.toBeNull();
+  }));
 });

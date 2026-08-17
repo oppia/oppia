@@ -290,6 +290,8 @@
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL": "Label shown before the overall percentage score on the result card.",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_TIME_TAKEN_LABEL": "Label shown before the time taken text on the result card.",
   "I18N_CERTIFICATE_ASSESSMENT_TOPICS_HEADING": "Heading displayed above the list of recommended topics on the certificate introduction card.",
+  "I18N_CERTIFICATE_ASSESSMENT_START_WARNING": "Warning message shown when the certificate assessment attempt fails to start.",
+  "I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING": "Warning message shown when the certificate assessment attempt fails to submit.",
   "I18N_CERTIFICATE_ASSESSMENT_TOPICS_SUBTEXT": "Text displayed below the recommended topics heading on the certificate introduction card. It explains how the listed topics relate to certificate readiness.",
   "I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING": "Heading for the certificate list section on the certificate offering available page.",
   "I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT": "Button text for viewing the score of a certificate assessment result.",

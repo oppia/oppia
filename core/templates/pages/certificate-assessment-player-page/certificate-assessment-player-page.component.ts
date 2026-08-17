@@ -104,6 +104,8 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
   isLoadingQuestion = false;
+  loadError = false;
+  private inflightIndexes = new Set<number>();
   // Answers keyed by question id; a null or missing value means the question
   // was not answered yet.
   answers: {[questionId: string]: string | null} = {};
@@ -135,36 +137,46 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   /**
    * Fetches the question at the given index from the certificate question
-   * handler and appends it to the questions list. Questions are fetched
-   * lazily: only the current question is loaded, and the next question is
-   * fetched when the learner advances to it.
+   * handler and stores it at that index in the questions array. Questions are
+   * fetched lazily: only the current question is loaded, and the next question
+   * is fetched when the learner advances to it. Duplicate and in-flight
+   * requests for the same index are suppressed.
    */
   private loadQuestion(index: number): void {
-    if (this.attempt === null || this.questions.length > index) {
+    if (
+      this.attempt === null ||
+      this.questions[index] !== undefined ||
+      this.inflightIndexes.has(index)
+    ) {
       return;
     }
     const attemptQuestion = this.attempt.questions[index];
     if (attemptQuestion === undefined) {
       return;
     }
+    this.inflightIndexes.add(index);
     this.isLoadingQuestion = true;
+    this.loadError = false;
     this.certificateAssessmentOfferingBackendApiService
       .getCertificateAssessmentQuestionAsync(
         this.attempt.attemptId,
         attemptQuestion.questionId
       )
       .then(response => {
-        this.questions.push(
-          this.convertStateDataToAssessmentQuestion(
-            response.question_id,
-            response.question_state_data
-          )
+        this.questions[index] = this.convertStateDataToAssessmentQuestion(
+          response.question_id,
+          response.question_state_data
         );
         this.isLoadingQuestion = false;
+        this.loadError = false;
         this.refreshComputedFields();
       })
       .catch(() => {
         this.isLoadingQuestion = false;
+        this.loadError = true;
+      })
+      .finally(() => {
+        this.inflightIndexes.delete(index);
       });
   }
 
