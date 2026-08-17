@@ -613,7 +613,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
     let resolveFirst: (
       value: CertificateAssessmentQuestionBackendResponse
-    ) => void;
+    ) => void = () => {};
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       new Promise(r => {
         resolveFirst = r;
@@ -628,7 +628,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
     expect(component.isLoadingQuestion).toBeTrue();
 
-    resolveFirst!(createQuestionResponse('question_1'));
+    resolveFirst(createQuestionResponse('question_1'));
     flushMicrotasks();
 
     expect(component.isLoadingQuestion).toBeFalse();
@@ -639,9 +639,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     const apiSpy = TestBed.inject(
       CertificateAssessmentOfferingBackendApiService
     ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
-    const deferreds: Array<
-      (value: CertificateAssessmentQuestionBackendResponse) => void
-    > = [];
+    const deferreds: ((
+      value: CertificateAssessmentQuestionBackendResponse
+    ) => void)[] = [];
     apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
       () =>
         new Promise(r => {
@@ -659,12 +659,20 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       2
     );
 
-    deferreds[1]!(createQuestionResponse('question_2'));
+    (
+      deferreds[1] as (
+        value: CertificateAssessmentQuestionBackendResponse
+      ) => void
+    )(createQuestionResponse('question_2'));
     flushMicrotasks();
     expect(component.questions[1]).toBeDefined();
     expect(component.questions[0]).toBeUndefined();
 
-    deferreds[0]!(createQuestionResponse('question_1'));
+    (
+      deferreds[0] as (
+        value: CertificateAssessmentQuestionBackendResponse
+      ) => void
+    )(createQuestionResponse('question_1'));
     flushMicrotasks();
     expect(component.questions[0]).toBeDefined();
     expect(component.questions[1]).toBeDefined();
