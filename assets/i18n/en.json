@@ -717,7 +717,7 @@
     "I18N_FEEDBACK_MODAL_HEADER": "Give feedback on this lesson",
     "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Screenshot upload failed. Please try again.",
     "I18N_FEEDBACK_SUBMITTED_ERROR": "There was an error submitting your feedback. Please try again.",
-    "I18N_FEEDBACK_SUBMITTED_SUCCESS": "Thank you! Your report has been sent to the lesson team.",
+    "I18N_FEEDBACK_SUBMITTED_SUCCESS": "Thank you! Your feedback has been sent to the lesson team.",
     "I18N_FEEDBACK_UPDATES_BREADCRUMB": "Feedback Updates",
     "I18N_FEEDBACK_UPDATES_FEEDBACK_THREAD_WARNING": "Avoid sharing any personal information as this discussion is publicly viewable.",
     "I18N_FEEDBACK_UPDATES_NO_ACTIVITY_CARD_HEADING": "Feedback Updates",
