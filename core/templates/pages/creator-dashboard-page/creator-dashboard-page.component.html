@@ -270,7 +270,7 @@
             <div class="title-section-mask"></div>
           </div>
         </a>
-        <div section="right-section" class="dashboard-card-right-section">
+        <div section="right-section" class="float-none h-auto w-100">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
@@ -343,7 +343,7 @@
             <div class="row-three w-100">
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
-                             class="position-relative w-100"
+                             class="position-relative w-100 mt-2"
                              layoutType="row"
                              layoutAlignType="start center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
@@ -610,12 +610,6 @@
     width: 184px;
   }
 
-  .oppia-dashboard-card-view-item .dashboard-card-right-section {
-    float: none;
-    height: auto;
-    width: 100%;
-  }
-
   .oppia-dashboard-card-view-item .mask-wrap {
     height: 61.8%;
     margin-top: -88%;
@@ -645,8 +639,6 @@
 
   .oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links {
     font-size: 24px;
-    margin: 10px 0 0 0;
-    width: 100%;
   }
 
   .oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
