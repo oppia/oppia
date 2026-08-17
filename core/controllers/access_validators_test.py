@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
@@ -216,6 +214,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             classroom_id=classroom_id_1,
             name='math',
             url_fragment='math',
+            feedback_recipient_email='user@email.com',
             course_details='Math course details',
             teaser_text='Math teaser text',
             topic_list_intro='Start with our first topic.',
@@ -1763,7 +1762,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             author_id='user_1',
             content='content',
             title='title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
             url_fragment='sample-url',
             tags=['news'],
             thumbnail_filename='thumbnail.svg',

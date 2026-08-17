@@ -560,10 +560,14 @@ def _build_opportunity_for_non_exploration_entity(
     Returns:
         TranslationOpportunity. The constructed opportunity domain object.
     """
-    # Story, Skill, and Topic do not extend BaseTranslatableObject, so
-    # get_content_count() is not available. Content count defaults to 0
-    # until these entities implement the translatable interface.
-    content_count = 0
+    # Story and Topic do not extend BaseTranslatableObject, so
+    # get_content_count() is not available for them. Content count defaults
+    # to 0 for non-translatable entities.
+    content_count = (
+        entity.get_content_count()
+        if isinstance(entity, translation_domain.BaseTranslatableObject)
+        else 0
+    )
     translation_counts = translation_services.get_translation_counts(
         translatable_entity_type, entity
     )
@@ -688,14 +692,18 @@ def _save_multi_translation_opportunities(
             if existing_model is None:
                 models_to_save.append(model)
             else:
+                merged_topic_ids = sorted(
+                    list(set(existing_model.topic_ids + model.topic_ids))
+                )
                 if (
                     existing_model.content_count != model.content_count
                     or existing_model.translation_counts
                     != model.translation_counts
                     or set(existing_model.incomplete_translation_language_codes)
                     != set(model.incomplete_translation_language_codes)
-                    or existing_model.topic_ids != model.topic_ids
+                    or existing_model.topic_ids != merged_topic_ids
                 ):
+                    model.topic_ids = merged_topic_ids
                     models_to_save.append(model)
 
         if models_to_save:
@@ -892,6 +900,42 @@ def _create_exploration_opportunities(
     ):
         create_translation_opportunity(
             {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic.id]
+        )
+
+
+def remove_topic_from_translation_opportunities(
+    topic_id: str,
+    entity_types_and_ids: Dict[str, List[str]],
+) -> None:
+    """Removes a topic ID from topic_ids list of translation opportunities.
+
+    Args:
+        topic_id: str. The topic ID to remove.
+        entity_types_and_ids: dict(str, list(str)). A dictionary mapping entity
+            types to lists of entity IDs.
+    """
+    opportunity_ids = [
+        f'{entity_type}.{entity_id}'
+        for entity_type, entity_ids in entity_types_and_ids.items()
+        for entity_id in entity_ids
+    ]
+
+    opp_models = opportunity_models.TranslationOpportunityModel.get_multi(
+        opportunity_ids
+    )
+    models_to_update = []
+
+    for model in opp_models:
+        if model is not None and topic_id in model.topic_ids:
+            model.topic_ids.remove(topic_id)
+            models_to_update.append(model)
+
+    if models_to_update:
+        opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
+            models_to_update
+        )
+        opportunity_models.TranslationOpportunityModel.put_multi(
+            models_to_update
         )
 
 

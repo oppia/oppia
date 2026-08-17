@@ -1,0 +1,19 @@
+<background-banner></background-banner>
+<div class="oppia-titled-background-banner-header">
+  <div class="col-4">
+    <button type="button"
+            class="btn btn-primary oppia-titled-background-banner-button"
+            [attr.aria-label]="buttonText | translate | uppercase"
+            [routerLink]="buttonRoute">
+      {{ buttonText | translate | uppercase }}
+    </button>
+  </div>
+  <div class="text-center">
+    <h1 tabindex="0" class="mb-0">
+      {{ title | translate | titlecase }}
+    </h1>
+  </div>
+  <!-- Empty column balances the button column so the title centers on the
+       page, not just on the remaining space next to the button. -->
+  <div class="col-4"></div>
+</div>

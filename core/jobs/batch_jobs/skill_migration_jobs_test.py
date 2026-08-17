@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.domain import skill_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import skill_migration_jobs
@@ -53,8 +51,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             description='description',
             misconception_count=0,
             language_code='cs',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         skill_summary_model.update_timestamps()
@@ -418,8 +416,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             description='description',
             misconception_count=0,
             language_code='cs',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         skill_summary_model.update_timestamps()

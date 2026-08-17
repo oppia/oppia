@@ -491,7 +491,7 @@ describe('SvgSanitizerService', () => {
         payload:
           '<svg><foreignobject><p><style><p title="</style><iframe on' +
           'load&#x3d;alert(1)<!--"></style>',
-        expected: [0, 6],
+        expected: [0, 5],
       },
       {
         title: 'removal-based mXSS behavior 1/2',

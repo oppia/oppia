@@ -20,6 +20,8 @@ import {
   LessonFeedbackModel,
   PlatformFeedbackModel,
   FeedbackSessionInfo,
+  ReportAnIssueCategory,
+  ReportType,
 } from './feedback.model';
 
 const feedbackSessionInfo: FeedbackSessionInfo = {
@@ -117,7 +119,7 @@ describe('LessonFeedbackModel', () => {
 describe('ReportAnIssueModel', () => {
   it('should create a new ReportAnIssueModel from arguments', () => {
     const feedback = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: 'text',
       pageUrl: 'http://localhost:8181/explore/test',
       explorationContext: {
@@ -127,7 +129,7 @@ describe('ReportAnIssueModel', () => {
         stateIndex: 1,
         learnerCurrentAnswer: 'test',
       },
-      category: 'broken_layout_or_image',
+      category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
       includeTechnicalLogs: true,
       sessionInfo: feedbackSessionInfo,
       screenshotFilename: null,
@@ -143,7 +145,9 @@ describe('ReportAnIssueModel', () => {
       stateIndex: 1,
       learnerCurrentAnswer: 'test',
     });
-    expect(feedback.category).toEqual('broken_layout_or_image');
+    expect(feedback.category).toEqual(
+      ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE
+    );
     expect(feedback.includeTechnicalLogs).toEqual(true);
     expect(feedback.sessionInfo).toEqual(feedbackSessionInfo);
     expect(feedback.screenshotFilename).toEqual(null);
@@ -151,7 +155,7 @@ describe('ReportAnIssueModel', () => {
 
   it('should convert to backend dict', () => {
     const feedback = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: 'text',
       pageUrl: 'http://localhost:8181/explore/test',
       explorationContext: {
@@ -161,14 +165,14 @@ describe('ReportAnIssueModel', () => {
         stateIndex: 1,
         learnerCurrentAnswer: 'test',
       },
-      category: 'broken_layout_or_image',
+      category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
       includeTechnicalLogs: true,
       sessionInfo: feedbackSessionInfo,
       screenshotFilename: null,
     });
 
     expect(feedback.toBackendDict()).toEqual({
-      source: 'lesson',
+      source: ReportType.LESSON,
       report_message: 'text',
       page_url: 'http://localhost:8181/explore/test',
       lesson_metadata: {
@@ -178,7 +182,7 @@ describe('ReportAnIssueModel', () => {
         state_index: 1,
         learner_current_answer: 'test',
       },
-      category: 'broken_layout_or_image',
+      category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
       include_technical_logs: true,
       session_info: feedbackSessionInfo,
       screenshot_filename: null,
