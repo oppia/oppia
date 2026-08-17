@@ -2362,7 +2362,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 param_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
