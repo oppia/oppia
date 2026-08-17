@@ -21,7 +21,10 @@ import {Component, ViewEncapsulation} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -237,19 +240,27 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
+  private isMetadataFieldTranslatedByBackend(
+    field: TranslatableExplorationMetadataField
+  ): boolean {
+    return (this.expInfo.translated_metadata_fields || []).includes(field);
+  }
+
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expTitleTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.TITLE
+      )
     );
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expDescTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expDescTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.OBJECTIVE
+      )
     );
   }
 
