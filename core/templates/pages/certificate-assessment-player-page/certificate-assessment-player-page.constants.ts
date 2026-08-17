@@ -21,3 +21,6 @@ export const CertificateAssessmentPlayerPageConstants = {
   STAGE_INSTRUCTIONS: 'instructions',
   STAGE_QUESTIONS: 'questions',
 } as const;
+
+export type CertificateAssessmentStage =
+  (typeof CertificateAssessmentPlayerPageConstants)[keyof typeof CertificateAssessmentPlayerPageConstants];
