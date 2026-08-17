@@ -2573,6 +2573,66 @@ describe('TopicStorySectionComponent', () => {
     expect(component.activeLessonNumber).toBe(2);
   });
 
+  it('should handle onNavigationPracticeSelected by scrolling to practice card', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    const practiceElement = jasmine.createSpyObj<HTMLElement>(
+      'practiceElement',
+      ['scrollIntoView']
+    );
+    spyOn(document, 'getElementById').and.returnValue(practiceElement);
+
+    component.onNavigationPracticeSelected('1');
+    tick(300);
+
+    expect(document.getElementById).toHaveBeenCalledWith('practice-card-1');
+    expect(practiceElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }));
+
+  it('should handle onNavigationPracticeSelected when element is not found', fakeAsync(() => {
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    component.onNavigationPracticeSelected('999');
+    tick(300);
+  }));
+
+  it('should handle onAdventureMasteredContinue when masteredAdventureIndex is null', () => {
+    component.masteredAdventureIndex = null;
+    component.showAdventureMasteredModal = true;
+
+    component.onAdventureMasteredContinue();
+
+    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.masteredAdventureIndex).toBeNull();
+  });
+
   it('should return false from isChapterPublished when getStatus returns null', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',

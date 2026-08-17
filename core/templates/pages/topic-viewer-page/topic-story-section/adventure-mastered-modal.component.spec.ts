@@ -16,7 +16,14 @@
  * @fileoverview Unit tests for AdventureMasteredModalComponent.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {ElementRef} from '@angular/core';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -25,6 +32,17 @@ import {AdventureMasteredModalComponent} from './adventure-mastered-modal.compon
 describe('AdventureMasteredModalComponent', () => {
   let component: AdventureMasteredModalComponent;
   let fixture: ComponentFixture<AdventureMasteredModalComponent>;
+
+  const createMockDialog = (
+    focusableElements: HTMLElement[] = []
+  ): HTMLElement => {
+    const dialogElement = document.createElement('div');
+    spyOn(dialogElement, 'focus');
+    spyOn(dialogElement, 'querySelectorAll').and.returnValue(
+      focusableElements as NodeListOf<HTMLElement>
+    );
+    return dialogElement;
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,5 +79,143 @@ describe('AdventureMasteredModalComponent', () => {
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
 
     expect(component.continue.emit).not.toHaveBeenCalled();
+  });
+
+  it('should save active element and focus dialog on init', fakeAsync(() => {
+    const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
+      'previouslyFocusedElement',
+      ['focus']
+    );
+    const dialogElement = createMockDialog();
+    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
+      previouslyFocusedElement
+    );
+    component['dialog'] = new ElementRef(dialogElement);
+
+    component.ngOnInit();
+    tick(0);
+
+    expect(dialogElement.focus).toHaveBeenCalled();
+    expect(component['modalFocusRestoreElement']).toBe(
+      previouslyFocusedElement
+    );
+  }));
+
+  it('should restore focus to the previously focused element on continue', () => {
+    const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
+      'previouslyFocusedElement',
+      ['focus']
+    );
+    component['modalFocusRestoreElement'] = previouslyFocusedElement;
+    spyOn(component.continue, 'emit');
+
+    component.onContinue();
+
+    expect(previouslyFocusedElement.focus).toHaveBeenCalled();
+    expect(component['modalFocusRestoreElement']).toBeNull();
+  });
+
+  it('should focus dialog on Tab when active element is last focusable', () => {
+    const firstFocusableElement = jasmine.createSpyObj<HTMLElement>(
+      'firstFocusableElement',
+      ['focus']
+    );
+    const lastFocusableElement = jasmine.createSpyObj<HTMLElement>(
+      'lastFocusableElement',
+      ['focus']
+    );
+    const dialogElement = createMockDialog([
+      firstFocusableElement,
+      lastFocusableElement,
+    ]);
+    component['dialog'] = new ElementRef(dialogElement);
+    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
+      lastFocusableElement
+    );
+
+    const tabEvent = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      cancelable: true,
+    });
+    spyOn(tabEvent, 'preventDefault');
+
+    component.onDialogTab(tabEvent);
+
+    expect(firstFocusableElement.focus).toHaveBeenCalled();
+    expect(tabEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should focus dialog on Shift+Tab when active element is first focusable', () => {
+    const firstFocusableElement = jasmine.createSpyObj<HTMLElement>(
+      'firstFocusableElement',
+      ['focus']
+    );
+    const lastFocusableElement = jasmine.createSpyObj<HTMLElement>(
+      'lastFocusableElement',
+      ['focus']
+    );
+    const dialogElement = createMockDialog([
+      firstFocusableElement,
+      lastFocusableElement,
+    ]);
+    component['dialog'] = new ElementRef(dialogElement);
+    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
+      firstFocusableElement
+    );
+
+    const shiftTabEvent = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      cancelable: true,
+    });
+    spyOn(shiftTabEvent, 'preventDefault');
+
+    component.onDialogTab(shiftTabEvent);
+
+    expect(lastFocusableElement.focus).toHaveBeenCalled();
+    expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should do nothing on Tab when dialog element is not set', () => {
+    component['dialog'] = undefined!;
+
+    const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+    spyOn(tabEvent, 'preventDefault');
+
+    component.onDialogTab(tabEvent);
+
+    expect(tabEvent.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('should prevent default on Tab when no focusable elements exist', () => {
+    component['dialog'] = new ElementRef(createMockDialog());
+
+    const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+    spyOn(tabEvent, 'preventDefault');
+
+    component.onDialogTab(tabEvent);
+
+    expect(tabEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should ignore non-Tab key in onDialogTab', () => {
+    component['dialog'] = new ElementRef(createMockDialog());
+
+    const enterEvent = new KeyboardEvent('keydown', {key: 'Enter'});
+    spyOn(enterEvent, 'preventDefault');
+
+    component.onDialogTab(enterEvent);
+
+    expect(enterEvent.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('should emit continue without restoring focus when no element was saved', () => {
+    component['modalFocusRestoreElement'] = null;
+    spyOn(component.continue, 'emit');
+
+    component.onContinue();
+
+    expect(component.continue.emit).toHaveBeenCalled();
+    expect(component['modalFocusRestoreElement']).toBeNull();
   });
 });
