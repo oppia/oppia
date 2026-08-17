@@ -1,8 +1,8 @@
-import { Page } from '@playwright/test';
-import { BaseUser } from '../common/playwright-utils';
+import {Page} from '@playwright/test';
+import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
-import { showMessage } from '../common/show-message';
-import { RTEEditor } from '../common/rte-editor';
+import {showMessage} from '../common/show-message';
+import {RTEEditor} from '../common/rte-editor';
 
 const titleInp = 'input.e2e-test-blog-post-title-field';
 const bodyInp = 'div.e2e-test-rte';
@@ -48,13 +48,12 @@ const delBtn = '.cdk-overlay-pane .e2e-test-delete-blog-post-button';
 const contentBtn = '.e2e-test-content-button';
 
 export class BlogPostEditor extends BaseUser {
-
-  async expectModalTitleToBe(title: string): Promise<void> {
-    await this.page.getByText(title).first().waitFor({ state: 'visible' });
+  async expectModalTitleToBeInBlogPostEditorPage(title: string): Promise<void> {
+    await this.page.getByText(title).first().waitFor({state: 'visible'});
   }
 
   async expectModalBodyToContain(text: string): Promise<void> {
-    await this.page.getByText(text).first().waitFor({ state: 'visible' });
+    await this.page.getByText(text).first().waitFor({state: 'visible'});
   }
 
   async pasteTextTo(sel: string): Promise<void> {
@@ -82,7 +81,7 @@ export class BlogPostEditor extends BaseUser {
   async previewBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(prevBtn);
     await this.clickOnElementWithSelector(prevBtn);
-    await this.expectModalTitleToBe('Blog Card Preview');
+    await this.expectModalTitleToBeInBlogPostEditorPage('Blog Card Preview');
   }
 
   async updateUserBioInRegisterModal(bio: string): Promise<void> {
@@ -99,7 +98,9 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementValueToBe(userInp, name);
   }
 
-  async expectRegisterButtonToBe(state: 'disabled' | 'enabled' | 'hidden'): Promise<void> {
+  async expectRegisterButtonToBe(
+    state: 'disabled' | 'enabled' | 'hidden'
+  ): Promise<void> {
     if (state === 'hidden') {
       await this.expectElementToBeVisible(saveBioBtn, false);
     } else if (state === 'disabled') {
@@ -112,13 +113,17 @@ export class BlogPostEditor extends BaseUser {
   async clickOnUpdateUsernameIcon(): Promise<void> {
     await this.expectElementToBeVisible(updUserIcn);
     await this.clickOnElementWithSelector(updUserIcn);
-    await this.expectModalTitleToBe('Add your Author Name and Biography:');
+    await this.expectModalTitleToBeInBlogPostEditorPage(
+      'Add your Author Name and Biography:'
+    );
   }
 
   async clickOnUpdateBioIcon(): Promise<void> {
     await this.expectElementToBeVisible(updBioIcn);
     await this.clickOnElementWithSelector(updBioIcn);
-    await this.expectModalTitleToBe('Add your Author Name and Biography:');
+    await this.expectModalTitleToBeInBlogPostEditorPage(
+      'Add your Author Name and Biography:'
+    );
   }
 
   async clickOnSaveProfileButton(): Promise<void> {
@@ -137,11 +142,15 @@ export class BlogPostEditor extends BaseUser {
     await this.expectTextContentToBe(dashBio, bio);
   }
 
-  async expectNewBlogPostButtonToBeVisible(visible: boolean = true): Promise<void> {
+  async expectNewBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
     await this.expectElementToBeVisible(newPostBtn, visible);
   }
 
-  async expectFirstBlogPostButtonToBeVisible(visible: boolean = true): Promise<void> {
+  async expectFirstBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
     await this.expectElementToBeVisible(firstPostBtn, visible);
   }
 
@@ -173,7 +182,9 @@ export class BlogPostEditor extends BaseUser {
     await this.goto(dashUrl);
   }
 
-  async createDraftBlogPostWithTitleAndOpenBodyRte(title: string): Promise<void> {
+  async createDraftBlogPostWithTitleAndOpenBodyRte(
+    title: string
+  ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOnElementWithSelector(createPostBtn);
     await this.updateBlogPostTitle(title);
@@ -181,7 +192,9 @@ export class BlogPostEditor extends BaseUser {
   }
 
   async pasteContentInBlogPostContentRte(): Promise<void> {
-    await this.page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await this.page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write']);
     if (this.isViewportAtMobileWidth()) {
       await this.pasteTextTo(mobBodyInp);
     } else {
@@ -190,15 +203,15 @@ export class BlogPostEditor extends BaseUser {
   }
 
   async clickOnDismissPasteErrorButton(): Promise<void> {
-    await this.page.locator(pasteErr).waitFor({ state: 'visible' });
+    await this.page.locator(pasteErr).waitFor({state: 'visible'});
     await this.clickOnElementWithSelector(disPasteBtn);
-    await this.page.locator(pasteErr).waitFor({ state: 'hidden' });
+    await this.page.locator(pasteErr).waitFor({state: 'hidden'});
   }
 
   async clickOnPasteValidComponentsButton(text: string): Promise<void> {
-    await this.page.locator(pasteErr).waitFor({ state: 'visible' });
+    await this.page.locator(pasteErr).waitFor({state: 'visible'});
     await this.clickOnElementWithSelector(validPasteBtn);
-    await this.page.locator(pasteErr).waitFor({ state: 'hidden' });
+    await this.page.locator(pasteErr).waitFor({state: 'hidden'});
     try {
       const isPresent = await this.isTextPresentOnPage(text);
       if (!isPresent) {
@@ -212,16 +225,16 @@ export class BlogPostEditor extends BaseUser {
   }
 
   async clickOnCancelPasteButton(): Promise<void> {
-    await this.page.locator(pasteErr).waitFor({ state: 'visible' });
+    await this.page.locator(pasteErr).waitFor({state: 'visible'});
     await this.clickOnElementWithSelector(canPasteBtn);
-    await this.page.locator(pasteErr).waitFor({ state: 'hidden' });
+    await this.page.locator(pasteErr).waitFor({state: 'hidden'});
   }
 
   async typeInRteToDismissError(): Promise<void> {
-    await this.page.locator(pasteErr).waitFor({ state: 'visible' });
+    await this.page.locator(pasteErr).waitFor({state: 'visible'});
     await this.expectElementToBeVisible(bodyInp);
     await this.typeInInputField(bodyInp, 'qwerty');
-    await this.page.locator(pasteErr).waitFor({ state: 'hidden' });
+    await this.page.locator(pasteErr).waitFor({state: 'hidden'});
   }
 
   async editDraftBlogPostWithTitle(title: string): Promise<void> {
@@ -243,13 +256,13 @@ export class BlogPostEditor extends BaseUser {
     const posts = await this.page.locator(listBlogs).all();
     for (let i = 0; i < posts.length; i++) {
       let checkTitle = await posts[i].locator(titlePage).innerText();
-      
+
       if (title === checkTitle) {
         await posts[i].locator('.e2e-test-blog-post-edit-box').click();
         await this.expectElementToBeClickable(delBtn);
         await this.clickOnElementWithSelector(delBtn);
         await this.expectElementToBeVisible(authorModal);
-        await this.expectModalTitleToBe('DELETE BLOG POST');
+        await this.expectModalTitleToBeInBlogPostEditorPage('DELETE BLOG POST');
         await this.expectModalBodyToContain('This action is irreversible');
         await this.clickOnElementWithSelector(confirmBtn);
         await this.expectElementToBeVisible(confirmBtn, false);
@@ -276,7 +289,7 @@ export class BlogPostEditor extends BaseUser {
     }
     await this.expectElementToBeVisible(thumbBox);
     await this.clickOnElementWithSelector(thumbBox);
-    await this.expectModalTitleToBe('Add a thumbnail');
+    await this.expectModalTitleToBeInBlogPostEditorPage('Add a thumbnail');
   }
 
   async expectAddThumbnailImageButtonToBeClickable(): Promise<void> {
@@ -294,7 +307,7 @@ export class BlogPostEditor extends BaseUser {
       await this.uploadFile(path);
       await this.waitForElementToStabilize(addThumbBtn);
       await this.clickOnElementWithSelector(addThumbBtn);
-      await this.page.locator('body.modal-open').waitFor({ state: 'hidden' });
+      await this.page.locator('body.modal-open').waitFor({state: 'hidden'});
     }
   }
 
@@ -307,7 +320,7 @@ export class BlogPostEditor extends BaseUser {
     await this.selectTag('News');
     await this.selectTag('International');
     const url = this.page.url();
-    const id = (url.split('/').pop()) as string;
+    const id = url.split('/').pop() as string;
     await this.saveBlogBodyChanges();
     await this.publishTheBlogPost();
     return id;
@@ -350,14 +363,17 @@ export class BlogPostEditor extends BaseUser {
   }
 
   async selectTag(tag: string, present: boolean = true): Promise<void> {
-    if (this.isViewportAtMobileWidth() && !(await this.isElementVisible(bodyInp))) {
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(bodyInp))
+    ) {
       await this.expectElementToBeVisible(contentBtn);
       await this.clickOnElementWithSelector(contentBtn);
     }
     await this.expectElementToBeVisible(tagSel);
-    
+
     await this.page.waitForFunction(
-      (args) => {
+      args => {
         const els = document.querySelectorAll(args.selector);
         for (const el of Array.from(els)) {
           if (el.textContent?.trim() === args.tag) {
@@ -367,33 +383,33 @@ export class BlogPostEditor extends BaseUser {
         }
         return false;
       },
-      { selector: tagSel, tag }
+      {selector: tagSel, tag}
     );
 
     await this.page.waitForFunction(
-      (args) => {
+      args => {
         const els = document.querySelectorAll(args.selector);
         for (const el of Array.from(els)) {
           if (el.textContent?.trim() === args.tag) {
-            return el.querySelector('button')?.getAttribute('aria-pressed') === args.state;
+            return (
+              el.querySelector('button')?.getAttribute('aria-pressed') ===
+              args.state
+            );
           }
         }
         return false;
       },
-      { selector: tagSel, tag, state: present ? 'true' : 'false' }
+      {selector: tagSel, tag, state: present ? 'true' : 'false'}
     );
   }
 
   async saveTheDraftBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(saveDraftBtn);
     await this.clickOnElementWithSelector(saveDraftBtn);
-    await this.page.waitForFunction(
-      (sel: string) => {
-        const el = document.querySelector(sel);
-        return (el as HTMLButtonElement)?.disabled === true;
-      },
-      saveDraftBtn
-    );
+    await this.page.waitForFunction((sel: string) => {
+      const el = document.querySelector(sel);
+      return (el as HTMLButtonElement)?.disabled === true;
+    }, saveDraftBtn);
   }
 
   async publishTheBlogPost(): Promise<void> {
@@ -417,9 +433,9 @@ export class BlogPostEditor extends BaseUser {
     await this.saveBlogBodyChanges();
   }
 
-async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
+  async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
     const el = this.page.locator(editBody);
-    await el.waitFor({ state: 'visible' });
+    await el.waitFor({state: 'visible'});
 
     // @ts-ignore: Bypassing strict Puppeteer types in rte-editor.ts until it is migrated
     const rte: any = new RTEEditor(this.page, el);
@@ -526,7 +542,9 @@ async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
     showMessage(`Draft blog post exists!`);
   }
 
-  async expectPublishedBlogPostWithTitleToBePresent(title: string): Promise<void> {
+  async expectPublishedBlogPostWithTitleToBePresent(
+    title: string
+  ): Promise<void> {
     await this.goto(dashUrl);
     await this.clickOnElementWithText('PUBLISHED');
     await this.waitForPageToFullyLoad();
@@ -553,7 +571,9 @@ async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
       await this.page.locator(errBox).waitFor();
       showMessage('User unauthorized to access blog dashboard!');
     } catch (err) {
-      throw new Error(`No unauthorization error on accessing the blog dashboard page!`);
+      throw new Error(
+        `No unauthorization error on accessing the blog dashboard page!`
+      );
     }
   }
 
@@ -574,12 +594,17 @@ async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
 
   async expectRemainingTagsLimitTextToBe(limit: number): Promise<void> {
     const sel = '.e2e-test-remaining-tags-limit-text';
-    await this.expectTextContentToBe(sel, `${limit} more tags can still be added.`);
+    await this.expectTextContentToBe(
+      sel,
+      `${limit} more tags can still be added.`
+    );
   }
 
   async expectTilesViewAndListViewButtonsArePresent(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      showMessage('Skipped: Grid view and list view buttons are not present on mobile viewport.');
+      showMessage(
+        'Skipped: Grid view and list view buttons are not present on mobile viewport.'
+      );
       return;
     }
     await this.expectElementToBeVisible(gridBtn);
@@ -595,4 +620,5 @@ async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
   }
 }
 
-export let BlogPostEditorFactory = (page: Page): BlogPostEditor => new BlogPostEditor(page);
+export let BlogPostEditorFactory = (page: Page): BlogPostEditor =>
+  new BlogPostEditor(page);
