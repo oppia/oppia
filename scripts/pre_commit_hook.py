@@ -36,6 +36,8 @@ import sys
 
 from typing import Final, List, Optional, Tuple
 
+from . import common
+
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
 #
@@ -74,9 +76,7 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'FIREBASE_CONFIG_STORAGE_BUCKET',
     b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID',
 ]
-NPX_CMD: Final = os.path.join(
-    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx'
-)
+NPX_CMD: Final = common.NPX_BIN_PATH
 
 
 def install_hook() -> None:
@@ -206,7 +206,10 @@ def check_changes_in_config() -> None:
 
 def run_formatters() -> None:
     """Runs prettier and black formatters."""
-    subprocess.run([NPX_CMD, 'lint-staged'], check=True)
+    node_bin_dir = os.path.abspath(os.path.join(common.NODE_PATH, 'bin'))
+    env = os.environ.copy()
+    env['PATH'] = f'{node_bin_dir}{os.pathsep}{env.get("PATH", "")}'
+    subprocess.run([NPX_CMD, 'lint-staged'], env=env, check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:
