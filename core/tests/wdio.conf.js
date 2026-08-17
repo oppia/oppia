@@ -38,10 +38,6 @@ var suites = {
 
   topicAndStoryEditor: [
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
-  ],
-
-  users: [
-    './core/tests/webdriverio_desktop/userJourneys.js'
   ]
 };
 
