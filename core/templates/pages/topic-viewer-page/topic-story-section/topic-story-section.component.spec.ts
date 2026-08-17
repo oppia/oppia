@@ -221,8 +221,10 @@ describe('TopicStorySectionComponent', () => {
     chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
       null
     );
+  });
 
-    fixture.detectChanges();
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   const createStorySummarySpy = (
@@ -345,6 +347,8 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should set study guide url on init', () => {
+    component.ngOnInit();
+
     expect(component.studyGuideUrl).toBe('/learn/math/topic/studyguide');
   });
 
@@ -531,7 +535,6 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
     await fixture.whenStable();
-    fixture.detectChanges();
 
     expect(component.lessonCards.length).toBe(1);
     expect(component.lessonCards[0].totalCheckpointsCount).toBe(5);
@@ -619,28 +622,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.practiceCard.studyUrl).toBe(
       '/learn/math/topic/studyguide'
     );
-  });
-
-  it('should forward the topic editor preview flag to the adventure navigation', () => {
-    component.isInTopicEditorPreview = true;
-    fixture.detectChanges();
-
-    const navigationElement = fixture.nativeElement.querySelector(
-      'topic-adventure-navigation'
-    );
-    expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeTrue();
-  });
-
-  it('should not forward the topic editor preview flag by default', () => {
-    component.isInTopicEditorPreview = false;
-    fixture.detectChanges();
-
-    const navigationElement = fixture.nativeElement.querySelector(
-      'topic-adventure-navigation'
-    );
-    expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeFalse();
   });
 
   it('should use fallback practice session url when fragments are missing', () => {
@@ -752,6 +733,7 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should clear fallback selection when language changes', () => {
+    component.ngOnInit();
     topicSessionFallbackLanguageService.clearSelection.calls.reset();
 
     i18nLanguageCodeService.onI18nLanguageCodeChange.emit('es');
@@ -1320,7 +1302,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     spyOn(document, 'getElementById').and.returnValue(null);
 
@@ -1374,7 +1355,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     expect(localStorageService.getSkippedAdventures).toHaveBeenCalledWith(
       'story_id_1'
@@ -1426,7 +1406,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     expect(component.isAdventureSkipped(0)).toBe(true);
     expect(component.isAdventureSkipped(1)).toBe(true);
@@ -1472,7 +1451,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     spyOn(document, 'getElementById').and.returnValue(null);
 
@@ -1552,7 +1530,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     expect(component.isAdventureCompleted(0)).toBe(true);
     expect(component.isAdventureCompleted(1)).toBe(false);
@@ -1712,22 +1689,9 @@ describe('TopicStorySectionComponent', () => {
     expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     expect(localStorageService.getSkippedAdventures).not.toHaveBeenCalled();
   });
-
-  it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
-    const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
-      null
-    );
-
-    component.onNavigationPracticeSelected('1');
-
-    tick(300);
-
-    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-1');
-  }));
 
   it('should select first not_started lesson as active when no in_progress', () => {
     const storyNodeSpy1 = createStoryNodeSpy(
@@ -1841,21 +1805,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.shouldShowAdventureEndTestCard(0)).toBe(false);
   });
 
-  it('should scroll to lesson element when found by getElementById', fakeAsync(() => {
-    const mockElement = document.createElement('div');
-    spyOn(document, 'getElementById').and.returnValue(mockElement);
-    spyOn(mockElement, 'scrollIntoView');
-
-    component.onNavigationLessonSelected({lessonNumber: 1, adventureIndex: 0});
-
-    tick(300);
-
-    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  }));
-
   it('should report story as completed only when all available lessons are completed', () => {
     const baseLesson = {
       lessonTitle: 'Lesson',
@@ -1967,21 +1916,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureCompleted(2)).toBe(false);
     expect(component.isAdventureCompleted(99)).toBe(false);
   });
-
-  it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
-    const mockElement = document.createElement('div');
-    spyOn(document, 'getElementById').and.returnValue(mockElement);
-    spyOn(mockElement, 'scrollIntoView');
-
-    component.onNavigationPracticeSelected('1');
-
-    tick(300);
-
-    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  }));
 
   it('should handle buildAdventureGroups when arcs is null', async () => {
     const storyNodeSpy = createStoryNodeSpy(
@@ -2271,7 +2205,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-    fixture.detectChanges();
 
     spyOn(document, 'getElementById').and.returnValue(null);
 

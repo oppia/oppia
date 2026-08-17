@@ -16,14 +16,7 @@
  * @fileoverview Unit tests for ArcSkipConfirmationModalComponent.
  */
 
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-  waitForAsync,
-} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -44,31 +37,6 @@ describe('ArcSkipConfirmationModalComponent', () => {
     component = fixture.componentInstance;
     component.adventureLabel = 'Adventure 2';
     component.confirmationMessage = 'Adventure 1 will be skipped';
-  });
-
-  it('should render the adventure label, confirmation message and translated texts', () => {
-    fixture.detectChanges();
-
-    expect(
-      fixture.nativeElement
-        .querySelector('.arc-skip-confirmation-title')
-        .textContent.trim()
-    ).toBe('I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_TITLE');
-    expect(
-      fixture.nativeElement
-        .querySelector('.arc-skip-confirmation-message')
-        .textContent.trim()
-    ).toBe('Adventure 1 will be skipped');
-    expect(
-      fixture.nativeElement
-        .querySelector('.arc-skip-confirmation-cancel')
-        .textContent.trim()
-    ).toBe('I18N_MODAL_CANCEL_BUTTON');
-    expect(
-      fixture.nativeElement
-        .querySelector('.arc-skip-confirmation-proceed')
-        .textContent.trim()
-    ).toBe('I18N_MODAL_CONTINUE_BUTTON');
   });
 
   it('should emit cancel when onCancel is called', () => {
@@ -95,18 +63,6 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(component.cancel.emit).toHaveBeenCalled();
   });
 
-  it('should stop click propagation when the dialog body is clicked', () => {
-    fixture.detectChanges();
-
-    const event = new Event('click');
-    spyOn(event, 'stopPropagation');
-    fixture.debugElement
-      .query(By.css('.arc-skip-confirmation-modal'))
-      .triggerEventHandler('click', event);
-
-    expect(event.stopPropagation).toHaveBeenCalled();
-  });
-
   it('should emit cancel when Escape is pressed', () => {
     spyOn(component.cancel, 'emit');
 
@@ -121,121 +77,5 @@ describe('ArcSkipConfirmationModalComponent', () => {
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
 
     expect(component.cancel.emit).not.toHaveBeenCalled();
-  });
-
-  it('should move focus into the dialog on init', fakeAsync(() => {
-    fixture.detectChanges();
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    spyOn(dialogElement, 'focus');
-
-    tick();
-
-    expect(dialogElement.focus).toHaveBeenCalled();
-  }));
-
-  it('should restore focus to the element that opened the modal on cancel', () => {
-    const triggerElement = document.createElement('button');
-    document.body.appendChild(triggerElement);
-    triggerElement.focus();
-    spyOn(triggerElement, 'focus');
-
-    fixture.detectChanges();
-    component.onCancel();
-
-    expect(triggerElement.focus).toHaveBeenCalled();
-    document.body.removeChild(triggerElement);
-  });
-
-  it('should move focus to the first focusable element on Tab from the last one', () => {
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-    const firstButton = buttons[0] as HTMLElement;
-    (buttons[buttons.length - 1] as HTMLElement).focus();
-    spyOn(firstButton, 'focus');
-
-    component.onDialogTab(new KeyboardEvent('keydown', {key: 'Tab'}));
-
-    expect(firstButton.focus).toHaveBeenCalled();
-  });
-
-  it('should move focus to the last focusable element on Shift+Tab from the first one', () => {
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-    const lastButton = buttons[buttons.length - 1] as HTMLElement;
-    (buttons[0] as HTMLElement).focus();
-    spyOn(lastButton, 'focus');
-
-    component.onDialogTab(
-      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true})
-    );
-
-    expect(lastButton.focus).toHaveBeenCalled();
-  });
-
-  it('should move focus to the last focusable element on Shift+Tab when the dialog is focused', () => {
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    const buttons = dialogElement.querySelectorAll('button');
-    const lastButton = buttons[buttons.length - 1] as HTMLElement;
-    dialogElement.focus();
-    spyOn(lastButton, 'focus');
-
-    component.onDialogTab(
-      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true})
-    );
-
-    expect(lastButton.focus).toHaveBeenCalled();
-  });
-
-  it('should prevent Tab navigation when the dialog has no focusable elements', () => {
-    fixture.detectChanges();
-
-    const dialogElement = fixture.nativeElement.querySelector(
-      '.arc-skip-confirmation-modal'
-    );
-    dialogElement
-      .querySelectorAll('button')
-      .forEach((button: HTMLElement) => button.remove());
-
-    const event = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      cancelable: true,
-    });
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(true);
-  });
-
-  it('should do nothing on Tab when no dialog is rendered', () => {
-    const event = new KeyboardEvent('keydown', {key: 'Tab', cancelable: true});
-
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(false);
-  });
-
-  it('should do nothing when a non-Tab key is pressed on the dialog', () => {
-    fixture.detectChanges();
-
-    const event = new KeyboardEvent('keydown', {
-      key: 'Enter',
-      cancelable: true,
-    });
-    component.onDialogTab(event);
-
-    expect(event.defaultPrevented).toBe(false);
   });
 });

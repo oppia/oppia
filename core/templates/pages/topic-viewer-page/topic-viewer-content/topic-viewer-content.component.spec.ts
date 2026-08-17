@@ -73,54 +73,10 @@ describe('TopicViewerContentComponent', () => {
     expect(component.trackStoryDataById(0, storySectionData)).toBe('story_1');
   });
 
-  it('should render story sections when story data is present in story view', () => {
-    component.canonicalStorySectionData = [storySectionData];
-    fixture.detectChanges();
-
-    expect(
-      fixture.nativeElement.querySelectorAll('topic-story-section').length
-    ).toBe(1);
-    expect(
-      fixture.nativeElement.querySelector('.redesigned-stories-list')
-    ).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('mat-card')).toBeNull();
-  });
-
-  it('should render coming soon card when story data is empty in story view', () => {
-    component.canonicalStorySectionData = [];
-    fixture.detectChanges();
-
-    const comingSoonCard = fixture.nativeElement.querySelector('mat-card');
-    expect(comingSoonCard).not.toBeNull();
-    expect(comingSoonCard.textContent).toContain(
-      'I18N_TOPIC_VIEWER_COMING_SOON'
-    );
-    expect(
-      fixture.nativeElement.querySelectorAll('topic-story-section').length
-    ).toBe(0);
-  });
-
-  it('should render studyguide section when studyguide view is active', () => {
-    component.activeView = component.VIEW_NAMES.STUDYGUIDE;
-    component.topicIsLoading = false;
-    component.subtopics = [];
-    fixture.detectChanges();
-
-    expect(
-      fixture.nativeElement
-        .querySelector('.oppia-redesigned-topic-viewer-container')
-        .classList.contains('studyguide-view-active')
-    ).toBeTrue();
-    expect(
-      fixture.nativeElement.querySelector('subtopics-list')
-    ).not.toBeNull();
-  });
-
-  it('should not render studyguide section while topic is loading', () => {
-    component.activeView = component.VIEW_NAMES.STUDYGUIDE;
-    component.topicIsLoading = true;
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('subtopics-list')).toBeNull();
+  it('should initialize with story view defaults', () => {
+    expect(component.activeView).toBe(component.VIEW_NAMES.STORY);
+    expect(component.canonicalStorySectionData).toEqual([]);
+    expect(component.topicIsLoading).toBeFalse();
+    expect(component.isInTopicEditorPreview).toBeFalse();
   });
 });

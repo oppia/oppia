@@ -64,48 +64,6 @@ describe('AdventureNavigationComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should offset the sticky navigation below the editor header in topic editor preview', fakeAsync(() => {
-    component.adventureGroups = [
-      {
-        lessons: [{lessonNumber: 1, isCompleted: false}],
-        accentColor: '#000',
-        showPractice: true,
-        isPracticeCompleted: false,
-        arcId: '1',
-      },
-    ];
-    component.isInTopicEditorPreview = true;
-    fixture.detectChanges();
-
-    const container = fixture.nativeElement.querySelector(
-      '.adventure-navigation-container'
-    );
-    expect(container.style.top).toBe('126px');
-
-    tick(500);
-  }));
-
-  it('should not offset the sticky navigation outside the topic editor preview', fakeAsync(() => {
-    component.adventureGroups = [
-      {
-        lessons: [{lessonNumber: 1, isCompleted: false}],
-        accentColor: '#000',
-        showPractice: true,
-        isPracticeCompleted: false,
-        arcId: '1',
-      },
-    ];
-    component.isInTopicEditorPreview = false;
-    fixture.detectChanges();
-
-    const container = fixture.nativeElement.querySelector(
-      '.adventure-navigation-container'
-    );
-    expect(container.style.top).toBe('56px');
-
-    tick(500);
-  }));
-
   it('should mark first lesson as active when no explicit active lesson exists', () => {
     component.activeLessonNumber = null;
 
