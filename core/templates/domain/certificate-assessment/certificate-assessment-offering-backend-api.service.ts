@@ -104,6 +104,11 @@ interface CertificateAssessmentQuestionBackendDict {
   question_version: number;
 }
 
+export interface CertificateAssessmentQuestionBackendResponse {
+  question_id: string;
+  question_state_data: StateBackendDict;
+}
+
 interface StartCertificateAssessmentBackendResponse {
   attempt_id: string;
   questions: CertificateAssessmentQuestionBackendDict[];
@@ -118,11 +123,6 @@ export interface SubmitCertificateAssessmentAnswerBackendDict {
 interface SubmitCertificateAssessmentBackendResponse {
   attempt_id: string;
   is_submitted: boolean;
-}
-
-export interface CertificateAssessmentQuestionBackendResponse {
-  question_id: string;
-  question_state_data: StateBackendDict;
 }
 
 @Injectable({
@@ -391,7 +391,7 @@ export class CertificateAssessmentOfferingBackendApiService {
     }
   }
 
-  async startCertificateAssessmentAttemptAsync(
+  async attemptCertificateAssessmentAsync(
     certificateId: string
   ): Promise<CertificateAssessmentAttemptData> {
     try {

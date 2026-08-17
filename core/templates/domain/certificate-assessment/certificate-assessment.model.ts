@@ -45,27 +45,49 @@ export interface AssessmentResultTopicWiseBreakdown {
   scorePercentage: number;
 }
 
-// The shape of each certificate assessment question returned by the assessment
-// player.
+/** The interaction type of an assessment question. */
 export type AssessmentQuestionType =
   | 'multiple_choice'
   | 'multiple_select'
   | 'text_input'
   | 'numeric_input';
 
+/** An answer choice within an assessment question. */
 export interface AssessmentQuestionOption {
+  /** Unique identifier for this option (content id). */
   id: string;
+  /** The choice's rich-text HTML, rendered via oppia-rte-output-display. */
   text: string;
+  /** The index of the option in the question's stored choice list. This is
+   *  the value submitted for multiple-choice questions, so it is independent
+   *  of any on-screen reordering of the choices. */
+  index: number;
 }
 
+/** A fully-resolved assessment question rendered by the conversation skin. */
 export interface AssessmentQuestion {
+  /** The question's unique identifier. */
   id: string;
+  /** The interaction type determining how the question is rendered. */
   type: AssessmentQuestionType;
+  /** The question's rich-text HTML, rendered via oppia-rte-output-display. */
   prompt: string;
+  /** Hint text shown to the learner on request. */
   hint: string;
+  /** Available answer choices (empty for free-response questions). */
   options: AssessmentQuestionOption[];
+  /** Input placeholder text for free-response questions. */
   placeholder?: string;
+  /** The correct answer text derived from the rule inputs. */
   correctAnswerText: string;
+  /** The index of the correct choice, taken from the rule inputs. Only set
+   *  for multiple-choice questions, whose rule inputs store the correct
+   *  answer as the index of the choice. */
+  correctAnswerIndex?: number;
+  /** The content ids of the correct choices, taken from the rule inputs. Only
+   *  set for multiple-select questions, whose rule inputs store the correct
+   *  answers as the content ids of the choices. */
+  correctAnswerOptionIds?: string[];
 }
 
 // The shape of a recommended topic tile shown on the certificate assessment

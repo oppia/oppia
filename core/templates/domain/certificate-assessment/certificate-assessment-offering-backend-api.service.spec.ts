@@ -1015,7 +1015,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
   it('should successfully start a certificate assessment attempt', fakeAsync(() => {
     caos
-      .startCertificateAssessmentAttemptAsync('mock_certificate_id')
+      .attemptCertificateAssessmentAsync('mock_certificate_id')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -1047,7 +1047,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
   it('should use rejection handler if starting a certificate assessment fails', fakeAsync(() => {
     caos
-      .startCertificateAssessmentAttemptAsync('mock_certificate_id')
+      .attemptCertificateAssessmentAsync('mock_certificate_id')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -1231,7 +1231,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
   it('should fall back to the http error message if starting a certificate assessment fails with no nested backend message', fakeAsync(() => {
     caos
-      .startCertificateAssessmentAttemptAsync('mock_certificate_id')
+      .attemptCertificateAssessmentAsync('mock_certificate_id')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

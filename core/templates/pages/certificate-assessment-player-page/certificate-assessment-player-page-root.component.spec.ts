@@ -77,13 +77,13 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     const certificateAssessmentOfferingBackendApiServiceSpy =
       jasmine.createSpyObj('CertificateAssessmentOfferingBackendApiService', [
         'getCertificateAssessmentOfferingAsync',
-        'startCertificateAssessmentAttemptAsync',
+        'attemptCertificateAssessmentAsync',
         'submitCertificateAssessmentAttemptAsync',
       ]);
     certificateAssessmentOfferingBackendApiServiceSpy.getCertificateAssessmentOfferingAsync.and.returnValue(
       Promise.resolve(mockOffering)
     );
-    certificateAssessmentOfferingBackendApiServiceSpy.startCertificateAssessmentAttemptAsync.and.returnValue(
+    certificateAssessmentOfferingBackendApiServiceSpy.attemptCertificateAssessmentAsync.and.returnValue(
       Promise.resolve(mockAttempt)
     );
     certificateAssessmentOfferingBackendApiServiceSpy.submitCertificateAssessmentAttemptAsync.and.returnValue(
@@ -159,7 +159,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(
-      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
@@ -176,7 +176,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   it('should stay on the intro stage when the session route fails to start an attempt', fakeAsync(async () => {
     await configureComponent('session');
     (
-      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync as jasmine.Spy
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
 
     component.ngOnInit();
@@ -230,7 +230,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(
-      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
@@ -238,7 +238,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
   it('should show a warning when starting the attempt fails', fakeAsync(() => {
     (
-      certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync as jasmine.Spy
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
 
     component.startAssessment();

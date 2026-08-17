@@ -28,7 +28,12 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
+import {
+  CertificateAssessmentAttemptData,
+  AssessmentQuestion,
+  AssessmentQuestionOption,
+  AssessmentQuestionType,
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
@@ -43,40 +48,14 @@ import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
-export type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input';
-
-export interface AssessmentQuestionOption {
-  id: string;
-  // The choice's rich-text HTML, rendered via oppia-rte-output-display.
-  text: string;
-  // The index of the option in the question's stored choice list. This is
-  // the value submitted for multiple-choice questions, so it is independent
-  // of any on-screen reordering of the choices.
-  index: number;
-}
-
-export interface AssessmentQuestion {
-  id: string;
-  type: AssessmentQuestionType;
-  // The question's rich-text HTML, rendered via oppia-rte-output-display.
-  prompt: string;
-  hint: string;
-  options: AssessmentQuestionOption[];
-  placeholder?: string;
-  correctAnswerText: string;
-  // The index of the correct choice, taken from the rule inputs. Only set
-  // for multiple-choice questions, whose rule inputs store the correct
-  // answer as the index of the choice.
-  correctAnswerIndex?: number;
-  // The content ids of the correct choices, taken from the rule inputs. Only
-  // set for multiple-select questions, whose rule inputs store the correct
-  // answers as the content ids of the choices.
-  correctAnswerOptionIds?: string[];
-}
+const INTERACTION_ID_MULTIPLE_CHOICE =
+  'MultipleChoiceInput' as InteractionSpecsKey;
+const INTERACTION_ID_ITEM_SELECTION =
+  'ItemSelectionInput' as InteractionSpecsKey;
+const INTERACTION_ID_TEXT_INPUT = 'TextInput' as InteractionSpecsKey;
+const INTERACTION_ID_NUMBER_WITH_UNITS =
+  'NumberWithUnits' as InteractionSpecsKey;
+const INTERACTION_ID_NUMERIC_INPUT = 'NumericInput' as InteractionSpecsKey;
 
 @Component({
   selector: 'certificate-assessment-player-page',
@@ -220,14 +199,14 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     interactionId: InteractionSpecsKey | null
   ): AssessmentQuestionType {
     switch (interactionId) {
-      case 'MultipleChoiceInput':
+      case INTERACTION_ID_MULTIPLE_CHOICE:
         return 'multiple_choice';
-      case 'ItemSelectionInput':
+      case INTERACTION_ID_ITEM_SELECTION:
         return 'multiple_select';
-      case 'TextInput':
+      case INTERACTION_ID_TEXT_INPUT:
         return 'text_input';
-      case 'NumberWithUnits':
-      case 'NumericInput':
+      case INTERACTION_ID_NUMBER_WITH_UNITS:
+      case INTERACTION_ID_NUMERIC_INPUT:
         return 'numeric_input';
       default:
         return 'text_input';

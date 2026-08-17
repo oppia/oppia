@@ -35,8 +35,8 @@ export class CertificateAssessmentTitledBackgroundBannerComponent {
   @Input() title: string = '';
   @Input() buttonText: string = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
   @Input() buttonRoute: string[] = [];
-  // Emitted on every banner button click. Consumers that need custom behavior
-  // (such as returning to a stage instead of navigating) can subscribe to this
-  // output and leave buttonRoute empty so no navigation is triggered.
-  @Output() buttonClick = new EventEmitter<void>();
+  // Emitted when the banner's button is clicked. Consumers that need custom
+  // behavior (such as returning to a stage instead of navigating) can subscribe
+  // to this output and leave buttonRoute empty so no navigation is triggered.
+  @Output() bannerClick = new EventEmitter<void>();
 }

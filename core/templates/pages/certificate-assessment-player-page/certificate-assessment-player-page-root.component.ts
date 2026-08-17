@@ -149,7 +149,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   async startAssessment(): Promise<void> {
     try {
       this.attempt =
-        await this.certificateAssessmentOfferingBackendApiService.startCertificateAssessmentAttemptAsync(
+        await this.certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync(
           this.certificateId
         );
       this.currentStage =

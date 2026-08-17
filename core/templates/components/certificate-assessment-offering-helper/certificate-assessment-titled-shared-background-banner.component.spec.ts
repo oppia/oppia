@@ -108,12 +108,12 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
     );
   });
 
-  it('should emit buttonClick exactly once when the button is clicked', () => {
+  it('should emit bannerClick exactly once when the button is clicked', () => {
     component.buttonRoute = ['/certificate-assessment'];
     fixture.detectChanges();
 
-    const clickSpy = jasmine.createSpy('buttonClickSpy');
-    component.buttonClick.subscribe(clickSpy);
+    const clickSpy = jasmine.createSpy('bannerClickSpy');
+    component.bannerClick.subscribe(clickSpy);
 
     const button = fixture.nativeElement.querySelector('button');
     button.click();
