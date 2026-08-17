@@ -27,6 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
+import pytest
 from typing import List, Optional, TypedDict
 
 MYPY = False
@@ -336,6 +337,31 @@ class UserSettingsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected display_alias to be a string,'
             ' received %s' % self.user_settings.display_alias,
+        ):
+            self.user_settings.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_str_profile_name_for_certificate_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = 0  # type: ignore[assignment]
+        with pytest.raises(
+            utils.ValidationError,
+            match=f'Expected profile_name_for_certificate to be a string, received {self.user_settings.profile_name_for_certificate}',
+        ):
+            self.user_settings.validate()
+
+    def test_validate_long_profile_name_for_certificate_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = 'a' * (
+            constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE + 1
+        )
+        with pytest.raises(
+            utils.ValidationError,
+            match=f'Profile name for certificates should be at most {constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE} characters long.',
         ):
             self.user_settings.validate()
 
