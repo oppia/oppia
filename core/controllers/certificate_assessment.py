@@ -20,9 +20,10 @@ import datetime
 
 from core import feconf, utils
 from core.controllers import acl_decorators, base
+from core.controllers import domain_objects_validator as validation_method
 from core.domain import certificate_assessment_services, topic_fetchers
 
-from typing import Dict, List, TypedDict
+from typing import Any, Dict, List, TypedDict
 
 
 def _format_utc_datetime(value: datetime.datetime) -> str:
@@ -84,17 +85,13 @@ class StartCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
     certificate_id: str
 
 
-class SubmitCertificateAssessmentAnswerDict(TypedDict):
-    """Dict representation of a single submitted answer."""
-
-    question_id: str
-    selected_answer: str
-
-
 class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of SubmitCertificateAssessmentHandler payload."""
 
-    answers: List[SubmitCertificateAssessmentAnswerDict]
+    # Here we use type Any because each submitted answer can hold a selected
+    # answer of any accepted interaction answer type (None, str, int, dict,
+    # list, or list of lists).
+    answers: List[Dict[str, Any]]
 
 
 class SubmitCertificateAssessmentHandlerNormalizedRequestDict(TypedDict):
@@ -439,7 +436,7 @@ class StartCertificateAssessmentHandler(
         Dict[str, str],
     ]
 ):
-    """Stub handler for starting a certificate assessment attempt."""
+    """Starts a certificate assessment attempt."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -449,25 +446,26 @@ class StartCertificateAssessmentHandler(
         },
     }
 
-    # TODO(#24717-2.13): Replace open_access with
-    # require_user_id_else_redirect_to_homepage once the real
-    # start_certificate_assessment_attempt() service is wired in.
-    @acl_decorators.open_access
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self) -> None:
-        """Returns a hardcoded attempt_id and question list."""
+        assert self.normalized_payload is not None
+        assert self.user_id is not None
+        try:
+            attempt, questions = (
+                certificate_assessment_services.start_certificate_assessment_attempt(
+                    self.normalized_payload['certificate_id'], self.user_id
+                )
+            )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e) from e
+        except (
+            certificate_assessment_services.CertificateAssessmentAttemptNotReadyException
+        ) as e:
+            raise self.InvalidInputException(str(e)) from e
         self.render_json(
             {
-                'attempt_id': 'dummy_attempt_id',
-                'questions': [
-                    {
-                        'question_id': 'dummy_question_id_1',
-                        'question_version': 1,
-                    },
-                    {
-                        'question_id': 'dummy_question_id_2',
-                        'question_version': 1,
-                    },
-                ],
+                'attempt_id': attempt.attempt_id,
+                'questions': questions,
             }
         )
 
@@ -478,7 +476,7 @@ class SubmitCertificateAssessmentHandler(
         SubmitCertificateAssessmentHandlerNormalizedRequestDict,
     ]
 ):
-    """Stub handler for submitting a certificate assessment attempt."""
+    """Submits a certificate assessment attempt."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -490,33 +488,58 @@ class SubmitCertificateAssessmentHandler(
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'dict',
-                        'properties': [
-                            {
-                                'name': 'question_id',
-                                'schema': {'type': 'basestring'},
-                            },
-                            {
-                                'name': 'selected_answer',
-                                'schema': {'type': 'basestring'},
-                            },
-                        ],
-                        'required': ['question_id', 'selected_answer'],
+                        'type': 'object_dict',
+                        'validation_method': (
+                            validation_method.validate_certificate_assessment_answer
+                        ),
                     },
                 }
             },
         },
     }
 
-    # TODO(#24717-2.13): Replace open_access with
-    # can_submit_assessment_response once real submission logic exists.
-    @acl_decorators.open_access
+    @acl_decorators.can_submit_assessment_response
     def post(self, attempt_id: str) -> None:
-        """Returns a hardcoded submission confirmation."""
+        assert self.normalized_payload is not None
+        # Here we use type Any because each submitted answer can hold a
+        # selected answer of any accepted interaction answer type.
+        answers: List[Dict[str, Any]] = self.normalized_payload['answers']
+        try:
+            attempt = certificate_assessment_services.submit_certificate_assessment_attempt(
+                attempt_id, answers
+            )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e) from e
+        self.render_json(
+            {'attempt_id': attempt.attempt_id, 'is_submitted': True}
+        )
+
+
+class CertificateQuestionHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Fetches question state data for an in-progress certificate attempt."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'attempt_id': {'schema': {'type': 'basestring'}},
+        'question_id': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_certificate_assessment_attempt
+    def get(self, attempt_id: str, question_id: str) -> None:
+        assert self.user_id is not None
+        try:
+            question_state_data = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
+                self.user_id, attempt_id, question_id
+            )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e) from e
         self.render_json(
             {
-                'attempt_id': attempt_id,
-                'is_submitted': True,
+                'question_id': question_id,
+                'question_state_data': question_state_data,
             }
         )
 
