@@ -283,8 +283,8 @@
                layout-wrap
                class="metrics"
                fxLayoutAlign="space-between center">
-            <ul class="row-one">
-              <li flex="50" class="e2e-test-exp-summary-tile-rating">
+            <ul class="row-one d-flex justify-content-start">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                         ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}"
@@ -296,7 +296,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback"
+              <li class="w-50 text-start e2e-test-exp-summary-tile-open-feedback"
                   tabindex="0"
                   [attr.aria-label]="'Feedbacks ' + exploration.numOpenThreads ">
                 <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
@@ -315,8 +315,8 @@
               </li>
             </ul>
 
-            <ul class="row-two">
-              <li flex="50" class="e2e-test-exp-summary-tile-num-views">
+            <ul class="row-two d-flex justify-content-start">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
                       placement="top">
@@ -328,7 +328,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-last-updated">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-last-updated">
                 <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}"
                       placement="top">
@@ -340,10 +340,9 @@
                 </span>
               </li>
             </ul>
-            <div class="row-three" flex="100">
+            <div class="row-three w-100">
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
-                             flex="100"
                              class="position-relative w-100"
                              layoutType="row"
                              layoutAlignType="start center"
@@ -452,16 +451,12 @@
   .row-one, .row-two {
     display: flex;
     font-size: 12px;
-    justify-content: flex-start;
+    justify-content: space-between;
     list-style-type: none;
     margin-bottom: 0;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
-  }
-  .row-one li, .row-two li {
-    text-align: left;
-    width: 50%;
   }
   .row-two {
     margin-bottom: 12px;
