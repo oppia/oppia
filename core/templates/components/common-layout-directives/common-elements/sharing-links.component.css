@@ -5,6 +5,10 @@
   margin: 0;
 }
 
+.oppia-sharing-links.fx-main-start {
+  justify-content: flex-start;
+}
+
 .oppia-sharing-links .padding-0-2 {
   padding: 0 0.125rem;
 }
