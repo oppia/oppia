@@ -1724,6 +1724,52 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assert_job_output_is_empty()
 
+    def test_skip_generation_when_reviewed_topic_is_deleted(self) -> None:
+        # 1) Create a real topic via the service (sets up versioning
+        # correctly), mimicking a topic that a reviewer reviewed against.
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_to_delete',
+            'topic-to-delete-name',
+            'topic-to-delete',
+            'description',
+            'fragm',
+        )
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
+        # 2) Create a translation review stat that references that topic.
+        review_stat = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            id='es.reviewer_del.topic_to_delete',
+            language_code='es',
+            reviewer_user_id='reviewer_del',
+            topic_id='topic_to_delete',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT
+            ),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+            ),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT
+            ),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE,
+        )
+        review_stat.update_timestamps()
+        review_stat.put()
+
+        # 3) Delete the topic, mimicking a topic removed after the review
+        # was recorded.
+        topic_services.delete_topic(
+            feconf.SYSTEM_COMMITTER_ID, 'topic_to_delete'
+        )
+
+        # 4) The job should skip the now-invalid review stat and complete
+        # without raising 'min() arg is an empty sequence'.
+        self.assert_job_output_is_empty()
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -1907,6 +1953,13 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             edited_by_reviewer=False,
         ).put()
 
+        self.assert_job_output_is_empty()
+
+    def test_skip_audit_if_translation_review_has_only_invalid_topics(
+        self,
+    ) -> None:
+        self.translation_review_model_with_invalid_topic.update_timestamps()
+        self.put_multi([self.translation_review_model_with_invalid_topic])
         self.assert_job_output_is_empty()
 
 
