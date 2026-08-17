@@ -214,7 +214,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     )
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -349,7 +349,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -392,7 +392,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -421,7 +421,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -457,7 +457,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -495,7 +495,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -515,7 +515,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
@@ -536,7 +536,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=8192',
+            '--max-old-space-size=5120',
             os.path.join(
                 common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
             ),
