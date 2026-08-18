@@ -1906,6 +1906,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         # Here we use cast because the mocked call arguments are not typed,
         # so that the email body is recognized as a string.
         return cast(str, mock_send_email.call_args[0][4])
+
     def test_submission_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2112,6 +2113,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             % feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
             email_body,
         )
+
     def test_submission_email_with_invalid_dashboard_raises_error(
         self,
     ) -> None:
@@ -2132,6 +2134,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         mock_send_email.assert_not_called()
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
+
     def test_status_change_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2197,6 +2200,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             'my-suggestions&feedback_id=feedback_id',
             email_body,
         )
+
     def test_reply_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
