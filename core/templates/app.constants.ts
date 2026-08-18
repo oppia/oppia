@@ -325,8 +325,8 @@ export const AppConstants = {
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
     SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
   },
-  VOLUNTEER_FORM_LINK:
-    'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+  VOLUNTEER_IDEALIST_LINK:
+    'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
   IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
   IMPACT_REPORT_LINK_2023:

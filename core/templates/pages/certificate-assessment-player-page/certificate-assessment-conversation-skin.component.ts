@@ -28,7 +28,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AssessmentQuestion} from './certificate-assessment-player-page.component';
+import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
