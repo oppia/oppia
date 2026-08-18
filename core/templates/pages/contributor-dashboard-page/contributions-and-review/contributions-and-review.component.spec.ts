@@ -3209,13 +3209,17 @@ describe('Contributions and review component', () => {
           suggestionId,
           action,
           reviewMessage,
-          skillDifficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
-          // The skill review service reports failures with no message, so the
-          // callback is invoked without arguments here as well.
-          return Promise.reject(errorCallback());
+          // The service supplies a generic message for a skill review
+          // failure, because that endpoint reports no reason of its own.
+          return Promise.reject(
+            errorCallback(
+              ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+            )
+          );
         }
       );
       component.contributions = {};
