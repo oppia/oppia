@@ -306,11 +306,11 @@ export class CkEditorInitializerService {
                * true iff "element" is an instance of this widget.
                */
               upcast: function (element: CKEDITOR.htmlParser.element) {
-                // This throws "TS2339". We need to suppress this error
-                // because the @types/ckeditor definition is incomplete.
-                // @ts-ignore
                 return (
                   element.name !== 'p' &&
+                  // This throws "TS2339". We need to suppress this error
+                  // because the @types/ckeditor definition is incomplete.
+                  // @ts-ignore
                   element.children.length > 0 &&
                   // This throws "TS2339". We need to suppress this error
                   // because the @types/ckeditor definition is incomplete.
