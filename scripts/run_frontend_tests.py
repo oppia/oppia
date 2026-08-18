@@ -198,6 +198,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # CI overhead on par with the previous minify-third-party-only approach.
         build.main(args=['--prod_env', '--skip_ng_build'])
 
+        # --configuration=production requires a matching
+        # `configurations.production` block in angular.json's test target.
+        # That block performs a fileReplacements swap
+        # (environment.ts → environment.prod.ts), mirroring the build
+        # target's existing production config.
         cmd.append('--configuration=production')
     else:
         build.main(args=[])

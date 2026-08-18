@@ -62,14 +62,7 @@ describe('Beam Jobs Tab Component', () => {
   let component: BeamJobsTabComponent;
   let loader: HarnessLoader;
 
-  const backendApiService: jasmine.SpyObj<ReleaseCoordinatorBackendApiService> =
-    jasmine.createSpyObj('ReleaseCoordinatorBackendApiService', [
-      'getBeamJobs',
-      'getBeamJobRuns',
-      'startNewBeamJob',
-      'cancelBeamJobRun',
-      'getBeamJobRunOutput',
-    ]);
+  let backendApiService: ReleaseCoordinatorBackendApiService;
 
   const fooJob = new BeamJob('FooJob');
   const barJob = new BeamJob('BarJob');
@@ -109,7 +102,19 @@ describe('Beam Jobs Tab Component', () => {
       providers: [
         {
           provide: ReleaseCoordinatorBackendApiService,
-          useValue: backendApiService,
+          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
+            'ReleaseCoordinatorBackendApiService',
+            {},
+            {
+              getBeamJobs: () => of(beamJobs),
+              getBeamJobRuns: () => of(beamJobRuns),
+              startNewBeamJob: () =>
+                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false)),
+              cancelBeamJobRun: () =>
+                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false)),
+              getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
+            } as Partial<ReleaseCoordinatorBackendApiService>
+          ),
         },
       ],
     });
@@ -127,17 +132,7 @@ describe('Beam Jobs Tab Component', () => {
 
     await TestBed.compileComponents();
 
-    backendApiService.getBeamJobs.and.returnValue(of(beamJobs));
-    backendApiService.getBeamJobRuns.and.returnValue(of(beamJobRuns));
-    backendApiService.startNewBeamJob.and.returnValue(
-      of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false))
-    );
-    backendApiService.cancelBeamJobRun.and.returnValue(
-      of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false))
-    );
-    backendApiService.getBeamJobRunOutput.and.returnValue(
-      of(new BeamJobRunResult('abc', '123'))
-    );
+    backendApiService = TestBed.inject(ReleaseCoordinatorBackendApiService);
 
     fixture = TestBed.createComponent(BeamJobsTabComponent);
     component = fixture.componentInstance;
@@ -153,8 +148,10 @@ describe('Beam Jobs Tab Component', () => {
       const beamJobRunsOutput = m.hot('^---r-|', {r: beamJobRuns});
       const expectedNames = '          e---n--';
       const expectedRuns = '           e---r--';
-      backendApiService.getBeamJobs.and.returnValue(beamJobsOutput);
-      backendApiService.getBeamJobRuns.and.returnValue(beamJobRunsOutput);
+      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobsOutput);
+      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(
+        beamJobRunsOutput
+      );
 
       fixture.detectChanges();
 
@@ -176,7 +173,7 @@ describe('Beam Jobs Tab Component', () => {
     marbles(m => {
       const beamJobs = m.hot('^-#', undefined, new Error('err'));
       const expectedNames = ' e-e';
-      backendApiService.getBeamJobs.and.returnValue(beamJobs);
+      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
 
       fixture.detectChanges();
       m.expect(component.jobNames).toBeObservable(expectedNames, {e: []});
@@ -190,7 +187,7 @@ describe('Beam Jobs Tab Component', () => {
     marbles(m => {
       const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
       const expectedRuns = '     e-e';
-      backendApiService.getBeamJobRuns.and.returnValue(beamJobRuns);
+      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
 
       fixture.detectChanges();
       m.expect(component.beamJobRuns).toBeObservable(expectedRuns, {e: []});
@@ -258,7 +255,10 @@ describe('Beam Jobs Tab Component', () => {
       false,
       null
     );
-    backendApiService.startNewBeamJob.and.returnValue(of(newPendingFooJob));
+    const startNewJobSpy = spyOn(
+      backendApiService,
+      'startNewBeamJob'
+    ).and.returnValue(of(newPendingFooJob));
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
@@ -283,7 +283,7 @@ describe('Beam Jobs Tab Component', () => {
     await confirmButton.click();
     await fixture.whenStable();
 
-    expect(backendApiService.startNewBeamJob).toHaveBeenCalledWith(fooJob);
+    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
     expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
@@ -302,7 +302,10 @@ describe('Beam Jobs Tab Component', () => {
       0,
       false
     );
-    backendApiService.cancelBeamJobRun.and.returnValue(of(cancellingFooJob));
+    const cancelBeamJobRunSpy = spyOn(
+      backendApiService,
+      'cancelBeamJobRun'
+    ).and.returnValue(of(cancellingFooJob));
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
@@ -328,9 +331,7 @@ describe('Beam Jobs Tab Component', () => {
     await confirmButton.click();
     await fixture.whenStable();
 
-    expect(backendApiService.cancelBeamJobRun).toHaveBeenCalledWith(
-      runningFooJob
-    );
+    expect(cancelBeamJobRunSpy).toHaveBeenCalledWith(runningFooJob);
     expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
@@ -342,9 +343,10 @@ describe('Beam Jobs Tab Component', () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
-    backendApiService.getBeamJobRunOutput.and.returnValue(
-      of(new BeamJobRunResult('Lorem Ipsum', ''))
-    );
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(new BeamJobRunResult('Lorem Ipsum', '')));
 
     await input.setValue('BarJob');
     await autocomplete.selectOption({text: 'BarJob'});
@@ -362,9 +364,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(await dialogHost.text()).toContain('Lorem Ipsum');
     await dialog.close();
 
-    expect(backendApiService.getBeamJobRunOutput).toHaveBeenCalledWith(
-      doneBarJob
-    );
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
     expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
 
     component.ngOnDestroy();
@@ -423,37 +423,41 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
-    backendApiService.getBeamJobRuns.and.returnValue(of(beamJobRuns));
-    backendApiService.getBeamJobRuns.calls.reset();
+    const getBeamJobRunsSpy = spyOn(
+      backendApiService,
+      'getBeamJobRuns'
+    ).and.returnValue(of(beamJobRuns));
 
     fixture.detectChanges();
 
     // The first time is called by ngOnInit().
-    expect(backendApiService.getBeamJobRuns).toHaveBeenCalledTimes(1);
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
     fixture.detectChanges();
 
     // The second time is called out by our interval refresh timer.
-    expect(backendApiService.getBeamJobRuns).toHaveBeenCalledTimes(2);
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
 
     component.ngOnDestroy();
   }));
 
   it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
-    backendApiService.getBeamJobRuns.and.returnValue(of(terminalBeamJobRuns));
-    backendApiService.getBeamJobRuns.calls.reset();
+    const getBeamJobRunsSpy = spyOn(
+      backendApiService,
+      'getBeamJobRuns'
+    ).and.returnValue(of(terminalBeamJobRuns));
 
     fixture.detectChanges();
 
     // The first time is called by ngOnInit().
-    expect(backendApiService.getBeamJobRuns).toHaveBeenCalledTimes(1);
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
     fixture.detectChanges();
 
     // The second time should not be called out, because all jobs are terminal.
-    expect(backendApiService.getBeamJobRuns).toHaveBeenCalledTimes(1);
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     component.ngOnDestroy();
   }));
