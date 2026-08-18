@@ -533,24 +533,84 @@
   position: absolute;
 }
 .oppia-top-navigation-bar .oppia-navbar-creator-updates {
-  padding: 8px 16px;
-  width: 280px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 8px 16px 12px;
+  width: 300px;
 }
-.oppia-top-navigation-bar .oppia-navbar-creator-update-card {
-  border-left: 3px solid #00645c;
+.oppia-top-navigation-bar .oppia-navbar-creator-updates-heading {
   color: #333;
   display: block;
   font-size: 13px;
+  font-weight: 700;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-card {
+  align-items: flex-start;
+  border-left: 3px solid #00645c;
+  display: flex;
+  gap: 4px;
   margin-top: 8px;
-  overflow-wrap: anywhere;
   padding: 8px 10px;
-  text-decoration: none;
 }
 .oppia-top-navigation-bar .oppia-navbar-creator-update-card:hover,
-.oppia-top-navigation-bar .oppia-navbar-creator-update-card:focus {
+.oppia-top-navigation-bar .oppia-navbar-creator-update-card:focus-within {
   background-color: #e8f5f3;
-  color: #00645c;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-link {
+  color: #333;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
   text-decoration: none;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-link:hover,
+.oppia-top-navigation-bar .oppia-navbar-creator-update-link:focus {
+  text-decoration: none;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-message {
+  color: #00645c;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-preview {
+  color: #5f6368;
+  font-size: 12px;
+  line-height: 17px;
+  overflow-wrap: anywhere;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-preview.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-toggle {
+  background: none;
+  border: 0;
+  color: #5f6368;
+  cursor: pointer;
+  flex: 0 0 auto;
+  padding: 2px 4px;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-toggle:hover,
+.oppia-top-navigation-bar .oppia-navbar-creator-update-toggle:focus {
+  color: #00645c;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all {
+  color: #00645c;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+  text-align: center;
+  text-decoration: none;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all:hover,
+.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all:focus {
+  text-decoration: underline;
 }
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;

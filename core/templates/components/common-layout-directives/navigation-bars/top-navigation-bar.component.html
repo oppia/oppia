@@ -433,12 +433,37 @@
         <li class="nav-item"
             *ngIf="unreadMySuggestionSummaries.length>0">
           <div class="oppia-navbar-creator-updates">
-            <strong>Updates from Creators:</strong>
-            <a *ngFor="let summary of unreadMySuggestionSummaries"
-               class="oppia-navbar-creator-update-card"
-               [href]="getMySuggestionUpdateUrl(summary.id)"
+            <span class="oppia-navbar-creator-updates-heading">
+              Updates from Creators
+            </span>
+            <div *ngFor="let summary of visibleCreatorUpdates"
+                 class="oppia-navbar-creator-update-card">
+              <a class="oppia-navbar-creator-update-link"
+                 [href]="getMySuggestionUpdateUrl(summary.id)"
+                 (click)="closeSubmenuIfNotMobile($event)">
+                <span class="oppia-navbar-creator-update-message">
+                  {{ getCreatorUpdateMessage(summary) }}
+                </span>
+                <span class="oppia-navbar-creator-update-preview"
+                      [ngClass]="{'is-clamped': !isCreatorUpdateExpanded(summary.id)}">
+                  {{ summary.feedback_text_preview }}
+                </span>
+              </a>
+              <button type="button"
+                      class="oppia-navbar-creator-update-toggle"
+                      [attr.aria-label]="isCreatorUpdateExpanded(summary.id) ? 'Show less' : 'Show more'"
+                      (click)="toggleCreatorUpdateExpanded(summary.id)">
+                <i class="fas"
+                   [ngClass]="isCreatorUpdateExpanded(summary.id) ? 'fa-chevron-up' : 'fa-chevron-down'"
+                   aria-hidden="true">
+                </i>
+              </button>
+            </div>
+            <a *ngIf="unreadMySuggestionSummaries.length > visibleCreatorUpdates.length"
+               class="oppia-navbar-creator-updates-view-all"
+               href="/learner-dashboard?active_tab=my-suggestions"
                (click)="closeSubmenuIfNotMobile($event)">
-              A creator responded to your feedback!
+              View all suggestions
             </a>
           </div>
         </li>

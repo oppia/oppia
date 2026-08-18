@@ -59,6 +59,7 @@ import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
   FeedbackModalType,
+  FeedbackStatus,
   LessonFeedbackSummary,
 } from 'domain/feedback/feedback.model';
 
@@ -159,6 +160,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   unreadMySuggestionSummaries: LessonFeedbackSummary[] = [];
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   isWebFeedbackModalEnabled: boolean = false;
+
+  // The maximum number of "Updates from Creators" cards shown at once
+  // in the profile dropdown. Additional unread updates are reachable
+  // via the "View all suggestions" link instead of being listed here.
+  readonly MAX_VISIBLE_CREATOR_UPDATES = 5;
+  private expandedCreatorUpdateIds: Set<string> = new Set();
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -738,5 +745,47 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return (
       '/learner-dashboard?active_tab=my-suggestions&feedback_id=' + feedbackId
     );
+  }
+
+  /**
+   * The cards shown in the "Updates from Creators" section of the
+   * profile dropdown, capped at MAX_VISIBLE_CREATOR_UPDATES so the
+   * menu doesn't grow unbounded when many suggestions have unread
+   * responses. Any remaining unread updates are reachable via the
+   * "View all suggestions" link instead of being listed individually.
+   */
+  get visibleCreatorUpdates(): LessonFeedbackSummary[] {
+    return this.unreadMySuggestionSummaries.slice(
+      0,
+      this.MAX_VISIBLE_CREATOR_UPDATES
+    );
+  }
+
+  isCreatorUpdateExpanded(feedbackId: string): boolean {
+    return this.expandedCreatorUpdateIds.has(feedbackId);
+  }
+
+  toggleCreatorUpdateExpanded(feedbackId: string): void {
+    if (this.expandedCreatorUpdateIds.has(feedbackId)) {
+      this.expandedCreatorUpdateIds.delete(feedbackId);
+    } else {
+      this.expandedCreatorUpdateIds.add(feedbackId);
+    }
+  }
+
+  /**
+   * Returns the notification message for a creator update card,
+   * differentiated by whether the underlying suggestion was marked
+   * fixed or just received a reply. Mirrors the equivalent logic in
+   * MySuggestionsTabComponent.getNotificationSummary().
+   */
+  getCreatorUpdateMessage(summary: LessonFeedbackSummary): string {
+    if (summary.status === FeedbackStatus.FIXED) {
+      return (
+        'A creator fixed an error you reported. Thank you for helping ' +
+        'make Oppia better for everyone!'
+      );
+    }
+    return 'A creator responded to your feedback!';
   }
 }
