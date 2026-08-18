@@ -47,8 +47,10 @@ export interface LessonFeedbackSummary {
   id: string;
   feedback_text_preview: string;
   status: FeedbackStatus;
+  lesson_title: string;
   source: string;
   unread_response_count: number;
+  last_updated_on_msecs: number;
 }
 
 export interface LessonFeedbackBackendResponse {

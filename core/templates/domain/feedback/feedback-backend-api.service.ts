@@ -50,6 +50,7 @@ interface FeedbackScreenshotSubmissionData {
 export class FeedbackBackendApiService {
   private lessonFeedbackUrl = '/feedback';
   private reportUrl = '/platform-feedback';
+  private myFeedbackUrl = '/my_feedback';
   private captchaConfigUrl = '/feedback_captcha_config_handler';
 
   constructor(
@@ -110,6 +111,50 @@ export class FeedbackBackendApiService {
     };
     return await this.http
       .post<FeedbackSubmitResponse>(this.lessonFeedbackUrl, requestPayload)
+      .toPromise();
+  }
+
+  async fetchMyFeedbackListAsync(
+    cursor: string | null = null,
+    statusFilter: string | null = null,
+    dateFromMsecs: number | null = null,
+    dateToMsecs: number | null = null
+  ): Promise<LessonFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    return await this.http
+      .get<LessonFeedbackBackendResponse>(this.myFeedbackUrl, {params})
+      .toPromise();
+  }
+
+  async fetchMyFeedbackDetailAsync(
+    feedbackId: string
+  ): Promise<LessonFeedbackDetailResponse> {
+    const url = [this.myFeedbackUrl, encodeURIComponent(feedbackId)].join('/');
+    return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async submitMyFeedbackFollowUpAsync(
+    feedbackId: string,
+    feedbackText: string
+  ): Promise<SuccessResponse> {
+    const url = [this.myFeedbackUrl, encodeURIComponent(feedbackId)].join('/');
+    return await this.http
+      .post<SuccessResponse>(url, {
+        feedback_text: feedbackText,
+      })
       .toPromise();
   }
 

@@ -19,7 +19,7 @@ from __future__ import annotations
 import urllib.parse
 
 from core import feconf, utils
-from core.domain import general_feedback_domain
+from core.domain import exp_services, general_feedback_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, Union, cast
@@ -81,6 +81,7 @@ def _lesson_feedback_model_to_domain(
         response_list=sanitized_responses,
         unread_response_count=model.unread_response_count,
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
+        last_updated_msecs=utils.get_time_in_millisecs(model.last_updated),
     )
 
 
@@ -329,11 +330,32 @@ def get_lesson_feedback_summaries(
     )
     # Here we use cast because PlatformFeedbackModel.fetch_page() inherits its
     # return annotation from BaseFeedbackModel.fetch_page().
-    summaries = [
+    domain_objects = [
         _lesson_feedback_model_to_domain(
             cast(general_feedback_models.LessonFeedbackModel, model)
-        ).to_summary_dict()
+        )
         for model in model_list
+    ]
+
+    # Batch-fetch exploration titles once per page rather than once per
+    # feedback entry, to avoid an N+1 query pattern.
+    exp_ids = list(
+        {
+            domain_object.lesson_metadata['exploration_id']
+            for domain_object in domain_objects
+        }
+    )
+    exp_titles_and_categories = (
+        exp_services.get_exploration_titles_and_categories(exp_ids)
+    )
+
+    summaries = [
+        domain_object.to_summary_dict(
+            exp_titles_and_categories.get(
+                domain_object.lesson_metadata['exploration_id'], {}
+            ).get('title'),
+        )
+        for domain_object in domain_objects
     ]
     return summaries, next_cursor, more
 
@@ -390,11 +412,32 @@ def get_learner_feedback_summaries(
     )
     # Here we use cast because LessonFeedbackModel.fetch_page() inherits its
     # return annotation from BaseFeedbackModel.fetch_page().
-    summaries = [
+    domain_objects = [
         _lesson_feedback_model_to_domain(
             cast(general_feedback_models.LessonFeedbackModel, model)
-        ).to_summary_dict()
+        )
         for model in model_list
+    ]
+
+    # Batch-fetch exploration titles once per page rather than once per
+    # feedback entry, to avoid an N+1 query pattern.
+    exp_ids = list(
+        {
+            domain_object.lesson_metadata['exploration_id']
+            for domain_object in domain_objects
+        }
+    )
+    exp_titles_and_categories = (
+        exp_services.get_exploration_titles_and_categories(exp_ids)
+    )
+
+    summaries = [
+        domain_object.to_summary_dict(
+            exp_titles_and_categories.get(
+                domain_object.lesson_metadata['exploration_id'], {}
+            ).get('title'),
+        )
+        for domain_object in domain_objects
     ]
     return summaries, next_cursor, more
 

@@ -76,6 +76,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
         self.assertEqual(feedback.to_dict(), expected_dict)
@@ -86,7 +87,9 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             'feedback_text_preview': f'{"N" * 97}...',
             'status': 'open',
             'source': 'lesson',
+            'lesson_title': 'exp1',
             'unread_response_count': 0,
+            'last_updated_msecs': 1700000000000.0,
         }
 
         feedback = general_feedback_domain.LessonFeedback(
@@ -99,9 +102,10 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
-        self.assertEqual(feedback.to_summary_dict(), expected_dict)
+        self.assertEqual(feedback.to_summary_dict('exp1'), expected_dict)
 
     def test_to_learner_dict(self) -> None:
         expected_dict: general_feedback_domain.LessonFeedbackDict = {
@@ -125,6 +129,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
         self.assertEqual(feedback.to_learner_dict(), expected_dict)

@@ -562,4 +562,75 @@ describe('Feedback backend api service', () => {
     flushMicrotasks();
     expect(onSuccess).toHaveBeenCalledWith({success: true});
   }));
+
+  it('should fetch my suggestions tab feedback list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchMyFeedbackListAsync(
+        'cursor',
+        filterState2.status,
+        filterState2.dateRange.start.getTime(),
+        filterState2.dateRange.end.getTime()
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request => request.method === 'GET' && request.url === '/my_feedback'
+    );
+    expect(req.request.params.get('status')).toBe(filterState2.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState2.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState2.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch details of a my suggestion Feedback entry', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchMyFeedbackDetailAsync('feedback_1')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' && request.url === '/my_feedback/feedback_1'
+    );
+
+    req.flush(detailLessonFeedbackResponse);
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(detailLessonFeedbackResponse);
+  }));
+
+  it('should be able to submit a FollowUo note from my suggestions tab', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .submitMyFeedbackFollowUpAsync('feedback_1', 'This is a follow up note')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'POST' && request.url === '/my_feedback/feedback_1'
+    );
+
+    req.flush({success: true});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({success: true});
+  }));
 });
