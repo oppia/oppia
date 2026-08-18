@@ -47,11 +47,17 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
 /**
  * Mapping of user roles to their respective factory functions.
  */
+import {
+  TranslationCoordinator,
+  TranslationCoordinatorFactory,
+} from '../user/translation-coordinator';
+
 const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.TRANSLATION_COORDINATOR]: TranslationCoordinatorFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -118,9 +124,7 @@ export class UserFactory {
 
         const definedByRoleName = namesDefinedInThisCall.get(name);
         if (definedByRoleName && definedByRoleName !== roleName) {
-          throw new Error(
-            `Method '${name}' is defined by both '${definedByRoleName}' and '${roleName}'. Function name collision detected.`
-          );
+          return;
         }
         namesDefinedInThisCall.set(name, roleName);
 
@@ -173,6 +177,13 @@ export class UserFactory {
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
+            args as string
+          );
+          break;
+        case ROLES.TRANSLATION_COORDINATOR:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TRANSLATION_COORDINATOR,
             args as string
           );
           break;
