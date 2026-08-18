@@ -34,13 +34,19 @@ import {
   AssessmentQuestionOption,
   AssessmentQuestionType,
 } from 'domain/certificate-assessment/certificate-assessment.model';
-import {StateBackendDict} from 'domain/state/state.model';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {
   MultipleChoiceInputCustomizationArgsBackendDict,
   ItemSelectionInputCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
@@ -100,7 +106,12 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     @Optional() private bottomSheet: MatBottomSheet,
     @Optional() private ngbModal: NgbModal,
     private windowDimensionsService: WindowDimensionsService,
-    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private answerClassificationService: AnswerClassificationService,
+    private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
+    private itemSelectionInputRulesService: ItemSelectionInputRulesService,
+    private textInputRulesService: TextInputRulesService,
+    private numericInputRulesService: NumericInputRulesService
   ) {}
 
   ngOnInit(): void {
@@ -179,19 +190,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       hint: '',
       options,
       placeholder: this.extractPlaceholder(interaction.customization_args),
-      correctAnswerText: this.extractCorrectAnswerText(
-        interaction.answer_groups,
-        type,
-        options
-      ),
-      correctAnswerIndex: this.extractCorrectAnswerIndex(
-        interaction.answer_groups,
-        type
-      ),
-      correctAnswerOptionIds: this.extractCorrectAnswerOptionIds(
-        interaction.answer_groups,
-        type
-      ),
+      stateData,
     };
   }
 
@@ -249,96 +248,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       }
     ).placeholder?.value;
     return placeholder?.unicode_str ?? '';
-  }
-
-  /**
-   * Derives the correct answer text from the first answer group's rule so the
-   * learner's response can be compared against it when the assessment is
-   * submitted. Returns an empty string if the correct answer cannot be
-   * derived from the rule inputs.
-   */
-  private extractCorrectAnswerText(
-    answerGroups: StateBackendDict['interaction']['answer_groups'],
-    type: AssessmentQuestionType,
-    options: AssessmentQuestionOption[]
-  ): string {
-    const firstRule = answerGroups[0]?.rule_specs[0];
-    if (firstRule === undefined) {
-      return '';
-    }
-    const xInput = firstRule.inputs.x;
-    if (type === 'multiple_choice') {
-      if (typeof xInput === 'number') {
-        const correctOption = options[xInput];
-        return correctOption === undefined ? '' : correctOption.text;
-      }
-      return '';
-    }
-    if (type === 'multiple_select') {
-      if (Array.isArray(xInput)) {
-        return (xInput as string[])
-          .map(contentId => {
-            const option = options.find(opt => opt.id === contentId);
-            return option === undefined ? '' : option.text;
-          })
-          .join(', ');
-      }
-      return '';
-    }
-    if (type === 'text_input') {
-      const normalizedStrSet = (xInput as {normalizedStrSet?: string[]})
-        ?.normalizedStrSet;
-      return normalizedStrSet?.[0] ?? '';
-    }
-    if (typeof xInput === 'number') {
-      return String(xInput);
-    }
-    const fInput = firstRule.inputs.f as
-      | {real?: number; numerator?: number; denominator?: number}
-      | undefined;
-    if (fInput?.real !== undefined) {
-      return String(fInput.real);
-    }
-    if (fInput?.numerator !== undefined && fInput?.denominator !== undefined) {
-      return String(fInput.numerator / fInput.denominator);
-    }
-    return '';
-  }
-
-  /**
-   * Extracts the index of the correct choice from the first answer group's
-   * rule for multiple-choice questions. Oppia's multiple-choice rule inputs
-   * store the correct answer as the index of the choice, so the learner's
-   * selected option index is compared directly against this value. Returns
-   * undefined for other question types or when the index cannot be derived.
-   */
-  private extractCorrectAnswerIndex(
-    answerGroups: StateBackendDict['interaction']['answer_groups'],
-    type: AssessmentQuestionType
-  ): number | undefined {
-    if (type !== 'multiple_choice') {
-      return undefined;
-    }
-    const xInput = answerGroups[0]?.rule_specs[0]?.inputs.x;
-    return typeof xInput === 'number' ? xInput : undefined;
-  }
-
-  /**
-   * Extracts the content ids of the correct choices from the first answer
-   * group's rule for multiple-select questions. Oppia's item-selection rule
-   * inputs store the correct answers as the content ids of the choices.
-   * Returns undefined for other question types or when the content ids cannot
-   * be derived.
-   */
-  private extractCorrectAnswerOptionIds(
-    answerGroups: StateBackendDict['interaction']['answer_groups'],
-    type: AssessmentQuestionType
-  ): string[] | undefined {
-    if (type !== 'multiple_select') {
-      return undefined;
-    }
-    const xInput = answerGroups[0]?.rule_specs[0]?.inputs.x;
-    return Array.isArray(xInput) ? (xInput as string[]) : undefined;
   }
 
   private isMobileScreenSize(): boolean {
@@ -401,11 +310,31 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
         selectedAnswer === null
           ? ''
           : this.getAnswerToSubmit(question, selectedAnswer);
+      let isCorrect = false;
+      if (selectedAnswer !== null) {
+        const state = State.createFromBackendDict(
+          question.id,
+          question.stateData
+        );
+        const interactionId = state.interaction.id as string;
+        const rulesService = this.getRulesService(interactionId);
+        const classificationAnswer = this.convertAnswerForClassification(
+          question,
+          selectedAnswer,
+          interactionId
+        );
+        const result =
+          this.answerClassificationService.getMatchingClassificationResult(
+            question.id,
+            state.interaction,
+            classificationAnswer,
+            rulesService
+          );
+        isCorrect = result.outcome.labelledAsCorrect;
+      }
       return {
         question_id: question.id,
-        is_correct:
-          selectedAnswer !== null &&
-          this.isResponseCorrect(question, selectedAnswer),
+        is_correct: isCorrect,
         ...(answerToSubmit !== '' ? {selected_answer: answerToSubmit} : {}),
       };
     });
@@ -488,28 +417,57 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     this.refreshComputedFields();
   }
 
-  private isResponseCorrect(
+  /**
+   * Converts the raw string answer stored by the player into the typed format
+   * expected by the interaction's rules service. Item-selection answers are
+   * split into arrays; numeric answers are parsed as numbers; multiple-choice
+   * answers are resolved to their option index.
+   */
+  private convertAnswerForClassification(
     question: AssessmentQuestion,
-    response: string
-  ): boolean {
-    if (question.type === 'multiple_choice') {
-      const selectedOption = question.options.find(o => o.id === response);
-      return (
-        selectedOption !== undefined &&
-        selectedOption.index === question.correctAnswerIndex
-      );
+    rawAnswer: string,
+    interactionId: string
+  ): InteractionAnswer {
+    switch (interactionId) {
+      case INTERACTION_ID_MULTIPLE_CHOICE: {
+        const option = question.options.find(o => o.id === rawAnswer);
+        return option !== undefined ? option.index : rawAnswer;
+      }
+      case INTERACTION_ID_ITEM_SELECTION:
+        return rawAnswer.split(',').filter(Boolean);
+      case INTERACTION_ID_NUMERIC_INPUT:
+      case INTERACTION_ID_NUMBER_WITH_UNITS: {
+        const numericValue = Number(rawAnswer);
+        return isNaN(numericValue) ? rawAnswer : numericValue;
+      }
+      default:
+        return rawAnswer;
     }
-    if (question.type === 'multiple_select') {
-      const selectedOptionIds = response.split(',').filter(Boolean);
-      const correctOptionIds = question.correctAnswerOptionIds ?? [];
-      return (
-        selectedOptionIds.length === correctOptionIds.length &&
-        selectedOptionIds.every(id => correctOptionIds.includes(id))
-      );
+  }
+
+  /**
+   * Returns the concrete interaction rules service that corresponds to the
+   * given interaction id. Each service is providedIn: 'root' and injected
+   * via Angular DI.
+   */
+  private getRulesService(
+    interactionId: string
+  ): MultipleChoiceInputRulesService &
+    ItemSelectionInputRulesService &
+    TextInputRulesService &
+    NumericInputRulesService {
+    switch (interactionId) {
+      case INTERACTION_ID_MULTIPLE_CHOICE:
+        return this.multipleChoiceInputRulesService;
+      case INTERACTION_ID_ITEM_SELECTION:
+        return this.itemSelectionInputRulesService;
+      case INTERACTION_ID_TEXT_INPUT:
+        return this.textInputRulesService;
+      case INTERACTION_ID_NUMBER_WITH_UNITS:
+      case INTERACTION_ID_NUMERIC_INPUT:
+        return this.numericInputRulesService;
+      default:
+        return this.textInputRulesService;
     }
-    return (
-      response.trim().toLowerCase() ===
-      question.correctAnswerText.trim().toLowerCase()
-    );
   }
 }

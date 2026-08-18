@@ -80,16 +80,9 @@ export interface AssessmentQuestion {
   options: AssessmentQuestionOption[];
   /** Input placeholder text for free-response questions. */
   placeholder?: string;
-  /** The correct answer text derived from the rule inputs. */
-  correctAnswerText: string;
-  /** The index of the correct choice, taken from the rule inputs. Only set
-   *  for multiple-choice questions, whose rule inputs store the correct
-   *  answer as the index of the choice. */
-  correctAnswerIndex?: number;
-  /** The content ids of the correct choices, taken from the rule inputs. Only
-   *  set for multiple-select questions, whose rule inputs store the correct
-   *  answers as the content ids of the choices. */
-  correctAnswerOptionIds?: string[];
+  /** The raw state backend dict used by AnswerClassificationService to
+   *  evaluate correctness via the interaction's rule functions. */
+  stateData: StateBackendDict;
 }
 
 // The shape of a recommended topic tile shown on the certificate assessment

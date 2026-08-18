@@ -40,6 +40,11 @@ import {
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 
@@ -48,6 +53,16 @@ const createOutcomeBackendDict = (): OutcomeBackendDict => ({
   dest_if_really_stuck: null,
   feedback: {content_id: 'feedback_1', html: '<p>Correct!</p>'},
   labelled_as_correct: true,
+  param_changes: [],
+  refresher_exploration_id: null,
+  missing_prerequisite_skill_id: null,
+});
+
+const createIncorrectOutcomeBackendDict = (): OutcomeBackendDict => ({
+  dest: 'final',
+  dest_if_really_stuck: null,
+  feedback: {content_id: 'feedback_1', html: '<p>Try again.</p>'},
+  labelled_as_correct: false,
   param_changes: [],
   refresher_exploration_id: null,
   missing_prerequisite_skill_id: null,
@@ -79,7 +94,7 @@ const createMultipleChoiceStateData = (): StateBackendDict => ({
       },
       showChoicesInShuffledOrder: {value: false},
     },
-    default_outcome: createOutcomeBackendDict(),
+    default_outcome: createIncorrectOutcomeBackendDict(),
     hints: [],
     id: 'MultipleChoiceInput',
     solution: null,
@@ -119,7 +134,7 @@ const createItemSelectionStateData = (): StateBackendDict => ({
       maxAllowableSelectionCount: {value: 4},
       minAllowableSelectionCount: {value: 1},
     },
-    default_outcome: createOutcomeBackendDict(),
+    default_outcome: createIncorrectOutcomeBackendDict(),
     hints: [],
     id: 'ItemSelectionInput',
     solution: null,
@@ -162,7 +177,7 @@ const createTextInputStateData = (): StateBackendDict => ({
       rows: {value: 1},
       catchMisspellings: {value: false},
     },
-    default_outcome: createOutcomeBackendDict(),
+    default_outcome: createIncorrectOutcomeBackendDict(),
     hints: [],
     id: 'TextInput',
     solution: null,
