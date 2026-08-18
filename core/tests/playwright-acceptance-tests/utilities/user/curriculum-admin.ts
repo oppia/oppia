@@ -639,27 +639,65 @@ export class CurriculumAdmin extends TopicManager {
     expectedSkillsCount: number
   ): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.expectElementToBeVisible('.e2e-test-topics-table');
 
-    const topicDetails = await this.page.evaluate(topicName => {
-      const items = Array.from(document.querySelectorAll('.list-item'));
-      const topicRow = items.find(item => {
-        return (
-          item.querySelector('.e2e-test-topic-name')?.textContent?.trim() ===
-          topicName
-        );
-      });
-      if (!topicRow) {
-        throw new Error(`Topic "${topicName}" not found in dashboard.`);
-      }
-      const tds = Array.from(topicRow.querySelectorAll('td'));
-      return {
-        publishedStoryCount: tds[2]?.textContent?.trim(),
-        subtopicCount: tds[3]?.textContent?.trim(),
-        skillsCount: tds[4]?.textContent?.trim().match(/^\d+/)?.[0],
-        topicStatus: tds[5]?.textContent?.trim(),
-      };
-    }, topicName);
+    let topicDetails: {
+      publishedStoryCount: string | null | undefined;
+      subtopicCount: string | null | undefined;
+      skillsCount: string | null | undefined;
+      topicStatus: string | null | undefined;
+    };
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible('.e2e-test-mobile-topic-table');
+      topicDetails = await this.page.evaluate(topicName => {
+        const items = Array.from(document.querySelectorAll('div.topic-item'));
+        const topicItem = items.find(item => {
+          return (
+            item
+              .querySelector('div.e2e-test-mobile-topic-name a')
+              ?.textContent?.trim() === topicName
+          );
+        }) as HTMLElement;
+        if (!topicItem) {
+          throw new Error(
+            `Topic "${topicName}" not found in mobile dashboard.`
+          );
+        }
+        const tds = Array.from(
+          topicItem.querySelectorAll('div.topic-item-value')
+        ) as HTMLElement[];
+        if (!tds || tds.length < 4) {
+          throw new Error('Cannot fetch mobile topic details.');
+        }
+        return {
+          publishedStoryCount: tds[0].innerText,
+          subtopicCount: tds[1].innerText,
+          skillsCount: tds[2].innerText,
+          topicStatus: tds[3].innerText,
+        };
+      }, topicName);
+    } else {
+      await this.expectElementToBeVisible('.e2e-test-topics-table');
+      topicDetails = await this.page.evaluate(topicName => {
+        const items = Array.from(document.querySelectorAll('.list-item'));
+        const topicRow = items.find(item => {
+          return (
+            item.querySelector('.e2e-test-topic-name')?.textContent?.trim() ===
+            topicName
+          );
+        });
+        if (!topicRow) {
+          throw new Error(`Topic "${topicName}" not found in dashboard.`);
+        }
+        const tds = Array.from(topicRow.querySelectorAll('td'));
+        return {
+          publishedStoryCount: tds[2]?.textContent?.trim(),
+          subtopicCount: tds[3]?.textContent?.trim(),
+          skillsCount: tds[4]?.textContent?.trim().match(/^\d+/)?.[0],
+          topicStatus: tds[5]?.textContent?.trim(),
+        };
+      }, topicName);
+    }
 
     expect(topicDetails.topicStatus).toEqual('Published');
     expect(topicDetails.publishedStoryCount).toEqual(
