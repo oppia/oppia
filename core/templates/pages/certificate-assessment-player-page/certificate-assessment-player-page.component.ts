@@ -47,6 +47,10 @@ import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/
 import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
+import {DragAndDropSortInputRulesService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
@@ -59,9 +63,13 @@ const INTERACTION_ID_MULTIPLE_CHOICE =
 const INTERACTION_ID_ITEM_SELECTION =
   'ItemSelectionInput' as InteractionSpecsKey;
 const INTERACTION_ID_TEXT_INPUT = 'TextInput' as InteractionSpecsKey;
+const INTERACTION_ID_NUMERIC_INPUT = 'NumericInput' as InteractionSpecsKey;
+const INTERACTION_ID_FRACTION_INPUT = 'FractionInput' as InteractionSpecsKey;
 const INTERACTION_ID_NUMBER_WITH_UNITS =
   'NumberWithUnits' as InteractionSpecsKey;
-const INTERACTION_ID_NUMERIC_INPUT = 'NumericInput' as InteractionSpecsKey;
+const INTERACTION_ID_DRAG_AND_DROP_SORT =
+  'DragAndDropSortInput' as InteractionSpecsKey;
+const INTERACTION_ID_IMAGE_CLICK = 'ImageClickInput' as InteractionSpecsKey;
 
 @Component({
   selector: 'certificate-assessment-player-page',
@@ -111,7 +119,11 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
     private textInputRulesService: TextInputRulesService,
-    private numericInputRulesService: NumericInputRulesService
+    private numericInputRulesService: NumericInputRulesService,
+    private fractionInputRulesService: FractionInputRulesService,
+    private numberWithUnitsRulesService: NumberWithUnitsRulesService,
+    private dragAndDropSortInputRulesService: DragAndDropSortInputRulesService,
+    private imageClickInputRulesService: ImageClickInputRulesService
   ) {}
 
   ngOnInit(): void {
@@ -204,9 +216,16 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
         return 'multiple_select';
       case INTERACTION_ID_TEXT_INPUT:
         return 'text_input';
-      case INTERACTION_ID_NUMBER_WITH_UNITS:
       case INTERACTION_ID_NUMERIC_INPUT:
         return 'numeric_input';
+      case INTERACTION_ID_FRACTION_INPUT:
+        return 'fraction_input';
+      case INTERACTION_ID_NUMBER_WITH_UNITS:
+        return 'number_with_units';
+      case INTERACTION_ID_DRAG_AND_DROP_SORT:
+        return 'drag_and_drop_sort';
+      case INTERACTION_ID_IMAGE_CLICK:
+        return 'image_click';
       default:
         return 'text_input';
     }
@@ -435,10 +454,22 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       }
       case INTERACTION_ID_ITEM_SELECTION:
         return rawAnswer.split(',').filter(Boolean);
-      case INTERACTION_ID_NUMERIC_INPUT:
-      case INTERACTION_ID_NUMBER_WITH_UNITS: {
+      case INTERACTION_ID_NUMERIC_INPUT: {
         const numericValue = Number(rawAnswer);
         return isNaN(numericValue) ? rawAnswer : numericValue;
+      }
+      case INTERACTION_ID_DRAG_AND_DROP_SORT:
+        return rawAnswer
+          .split(',')
+          .filter(Boolean)
+          .map(id => [id]);
+      case INTERACTION_ID_IMAGE_CLICK: {
+        try {
+          const parsed = JSON.parse(rawAnswer) as InteractionAnswer;
+          return parsed;
+        } catch {
+          return rawAnswer;
+        }
       }
       default:
         return rawAnswer;
@@ -455,7 +486,11 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   ): MultipleChoiceInputRulesService &
     ItemSelectionInputRulesService &
     TextInputRulesService &
-    NumericInputRulesService {
+    NumericInputRulesService &
+    FractionInputRulesService &
+    NumberWithUnitsRulesService &
+    DragAndDropSortInputRulesService &
+    ImageClickInputRulesService {
     switch (interactionId) {
       case INTERACTION_ID_MULTIPLE_CHOICE:
         return this.multipleChoiceInputRulesService;
@@ -463,9 +498,16 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
         return this.itemSelectionInputRulesService;
       case INTERACTION_ID_TEXT_INPUT:
         return this.textInputRulesService;
-      case INTERACTION_ID_NUMBER_WITH_UNITS:
       case INTERACTION_ID_NUMERIC_INPUT:
         return this.numericInputRulesService;
+      case INTERACTION_ID_FRACTION_INPUT:
+        return this.fractionInputRulesService;
+      case INTERACTION_ID_NUMBER_WITH_UNITS:
+        return this.numberWithUnitsRulesService;
+      case INTERACTION_ID_DRAG_AND_DROP_SORT:
+        return this.dragAndDropSortInputRulesService;
+      case INTERACTION_ID_IMAGE_CLICK:
+        return this.imageClickInputRulesService;
       default:
         return this.textInputRulesService;
     }

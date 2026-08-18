@@ -52,7 +52,11 @@ export type AssessmentQuestionType =
   | 'multiple_choice'
   | 'multiple_select'
   | 'text_input'
-  | 'numeric_input';
+  | 'numeric_input'
+  | 'fraction_input'
+  | 'number_with_units'
+  | 'drag_and_drop_sort'
+  | 'image_click';
 
 /** An answer choice within an assessment question. */
 export interface AssessmentQuestionOption {

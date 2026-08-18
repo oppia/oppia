@@ -79,7 +79,8 @@ export class CertificateAssessmentConversationSkinComponent
     }
     if (
       this.currentQuestion?.type === 'multiple_choice' ||
-      this.currentQuestion?.type === 'multiple_select'
+      this.currentQuestion?.type === 'multiple_select' ||
+      this.currentQuestion?.type === 'drag_and_drop_sort'
     ) {
       this.selectedOptionIds = this.savedResponse.split(',').filter(Boolean);
     } else {
