@@ -681,6 +681,9 @@ EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION = (
+    'web_user_feedback_message_notification'
+)
 EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
@@ -1182,6 +1185,9 @@ CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
 )
 CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
     '/certificate_assessment_attempts_handler'
+)
+CERTIFICATE_QUESTION_HANDLER = (
+    '/certificate_question_handler/<attempt_id>/<question_id>'
 )
 
 # Event types.
@@ -1997,3 +2003,5 @@ TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
 )
 
 DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM_EMAIL = 'web-leap-leads@oppia.org'
+DESTINATION_TECHNICAL_INTERNAL_TEAM_EMAIL = 'web-core-leads@oppia.org'
