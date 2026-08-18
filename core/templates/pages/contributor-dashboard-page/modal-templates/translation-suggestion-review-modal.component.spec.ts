@@ -29,6 +29,7 @@ import {TranslationSuggestionReviewModalComponent} from './translation-suggestio
 import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -1361,9 +1362,9 @@ describe('Translation Suggestion Review Modal Component', function () {
         'suggestion_1',
         AppConstants.ACTION_ACCEPT_SUGGESTION,
         '',
-        // A skill translation is not applied as a new version of the skill,
-        // so it carries no commit message.
-        null,
+        // The caller passes the commit message for every accept, and the
+        // service drops it for a skill, which is not applied as a new version.
+        component.finalCommitMessage,
         jasmine.any(Function),
         jasmine.any(Function)
       );
@@ -1429,7 +1430,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           successCallback,
           errorCallback
         ) => {
-          errorCallback();
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
           return Promise.resolve();
         }
       );
@@ -1506,7 +1509,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           successCallback,
           errorCallback
         ) => {
-          errorCallback();
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
           return Promise.resolve();
         }
       );
