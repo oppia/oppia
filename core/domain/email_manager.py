@@ -1454,14 +1454,6 @@ def send_feedback_submission_email(
         feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson feedback or platform feedback for
             which the notification should be sent.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
@@ -1555,14 +1547,6 @@ def send_feedback_status_change_email(
         feedback: LessonFeedback. The lesson feedback whose status was changed.
         author_id: str. The ID of the user who submitted the feedback.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
@@ -1608,14 +1592,6 @@ def send_feedback_reply_email(
         author_id: str. The ID of the user who submitted the feedback.
     """
     assert feedback.lesson_metadata is not None
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')

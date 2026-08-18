@@ -1906,42 +1906,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         # Here we use cast because the mocked call arguments are not typed,
         # so that the email body is recognized as a string.
         return cast(str, mock_send_email.call_args[0][4])
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_submission_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_submission_email(feedback)
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
     def test_submission_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -1968,10 +1932,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
@@ -2028,10 +1988,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_curriculum_platform_feedback_submission_email(self) -> None:
@@ -2082,10 +2038,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_technical_external_platform_feedback_email(self) -> None:
@@ -2126,10 +2078,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_technical_internal_platform_feedback_email(self) -> None:
@@ -2164,15 +2112,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             % feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
             email_body,
         )
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            )
-        ]
-    )
     def test_submission_email_with_invalid_dashboard_raises_error(
         self,
     ) -> None:
@@ -2193,46 +2132,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         mock_send_email.assert_not_called()
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_status_change_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_status_change_email(
-                    feedback,
-                    self.user.user_id,
-                )
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
     def test_status_change_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2262,10 +2161,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
@@ -2302,46 +2197,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             'my-suggestions&feedback_id=feedback_id',
             email_body,
         )
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_reply_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_reply_email(
-                    feedback,
-                    'Thanks for the suggestion.',
-                    self.user.user_id,
-                )
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
     def test_reply_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2372,10 +2227,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
