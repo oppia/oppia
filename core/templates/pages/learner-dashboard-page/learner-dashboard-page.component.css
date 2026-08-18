@@ -95,7 +95,7 @@ oppia-learner-dashboard-page .oppia-svg-image {
   color: #00645c;
 }
 
-oppia-learner-dashboard-sidebar-notification-badge {
+.oppia-learner-dashboard-sidebar-notification-badge {
   align-items: center;
   background: #c92820;
   border-radius: 999px;

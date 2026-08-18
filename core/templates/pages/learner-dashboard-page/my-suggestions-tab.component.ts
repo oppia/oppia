@@ -34,6 +34,7 @@ import {
 } from 'domain/feedback/feedback.model';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
 
 interface LearnerFeedbackStatusDetails {
   label: string;
@@ -55,18 +56,19 @@ export class MySuggestionsTabComponent implements OnInit {
   selectedFeedbackId: string | null = null;
   nextCursor: string | null = null;
   moreFeedbackAvailable: boolean = false;
-  isLoadingList: boolean = false;
-  isLoadingDetail: boolean = false;
+  isLoadingMore: boolean = false;
   isSubmittingFollowUp: boolean = false;
   followUpText: string = '';
   errorMessage: string | null = null;
   followUpModalRef: NgbModalRef | null = null;
+  selectedStatusFilter: FeedbackStatus | 'all' = 'all';
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
     private feedbackBackendApiService: FeedbackBackendApiService,
     private ngbModal: NgbModal,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +78,8 @@ export class MySuggestionsTabComponent implements OnInit {
   }
 
   fetchFeedbackSummaries(feedbackIdToOpen: string | null = null): void {
-    this.isLoadingList = true;
+    this.isLoadingMore = true;
+    this.loaderService.showLoadingScreen('Loading');
     this.errorMessage = null;
     this.feedbackBackendApiService
       .fetchMyFeedbackListAsync(this.nextCursor)
@@ -87,7 +90,8 @@ export class MySuggestionsTabComponent implements OnInit {
         ];
         this.nextCursor = response.next_cursor;
         this.moreFeedbackAvailable = response.more;
-        this.isLoadingList = false;
+        this.isLoadingMore = false;
+        this.loaderService.hideLoadingScreen();
         this.emitUnreadCount();
         if (feedbackIdToOpen) {
           this.openFeedback(feedbackIdToOpen);
@@ -95,28 +99,44 @@ export class MySuggestionsTabComponent implements OnInit {
       })
       .catch(() => {
         this.errorMessage = 'Failed to load your suggestions.';
-        this.isLoadingList = false;
+        this.isLoadingMore = false;
+        this.loaderService.hideLoadingScreen();
       });
+  }
+
+  get filteredFeedbackSummaries(): LessonFeedbackSummary[] {
+    if (this.selectedStatusFilter === 'all') {
+      return this.feedbackSummaries;
+    }
+    return this.feedbackSummaries.filter(
+      summary => summary.status === this.selectedStatusFilter
+    );
+  }
+
+  onStatusFilterChange(event: Event): void {
+    this.selectedStatusFilter = (event.target as HTMLSelectElement).value as
+      | FeedbackStatus
+      | 'all';
   }
 
   openFeedback(feedbackId: string): void {
     this.selectedFeedbackId = feedbackId;
     this.selectedFeedback = null;
-    this.isLoadingDetail = true;
+    this.loaderService.showLoadingScreen('Loading');
     this.errorMessage = null;
     this.feedbackBackendApiService
       .fetchMyFeedbackDetailAsync(feedbackId)
       .then(response => {
         this.selectedFeedback = response;
         this.markFeedbackSummaryAsRead(feedbackId);
-        this.isLoadingDetail = false;
+        this.loaderService.hideLoadingScreen();
         setTimeout(() => {
           this.focusSelectedFeedback();
         });
       })
       .catch(() => {
         this.errorMessage = 'Failed to load this suggestion.';
-        this.isLoadingDetail = false;
+        this.loaderService.hideLoadingScreen();
       });
   }
 
@@ -134,6 +154,7 @@ export class MySuggestionsTabComponent implements OnInit {
     if (!this.canAddFollowUpNote()) {
       return;
     }
+    this.errorMessage = null;
     this.followUpModalRef = this.ngbModal.open(this.followUpModal, {
       backdrop: 'static',
     });
@@ -187,6 +208,13 @@ export class MySuggestionsTabComponent implements OnInit {
       className: 'oppia-my-suggestions-status-submitted',
       tooltip: null,
     };
+  }
+
+  getLessonStepDescription(stateName: string): string {
+    if (stateName === 'Start') {
+      return 'right at the beginning of the lesson';
+    }
+    return `around the "${stateName}" part of the lesson`;
   }
 
   formatDate(timestampMsecs: number): string {

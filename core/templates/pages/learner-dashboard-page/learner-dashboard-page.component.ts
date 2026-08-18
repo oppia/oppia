@@ -313,7 +313,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
 
-    if(this.isNewExplorationEditorFeedbackTabEnabled()) {
+    if (this.isNewExplorationEditorFeedbackTabEnabled()) {
       this.fetchUnreadMySuggestionsCount();
     }
 
@@ -628,12 +628,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION_HEADING';
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .MY_SUGGESTIONS:
-        return 'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION';
+        return 'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION_HEADING';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }
   }
-
 
   fetchUnreadMySuggestionsCount(): void {
     this.feedbackBackendApiService

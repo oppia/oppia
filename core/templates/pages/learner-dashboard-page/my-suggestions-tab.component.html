@@ -2,46 +2,81 @@
   <div *ngIf="errorMessage" class="oppia-my-suggestions-alert" role="alert">
     {{ errorMessage }}
   </div>
+  <div *ngIf="feedbackSummaries.length === 0"
+       class="oppia-my-suggestions-state">
+    <span class="oppia-my-suggestions-empty-icon">
+      <i class="far fa-comment fa-lg" aria-hidden="true"></i>
+    </span>
+    <span class="oppia-my-suggestions-state-text">
+      Feedbacks you send to the Lessons team will appear here.
+    </span>
+    <oppia-classroom-button [classroom]="'math'"
+                            [buttonText]="'I18N_ACTION_EXPLORE_LESSONS'"
+                            [variant]="'default'">
+    </oppia-classroom-button>
+  </div>
 
-  <div *ngIf="!selectedFeedbackId" class="oppia-my-suggestions-list">
-    <div *ngIf="isLoadingList && feedbackSummaries.length === 0"
-         class="oppia-my-suggestions-loading">
-      Loading suggestions...
-    </div>
+  <div *ngIf="!selectedFeedbackId" class="oppia-my-suggestions-list-view">
 
-    <div *ngIf="!isLoadingList && feedbackSummaries.length === 0"
-         class="oppia-my-suggestions-empty">
-      Feedback you send to the Lessons Team will appear here.
-    </div>
 
-    <button *ngFor="let feedback of feedbackSummaries"
-            type="button"
-            class="oppia-my-suggestions-row e2e-test-my-suggestions-row"
-            (click)="openFeedback(feedback.id)">
-      <span class="oppia-my-suggestions-row-main">
-        <span class="oppia-my-suggestions-preview">
-          {{ feedback.feedback_text_preview }}
-        </span>
-        <span *ngIf="feedback.unread_response_count > 0"
-              class="oppia-my-suggestions-notification-summary">
-          {{ getNotificationSummary(feedback) }}
-        </span>
-        <span *ngIf="feedback.unread_response_count > 0"
-              class="oppia-my-suggestions-unread">
-          {{ feedback.unread_response_count }}
-        </span>
-      </span>
-      <span class="oppia-my-suggestions-row-status"
-            [ngClass]="getStatusDetails(feedback.status).className"
-            [attr.title]="getStatusDetails(feedback.status).tooltip">
-        {{ getStatusDetails(feedback.status).label }}
-      </span>
-    </button>
+    <ng-container *ngIf="feedbackSummaries.length > 0">
+      <div class="oppia-my-suggestions-filter">
+        <div class="oppia-my-suggestions-filter-select-container">
+          <label class="visually-hidden" for="suggestion-status-filter">
+            Filter by status
+          </label>
+          <select id="suggestion-status-filter"
+                  class="oppia-my-suggestions-filter-select"
+                  (change)="onStatusFilterChange($event)">
+            <option value="all">All</option>
+            <option value="submitted">Submitted</option>
+            <option value="reviewed">Reviewed by Team</option>
+            <option value="fixed">Lesson Updated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="oppia-my-suggestions-table-wrapper">
+        <table class="oppia-my-suggestions-table">
+          <thead>
+            <tr>
+              <th>Feedback</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let feedback of filteredFeedbackSummaries"
+                class="oppia-my-suggestions-table-row e2e-test-my-suggestions-row"
+                (click)="openFeedback(feedback.id)">
+              <td class="oppia-my-suggestions-preview-cell">
+                <span class="oppia-my-suggestions-preview">
+                  {{ feedback.feedback_text_preview }}
+                </span>
+                <span *ngIf="feedback.unread_response_count > 0"
+                      class="oppia-my-suggestions-notification-summary">
+                  {{ getNotificationSummary(feedback) }}
+                  <span class="oppia-my-suggestions-unread">
+                    {{ feedback.unread_response_count }}
+                  </span>
+                </span>
+              </td>
+              <td class="oppia-my-suggestions-status-cell">
+                <span class="oppia-my-suggestions-row-status"
+                      [ngClass]="getStatusDetails(feedback.status).className"
+                      [attr.title]="getStatusDetails(feedback.status).tooltip">
+                  {{ getStatusDetails(feedback.status).label }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
 
     <button *ngIf="moreFeedbackAvailable"
             type="button"
             class="oppia-my-suggestions-load-more"
-            [disabled]="isLoadingList"
+            [disabled]="isLoadingMore"
             (click)="fetchFeedbackSummaries()">
       Load more
     </button>
@@ -50,85 +85,155 @@
   <div *ngIf="selectedFeedbackId"
        class="oppia-my-suggestions-detail e2e-test-my-suggestions-detail"
        tabindex="-1">
-    <button type="button"
-            class="oppia-my-suggestions-back"
-            (click)="showAllFeedback()">
-      <i class="fas fa-angle-left" aria-hidden="true"></i>
-      Back to My Suggestions
-    </button>
-
-    <div *ngIf="isLoadingDetail" class="oppia-my-suggestions-loading">
-      Loading suggestion...
-    </div>
-
-    <ng-container *ngIf="selectedFeedback && !isLoadingDetail">
-      <div class="oppia-my-suggestions-detail-header">
-        <span class="oppia-my-suggestions-row-status"
-              [ngClass]="getStatusDetails(selectedFeedback.status).className"
-              [attr.title]="getStatusDetails(selectedFeedback.status).tooltip">
-          {{ getStatusDetails(selectedFeedback.status).label }}
-        </span>
-        <span class="oppia-my-suggestions-date">
-          {{ formatDate(selectedFeedback.created_on_msecs) }}
-        </span>
-      </div>
-
-      <div class="oppia-my-suggestions-message-group">
-        <h3>Your feedback</h3>
-        <p>{{ selectedFeedback.feedback_text }}</p>
-        <div *ngIf="selectedFeedback.response_list.length > 0"
-             class="oppia-my-suggestions-responses">
-          <div *ngFor="let response of selectedFeedback.response_list"
-               class="oppia-my-suggestions-response">
-            <h3>Creator response</h3>
-            <p>{{ response.response_text }}</p>
-            <span>{{ formatDate(response.responded_on) }}</span>
-          </div>
-        </div>
-      </div>
-
+    <div class="oppia-my-suggestions-detail-actions">
       <button type="button"
+              class="oppia-my-suggestions-back"
+              (click)="showAllFeedback()">
+        <i class="fas fa-angle-left" aria-hidden="true"></i>
+        Back to my suggestions
+      </button>
+
+      <button *ngIf="selectedFeedback"
+              type="button"
               class="oppia-my-suggestions-follow-up-button"
               [disabled]="!canAddFollowUpNote()"
               (click)="openFollowUpModal()">
         Add a follow-up note
       </button>
+    </div>
+
+    <ng-container *ngIf="selectedFeedback">
+      <div class="oppia-my-suggestions-lesson-context"
+           *ngIf="selectedFeedback.lesson_metadata as lesson">
+        <i class="fas fa-book-open" aria-hidden="true"></i>
+        <span>
+          You sent this while going through
+          <a [routerLink]="'/explore/' + lesson.exploration_id">this lesson</a>,
+          {{ getLessonStepDescription(lesson.state_name) }}.
+        </span>
+      </div>
+
+      <div class="oppia-my-suggestions-detail-header">
+        <div class="oppia-my-suggestions-meta-item">
+          <span class="oppia-my-suggestions-meta-label">Status</span>
+          <span class="oppia-my-suggestions-row-status"
+                [ngClass]="getStatusDetails(selectedFeedback.status).className"
+                [attr.title]="getStatusDetails(selectedFeedback.status).tooltip">
+            {{ getStatusDetails(selectedFeedback.status).label }}
+          </span>
+        </div>
+        <div class="oppia-my-suggestions-meta-item oppia-my-suggestions-meta-item-date">
+          <span class="oppia-my-suggestions-meta-label">Submitted on</span>
+          <span class="oppia-my-suggestions-date">
+            {{ formatDate(selectedFeedback.created_on_msecs) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="oppia-my-suggestions-thread">
+        <div class="oppia-my-suggestions-thread-item">
+          <span class="oppia-my-suggestions-avatar oppia-my-suggestions-avatar-you">
+            Y
+          </span>
+          <div class="oppia-my-suggestions-thread-content">
+            <div class="oppia-my-suggestions-thread-meta">
+              <span class="oppia-my-suggestions-thread-author">
+                Your feedback
+              </span>
+              <span class="oppia-my-suggestions-thread-date">
+                {{ formatDate(selectedFeedback.created_on_msecs) }}
+              </span>
+            </div>
+            <p>{{ selectedFeedback.feedback_text }}</p>
+          </div>
+        </div>
+
+        <div *ngFor="let response of selectedFeedback.response_list"
+             class="oppia-my-suggestions-thread-item oppia-my-suggestions-thread-item-creator">
+          <span class="oppia-my-suggestions-avatar oppia-my-suggestions-avatar-team">
+            <i class="far fa-comment" aria-hidden="true"></i>
+          </span>
+          <div class="oppia-my-suggestions-thread-content">
+            <div class="oppia-my-suggestions-thread-meta">
+              <span class="oppia-my-suggestions-thread-author">
+                Creator response
+              </span>
+              <span class="oppia-my-suggestions-thread-date">
+                {{ formatDate(response.responded_on) }}
+              </span>
+            </div>
+            <p>{{ response.response_text }}</p>
+          </div>
+        </div>
+      </div>
     </ng-container>
   </div>
 </section>
 
 <ng-template #followUpModal>
-  <div class="modal-header">
-    <h3 class="modal-title">Add a follow-up note</h3>
-    <button type="button"
-            class="close"
-            aria-label="Close"
-            (click)="followUpModalRef?.dismiss()">
-      <span aria-hidden="true">x</span>
-    </button>
-  </div>
-  <form (ngSubmit)="submitFollowUp()">
-    <div class="modal-body">
-      <label for="mySuggestionsFollowUp">
-        Follow-up note
-      </label>
-      <textarea id="mySuggestionsFollowUp"
-                name="mySuggestionsFollowUp"
-                rows="4"
-                [(ngModel)]="followUpText">
-      </textarea>
-    </div>
-    <div class="modal-footer">
+  <div class="oppia-follow-up-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Add a follow-up note</h3>
       <button type="button"
-              class="btn btn-secondary"
+              class="close"
+              aria-label="Close"
+              [disabled]="isSubmittingFollowUp"
               (click)="followUpModalRef?.dismiss()">
-        Cancel
-      </button>
-      <button type="submit"
-              class="btn btn-success"
-              [disabled]="isSubmittingFollowUp || !followUpText.trim()">
-        Submit
+        <span aria-hidden="true">&times;</span>
       </button>
     </div>
-  </form>
+    <form (ngSubmit)="submitFollowUp()">
+      <div class="modal-body">
+        <p class="oppia-follow-up-modal-helper">
+          A creator marked this as fixed. Let them know if it's resolved,
+          or add anything else you'd like them to know.
+        </p>
+
+        <div class="oppia-follow-up-modal-original" *ngIf="selectedFeedback">
+          <span class="oppia-follow-up-modal-original-label">
+            Your original feedback
+          </span>
+          <p class="oppia-follow-up-modal-original-text">
+            {{ selectedFeedback.feedback_text }}
+          </p>
+        </div>
+
+        <div *ngIf="errorMessage"
+             class="oppia-my-suggestions-alert oppia-follow-up-modal-alert"
+             role="alert">
+          {{ errorMessage }}
+        </div>
+
+        <label for="mySuggestionsFollowUp" class="oppia-follow-up-modal-label">
+          Your note
+        </label>
+        <textarea id="mySuggestionsFollowUp"
+                  name="mySuggestionsFollowUp"
+                  class="oppia-my-suggestions-textarea"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="E.g. Thanks, that fixed it! or It's still happening on question 3."
+                  [disabled]="isSubmittingFollowUp"
+                  [(ngModel)]="followUpText">
+        </textarea>
+        <div class="oppia-follow-up-modal-char-count">
+          {{ followUpText.length }}/500
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                [disabled]="isSubmittingFollowUp"
+                (click)="followUpModalRef?.dismiss()">
+          Cancel
+        </button>
+        <button type="submit"
+                class="btn btn-success oppia-follow-up-modal-submit"
+                [disabled]="isSubmittingFollowUp || !followUpText.trim()">
+          <span *ngIf="!isSubmittingFollowUp">Send note</span>
+          <span *ngIf="isSubmittingFollowUp">Sending...</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </ng-template>
