@@ -24,7 +24,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
-import {By} from '@angular/platform-browser';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
