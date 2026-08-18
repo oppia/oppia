@@ -1287,12 +1287,16 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
 
   it('should dismiss the bottom sheet with false when cancelled and not newly created', fakeAsync(() => {
     component.componentId = 'link';
-    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.attrsCustomizationArgsDict = {
+      alt: '',
+      caption: '',
+      filepath: '',
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'filepath', default_value: ''},
       {name: 'caption', default_value: ''},
       {name: 'alt', default_value: ''},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     component.ngOnInit();
     flush();
     component.componentIsNewlyCreated = false;
@@ -1302,12 +1306,16 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
 
   it('should dismiss the bottom sheet with the customization args on save', fakeAsync(() => {
     component.componentId = 'link';
-    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.attrsCustomizationArgsDict = {
+      alt: '',
+      caption: '',
+      filepath: '',
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'filepath', default_value: ''},
       {name: 'caption', default_value: ''},
       {name: 'alt', default_value: ''},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     component.ngOnInit();
     flush();
     component.save();
@@ -1318,10 +1326,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
@@ -1357,10 +1365,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(alertsService, 'addWarning');
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
@@ -1392,10 +1400,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
@@ -1426,10 +1434,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.BLOG_POST
     );
@@ -1462,10 +1470,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -1498,13 +1506,13 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {
         name: 'math_content',
         default_value: {raw_latex: '', svg_filename: ''},
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;

@@ -283,13 +283,15 @@ export class CkEditorInitializerService {
                * This is how the widget will be represented in the outputs
                * source, so it is called when we call editor.getData().
                */
-              downcast: function (element) {
+              downcast: function (element: CKEDITOR.htmlParser.element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
+                // @ts-ignore
                 (element.children[0] as CKEDITOR.htmlParser.element).setHtml(
                   ''
                 );
                 // Return just the rich text component, without its wrapper.
+                // @ts-ignore
                 return element.children[0];
               },
               /**
@@ -297,10 +299,12 @@ export class CkEditorInitializerService {
                * when we first load data in. Returns a boolean,
                * true iff "element" is an instance of this widget.
                */
-              upcast: function (element) {
+              upcast: function (element: CKEDITOR.htmlParser.element) {
                 return (
                   element.name !== 'p' &&
+                  // @ts-ignore
                   element.children.length > 0 &&
+                  // @ts-ignore
                   (element.children[0] as CKEDITOR.htmlParser.element).name ===
                     tagName
                 );

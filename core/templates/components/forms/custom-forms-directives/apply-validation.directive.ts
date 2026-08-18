@@ -57,10 +57,10 @@ export class ApplyValidationDirective implements Validator {
       for (let key in validatorSpec) {
         if (key !== 'id') {
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
-            cloneDeep(validatorSpec[key]);
+            cloneDeep(validatorSpec[key as keyof OppiaValidator]);
         }
       }
-      if (SchemaValidators[validatorName]) {
+      if (SchemaValidators[validatorName as keyof typeof SchemaValidators]) {
         const error = SchemaValidators[validatorName](
           filterArgs,
           this.numberConversionService

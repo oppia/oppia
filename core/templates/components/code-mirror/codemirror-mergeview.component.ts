@@ -28,6 +28,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
+// @ts-ignore
 import * as dmpModule from 'diff_match_patch/lib/diff_match_patch';
 
 @Component({
