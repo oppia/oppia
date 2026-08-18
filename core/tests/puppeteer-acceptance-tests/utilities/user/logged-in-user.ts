@@ -55,7 +55,7 @@ const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
-const invalidUsernameErrorContainer = '.oppia-warning-text';
+const invalidUsernameErrorContainer = '.e2e-test-username-warning';
 const optionText = '.mat-option-text';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
