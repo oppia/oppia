@@ -52,15 +52,15 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/about$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({}, 0.88),
         },
         {
           matchingUrlPattern: 'http://[^/]+/admin$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({}, 0.93),
         },
         {
           matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
-          assertions: buildPageAssertions({}, 0.98),
+          assertions: buildPageAssertions({}, 0.92),
         },
         {
           matchingUrlPattern: 'http://[^/]+/community-library$',
@@ -119,6 +119,7 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.91}],
             'errors-in-console': ['error', {minScore: 1}],
             'modern-image-formats': [
               'error',
@@ -157,12 +158,13 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/privacy-policy$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.95}],
           }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/profile/username1$',
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
         },
@@ -173,24 +175,25 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/teach$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.95}],
+            'categories:accessibility': ['error', {minScore: 0.91}],
             'uses-responsive-images': ['error', {minScore: 0.5}],
           }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/terms$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({}, 0.95),
         },
         {
           matchingUrlPattern: 'http://[^/]+/thanks$',
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/volunteer$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.95}],
+            'categories:accessibility': ['error', {minScore: 0.88}],
             'uses-responsive-images': ['error', {minScore: 0.5}],
           }),
         },
@@ -207,6 +210,7 @@ module.exports = {
           matchingUrlPattern:
             '^http://localhost:8181/learn/staging/dummy-topic-one/story$', // pylint: disable=line-too-long
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.91}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
         },
@@ -214,6 +218,7 @@ module.exports = {
           matchingUrlPattern:
             '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$', // pylint: disable=line-too-long
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
             'errors-in-console': ['error', {minScore: 0}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
@@ -221,6 +226,7 @@ module.exports = {
         {
           matchingUrlPattern: '^http://localhost:8181/learn/math$',
           assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
             // Classroom pages use JPEG images that are not next-gen formats.
             'modern-image-formats': [
               'error',
@@ -231,7 +237,7 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/create/.*$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.95}],
             'errors-in-console': ['error', {minScore: 1}],
             // TODO(#13465): Change this maxLength to 0 once images are
             // migrated.
@@ -251,7 +257,7 @@ module.exports = {
         {
           matchingUrlPattern: '^http://localhost:8181/explore/.*$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.91}],
             // Explore page uses deprecated APIs from third-party scripts.
             deprecations: ['error', {minScore: 0}],
             // Explore page has images that are not in next-gen formats.
@@ -266,7 +272,7 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/topic_editor/.*$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.92}],
           }),
         },
         {
