@@ -1981,8 +1981,8 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Empty Adventure', []),
     ];
 
-    expect(component.areAllLessonsCompleted(0)).toBeFalse();
-    expect(component.areAllLessonsCompleted(1)).toBeFalse();
+    expect(component.areAllLessonsCompleted(0)).toBeFalsy();
+    expect(component.areAllLessonsCompleted(1)).toBeFalsy();
   });
 
   it('should handle buildAdventureGroups when arcs is null', async () => {
@@ -3041,7 +3041,7 @@ describe('TopicStorySectionComponent', () => {
       'topic-adventure-navigation'
     );
     expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeTrue();
+    expect(navigationElement.isInTopicEditorPreview).toBeTruthy();
   });
 
   it('should not forward the topic editor preview flag by default', () => {
@@ -3052,7 +3052,7 @@ describe('TopicStorySectionComponent', () => {
       'topic-adventure-navigation'
     );
     expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeFalse();
+    expect(navigationElement.isInTopicEditorPreview).toBeFalsy();
   });
 
   it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
@@ -3289,8 +3289,12 @@ describe('TopicStorySectionComponent', () => {
         },
       ]
     );
-    component.storySummary.getId.and.returnValue('');
-    component.storySummary.isNodeCompleted.and.returnValue(true);
+    (
+      component.storySummary as jasmine.SpyObj<StorySummary>
+    ).getId.and.returnValue('');
+    (
+      component.storySummary as jasmine.SpyObj<StorySummary>
+    ).isNodeCompleted.and.returnValue(true);
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
       return fieldName === 'arc_mastered' ? ['true'] : ['1'];
     });
