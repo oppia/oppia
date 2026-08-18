@@ -85,7 +85,6 @@ class EmailToAdminTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -118,7 +117,6 @@ class DummyMailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -252,7 +250,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -281,7 +278,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
@@ -311,7 +307,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -361,7 +356,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -436,7 +430,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -507,7 +500,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -578,7 +570,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -780,7 +771,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -834,7 +824,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -914,7 +903,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -970,7 +958,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1060,7 +1047,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1119,7 +1105,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1177,7 +1162,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1339,7 +1323,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1414,7 +1397,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1488,7 +1470,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1564,7 +1545,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1640,7 +1620,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1716,7 +1695,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -2291,9 +2269,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.EMAIL_SENDER_NAME, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_that_email_not_sent_if_feedback_messages_are_empty(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
         with self.can_send_feedback_email_ctx:
@@ -2307,7 +2283,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2425,7 +2400,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2528,7 +2502,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2625,7 +2598,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2735,7 +2707,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2921,7 +2892,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3001,7 +2971,6 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3075,7 +3044,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -3108,7 +3076,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3174,7 +3141,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3240,7 +3206,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3306,7 +3271,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3366,7 +3330,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3426,7 +3389,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3690,7 +3652,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3719,7 +3680,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3753,7 +3713,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3778,7 +3737,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3811,7 +3769,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3893,7 +3850,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -3975,7 +3931,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4057,7 +4012,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4139,7 +4093,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4221,7 +4174,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4303,7 +4255,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4385,7 +4336,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4481,7 +4431,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4639,7 +4588,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4724,7 +4672,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4808,7 +4755,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4894,7 +4840,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4980,7 +4925,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5066,7 +5010,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5152,7 +5095,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5238,7 +5180,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5336,7 +5277,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5498,7 +5438,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5860,7 +5799,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 False,
@@ -5898,7 +5836,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 True,
@@ -5939,7 +5876,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 True,
@@ -5967,7 +5903,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6001,7 +5936,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6101,7 +6035,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6214,7 +6147,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6315,7 +6247,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6431,7 +6362,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6589,7 +6519,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6883,7 +6812,6 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6921,7 +6849,6 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7154,7 +7081,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7187,7 +7113,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7210,7 +7135,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7239,7 +7163,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7275,7 +7198,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7343,7 +7265,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7444,7 +7365,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7511,7 +7431,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7610,7 +7529,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7683,7 +7601,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7793,7 +7710,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7954,7 +7870,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -7988,7 +7903,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8188,7 +8102,6 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8212,7 +8125,6 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8281,9 +8193,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.EMAIL_SENDER_NAME, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self,
     ) -> None:
@@ -8295,9 +8205,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.EMAIL_SENDER_NAME, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -8344,7 +8252,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8405,7 +8312,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8463,7 +8369,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8552,7 +8457,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8612,7 +8516,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8669,7 +8572,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8730,7 +8632,6 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -8830,9 +8731,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         )
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.EMAIL_SENDER_NAME, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_reminder_mail_to_notify_curriculum_admins([], [])
@@ -8845,7 +8744,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
             (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
             (
@@ -8867,7 +8765,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -8926,7 +8823,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -8997,7 +8893,6 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
@@ -9079,7 +8974,6 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
@@ -9157,7 +9051,6 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.EMAIL_SENDER_NAME, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
