@@ -325,22 +325,6 @@ describe('Learner Dashboard Backend API Service', () => {
         node_count: 5,
       },
     ],
-    collection_playlist: [
-      {
-        status: 'public',
-        thumbnail_bg_color: '#ae511b',
-        community_owned: false,
-        created_on: 1558593739415.726,
-        thumbnail_icon_url: '/subjects/Arithmetic.svg',
-        language_code: 'en',
-        id: 'GdYIgsfRZwG7',
-        category: 'Arithmetic',
-        title: 'Negative Numbers',
-        last_updated_msec: 1558593926486.329,
-        objective: 'Learn what negative numbers are, and how to use them.',
-        node_count: 5,
-      },
-    ],
     incomplete_collections_list: [
       {
         status: 'public',
@@ -361,7 +345,6 @@ describe('Learner Dashboard Backend API Service', () => {
     number_of_nonexistent_collections: {
       completed_collections: 0,
       incomplete_collections: 0,
-      collection_playlist: 0,
     },
     user_email: 'user@example.com',
     completed_to_incomplete_collections: [],
@@ -401,35 +384,8 @@ describe('Learner Dashboard Backend API Service', () => {
         activity_type: 'exploration',
       },
     ],
-    exploration_playlist: [
-      {
-        category: 'Welcome',
-        created_on_msec: 1564183471833.675,
-        community_owned: true,
-        thumbnail_bg_color: '#992a2b',
-        title: 'Welcome to Oppia!',
-        num_views: 14897,
-        tags: [],
-        last_updated_msec: 1571653541705.924,
-        human_readable_contributors_summary: {},
-        status: 'public',
-        language_code: 'en',
-        objective: "become familiar with Oppia's capabilities",
-        thumbnail_icon_url: '/subjects/Welcome.svg',
-        ratings: {
-          1: 1,
-          2: 1,
-          3: 3,
-          4: 24,
-          5: 46,
-        },
-        id: '0',
-        activity_type: 'exploration',
-      },
-    ],
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
-      exploration_playlist: 0,
       completed_explorations: 0,
     },
     completed_explorations_list: [

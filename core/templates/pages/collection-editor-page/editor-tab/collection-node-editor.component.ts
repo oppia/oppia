@@ -24,10 +24,12 @@ import {Collection} from 'domain/collection/collection.model';
 import {AlertsService} from 'services/alerts.service';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
+import './collection-node-editor.component.css';
 
 @Component({
   selector: 'oppia-collection-node-editor',
   templateUrl: './collection-node-editor.component.html',
+  styleUrls: ['./collection-node-editor.component.css'],
 })
 export class CollectionNodeEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

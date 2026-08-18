@@ -1140,5 +1140,75 @@ describe('Site Analytics Service', () => {
         }
       );
     });
+
+    it('should register lesson feedback modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonFeedbackModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_modal_open',
+        {
+          exploration_id: expId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonIssueModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_modal_open', {
+        exploration_id: expId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      sas.registerWebsiteIssueModalOpenEvent();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'website_issue_modal_open',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson feedback modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonFeedbackSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_submitted',
+        {
+          exploration_id: expId,
+          feedbackId: feedbackId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonIssueSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_submitted', {
+        exploration_id: expId,
+        feedbackId: feedbackId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      const feedbackId: string = 'feedback_id';
+      sas.registerWebsiteIssueSubmittedEvent(feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'website_issue_submitted', {
+        page_path: pathname,
+        feedbackId: feedbackId,
+        login_status: 'logged_in',
+      });
+    });
   });
 });
