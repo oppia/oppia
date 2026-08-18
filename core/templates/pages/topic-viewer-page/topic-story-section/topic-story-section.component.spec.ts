@@ -1047,6 +1047,30 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].totalCheckpointsCount).toBe(0);
   });
 
+  it('should handle an empty node number when loading chapter progress', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.lessonCards[0].practiceUrl).toContain(
+      '/learn/math/topic/practice/'
+    );
+  }));
+
   it('should return empty string for getAdventureCompletionText with invalid index', () => {
     expect(component.getAdventureCompletionText(999)).toBe('');
   });
@@ -1950,6 +1974,15 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureCompleted(1)).toBe(true);
     expect(component.isAdventureCompleted(2)).toBe(false);
     expect(component.isAdventureCompleted(99)).toBe(false);
+  });
+
+  it('should report that missing or empty adventures have incomplete lessons', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Empty Adventure', []),
+    ];
+
+    expect(component.areAllLessonsCompleted(0)).toBeFalse();
+    expect(component.areAllLessonsCompleted(1)).toBeFalse();
   });
 
   it('should handle buildAdventureGroups when arcs is null', async () => {
@@ -3236,12 +3269,37 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should not persist or restore mastered adventures when story id is missing', () => {
-    (component.storySummary.getId as jasmine.Spy).and.returnValue('');
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    component.storySummary.getId.and.returnValue('');
+    component.storySummary.isNodeCompleted.and.returnValue(true);
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      return fieldName === 'arc_mastered' ? ['true'] : ['1'];
+    });
     localStorageService.getMasteredAdventures.calls.reset();
     localStorageService.updateMasteredAdventures.calls.reset();
 
     component.ngOnInit();
 
     expect(localStorageService.getMasteredAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.updateMasteredAdventures).not.toHaveBeenCalled();
   });
 });
