@@ -1049,9 +1049,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.ngOnInit();
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1079,9 +1080,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.reviewMessage = 'Review message';
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1122,9 +1124,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1154,8 +1157,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1175,8 +1179,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '2',
           'suggestion_2',
           'accept',
@@ -1209,9 +1214,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1232,8 +1238,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1258,9 +1265,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1291,8 +1299,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1318,16 +1327,20 @@ describe('Translation Suggestion Review Modal Component', function () {
       }
     );
 
-    it('should call reviewSkillSuggestion when accepting a skill translation suggestion', fakeAsync(() => {
+    it('should review a skill translation suggestion when accepting', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1341,14 +1354,15 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
         '1',
         'suggestion_1',
         AppConstants.ACTION_ACCEPT_SUGGESTION,
         '',
-        // A skill translation is not applied as a new version, so it carries
-        // no skill difficulty and no commit message.
+        // A skill translation is not applied as a new version of the skill,
+        // so it carries no commit message.
         null,
         jasmine.any(Function),
         jasmine.any(Function)
@@ -1358,13 +1372,13 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     }));
 
-    it('should call reviewExplorationSuggestion with a commit message when accepting an exploration translation suggestion', fakeAsync(() => {
+    it('should send a commit message when accepting an exploration translation suggestion', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type =
         AppConstants.ENTITY_TYPE.EXPLORATION;
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
           targetId,
@@ -1384,8 +1398,9 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewExplorationSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
         '1',
         'suggestion_1',
         AppConstants.ACTION_ACCEPT_SUGGESTION,
@@ -1399,13 +1414,17 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should warn when accepting a skill translation suggestion fails', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1426,16 +1445,20 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     }));
 
-    it('should call reviewSkillSuggestion when rejecting a skill translation suggestion', fakeAsync(() => {
+    it('should review a skill translation suggestion when rejecting', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1449,8 +1472,9 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
         '1',
         'suggestion_1',
         AppConstants.ACTION_REJECT_SUGGESTION,
@@ -1467,13 +1491,17 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should warn when rejecting a skill translation suggestion fails', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1530,9 +1558,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1557,8 +1586,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1582,8 +1612,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1856,9 +1887,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1884,8 +1916,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',

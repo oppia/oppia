@@ -406,7 +406,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
 
     modalRef.result.then(
       result => {
-        this.contributionAndReviewService.reviewSkillSuggestion(
+        this.contributionAndReviewService.reviewQuestionSuggestion(
           result.targetId,
           result.suggestionId,
           result.action,
