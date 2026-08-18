@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import './contributor-dashboard-page-root.component.css';
 
 @Component({
   selector: 'oppia-contributor-dashboard-page-root',
   templateUrl: './contributor-dashboard-page-root.component.html',
+  styleUrls: ['./contributor-dashboard-page-root.component.css'],
 })
 export class ContributorDashboardPageRootComponent extends BaseRootComponent {
   title: string =

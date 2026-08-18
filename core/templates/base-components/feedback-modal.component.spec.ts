@@ -57,6 +57,12 @@ import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UserInfo} from 'domain/user/user-info.model';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'oppia-image-receiver',
@@ -205,6 +211,7 @@ describe('FeedbackModalComponent', () => {
   let insertScriptService: jasmine.SpyObj<InsertScriptService>;
   let translateService: jasmine.SpyObj<TranslateService>;
   let alertService: jasmine.SpyObj<AlertsService>;
+  let sas: jasmine.SpyObj<SiteAnalyticsService>;
 
   const createComponent = (
     modalType: FeedbackModalType = FeedbackModalType.LESSON_FEEDBACK
@@ -257,6 +264,25 @@ describe('FeedbackModalComponent', () => {
       'addSuccessMessage',
       'addWarning',
     ]);
+    sas = jasmine.createSpyObj('SiteAnalyticsService', [
+      'registerLessonFeedbackModalOpenEvent',
+      'registerLessonIssueModalOpenEvent',
+      'registerWebsiteIssueModalOpenEvent',
+      'registerLessonFeedbackSubmittedEvent',
+      'registerLessonIssueSubmittedEvent',
+      'registerWebsiteIssueSubmittedEvent',
+    ]);
+    pageContextService = jasmine.createSpyObj('PageContextService', [
+      'getExplorationId',
+      'getExplorationVersion',
+    ]);
+
+    (pageContextService.getExplorationId as jasmine.Spy).and.returnValue(
+      'exp1'
+    );
+    (pageContextService.getExplorationVersion as jasmine.Spy).and.returnValue(
+      1
+    );
 
     feedbackSessionInfoService.getSessionInfo.and.returnValue(
       feedbackSessionInfo
@@ -285,7 +311,6 @@ describe('FeedbackModalComponent', () => {
         MockTranslatePipe,
       ],
       providers: [
-        PageContextService,
         PlayerPositionService,
         LearnerAnswerInfoService,
         FeedbackBackendApiService,
@@ -321,6 +346,14 @@ describe('FeedbackModalComponent', () => {
           provide: InsertScriptService,
           useValue: insertScriptService,
         },
+        {
+          provide: PageContextService,
+          useValue: pageContextService,
+        },
+        {
+          provide: SiteAnalyticsService,
+          useValue: sas,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -354,8 +387,7 @@ describe('FeedbackModalComponent', () => {
   });
 
   it('should identify site issue mode correctly', () => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
 
     expect(component.isSiteIssueMode).toBe(true);
     expect(component.isLessonFeedbackMode).toBe(false);
@@ -834,11 +866,11 @@ describe('FeedbackModalComponent', () => {
 
   it('should call submitLessonFeedbackAsync with correct payload', fakeAsync(() => {
     createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_FEEDBACK;
+    expect(sas.registerLessonFeedbackModalOpenEvent).toHaveBeenCalledWith(
+      'exp1'
+    );
     component.feedbackText = 'Great lesson!';
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -850,10 +882,18 @@ describe('FeedbackModalComponent', () => {
     const submitSpy = spyOn(
       feedbackBackendApiService,
       'submitLessonFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
+    expect(sas.registerLessonFeedbackSubmittedEvent).toHaveBeenCalledWith(
+      'exp1',
+      'feedback_id'
+    );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_FEEDBACK_SUBMITTED_SUCCESS'
     );
@@ -864,11 +904,9 @@ describe('FeedbackModalComponent', () => {
 
   it('should close modal after successful lesson feedback submission', fakeAsync(() => {
     createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_FEEDBACK;
+
     component.feedbackText = 'Great lesson!';
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -879,7 +917,11 @@ describe('FeedbackModalComponent', () => {
     spyOn(
       feedbackBackendApiService,
       'submitLessonFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     const closeSpy = spyOn(component, 'closeModal').and.callThrough();
 
@@ -894,11 +936,9 @@ describe('FeedbackModalComponent', () => {
 
   it('should log error and not close modal when lesson feedback submission fails', fakeAsync(() => {
     createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_FEEDBACK;
+
     component.feedbackText = 'Feedback';
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -925,15 +965,13 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should call submitSiteAndLessonIssueReportAsync with session info when includeTechnicalLogs is true', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    createComponent(FeedbackModalType.LESSON_ISSUE);
+    expect(sas.registerLessonIssueModalOpenEvent).toHaveBeenCalledWith('exp1');
     component.isUserLoggedIn = true;
     component.feedbackText = 'Lesson issue report';
     component.category = ReportAnIssueCategory.TYPO;
     component.includeTechnicalLogs = true;
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -946,10 +984,18 @@ describe('FeedbackModalComponent', () => {
     const submitSpy = spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
+    expect(sas.registerLessonIssueSubmittedEvent).toHaveBeenCalledWith(
+      'exp1',
+      'feedback_id'
+    );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
     );
@@ -960,14 +1006,11 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should not include session info when includeTechnicalLogs is false for lesson issue', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    createComponent(FeedbackModalType.LESSON_ISSUE);
     component.feedbackText = 'Lesson issue';
     component.includeTechnicalLogs = false;
     component.isUserLoggedIn = true;
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -981,7 +1024,11 @@ describe('FeedbackModalComponent', () => {
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
@@ -990,13 +1037,10 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should close modal after successful lesson issue submission', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    createComponent(FeedbackModalType.LESSON_ISSUE);
     component.isUserLoggedIn = true;
     component.feedbackText = 'Issue';
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -1007,7 +1051,11 @@ describe('FeedbackModalComponent', () => {
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     const closeSpy = spyOn(component, 'closeModal').and.callThrough();
 
@@ -1021,14 +1069,11 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should log error and not close modal when lesson issue submission fails', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    createComponent(FeedbackModalType.LESSON_ISSUE);
     component.feedbackText = 'Issue';
     component.isUserLoggedIn = true;
     component.includeTechnicalLogs = false;
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -1055,13 +1100,10 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should default exploration version to 0 when pageContextService returns null', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    createComponent(FeedbackModalType.LESSON_ISSUE);
     component.feedbackText = 'Lesson issue';
     component.includeTechnicalLogs = false;
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(null);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Intro'
     );
@@ -1072,7 +1114,11 @@ describe('FeedbackModalComponent', () => {
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     expect(() => {
       component.submit();
@@ -1081,18 +1127,25 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should call submitSiteAndLessonIssueReportAsync for site issue', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+    expect(sas.registerWebsiteIssueModalOpenEvent).toHaveBeenCalled();
     component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue report';
 
     const submitSpy = spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
+    expect(sas.registerWebsiteIssueSubmittedEvent).toHaveBeenCalledWith(
+      'feedback_id'
+    );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
     );
@@ -1102,8 +1155,8 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should include session info when includeTechnicalLogs is true for site issue', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+
     component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = true;
@@ -1112,7 +1165,11 @@ describe('FeedbackModalComponent', () => {
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
@@ -1121,15 +1178,19 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should not include session info when includeTechnicalLogs is false for site issue', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = false;
     feedbackSessionInfoService.getSessionInfo.calls.reset();
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     component.submit();
     tick();
@@ -1138,14 +1199,18 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should not close modal after un-successful site issue submission', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+
     component.feedbackText = 'Site issue';
 
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     const closeSpy = spyOn(component, 'closeModal').and.callThrough();
 
@@ -1159,15 +1224,19 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should close modal after successful site issue submission', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+
     component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
 
     spyOn(
       feedbackBackendApiService,
       'submitSiteAndLessonIssueReportAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        id: 'feedback_id',
+      })
+    );
 
     const closeSpy = spyOn(component, 'closeModal').and.callThrough();
 
@@ -1181,8 +1250,8 @@ describe('FeedbackModalComponent', () => {
   }));
 
   it('should log error and not close modal when site issue submission fails', fakeAsync(() => {
-    createComponent();
-    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    createComponent(FeedbackModalType.SITE_ISSUE);
+
     component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = false;
@@ -1408,5 +1477,107 @@ describe('FeedbackModalComponent', () => {
     if (turnstile) {
       expect(turnstile.render).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe('FeedbackModalComponent in bottom sheet mode', () => {
+  let component: FeedbackModalComponent;
+  let fixture: ComponentFixture<FeedbackModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownSubject: Subject<KeyboardEvent>;
+
+  beforeEach(waitForAsync(() => {
+    keydownSubject = new Subject<KeyboardEvent>();
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(keydownSubject.asObservable());
+
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', [
+      'instant',
+    ]);
+    translateServiceSpy.instant.and.callFake((key: string) => key);
+
+    const alertServiceSpy = jasmine.createSpyObj('AlertsService', [
+      'addSuccessMessage',
+      'addWarning',
+    ]);
+
+    const feedbackSessionInfoServiceSpy = jasmine.createSpyObj(
+      'FeedbackSessionInfoService',
+      ['getSessionInfo']
+    );
+
+    const feedbackScreenshotStagingServiceSpy = jasmine.createSpyObj(
+      'FeedbackScreenshotStagingService',
+      ['stageScreenshotAsync', 'clearStagedScreenshot']
+    );
+
+    const insertScriptServiceSpy = jasmine.createSpyObj('InsertScriptService', [
+      'loadScript',
+    ]);
+    insertScriptServiceSpy.loadScript.and.returnValue(true);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, FormsModule, RouterTestingModule],
+      declarations: [
+        FeedbackModalComponent,
+        MockImageReceiverComponent,
+        MockTranslatePipe,
+      ],
+      providers: [
+        PageContextService,
+        PlayerPositionService,
+        LearnerAnswerInfoService,
+        FeedbackBackendApiService,
+        {provide: TranslateService, useValue: translateServiceSpy},
+        {provide: AlertsService, useValue: alertServiceSpy},
+        {
+          provide: FeedbackSessionInfoService,
+          useValue: feedbackSessionInfoServiceSpy,
+        },
+        {provide: UserService, useClass: MockUserService},
+        {provide: WindowRef, useClass: MockWindowRef},
+        {provide: NgbActiveModal, useClass: MockActiveModal},
+        {
+          provide: FeedbackScreenshotStagingService,
+          useValue: feedbackScreenshotStagingServiceSpy,
+        },
+        {provide: InsertScriptService, useValue: insertScriptServiceSpy},
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {
+          provide: MAT_BOTTOM_SHEET_DATA,
+          useValue: {feedbackModalType: FeedbackModalType.LESSON_FEEDBACK},
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(FeedbackModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should set the feedback modal type from the injected data', () => {
+    expect(component.feedbackModalType).toBe(FeedbackModalType.LESSON_FEEDBACK);
+  });
+
+  it('should dismiss the bottom sheet when Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should not dismiss the bottom sheet when a non-Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('should dismiss the bottom sheet on closeModal', () => {
+    component.closeModal();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   });
 });

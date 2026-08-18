@@ -1874,6 +1874,7 @@ describe('Contributions and review component', () => {
     });
 
     it('should load reviewable translation opportunities correctly', () => {
+      component.languageCode = 'en';
       component
         .loadReviewableTranslationOpportunities()
         .then(({opportunitiesDicts, more}) => {
@@ -1887,6 +1888,10 @@ describe('Contributions and review component', () => {
               actionButtonTitle: 'Translations',
               isPinned: false,
               topicName: 'Topic 1',
+              totalCount: 1,
+              translationsCount: 2,
+              inReviewCount: 2,
+              progressPercentage: '200.00',
             },
             {
               id: '2',
@@ -1897,6 +1902,10 @@ describe('Contributions and review component', () => {
               actionButtonTitle: 'Translations',
               isPinned: false,
               topicName: 'Topic 2',
+              totalCount: 2,
+              translationsCount: 4,
+              inReviewCount: 4,
+              progressPercentage: '200.00',
             },
           ]);
           expect(more).toEqual(false);

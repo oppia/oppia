@@ -61,6 +61,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -106,6 +107,10 @@ export interface Opportunity {
   translationWordCount?: number;
   isPinned?: boolean;
   topicName?: string;
+  totalCount?: number;
+  translationsCount?: number;
+  inReviewCount?: number;
+  progressPercentage?: string;
 }
 
 export interface GetOpportunitiesResponse {
@@ -143,6 +148,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css'],
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
   @Input() activeTopicName: string = '';
@@ -761,6 +767,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           opportunities: ExplorationOpportunitySummary[];
           more: boolean;
         }) => {
+          // Keep the correct object type for this.opportunities.
           this.opportunities = response.opportunities;
           const opportunitiesDicts: Opportunity[] = [];
           response.opportunities.forEach(
@@ -774,6 +781,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
                 actionButtonTitle: 'Translations',
                 isPinned: opportunity.isPinned,
                 topicName: opportunity.topicName,
+                totalCount: opportunity.getContentCount(),
+                translationsCount: opportunity.getTranslationsCount(
+                  this.languageCode
+                ),
+                inReviewCount: opportunity.getTranslationsInReviewCount(
+                  this.languageCode
+                ),
+                progressPercentage: opportunity
+                  .getTranslationProgressPercentage(this.languageCode)
+                  .toFixed(2),
               };
               opportunitiesDicts.push(opportunityDict);
             }
