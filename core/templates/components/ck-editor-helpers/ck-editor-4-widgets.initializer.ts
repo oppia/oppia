@@ -286,6 +286,7 @@ export class CkEditorInitializerService {
               downcast: function (element: CKEDITOR.htmlParser.element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
+
                 // This throws "TS2339". We need to suppress this error
                 // because the @types/ckeditor definition is incomplete.
                 // @ts-ignore
@@ -293,6 +294,7 @@ export class CkEditorInitializerService {
                   ''
                 );
                 // Return just the rich text component, without its wrapper.
+
                 // This throws "TS2339". We need to suppress this error
                 // because the @types/ckeditor definition is incomplete.
                 // @ts-ignore
