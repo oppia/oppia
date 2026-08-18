@@ -408,6 +408,9 @@ export class BaseUser {
       'button.e2e-test-register-user:not([disabled])'
     );
 
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
