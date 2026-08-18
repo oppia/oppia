@@ -1344,6 +1344,9 @@ export class LoggedInUser extends BaseUser {
         };
 
         if (!href) {
+          await this.clickOnElementWithSelector(
+            '.e2e-test-email-preferences-radio-no'
+          );
           await Promise.all([
             this.page.waitForNavigation({
               waitUntil: 'networkidle',
@@ -1355,6 +1358,9 @@ export class LoggedInUser extends BaseUser {
           return;
         }
 
+        await this.clickOnElementWithSelector(
+          '.e2e-test-email-preferences-radio-no'
+        );
         await Promise.all([
           this.page.waitForNavigation({
             waitUntil: 'networkidle',
@@ -2157,6 +2163,9 @@ export class LoggedInUser extends BaseUser {
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.expectElementToBeVisible(registerNewUserButton);
+      await this.clickOnElementWithSelector(
+        '.e2e-test-email-preferences-radio-no'
+      );
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
