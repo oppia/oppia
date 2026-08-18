@@ -116,16 +116,18 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'exploration-editor',
         'blog-admin',
         'blog-editor',
+    ],
+    '2': [
         'community',
         'login',
         'contact',
         'donate',
-    ],
-    '2': [
         'get-started',
         'teach',
         'thanks',
         'volunteer',
+    ],
+    '3': [
         'contributor-dashboard',
         'learner-dashboard',
         'email-dashboard',
@@ -408,7 +410,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 ],
             },
             'lighthouse': {
-                'count': 2,
+                'count': 3,
                 'suites': [
                     {
                         'name': '1',
@@ -421,6 +423,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
+                    },
+                    {
+                        'name': '3',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['3'],
                     },
                 ],
             },
@@ -649,6 +657,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
+                },
+                {
+                    'name': '3',
+                    'module': '.lighthouserc.js',
+                    'environment': 'python',
+                    'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['3'],
                 },
             ],
         )
@@ -935,7 +949,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'suites': [],
                                 },
                                 'lighthouse': {
-                                    'count': 2,
+                                    'count': 3,
                                     'suites': [
                                         {
                                             'name': '1',
@@ -951,6 +965,14 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '2'
+                                            ],
+                                        },
+                                        {
+                                            'name': '3',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '3'
                                             ],
                                         },
                                     ],
@@ -990,7 +1012,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'suites': [],
                                 },
                                 'lighthouse': {
-                                    'count': 2,
+                                    'count': 3,
                                     'suites': [
                                         {
                                             'name': '1',
@@ -1006,6 +1028,14 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '2'
+                                            ],
+                                        },
+                                        {
+                                            'name': '3',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '3'
                                             ],
                                         },
                                     ],
