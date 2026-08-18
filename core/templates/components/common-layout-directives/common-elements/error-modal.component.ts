@@ -40,9 +40,9 @@ export class ErrorModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private frontendErrorBackendApiService: FrontendErrorBackendApiService,
-    @Optional() private bottomSheetRef: MatBottomSheetRef
+    @Optional() protected bottomSheetRef: MatBottomSheetRef
   ) {
-    super(ngbActiveModal);
+    super(ngbActiveModal, bottomSheetRef);
   }
 
   toggleDetails(): void {
