@@ -32,6 +32,8 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const cookieBannerAcceptButtonSelector =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
@@ -48,6 +50,8 @@ const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
+const usernameSelector = 'input.e2e-test-username-input';
+const termsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -377,17 +381,31 @@ export class BaseUser {
   }
 
   /**
+   * This function accepts the cookie banner if it is present on the page.
+   */
+  async acceptCookieBannerIfPresent(): Promise<void> {
+    if (await this.page.$(cookieBannerAcceptButtonSelector)) {
+      await this.clickOnElementWithSelector(cookieBannerAcceptButtonSelector);
+      this.userHasAcceptedCookies = true;
+      await this.page.waitForSelector(cookieBannerAcceptButtonSelector, {
+        hidden: true,
+        timeout: 10000,
+      });
+    }
+  }
+
+  /**
    * This function signs up a new user with the given username and email.
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
-    );
+
+    await this.typeInInputField(usernameSelector, username);
+    await this.clickOnElementWithSelector(termsCheckboxSelector);
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
+
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
@@ -809,14 +827,44 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
-    await this.page.keyboard.press('Backspace');
+
+    const isTextInput = await element.evaluate(
+      el => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+    );
+
+    if (isTextInput) {
+      // Click the field to move the pointer (so hover-paused toasts dismiss)
+      // and to focus it before clearing, matching the keyboard-only behavior.
+      await element.click();
+
+      // Clear via the native value setter and an input event to update ngModel
+      // deterministically without depending on focus/selection timing. Do not
+      // dispatch 'change' here: change-bound editors (e.g. the URL fragment
+      // editor) would commit an empty value to their model before the user
+      // types; the native 'change' fires on the next blur with the full value.
+      await element.evaluate(el => {
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          el instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        valueSetter?.call(el, '');
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+      });
+    } else {
+      // Rich-text editors (e.g. CKEditor) expose contenteditable divs, which
+      // cannot be cleared by setting their text directly without desyncing the
+      // editor's internal model. Clear them with real keyboard events instead.
+      await element.click();
+      await this.page.keyboard.down('Control');
+      await this.page.keyboard.press('A');
+      await this.page.keyboard.up('Control');
+      await this.page.keyboard.press('Backspace');
+    }
   }
 
   /**
@@ -881,6 +929,19 @@ export class BaseUser {
     await this.waitForElementToStabilize(selector);
 
     await element.type(text);
+  }
+
+  /**
+   * Checks if the value of text input with the given selector is equal to the given value.
+   * @param selector - The selector of the text input.
+   * @param value - The expected value of the text input.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const element = await this.page.$(selector);
+    expect(await element?.evaluate(el => (el as HTMLInputElement).value)).toBe(
+      value
+    );
   }
 
   /**
@@ -1341,15 +1402,17 @@ export class BaseUser {
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
    * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
-   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
-   * almost all cases and for the page to fully load.
+   * idle within a certain timeframe.
    *
-   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * The default timeout is intentionally short because this helper is best-effort; on busy CI runners, a long default timeout
+   * can significantly inflate total setup time across many calls.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 5000, idleTime: 500}.
    * @param {Page} page The page to wait for network idle. Defaults to the current page.
    */
   async waitForNetworkIdle(
     options: {timeout?: number; idleTime?: number} = {
-      timeout: 30000,
+      timeout: 5000,
       idleTime: 500,
     },
     page: Page = this.page
@@ -1757,6 +1820,23 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the placeholder attribute of the given input or textarea
+   * element matches the expected value.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {string} expectedPlaceholder - The expected placeholder text.
+   */
+  async expectElementPlaceholderToBe(
+    selector: string,
+    expectedPlaceholder: string
+  ): Promise<void> {
+    const placeholder = await this.page.$eval(
+      selector,
+      el => (el as HTMLInputElement | HTMLTextAreaElement).placeholder
+    );
+    expect(placeholder).toBe(expectedPlaceholder);
+  }
+
+  /**
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
@@ -1796,17 +1876,38 @@ export class BaseUser {
   /**
    * Verifies whether a chapter is clickable or not.
    * @param {string} chapterName - The name of the chapter.
-   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   * @param {boolean} [shouldBeNavigable=true] - Expected navigable state.
    */
-  async expectChapterToBeClickable(
+  async expectChapterToBeNavigable(
     chapterName: string,
-    shouldBeClickable: boolean = true
+    shouldBeNavigable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
 
-    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
-  }
+    const currentUrl = this.page.url();
 
+    await chapterElement.click();
+    // Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
+    await this.waitForPageToFullyLoad();
+    const newUrl = this.page.url();
+    const didNavigate = newUrl !== currentUrl;
+
+    if (shouldBeNavigable && !didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" did not navigate but expected to.`
+      );
+    }
+
+    if (!shouldBeNavigable && didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" navigated but expected not to.`
+      );
+    }
+
+    if (didNavigate) {
+      await this.page.goBack({waitUntil: 'networkidle0'});
+    }
+  }
   /**
    * Helper method to wait for a action progress message to disappear
    * @param {string} progressMessage - The processing message to wait for completion

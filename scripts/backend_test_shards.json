@@ -218,7 +218,8 @@
         "core.domain.voiceover_cloud_task_services_test",
         "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
         "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test",
-        "core.jobs.batch_jobs.translation_opportunity_backfill_jobs_test"
+        "core.jobs.batch_jobs.translation_opportunity_backfill_jobs_test",
+        "core.jobs.batch_jobs.web_feedback_cleanup_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
