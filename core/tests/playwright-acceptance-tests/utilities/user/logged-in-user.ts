@@ -2157,10 +2157,10 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
-    const invalidUsernameErrorContainerElement = await this.page.$(
+    const isUsernameErrorVisible = await this.page.isVisible(
       invalidUsernameErrorContainer
     );
-    if (!invalidUsernameErrorContainerElement) {
+    if (!isUsernameErrorVisible) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.expectElementToBeVisible(registerNewUserButton);
       await this.clickOnElementWithSelector(

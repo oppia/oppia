@@ -907,10 +907,19 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
-    const invalidUsernameErrorContainerElement = await this.page.$(
+    const isUsernameErrorVisible = await this.page.evaluate(
+      (selector: string) => {
+        const el = document.querySelector(selector);
+        return (
+          el !== null &&
+          window.getComputedStyle(el).display !== 'none' &&
+          window.getComputedStyle(el).visibility !== 'hidden' &&
+          el.textContent !== ''
+        );
+      },
       invalidUsernameErrorContainer
     );
-    if (!invalidUsernameErrorContainerElement) {
+    if (!isUsernameErrorVisible) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
       await this.clickOnElementWithSelector(
