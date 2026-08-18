@@ -150,6 +150,9 @@ const enableDiagnosticTestButton =
 const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 const oldTopicNameField = '.e2e-test-topic-name-field';
 const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
+const mobileUnpublishTopicButton = '.e2e-test-mobile-unpublish-topic-button';
+const mobileNavbarDropdownOptions =
+  '.oppia-topic-nav-topic-nav-dropdown-options';
 const topicAndSkillsDashboardSelector = '.e2e-test-topics-and-skills-dashboard';
 const skillEditorSelector = '.e2e-test-skill-editor';
 
@@ -711,7 +714,15 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   async expectUnpublishTopicButtonToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(unpublishTopicButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
+      await this.expectElementToBeVisible(mobileUnpublishTopicButton);
+    } else {
+      await this.expectElementToBeVisible(unpublishTopicButton);
+    }
   }
 
   async navigateToSkillsTab(): Promise<void> {
@@ -766,8 +777,19 @@ export class CurriculumAdmin extends TopicManager {
 
   async unpublishTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
-    await this.clickOnElementWithSelector(unpublishTopicButton);
-    await this.page.reload({waitUntil: 'networkidle'});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
+      await this.clickOnElementWithSelector(mobileUnpublishTopicButton);
+      await this.page.reload({waitUntil: 'networkidle'});
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
+    } else {
+      await this.clickOnElementWithSelector(unpublishTopicButton);
+      await this.page.reload({waitUntil: 'networkidle'});
+    }
 
     const isUnpublishPresent =
       await this.isTextPresentOnPage('Unpublish Topic');
