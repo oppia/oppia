@@ -340,10 +340,7 @@ export class TopicStorySectionComponent
       return false;
     }
 
-    return (
-      this.areAllLessonsCompleted(adventureIndex) &&
-      this.isAdventurePracticeCompleted(adventureIndex)
-    );
+    return this.areAllLessonsCompleted(adventureIndex);
   }
 
   areAllLessonsCompleted(adventureIndex: number): boolean {
@@ -656,7 +653,6 @@ export class TopicStorySectionComponent
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
-    this.restoreMasteredAdventures();
     this.updateVisibleSections();
     this.maybeShowAdventureMasteredModal();
   }
@@ -758,6 +754,7 @@ export class TopicStorySectionComponent
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
+    this.restoreMasteredAdventures();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
     this.maybeShowAdventureMasteredModal();
