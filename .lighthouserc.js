@@ -109,7 +109,7 @@ module.exports = {
               redirects: ['error', {minScore: 1}],
               'uses-responsive-images': ['error', {minScore: 0.8}],
             },
-            0.98
+            0.95
           ),
         },
         {

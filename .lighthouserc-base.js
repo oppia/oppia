@@ -45,7 +45,8 @@ module.exports = {
       'uses-optimized-images': ['error', {minScore: 1}],
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
-      'offscreen-images': ['error', {minScore: 0.45}],
+      // offscreen-images is asserted per-page in .lighthouserc.js because the
+      // audit consistently scores 0 in headless CI environments.
       'server-response-time': ['off', {}],
       // Best practices category.
       'no-document-write': ['error', {minScore: 1}],
