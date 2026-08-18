@@ -19,7 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import puppeteer, {ElementHandle} from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
@@ -242,7 +242,7 @@ const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
-const classroomNewChapterSelector = '.classroom-new-chapter';
+const newLabelSelector = '.e2e-test-new-label';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -4395,24 +4395,22 @@ export class LoggedInUser extends BaseUser {
    * @param {string} chapterName - The name of the lesson to check.
    */
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
-    const chapterCards = await this.page.$$(chapterSelector);
+    const lessonSel = learnerDashSelectors.lessonCard;
 
-    for (const titleHandle of chapterCards) {
-      const titleText = await titleHandle.evaluate(el =>
-        (el.textContent || '').replace(/\s+/g, ' ').trim()
-      );
+    await this.page.waitForSelector(lessonSel.content);
 
-      if (titleText.includes(chapterName)) {
-        const container = (await titleHandle.evaluateHandle(
-          el =>
-            el.closest('.chapter-title') ||
-            el.closest('.chapter-text') ||
-            el.parentElement
-        )) as ElementHandle;
+    const cards = await this.page.$$(lessonSel.content);
 
-        const newLabelHandle = await container.$(classroomNewChapterSelector);
+    for (const card of cards) {
+      const titleEl = await card.$(lessonSel.heading);
+      const titleText = titleEl
+        ? await titleEl.evaluate(el => el.textContent?.trim())
+        : '';
 
-        if (!newLabelHandle) {
+      if (titleText?.includes(chapterName)) {
+        const newLabel = await card.$(newLabelSelector);
+
+        if (!newLabel) {
           throw new Error(
             `Lesson "${chapterName}" found but does NOT have a new label`
           );
@@ -4423,71 +4421,6 @@ export class LoggedInUser extends BaseUser {
     }
 
     throw new Error(`Lesson "${chapterName}" not found`);
-  }
-
-  /**
-   * Verifies that the specified lesson card in a learner dashboard card
-   * display section displays the "New" label.
-   * @param {string} sectionName - The section title to inspect.
-   * @param {string} chapterName - The name of the lesson to check.
-   */
-  async expectLessonCardInSectionToHaveNewLabel(
-    sectionName: string,
-    chapterName: string
-  ): Promise<void> {
-    const subsectionElement =
-      await this.findSubsectionElementBasedOnTitle(sectionName);
-    const lessonCardElement = await this.findChildElementInParent(
-      subsectionElement,
-      learnerDashSelectors.lessonCard,
-      chapterName
-    );
-
-    if (!lessonCardElement) {
-      throw new Error(`Lesson "${chapterName}" not found`);
-    }
-
-    const newLabelHandle = await lessonCardElement.$(
-      classroomNewChapterSelector
-    );
-
-    if (!newLabelHandle) {
-      throw new Error(
-        `Lesson "${chapterName}" found but does NOT have a new label`
-      );
-    }
-
-    showMessage(
-      `Lesson "${chapterName}" has a new label in "${sectionName}" section`
-    );
-  }
-
-  /**
-   * Verifies that the specified lesson card in the learner dashboard's
-   * "Lessons in progress" section displays the "New" label.
-   * @param {string} chapterName - The name of the lesson to check.
-   */
-  async expectInProgressLessonCardToHaveNewLabel(
-    chapterName: string
-  ): Promise<void> {
-    await this.expectLessonCardInSectionToHaveNewLabel(
-      'Lessons in progress',
-      chapterName
-    );
-  }
-
-  /**
-   * Verifies that the specified lesson card in the learner dashboard's
-   * "Recommended for you" section displays the "New" label.
-   * @param {string} chapterName - The name of the lesson to check.
-   */
-  async expectRecommendedLessonCardToHaveNewLabel(
-    chapterName: string
-  ): Promise<void> {
-    await this.expectLessonCardInSectionToHaveNewLabel(
-      'Recommended for you',
-      chapterName
-    );
   }
 
   /**
