@@ -63,6 +63,8 @@ export class LocalStorageService {
 
   SKIPPED_ADVENTURES_KEY = 'skipped_adventures';
 
+  MASTERED_ADVENTURES_KEY = 'mastered_adventures';
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -508,6 +510,59 @@ export class LocalStorageService {
       const skippedAdventures = this.parseSkippedAdventuresDict()[storyId];
       if (Array.isArray(skippedAdventures)) {
         return skippedAdventures;
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Parse the stored mastered adventures dict, falling back to an empty dict
+   * if the stored value is not valid JSON.
+   * @returns The stored mastered adventures dict, or an empty dict.
+   */
+  private parseMasteredAdventuresDict(): {[storyId: string]: string[]} {
+    const stringifiedMasteredAdventures = (this.storage as Storage).getItem(
+      this.MASTERED_ADVENTURES_KEY
+    );
+    if (!stringifiedMasteredAdventures) {
+      return {};
+    }
+    try {
+      return JSON.parse(stringifiedMasteredAdventures) as {
+        [storyId: string]: string[];
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Save the given mastered adventure arc IDs for a story to localStorage.
+   * @param storyId The id of the story the mastered adventures belong to.
+   * @param masteredArcIds The arc IDs of the mastered adventures.
+   */
+  updateMasteredAdventures(storyId: string, masteredArcIds: string[]): void {
+    if (this.isStorageAvailable()) {
+      const masteredAdventuresDict = this.parseMasteredAdventuresDict();
+      masteredAdventuresDict[storyId] = masteredArcIds;
+      (this.storage as Storage).setItem(
+        this.MASTERED_ADVENTURES_KEY,
+        JSON.stringify(masteredAdventuresDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the mastered adventure arc IDs for a story from localStorage.
+   * @param storyId The id of the story the mastered adventures belong to.
+   * @returns The arc IDs of the mastered adventures, or an empty array if none
+   *   are stored.
+   */
+  getMasteredAdventures(storyId: string): string[] {
+    if (this.isStorageAvailable()) {
+      const masteredAdventures = this.parseMasteredAdventuresDict()[storyId];
+      if (Array.isArray(masteredAdventures)) {
+        return masteredAdventures;
       }
     }
     return [];

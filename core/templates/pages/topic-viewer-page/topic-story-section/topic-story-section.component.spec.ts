@@ -122,8 +122,11 @@ describe('TopicStorySectionComponent', () => {
     localStorageService = jasmine.createSpyObj('LocalStorageService', [
       'getSkippedAdventures',
       'updateSkippedAdventures',
+      'getMasteredAdventures',
+      'updateMasteredAdventures',
     ]);
     localStorageService.getSkippedAdventures.and.returnValue([]);
+    localStorageService.getMasteredAdventures.and.returnValue([]);
     platformFeatureService = {
       status: {
         SerialChapterLaunchLearnerView: {
@@ -837,6 +840,38 @@ describe('TopicStorySectionComponent', () => {
     expect(component.practiceCard.practiceUrl).toContain('add/test/arc/1');
     expect(component.practiceCard.practiceUrl).not.toContain(
       'add/test/arc/arc'
+    );
+  });
+
+  it('should return correct practice title for each adventure index', () => {
+    expect(component.getPracticeTitle(0)).toBe('Adventure 1 Review & Test');
+    expect(component.getPracticeTitle(1)).toBe('Adventure 2 Review & Test');
+    expect(component.getPracticeTitle(2)).toBe('Adventure 3 Review & Test');
+  });
+
+  it('should return correct practice description with unlock message for non-last adventures', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+
+    expect(component.getPracticeDescription(0)).toBe(
+      'Test what you have learned in Adventure 1 to unlock Adventure 2.'
+    );
+    expect(component.getPracticeDescription(1)).toBe(
+      'Test what you have learned in Adventure 2.'
+    );
+  });
+
+  it('should return correct practice description without unlock for last adventure', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+    ];
+
+    expect(component.getPracticeDescription(2)).toBe(
+      'Test what you have learned in Adventure 3.'
     );
   });
 
@@ -3031,4 +3066,182 @@ describe('TopicStorySectionComponent', () => {
       block: 'start',
     });
   }));
+
+  it('should restore mastered adventures from localStorage on init', () => {
+    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(localStorageService.getMasteredAdventures).toHaveBeenCalledWith(
+      'story_id_1'
+    );
+    expect(component.isAdventurePracticeCompleted(0)).toBe(true);
+    expect(component.isAdventurePracticeCompleted(1)).toBe(false);
+  });
+
+  it('should persist mastered adventures when returning from arc test', fakeAsync(() => {
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.callFake(
+      (title: string) => title === 'Node 1'
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(localStorageService.updateMasteredAdventures).toHaveBeenCalledWith(
+      'story_id_1',
+      ['1']
+    );
+  }));
+
+  it('should retain mastered adventures across page reload from localStorage', () => {
+    localStorageService.getMasteredAdventures.and.returnValue(['1', '2']);
+
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+    const storyNodeSpy3 = createStoryNodeSpy(
+      'Node 3',
+      'Desc 3',
+      'exp_3',
+      'node_3',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2', 'Node 3'],
+      [storyNodeSpy1, storyNodeSpy2, storyNodeSpy3],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+        {
+          id: 'arc_3',
+          title: 'Adventure 3',
+          description: 'Third adventure',
+          node_ids: ['node_3'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.isAdventurePracticeCompleted(0)).toBe(true);
+    expect(component.isAdventurePracticeCompleted(1)).toBe(true);
+    expect(component.isAdventurePracticeCompleted(2)).toBe(false);
+  });
+
+  it('should not persist or restore mastered adventures when story id is missing', () => {
+    (component.storySummary.getId as jasmine.Spy).and.returnValue('');
+    localStorageService.getMasteredAdventures.calls.reset();
+    localStorageService.updateMasteredAdventures.calls.reset();
+
+    component.ngOnInit();
+
+    expect(localStorageService.getMasteredAdventures).not.toHaveBeenCalled();
+  });
 });

@@ -418,5 +418,58 @@ describe('LocalStorageService', () => {
 
       expect(localStorageService.getSkippedAdventures('story_4')).toEqual([]);
     });
+
+    it('should correctly save and retrieve mastered adventures', () => {
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+
+      localStorageService.updateMasteredAdventures('story_1', ['1', '2']);
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([
+        '1',
+        '2',
+      ]);
+      expect(localStorageService.getMasteredAdventures('story_2')).toEqual([]);
+    });
+
+    it('should overwrite existing mastered adventures for a story', () => {
+      localStorageService.updateMasteredAdventures('story_3', ['1', '2']);
+      localStorageService.updateMasteredAdventures('story_3', ['3']);
+
+      expect(localStorageService.getMasteredAdventures('story_3')).toEqual([
+        '3',
+      ]);
+    });
+
+    it('should not save mastered adventures when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.updateMasteredAdventures('story_1', ['1']);
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+    });
+
+    it('should handle corrupt mastered adventures data in storage', () => {
+      localStorage.setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        '{invalid json'
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+
+      localStorageService.updateMasteredAdventures('story_1', ['1']);
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([
+        '1',
+      ]);
+    });
+
+    it('should return an empty list when the stored mastered value is not an array', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        JSON.stringify({story_4: 'not-an-array'})
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_4')).toEqual([]);
+    });
   });
 });

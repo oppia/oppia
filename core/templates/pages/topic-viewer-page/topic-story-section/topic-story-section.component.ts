@@ -340,6 +340,18 @@ export class TopicStorySectionComponent
       return false;
     }
 
+    return (
+      this.areAllLessonsCompleted(adventureIndex) &&
+      this.isAdventurePracticeCompleted(adventureIndex)
+    );
+  }
+
+  areAllLessonsCompleted(adventureIndex: number): boolean {
+    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
+    if (!adventureGroup || adventureGroup.lessonCards.length === 0) {
+      return false;
+    }
+
     return adventureGroup.lessonCards.every(
       card => card.lessonProgressStatus === 'completed'
     );
@@ -431,6 +443,27 @@ export class TopicStorySectionComponent
     this.localStorageService.updateSkippedAdventures(
       storyId,
       Array.from(this.skippedAdventureIndices)
+    );
+  }
+
+  private restoreMasteredAdventures(): void {
+    const storyId = this.storySummary.getId();
+    if (!storyId) {
+      return;
+    }
+    this.completedAdventurePracticeArcIds = new Set(
+      this.localStorageService.getMasteredAdventures(storyId)
+    );
+  }
+
+  private persistMasteredAdventures(): void {
+    const storyId = this.storySummary.getId();
+    if (!storyId) {
+      return;
+    }
+    this.localStorageService.updateMasteredAdventures(
+      storyId,
+      Array.from(this.completedAdventurePracticeArcIds)
     );
   }
 
@@ -623,6 +656,7 @@ export class TopicStorySectionComponent
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
+    this.restoreMasteredAdventures();
     this.updateVisibleSections();
     this.maybeShowAdventureMasteredModal();
   }
@@ -747,6 +781,19 @@ export class TopicStorySectionComponent
       studyUrl: this.studyGuideUrl,
       practiceUrl: firstArcId ? this.getEndOfArcUrl(firstArcId) : '#',
     };
+  }
+
+  getPracticeTitle(adventureIndex: number): string {
+    return `Adventure ${adventureIndex + 1} Review & Test`;
+  }
+
+  getPracticeDescription(adventureIndex: number): string {
+    const adventureNumber = adventureIndex + 1;
+    const nextAdventureNumber = adventureNumber + 1;
+    if (adventureIndex < this.visibleAdventureGroups.length - 1) {
+      return `Test what you have learned in Adventure ${adventureNumber} to unlock Adventure ${nextAdventureNumber}.`;
+    }
+    return `Test what you have learned in Adventure ${adventureNumber}.`;
   }
 
   getLessonPracticeUrl(nodeId: string): string {
@@ -931,11 +978,12 @@ export class TopicStorySectionComponent
       group => group.arcId === masteredArcId
     );
 
-    if (adventureIndex === -1 || !this.isAdventureCompleted(adventureIndex)) {
+    if (adventureIndex === -1 || !this.areAllLessonsCompleted(adventureIndex)) {
       return;
     }
 
     this.completedAdventurePracticeArcIds.add(masteredArcId);
+    this.persistMasteredAdventures();
     this.updateVisibleSections();
 
     this.hasHandledArcMasteredQueryParams = true;

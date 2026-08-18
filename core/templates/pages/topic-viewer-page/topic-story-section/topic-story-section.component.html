@@ -125,8 +125,8 @@
                    [id]="'practice-card-' + adventureGroup.arcId"
                    *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
                 <topic-adventure-end-test-card
-                  [practiceTitle]="practiceCard.practiceTitle"
-                  [practiceDescription]="practiceCard.practiceDescription"
+                  [practiceTitle]="getPracticeTitle(adventureIdx)"
+                  [practiceDescription]="getPracticeDescription(adventureIdx)"
                   [thumbnailUrl]="practiceCard.thumbnailUrl"
                   [studyUrl]="practiceCard.studyUrl"
                   [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
