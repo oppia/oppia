@@ -112,7 +112,7 @@
     },
     {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts",
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts",
       "framework": "playwright"
     },
     {
