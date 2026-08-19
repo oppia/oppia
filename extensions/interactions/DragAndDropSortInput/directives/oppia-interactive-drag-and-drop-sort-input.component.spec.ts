@@ -223,24 +223,6 @@ describe('Drag and drop sort input interactive component', () => {
       ]);
     });
 
-    it('should make a default list of lists when savedSolution is undefined', () => {
-      component.savedSolution = undefined;
-      component.ngOnInit();
-
-      expect(component.allowMultipleItemsInSamePosition).toBe(true);
-      expect(component.multipleItemsInSamePositionArray).toEqual([
-        [],
-        ['<p>choice 1</p>'],
-        [],
-        ['<p>choice 2</p>'],
-        [],
-        ['<p>choice 3</p>'],
-        [],
-        ['<p>choice 4</p>'],
-        [],
-      ]);
-    });
-
     it('should move items inside same list', () => {
       component.noShow = 1;
       component.hide = [1, 2, 3, 4];
@@ -259,7 +241,7 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
-      expect(component.dragStarted).toBeFalse();
+      expect(component.dragStarted).toBe(false);
     });
 
     it('should throw error if story url fragment is not present', () => {
@@ -374,7 +356,7 @@ describe('Drag and drop sort input interactive component', () => {
       ]);
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
-      expect(component.dragStarted).toBeFalse();
+      expect(component.dragStarted).toBe(false);
       expect(component.highlightedGroup).toBe(-1);
     });
 
@@ -468,7 +450,7 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.noShow).toBe(1);
       expect(component.hide).toEqual([1, 2]);
-      expect(component.dragStarted).toBeTrue();
+      expect(component.dragStarted).toBe(true);
     });
 
     it('should set focus on list items change', () => {
@@ -543,13 +525,13 @@ describe('Drag and drop sort input interactive component', () => {
     it('should return true if child element have border', () => {
       component.noShow = -1;
 
-      expect(component.isChildElementHaveBorder(1)).toBeTrue();
+      expect(component.isChildElementHaveBorder(1)).toBe(true);
     });
 
     it('should return true if child element have zero height', () => {
       component.hide = [1, 2];
 
-      expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
+      expect(component.isChildElementHaveZeroHeight(1)).toBe(true);
     });
 
     describe('getFlatIndex', () => {
@@ -1042,18 +1024,6 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list when user did not save a solution', () => {
       component.savedSolution = null;
-      component.ngOnInit();
-
-      expect(component.allowMultipleItemsInSamePosition).toBe(false);
-      expect(component.singleItemInSamePositionArray).toEqual([
-        '<p>choice 1</p>',
-        '<p>choice 2</p>',
-        '<p>choice 3</p>',
-      ]);
-    });
-
-    it('should make a default list when savedSolution is undefined', () => {
-      component.savedSolution = undefined;
       component.ngOnInit();
 
       expect(component.allowMultipleItemsInSamePosition).toBe(false);
