@@ -857,7 +857,7 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
     ) -> None:
         self.exp_1.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete exploration')
 
-        CHANGE_DICT['content_id'] = 'content_0'
+        CHANGE_DICT['content_id'] = 'default_outcome_1'
         valid_suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -904,13 +904,13 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
                 exp_1_updated.version,
                 'hi',
                 {
-                    'content_0': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE,
+                    'default_outcome_1': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE,
                 },
             )
         )
         self.put_multi([entity_translation_v2])
 
-        CHANGE_DICT['content_id'] = 'content_0'
+        CHANGE_DICT['content_id'] = 'default_outcome_1'
         valid_suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
