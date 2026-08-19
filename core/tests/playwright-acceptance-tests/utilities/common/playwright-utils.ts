@@ -37,6 +37,8 @@ const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
+const baseURL = testConstants.URLs.BaseURL;
+
 export class BaseUser {
   readonly page: Page;
   userHasAcceptedCookies: boolean = false;
@@ -1291,6 +1293,26 @@ export class BaseUser {
     showMessage(
       `Element ${elementDesc} did not stabilize within ${timeout} ms`
     );
+  }
+
+  /**
+   * This function checks the exploration accessibility by navigating to the
+   * exploration page based on the explorationId.
+   * @param {string | null} explorationId - The exploration ID to check.
+   */
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrl = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.goto(explorationUrl);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
   }
 }
 
