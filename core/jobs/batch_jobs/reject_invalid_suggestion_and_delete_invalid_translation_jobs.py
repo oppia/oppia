@@ -68,8 +68,17 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         entity_translation_models = _get_entity_translation_models(
             self.pipeline
         )
-        updated_suggestion_dicts = (
+
+        filtered_entity_translation_models = (
             entity_translation_models
+            | 'Filter to match current exploration version'
+            >> beam.ParDo(
+                FilterTranslationModelsMatchingCurrentExplorationVersion()
+            )
+        )
+
+        updated_suggestion_dicts = (
+            filtered_entity_translation_models
             | 'Get translation suggestion dicts'
             >> beam.ParDo(
                 ComputeSuggestionsInReviewForTranslatedContents(
@@ -148,8 +157,17 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJob(
         entity_translation_models = _get_entity_translation_models(
             self.pipeline
         )
-        suggestion_dicts = (
+
+        filtered_entity_translation_models = (
             entity_translation_models
+            | 'Filter to match current exploration version'
+            >> beam.ParDo(
+                FilterTranslationModelsMatchingCurrentExplorationVersion()
+            )
+        )
+
+        suggestion_dicts = (
+            filtered_entity_translation_models
             | 'Get suggestions to be rejected list'
             >> beam.ParDo(
                 ComputeSuggestionsInReviewForTranslatedContents(
@@ -792,10 +810,6 @@ def _get_entity_translation_models(
             translation_models.EntityTranslationsModel.get_all(
                 include_deleted=False
             )
-        )
-        | 'Filter to match current exploration version'
-        >> beam.ParDo(
-            FilterTranslationModelsMatchingCurrentExplorationVersion()
         )
     )
 

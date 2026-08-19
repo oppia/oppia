@@ -449,6 +449,89 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
         )
 
+    def test_suggestion_for_deleted_exploration_produces_no_output(
+        self,
+    ) -> None:
+        self.exp_1.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete exploration')
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion])
+
+        self.assert_job_output_is_empty()
+
+        not_updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion.id
+        )
+        self.assertEqual(
+            not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
+    def test_old_version_suggestion_with_needs_update_true_in_current_translation_is_not_rejected(
+        self,
+    ) -> None:
+        self.exp_1.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Edit exploration',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title',
+                }
+            ],
+        )
+        exp_1_updated = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        entity_translation_v2 = (
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.EXP_1_ID,
+                exp_1_updated.version,
+                'hi',
+                {
+                    'content_0': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE,
+                },
+            )
+        )
+        self.put_multi([entity_translation_v2])
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion])
+
+        self.assert_job_output_is_empty()
+
+        not_updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion.id
+        )
+        self.assertEqual(
+            not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
 
 class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
@@ -745,6 +828,89 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
         self.put_multi([entity_translation_v2])
 
         CHANGE_DICT['content_id'] = 'default_outcome_1'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion])
+
+        self.assert_job_output_is_empty()
+
+        not_updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion.id
+        )
+        self.assertEqual(
+            not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
+    def test_suggestion_for_deleted_exploration_produces_no_output(
+        self,
+    ) -> None:
+        self.exp_1.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete exploration')
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=1,
+            language_code='hi',
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion])
+
+        self.assert_job_output_is_empty()
+
+        not_updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion.id
+        )
+        self.assertEqual(
+            not_updated_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
+    def test_old_version_suggestion_with_needs_update_true_in_current_translation_is_not_reported(
+        self,
+    ) -> None:
+        self.exp_1.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Edit exploration',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title',
+                }
+            ],
+        )
+        exp_1_updated = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        entity_translation_v2 = (
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.EXP_1_ID,
+                exp_1_updated.version,
+                'hi',
+                {
+                    'content_0': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE,
+                },
+            )
+        )
+        self.put_multi([entity_translation_v2])
+
+        CHANGE_DICT['content_id'] = 'content_0'
         valid_suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
