@@ -101,6 +101,49 @@ export interface AssessmentQuestion {
   stateData: StateBackendDict;
 }
 
+/** Converts an interaction id from the backend into the narrower assessment
+ *  question type union used by the frontend model. */
+export function getAssessmentQuestionType(
+  interactionId: string
+): AssessmentQuestionType {
+  switch (interactionId) {
+    case 'MultipleChoiceInput':
+      return AssessmentQuestionTypes.MULTIPLE_CHOICE;
+    case 'ItemSelectionInput':
+      return AssessmentQuestionTypes.MULTIPLE_SELECT;
+    case 'TextInput':
+      return AssessmentQuestionTypes.TEXT_INPUT;
+    case 'NumericInput':
+      return AssessmentQuestionTypes.NUMERIC_INPUT;
+    case 'FractionInput':
+      return AssessmentQuestionTypes.FRACTION_INPUT;
+    case 'NumberWithUnits':
+      return AssessmentQuestionTypes.NUMBER_WITH_UNITS;
+    case 'DragAndDropSortInput':
+      return AssessmentQuestionTypes.DRAG_AND_DROP_SORT;
+    case 'ImageClickInput':
+      return AssessmentQuestionTypes.IMAGE_CLICK;
+    default:
+      return AssessmentQuestionTypes.TEXT_INPUT;
+  }
+}
+
+/** Converts question state data returned by the certificate question handler
+ *  into the AssessmentQuestion shape rendered by the conversation skin. */
+export function createAssessmentQuestionFromStateData(
+  questionId: string,
+  stateData: StateBackendDict
+): AssessmentQuestion {
+  return {
+    id: questionId,
+    type: getAssessmentQuestionType(stateData.interaction.id ?? ''),
+    prompt: stateData.content.html,
+    hint: '',
+    options: [],
+    stateData,
+  };
+}
+
 // The shape of a recommended topic tile shown on the certificate assessment
 // introduction card.
 export interface RecommendedTopicStub {

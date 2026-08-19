@@ -132,7 +132,7 @@ const stateDataFor = (
     customization_args: customizationArgsFor(id),
     default_outcome: outcome(false),
     hints: [],
-    id,
+    id: id as StateBackendDict['interaction']['id'],
     solution: null,
   },
   param_changes: [],
@@ -297,7 +297,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should not load when attempt question index is out of range', fakeAsync(() => {
     loadQ1();
     // eslint-disable-next-line dot-notation
-    (component as Record<string, unknown>)['loadQuestion'](99);
+    (component as unknown as {loadQuestion: (index: number) => void})[
+      'loadQuestion'
+    ](99);
     flushMicrotasks();
     expect(component.questions.length).toBe(1);
   }));
@@ -315,7 +317,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
     expect(component.isLoadingQuestion).toBeTrue();
     // eslint-disable-next-line dot-notation
-    (component as Record<string, unknown>)['loadQuestion'](0);
+    (component as unknown as {loadQuestion: (index: number) => void})[
+      'loadQuestion'
+    ](0);
     expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
       1
     );
@@ -354,7 +358,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       Promise.resolve(questionResponse('q1'))
     );
     // eslint-disable-next-line dot-notation
-    (component as Record<string, unknown>)['loadQuestion'](0);
+    (component as unknown as {loadQuestion: (index: number) => void})[
+      'loadQuestion'
+    ](0);
     flushMicrotasks();
     expect(component.loadError).toBeFalse();
   }));
@@ -363,7 +369,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     load();
     const count = apiSpy.getCertificateAssessmentQuestionAsync.calls.count();
     // eslint-disable-next-line dot-notation
-    (component as Record<string, unknown>)['loadQuestion'](0);
+    (component as unknown as {loadQuestion: (index: number) => void})[
+      'loadQuestion'
+    ](0);
     expect(apiSpy.getCertificateAssessmentQuestionAsync.calls.count()).toBe(
       count
     );

@@ -468,7 +468,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.maxGroups = this.choices.length;
 
     let savedSolution = (
-      this.lastAnswer !== null
+      this.lastAnswer !== null && this.lastAnswer !== undefined
         ? this.lastAnswer
         : this.savedSolution !== null
           ? this.savedSolution

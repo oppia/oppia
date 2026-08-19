@@ -29,10 +29,9 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
-  CertificateAssessmentAttemptData,
   AssessmentQuestion,
-  AssessmentQuestionType,
-  AssessmentQuestionTypes,
+  CertificateAssessmentAttemptData,
+  createAssessmentQuestionFromStateData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
@@ -192,14 +191,10 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
         null
       );
 
-    this.questions[index] = {
-      id: questionId,
-      type: this.getAssessmentQuestionType(interactionId),
-      prompt: stateData.content.html,
-      hint: '',
-      options: [],
-      stateData,
-    };
+    this.questions[index] = createAssessmentQuestionFromStateData(
+      questionId,
+      stateData
+    );
   }
 
   private isMobileScreenSize(): boolean {
@@ -376,34 +371,5 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     this.totalQuestionCount = this.getTotalQuestionCount();
     this.progressPercentage = this.getProgressPercentage();
     this.isLastQuestion = this.isCurrentQuestionLast();
-  }
-
-  /**
-   * Converts an interaction id from the backend into the narrower assessment
-   * question type union used by the frontend model.
-   */
-  private getAssessmentQuestionType(
-    interactionId: string
-  ): AssessmentQuestionType {
-    switch (interactionId) {
-      case 'MultipleChoiceInput':
-        return AssessmentQuestionTypes.MULTIPLE_CHOICE;
-      case 'ItemSelectionInput':
-        return AssessmentQuestionTypes.MULTIPLE_SELECT;
-      case 'TextInput':
-        return AssessmentQuestionTypes.TEXT_INPUT;
-      case 'NumericInput':
-        return AssessmentQuestionTypes.NUMERIC_INPUT;
-      case 'FractionInput':
-        return AssessmentQuestionTypes.FRACTION_INPUT;
-      case 'NumberWithUnits':
-        return AssessmentQuestionTypes.NUMBER_WITH_UNITS;
-      case 'DragAndDropSortInput':
-        return AssessmentQuestionTypes.DRAG_AND_DROP_SORT;
-      case 'ImageClickInput':
-        return AssessmentQuestionTypes.IMAGE_CLICK;
-      default:
-        return AssessmentQuestionTypes.TEXT_INPUT;
-    }
   }
 }

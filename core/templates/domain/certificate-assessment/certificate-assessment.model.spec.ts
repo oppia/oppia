@@ -25,6 +25,8 @@ import {
   CertificateAssessmentQuestionData,
   CertificateAssessmentQuestionStateBackendDict,
   AssessmentQuestionTypes,
+  createAssessmentQuestionFromStateData,
+  getAssessmentQuestionType,
 } from './certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
 
@@ -261,5 +263,58 @@ describe('AssessmentQuestionTypes constants', () => {
   it('should have exactly 8 constants', () => {
     const keys = Object.keys(AssessmentQuestionTypes);
     expect(keys.length).toBe(8);
+  });
+});
+
+describe('getAssessmentQuestionType', () => {
+  it('should map all interaction types to their assessment question types', () => {
+    expect(getAssessmentQuestionType('MultipleChoiceInput')).toBe(
+      AssessmentQuestionTypes.MULTIPLE_CHOICE
+    );
+    expect(getAssessmentQuestionType('ItemSelectionInput')).toBe(
+      AssessmentQuestionTypes.MULTIPLE_SELECT
+    );
+    expect(getAssessmentQuestionType('TextInput')).toBe(
+      AssessmentQuestionTypes.TEXT_INPUT
+    );
+    expect(getAssessmentQuestionType('NumericInput')).toBe(
+      AssessmentQuestionTypes.NUMERIC_INPUT
+    );
+    expect(getAssessmentQuestionType('FractionInput')).toBe(
+      AssessmentQuestionTypes.FRACTION_INPUT
+    );
+    expect(getAssessmentQuestionType('NumberWithUnits')).toBe(
+      AssessmentQuestionTypes.NUMBER_WITH_UNITS
+    );
+    expect(getAssessmentQuestionType('DragAndDropSortInput')).toBe(
+      AssessmentQuestionTypes.DRAG_AND_DROP_SORT
+    );
+    expect(getAssessmentQuestionType('ImageClickInput')).toBe(
+      AssessmentQuestionTypes.IMAGE_CLICK
+    );
+  });
+
+  it('should default to TEXT_INPUT for unknown interaction types', () => {
+    expect(getAssessmentQuestionType('UnknownType')).toBe(
+      AssessmentQuestionTypes.TEXT_INPUT
+    );
+  });
+});
+
+describe('createAssessmentQuestionFromStateData', () => {
+  it('should create an AssessmentQuestion from question state data', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>What is 2+2?</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+
+    const question = createAssessmentQuestionFromStateData('q1', stateData);
+
+    expect(question.id).toBe('q1');
+    expect(question.type).toBe(AssessmentQuestionTypes.TEXT_INPUT);
+    expect(question.prompt).toBe('<p>What is 2+2?</p>');
+    expect(question.hint).toBe('');
+    expect(question.options).toEqual([]);
+    expect(question.stateData).toBe(stateData);
   });
 });

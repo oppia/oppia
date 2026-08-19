@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
@@ -28,6 +29,7 @@ describe('AssessmentInstructionPanelComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AssessmentInstructionPanelComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AssessmentInstructionPanelComponent);
