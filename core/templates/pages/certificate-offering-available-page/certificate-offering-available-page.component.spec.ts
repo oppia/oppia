@@ -20,8 +20,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {AlertsService} from 'services/alerts.service';
 import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
