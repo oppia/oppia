@@ -61,6 +61,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             response_list=[],
             unread_response_count=0,
             created_on_msecs=0,
+            last_updated_msecs=0,
         )
         create_lesson_feedback_mock = mock.Mock(return_value=feedback)
 

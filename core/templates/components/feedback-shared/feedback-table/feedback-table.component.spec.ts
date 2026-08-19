@@ -81,8 +81,10 @@ describe('FeedbackTableComponent', () => {
         id: 'test_feedback_id',
         category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
         source: ReportType.APP,
+        lesson_title: 'exp_1',
         status: FeedbackStatus.OPEN,
         report_message_preview: expectedFeedbackDescription,
+        last_updated_msecs: 1000,
       },
     ];
     expect(
@@ -100,8 +102,10 @@ describe('FeedbackTableComponent', () => {
         id: 'test_feedback_id',
         source: ReportType.APP,
         status: FeedbackStatus.OPEN,
+        lesson_title: 'exp_1',
         feedback_text_preview: expectedFeedbackDescription,
         unread_response_count: 1,
+        last_updated_msecs: 1000,
       },
     ];
     expect(

@@ -73,7 +73,9 @@ const mockLessonFeedbackSummary: LessonFeedbackSummary = {
   feedback_text_preview: 'Lesson feedback',
   status: FeedbackStatus.OPEN,
   source: ReportType.LESSON,
+  lesson_title: 'exp_1',
   unread_response_count: 0,
+  last_updated_msecs: 12345,
 };
 
 const mockPlatformFeedbackSummary: PlatformFeedbackSummary = {
@@ -921,7 +923,9 @@ describe('Feedback Tab Component', () => {
       feedback_text_preview: 'Need help with fractions',
       status: FeedbackStatus.OPEN,
       source: ReportType.LESSON,
+      lesson_title: 'exp_1',
       unread_response_count: 0,
+      last_updated_msecs: 12345,
     };
 
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =

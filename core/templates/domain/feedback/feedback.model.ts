@@ -50,7 +50,7 @@ export interface LessonFeedbackSummary {
   lesson_title: string;
   source: string;
   unread_response_count: number;
-  last_updated_on_msecs: number;
+  last_updated_msecs: number;
 }
 
 export interface LessonFeedbackBackendResponse {
