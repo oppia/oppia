@@ -87,7 +87,8 @@
                 [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
                 [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
                 [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
-                [navigatedLessonNumber]="navigatedLessonNumber">
+                [navigatedLessonNumber]="navigatedLessonNumber"
+                (startLessonClick)="onLessonStartClick($event)">
               </topic-lesson-card>
             </div>
 
@@ -131,7 +132,8 @@
             [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
             [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
             [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
-            [navigatedLessonNumber]="navigatedLessonNumber">
+            [navigatedLessonNumber]="navigatedLessonNumber"
+            (startLessonClick)="onLessonStartClick($event)">
           </topic-lesson-card>
         </div>
 

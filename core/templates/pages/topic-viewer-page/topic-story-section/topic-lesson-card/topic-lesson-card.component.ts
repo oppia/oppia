@@ -18,9 +18,11 @@
 
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -68,6 +70,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() isNewLessonLabelVisible: boolean = false;
   @Input() isComingSoonSectionCard: boolean = false;
   @Input() navigatedLessonNumber: number | null = null;
+  @Output() startLessonClick = new EventEmitter<number>();
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
@@ -132,6 +135,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     if (!this.startUrl || this.isComingSoonLesson) {
       return;
     }
+
+    this.startLessonClick.emit(this.lessonNumber);
 
     if (!this.selectedTextLanguageCode) {
       this.navigateTo(this.startUrl);

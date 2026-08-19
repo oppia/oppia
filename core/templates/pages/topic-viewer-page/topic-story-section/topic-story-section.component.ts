@@ -171,13 +171,35 @@ export class TopicStorySectionComponent
       this._expandedAdventureIndices.add(adventureIndex);
     }
 
-    // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
       const lessonCardElement = this.getLessonCardElement(lessonNumber);
       if (lessonCardElement) {
-        lessonCardElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        const navbarHeight = 56;
+        const adventureNav = document.querySelector(
+          '.adventure-navigation-container'
+        );
+        const adventureNavHeight = adventureNav
+          ? adventureNav.getBoundingClientRect().height
+          : 0;
+        const offset = navbarHeight + adventureNavHeight + 16;
+        const lessonTop =
+          lessonCardElement.getBoundingClientRect().top +
+          window.scrollY -
+          offset;
+        window.scrollTo({top: lessonTop, behavior: 'smooth'});
       }
-    }, 300);
+    }, 400);
+  }
+
+  onLessonStartClick(lessonNumber: number): void {
+    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
+      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
+    );
+    if (adventureIndex !== -1) {
+      this._expandedAdventureIndices.add(adventureIndex);
+    }
+    this.activeLessonNumber = lessonNumber;
+    this.navigatedLessonNumber = lessonNumber;
   }
 
   onNavigationPracticeSelected(adventureIndex: number): void {

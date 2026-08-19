@@ -1456,7 +1456,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.navigatedLessonNumber).toBe(2);
     expect(component.isAdventureExpanded(0)).toBe(true);
 
-    tick(300);
+    tick(400);
   }));
 
   it('should handle adventure navigation practice selected when practice card is not rendered', fakeAsync(() => {
@@ -1642,16 +1642,18 @@ describe('TopicStorySectionComponent', () => {
       fail('Expected lesson wrapper to be defined');
       return;
     }
-    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
+    spyOn(lessonWrapper.nativeElement, 'getBoundingClientRect').and.returnValue(
+      {top: 500} as DOMRect
+    );
+    spyOn(window, 'scrollTo');
 
     component.onNavigationLessonSelected(1);
 
-    tick(300);
+    tick(400);
 
-    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    expect(window.scrollTo).toHaveBeenCalledWith(
+      jasmine.objectContaining({behavior: 'smooth'})
+    );
   }));
 
   it('should scroll to the practice card when navigating to a practice session', fakeAsync(() => {
@@ -2059,7 +2061,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.activeLessonNumber).toBe(999);
     expect(component.navigatedLessonNumber).toBe(999);
 
-    tick(300);
+    tick(400);
   }));
 
   it('should set masteryChallengeUrl from mastery challenge url', () => {
@@ -2459,16 +2461,18 @@ describe('TopicStorySectionComponent', () => {
       fail('Expected coming-soon lesson wrapper to be defined');
       return;
     }
-    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
+    spyOn(lessonWrapper.nativeElement, 'getBoundingClientRect').and.returnValue(
+      {top: 500} as DOMRect
+    );
+    spyOn(window, 'scrollTo');
 
     component.onNavigationLessonSelected(1);
 
-    tick(300);
+    tick(400);
 
-    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    expect(window.scrollTo).toHaveBeenCalledWith(
+      jasmine.objectContaining({behavior: 'smooth'})
+    );
   }));
 
   it('should return false from isChapterReadyToPublish when getStatus throws and serial flag enabled', () => {

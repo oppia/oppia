@@ -2,8 +2,7 @@
      [attr.aria-label]="lessonTitle || 'Lesson card'"
      [class.collapsed]="!isExpanded"
      [class.coming-soon-section-card]="isComingSoonSectionCard">
-  <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded"
-       [ngStyle]="{'background-color': adventureAccentColor}">
+  <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded">
     <img class="topic-lesson-card-image"
          [src]="resolvedThumbnailUrl"
          alt="{{ getThumbnailAltText() }}">

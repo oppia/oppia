@@ -228,6 +228,30 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isComingSoonLesson).toBeFalse();
   });
 
+  it('should emit startLessonClick on start button click', () => {
+    spyOn(component, 'navigateTo');
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.lessonNumber = 3;
+    component.selectedTextLanguageCode = null;
+
+    component.onStartButtonClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith(3);
+    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+  });
+
+  it('should not emit startLessonClick when startUrl is empty', () => {
+    spyOn(component, 'navigateTo');
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '';
+
+    component.onStartButtonClick();
+
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
+    expect(component.navigateTo).not.toHaveBeenCalled();
+  });
+
   it('should navigate to startUrl directly when no fallback is needed', () => {
     spyOn(component, 'navigateTo');
     component.startUrl = '/explore/123';

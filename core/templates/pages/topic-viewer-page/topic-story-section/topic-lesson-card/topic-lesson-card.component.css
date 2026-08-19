@@ -8,6 +8,7 @@
   display: flex;
   max-width: 912px;
   min-height: 248px;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -15,6 +16,7 @@
   border: 1px solid #d1d5db;
   border-radius: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .topic-lesson-card.coming-soon-section-card {
@@ -28,9 +30,10 @@
 }
 
 .topic-lesson-card-thumbnail {
-  align-self: stretch;
+  background-color: #8ebbb6;
   flex: 0 0 auto;
-  height: auto;
+  height: 248px;
+  max-height: 248px;
   overflow: hidden;
   width: 212px;
 }
@@ -38,7 +41,7 @@
 .topic-lesson-card-image {
   display: block;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   width: 100%;
 }
