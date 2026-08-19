@@ -1949,9 +1949,6 @@ export class LoggedInUser extends BaseUser {
       );
 
       if (actualLessonName === lessonName) {
-        await this.clickOnElementWithSelector(
-          '.e2e-test-email-preferences-radio-no'
-        );
         await Promise.all([
           this.page.waitForNavigation({waitUntil: 'networkidle0'}),
           await this.waitForElementToBeClickable(lessonTileTitle),
@@ -3236,9 +3233,6 @@ export class LoggedInUser extends BaseUser {
         };
 
         if (!href) {
-          await this.clickOnElementWithSelector(
-            '.e2e-test-email-preferences-radio-no'
-          );
           await Promise.all([
             this.page.waitForNavigation({
               waitUntil: 'networkidle2',
@@ -3250,9 +3244,6 @@ export class LoggedInUser extends BaseUser {
           return;
         }
 
-        await this.clickOnElementWithSelector(
-          '.e2e-test-email-preferences-radio-no'
-        );
         await Promise.all([
           this.page.waitForNavigation({
             waitUntil: 'networkidle2',

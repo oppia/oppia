@@ -4994,7 +4994,11 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
       visible: true,
     });
-    await this.page.click(returnToStoryFromLastStateSelector);
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+      this.page.click(returnToStoryFromLastStateSelector),
+    ]);
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,
