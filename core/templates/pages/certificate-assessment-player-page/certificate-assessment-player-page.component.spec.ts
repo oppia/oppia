@@ -26,6 +26,8 @@ import {
 } from '@angular/core/testing';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {of} from 'rxjs';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
   CertificateAssessmentAttemptData,
@@ -170,10 +172,12 @@ const makeAttempt = (
     })),
   });
 
-const modalRef = (reject = false): NgbModalRef =>
+const modalRef = (reject = false, resolveValue: unknown = null): NgbModalRef =>
   ({
     componentInstance: {} as Record<string, unknown>,
-    result: reject ? Promise.reject('dismissed') : Promise.resolve(null),
+    result: reject
+      ? Promise.reject('dismissed')
+      : Promise.resolve(resolveValue),
     close: () => {},
     dismiss: () => {},
   }) as unknown as NgbModalRef;
@@ -194,6 +198,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     attempt: CertificateAssessmentAttemptData | null = makeAttempt()
   ): Promise<void> => {
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    bottomSheetSpy.open.and.returnValue({
+      afterDismissed: () => of(null),
+    });
     modalSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalSpy.open.and.returnValue(modalRef());
     dimsSpy = jasmine.createSpyObj('WindowDimensionsService', ['getWidth']);
@@ -243,7 +250,10 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      declarations: [CertificateAssessmentPlayerPageComponent],
+      declarations: [
+        CertificateAssessmentPlayerPageComponent,
+        MockTranslatePipe,
+      ],
       imports: [CommonModule],
       providers: [
         {provide: MatBottomSheet, useValue: bottomSheetSpy},
@@ -285,6 +295,18 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   const loadQ1 = (): void => {
     fixture.detectChanges();
     flushMicrotasks();
+  };
+
+  const triggerTimeExpiry = (): void => {
+    component.isTimeExpired = true;
+    component.ngOnChanges({
+      isTimeExpired: {
+        currentValue: true,
+        previousValue: false,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    });
   };
 
   beforeEach(async () => {
@@ -516,11 +538,10 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.getProgressPercentage()).toBe(100);
   }));
 
-  it('should open time-expired modal on desktop', fakeAsync(() => {
+  it('should open time-expired modal on desktop when time expires', fakeAsync(() => {
     loadQ1();
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-    component.ngOnInit();
+    spyOn(component.assessmentSubmitted, 'emit');
+    triggerTimeExpiry();
     expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
       backdrop: 'static',
       centered: true,
@@ -528,27 +549,119 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     });
   }));
 
-  it('should open time-expired modal as bottom sheet on mobile', fakeAsync(() => {
+  it('should open time-expired modal as bottom sheet on mobile when time expires', fakeAsync(() => {
     loadQ1();
     dimsSpy.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-    component.ngOnInit();
+    spyOn(component.assessmentSubmitted, 'emit');
+    triggerTimeExpiry();
     expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
   }));
 
-  it('should handle time-expired modal dismiss', fakeAsync(() => {
+  it('should auto-submit the current answers when time expires', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.q1 = 1;
+    component.answers.q2 = ['a', 'b', 'd'];
+    triggerTimeExpiry();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'q1', is_correct: false, selected_answer: '1'},
+      {question_id: 'q2', is_correct: false, selected_answer: '["a","b","d"]'},
+      {question_id: 'q3', is_correct: false},
+    ]);
+  }));
+
+  it('should not handle time expiry more than once', fakeAsync(() => {
     loadQ1();
-    modalSpy.open.and.returnValue(modalRef(true));
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
+    spyOn(component.assessmentSubmitted, 'emit');
+    triggerTimeExpiry();
+    component.isTimeExpired = true;
+    component.ngOnChanges({
+      isTimeExpired: {
+        currentValue: true,
+        previousValue: true,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
+    expect(modalSpy.open).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should not handle time expiry when the flag has not become true', fakeAsync(() => {
+    loadQ1();
+    component.ngOnChanges({});
+    expect(modalSpy.open).not.toHaveBeenCalled();
+  }));
+
+  it('should handle time expiry on init when already expired', fakeAsync(() => {
+    loadQ1();
+    component.isTimeExpired = true;
+    spyOn(component.assessmentSubmitted, 'emit');
     component.ngOnInit();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
+    expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-time-expired-modal',
+    });
+  }));
+
+  it('should submit and emit view results when time expires and the modal closes with view-results', fakeAsync(() => {
+    loadQ1();
+    spyOn(component.assessmentSubmitted, 'emit');
+    spyOn(component.viewResults, 'emit');
+    modalSpy.open.and.returnValue(modalRef(false, 'view-results'));
+    triggerTimeExpiry();
     flushMicrotasks();
+
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
+    expect(component.viewResults.emit).toHaveBeenCalled();
+  }));
+
+  it('should emit assessment ended when the time-expired modal is dismissed', fakeAsync(() => {
+    loadQ1();
+    spyOn(component.assessmentEnded, 'emit');
+    spyOn(component.viewResults, 'emit');
+    modalSpy.open.and.returnValue(modalRef(true));
+    triggerTimeExpiry();
+    flushMicrotasks();
+
+    expect(component.viewResults.emit).not.toHaveBeenCalled();
+    expect(component.assessmentEnded.emit).toHaveBeenCalled();
+  }));
+
+  it('should emit view results when the time-expired bottom sheet is dismissed with view-results', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    spyOn(component.viewResults, 'emit');
+    spyOn(component.assessmentEnded, 'emit');
+    bottomSheetSpy.open.and.returnValue({
+      afterDismissed: () => of('view-results'),
+    });
+    triggerTimeExpiry();
+    flushMicrotasks();
+
+    expect(component.viewResults.emit).toHaveBeenCalled();
+    expect(component.assessmentEnded.emit).not.toHaveBeenCalled();
+  }));
+
+  it('should emit assessment ended when the time-expired bottom sheet is dismissed', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    spyOn(component.assessmentEnded, 'emit');
+    spyOn(component.viewResults, 'emit');
+    bottomSheetSpy.open.and.returnValue({
+      afterDismissed: () => of(null),
+    });
+    triggerTimeExpiry();
+    flushMicrotasks();
+
+    expect(component.viewResults.emit).not.toHaveBeenCalled();
+    expect(component.assessmentEnded.emit).toHaveBeenCalled();
   }));
 
   it('should open unanswered-question modal on desktop', fakeAsync(() => {
     loadQ1();
-    component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = true;
     component.ngOnInit();
     expect(modalSpy.open).toHaveBeenCalledWith(
@@ -564,7 +677,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should open unanswered-question modal as bottom sheet on mobile', fakeAsync(() => {
     loadQ1();
     dimsSpy.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = true;
     component.ngOnInit();
     expect(bottomSheetSpy.open).toHaveBeenCalledWith(
@@ -575,7 +687,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should handle unanswered-question modal dismiss', fakeAsync(() => {
     loadQ1();
     modalSpy.open.and.returnValue(modalRef(true));
-    component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = true;
     component.ngOnInit();
     flushMicrotasks();
@@ -584,7 +695,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should not open any modal when both flags are false', fakeAsync(() => {
     loadQ1();
     modalSpy.open.calls.reset();
-    component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = false;
     component.ngOnInit();
     expect(modalSpy.open).not.toHaveBeenCalled();

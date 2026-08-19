@@ -16,7 +16,7 @@
  * @fileoverview Root wrapper for the certificate assessment player page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
@@ -41,7 +41,7 @@ type CertificateAssessmentStage =
 })
 export class CertificateAssessmentPlayerPageRootComponent
   extends BaseRootComponent
-  implements OnInit
+  implements OnInit, OnDestroy
 {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_PLAYER
@@ -68,6 +68,10 @@ export class CertificateAssessmentPlayerPageRootComponent
   showAssessmentInterruptCard = false;
   isLoading = true;
   hasError = false;
+  remainingTimeInSeconds = 0;
+  isTimeExpired = false;
+  private timerId: number | null = null;
+  private hasStartedTimer = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -98,6 +102,7 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       await this.loadClassroomUrlFragment();
+      this.startTimerIfReady();
     } catch {
       this.hasError = true;
       await this.redirectToNotFound();
@@ -142,6 +147,7 @@ export class CertificateAssessmentPlayerPageRootComponent
         );
       this.currentStage =
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+      this.startTimerIfReady();
     } catch {
       this.alertsService.addWarning(
         this.translateService.instant(
@@ -162,10 +168,9 @@ export class CertificateAssessmentPlayerPageRootComponent
         this.attempt.attemptId,
         answers
       );
-      await this.router.navigate([
-        `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
-        this.attempt.attemptId,
-      ]);
+      if (!this.isTimeExpired) {
+        await this.navigateToResultPage();
+      }
     } catch {
       this.alertsService.addWarning(
         this.translateService.instant(
@@ -184,5 +189,65 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.showAssessmentInterruptCard = false;
     this.currentStage =
       CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+    this.startTimerIfReady();
+  }
+
+  onViewResults(): Promise<boolean> {
+    return this.navigateToResultPage();
+  }
+
+  onAssessmentEnded(): Promise<boolean> {
+    return this.navigateToLearnerDashboard();
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimer();
+  }
+
+  private startTimerIfReady(): void {
+    if (
+      this.hasStartedTimer ||
+      this.attempt === null ||
+      this.certificateOffering.timeLimitInMinutes <= 0 ||
+      this.currentStage !==
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+    ) {
+      return;
+    }
+    this.hasStartedTimer = true;
+    this.remainingTimeInSeconds =
+      this.certificateOffering.timeLimitInMinutes * 60;
+    this.timerId = window.setInterval(() => {
+      if (this.remainingTimeInSeconds > 0) {
+        this.remainingTimeInSeconds -= 1;
+      }
+      if (this.remainingTimeInSeconds === 0) {
+        this.isTimeExpired = true;
+        this.clearTimer();
+      }
+    }, 1000);
+  }
+
+  private clearTimer(): void {
+    if (this.timerId !== null) {
+      window.clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+
+  private async navigateToLearnerDashboard(): Promise<boolean> {
+    return this.router.navigate([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
+    ]);
+  }
+
+  private async navigateToResultPage(): Promise<boolean> {
+    if (this.attempt === null) {
+      return false;
+    }
+    return this.router.navigate([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      this.attempt.attemptId,
+    ]);
   }
 }

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageRootComponent.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
@@ -164,6 +164,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    component.ngOnDestroy();
   }));
 
   it('should keep the intro stage when the route path is unrecognized', fakeAsync(async () => {
@@ -241,6 +243,128 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
+  it('should start the countdown timer when questions are available', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.returnValue(123 as never);
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.setInterval).toHaveBeenCalled();
+  }));
+
+  it('should decrement the countdown and mark the assessment expired at zero', fakeAsync(() => {
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+
+    tick(2000);
+    expect(component.remainingTimeInSeconds).toBe(3598);
+    expect(component.isTimeExpired).toBeFalse();
+
+    tick(3598000);
+    expect(component.remainingTimeInSeconds).toBe(0);
+    expect(component.isTimeExpired).toBeTrue();
+  }));
+
+  it('should not start the countdown without an attempt', () => {
+    spyOn(window, 'setInterval');
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    expect(window.setInterval).not.toHaveBeenCalled();
+    expect(component.remainingTimeInSeconds).toBe(0);
+  });
+
+  it('should not start the countdown without a positive time limit', () => {
+    spyOn(window, 'setInterval');
+    component.attempt = mockAttempt;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    expect(window.setInterval).not.toHaveBeenCalled();
+    expect(component.remainingTimeInSeconds).toBe(0);
+  });
+
+  it('should not start the countdown outside the questions stage', () => {
+    spyOn(window, 'setInterval');
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    expect(window.setInterval).not.toHaveBeenCalled();
+    expect(component.remainingTimeInSeconds).toBe(0);
+  });
+
+  it('should not restart an already running countdown', () => {
+    spyOn(window, 'setInterval').and.returnValue(123 as never);
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    expect(window.setInterval).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear the countdown timer on destroy', fakeAsync(() => {
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    expect(
+      (component as unknown as {timerId: number | null}).timerId
+    ).not.toBeNull();
+
+    component.ngOnDestroy();
+
+    expect(
+      (component as unknown as {timerId: number | null}).timerId
+    ).toBeNull();
+  }));
+
+  it('should not navigate to results when there is no attempt', fakeAsync(() => {
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  }));
+
   it('should show a warning when starting the attempt fails', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
@@ -276,6 +400,17 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
+  it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
+    component.attempt = mockAttempt;
+    component.isTimeExpired = true;
+    const answers = [{question_id: 'question_1', is_correct: true}];
+
+    component.onAssessmentSubmitted(answers);
+    flushMicrotasks();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  }));
+
   it('should not submit when there is no attempt', fakeAsync(() => {
     component.onAssessmentSubmitted([]);
     flushMicrotasks();
@@ -301,6 +436,27 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
     );
+  }));
+
+  it('should navigate to the result page when view results is requested', fakeAsync(() => {
+    component.attempt = mockAttempt;
+
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should navigate to the learner dashboard when the assessment is ended', fakeAsync(() => {
+    component.onAssessmentEnded();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
+    ]);
   }));
 
   it('should reset to the intro stage on retry', () => {

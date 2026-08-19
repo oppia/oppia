@@ -113,7 +113,7 @@ describe('TimeExpiredModalComponent', () => {
   describe('viewResults', () => {
     it('should close NgbActiveModal when available', () => {
       component.viewResults();
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith('view-results');
     });
 
     it('should close the modal when the action button is clicked', () => {
@@ -123,7 +123,7 @@ describe('TimeExpiredModalComponent', () => {
 
       viewResultsButton.triggerEventHandler('click', null);
 
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith('view-results');
     });
 
     it('should dismiss MatBottomSheetRef when NgbActiveModal is not available', () => {

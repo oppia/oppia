@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Component for the certificate assessment conversation skin,
- * i.e. the question-by-question player screen (progress bar, timer,
+ * i.e. the question-by-question player screen (progress bar,
  * question card, and navigation actions).
  */
 

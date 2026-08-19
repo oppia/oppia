@@ -42,9 +42,9 @@ export class TimeExpiredModalComponent {
 
   viewResults(): void {
     if (this.ngbActiveModal) {
-      this.ngbActiveModal.close();
+      this.ngbActiveModal.close('view-results');
     } else if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss();
+      this.bottomSheetRef.dismiss('view-results');
     }
   }
 }
