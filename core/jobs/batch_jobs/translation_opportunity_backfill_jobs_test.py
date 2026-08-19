@@ -221,11 +221,11 @@ class TranslationOpportunityJobTestBase(
         translation_model.put()
 
 
-class BackfillTranslationOpportunityModelJobTests(
+class BackfillExplorationTranslationOpportunityModelJobTests(
     TranslationOpportunityJobTestBase
 ):
     JOB_CLASS = (
-        translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJob
+        translation_opportunity_backfill_jobs.BackfillExplorationTranslationOpportunityModelJob
     )
 
     def test_creates_translation_opportunity_model(self) -> None:
@@ -253,7 +253,7 @@ class BackfillTranslationOpportunityModelJobTests(
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration('exp_es')
         exp.language_code = 'es'
-        res = translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
+        res = translation_opportunity_backfill_jobs.BackfillExplorationTranslationOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
             (
                 'exp_es',
                 {
@@ -726,13 +726,13 @@ class BackfillTranslationOpportunityModelJobTests(
         )
 
 
-class AuditBackfillTranslationOpportunityModelJobTests(
+class AuditBackfillExplorationTranslationOpportunityModelJobTests(
     TranslationOpportunityJobTestBase
 ):
-    """Tests for AuditBackfillTranslationOpportunityModelJob."""
+    """Tests for AuditBackfillExplorationTranslationOpportunityModelJob."""
 
     JOB_CLASS = (
-        translation_opportunity_backfill_jobs.AuditBackfillTranslationOpportunityModelJob
+        translation_opportunity_backfill_jobs.AuditBackfillExplorationTranslationOpportunityModelJob
     )
 
     def test_empty_job_output(self) -> None:

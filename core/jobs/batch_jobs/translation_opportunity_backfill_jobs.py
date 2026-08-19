@@ -451,7 +451,7 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
         ) | 'Flatten results' >> beam.Flatten()
 
 
-class BackfillTranslationOpportunityModelJob(
+class BackfillExplorationTranslationOpportunityModelJob(
     BackfillTranslationOpportunityModelJobBase
 ):
     """Backfills TranslationOpportunityModels from existing ExplorationModels and StoryModels."""
@@ -556,10 +556,10 @@ class BackfillTranslationOpportunityModelJob(
         )
 
 
-class AuditBackfillTranslationOpportunityModelJob(
-    BackfillTranslationOpportunityModelJob
+class AuditBackfillExplorationTranslationOpportunityModelJob(
+    BackfillExplorationTranslationOpportunityModelJob
 ):
-    """Audit job for BackfillTranslationOpportunityModelJob."""
+    """Audit job for BackfillExplorationTranslationOpportunityModelJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
 
