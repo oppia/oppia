@@ -160,12 +160,18 @@ const desktopTopicListItemSelector = '.list-item';
 const desktopTopicListItemOptions = '.e2e-test-topic-edit-box';
 const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
+const mobileTopicEditBoxButton = '.e2e-test-mobile-topic-edit-box';
+const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
 
 const desktopSkillListItemSelector = '.list-item';
 const desktopSkillListItemOptions =
   '.e2e-test-skill-edit-box .skill-edit-box-icon';
 const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const confirmSkillDeletionButton = '.e2e-test-confirm-skill-deletion-button';
+const mobileSkillItemSelector = '.e2e-test-mobile-skill-item';
+const mobileSkillOptionsButton =
+  '.e2e-test-mobile-skills-option p.skill-edit-box-icon';
+const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
 
 const removeQuestion = '.link-off-icon';
 const removeQuestionConfirmationButton =
@@ -174,6 +180,8 @@ const removeQuestionConfirmationButton =
 const createNewSkillButton = '.e2e-test-create-skill-button';
 const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
+const mobileCreateSkillButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
 
 const errorPageHeading = '.e2e-test-error-page-heading';
 const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
@@ -730,21 +738,28 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(skillsTab);
 
     const skillsVisible = await this.isElementVisible(desktopSkillSelector);
+    const mobileSkillsVisible =
+      await this.isElementVisible(mobileSkillSelector);
     const noSkillsVisible = await this.isElementVisible(
       noSkillsPresentMessageSelector
     );
-    if (!skillsVisible && !noSkillsVisible) {
+    if (!skillsVisible && !mobileSkillsVisible && !noSkillsVisible) {
       throw new Error('Skills tab content not loaded.');
     }
   }
 
   async clickOnCreateNewSkillButtonInSkillDashboard(): Promise<void> {
-    await this.expectElementToBeVisible(
-      createNewSkillButtonInSkillDashboardSelector
-    );
-    await this.clickOnElementWithSelector(
-      createNewSkillButtonInSkillDashboardSelector
-    );
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileCreateSkillButton);
+      await this.clickOnElementWithSelector(mobileCreateSkillButton);
+    } else {
+      await this.expectElementToBeVisible(
+        createNewSkillButtonInSkillDashboardSelector
+      );
+      await this.clickOnElementWithSelector(
+        createNewSkillButtonInSkillDashboardSelector
+      );
+    }
     await this.expectElementToBeVisible(
       '.e2e-test-new-skill-description-field'
     );
@@ -802,34 +817,66 @@ export class CurriculumAdmin extends TopicManager {
   async deleteTopic(topicName: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(topicsTab);
-    await this.expectElementToBeVisible(desktopTopicListItemSelector);
 
-    const topics = await this.page.$$(desktopTopicListItemSelector);
-    for (const topic of topics) {
-      const nameEl = await topic.$(desktopTopicSelector);
-      if (!nameEl) {
-        continue;
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible('.e2e-test-mobile-topic-table');
+      const topicItems = await this.page.$$('div.topic-item');
+      for (const item of topicItems) {
+        const nameEl = await item.$('div.e2e-test-mobile-topic-name a');
+        if (!nameEl) {
+          continue;
+        }
+        const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+        if (name !== topicName) {
+          continue;
+        }
+
+        const editBtn = await item.$(mobileTopicEditBoxButton);
+        if (!editBtn) {
+          throw new Error('Mobile topic edit button not found.');
+        }
+        await editBtn.click();
+
+        await this.expectElementToBeVisible(mobileDeleteTopicButton);
+        await this.clickOnElementWithSelector(mobileDeleteTopicButton);
+
+        await this.expectElementToBeVisible(confirmTopicDeletionButton);
+        await this.clickOnElementWithSelector(confirmTopicDeletionButton);
+        await this.expectElementToBeVisible(confirmTopicDeletionButton, false);
+
+        showMessage(`Topic "${topicName}" has been successfully deleted.`);
+        return;
       }
-      const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
-      if (name !== topicName) {
-        continue;
+    } else {
+      await this.expectElementToBeVisible(desktopTopicListItemSelector);
+
+      const topics = await this.page.$$(desktopTopicListItemSelector);
+      for (const topic of topics) {
+        const nameEl = await topic.$(desktopTopicSelector);
+        if (!nameEl) {
+          continue;
+        }
+        const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+        if (name !== topicName) {
+          continue;
+        }
+
+        const editBox = await topic.$(desktopTopicListItemOptions);
+        if (!editBox) {
+          throw new Error('Topic edit button not found.');
+        }
+        await editBox.click();
+
+        await this.expectElementToBeVisible(desktopDeleteTopicButton);
+        await this.clickOnElementWithSelector(desktopDeleteTopicButton);
+
+        await this.expectElementToBeVisible(confirmTopicDeletionButton);
+        await this.clickOnElementWithSelector(confirmTopicDeletionButton);
+        await this.expectElementToBeVisible(confirmTopicDeletionButton, false);
+
+        showMessage(`Topic "${topicName}" has been successfully deleted.`);
+        return;
       }
-
-      const editBox = await topic.$(desktopTopicListItemOptions);
-      if (!editBox) {
-        throw new Error('Topic edit button not found.');
-      }
-      await editBox.click();
-
-      await this.expectElementToBeVisible(desktopDeleteTopicButton);
-      await this.clickOnElementWithSelector(desktopDeleteTopicButton);
-
-      await this.expectElementToBeVisible(confirmTopicDeletionButton);
-      await this.clickOnElementWithSelector(confirmTopicDeletionButton);
-      await this.expectElementToBeVisible(confirmTopicDeletionButton, false);
-
-      showMessage(`Topic "${topicName}" has been successfully deleted.`);
-      return;
     }
     throw new Error(`Topic "${topicName}" not found in dashboard.`);
   }
@@ -858,26 +905,59 @@ export class CurriculumAdmin extends TopicManager {
   async deleteSkill(skillName: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
-    await this.expectElementToBeVisible(desktopSkillListItemSelector);
 
-    const skillRow = this.page.locator(desktopSkillListItemSelector).filter({
-      has: this.page.locator(desktopSkillSelector, {hasText: skillName}),
-    });
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible('.e2e-test-mobile-skills-table');
+      const skillItems = await this.page.$$(mobileSkillItemSelector);
+      for (const item of skillItems) {
+        const nameEl = await item.$('.e2e-test-mobile-skill-name');
+        if (!nameEl) {
+          continue;
+        }
+        const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+        if (name !== skillName) {
+          continue;
+        }
 
-    if (!(await skillRow.count())) {
+        const optionsBtn = await item.$(mobileSkillOptionsButton);
+        if (!optionsBtn) {
+          throw new Error('Mobile skill options button not found.');
+        }
+        await optionsBtn.click();
+
+        await this.expectElementToBeVisible(mobileDeleteSkillButton);
+        await this.clickOnElementWithSelector(mobileDeleteSkillButton);
+
+        await this.expectElementToBeVisible(confirmSkillDeletionButton);
+        await this.clickOnElementWithSelector(confirmSkillDeletionButton);
+        await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+
+        showMessage(`Skill "${skillName}" has been successfully deleted.`);
+        return;
+      }
       throw new Error(`Skill "${skillName}" not found in dashboard.`);
+    } else {
+      await this.expectElementToBeVisible(desktopSkillListItemSelector);
+
+      const skillRow = this.page.locator(desktopSkillListItemSelector).filter({
+        has: this.page.locator(desktopSkillSelector, {hasText: skillName}),
+      });
+
+      if (!(await skillRow.count())) {
+        throw new Error(`Skill "${skillName}" not found in dashboard.`);
+      }
+
+      await skillRow.locator(desktopSkillListItemOptions).click();
+
+      await this.expectElementToBeVisible(desktopDeleteSkillButton);
+      await this.clickOnElementWithSelector(desktopDeleteSkillButton);
+
+      await this.expectElementToBeVisible(confirmSkillDeletionButton);
+      await this.clickOnElementWithSelector(confirmSkillDeletionButton);
+      await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+
+      showMessage(`Skill "${skillName}" has been successfully deleted.`);
     }
-
-    await skillRow.locator(desktopSkillListItemOptions).click();
-
-    await this.expectElementToBeVisible(desktopDeleteSkillButton);
-    await this.clickOnElementWithSelector(desktopDeleteSkillButton);
-
-    await this.expectElementToBeVisible(confirmSkillDeletionButton);
-    await this.clickOnElementWithSelector(confirmSkillDeletionButton);
-    await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
-
-    showMessage(`Skill "${skillName}" has been successfully deleted.`);
   }
 
   async expectSkillNotInTopicsAndSkillsDashboard(
