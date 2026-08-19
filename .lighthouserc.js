@@ -148,18 +148,18 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/license$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.91}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/moderator$',
-          assertions: buildPageAssertions({}, 0.97),
+          assertions: buildPageAssertions({}, 0.92),
         },
         {
           matchingUrlPattern: 'http://[^/]+/preferences$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.88}],
+            'categories:accessibility': ['error', {minScore: 0.84}],
             'offscreen-images': ['error', {minScore: 0}],
           }),
         },

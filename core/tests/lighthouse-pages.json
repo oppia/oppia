@@ -1,4 +1,8 @@
 {
+  "donate": {
+    "url": "http://localhost:8181/donate",
+    "page_module": "core/templates/pages/donate-page/donate-page.module.ts"
+  },
   "splash": {
     "url": "http://localhost:8181/",
     "page_module": "core/templates/pages/splash-page/splash-page.module.ts"
@@ -38,10 +42,6 @@
   "delete-account": {
     "url": "http://localhost:8181/delete-account",
     "page_module": "core/templates/pages/delete-account-page/delete-account-page.module.ts"
-  },
-  "donate": {
-    "url": "http://localhost:8181/donate",
-    "page_module": "core/templates/pages/donate-page/donate-page.module.ts"
   },
   "get-started": {
     "url": "http://localhost:8181/get-started",
