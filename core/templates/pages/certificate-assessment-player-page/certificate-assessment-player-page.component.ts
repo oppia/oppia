@@ -82,19 +82,10 @@ export class CertificateAssessmentPlayerPageComponent
   isLoadingQuestion = false;
   loadError = false;
   private inflightIndexes = new Set<number>();
-  /** Answers keyed by question id; a null or missing value means the
-   *  question was not answered yet. Values are InteractionAnswer typed to
-   *  match what interaction components provide via CurrentInteractionService. */
   answers: {[questionId: string]: InteractionAnswer | null} = {};
-  /** Pre-created Interaction objects keyed by question id, built from the
-   *  state backend dict during loadQuestion(). */
   interactions: {[questionId: string]: Interaction} = {};
-  /** Generated interaction HTML strings keyed by question id, produced by
-   *  ExplorationHtmlFormatterService.getInteractionHtml(). */
   interactionHtmls: {[questionId: string]: string} = {};
   focusLabel = '';
-  // Derived fields bound by the conversation skin template. They are
-  // recomputed whenever the current question index or the answers change.
   currentQuestion: AssessmentQuestion | null = null;
   totalQuestionCount = 0;
   progressPercentage = 0;
@@ -112,9 +103,6 @@ export class CertificateAssessmentPlayerPageComponent
     private focusManagerService: FocusManagerService,
     private interactionRulesRegistryService: InteractionRulesRegistryService
   ) {
-    // Stored as a field so that the exact same bound function reference
-    // can be cleared on destroy. Calling bind() inline would create a new
-    // function each time, defeating identity-safe cleanup.
     this.handleSubmitFn = this.handleInteractionSubmit.bind(this);
   }
 
@@ -134,13 +122,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.clearOnSubmitFn(this.handleSubmitFn);
   }
 
-  /**
-   * Fetches the question at the given index from the certificate question
-   * handler and stores it at that index in the questions array. Questions are
-   * fetched lazily: only the current question is loaded, and the next question
-   * is fetched when the learner advances to it. Duplicate and in-flight
-   * requests for the same index are suppressed.
-   */
   private loadQuestion(index: number): void {
     if (
       this.attempt === null ||
@@ -179,11 +160,6 @@ export class CertificateAssessmentPlayerPageComponent
       });
   }
 
-  /**
-   * Builds an AssessmentQuestion from the state data returned by the
-   * certificate question handler, and pre-creates the Interaction object
-   * and interaction HTML needed for rendering via oppia-interaction-display.
-   */
   private buildQuestionFromStateData(
     index: number,
     questionId: string,
@@ -299,12 +275,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.assessmentSubmitted.emit(answers);
   }
 
-  /**
-   * Called when the interaction component submits an answer via
-   * CurrentInteractionService.onSubmit → onSubmitFn. Stores the typed
-   * answer only; navigation is triggered separately by the Next / Submit
-   * Assessment buttons in the conversation skin.
-   */
   handleInteractionSubmit(answer: InteractionAnswer): void {
     const question = this.getCurrentQuestion();
     if (question === null) {
@@ -314,10 +284,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.refreshComputedFields();
   }
 
-  /**
-   * Returns the interaction HTML string for the current question, suitable
-   * for rendering via oppia-interaction-display.
-   */
   getInteractionHtml(): string {
     const question = this.getCurrentQuestion();
     if (question === null) {
@@ -326,24 +292,6 @@ export class CertificateAssessmentPlayerPageComponent
     return this.interactionHtmls[question.id] ?? '';
   }
 
-  /**
-   * Returns the last answer submitted for the current question. This is
-   * passed to the interaction component via parentScope so that the
-   * interaction can restore the previous answer on re-render (e.g. when
-   * the learner navigates back).
-   */
-  getLastAnswer(): InteractionAnswer | null {
-    const question = this.getCurrentQuestion();
-    if (question === null) {
-      return null;
-    }
-    return this.answers[question.id] ?? null;
-  }
-
-  /**
-   * Converts a typed InteractionAnswer into the string format expected by
-   * the backend submission payload.
-   */
   private formatAnswerForBackend(answer: InteractionAnswer): string {
     if (typeof answer === 'string') {
       return answer;
@@ -378,18 +326,10 @@ export class CertificateAssessmentPlayerPageComponent
     return this.attempt?.questions.length ?? this.questions.length;
   }
 
-  /** Retries loading the question at the current index after a failure.
-   *  Guards in loadQuestion prevent duplicate or in-flight requests, so this
-   *  is safe to call repeatedly. */
   retryLoadQuestion(): void {
     this.loadQuestion(this.currentQuestionIndex);
   }
 
-  /**
-   * Recomputes the derived fields bound by the conversation skin template
-   * from the current question, attempt, and answers. This keeps the template
-   * bindings in sync whenever the current question index or answers change.
-   */
   private refreshComputedFields(): void {
     this.currentQuestion = this.getCurrentQuestion();
     this.totalQuestionCount = this.getTotalQuestionCount();

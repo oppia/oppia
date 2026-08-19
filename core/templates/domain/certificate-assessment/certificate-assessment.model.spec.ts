@@ -24,9 +24,7 @@ import {
   AvailableCertificateAssessmentOfferingBackendDict,
   CertificateAssessmentQuestionData,
   CertificateAssessmentQuestionStateBackendDict,
-  AssessmentQuestionTypes,
   createAssessmentQuestionFromStateData,
-  getAssessmentQuestionType,
 } from './certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
 
@@ -246,61 +244,6 @@ describe('Certificate Assessment Question Data Model', () => {
   });
 });
 
-describe('AssessmentQuestionTypes constants', () => {
-  it('should define all question type constants', () => {
-    expect(AssessmentQuestionTypes.MULTIPLE_CHOICE).toBe('multiple_choice');
-    expect(AssessmentQuestionTypes.MULTIPLE_SELECT).toBe('multiple_select');
-    expect(AssessmentQuestionTypes.TEXT_INPUT).toBe('text_input');
-    expect(AssessmentQuestionTypes.NUMERIC_INPUT).toBe('numeric_input');
-    expect(AssessmentQuestionTypes.FRACTION_INPUT).toBe('fraction_input');
-    expect(AssessmentQuestionTypes.NUMBER_WITH_UNITS).toBe('number_with_units');
-    expect(AssessmentQuestionTypes.DRAG_AND_DROP_SORT).toBe(
-      'drag_and_drop_sort'
-    );
-    expect(AssessmentQuestionTypes.IMAGE_CLICK).toBe('image_click');
-  });
-
-  it('should have exactly 9 constants', () => {
-    const keys = Object.keys(AssessmentQuestionTypes);
-    expect(keys.length).toBe(9);
-  });
-});
-
-describe('getAssessmentQuestionType', () => {
-  it('should map all interaction types to their assessment question types', () => {
-    expect(getAssessmentQuestionType('MultipleChoiceInput')).toBe(
-      AssessmentQuestionTypes.MULTIPLE_CHOICE
-    );
-    expect(getAssessmentQuestionType('ItemSelectionInput')).toBe(
-      AssessmentQuestionTypes.MULTIPLE_SELECT
-    );
-    expect(getAssessmentQuestionType('TextInput')).toBe(
-      AssessmentQuestionTypes.TEXT_INPUT
-    );
-    expect(getAssessmentQuestionType('NumericInput')).toBe(
-      AssessmentQuestionTypes.NUMERIC_INPUT
-    );
-    expect(getAssessmentQuestionType('FractionInput')).toBe(
-      AssessmentQuestionTypes.FRACTION_INPUT
-    );
-    expect(getAssessmentQuestionType('NumberWithUnits')).toBe(
-      AssessmentQuestionTypes.NUMBER_WITH_UNITS
-    );
-    expect(getAssessmentQuestionType('DragAndDropSortInput')).toBe(
-      AssessmentQuestionTypes.DRAG_AND_DROP_SORT
-    );
-    expect(getAssessmentQuestionType('ImageClickInput')).toBe(
-      AssessmentQuestionTypes.IMAGE_CLICK
-    );
-  });
-
-  it('should default to UNSUPPORTED for unknown interaction types', () => {
-    expect(getAssessmentQuestionType('UnknownType')).toBe(
-      AssessmentQuestionTypes.UNSUPPORTED
-    );
-  });
-});
-
 describe('createAssessmentQuestionFromStateData', () => {
   it('should create an AssessmentQuestion from question state data', () => {
     const stateData = {
@@ -311,10 +254,6 @@ describe('createAssessmentQuestionFromStateData', () => {
     const question = createAssessmentQuestionFromStateData('q1', stateData);
 
     expect(question.id).toBe('q1');
-    expect(question.type).toBe(AssessmentQuestionTypes.TEXT_INPUT);
     expect(question.prompt).toBe('<p>What is 2+2?</p>');
-    expect(question.hint).toBe('');
-    expect(question.options).toEqual([]);
-    expect(question.stateData).toBe(stateData);
   });
 });

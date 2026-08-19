@@ -47,113 +47,18 @@ export interface AssessmentResultTopicWiseBreakdown {
   scorePercentage: number;
 }
 
-/** The interaction type of an assessment question. */
-export type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input'
-  | 'fraction_input'
-  | 'number_with_units'
-  | 'drag_and_drop_sort'
-  | 'image_click'
-  | 'unsupported';
-
-/** Named constants for AssessmentQuestionType values. */
-export const AssessmentQuestionTypes = {
-  MULTIPLE_CHOICE: 'multiple_choice' as const,
-  MULTIPLE_SELECT: 'multiple_select' as const,
-  TEXT_INPUT: 'text_input' as const,
-  NUMERIC_INPUT: 'numeric_input' as const,
-  FRACTION_INPUT: 'fraction_input' as const,
-  NUMBER_WITH_UNITS: 'number_with_units' as const,
-  DRAG_AND_DROP_SORT: 'drag_and_drop_sort' as const,
-  IMAGE_CLICK: 'image_click' as const,
-  UNSUPPORTED: 'unsupported' as const,
-};
-
-/** An answer choice within an assessment question. */
-export interface AssessmentQuestionOption {
-  /** Unique identifier for this option (content id). */
-  id: string;
-  /** The choice's rich-text HTML, rendered via oppia-rte-output-display. */
-  text: string;
-  /** The index of the option in the question's stored choice list. This is
-   *  the value submitted for multiple-choice questions, so it is independent
-   *  of any on-screen reordering of the choices. */
-  index: number;
-}
-
-/** A fully-resolved assessment question rendered by the conversation skin. */
 export interface AssessmentQuestion {
-  /** The question's unique identifier. */
   id: string;
-  /** The interaction type determining how the question is rendered. */
-  type: AssessmentQuestionType;
-  /** The question's rich-text HTML, rendered via oppia-rte-output-display. */
   prompt: string;
-  /** Hint text shown to the learner on request. */
-  hint: string;
-  /** Available answer choices (empty for free-response questions). */
-  options: AssessmentQuestionOption[];
-  /** Input placeholder text for free-response questions. */
-  placeholder?: string;
-  /** The raw state backend dict used by AnswerClassificationService to
-   *  evaluate correctness via the interaction's rule functions. */
-  stateData: StateBackendDict;
 }
 
-/** Converts an interaction id from the backend into the narrower assessment
- *  question type union used by the frontend model. */
-export function getAssessmentQuestionType(
-  interactionId: string
-): AssessmentQuestionType {
-  switch (interactionId) {
-    case 'MultipleChoiceInput':
-      return AssessmentQuestionTypes.MULTIPLE_CHOICE;
-    case 'ItemSelectionInput':
-      return AssessmentQuestionTypes.MULTIPLE_SELECT;
-    case 'TextInput':
-      return AssessmentQuestionTypes.TEXT_INPUT;
-    case 'NumericInput':
-      return AssessmentQuestionTypes.NUMERIC_INPUT;
-    case 'FractionInput':
-      return AssessmentQuestionTypes.FRACTION_INPUT;
-    case 'NumberWithUnits':
-      return AssessmentQuestionTypes.NUMBER_WITH_UNITS;
-    case 'DragAndDropSortInput':
-      return AssessmentQuestionTypes.DRAG_AND_DROP_SORT;
-    case 'ImageClickInput':
-      return AssessmentQuestionTypes.IMAGE_CLICK;
-    default:
-      return AssessmentQuestionTypes.UNSUPPORTED;
-  }
-}
-
-/** Converts question state data returned by the certificate question handler
- *  into the AssessmentQuestion shape rendered by the conversation skin. */
-export function createAssessmentQuestionFromStateData(
+export const createAssessmentQuestionFromStateData = (
   questionId: string,
   stateData: StateBackendDict
-): AssessmentQuestion {
-  return {
-    id: questionId,
-    type: getAssessmentQuestionType(stateData.interaction.id ?? ''),
-    prompt: stateData.content.html,
-    hint: '',
-    options: [],
-    stateData,
-  };
-}
-
-// The shape of a recommended topic tile shown on the certificate assessment
-// introduction card.
-export interface RecommendedTopicStub {
-  name: string;
-  lessonCount: number;
-  // Placeholder swatch shown instead of a topic thumbnail image.
-  colorClass: string;
-}
+): AssessmentQuestion => ({
+  id: questionId,
+  prompt: stateData.content.html,
+});
 
 export interface CertificateAssessmentOfferingTopicData {
   [topicId: string]: number;
@@ -196,14 +101,11 @@ export interface CertificateAssessmentAttemptQuestion {
   questionVersion: number;
 }
 
-/** Backend response shape for the question handler. */
 export interface CertificateAssessmentQuestionStateBackendDict {
   question_id: string;
   question_state_data: StateBackendDict;
 }
 
-/** Domain representation of a single assessment question returned by the
- *  question handler. */
 export class CertificateAssessmentQuestionData {
   _questionId: string;
   _questionStateData: StateBackendDict;

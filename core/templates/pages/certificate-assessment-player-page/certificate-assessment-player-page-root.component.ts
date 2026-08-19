@@ -111,18 +111,9 @@ export class CertificateAssessmentPlayerPageRootComponent
       await this.router.navigate([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
       ]);
-    } catch {
-      // Navigation to the error page is best-effort. The in-page error state
-      // (hasError) remains as a fallback if the redirect fails.
-    }
+    } catch {}
   }
 
-  /**
-   * Resolves the classroom URL fragment used by the banner exit buttons on the
-   * instruction and question pages. The resolution is best-effort: if the
-   * classroom data cannot be loaded, the fragment stays empty and the exit
-   * button is left without a usable route.
-   */
   private async loadClassroomUrlFragment(): Promise<void> {
     try {
       const classroomDataResponse =
@@ -131,10 +122,7 @@ export class CertificateAssessmentPlayerPageRootComponent
         );
       this.classroomUrlFragment =
         classroomDataResponse.classroomDict.urlFragment;
-    } catch {
-      // Classroom data is only used for the banner exit route, so a failure to
-      // load it should not block the assessment flow.
-    }
+    } catch {}
   }
 
   showInstructions(): void {

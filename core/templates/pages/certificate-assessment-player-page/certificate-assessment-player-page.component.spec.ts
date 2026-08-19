@@ -28,7 +28,6 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
-  AssessmentQuestionTypes,
   CertificateAssessmentAttemptData,
   CertificateAssessmentQuestionData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
@@ -292,8 +291,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     await setup();
   });
 
-  // ---- loadQuestion ----
-
   it('should load questions from the attempt', fakeAsync(() => {
     load();
     expect(component.questions.length).toBe(3);
@@ -321,10 +318,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should not load when attempt question index is out of range', fakeAsync(() => {
     loadQ1();
-    // eslint-disable-next-line dot-notation
-    (component as unknown as {loadQuestion: (index: number) => void})[
-      'loadQuestion'
-    ](99);
+    (
+      component as unknown as {loadQuestion: (index: number) => void}
+    ).loadQuestion(99);
     flushMicrotasks();
     expect(component.questions.length).toBe(1);
   }));
@@ -341,10 +337,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       1
     );
     expect(component.isLoadingQuestion).toBeTrue();
-    // eslint-disable-next-line dot-notation
-    (component as unknown as {loadQuestion: (index: number) => void})[
-      'loadQuestion'
-    ](0);
+    (
+      component as unknown as {loadQuestion: (index: number) => void}
+    ).loadQuestion(0);
     expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
       1
     );
@@ -382,10 +377,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       Promise.resolve(questionResponse('q1'))
     );
-    // eslint-disable-next-line dot-notation
-    (component as unknown as {loadQuestion: (index: number) => void})[
-      'loadQuestion'
-    ](0);
+    (
+      component as unknown as {loadQuestion: (index: number) => void}
+    ).loadQuestion(0);
     flushMicrotasks();
     expect(component.loadError).toBeFalse();
   }));
@@ -413,16 +407,13 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should not reload already loaded question', fakeAsync(() => {
     load();
     const count = apiSpy.getCertificateAssessmentQuestionAsync.calls.count();
-    // eslint-disable-next-line dot-notation
-    (component as unknown as {loadQuestion: (index: number) => void})[
-      'loadQuestion'
-    ](0);
+    (
+      component as unknown as {loadQuestion: (index: number) => void}
+    ).loadQuestion(0);
     expect(apiSpy.getCertificateAssessmentQuestionAsync.calls.count()).toBe(
       count
     );
   }));
-
-  // ---- navigation ----
 
   it('should advance to next question', () => {
     component.nextQuestion();
@@ -446,8 +437,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestionIndex).toBe(0);
   });
 
-  // ---- derived fields ----
-
   it('should recompute derived fields on first load', fakeAsync(() => {
     expect(component.currentQuestion).toBeNull();
     loadQ1();
@@ -469,8 +458,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.isLastQuestion).toBeFalse();
   }));
 
-  // ---- handleInteractionSubmit ----
-
   it('should store answer via handleInteractionSubmit', fakeAsync(() => {
     load();
     component.currentQuestionIndex = 0;
@@ -482,25 +469,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(() => component.handleInteractionSubmit(1)).not.toThrowError();
   });
 
-  // ---- getLastAnswer ----
-
-  it('should return null when no question loaded', () => {
-    expect(component.getLastAnswer()).toBeNull();
-  });
-
-  it('should return null when no answer set', fakeAsync(() => {
-    load();
-    expect(component.getLastAnswer()).toBeNull();
-  }));
-
-  it('should return last answer', fakeAsync(() => {
-    load();
-    component.answers.q3 = 'hello';
-    expect(component.getLastAnswer()).toBe('hello');
-  }));
-
-  // ---- getInteractionHtml ----
-
   it('should return empty when no question loaded', () => {
     expect(component.getInteractionHtml()).toBe('');
   });
@@ -509,8 +477,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     load();
     expect(component.getInteractionHtml()).toBe('<div>interaction</div>');
   }));
-
-  // ---- getCurrentQuestion ----
 
   it('should return null when no questions loaded', () => {
     expect(component.getCurrentQuestion()).toBeNull();
@@ -528,8 +494,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
   }));
 
-  // ---- isCurrentQuestionLast ----
-
   it('should report whether current question is last', fakeAsync(() => {
     load();
     component.currentQuestionIndex = 0;
@@ -537,8 +501,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.currentQuestionIndex = 2;
     expect(component.isCurrentQuestionLast()).toBeTrue();
   }));
-
-  // ---- getProgressPercentage ----
 
   it('should return 0 when no questions', async () => {
     await setup(null);
@@ -553,8 +515,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.currentQuestionIndex = 2;
     expect(component.getProgressPercentage()).toBe(100);
   }));
-
-  // ---- modals ----
 
   it('should open time-expired modal on desktop', fakeAsync(() => {
     loadQ1();
@@ -629,8 +589,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.ngOnInit();
     expect(modalSpy.open).not.toHaveBeenCalled();
   }));
-
-  // ---- submitAssessment ----
 
   it('should emit correct answers on submit', fakeAsync(() => {
     load();
@@ -805,42 +763,4 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       'TextInput'
     );
   }));
-
-  // ---- getAssessmentQuestionType ----
-
-  it('should map all interaction types and default', async () => {
-    const allTypes: [string, string][] = [
-      ['MultipleChoiceInput', AssessmentQuestionTypes.MULTIPLE_CHOICE],
-      ['ItemSelectionInput', AssessmentQuestionTypes.MULTIPLE_SELECT],
-      ['TextInput', AssessmentQuestionTypes.TEXT_INPUT],
-      ['NumericInput', AssessmentQuestionTypes.NUMERIC_INPUT],
-      ['FractionInput', AssessmentQuestionTypes.FRACTION_INPUT],
-      ['NumberWithUnits', AssessmentQuestionTypes.NUMBER_WITH_UNITS],
-      ['DragAndDropSortInput', AssessmentQuestionTypes.DRAG_AND_DROP_SORT],
-      ['ImageClickInput', AssessmentQuestionTypes.IMAGE_CLICK],
-      ['UnknownType', AssessmentQuestionTypes.UNSUPPORTED],
-    ];
-    const ids = allTypes.map((_, i) => `t${i}`);
-    await setup(makeAttempt(ids));
-    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      (_a: string, qId: string) => {
-        const idx = parseInt(qId.substring(1));
-        return Promise.resolve(
-          CertificateAssessmentQuestionData.createFromBackendDict({
-            question_id: qId,
-            question_state_data: stateDataFor(allTypes[idx][0]),
-          })
-        );
-      }
-    );
-    fixture.detectChanges();
-    await fixture.whenStable();
-    for (let i = 1; i < allTypes.length; i++) {
-      component.nextQuestion();
-      await fixture.whenStable();
-    }
-    for (let i = 0; i < allTypes.length; i++) {
-      expect(component.questions[i].type).toBe(allTypes[i][1]);
-    }
-  });
 });

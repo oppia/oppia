@@ -74,8 +74,6 @@ export class AssessmentIntroductionCardComponent implements OnInit {
           offeringTopicIds.includes(topicSummary.getId())
         );
     } catch {
-      // Keep the recommended topics empty so the component renders its
-      // fallback state instead of propagating the failure through ngOnInit.
       this.recommendedTopicSummaries = [];
     } finally {
       this.isLoadingTopics = false;

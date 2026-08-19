@@ -21,7 +21,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
-import {InteractionAnswer} from 'interactions/answer-defs';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import './certificate-assessment-conversation-skin.component.css';
 
@@ -37,7 +36,6 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
   @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
   @Input() interactionHtml = '';
-  @Input() lastAnswer: InteractionAnswer | null = null;
 
   @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
@@ -62,12 +60,8 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
   }
 
   onNextQuestion(): void {
-    // Interactions that submit answers via their own handlers (e.g.
-    // ImageClickInput) do not register a submit function, so calling
-    // submitAnswer() would throw. The answer was already captured via the
-    // interaction's own onSubmit -> handleInteractionSubmit, so we can
-    // navigate without submitting again. For registered interactions, let
-    // genuine submission failures surface rather than silently navigating.
+    // Interactions with their own submit handlers (e.g. ImageClickInput) do
+    // not register a submit function, so only submit when one is registered.
     if (this.currentInteractionService.isSubmitAnswerFnRegistered()) {
       this.currentInteractionService.submitAnswer();
     }
