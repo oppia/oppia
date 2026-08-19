@@ -111,52 +111,53 @@ export class Contributor extends ExplorationEditor {
   ): Promise<ElementHandle | null> {
     await this.page.waitForNetworkIdle();
 
-    const translationOpportunitiesPreset = await this.isElementVisible(
-      opportunityItemSelector
-    );
-
-    // Sometimes, the opportunities refreshes after they have been loaded.
-    // This causes problem that older node gets detached from the DOM.
-    // So, we are ensuring that the opportunity list hasn't been changed
-    // for 200 ms.
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-
-    // TODO(#23395): Currently, the opportunity list is refreshed after the
-    // page is loaded. This causes the test to fail. We are using a workaround
-    // for now, by waiting for the opportunity list to be loaded.
-    // Once the issue is fixed, remove the following do-while loop.
-    do {
-      await this.page.waitForTimeout(200);
-
-      const currentElementIds = await this.page.evaluate((selector: string) => {
-        const elements = document.querySelectorAll(selector);
-        return Array.from(elements).map((el, index) => {
-          return el.textContent?.trim() || `element-${index}`;
-        });
-      }, opportunityItemSelector);
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
-
-    // Handle the case where no translation opportunity is present.
-    if (!translationOpportunitiesPreset) {
+    try {
+      await this.page.waitForFunction(
+        (
+          itemSelector: string,
+          headingSelector: string,
+          subheadingSelector: string,
+          expectedHeading: string,
+          expectedSubheading: string,
+          shouldBeVisible: boolean
+        ) => {
+          const elements = document.querySelectorAll(itemSelector);
+          let found = false;
+          for (const el of elements) {
+            const elHeading = el.querySelector(headingSelector)?.textContent?.trim();
+            const elSubheading = el.querySelector(subheadingSelector)?.textContent?.trim();
+            if (elHeading === expectedHeading && elSubheading?.includes(expectedSubheading)) {
+              found = true;
+              break;
+            }
+          }
+          return found === shouldBeVisible;
+        },
+        {timeout: 10000},
+        opportunityItemSelector,
+        opportunityItemHeadingSelector,
+        opportunitySubHeadingSelector,
+        heading,
+        subheading,
+        visible
+      );
+    } catch (e) {
       if (visible) {
         throw new Error(
           `Translation opportunity for ${heading} in ${subheading} not found.`
         );
       } else {
-        showMessage(
-          `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+        throw new Error(
+          `Failure: Translation opportunity for ${heading} in ${subheading} was found.`
         );
-        return null;
       }
+    }
+
+    if (!visible) {
+      showMessage(
+        `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+      return null;
     }
 
     // Get the opportunity item element.
@@ -177,23 +178,10 @@ export class Contributor extends ExplorationEditor {
         opportunityItemHeading === heading &&
         opportunityItemSubHeading?.includes(subheading)
       ) {
-        if (!visible) {
-          throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-          );
-        }
         return opportunityItemElement;
       }
     }
 
-    if (visible) {
-      throw new Error(
-        `Translation opportunity for ${heading} in ${subheading} not found.`
-      );
-    }
-    showMessage(
-      `Success: Translation opportunity for ${heading} in ${subheading} not found.`
-    );
     return null;
   }
 
