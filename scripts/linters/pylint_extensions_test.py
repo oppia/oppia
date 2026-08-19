@@ -34,14 +34,14 @@ from . import pylint_extensions
 class CheckerTestBase(unittest.TestCase):
     """Provides the private helper method `_build_module_node` for our tests.
 
-    `astroid.scoped_nodes.Module` cannot be constructed with a docstring; those
+    `astroid.nodes.Module` cannot be constructed with a docstring; those
     must be set using the `postinit` method. This class provides the helper
     `_build_module_node` to make the entire operation easier and less verbose.
     """
 
     def _build_module_node(
         self, doc: str | None = 'Custom test'
-    ) -> astroid.scoped_nodes.Module:
+    ) -> astroid.nodes.Module:
         """Returns a Module node with the given docstring.
 
         Replicates the pre-astroid-3.0 `Module(name=..., doc=...)` constructor.
@@ -53,12 +53,10 @@ class CheckerTestBase(unittest.TestCase):
         Returns:
             astroid.nodes.Module. The constructed module node.
         """
-        node = astroid.scoped_nodes.Module(name='test')
+        node = astroid.nodes.Module(name='test')
         node.postinit(
             body=[],
-            doc_node=(
-                astroid.node_classes.Const(doc) if doc is not None else None
-            ),
+            doc_node=(astroid.nodes.Const(doc) if doc is not None else None),
         )
         return node
 

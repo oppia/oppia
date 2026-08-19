@@ -77,11 +77,11 @@ from pylint.checkers import utils as checker_utils
 from pylint.extensions import _check_docs_utils
 
 
-def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:
+def read_from_node(node: astroid.nodes.Module) -> List[str]:
     """Returns the data read from the ast node in unicode form.
 
     Args:
-        node: astroid.scoped_nodes.Module. Node to access module content.
+        node: astroid.nodes.Module. Node to access module content.
 
     Returns:
         list(str). The data read from the ast node.
@@ -460,12 +460,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
     DOCSTRING_SECTION_YIELDS = 'yields'
     DOCSTRING_SECTION_RAISES = 'raises'
 
-    def visit_classdef(self, node: astroid.scoped_nodes.ClassDef) -> None:
+    def visit_classdef(self, node: astroid.nodes.ClassDef) -> None:
         """Visit each class definition in a module and check if there is a
         single new line below each class docstring.
 
         Args:
-            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+            node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
         # Check if the given node has docstring.
@@ -493,11 +493,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
         elif second_line_after_doc == '':
             self.add_message('newline-below-class-docstring', node=node)
 
-    def visit_functiondef(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Called for function and method definitions (def).
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
         node_doc = docstrings_checker.docstringify(node.doc_node)
@@ -510,19 +510,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     def check_typeinfo(
         self,
-        node: astroid.scoped_nodes.FunctionDef,
-        node_doc: (
-            _check_docs_utils.Docstring | _check_docs_utils.GoogleDocstring
-        ),
+        node: astroid.nodes.FunctionDef,
+        node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether all parameters in a function definition are
         properly formatted.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
-            node_doc: Docstring|GoogleDocstring. Pylint Docstring class instance
-                representing a node's docstring.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
         """
         # The regexes are taken from the pylint codebase and are modified
         # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
@@ -636,14 +634,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     def check_functiondef_params(
         self,
-        node: astroid.scoped_nodes.FunctionDef,
+        node: astroid.nodes.FunctionDef,
         node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether all parameters in a function definition are
         documented.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
@@ -681,16 +679,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
             node_doc, node.args, node, accept_no_param_doc=node_allow_no_param
         )
 
-    def check_docstring_style(
-        self, node: astroid.scoped_nodes.FunctionDef
-    ) -> None:
+    def check_docstring_style(self, node: astroid.nodes.FunctionDef) -> None:
         """It fetches a function node and extract the class node from function
         node if it is inside a class body and passes it to
         check_docstring_structure which checks whether the docstring has a
         space at the beginning and a period at the end.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
         if node.name in self.constructor_names:
@@ -700,13 +696,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_docstring_structure(node)
 
     def check_newline_above_args(
-        self, node: astroid.scoped_nodes.FunctionDef, docstring: List[str]
+        self, node: astroid.nodes.FunctionDef, docstring: List[str]
     ) -> None:
         """Checks to ensure that there is a single space above the
         argument parameters in the docstring.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
             docstring: list(str). Function docstring in splitted by newlines.
         """
@@ -727,15 +723,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if line != '':
                 blank_line_counter = 0
 
-    def check_docstring_structure(
-        self, node: astroid.node_classes.NodeNG
-    ) -> None:
+    def check_docstring_structure(self, node: astroid.nodes.NodeNG) -> None:
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
         docstring.
 
         Args:
-            node: astroid.node_classes.NodeNG. Node for a function or
+            node: astroid.nodes.NodeNG. Node for a function or
                 method definition in the AST.
         """
         if node.doc_node:
@@ -768,7 +762,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     self.add_message('no-period-used', node=node)
 
     def check_docstring_section_indentation(
-        self, node: astroid.scoped_nodes.FunctionDef
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Checks whether the function argument definitions ("Args": section,
         "Returns": section, "Yield": section, "Raises: section) are indented
@@ -777,7 +771,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         should be indented by 8.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
         arguments_node = node.args
@@ -985,14 +979,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     def check_functiondef_returns(
         self,
-        node: astroid.scoped_nodes.FunctionDef,
+        node: astroid.nodes.FunctionDef,
         node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether a function documented with a return value actually has
         a return statement in its definition.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
@@ -1000,7 +994,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not node_doc.supports_yields and node.is_generator():
             return
 
-        return_nodes = node.nodes_of_class(astroid.node_classes.Return)
+        return_nodes = node.nodes_of_class(astroid.nodes.Return)
         if (node_doc.has_returns() or node_doc.has_rtype()) and not any(
             docstrings_checker.returns_something(ret_node)
             for ret_node in return_nodes
@@ -1009,14 +1003,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     def check_functiondef_yields(
         self,
-        node: astroid.scoped_nodes.FunctionDef,
+        node: astroid.nodes.FunctionDef,
         node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether a function documented with a yield value actually has
         a yield statement in its definition.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node for a function or
+            node: astroid.nodes.Function. Node for a function or
                 method definition in the AST.
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
@@ -1029,16 +1023,16 @@ class DocstringParameterChecker(checkers.BaseChecker):
         ) and not node.is_generator():
             self.add_message('redundant-yields-doc', node=node)
 
-    def visit_raise(self, node: astroid.node_classes.Raise) -> None:
+    def visit_raise(self, node: astroid.nodes.Raise) -> None:
         """Visits a function node that raises an exception and verifies that all
         exceptions raised in the function definition are documented.
 
         Args:
-            node: astroid.node_classes.Raise. Node for a function or
+            node: astroid.nodes.Raise. Node for a function or
                 method definition in the AST.
         """
         func_node = node.frame()
-        if not isinstance(func_node, astroid.scoped_nodes.FunctionDef):
+        if not isinstance(func_node, astroid.nodes.FunctionDef):
             return
 
         expected_excs = docstrings_checker.possible_exc_types(node)
@@ -1064,12 +1058,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
         missing_excs = expected_excs - found_excs
         self._add_raise_message(missing_excs, func_node)
 
-    def visit_return(self, node: astroid.node_classes.Return) -> None:
+    def visit_return(self, node: astroid.nodes.Return) -> None:
         """Visits a function node that contains a return statement and verifies
         that the return value and the return type are documented.
 
         Args:
-            node: astroid.node_classes.Return. Node for a function or
+            node: astroid.nodes.Return. Node for a function or
                 method definition in the AST.
         """
         if not docstrings_checker.returns_something(node):
@@ -1095,13 +1089,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
             self.add_message('missing-return-type-doc', node=func_node)
 
     def visit_yield(
-        self, node: astroid.node_classes.Yield | astroid.node_classes.YieldFrom
+        self, node: astroid.nodes.Yield | astroid.nodes.YieldFrom
     ) -> None:
         """Visits a function node that contains a yield statement and verifies
         that the yield value and the yield type are documented.
 
         Args:
-            node: astroid.node_classes.Yield|astroid.node_classes.YieldFrom. A
+            node: astroid.nodes.Yield|astroid.nodes.YieldFrom. A
                 Node for a function or method definition in the AST.
         """
         func_node = node.frame()
@@ -1122,21 +1116,21 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not doc_has_yields_type:
             self.add_message('missing-yield-type-doc', node=func_node)
 
-    def visit_yieldfrom(self, node: astroid.node_classes.YieldFrom) -> None:
+    def visit_yieldfrom(self, node: astroid.nodes.YieldFrom) -> None:
         """Visits a function node that contains a yield from statement and
         verifies that the yield from value and the yield from type are
         documented.
 
         Args:
-            node: astroid.node_classes.YieldFrom. Node to access module.
+            node: astroid.nodes.YieldFrom. Node to access module.
         """
         self.visit_yield(node)
 
     def check_arguments_in_docstring(
         self,
         doc: _check_docs_utils.Docstring,
-        arguments_node: astroid.node_classes.Arguments,
-        warning_node: astroid.node_classes.NodeNG,
+        arguments_node: astroid.nodes.Arguments,
+        warning_node: astroid.nodes.NodeNG,
         accept_no_param_doc: Optional[bool] = None,
     ) -> None:
         """Check that all parameters in a function, method or class constructor
@@ -1159,9 +1153,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
         Args:
             doc: str. Docstring for the function, method or class.
-            arguments_node: astroid.node_classes.Arguments. Arguments node
+            arguments_node: astroid.nodes.Arguments. Arguments node
                 for the function, method or class constructor.
-            warning_node: astroid.scoped_nodes.Node. The node to assign
+            warning_node: astroid.nodes.Node. The node to assign
                 the warnings to.
             accept_no_param_doc: bool|None. Whether or not to allow
                 no parameters to be documented. If None then
@@ -1269,7 +1263,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self,
         class_doc: _check_docs_utils.Docstring,
         init_doc: _check_docs_utils.Docstring,
-        class_node: astroid.scoped_nodes.ClassDef,
+        class_node: astroid.nodes.ClassDef,
     ) -> None:
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
@@ -1280,7 +1274,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             init_doc:  Docstring. Pylint docstring class instance representing
                 a method's docstring, the method here is the constructor method
                 for the above class.
-            class_node: astroid.scoped_nodes.ClassDef. Node for class definition
+            class_node: astroid.nodes.ClassDef. Node for class definition
                 in AST.
         """
         if class_doc.has_params() and init_doc.has_params():
@@ -1291,14 +1285,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
             )
 
     def _handle_no_raise_doc(
-        self, excs: Set[str], node: astroid.scoped_nodes.FunctionDef
+        self, excs: Set[str], node: astroid.nodes.FunctionDef
     ) -> None:
         """Checks whether the raised exception in a function has been
         documented, add a message otherwise.
 
         Args:
             excs: list(str). A list of exception types.
-            node: astroid.scoped_nodes.FunctionDef. Node to access module.
+            node: astroid.nodes.FunctionDef. Node to access module.
         """
         if self.linter.config.accept_no_raise_doc:
             return
@@ -1306,13 +1300,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self._add_raise_message(excs, node)
 
     def _add_raise_message(
-        self, missing_excs: Set[str], node: astroid.node_classes.NodeNG
+        self, missing_excs: Set[str], node: astroid.nodes.NodeNG
     ) -> None:
         """Adds a message on :param:`node` for the missing exception type.
 
         Args:
             missing_excs: list(str). A list of missing exception types.
-            node: astroid.node_classes.NodeNG. The node show the message on.
+            node: astroid.nodes.NodeNG. The node show the message on.
         """
         if not missing_excs:
             return
@@ -1348,18 +1342,18 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     ]
 
     @checker_utils.only_required_for_messages('import-only-modules')
-    def visit_importfrom(self, node: astroid.node_classes.ImportFrom) -> None:
+    def visit_importfrom(self, node: astroid.nodes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node: astroid.node_classes.ImportFrom. Node for a import-from
+            node: astroid.nodes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
 
         try:
             imported_module = node.do_import_module(node.modname)
-        except astroid.AstroidBuildingError:
+        except astroid.exceptions.AstroidBuildingError:
             return
 
         if node.modname in self.EXCLUDED_IMPORT_MODULES:
@@ -1369,7 +1363,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         for name, _ in node.names:
             try:
                 imported_module.import_module(name, True)
-            except astroid.AstroidImportError:
+            except astroid.exceptions.AstroidImportError:
                 self.add_message(
                     'import-only-modules',
                     node=node,
@@ -1395,11 +1389,11 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def process_module(self, node: astroid.nodes.Module) -> None:
         """Process a module.
 
         Args:
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         file_content = read_from_node(node)
         for line_num, line in enumerate(file_content):
@@ -1429,12 +1423,12 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
         ),
     }
 
-    def visit_functiondef(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits every function definition in the python file and check the
         function arguments order. It then adds a message accordingly.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
 
@@ -1520,12 +1514,12 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
     def _iterate_forbidden_imports(
         self,
-        node: astroid.node_classes.Import | astroid.node_classes.ImportFrom,
+        node: astroid.nodes.Import | astroid.nodes.ImportFrom,
     ) -> Generator[Tuple[str, Tuple[str, Optional[str]]], None, None]:
         """Yields pairs of module name and forbidden imports.
 
         Args:
-            node: astroid.node_classes.Import|astroid.node_classes.ImportFrom. A
+            node: astroid.nodes.Import|astroid.nodes.ImportFrom. A
                 Node from some `import *` or `from * import *` in the AST.
 
         Yields:
@@ -1543,14 +1537,14 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
     def _add_invalid_import_message(
         self,
-        node: astroid.node_classes.Import | astroid.node_classes.ImportFrom,
+        node: astroid.nodes.Import | astroid.nodes.ImportFrom,
         module_name: str,
         forbidden_import_names: Tuple[str, Optional[str]],
     ) -> None:
         """Adds pylint message about the invalid import.
 
         Args:
-            node: astroid.node_classes.Import|astroid.node_classes.ImportFrom. A
+            node: astroid.nodes.Import|astroid.nodes.ImportFrom. A
                 Node for a import statement in the AST.
             module_name: str. The module that was checked.
             forbidden_import_names: tuple(str, str|None). The import that
@@ -1573,11 +1567,11 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 ),
             )
 
-    def visit_import(self, node: astroid.node_classes.Import) -> None:
+    def visit_import(self, node: astroid.nodes.Import) -> None:
         """Visits every import statement in the file.
 
         Args:
-            node: astroid.node_classes.Import. Node for a import statement
+            node: astroid.nodes.Import. Node for a import statement
                 in the AST.
         """
         names = [name for name, _ in node.names]
@@ -1595,12 +1589,12 @@ class RestrictedImportChecker(checkers.BaseChecker):
                     node, module_name, forbidden_import_names
                 )
 
-    def visit_importfrom(self, node: astroid.node_classes.ImportFrom) -> None:
+    def visit_importfrom(self, node: astroid.nodes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node: astroid.node_classes.ImportFrom. Node for a import-from
+            node: astroid.nodes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
         forbidden_imports = self._iterate_forbidden_imports(node)
@@ -1637,11 +1631,11 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def process_module(self, node: astroid.nodes.Module) -> None:
         """Process a module.
 
         Args:
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
 
         file_content = read_from_node(node)
@@ -1846,12 +1840,12 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         ),
     }
 
-    def visit_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def visit_module(self, node: astroid.nodes.Module) -> None:
         """Visit a module to ensure that there is a blank line below
         file overview docstring.
 
         Args:
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         # Check if the given node has docstring.
         if node.doc_node is None:
@@ -1979,12 +1973,12 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         ),
     )
 
-    def visit_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def visit_module(self, node: astroid.nodes.Module) -> None:
         """Visit a module to ensure that there is a comment for each MyPy
         type ignore.
 
         Args:
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         tokens = pylint_utils.tokenize_module(node)
         self._process_module_tokens(tokens, node)
@@ -1992,7 +1986,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     def _process_module_tokens(
         self,
         tokens: List[tokenize.TokenInfo],
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks if the MyPy type ignores present in a module are properly
         documented by a code comment or not. Also, checks for unnecessary code
@@ -2000,7 +1994,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         expected_type_ignore_comment_substring = (
             r'Here we use MyPy ignore because'
@@ -2184,12 +2178,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         ),
     }
 
-    def visit_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def visit_module(self, node: astroid.nodes.Module) -> None:
         """Visit a module to ensure that there is a comment for each exceptional
         type (cast, Any and object).
 
         Args:
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         tokens = pylint_utils.tokenize_module(node)
         self._process_module_tokens(tokens, node)
@@ -2197,7 +2191,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def _process_module_tokens(
         self,
         tokens: List[tokenize.TokenInfo],
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks whether an exceptional type in backend type annotations is
         documented. If exceptional type is not documented, then it adds a
@@ -2205,7 +2199,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         self.check_comment_is_present_with_any_type(tokens, node)
         self.check_comment_is_present_with_cast_method(tokens, node)
@@ -2270,7 +2264,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         line: str,
         line_num: int,
         exceptional_type: str,
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks whether the given exceptional type in a module has been
         documented or not. If the exceptional type is not documented then
@@ -2289,7 +2283,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line_num: int. The line number of given token.
             exceptional_type: str. The exceptional type for which this method
                 is called, Possible values can be 'Any' or 'object'.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         # Checking if linters are in argument-section, return-section or
         # outside of the function signature.
@@ -2380,7 +2374,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         self,
         exceptional_type: str,
         line_num: int,
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """This method should be called only when an exceptional type error is
         encountered. If the exceptional type is Any then 'any-type-used' error
@@ -2391,7 +2385,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             exceptional_type: str. The exceptional type for which this method
                 is called, Possible values can be 'Any', 'object' and 'cast'.
             line_num: int. The line number where error is encountered.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         if exceptional_type == 'Any':
             self.add_message('any-type-used', line=line_num, node=node)
@@ -2403,7 +2397,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def check_comment_is_present_with_object_class(
         self,
         tokens: List[tokenize.TokenInfo],
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks whether the object class in a module has been documented
         or not. If the object class is not documented then adds an error
@@ -2411,7 +2405,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         object_class_status_dict: TypeStatusDict = copy.deepcopy(
             self.EXCEPTIONAL_TYPE_STATUS_DICT
@@ -2441,7 +2435,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def check_comment_is_present_with_cast_method(
         self,
         tokens: List[tokenize.TokenInfo],
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks whether the cast method in a module has been documented
         or not. If the cast method is not documented then adds an error
@@ -2449,7 +2443,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         expected_cast_method_comment_substring = r'Here we use cast because'
         cast_comment_present = False
@@ -2495,7 +2489,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def check_comment_is_present_with_any_type(
         self,
         tokens: List[tokenize.TokenInfo],
-        node: astroid.scoped_nodes.Module,
+        node: astroid.nodes.Module,
     ) -> None:
         """Checks whether the Any type in a module has been documented
         or not. If the Any type is not documented then adds an error
@@ -2503,7 +2497,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.scoped_nodes.Module. Node to access module content.
+            node: astroid.nodes.Module. Node to access module content.
         """
         import_status_dict: ImportStatusDict = {
             'single_line_import': False,
@@ -2557,11 +2551,11 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
         )
     }
 
-    def visit_compare(self, node: astroid.node_classes.Compare) -> None:
+    def visit_compare(self, node: astroid.nodes.Compare) -> None:
         """Called for comparisons (a != b).
 
         Args:
-            node: astroid.node_classes.Compare. A node indicating comparison.
+            node: astroid.nodes.Compare. A node indicating comparison.
         """
 
         ops = node.ops
@@ -2591,12 +2585,12 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
         )
     }
 
-    def visit_functiondef(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Visit every function definition and ensure their name doesn't have
         test_only as its prefix.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. A node for a function or
+            node: astroid.nodes.FunctionDef. A node for a function or
                 method definition in the AST.
         """
         modnode = node.root()
@@ -2715,12 +2709,12 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                 r'{}'.format('|'.join(remove_regexes))
             )
 
-    def visit_call(self, node: astroid.node_classes.Call) -> None:
+    def visit_call(self, node: astroid.nodes.Call) -> None:
         """Visit a function call to ensure that the call is
         not using any disallowed functions.
 
         Args:
-            node: astroid.node_classes.Call. Node to access call content.
+            node: astroid.nodes.Call. Node to access call content.
         """
         func = node.func.as_string()
         if func in self.funcs_to_replace_str:
@@ -2787,12 +2781,12 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     }
 
     def check_given_variable_is_a_dict(
-        self, node: astroid.scoped_nodes.ClassDef, variable_name: str
+        self, node: astroid.nodes.ClassDef, variable_name: str
     ) -> bool:
         """Checks whether schema variable of a handlers class is of dict type.
 
         Args:
-            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+            node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
             variable_name: str. Name of the variable which contains schemas.
 
@@ -2809,12 +2803,12 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         return True
 
     def check_parent_class_is_basehandler(
-        self, node: astroid.scoped_nodes.ClassDef
+        self, node: astroid.nodes.ClassDef
     ) -> bool:
         """Checks whether the parent class of given class is BaseHandler.
 
         Args:
-            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+            node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
 
         Returns:
@@ -2825,12 +2819,12 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
                 return True
         return False
 
-    def visit_classdef(self, node: astroid.scoped_nodes.ClassDef) -> None:
+    def visit_classdef(self, node: astroid.nodes.ClassDef) -> None:
         """Visit each class definition in controllers layer module and check
         if it contains schema or not.
 
         Args:
-            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+            node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
         if not self.check_parent_class_is_basehandler(node):
@@ -2878,12 +2872,12 @@ class DisallowedImportsChecker(checkers.BaseChecker):
         ),
     }
 
-    def visit_importfrom(self, node: astroid.node_classes.ImportFrom) -> None:
+    def visit_importfrom(self, node: astroid.nodes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and ensures that
         only allowed imports are made.
 
         Args:
-            node: astroid.node_classes.ImportFrom. Node for a import-from
+            node: astroid.nodes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
         if node.modname != 'typing':
@@ -2906,26 +2900,26 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
         ),
     }
 
-    def visit_binop(self, node: astroid.node_classes.BinOp) -> None:
+    def visit_binop(self, node: astroid.nodes.BinOp) -> None:
         """Visits a binary operation node in the AST
         then checks if it's a string concatenation operation.
 
         Args:
-            node: astroid.node_classes.BinOp. The binary operation node to
+            node: astroid.nodes.BinOp. The binary operation node to
                 check.
         """
 
-        if isinstance(node, astroid.node_classes.BinOp) and node.op == '+':
+        if isinstance(node, astroid.nodes.BinOp) and node.op == '+':
             try:
                 left_inferred = next(node.left.infer())
                 right_inferred = next(node.right.infer())
-            except astroid.InferenceError:
+            except astroid.exceptions.InferenceError:
                 return
             # Ignore operation if either side is inferred to be a datetime obj.
             if any(
                 isinstance(
                     inferred,
-                    (astroid.node_classes.Instance, astroid.node_classes.Const),
+                    (astroid.bases.Instance, astroid.nodes.Const),
                 )
                 and isinstance(inferred.pytype(), str)
                 and 'datetime.datetime' in inferred.pytype()
@@ -2933,8 +2927,8 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
             ):
                 return
             if (
-                isinstance(left_inferred, astroid.node_classes.Const)
-                and isinstance(right_inferred, astroid.node_classes.Const)
+                isinstance(left_inferred, astroid.nodes.Const)
+                and isinstance(right_inferred, astroid.nodes.Const)
                 and isinstance(left_inferred.value, str)
                 and isinstance(right_inferred.value, str)
             ):
@@ -2980,8 +2974,8 @@ class QuoteConventionChecker(
     }
 
     NODE_TYPES_WITH_CHECKED_DOCS = (
-        astroid.scoped_nodes.ClassDef,
-        astroid.scoped_nodes.FunctionDef,
+        astroid.nodes.ClassDef,
+        astroid.nodes.FunctionDef,
     )
 
     def __init__(self, linter: lint.PyLinter) -> None:
@@ -2990,7 +2984,7 @@ class QuoteConventionChecker(
         # module, populated from the AST before the tokens are classified.
         self._docstring_token_positions: Set[Tuple[int, int]] = set()
 
-    def process_module(self, node: astroid.scoped_nodes.Module) -> None:
+    def process_module(self, node: astroid.nodes.Module) -> None:
         """Records the source position of every docstring in the module.
 
         Pylint calls `process_module` (a raw-file-checker hook) before

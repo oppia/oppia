@@ -27,7 +27,7 @@ from core.platform import models
 
 from typing import Final, Type
 
-MYPY = True
+MYPY = False
 if MYPY:
     from mypy_imports import question_models
 

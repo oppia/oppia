@@ -703,27 +703,32 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN: Callable[  # pylint: disable=invalid-name
-    [str], str
-] = lambda recipient_username: f'Hi {recipient_username},'
-DEFAULT_SIGNOFF_HTML_FN: Callable[  # pylint: disable=invalid-name
-    [str], str
-] = lambda sender_username: f'Thanks!<br>{sender_username} (Oppia moderator)'
-DEFAULT_EMAIL_SUBJECT_FN: Callable[  # pylint: disable=invalid-name
-    [str], str
-] = (
-    lambda exp_title: f'Your Oppia exploration "{exp_title}" has been unpublished'
-)
+
+
+def default_salutation_html_fn(recipient_username: str) -> str:
+    """Returns the default HTML salutation for the given email recipient."""
+    return f'Hi {recipient_username},'
+
+
+def default_signoff_html_fn(sender_username: str) -> str:
+    """Returns the default HTML signoff for the given email sender."""
+    return f'Thanks!<br>{sender_username} (Oppia moderator)'
+
+
+def default_email_subject_fn(exp_title: str) -> str:
+    """Returns the default email subject for the given exploration title."""
+    return f'Your Oppia exploration "{exp_title}" has been unpublished'
+
 
 VALID_MODERATOR_ACTIONS: Dict[
     str, Dict[str, Union[str, Callable[[str], str]]]
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
+        'email_subject_fn': default_email_subject_fn,
         'email_intent': 'unpublish_exploration',
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
+        'email_salutation_html_fn': default_salutation_html_fn,
+        'email_signoff_html_fn': default_signoff_html_fn,
     },
 }
 

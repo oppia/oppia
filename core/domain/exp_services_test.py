@@ -11481,7 +11481,8 @@ class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-    SAMPLE_EXPLORATION_YAML: str = """
+    SAMPLE_EXPLORATION_YAML: str = (
+        """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -11635,6 +11636,7 @@ states_schema_version: 42
 tags: []
 title: Title
 """
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -11872,7 +11874,8 @@ class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-    SAMPLE_EXPLORATION_YAML: str = """
+    SAMPLE_EXPLORATION_YAML: str = (
+        """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -12060,6 +12063,7 @@ states_schema_version: 42
 tags: []
 title: Title
 """
+    )
 
     def setUp(self) -> None:
         super().setUp()
