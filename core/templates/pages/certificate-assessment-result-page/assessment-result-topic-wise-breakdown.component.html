@@ -5,7 +5,7 @@
     <span class="topic-row-name">{{ topic.topicName }}</span>
     <div class="topic-row-bar" role="progressbar"
          [attr.aria-label]="topic.topicName"
-         [attr.aria-valuenow]="topic.scorePercentage"
+         [attr.aria-valuenow]="topic.scorePercentage | number: '1.0-0'"
          aria-valuemin="0"
          aria-valuemax="100">
       <div class="topic-row-bar-fill" [style.width.%]="topic.scorePercentage">

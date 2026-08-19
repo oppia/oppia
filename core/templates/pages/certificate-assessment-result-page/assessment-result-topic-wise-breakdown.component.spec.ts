@@ -55,5 +55,8 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
     expect(rows[0].querySelector('.topic-row-value').textContent).toContain(
       '88%'
     );
+    expect(
+      rows[0].querySelector('.topic-row-bar').getAttribute('aria-valuenow')
+    ).toBe('88');
   });
 });
