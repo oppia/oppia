@@ -20,6 +20,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Optional,
   Output,
@@ -36,7 +37,10 @@ import {
 import {StateBackendDict} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {
+  CurrentInteractionService,
+  OnSubmitFn,
+} from 'pages/exploration-player-page/services/current-interaction.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -53,7 +57,9 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   templateUrl: './certificate-assessment-player-page.component.html',
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
-export class CertificateAssessmentPlayerPageComponent implements OnInit {
+export class CertificateAssessmentPlayerPageComponent
+  implements OnInit, OnDestroy
+{
   @Input() attempt: CertificateAssessmentAttemptData | null = null;
   @Input() classroomUrlFragment = '';
   @Output() assessmentSubmitted = new EventEmitter<
@@ -93,6 +99,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   totalQuestionCount = 0;
   progressPercentage = 0;
   isLastQuestion = false;
+  private handleSubmitFn: OnSubmitFn;
 
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
@@ -104,12 +111,15 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private focusManagerService: FocusManagerService,
     private interactionRulesRegistryService: InteractionRulesRegistryService
-  ) {}
+  ) {
+    // Stored as a field so that the exact same bound function reference
+    // can be cleared on destroy. Calling bind() inline would create a new
+    // function each time, defeating identity-safe cleanup.
+    this.handleSubmitFn = this.handleInteractionSubmit.bind(this);
+  }
 
   ngOnInit(): void {
-    this.currentInteractionService.setOnSubmitFn(
-      this.handleInteractionSubmit.bind(this)
-    );
+    this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.loadQuestion(0);
     this.refreshComputedFields();
     if (this.showTimeExpiredModal) {
@@ -118,6 +128,10 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     if (this.showUnansweredQuestionModal) {
       this.openUnansweredQuestionModal();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.currentInteractionService.clearOnSubmitFn(this.handleSubmitFn);
   }
 
   /**
@@ -251,7 +265,10 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   }
 
   submitAssessment(): void {
-    const answers = this.questions.map(question => {
+    const loadedQuestions = this.questions.filter(
+      (question): question is AssessmentQuestion => question !== undefined
+    );
+    const answers = loadedQuestions.map(question => {
       const answer = this.answers[question.id] ?? null;
       let isCorrect = false;
       if (answer !== null) {
@@ -328,10 +345,10 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
    * the backend submission payload.
    */
   private formatAnswerForBackend(answer: InteractionAnswer): string {
-    if (Array.isArray(answer)) {
-      return answer.join(',');
+    if (typeof answer === 'string') {
+      return answer;
     }
-    return String(answer);
+    return JSON.stringify(answer);
   }
 
   getProgressPercentage(): number {
@@ -359,6 +376,13 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   private getTotalQuestionCount(): number {
     return this.attempt?.questions.length ?? this.questions.length;
+  }
+
+  /** Retries loading the question at the current index after a failure.
+   *  Guards in loadQuestion prevent duplicate or in-flight requests, so this
+   *  is safe to call repeatedly. */
+  retryLoadQuestion(): void {
+    this.loadQuestion(this.currentQuestionIndex);
   }
 
   /**

@@ -56,7 +56,8 @@ export type AssessmentQuestionType =
   | 'fraction_input'
   | 'number_with_units'
   | 'drag_and_drop_sort'
-  | 'image_click';
+  | 'image_click'
+  | 'unsupported';
 
 /** Named constants for AssessmentQuestionType values. */
 export const AssessmentQuestionTypes = {
@@ -68,6 +69,7 @@ export const AssessmentQuestionTypes = {
   NUMBER_WITH_UNITS: 'number_with_units' as const,
   DRAG_AND_DROP_SORT: 'drag_and_drop_sort' as const,
   IMAGE_CLICK: 'image_click' as const,
+  UNSUPPORTED: 'unsupported' as const,
 };
 
 /** An answer choice within an assessment question. */
@@ -124,7 +126,7 @@ export function getAssessmentQuestionType(
     case 'ImageClickInput':
       return AssessmentQuestionTypes.IMAGE_CLICK;
     default:
-      return AssessmentQuestionTypes.TEXT_INPUT;
+      return AssessmentQuestionTypes.UNSUPPORTED;
   }
 }
 

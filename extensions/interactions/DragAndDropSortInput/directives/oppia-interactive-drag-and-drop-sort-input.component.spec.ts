@@ -223,6 +223,24 @@ describe('Drag and drop sort input interactive component', () => {
       ]);
     });
 
+    it('should make a default list of lists when savedSolution is undefined', () => {
+      component.savedSolution = undefined;
+      component.ngOnInit();
+
+      expect(component.allowMultipleItemsInSamePosition).toBe(true);
+      expect(component.multipleItemsInSamePositionArray).toEqual([
+        [],
+        ['<p>choice 1</p>'],
+        [],
+        ['<p>choice 2</p>'],
+        [],
+        ['<p>choice 3</p>'],
+        [],
+        ['<p>choice 4</p>'],
+        [],
+      ]);
+    });
+
     it('should move items inside same list', () => {
       component.noShow = 1;
       component.hide = [1, 2, 3, 4];
@@ -1024,6 +1042,18 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list when user did not save a solution', () => {
       component.savedSolution = null;
+      component.ngOnInit();
+
+      expect(component.allowMultipleItemsInSamePosition).toBe(false);
+      expect(component.singleItemInSamePositionArray).toEqual([
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+      ]);
+    });
+
+    it('should make a default list when savedSolution is undefined', () => {
+      component.savedSolution = undefined;
       component.ngOnInit();
 
       expect(component.allowMultipleItemsInSamePosition).toBe(false);

@@ -114,19 +114,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     this.choices = this.getOrderedChoices();
 
     this.answer = this.lastAnswer !== undefined ? this.lastAnswer : null;
-    if (this.answer !== null) {
-      const selectedChoice = this.choices.find(
-        choice => choice.originalIndex === this.answer
-      );
-      if (selectedChoice) {
-        const selectedElement = document.querySelector(
-          'button.multiple-choice-option.selected'
-        );
-        if (selectedElement) {
-          selectedElement.classList.remove('selected');
-        }
-      }
-    }
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(),
       () => this.validate()
@@ -139,15 +126,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       return;
     }
     this.errorMessageI18nKey = '';
-    // Deselect previously selected option.
-    var selectedElement = document.querySelector(
-      'button.multiple-choice-option.selected'
-    );
-    if (selectedElement) {
-      selectedElement.classList.remove('selected');
-    }
-    // Selected current option.
-    (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
   }

@@ -40,7 +40,7 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     );
     currentInteractionServiceSpy = jasmine.createSpyObj(
       'CurrentInteractionService',
-      ['submitAnswer']
+      ['submitAnswer', 'isSubmitAnswerFnRegistered']
     );
 
     await TestBed.configureTestingModule({
@@ -86,6 +86,9 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
 
   it('should call submitAnswer and emit nextQuestion on onNextQuestion', () => {
     spyOn(component.nextQuestion, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
 
     component.onNextQuestion();
 
@@ -93,17 +96,34 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     expect(component.nextQuestion.emit).toHaveBeenCalled();
   });
 
-  it('should still emit nextQuestion when submitAnswer throws in onNextQuestion', () => {
+  it('should not call submitAnswer when no submit function is registered', () => {
     spyOn(component.nextQuestion, 'emit');
-    currentInteractionServiceSpy.submitAnswer.and.throwError('not registered');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      false
+    );
 
     component.onNextQuestion();
 
+    expect(currentInteractionServiceSpy.submitAnswer).not.toHaveBeenCalled();
     expect(component.nextQuestion.emit).toHaveBeenCalled();
+  });
+
+  it('should let submitAnswer errors propagate in onNextQuestion', () => {
+    spyOn(component.nextQuestion, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
+    currentInteractionServiceSpy.submitAnswer.and.throwError('submit failed');
+
+    expect(() => component.onNextQuestion()).toThrowError('submit failed');
+    expect(component.nextQuestion.emit).not.toHaveBeenCalled();
   });
 
   it('should call submitAnswer and emit submitAssessment on onSubmitAssessment', () => {
     spyOn(component.submitAssessment, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
 
     component.onSubmitAssessment();
 
@@ -111,12 +131,26 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     expect(component.submitAssessment.emit).toHaveBeenCalled();
   });
 
-  it('should still emit submitAssessment when submitAnswer throws in onSubmitAssessment', () => {
+  it('should not call submitAnswer when no submit function is registered for assessment', () => {
     spyOn(component.submitAssessment, 'emit');
-    currentInteractionServiceSpy.submitAnswer.and.throwError('not registered');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      false
+    );
 
     component.onSubmitAssessment();
 
+    expect(currentInteractionServiceSpy.submitAnswer).not.toHaveBeenCalled();
     expect(component.submitAssessment.emit).toHaveBeenCalled();
+  });
+
+  it('should let submitAnswer errors propagate in onSubmitAssessment', () => {
+    spyOn(component.submitAssessment, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
+    currentInteractionServiceSpy.submitAnswer.and.throwError('submit failed');
+
+    expect(() => component.onSubmitAssessment()).toThrowError('submit failed');
+    expect(component.submitAssessment.emit).not.toHaveBeenCalled();
   });
 });

@@ -7,6 +7,11 @@
 </div>
 <div *ngIf="loadError" class="text-center py-3 text-danger">
   <p>Failed to load the question. Please try again later.</p>
+  <button type="button"
+          class="btn certificate-assessment-primary-button"
+          (click)="retryLoadQuestion()">
+    Retry
+  </button>
 </div>
 <oppia-certificate-assessment-conversation-skin #conversationSkin
                                                 *ngIf="!isLoadingQuestion && currentQuestion"

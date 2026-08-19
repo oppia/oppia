@@ -32,8 +32,11 @@ import {
   CertificateAssessmentAttemptData,
   CertificateAssessmentQuestionData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
-import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
+import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -56,7 +59,7 @@ const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
 
 const customizationArgsFor = (
   interactionId: string
-): Record<string, unknown> => {
+): InteractionCustomizationArgsBackendDict => {
   switch (interactionId) {
     case 'TextInput':
       return {
@@ -186,6 +189,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let registrySpy: jasmine.SpyObj<InteractionRulesRegistryService>;
   let classificationSpy: jasmine.SpyObj<AnswerClassificationService>;
   let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
+  let currentInteractionServiceSpy: jasmine.SpyObj<CurrentInteractionService>;
 
   const setup = async (
     attempt: CertificateAssessmentAttemptData | null = makeAttempt()
@@ -205,11 +209,16 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       'getRulesServiceByInteractionId',
     ]);
     registrySpy.getRulesServiceByInteractionId.and.returnValue({
-      Equals: (answer: unknown, ruleInputs: {x: unknown}) => {
+      Equals: (
+        answer: InteractionAnswer,
+        ruleInputs: {x: InteractionAnswer}
+      ) => {
         if (Array.isArray(answer) && Array.isArray(ruleInputs.x)) {
+          const answerArray = answer as InteractionAnswer[];
+          const xArray = ruleInputs.x as InteractionAnswer[];
           return (
-            answer.length === ruleInputs.x.length &&
-            answer.every((v, i) => v === (ruleInputs.x as unknown[])[i])
+            answerArray.length === xArray.length &&
+            answerArray.every((v, i) => v === xArray[i])
           );
         }
         return answer === ruleInputs.x;
@@ -218,14 +227,20 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     classificationSpy = jasmine.createSpyObj('Classification', [
       'getMatchingClassificationResult',
     ]);
-    classificationSpy.getMatchingClassificationResult.and.returnValue({
-      outcome: {labelledAsCorrect: false},
-      answerGroupIndex: 0,
-      ruleIndex: 0,
-      classificationCategorization: 'default_outcome',
-    } as never);
+    classificationSpy.getMatchingClassificationResult.and.returnValue(
+      new AnswerClassificationResult(
+        Outcome.createFromBackendDict(outcome(false)),
+        0,
+        0,
+        'default_outcome'
+      )
+    );
     formatterSpy = jasmine.createSpyObj('Formatter', ['getInteractionHtml']);
     formatterSpy.getInteractionHtml.and.returnValue('<div>interaction</div>');
+    currentInteractionServiceSpy = jasmine.createSpyObj('CurrentInteraction', [
+      'setOnSubmitFn',
+      'clearOnSubmitFn',
+    ]);
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
@@ -244,9 +259,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         {provide: ExplorationHtmlFormatterService, useValue: formatterSpy},
         {
           provide: CurrentInteractionService,
-          useValue: jasmine.createSpyObj('CurrentInteraction', [
-            'setOnSubmitFn',
-          ]),
+          useValue: currentInteractionServiceSpy,
         },
         {
           provide: FocusManagerService,
@@ -293,6 +306,18 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.questions.length).toBe(0);
     expect(apiSpy.getCertificateAssessmentQuestionAsync).not.toHaveBeenCalled();
   });
+
+  it('should register and clear its onSubmit callback on destroy', fakeAsync(() => {
+    loadQ1();
+    const registeredFn =
+      currentInteractionServiceSpy.setOnSubmitFn.calls.mostRecent().args[0];
+    expect(typeof registeredFn).toBe('function');
+
+    fixture.destroy();
+    expect(currentInteractionServiceSpy.clearOnSubmitFn).toHaveBeenCalledWith(
+      registeredFn
+    );
+  }));
 
   it('should not load when attempt question index is out of range', fakeAsync(() => {
     loadQ1();
@@ -363,6 +388,26 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     ](0);
     flushMicrotasks();
     expect(component.loadError).toBeFalse();
+  }));
+
+  it('should retry loading the current question after a failure', fakeAsync(() => {
+    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
+      Promise.reject(new Error('err'))
+    );
+    loadQ1();
+    expect(component.loadError).toBeTrue();
+    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
+      Promise.resolve(questionResponse('q1'))
+    );
+
+    component.retryLoadQuestion();
+    flushMicrotasks();
+
+    expect(component.loadError).toBeFalse();
+    expect(component.currentQuestion).not.toBeNull();
+    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
+      2
+    );
   }));
 
   it('should not reload already loaded question', fakeAsync(() => {
@@ -590,19 +635,41 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should emit correct answers on submit', fakeAsync(() => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
-    classificationSpy.getMatchingClassificationResult.and.returnValue({
-      outcome: {labelledAsCorrect: true},
-      answerGroupIndex: 0,
-      ruleIndex: 0,
-      classificationCategorization: 'explicit',
-    } as never);
+    classificationSpy.getMatchingClassificationResult.and.returnValue(
+      new AnswerClassificationResult(
+        Outcome.createFromBackendDict(outcome(true)),
+        0,
+        0,
+        'explicit'
+      )
+    );
     component.answers.q1 = 1;
     component.answers.q2 = ['a', 'b', 'd'];
     component.submitAssessment();
     expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
       {question_id: 'q1', is_correct: true, selected_answer: '1'},
-      {question_id: 'q2', is_correct: true, selected_answer: 'a,b,d'},
+      {question_id: 'q2', is_correct: true, selected_answer: '["a","b","d"]'},
       {question_id: 'q3', is_correct: false},
+    ]);
+  }));
+
+  it('should skip unloaded questions when submitting', fakeAsync(() => {
+    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      (_attemptId: string, questionId: string) => {
+        if (questionId === 'q2') {
+          return Promise.reject(new Error('load failed'));
+        }
+        return Promise.resolve(questionResponse(questionId));
+      }
+    );
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.q1 = 1;
+    component.answers.q3 = 'circle';
+    component.submitAssessment();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'q1', is_correct: false, selected_answer: '1'},
+      {question_id: 'q3', is_correct: false, selected_answer: 'circle'},
     ]);
   }));
 
@@ -624,7 +691,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(answers[1]).toEqual({
       question_id: 'q2',
       is_correct: false,
-      selected_answer: 'a,c',
+      selected_answer: '["a","c"]',
     });
     expect(answers[2]).toEqual({
       question_id: 'q3',
@@ -643,6 +710,83 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(answers[0]).toEqual({question_id: 'q1', is_correct: false});
     expect(answers[0].selected_answer).toBeUndefined();
   }));
+
+  it('should preserve structured answers when formatting for backend', () => {
+    const formatAnswerForBackend = (
+      component as unknown as {
+        formatAnswerForBackend: (answer: InteractionAnswer) => string;
+      }
+    ).formatAnswerForBackend;
+
+    expect(
+      formatAnswerForBackend({
+        isNegative: false,
+        wholeNumber: 3,
+        numerator: 1,
+        denominator: 2,
+      })
+    ).toBe(
+      JSON.stringify({
+        isNegative: false,
+        wholeNumber: 3,
+        numerator: 1,
+        denominator: 2,
+      })
+    );
+    expect(
+      formatAnswerForBackend({
+        type: 'proper',
+        real: 4,
+        fraction: {
+          isNegative: false,
+          wholeNumber: 0,
+          numerator: 1,
+          denominator: 4,
+        },
+        units: [
+          {unit: 'm', exponent: 1},
+          {unit: 's', exponent: -1},
+        ],
+      })
+    ).toBe(
+      JSON.stringify({
+        type: 'proper',
+        real: 4,
+        fraction: {
+          isNegative: false,
+          wholeNumber: 0,
+          numerator: 1,
+          denominator: 4,
+        },
+        units: [
+          {unit: 'm', exponent: 1},
+          {unit: 's', exponent: -1},
+        ],
+      })
+    );
+    expect(
+      formatAnswerForBackend([
+        ['left-1', 'right-1'],
+        ['left-2', 'right-2'],
+      ])
+    ).toBe(
+      JSON.stringify([
+        ['left-1', 'right-1'],
+        ['left-2', 'right-2'],
+      ])
+    );
+    expect(
+      formatAnswerForBackend({
+        clickPosition: [12, 34],
+        clickedRegions: ['region-1', 'region-2'],
+      })
+    ).toBe(
+      JSON.stringify({
+        clickPosition: [12, 34],
+        clickedRegions: ['region-1', 'region-2'],
+      })
+    );
+  });
 
   it('should use registry to resolve rules service', fakeAsync(() => {
     load();
@@ -674,7 +818,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       ['NumberWithUnits', AssessmentQuestionTypes.NUMBER_WITH_UNITS],
       ['DragAndDropSortInput', AssessmentQuestionTypes.DRAG_AND_DROP_SORT],
       ['ImageClickInput', AssessmentQuestionTypes.IMAGE_CLICK],
-      ['UnknownType', AssessmentQuestionTypes.TEXT_INPUT],
+      ['UnknownType', AssessmentQuestionTypes.UNSUPPORTED],
     ];
     const ids = allTypes.map((_, i) => `t${i}`);
     await setup(makeAttempt(ids));

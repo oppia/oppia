@@ -260,9 +260,9 @@ describe('AssessmentQuestionTypes constants', () => {
     expect(AssessmentQuestionTypes.IMAGE_CLICK).toBe('image_click');
   });
 
-  it('should have exactly 8 constants', () => {
+  it('should have exactly 9 constants', () => {
     const keys = Object.keys(AssessmentQuestionTypes);
-    expect(keys.length).toBe(8);
+    expect(keys.length).toBe(9);
   });
 });
 
@@ -294,9 +294,9 @@ describe('getAssessmentQuestionType', () => {
     );
   });
 
-  it('should default to TEXT_INPUT for unknown interaction types', () => {
+  it('should default to UNSUPPORTED for unknown interaction types', () => {
     expect(getAssessmentQuestionType('UnknownType')).toBe(
-      AssessmentQuestionTypes.TEXT_INPUT
+      AssessmentQuestionTypes.UNSUPPORTED
     );
   });
 });

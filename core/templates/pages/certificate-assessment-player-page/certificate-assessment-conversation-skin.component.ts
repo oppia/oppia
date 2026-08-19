@@ -62,21 +62,21 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
   }
 
   onNextQuestion(): void {
-    try {
+    // Interactions that submit answers via their own handlers (e.g.
+    // ImageClickInput) do not register a submit function, so calling
+    // submitAnswer() would throw. The answer was already captured via the
+    // interaction's own onSubmit -> handleInteractionSubmit, so we can
+    // navigate without submitting again. For registered interactions, let
+    // genuine submission failures surface rather than silently navigating.
+    if (this.currentInteractionService.isSubmitAnswerFnRegistered()) {
       this.currentInteractionService.submitAnswer();
-    } catch {
-      // SubmitAnswerFn may not be registered yet (e.g. ImageClickInput)
-      // or the interaction hasn't loaded. The answer (if any) was already
-      // captured via the interaction's own onSubmit -> handleInteractionSubmit.
     }
     this.nextQuestion.emit();
   }
 
   onSubmitAssessment(): void {
-    try {
+    if (this.currentInteractionService.isSubmitAnswerFnRegistered()) {
       this.currentInteractionService.submitAnswer();
-    } catch {
-      // Same rationale as onNextQuestion.
     }
     this.submitAssessment.emit();
   }

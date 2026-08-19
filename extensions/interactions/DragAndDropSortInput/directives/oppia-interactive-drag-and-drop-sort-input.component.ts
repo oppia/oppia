@@ -470,7 +470,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     let savedSolution = (
       this.lastAnswer !== null && this.lastAnswer !== undefined
         ? this.lastAnswer
-        : this.savedSolution !== null
+        : this.savedSolution !== null && this.savedSolution !== undefined
           ? this.savedSolution
           : []
     ) as DragAndDropAnswer;
