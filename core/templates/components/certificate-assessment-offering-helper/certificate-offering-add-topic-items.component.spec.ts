@@ -27,7 +27,7 @@ import {
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';

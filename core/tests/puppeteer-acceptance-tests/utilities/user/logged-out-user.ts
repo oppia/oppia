@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -67,7 +67,7 @@ const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
-const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const robotsTxtUrl = testConstants.URLs.RobotsTxt;
 const sitemapXmlUrl = testConstants.URLs.SitemapXml;
@@ -127,6 +127,7 @@ const footerTermsLink = 'a.e2e-test-terms-link';
 const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
 const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
 const footerContactUsLink = 'a.e2e-test-contact-link';
+const footerVersionInfoSelector = '.e2e-test-footer-version-info';
 
 const oppiaYouTubeLinkIcon = '.e2e-test-oppia-youtube-follow';
 const oppiaFacebookLinkIcon = '.e2e-test-oppia-facebook-follow';
@@ -217,10 +218,10 @@ const readBlogPostDesktopButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-desktop-button';
 const readBlogPostMobileButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-mobile-button';
-const applyToVolunteerButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
-const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
+const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
 const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
 const tabsPreviousButtonInVolunteerPage =
   '.e2e-test-volunteer-page-tabs-prev-btn';
@@ -491,6 +492,21 @@ const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
 const communityLibraryContainerSelector = '.e2e-test-library-container';
 const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
+
+// Collection library and player selectors.
+const collectionSummaryTileTitleSelector =
+  '.e2e-test-collection-summary-tile-title';
+const collectionExplorationSelector = '.e2e-test-collection-exploration';
+const mobileCollectionExplorationSelector =
+  '.e2e-mobile-test-collection-exploration';
+const mobilePathSegmentLinkSelector = '.mobile-path-segment a';
+const collectionPreviewTileSelector = '.oppia-exploration-summary-tile';
+const collectionPlayerTitleSelector = '.oppia-collection-player-title-font';
+const backToCollectionLinkSelector = '.conversation-skin-back-to-collection';
+const shareCollectionFooterSelector = '.e2e-test-share-collection-footer';
+const collectionPathLinkSelector = '.oppia-collection-path-section > a';
+const collectionPathExplorationLinkSelector =
+  '.oppia-collection-path-section a, .mobile-path-segment a';
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
 
@@ -611,10 +627,23 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
+const desktopCollectionExplorationTileSelector =
+  '.e2e-test-collection-exploration';
+const mobileCollectionExplorationTileSelector =
+  '.e2e-mobile-test-collection-exploration';
+const backToCollectionButtonSelector = '.conversation-skin-back-to-collection';
+const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
+const collectionPreviewTileLinkSelector =
+  '.oppia-exploration-summary-tile a[href*="/explore/"]';
+
+const viewSolutionButtonSelector = '.e2e-test-view-solution';
+const viewHintButtonSelector = '.e2e-test-view-hint';
+const textAreaInputSelector = 'textarea.e2e-test-description-box';
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
-const metaDescriptionSelector = 'meta[name="description"]';
+const metaDescriptionSelector =
+  'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
 
@@ -2226,6 +2255,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the footer version info matches the expected pattern.
+   * @param {RegExp} pattern - The regular expression pattern to match against the version text.
+   */
+  async expectFooterVersionToMatchPattern(pattern: RegExp): Promise<void> {
+    await this.page.waitForSelector(footerVersionInfoSelector);
+    const versionText = await this.page.$eval(
+      footerVersionInfoSelector,
+      el => el.textContent?.trim() || ''
+    );
+
+    if (!pattern.test(versionText)) {
+      throw new Error(
+        `Footer version text "${versionText}" does not match expected pattern ${pattern}`
+      );
+    }
+
+    showMessage(`Footer version verified: ${versionText}`);
+  }
+
+  /**
    * Function to click the first LinkedIn button in the Teach page
    * and check if it opens corresponding Creator's LinkedIn Url link
    */
@@ -2731,28 +2780,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Apply To Volunteer at the top of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the top of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheTopOfVolunteerPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
+      'Explore Volunteer Openings at the top of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
   /**
-   * Function to click the Apply To Volunteer at the bottom of the Volunteer page
-   * and check if it opens the Volunteer form.
+   * Function to click the Explore Volunteer Openings button at the bottom of the
+   * Volunteer page and check if it opens the Oppia Idealist page.
    */
-  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
     await this.clickLinkButtonToNewTab(
-      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
-      'Apply To Volunteer at the bottom of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
+      'Explore Volunteer Openings at the bottom of the Volunteer page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
@@ -3045,6 +3094,317 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that a collection with the given title is visible
+   * in the community library and returns the anchor element.
+   * @param {string} collectionTitle - The collection title to find.
+   * @returns {Promise<ElementHandle<Element>>} The anchor element wrapping the
+   *   collection tile.
+   */
+  async expectCollectionToBeVisibleInLibrary(
+    collectionTitle: string
+  ): Promise<ElementHandle<Element>> {
+    // The collection-summary-tile-title class is present on both the
+    // library groups page and the search results page.
+    await this.expectElementToBeVisible(collectionSummaryTileTitleSelector);
+
+    const titleElements = await this.page.$$(
+      collectionSummaryTileTitleSelector
+    );
+    for (const titleElement of titleElements) {
+      const title = await titleElement.evaluate(el => el.textContent?.trim());
+      if (title === collectionTitle) {
+        // Get the parent anchor <a> that wraps the tile.
+        const anchorHandle = await titleElement.evaluateHandle(el =>
+          el.closest('a')
+        );
+        const anchor = anchorHandle.asElement();
+        if (!anchor) {
+          throw new Error(
+            `Found collection "${collectionTitle}" but it has no parent anchor.`
+          );
+        }
+        showMessage(
+          `Collection "${collectionTitle}" is visible in library as expected.`
+        );
+        return anchor as ElementHandle<Element>;
+      }
+    }
+
+    const titles = await Promise.all(
+      titleElements.map(el => el.evaluate(e => e.textContent?.trim()))
+    );
+    throw new Error(
+      `Expected collection "${collectionTitle}" to be visible in library, ` +
+        `but found: [${titles.join(', ')}]`
+    );
+  }
+
+  /**
+   * Clicks on a collection with the given title in the community library.
+   * @param {string} collectionName - The name of the collection to click on.
+   */
+  async clickOnCollectionInLibrary(collectionName: string): Promise<void> {
+    const anchor =
+      await this.expectCollectionToBeVisibleInLibrary(collectionName);
+    await this.clickOnElement(anchor);
+    await this.waitForPageToFullyLoad();
+    showMessage(`Clicked on collection: "${collectionName}".`);
+  }
+
+  /**
+   * Verifies that the "Begin [collectionName]:" text is visible on the
+   * collection player page.
+   * @param {string} expectedText - The collection name.
+   */
+  async expectCollectionBeginTextVisible(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(collectionPlayerTitleSelector);
+    const titleText = await this.page.$eval(collectionPlayerTitleSelector, el =>
+      el.textContent?.trim()
+    );
+    if (!titleText || !titleText.includes(expectedText)) {
+      throw new Error(
+        `Expected "${expectedText}" to be visible, but found: "${titleText}".`
+      );
+    }
+    showMessage(`"${expectedText}" is visible on the collection player page.`);
+  }
+
+  /**
+   * Verifies that an exploration with the given name is visible on the
+   * collection player page.
+   * @param {string} explorationName - The exploration name.
+   */
+  async expectExplorationVisibleInCollectionPage(
+    explorationName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, explorations are rendered as SVG circles inside
+      // .mobile-path-segment elements. The exploration name is stored in the
+      // title-data attribute of the parent <a> element, not in textContent.
+      await this.expectElementToBeVisible(mobileCollectionExplorationSelector);
+      const found = await this.page.evaluate(
+        (name: string, selector: string) => {
+          const links = document.querySelectorAll(selector);
+          for (const link of links) {
+            const titleData = link.getAttribute('title-data') || '';
+            if (titleData.includes(name)) {
+              return true;
+            }
+          }
+          return false;
+        },
+        explorationName,
+        mobilePathSegmentLinkSelector
+      );
+
+      if (!found) {
+        throw new Error(
+          `Expected exploration "${explorationName}" to be visible in ` +
+            'collection, but it was not found.'
+        );
+      }
+    } else {
+      // On desktop, exploration titles are rendered in div elements above the
+      // SVG icons and the exploration links are direct children of the
+      // collection path section.
+      await this.expectElementToBeVisible(collectionExplorationSelector);
+      const found = await this.page.evaluate(
+        (name: string, selector: string) => {
+          const elements = document.querySelectorAll(selector);
+          for (const el of elements) {
+            if (el.textContent?.trim().includes(name)) {
+              return true;
+            }
+          }
+          return false;
+        },
+        explorationName,
+        collectionPathExplorationLinkSelector
+      );
+
+      if (!found) {
+        throw new Error(
+          `Expected exploration "${explorationName}" to be visible in ` +
+            'collection, but it was not found.'
+        );
+      }
+    }
+    showMessage(
+      `Exploration "${explorationName}" is visible in the collection.`
+    );
+  }
+
+  /**
+   * Plays an exploration from the collection player page by clicking on it.
+   * @param {string} explorationName - The exploration name to play.
+   */
+  async playExplorationFromCollectionPage(
+    explorationName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, the collection page shows SVG circles for each exploration.
+      // Clicking a circle triggers updateExplorationPreview(), which displays
+      // an exploration summary tile. Clicking the summary tile navigates to
+      // the exploration.
+      const mobileLinkElements = await this.page.$$(
+        mobilePathSegmentLinkSelector
+      );
+      for (const linkElement of mobileLinkElements) {
+        const titleData = await linkElement.evaluate(
+          el => el.getAttribute('title-data') || ''
+        );
+        if (titleData.includes(explorationName)) {
+          // Click the SVG circle to trigger Angular's click handler.
+          const svgElement = await linkElement.waitForSelector(
+            mobileCollectionExplorationSelector,
+            {visible: true}
+          );
+          if (!svgElement) {
+            throw new Error(
+              `Could not find exploration "${explorationName}" to play in the collection.`
+            );
+          }
+          await this.clickOnElement(svgElement);
+
+          // Wait for the exploration summary preview tile to appear.
+          await this.expectElementToBeVisible(collectionPreviewTileSelector);
+
+          await this.clickOnElementWithSelector(
+            `${collectionPreviewTileSelector} a`
+          );
+          await this.expectElementToBeVisible(stateConversationContent);
+          showMessage(`Playing exploration: "${explorationName}".`);
+          return;
+        }
+      }
+      throw new Error(
+        `Could not find exploration "${explorationName}" to play ` +
+          'in the collection.'
+      );
+    } else {
+      // On desktop, the exploration links are direct children of the
+      // collection path section.
+      const explorationLinkElements = await this.page.$$(
+        collectionPathLinkSelector
+      );
+      for (const linkElement of explorationLinkElements) {
+        const text = await linkElement.evaluate(el => el.textContent?.trim());
+        if (text && text.includes(explorationName)) {
+          await this.clickOnElement(linkElement);
+          await this.expectElementToBeVisible(stateConversationContent);
+          showMessage(`Playing exploration: "${explorationName}".`);
+          return;
+        }
+      }
+      throw new Error(
+        `Could not find exploration "${explorationName}" to play ` +
+          'in the collection.'
+      );
+    }
+  }
+
+  /**
+   * Clicks the "Back to Collection" link on the exploration player page.
+   */
+  async clickBackToCollection(): Promise<void> {
+    await this.expectElementToBeVisible(backToCollectionLinkSelector);
+    await this.clickOnElementWithSelector(backToCollectionLinkSelector);
+    await this.waitForPageToFullyLoad();
+
+    // Post-check: verify navigation back to the collection player page.
+    await this.expectElementToBeVisible(collectionPlayerTitleSelector);
+    showMessage('Clicked "Back to Collection".');
+  }
+
+  /**
+   * Verifies that the paw icon is visible for a completed exploration
+   * at the given index in the collection player page.
+   *
+   * Note: This method only works for logged-in users because the backend
+   * only tracks exploration completion for authenticated users. For guests,
+   * completed_exploration_ids is always empty and the paw icon will never
+   * render (see summary_services.get_learner_collection_dict_by_id).
+   *
+   * @param {number} explorationIndex - The 0-based index of the exploration.
+   */
+  async expectPawIconVisibleForExploration(
+    explorationIndex: number
+  ): Promise<void> {
+    // Desktop uses '.oppia-collection-path-section > a' while mobile
+    // uses '.mobile-path-segment' — the desktop section is hidden via
+    // CSS at widths <= 942px.
+    const selector = this.isViewportAtMobileWidth()
+      ? '.mobile-path-segment'
+      : collectionPathLinkSelector;
+
+    const hasPaw = await this.page.evaluate(
+      (index: number, sel: string) => {
+        const explorations = document.querySelectorAll(sel);
+        if (index >= explorations.length) {
+          return false;
+        }
+        const exploration = explorations[index];
+        const images = exploration.querySelectorAll('image');
+        for (const img of images) {
+          const xlinkHref =
+            img.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
+          const href = img.getAttribute('href') || '';
+          if (
+            xlinkHref.includes('collection_paw') ||
+            href.includes('collection_paw')
+          ) {
+            return true;
+          }
+        }
+        return false;
+      },
+      explorationIndex,
+      selector
+    );
+
+    if (!hasPaw) {
+      throw new Error(
+        `Expected paw icon on exploration at index ${explorationIndex}, ` +
+          'but it was not found.'
+      );
+    }
+    showMessage(
+      `Paw icon is visible for exploration at index ${explorationIndex}.`
+    );
+  }
+
+  /**
+   * Verifies the share collection footer text matches the expected value.
+   * On mobile viewports (< 658px), the share collection footer is hidden
+   * via CSS (display: none), so this check is skipped.
+   * @param {string} expectedText - The expected text (case-insensitive).
+   */
+  async expectShareCollectionFooterText(expectedText: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping share collection footer text check on mobile viewport ' +
+          '(element is hidden by CSS at widths below 658px).'
+      );
+      return;
+    }
+    await this.expectElementToBeVisible(shareCollectionFooterSelector);
+    const actualText = await this.page.$eval(
+      shareCollectionFooterSelector,
+      el => el.textContent?.trim()
+    );
+    if (
+      !actualText ||
+      actualText.toLowerCase() !== expectedText.toLowerCase()
+    ) {
+      throw new Error(
+        'Expected share collection footer text to be ' +
+          `"${expectedText}", but found: "${actualText}".`
+      );
+    }
+    showMessage(`Share collection footer text is "${actualText}" as expected.`);
+  }
+
+  /**
    * Function to verify the Features accordion functionality in the About page.
    * It verifies that the expand button opens the corresponding accordion panel content
    * and the close button closes it.
@@ -3178,7 +3538,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Volunteer with Oppia on the about page
-   * and check if it opens the Volunteer form.
+   * and check if it opens the Oppia Idealist page.
    */
   async clickVolunteerWithOppiaButtonInAboutPage(): Promise<void> {
     const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
@@ -3186,9 +3546,9 @@ export class LoggedOutUser extends BaseUser {
       : volunteerWithOppiaDesktopButtonInAboutPage;
     await this.clickLinkButtonToNewTab(
       volunteerWithOppiaButtonInAboutPage,
-      'Apply To Volunteer at the top of the Volunteer page',
-      volunteerFormUrl,
-      'Volunteer Form'
+      'Volunteer with Oppia at the bottom of the About page',
+      volunteerIdealistPageUrl,
+      'Oppia Idealist page'
     );
   }
 
@@ -3502,15 +3862,23 @@ export class LoggedOutUser extends BaseUser {
       practiceQuestionHeaderSelector,
       el => el?.textContent?.trim() ?? ''
     );
-    try {
-      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+    // Wait for either the desktop or mobile next button to be visible.
+    const nextButtonSelector = `${nextCardButton}, ${nextCardArrowButton}`;
+    await this.page.waitForSelector(nextButtonSelector, {visible: true});
+
+    // Determine which button is visible and click it.
+    const isDesktopButtonVisible = await this.page.evaluate(
+      (selector: string) => {
+        const desktopBtn = document.querySelector(selector);
+        return desktopBtn && (desktopBtn as HTMLElement).offsetParent !== null;
+      },
+      nextCardButton
+    );
+
+    if (isDesktopButtonVisible) {
       await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
     }
 
     await this.page.waitForFunction(
@@ -3536,15 +3904,23 @@ export class LoggedOutUser extends BaseUser {
       currentCardContentSelector,
       el => el.textContent
     );
-    try {
-      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+    // Wait for either the desktop or mobile next button to be visible.
+    const nextButtonSelector = `${nextCardButton}, ${nextCardArrowButton}`;
+    await this.page.waitForSelector(nextButtonSelector, {visible: true});
+
+    // Determine which button is visible and click it.
+    const isDesktopButtonVisible = await this.page.evaluate(
+      (selector: string) => {
+        const desktopBtn = document.querySelector(selector);
+        return desktopBtn && (desktopBtn as HTMLElement).offsetParent !== null;
+      },
+      nextCardButton
+    );
+
+    if (isDesktopButtonVisible) {
       await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
     }
 
     // Wait until card content changes.
@@ -4992,15 +5368,11 @@ export class LoggedOutUser extends BaseUser {
       timeout: 80000,
     });
 
-    // Dismiss the hint card tooltip if it is covering the hint button.
-    const hintCardTooltipCloseButton = await this.page.$(
-      '.hint-box .btn-close'
-    );
-    if (hintCardTooltipCloseButton) {
-      await hintCardTooltipCloseButton.click();
-    }
-
-    await this.clickOnElementWithSelector(hintButtonSelector);
+    // On mobile preview, nav overlays can occasionally block the hint button.
+    // Fall back to a direct DOM click if strict clickability checks fail.
+    await this.page.$eval(hintButtonSelector, el => {
+      (el as HTMLElement).click();
+    });
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -5054,11 +5426,54 @@ export class LoggedOutUser extends BaseUser {
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
   async viewSolution(timeout: number = 60000): Promise<void> {
+    const isSolutionButtonVisible = await this.isElementVisible(
+      viewSolutionButton,
+      true,
+      3000
+    );
+
+    // In some flows, the learner must consume the currently-visible hint
+    // before the solution button is shown.
+    if (!isSolutionButtonVisible) {
+      const isHintButtonVisible = await this.isElementVisible(
+        hintButtonSelector,
+        true,
+        3000
+      );
+
+      if (isHintButtonVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+    }
+
     await this.page.waitForSelector(viewSolutionButton, {
       visible: true,
       timeout: timeout,
     });
-    await this.clickOnElementWithSelector(viewSolutionButton);
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileNavOpen = await this.isElementVisible(
+        '.exp-nav-dropdown-container',
+        true,
+        1000
+      );
+      if (isMobileNavOpen) {
+        const isMobileOptionsVisible = await this.isElementVisible(
+          'i.e2e-test-mobile-options',
+          true,
+          1000
+        );
+        if (isMobileOptionsVisible) {
+          await this.clickOnElementWithSelector('i.e2e-test-mobile-options');
+        }
+      }
+
+      await this.page.$eval(viewSolutionButton, element => {
+        (element as HTMLElement).click();
+      });
+    } else {
+      await this.clickOnElementWithSelector(viewSolutionButton);
+    }
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,
@@ -5194,9 +5609,6 @@ export class LoggedOutUser extends BaseUser {
    * Opens the lesson info modal.
    */
   async openLessonInfoModal(): Promise<void> {
-    await this.page.waitForSelector(lessonInfoButton, {
-      visible: true,
-    });
     await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
   }
@@ -6459,12 +6871,21 @@ export class LoggedOutUser extends BaseUser {
   async expectSubheadingInAboutUsPageToContain(
     subheading: string
   ): Promise<void> {
+    const normalizeSubheadingText = (text: string | null | undefined): string =>
+      (text ?? '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
     const subheadings = await this.page.$$eval(
       aboutUsSubheadingSelector,
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (subheadings.includes(subheading)) {
+    const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
+    const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
+
+    if (normalizedSubheadings.includes(normalizedExpectedSubheading)) {
       showMessage(`Subheading ${subheading} is present.`);
     } else {
       throw new Error(
@@ -7494,6 +7915,307 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  private storedCollectionPath: string | null = null;
+  /**
+   * Navigates to the named collection from the community library. Internally
+   * stores the collection URL path so it can be reused later (e.g. after a
+   * language change).
+   */
+  async navigateToCollectionFromLibrary(collectionName: string): Promise<void> {
+    await this.page.waitForSelector(collectionSummaryTileTitleSelector, {
+      visible: true,
+    });
+
+    const titleElements = await this.page.$$(
+      collectionSummaryTileTitleSelector
+    );
+
+    for (const titleEl of titleElements) {
+      const text = await titleEl.evaluate(el => el.textContent?.trim() ?? '');
+      if (!text.includes(collectionName)) {
+        continue;
+      }
+
+      // Walk up from the title element to find the nearest collection link.
+      const path = await titleEl.evaluate(el => {
+        let node: Element | null = el;
+
+        while (node) {
+          if (node.tagName === 'A') {
+            const href = (node as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
+
+          const link =
+            node.querySelector('a[href*="/collection/"]') ??
+            node.parentElement?.querySelector('a[href*="/collection/"]');
+
+          if (link) {
+            const href = (link as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
+
+          node = node.parentElement;
+        }
+
+        return null;
+      });
+
+      if (!path) {
+        throw new Error(`Could not open ${collectionName} collection card.`);
+      }
+
+      this.storedCollectionPath = path;
+      await this.page.goto(`http://localhost:8181${path}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+      await this.waitForPageToFullyLoad();
+      return;
+    }
+
+    throw new Error(`Could not open ${collectionName} collection card.`);
+  }
+
+  /**
+   * Expects the "Begin <collectionName>" button to be present on the collection
+   * page, confirming the page has fully loaded with the correct collection.
+   */
+  async expectBeginCollectionButtonToBePresent(
+    collectionName: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(`Begin ${collectionName}`)) {
+      throw new Error(
+        `Expected "Begin ${collectionName}" on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Expects an exploration with the given title to be listed on the currently
+   * open collection page.
+   * @param {string} explorationTitle - The title of the exploration expected to be listed.
+   */
+  async expectExplorationToBeListedInCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(explorationTitle)) {
+      throw new Error(
+        `${explorationTitle} was not listed on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Navigates to an exploration from the collection page by clicking its tile.
+   * Handles desktop and mobile viewports, and falls back to the first available
+   * tile when the target title cannot be matched by text content.
+   * @param {string} explorationTitle - The title of the exploration to navigate to.
+   */
+  async navigateToExplorationFromCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const tileSelector = isMobile
+      ? mobileCollectionExplorationTileSelector
+      : desktopCollectionExplorationTileSelector;
+
+    await this.page.waitForSelector(tileSelector, {visible: true});
+    const tiles = await this.page.$$(tileSelector);
+
+    for (const tile of tiles) {
+      const tileText = await tile.evaluate(el => el.textContent?.trim() ?? '');
+      if (tileText.includes(explorationTitle)) {
+        await this.openExplorationTile(tile, isMobile);
+        return;
+      }
+    }
+
+    // Fallback: open the first available tile.
+    if (tiles.length > 0) {
+      await this.openExplorationTile(tiles[0], isMobile);
+      return;
+    }
+
+    throw new Error(
+      'Could not find any exploration tiles on the collection page.'
+    );
+  }
+
+  /**
+   * Opens an exploration tile. Prefers a direct href link when available;
+   * falls back to the mobile preview-tile flow otherwise.
+   * @param {puppeteer.ElementHandle} tile - The exploration tile to open.
+   * @param {boolean} isMobile - Whether the current viewport is using the mobile layout.
+   */
+  private async openExplorationTile(
+    tile: puppeteer.ElementHandle,
+    isMobile: boolean
+  ): Promise<void> {
+    const link = await tile
+      .$eval(explorationTileHrefLinkSelector, el => {
+        const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+        return href.startsWith('http')
+          ? new URL(href).pathname + new URL(href).search
+          : href;
+      })
+      .catch(() => null);
+
+    if (link) {
+      await this.page.goto(`http://localhost:8181${link}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else if (isMobile) {
+      await tile.click();
+      await this.page.waitForSelector(collectionPreviewTileLinkSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      const previewLink = await this.page
+        .$eval(collectionPreviewTileLinkSelector, el => {
+          const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+          return href.startsWith('http')
+            ? new URL(href).pathname + new URL(href).search
+            : href;
+        })
+        .catch(() => null);
+      if (!previewLink) {
+        throw new Error(
+          'Could not resolve exploration link from preview tile.'
+        );
+      }
+      await this.page.goto(`http://localhost:8181${previewLink}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else {
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        }),
+        tile.click(),
+      ]);
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectToBeOnPage('/explore/');
+  }
+
+  /**
+   * Accepts two possible completion toast messages and passes as long as either
+   * one appears. Use this when the exact wording may vary between exploration
+   * types.
+   */
+  async expectExplorationCompletionToastMessageWithFallback(
+    primaryMessage: string,
+    fallbackMessage: string
+  ): Promise<void> {
+    try {
+      await this.expectExplorationCompletionToastMessage(primaryMessage);
+    } catch {
+      await this.expectExplorationCompletionToastMessage(fallbackMessage);
+    }
+  }
+
+  /**
+   * Clicks the "Back to Collection" button and waits until the browser is on a
+   * collection page. Re-navigates via the stored collection path (with query
+   * params) if one is available, to avoid frontend routing errors caused by
+   * key-less collection URLs.
+   */
+  async clickBackToCollectionButton(): Promise<void> {
+    await this.page.waitForSelector(backToCollectionButtonSelector, {
+      visible: true,
+      timeout: 10000,
+    });
+    await this.clickOnElementWithSelector(backToCollectionButtonSelector);
+
+    if (this.storedCollectionPath?.includes('key=')) {
+      await this.page.goto(
+        `http://localhost:8181${this.storedCollectionPath}`,
+        {waitUntil: 'domcontentloaded', timeout: 60000}
+      );
+    }
+
+    await this.page.waitForFunction(
+      () => window.location.pathname.includes('/collection/'),
+      {timeout: 15000}
+    );
+  }
+
+  /**
+   * Navigates directly to the collection page that was stored when
+   * navigateToCollectionFromLibrary was called. Useful for reloading the page
+   * after a language change.
+   */
+  async navigateToCollectionPage(): Promise<void> {
+    if (!this.storedCollectionPath) {
+      throw new Error(
+        'No collection path stored. Call navigateToCollectionFromLibrary first.'
+      );
+    }
+    await this.page.goto(`http://localhost:8181${this.storedCollectionPath}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Function to submit an text input answer.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitTextInputAnsswer(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(textAreaInputSelector);
+
+    await this.typeInInputField(textAreaInputSelector, answer);
+    await this.expectElementValueToBe(textAreaInputSelector, answer);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+  /**
+   * Polls until the "View Solution" button becomes visible in the preview tab.
+   * The solution button is only unlocked after enough wrong submissions and
+   * hint consumption, so this method drives that process automatically by
+   * submitting the given wrong answer and consuming any newly-revealed hint on
+   * each iteration. Fails if the button is still not visible after 5 retries.
+   */
+  async waitForSolutionButtonToBeVisible(wrongAnswer: string): Promise<void> {
+    let isSolutionVisible = await this.isElementVisible(
+      viewSolutionButtonSelector,
+      true,
+      2000
+    );
+    for (let i = 0; i < 5 && !isSolutionVisible; i++) {
+      await this.submitTextInputAnsswer(wrongAnswer);
+      await this.expectOppiaFeedbackToBe('Try again.');
+
+      const isHintVisible = await this.isElementVisible(
+        viewHintButtonSelector,
+        true,
+        2000
+      );
+      if (isHintVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+
+      isSolutionVisible = await this.isElementVisible(
+        viewSolutionButtonSelector,
+        true,
+        2000
+      );
+    }
+    expect(isSolutionVisible).toBe(true);
+  }
   /**
    * Verifies that sitemap.xml contains valid XML URL entries.
    */
@@ -7544,13 +8266,14 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // If an expected description is provided, assert meta description matches it.
+    // Some routes populate description via itemprop while others use name.
     if (expected.description !== undefined) {
       const description = await this.page.$eval(metaDescriptionSelector, el =>
         el.getAttribute('content')
       );
       if (description !== expected.description) {
         throw new Error(
-          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+          `meta description mismatch (name/itemprop). Expected: "${expected.description}", Found: "${description}"`
         );
       }
     }

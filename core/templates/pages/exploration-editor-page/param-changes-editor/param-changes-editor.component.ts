@@ -32,6 +32,7 @@ import {ExplorationParamChangesService} from '../services/exploration-param-chan
 import cloneDeep from 'lodash/cloneDeep';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import './param-changes-editor.component.css';
 
 interface RandomSelectorCustomizationArgs {
   list_of_values: (string | number | boolean)[];
@@ -44,6 +45,7 @@ interface CopierCustomizationArgs {
 @Component({
   selector: 'param-changes-editor',
   templateUrl: './param-changes-editor.component.html',
+  styleUrls: ['./param-changes-editor.component.css'],
 })
 export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   @Input() paramChangesServiceName!:
