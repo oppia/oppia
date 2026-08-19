@@ -123,6 +123,8 @@ const newChapterPhotoBoxButton =
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const newChapterErrorMessageSelector =
   '.acceptance-restricted-interaction-error';
+const publishedChaptersDropErrorSelector =
+  '.e2e-test-published-chapters-drop-error';
 
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
@@ -403,6 +405,8 @@ const mobileAcquiredSkillsSectionBodySelector =
   '.e2e-test-section-body-acquired-skills';
 const warningIndicatorSelector = '.e2e-test-warning-indicator';
 const warningTextSelector = '.e2e-test-warnings-text';
+const dragHandleSelector = 'tr.cdk-drag';
+const dragHandlerSelector = '.drag-handler';
 
 // Adventure (Arc) selectors.
 const arcEditButtonSelector = '.arc-edit-button';
@@ -410,7 +414,6 @@ const arcRemoveButtonSelector = '.arc-remove-button';
 const editArcTitleFieldSelector = '.e2e-test-edit-arc-title-field';
 const editArcDescriptionFieldSelector = '.e2e-test-edit-arc-description-field';
 const saveEditArcButtonSelector = '.e2e-test-save-edit-arc-button';
-
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -5734,6 +5737,78 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Drags a chapter from one position to another in the Story Editor chapter panel.
+   * @param storyName - The name of the story.
+   * @param topicName - The name of the topic under which the story exists.
+   * @param fromChapterName - The name of the chapter to be moved.
+   * @param toChapterName - The name of the target chapter where the dragged chapter will be placed.
+   */
+
+  async dragChapterByName(
+    storyName: string,
+    topicName: string,
+    fromChapterName: string,
+    toChapterName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+
+    await this.page.waitForSelector(dragHandleSelector);
+
+    const rows = await this.page.$$(dragHandleSelector);
+
+    let sourceHandle = null;
+    let targetHandle = null;
+
+    for (const row of rows) {
+      const titleEl = await row.$(chapterTitleSelector);
+
+      if (!titleEl) {
+        continue;
+      }
+      const text = await titleEl.evaluate(el => el.textContent?.trim() || '');
+
+      if (text.includes(fromChapterName)) {
+        sourceHandle = await row.$(dragHandlerSelector);
+      }
+
+      if (text.includes(toChapterName)) {
+        targetHandle = await row.$(dragHandlerSelector);
+      }
+    }
+
+    if (!sourceHandle) {
+      throw new Error(`Source chapter "${fromChapterName}" not found`);
+    }
+
+    if (!targetHandle) {
+      throw new Error(`Target chapter "${toChapterName}" not found`);
+    }
+
+    const s = await sourceHandle.boundingBox();
+    const t = await targetHandle.boundingBox();
+
+    if (!s || !t) {
+      throw new Error('Could not get drag coordinates');
+    }
+
+    await this.page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
+
+    await this.page.mouse.down();
+
+    await this.page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, {
+      steps: 25,
+    });
+
+    await this.page.mouse.up();
+
+    await this.page.waitForTimeout(500);
+
+    showMessage(
+      `Dragged chapter "${fromChapterName}" to chapter "${toChapterName}"`
+    );
+  }
+
+  /**
    * Splits into a new adventure (arc) after the specified chapter.
    * Finds the split button that appears between the target chapter and the
    * next chapter, and clicks it to create a new adventure boundary.
@@ -5898,6 +5973,37 @@ export class TopicManager extends BaseUser {
     showMessage(
       `Adventure header "${title}" is ${visible ? 'visible' : 'not visible'} ` +
         'as expected.'
+    );
+  }
+
+  /**
+   * Verifies that published chapters cannot be reordered.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic under which the story exists.
+   * @param {string} publishedChapterName - The name of the published chapter to drag.
+   * @param {string} targetChapterName - The chapter used as the drag target.
+   * @param {string} dropdownValue - The published chapter dropdown value to publish up to.
+   */
+  async expectPublishedChapterReorderToBeBlocked(
+    storyName: string,
+    topicName: string,
+    publishedChapterName: string,
+    targetChapterName: string,
+    dropdownValue: string
+  ): Promise<void> {
+    await this.publishChapter(storyName, topicName, dropdownValue);
+
+    await this.dragChapterByName(
+      storyName,
+      topicName,
+      publishedChapterName,
+      targetChapterName
+    );
+
+    await this.page.waitForSelector(publishedChaptersDropErrorSelector);
+    await this.expectElementContentToBe(
+      publishedChaptersDropErrorSelector,
+      'The positions of published chapters cannot be changed.'
     );
   }
 
