@@ -57,6 +57,7 @@ module.exports = async (browser, context) => {
     await setRole(page, 'BLOG_ADMIN');
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
+  await page.close();
 };
 
 const seedBlankPagesForLighthouseRuns = async function (
@@ -66,19 +67,8 @@ const seedBlankPagesForLighthouseRuns = async function (
 ) {
   const numberOfRuns = Number(context.options.numberOfRuns) || 1;
 
-  // Close all pages except the login page to prevent stale Chrome DevTools
-  // Protocol targets from accumulating across URLs and causing
-  // Target.getTargetInfo errors.
-  for (const existingPage of await browser.pages()) {
-    if (existingPage !== page) {
-      await existingPage.close();
-    }
-  }
-
-  await page.goto('about:blank');
-
-  // Create fresh blank pages for each Lighthouse run.
-  for (let i = 1; i < numberOfRuns; i++) {
+  let pages = await browser.pages();
+  for (let i = pages.length; i < numberOfRuns; i++) {
     const blankPage = await browser.newPage();
     await blankPage.goto('about:blank');
   }

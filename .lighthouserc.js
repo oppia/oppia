@@ -64,19 +64,27 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/community-library$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.91}],
+          }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/contact$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
+          }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.95}],
+          }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.88}],
+          }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
