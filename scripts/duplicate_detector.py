@@ -317,6 +317,17 @@ def main() -> None:
     logging.info('Classifying %s issues...', len(issues_to_classify))
     for target_issue in issues_to_classify:
         current_id = target_issue['number']
+
+        target_labels = [
+            label.get('name') for label in target_issue.get('labels', [])
+        ]
+        if constants.DUPLICATE_ISSUE_LABEL in target_labels:
+            logging.info(
+                'Issue #%s: Already labeled as potential duplicate. Skipping.',
+                current_id,
+            )
+            continue
+
         best_issue_number, best_score = find_best_match(
             target_issue, open_issues, embeddings
         )

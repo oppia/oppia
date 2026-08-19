@@ -495,6 +495,43 @@ class MainTests(unittest.TestCase):
         duplicate_detector.main()
         mock_urlopen.assert_not_called()
 
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_manual_trigger_skips_already_labeled(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_urlopen: mock.MagicMock,
+    ) -> None:
+        """Test main skips issues already labeled as duplicate."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                'START_ISSUE_NUMBER': '1',
+                'END_ISSUE_NUMBER': '10',
+                'THRESHOLD_SCORE': '0.8',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = [
+            {
+                'number': 1,
+                'title': 'issue 1',
+                'body': 'body 1',
+                'user': {'login': 'user1'},
+                'labels': [{'name': 'potential-duplicate'}],
+            }
+        ]
+
+        duplicate_detector.main()
+        mock_urlopen.assert_not_called()
+
     @mock.patch('builtins.open')
     @mock.patch('os.path.exists')
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
