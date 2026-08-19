@@ -24,162 +24,115 @@ import {
   fakeAsync,
   flushMicrotasks,
 } from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
-import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
-import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
+  AssessmentQuestionTypes,
   CertificateAssessmentAttemptData,
   CertificateAssessmentQuestionData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
+import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 
-const createOutcomeBackendDict = (): OutcomeBackendDict => ({
+const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
   dest_if_really_stuck: null,
-  feedback: {content_id: 'feedback_1', html: '<p>Correct!</p>'},
-  labelled_as_correct: true,
+  feedback: {content_id: 'f', html: '<p>f</p>'},
+  labelled_as_correct: labelledAsCorrect,
   param_changes: [],
   refresher_exploration_id: null,
   missing_prerequisite_skill_id: null,
 });
 
-const createIncorrectOutcomeBackendDict = (): OutcomeBackendDict => ({
-  dest: 'final',
-  dest_if_really_stuck: null,
-  feedback: {content_id: 'feedback_1', html: '<p>Try again.</p>'},
-  labelled_as_correct: false,
-  param_changes: [],
-  refresher_exploration_id: null,
-  missing_prerequisite_skill_id: null,
-});
-
-const createMultipleChoiceStateData = (): StateBackendDict => ({
-  classifier_model_id: null,
-  content: {
-    content_id: 'content',
-    html: '<p>Which number completes the sequence: 2, 4, 6, ?</p>',
-  },
-  interaction: {
-    answer_groups: [
-      {
-        rule_specs: [{rule_type: 'Equals', inputs: {x: 1}}],
-        outcome: createOutcomeBackendDict(),
-        training_data: [],
-        tagged_skill_misconception_id: null,
-      },
-    ],
-    confirmed_unclassified_answers: [],
-    customization_args: {
-      choices: {
-        value: [
-          {html: '<p>7</p>', content_id: 'a'},
-          {html: '<p>8</p>', content_id: 'b'},
-          {html: '<p>9</p>', content_id: 'c'},
-        ],
-      },
-      showChoicesInShuffledOrder: {value: false},
-    },
-    default_outcome: createIncorrectOutcomeBackendDict(),
-    hints: [],
-    id: 'MultipleChoiceInput',
-    solution: null,
-  },
-  param_changes: [],
-  solicit_answer_details: false,
-  card_is_checkpoint: false,
-  linked_skill_id: null,
-  inapplicable_skill_misconception_ids: [],
-});
-
-const createItemSelectionStateData = (): StateBackendDict => ({
-  classifier_model_id: null,
-  content: {
-    content_id: 'content',
-    html: '<p>Select all prime numbers.</p>',
-  },
-  interaction: {
-    answer_groups: [
-      {
-        rule_specs: [{rule_type: 'Equals', inputs: {x: ['a', 'b', 'd']}}],
-        outcome: createOutcomeBackendDict(),
-        training_data: [],
-        tagged_skill_misconception_id: null,
-      },
-    ],
-    confirmed_unclassified_answers: [],
-    customization_args: {
-      choices: {
-        value: [
-          {html: '<p>2</p>', content_id: 'a'},
-          {html: '<p>3</p>', content_id: 'b'},
-          {html: '<p>4</p>', content_id: 'c'},
-          {html: '<p>5</p>', content_id: 'd'},
-        ],
-      },
-      maxAllowableSelectionCount: {value: 4},
-      minAllowableSelectionCount: {value: 1},
-    },
-    default_outcome: createIncorrectOutcomeBackendDict(),
-    hints: [],
-    id: 'ItemSelectionInput',
-    solution: null,
-  },
-  param_changes: [],
-  solicit_answer_details: false,
-  card_is_checkpoint: false,
-  linked_skill_id: null,
-  inapplicable_skill_misconception_ids: [],
-});
-
-const createTextInputStateData = (): StateBackendDict => ({
-  classifier_model_id: null,
-  content: {
-    content_id: 'content',
-    html: '<p>Type the name of the shape with three sides.</p>',
-  },
-  interaction: {
-    answer_groups: [
-      {
-        rule_specs: [
-          {
-            rule_type: 'Equals',
-            inputs: {x: {normalizedStrSet: ['Triangle']}},
-          },
-        ],
-        outcome: createOutcomeBackendDict(),
-        training_data: [],
-        tagged_skill_misconception_id: null,
-      },
-    ],
-    confirmed_unclassified_answers: [],
-    customization_args: {
-      placeholder: {
-        value: {
-          content_id: 'ca_placeholder_0',
-          unicode_str: 'Enter your answer',
+const customizationArgsFor = (
+  interactionId: string
+): Record<string, unknown> => {
+  switch (interactionId) {
+    case 'TextInput':
+      return {
+        rows: {value: 1},
+        placeholder: {
+          value: {content_id: 'ca_placeholder_0', unicode_str: 'Type here'},
         },
-      },
-      rows: {value: 1},
-      catchMisspellings: {value: false},
-    },
-    default_outcome: createIncorrectOutcomeBackendDict(),
+        catchMisspellings: {value: false},
+      };
+    case 'MultipleChoiceInput':
+      return {
+        choices: {
+          value: [
+            {html: '<p>3</p>', content_id: 'a'},
+            {html: '<p>4</p>', content_id: 'b'},
+          ],
+        },
+        showChoicesInShuffledOrder: {value: false},
+      };
+    case 'ItemSelectionInput':
+      return {
+        choices: {
+          value: [
+            {html: '<p>2</p>', content_id: 'a'},
+            {html: '<p>3</p>', content_id: 'b'},
+            {html: '<p>4</p>', content_id: 'c'},
+          ],
+        },
+        maxAllowableSelectionCount: {value: 3},
+        minAllowableSelectionCount: {value: 1},
+      };
+    case 'NumericInput':
+      return {requireNonnegativeInput: {value: true}};
+    case 'FractionInput':
+      return {
+        requireSimplestForm: {value: true},
+        allowImproperFraction: {value: true},
+        allowNonzeroIntegerPart: {value: true},
+        customPlaceholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'Enter fraction',
+          },
+        },
+      };
+    case 'DragAndDropSortInput':
+      return {
+        choices: {
+          value: [
+            {html: '<p>Item A</p>', content_id: 'a'},
+            {html: '<p>Item B</p>', content_id: 'b'},
+          ],
+        },
+        allowMultipleItemsInSamePosition: {value: false},
+      };
+    case 'NumberWithUnits':
+    case 'ImageClickInput':
+      return {};
+    default:
+      return {};
+  }
+};
+
+const stateDataFor = (
+  id: string,
+  answerGroups: StateBackendDict['interaction']['answer_groups'] = []
+): StateBackendDict => ({
+  classifier_model_id: null,
+  content: {content_id: 'c', html: '<p>prompt</p>'},
+  interaction: {
+    answer_groups: answerGroups,
+    confirmed_unclassified_answers: [],
+    customization_args: customizationArgsFor(id),
+    default_outcome: outcome(false),
     hints: [],
-    id: 'TextInput',
+    id,
     solution: null,
   },
   param_changes: [],
@@ -189,76 +142,115 @@ const createTextInputStateData = (): StateBackendDict => ({
   inapplicable_skill_misconception_ids: [],
 });
 
-const createQuestionResponse = (
+const questionResponse = (
   questionId: string
 ): CertificateAssessmentQuestionData => {
-  let stateData: StateBackendDict;
-  if (questionId === 'question_1') {
-    stateData = createMultipleChoiceStateData();
-  } else if (questionId === 'question_2') {
-    stateData = createItemSelectionStateData();
-  } else {
-    stateData = createTextInputStateData();
-  }
+  const interactionId =
+    questionId === 'q1'
+      ? 'MultipleChoiceInput'
+      : questionId === 'q2'
+        ? 'ItemSelectionInput'
+        : 'TextInput';
   return CertificateAssessmentQuestionData.createFromBackendDict({
     question_id: questionId,
-    question_state_data: stateData,
+    question_state_data: stateDataFor(interactionId),
   });
 };
 
-class MockNgbModal {
-  open(component: unknown, options: NgbModalOptions): NgbModalRef {
-    return {
-      componentInstance: {},
-      result: Promise.resolve(null),
-      close: () => {},
-      dismiss: () => {},
-    } as NgbModalRef;
-  }
-}
+const makeAttempt = (
+  ids: string[] = ['q1', 'q2', 'q3']
+): CertificateAssessmentAttemptData =>
+  CertificateAssessmentAttemptData.createFromBackendDict({
+    attempt_id: 'att-1',
+    questions: ids.map(questionId => ({
+      question_id: questionId,
+      question_version: 1,
+    })),
+  });
+
+const modalRef = (reject = false): NgbModalRef =>
+  ({
+    componentInstance: {} as Record<string, unknown>,
+    result: reject ? Promise.reject('dismissed') : Promise.resolve(null),
+    close: () => {},
+    dismiss: () => {},
+  }) as unknown as NgbModalRef;
 
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
   let fixture: ComponentFixture<CertificateAssessmentPlayerPageComponent>;
+  let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
+  let modalSpy: jasmine.SpyObj<NgbModal>;
+  let dimsSpy: jasmine.SpyObj<WindowDimensionsService>;
+  let apiSpy: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  let registrySpy: jasmine.SpyObj<InteractionRulesRegistryService>;
+  let classificationSpy: jasmine.SpyObj<AnswerClassificationService>;
+  let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
 
-  const configureComponent = async (
-    attempt: CertificateAssessmentAttemptData | null
+  const setup = async (
+    attempt: CertificateAssessmentAttemptData | null = makeAttempt()
   ): Promise<void> => {
-    const bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    const windowDimensionsServiceSpy = jasmine.createSpyObj(
-      'WindowDimensionsService',
-      ['getWidth']
+    bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    modalSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    modalSpy.open.and.returnValue(modalRef());
+    dimsSpy = jasmine.createSpyObj('WindowDimensionsService', ['getWidth']);
+    dimsSpy.getWidth.and.returnValue(800);
+    apiSpy = jasmine.createSpyObj('Api', [
+      'getCertificateAssessmentQuestionAsync',
+    ]);
+    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      (_a: string, qId: string) => Promise.resolve(questionResponse(qId))
     );
-    windowDimensionsServiceSpy.getWidth.and.returnValue(800);
-    const certificateAssessmentOfferingBackendApiServiceSpy =
-      jasmine.createSpyObj('CertificateAssessmentOfferingBackendApiService', [
-        'getCertificateAssessmentQuestionAsync',
-      ]);
-    certificateAssessmentOfferingBackendApiServiceSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      (_attemptId: string, questionId: string) =>
-        Promise.resolve(createQuestionResponse(questionId))
-    );
+    registrySpy = jasmine.createSpyObj('Registry', [
+      'getRulesServiceByInteractionId',
+    ]);
+    registrySpy.getRulesServiceByInteractionId.and.returnValue({
+      Equals: (answer: unknown, ruleInputs: {x: unknown}) => {
+        if (Array.isArray(answer) && Array.isArray(ruleInputs.x)) {
+          return (
+            answer.length === ruleInputs.x.length &&
+            answer.every((v, i) => v === (ruleInputs.x as unknown[])[i])
+          );
+        }
+        return answer === ruleInputs.x;
+      },
+    });
+    classificationSpy = jasmine.createSpyObj('Classification', [
+      'getMatchingClassificationResult',
+    ]);
+    classificationSpy.getMatchingClassificationResult.and.returnValue({
+      outcome: {labelledAsCorrect: false},
+      answerGroupIndex: 0,
+      ruleIndex: 0,
+      classificationCategorization: 'default_outcome',
+    } as never);
+    formatterSpy = jasmine.createSpyObj('Formatter', ['getInteractionHtml']);
+    formatterSpy.getInteractionHtml.and.returnValue('<div>interaction</div>');
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
       imports: [CommonModule],
       providers: [
-        {
-          provide: MatBottomSheet,
-          useValue: bottomSheetSpy,
-        },
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal,
-        },
-        {
-          provide: WindowDimensionsService,
-          useValue: windowDimensionsServiceSpy,
-        },
+        {provide: MatBottomSheet, useValue: bottomSheetSpy},
+        {provide: NgbModal, useValue: modalSpy},
+        {provide: WindowDimensionsService, useValue: dimsSpy},
         {
           provide: CertificateAssessmentOfferingBackendApiService,
-          useValue: certificateAssessmentOfferingBackendApiServiceSpy,
+          useValue: apiSpy,
+        },
+        {provide: InteractionRulesRegistryService, useValue: registrySpy},
+        {provide: AnswerClassificationService, useValue: classificationSpy},
+        {provide: ExplorationHtmlFormatterService, useValue: formatterSpy},
+        {
+          provide: CurrentInteractionService,
+          useValue: jasmine.createSpyObj('CurrentInteraction', [
+            'setOnSubmitFn',
+          ]),
+        },
+        {
+          provide: FocusManagerService,
+          useValue: jasmine.createSpyObj('Focus', ['generateFocusLabel']),
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -269,20 +261,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.attempt = attempt;
   };
 
-  const createAttempt = (): CertificateAssessmentAttemptData =>
-    CertificateAssessmentAttemptData.createFromBackendDict({
-      attempt_id: 'attempt-1234',
-      questions: [
-        {question_id: 'question_1', question_version: 1},
-        {question_id: 'question_2', question_version: 2},
-        {question_id: 'question_3', question_version: 1},
-      ],
-    });
-
-  // Loads all three questions by advancing through the player, since
-  // questions are fetched lazily. The first change detection also triggers
-  // ngOnInit, so this must be called from a fakeAsync test.
-  const loadAllQuestions = (): void => {
+  const load = (): void => {
     fixture.detectChanges();
     flushMicrotasks();
     component.nextQuestion();
@@ -291,429 +270,425 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     flushMicrotasks();
   };
 
+  const loadQ1 = (): void => {
+    fixture.detectChanges();
+    flushMicrotasks();
+  };
+
   beforeEach(async () => {
-    await configureComponent(createAttempt());
+    await setup();
   });
 
-  it('should build questions from the attempt using the real question ids', fakeAsync(() => {
-    loadAllQuestions();
+  // ---- loadQuestion ----
 
+  it('should load questions from the attempt', fakeAsync(() => {
+    load();
     expect(component.questions.length).toBe(3);
-    expect(component.questions.map(question => question.id)).toEqual([
-      'question_1',
-      'question_2',
-      'question_3',
-    ]);
-    expect(component.questions[0].prompt).toBe(
-      'Which number completes the sequence: 2, 4, 6, ?'
-    );
+    expect(component.questions.map(q => q.id)).toEqual(['q1', 'q2', 'q3']);
   }));
 
-  it('should build no questions when the attempt is null', async () => {
-    await configureComponent(null);
+  it('should not load when attempt is null', async () => {
+    await setup(null);
     fixture.detectChanges();
-
     expect(component.questions.length).toBe(0);
-    expect(component.getCurrentQuestion()).toBeNull();
-    expect(
-      TestBed.inject(CertificateAssessmentOfferingBackendApiService)
-        .getCertificateAssessmentQuestionAsync
-    ).not.toHaveBeenCalled();
+    expect(apiSpy.getCertificateAssessmentQuestionAsync).not.toHaveBeenCalled();
   });
 
-  it('should advance to the next question on nextQuestion when not at the last question', () => {
-    expect(component.currentQuestionIndex).toBe(0);
-
-    component.nextQuestion();
-
-    expect(component.currentQuestionIndex).toBe(1);
-  });
-
-  it('should not advance past the last question on nextQuestion', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = component.questions.length - 1;
-
-    component.nextQuestion();
-
-    expect(component.currentQuestionIndex).toBe(component.questions.length - 1);
-  }));
-
-  it('should go back one question when previousQuestion is called away from the start', () => {
-    component.currentQuestionIndex = 2;
-
-    component.previousQuestion();
-
-    expect(component.currentQuestionIndex).toBe(1);
-  });
-
-  it('should not go back past the first question', () => {
-    component.currentQuestionIndex = 0;
-
-    component.previousQuestion();
-
-    expect(component.currentQuestionIndex).toBe(0);
-  });
-
-  it('should compute the progress percentage based on the current question index', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = 0;
-    expect(component.getProgressPercentage()).toBe(
-      Math.round((1 / component.questions.length) * 100)
-    );
-
-    component.currentQuestionIndex = component.questions.length - 1;
-    expect(component.getProgressPercentage()).toBe(100);
-  }));
-
-  it('should return the question at the current question index', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = 1;
-
-    expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
-  }));
-
-  it('should report whether the current question is the last one', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = 0;
-    expect(component.isCurrentQuestionLast()).toBeFalse();
-
-    component.currentQuestionIndex = component.questions.length - 1;
-    expect(component.isCurrentQuestionLast()).toBeTrue();
-  }));
-
-  it('should recompute the derived fields when the first question loads', fakeAsync(() => {
-    expect(component.currentQuestion).toBeNull();
-    expect(component.totalQuestionCount).toBe(0);
-
-    fixture.detectChanges();
+  it('should not load when attempt question index is out of range', fakeAsync(() => {
+    loadQ1();
+    // eslint-disable-next-line dot-notation
+    (component as Record<string, unknown>)['loadQuestion'](99);
     flushMicrotasks();
-
-    expect(component.currentQuestion).toEqual(component.questions[0]);
-    expect(component.totalQuestionCount).toBe(3);
-    expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
-    expect(component.isLastQuestion).toBeFalse();
+    expect(component.questions.length).toBe(1);
   }));
 
-  it('should recompute the derived fields when navigating between questions', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = 0;
-
-    component.nextQuestion();
-    expect(component.currentQuestion).toEqual(component.questions[1]);
-    expect(component.isLastQuestion).toBeFalse();
-
-    component.nextQuestion();
-    expect(component.currentQuestion).toEqual(component.questions[2]);
-    expect(component.isLastQuestion).toBeTrue();
-    expect(component.progressPercentage).toBe(100);
-
-    component.previousQuestion();
-    expect(component.currentQuestion).toEqual(component.questions[1]);
-    expect(component.isLastQuestion).toBeFalse();
-  }));
-
-  it('should recompute the saved response field when the answer changes', fakeAsync(() => {
-    loadAllQuestions();
-    component.currentQuestionIndex = 0;
-    expect(component.savedResponse).toBe('');
-
-    component.updateResponse('b');
-    expect(component.savedResponse).toBe('b');
-    expect(component.answers.question_1).toBe('b');
-
-    component.nextQuestion();
-    expect(component.savedResponse).toBe('');
-  }));
-
-  it('should read and store submitted responses by question id', fakeAsync(() => {
-    loadAllQuestions();
-    expect(component.getSavedResponse()).toBe('');
-
-    component.updateResponse('b');
-    expect(component.getSavedResponse()).toBe('b');
-    expect(component.answers.question_1).toBe('b');
-
-    component.currentQuestionIndex = 1;
-    expect(component.getSavedResponse()).toBe('');
-
-    component.updateResponse('a,c');
-    expect(component.getSavedResponse()).toBe('a,c');
-    expect(component.answers.question_2).toBe('a,c');
-  }));
-
-  it('should emit answers with correctness on submitAssessment', fakeAsync(() => {
-    loadAllQuestions();
-    spyOn(component.assessmentSubmitted, 'emit');
-    // The first question is multiple choice; the correct option is index 1
-    // (the choice with text '8').
-    component.answers.question_1 = 'b';
-    // The second question is multiple select; the correct options are the
-    // choices with content ids 'a', 'b' and 'd'.
-    component.answers.question_2 = 'a,b,d';
-    // The third question is left unanswered.
-
-    component.submitAssessment();
-
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
-      {question_id: 'question_1', is_correct: true, selected_answer: '1'},
-      {
-        question_id: 'question_2',
-        is_correct: true,
-        selected_answer: 'a,b,d',
-      },
-      {question_id: 'question_3', is_correct: false},
-    ]);
-  }));
-
-  it('should emit incorrect answers on submitAssessment when they are wrong', fakeAsync(() => {
-    loadAllQuestions();
-    spyOn(component.assessmentSubmitted, 'emit');
-    component.answers.question_1 = 'a';
-    component.answers.question_2 = 'a,c';
-    component.answers.question_3 = 'circle';
-
-    component.submitAssessment();
-
-    const answers = (
-      component.assessmentSubmitted.emit as jasmine.Spy
-    ).calls.mostRecent().args[0];
-    expect(answers[0]).toEqual({
-      question_id: 'question_1',
-      is_correct: false,
-      selected_answer: '0',
-    });
-    expect(answers[1]).toEqual({
-      question_id: 'question_2',
-      is_correct: false,
-      selected_answer: 'a,c',
-    });
-    expect(answers[2]).toEqual({
-      question_id: 'question_3',
-      is_correct: false,
-      selected_answer: 'circle',
-    });
-  }));
-
-  it('should not render the time-expired modal inline in the page', () => {
-    expect(
-      fixture.debugElement.query(By.css('oppia-time-expired-modal'))
-    ).toBeNull();
-  });
-
-  it('should open the time-expired modal when showTimeExpiredModal is true', () => {
-    const ngbModal = TestBed.inject(NgbModal);
-    spyOn(ngbModal, 'open').and.callThrough();
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
-
-    expect(ngbModal.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-  });
-
-  it('should not open the time-expired modal when showTimeExpiredModal is false', () => {
-    const ngbModal = TestBed.inject(NgbModal);
-    spyOn(ngbModal, 'open').and.callThrough();
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
-
-    expect(ngbModal.open).not.toHaveBeenCalled();
-  });
-
-  it('should handle the time-expired modal result when it is dismissed', fakeAsync(() => {
-    const ngbModal = TestBed.inject(NgbModal);
-    const modalRef = {
-      componentInstance: {},
-      result: Promise.reject('dismissed'),
-    } as NgbModalRef;
-    spyOn(ngbModal, 'open').and.returnValue(modalRef);
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-
-    fixture.detectChanges();
-    flushMicrotasks();
-
-    expect(ngbModal.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-  }));
-
-  it('should open the unanswered-question modal when showUnansweredQuestionModal is true', () => {
-    const ngbModal = TestBed.inject(NgbModal);
-    spyOn(ngbModal, 'open').and.callThrough();
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = true;
-    fixture.detectChanges();
-
-    const modalRef = (ngbModal.open as jasmine.Spy).calls.mostRecent()
-      .returnValue as NgbModalRef;
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      UnansweredQuestionModalComponent,
-      {
-        backdrop: 'static',
-        centered: true,
-        windowClass: 'oppia-unanswered-question-modal',
-      }
-    );
-    expect(modalRef.componentInstance.unansweredQuestionCount).toBe(3);
-  });
-
-  it('should handle the unanswered-question modal result when it is dismissed', fakeAsync(() => {
-    const ngbModal = TestBed.inject(NgbModal);
-    const modalRef = {
-      componentInstance: {},
-      result: Promise.reject('dismissed'),
-    } as NgbModalRef;
-    spyOn(ngbModal, 'open').and.returnValue(modalRef);
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = true;
-
-    fixture.detectChanges();
-    flushMicrotasks();
-
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      UnansweredQuestionModalComponent,
-      {
-        backdrop: 'static',
-        centered: true,
-        windowClass: 'oppia-unanswered-question-modal',
-      }
-    );
-  }));
-
-  it('should not open any modal when both modal flags are false', () => {
-    const ngbModal = TestBed.inject(NgbModal);
-    spyOn(ngbModal, 'open').and.callThrough();
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
-
-    expect(ngbModal.open).not.toHaveBeenCalled();
-  });
-
-  it('should open the time-expired modal as a bottom sheet on mobile screens', () => {
-    const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(
-      WindowDimensionsService
-    ) as jasmine.SpyObj<WindowDimensionsService>;
-    windowDimensionsService.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
-
-    expect(bottomSheet.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
-  });
-
-  it('should open the unanswered-question modal as a bottom sheet on mobile screens', () => {
-    const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(
-      WindowDimensionsService
-    ) as jasmine.SpyObj<WindowDimensionsService>;
-    windowDimensionsService.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = true;
-    fixture.detectChanges();
-
-    expect(bottomSheet.open).toHaveBeenCalledWith(
-      UnansweredQuestionModalComponent
-    );
-  });
-
-  it('should not fire a second request when loadQuestion is called for the same in-flight index', fakeAsync(() => {
-    const apiSpy = TestBed.inject(
-      CertificateAssessmentOfferingBackendApiService
-    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
-    let resolveFirst: (
-      value: CertificateAssessmentQuestionData
-    ) => void = () => {};
+  it('should not fire second request for in-flight index', fakeAsync(() => {
+    let resolve!: (v: CertificateAssessmentQuestionData) => void;
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       new Promise(r => {
-        resolveFirst = r;
+        resolve = r;
       })
     );
-
-    fixture.detectChanges();
-    flushMicrotasks();
-
+    loadQ1();
     expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
       1
     );
     expect(component.isLoadingQuestion).toBeTrue();
-
-    resolveFirst(createQuestionResponse('question_1'));
+    // eslint-disable-next-line dot-notation
+    (component as Record<string, unknown>)['loadQuestion'](0);
+    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
+      1
+    );
+    resolve(questionResponse('q1'));
     flushMicrotasks();
-
     expect(component.isLoadingQuestion).toBeFalse();
-    expect(component.questions[0]).toBeDefined();
   }));
 
-  it('should store questions at the correct index for sparse loading', fakeAsync(() => {
-    const apiSpy = TestBed.inject(
-      CertificateAssessmentOfferingBackendApiService
-    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
-    const deferreds: ((value: CertificateAssessmentQuestionData) => void)[] =
-      [];
+  it('should store questions at correct index for sparse loading', fakeAsync(() => {
+    const deferreds: ((v: CertificateAssessmentQuestionData) => void)[] = [];
     apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
       () =>
         new Promise(r => {
           deferreds.push(r);
         })
     );
-
-    fixture.detectChanges();
-    flushMicrotasks();
-
+    loadQ1();
     component.nextQuestion();
     flushMicrotasks();
-
-    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
-      2
-    );
-
-    (deferreds[1] as (value: CertificateAssessmentQuestionData) => void)(
-      createQuestionResponse('question_2')
-    );
+    deferreds[1](questionResponse('q2'));
     flushMicrotasks();
     expect(component.questions[1]).toBeDefined();
     expect(component.questions[0]).toBeUndefined();
-
-    (deferreds[0] as (value: CertificateAssessmentQuestionData) => void)(
-      createQuestionResponse('question_1')
-    );
+    deferreds[0](questionResponse('q1'));
     flushMicrotasks();
     expect(component.questions[0]).toBeDefined();
-    expect(component.questions[1]).toBeDefined();
   }));
 
-  it('should set loadError when a question fetch fails and clear it on success', fakeAsync(() => {
-    const apiSpy = TestBed.inject(
-      CertificateAssessmentOfferingBackendApiService
-    ) as jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  it('should set loadError on failure and clear on success', fakeAsync(() => {
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.reject(new Error('network error'))
+      Promise.reject(new Error('err'))
     );
-
-    fixture.detectChanges();
-    flushMicrotasks();
-
+    loadQ1();
     expect(component.loadError).toBeTrue();
-    expect(component.isLoadingQuestion).toBeFalse();
-    expect(component.getCurrentQuestion()).toBeNull();
-
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.resolve(createQuestionResponse('question_1'))
+      Promise.resolve(questionResponse('q1'))
     );
-
-    fixture.detectChanges();
+    // eslint-disable-next-line dot-notation
+    (component as Record<string, unknown>)['loadQuestion'](0);
     flushMicrotasks();
-
     expect(component.loadError).toBeFalse();
-    expect(component.getCurrentQuestion()).not.toBeNull();
   }));
+
+  it('should not reload already loaded question', fakeAsync(() => {
+    load();
+    const count = apiSpy.getCertificateAssessmentQuestionAsync.calls.count();
+    // eslint-disable-next-line dot-notation
+    (component as Record<string, unknown>)['loadQuestion'](0);
+    expect(apiSpy.getCertificateAssessmentQuestionAsync.calls.count()).toBe(
+      count
+    );
+  }));
+
+  // ---- navigation ----
+
+  it('should advance to next question', () => {
+    component.nextQuestion();
+    expect(component.currentQuestionIndex).toBe(1);
+  });
+
+  it('should not advance past last question', fakeAsync(() => {
+    load();
+    component.nextQuestion();
+    expect(component.currentQuestionIndex).toBe(2);
+  }));
+
+  it('should go back one question', () => {
+    component.currentQuestionIndex = 2;
+    component.previousQuestion();
+    expect(component.currentQuestionIndex).toBe(1);
+  });
+
+  it('should not go back past first question', () => {
+    component.previousQuestion();
+    expect(component.currentQuestionIndex).toBe(0);
+  });
+
+  // ---- derived fields ----
+
+  it('should recompute derived fields on first load', fakeAsync(() => {
+    expect(component.currentQuestion).toBeNull();
+    loadQ1();
+    expect(component.currentQuestion).toEqual(component.questions[0]);
+    expect(component.totalQuestionCount).toBe(3);
+    expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
+    expect(component.isLastQuestion).toBeFalse();
+  }));
+
+  it('should recompute derived fields when navigating', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    component.nextQuestion();
+    expect(component.isLastQuestion).toBeFalse();
+    component.nextQuestion();
+    expect(component.isLastQuestion).toBeTrue();
+    expect(component.progressPercentage).toBe(100);
+    component.previousQuestion();
+    expect(component.isLastQuestion).toBeFalse();
+  }));
+
+  // ---- handleInteractionSubmit ----
+
+  it('should store answer via handleInteractionSubmit', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    component.handleInteractionSubmit(1);
+    expect(component.answers.q1).toBe(1);
+  }));
+
+  it('should not throw when no question loaded', () => {
+    expect(() => component.handleInteractionSubmit(1)).not.toThrowError();
+  });
+
+  // ---- getLastAnswer ----
+
+  it('should return null when no question loaded', () => {
+    expect(component.getLastAnswer()).toBeNull();
+  });
+
+  it('should return null when no answer set', fakeAsync(() => {
+    load();
+    expect(component.getLastAnswer()).toBeNull();
+  }));
+
+  it('should return last answer', fakeAsync(() => {
+    load();
+    component.answers.q3 = 'hello';
+    expect(component.getLastAnswer()).toBe('hello');
+  }));
+
+  // ---- getInteractionHtml ----
+
+  it('should return empty when no question loaded', () => {
+    expect(component.getInteractionHtml()).toBe('');
+  });
+
+  it('should return html for loaded question', fakeAsync(() => {
+    load();
+    expect(component.getInteractionHtml()).toBe('<div>interaction</div>');
+  }));
+
+  // ---- getCurrentQuestion ----
+
+  it('should return null when no questions loaded', () => {
+    expect(component.getCurrentQuestion()).toBeNull();
+  });
+
+  it('should return null when question at index not loaded', fakeAsync(() => {
+    loadQ1();
+    component.currentQuestionIndex = 1;
+    expect(component.getCurrentQuestion()).toBeNull();
+  }));
+
+  it('should return question at current index', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 1;
+    expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
+  }));
+
+  // ---- isCurrentQuestionLast ----
+
+  it('should report whether current question is last', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    expect(component.isCurrentQuestionLast()).toBeFalse();
+    component.currentQuestionIndex = 2;
+    expect(component.isCurrentQuestionLast()).toBeTrue();
+  }));
+
+  // ---- getProgressPercentage ----
+
+  it('should return 0 when no questions', async () => {
+    await setup(null);
+    fixture.detectChanges();
+    expect(component.getProgressPercentage()).toBe(0);
+  });
+
+  it('should compute progress percentage', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    expect(component.getProgressPercentage()).toBe(Math.round((1 / 3) * 100));
+    component.currentQuestionIndex = 2;
+    expect(component.getProgressPercentage()).toBe(100);
+  }));
+
+  // ---- modals ----
+
+  it('should open time-expired modal on desktop', fakeAsync(() => {
+    loadQ1();
+    component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
+    component.ngOnInit();
+    expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-time-expired-modal',
+    });
+  }));
+
+  it('should open time-expired modal as bottom sheet on mobile', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
+    component.ngOnInit();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
+  }));
+
+  it('should handle time-expired modal dismiss', fakeAsync(() => {
+    loadQ1();
+    modalSpy.open.and.returnValue(modalRef(true));
+    component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
+    component.ngOnInit();
+    flushMicrotasks();
+  }));
+
+  it('should open unanswered-question modal on desktop', fakeAsync(() => {
+    loadQ1();
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = true;
+    component.ngOnInit();
+    expect(modalSpy.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent,
+      {
+        backdrop: 'static',
+        centered: true,
+        windowClass: 'oppia-unanswered-question-modal',
+      }
+    );
+  }));
+
+  it('should open unanswered-question modal as bottom sheet on mobile', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = true;
+    component.ngOnInit();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent
+    );
+  }));
+
+  it('should handle unanswered-question modal dismiss', fakeAsync(() => {
+    loadQ1();
+    modalSpy.open.and.returnValue(modalRef(true));
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = true;
+    component.ngOnInit();
+    flushMicrotasks();
+  }));
+
+  it('should not open any modal when both flags are false', fakeAsync(() => {
+    loadQ1();
+    modalSpy.open.calls.reset();
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = false;
+    component.ngOnInit();
+    expect(modalSpy.open).not.toHaveBeenCalled();
+  }));
+
+  // ---- submitAssessment ----
+
+  it('should emit correct answers on submit', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    classificationSpy.getMatchingClassificationResult.and.returnValue({
+      outcome: {labelledAsCorrect: true},
+      answerGroupIndex: 0,
+      ruleIndex: 0,
+      classificationCategorization: 'explicit',
+    } as never);
+    component.answers.q1 = 1;
+    component.answers.q2 = ['a', 'b', 'd'];
+    component.submitAssessment();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'q1', is_correct: true, selected_answer: '1'},
+      {question_id: 'q2', is_correct: true, selected_answer: 'a,b,d'},
+      {question_id: 'q3', is_correct: false},
+    ]);
+  }));
+
+  it('should emit incorrect answers on submit', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.q1 = 0;
+    component.answers.q2 = ['a', 'c'];
+    component.answers.q3 = 'circle';
+    component.submitAssessment();
+    const answers = (
+      component.assessmentSubmitted.emit as jasmine.Spy
+    ).calls.mostRecent().args[0];
+    expect(answers[0]).toEqual({
+      question_id: 'q1',
+      is_correct: false,
+      selected_answer: '0',
+    });
+    expect(answers[1]).toEqual({
+      question_id: 'q2',
+      is_correct: false,
+      selected_answer: 'a,c',
+    });
+    expect(answers[2]).toEqual({
+      question_id: 'q3',
+      is_correct: false,
+      selected_answer: 'circle',
+    });
+  }));
+
+  it('should omit selected_answer when answer is null', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.submitAssessment();
+    const answers = (
+      component.assessmentSubmitted.emit as jasmine.Spy
+    ).calls.mostRecent().args[0];
+    expect(answers[0]).toEqual({question_id: 'q1', is_correct: false});
+    expect(answers[0].selected_answer).toBeUndefined();
+  }));
+
+  it('should use registry to resolve rules service', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.q1 = 1;
+    component.answers.q2 = ['a'];
+    component.answers.q3 = 'x';
+    component.submitAssessment();
+    expect(registrySpy.getRulesServiceByInteractionId).toHaveBeenCalledWith(
+      'MultipleChoiceInput'
+    );
+    expect(registrySpy.getRulesServiceByInteractionId).toHaveBeenCalledWith(
+      'ItemSelectionInput'
+    );
+    expect(registrySpy.getRulesServiceByInteractionId).toHaveBeenCalledWith(
+      'TextInput'
+    );
+  }));
+
+  // ---- getAssessmentQuestionType ----
+
+  it('should map all interaction types and default', async () => {
+    const allTypes: [string, string][] = [
+      ['MultipleChoiceInput', AssessmentQuestionTypes.MULTIPLE_CHOICE],
+      ['ItemSelectionInput', AssessmentQuestionTypes.MULTIPLE_SELECT],
+      ['TextInput', AssessmentQuestionTypes.TEXT_INPUT],
+      ['NumericInput', AssessmentQuestionTypes.NUMERIC_INPUT],
+      ['FractionInput', AssessmentQuestionTypes.FRACTION_INPUT],
+      ['NumberWithUnits', AssessmentQuestionTypes.NUMBER_WITH_UNITS],
+      ['DragAndDropSortInput', AssessmentQuestionTypes.DRAG_AND_DROP_SORT],
+      ['ImageClickInput', AssessmentQuestionTypes.IMAGE_CLICK],
+      ['UnknownType', AssessmentQuestionTypes.TEXT_INPUT],
+    ];
+    const ids = allTypes.map((_, i) => `t${i}`);
+    await setup(makeAttempt(ids));
+    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      (_a: string, qId: string) => {
+        const idx = parseInt(qId.substring(1));
+        return Promise.resolve(
+          CertificateAssessmentQuestionData.createFromBackendDict({
+            question_id: qId,
+            question_state_data: stateDataFor(allTypes[idx][0]),
+          })
+        );
+      }
+    );
+    fixture.detectChanges();
+    await fixture.whenStable();
+    for (let i = 1; i < allTypes.length; i++) {
+      component.nextQuestion();
+      await fixture.whenStable();
+    }
+    for (let i = 0; i < allTypes.length; i++) {
+      expect(component.questions[i].type).toBe(allTypes[i][1]);
+    }
+  });
 });

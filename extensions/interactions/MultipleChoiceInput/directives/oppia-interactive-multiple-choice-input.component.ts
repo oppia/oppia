@@ -43,6 +43,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
   @Input() choicesWithValue!: string;
   @Input() showChoicesInShuffledOrderWithValue!: string;
+  @Input() lastAnswer!: number | null;
   choices!: ChoiceWithIndex[];
   answer: number | null = null;
   displayedCard!: StateCard;
@@ -112,7 +113,20 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   ngOnInit(): void {
     this.choices = this.getOrderedChoices();
 
-    this.answer = null;
+    this.answer = this.lastAnswer !== undefined ? this.lastAnswer : null;
+    if (this.answer !== null) {
+      const selectedChoice = this.choices.find(
+        choice => choice.originalIndex === this.answer
+      );
+      if (selectedChoice) {
+        const selectedElement = document.querySelector(
+          'button.multiple-choice-option.selected'
+        );
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+        }
+      }
+    }
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(),
       () => this.validate()
@@ -136,6 +150,10 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+  }
+
+  isSelectedChoice(choice: ChoiceWithIndex): boolean {
+    return this.answer !== null && this.answer === choice.originalIndex;
   }
 
   @HostListener('document:keydown.enter', ['$event'])

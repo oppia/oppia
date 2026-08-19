@@ -15,9 +15,9 @@
                                                 [totalQuestions]="totalQuestionCount"
                                                 [progressPercentage]="progressPercentage"
                                                 [isLastQuestion]="isLastQuestion"
-                                                [savedResponse]="savedResponse"
+                                                [interactionHtml]="getInteractionHtml()"
+                                                [lastAnswer]="getLastAnswer()"
                                                 (previousQuestion)="previousQuestion()"
                                                 (nextQuestion)="nextQuestion()"
-                                                (submitAssessment)="submitAssessment()"
-                                                (responseChange)="updateResponse($event)">
+                                                (submitAssessment)="submitAssessment()">
 </oppia-certificate-assessment-conversation-skin>

@@ -58,6 +58,18 @@ export type AssessmentQuestionType =
   | 'drag_and_drop_sort'
   | 'image_click';
 
+/** Named constants for AssessmentQuestionType values. */
+export const AssessmentQuestionTypes = {
+  MULTIPLE_CHOICE: 'multiple_choice' as const,
+  MULTIPLE_SELECT: 'multiple_select' as const,
+  TEXT_INPUT: 'text_input' as const,
+  NUMERIC_INPUT: 'numeric_input' as const,
+  FRACTION_INPUT: 'fraction_input' as const,
+  NUMBER_WITH_UNITS: 'number_with_units' as const,
+  DRAG_AND_DROP_SORT: 'drag_and_drop_sort' as const,
+  IMAGE_CLICK: 'image_click' as const,
+};
+
 /** An answer choice within an assessment question. */
 export interface AssessmentQuestionOption {
   /** Unique identifier for this option (content id). */

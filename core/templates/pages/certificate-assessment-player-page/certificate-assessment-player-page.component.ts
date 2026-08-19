@@ -31,45 +31,23 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {
   CertificateAssessmentAttemptData,
   AssessmentQuestion,
-  AssessmentQuestionOption,
   AssessmentQuestionType,
+  AssessmentQuestionTypes,
 } from 'domain/certificate-assessment/certificate-assessment.model';
-import {State, StateBackendDict} from 'domain/state/state.model';
-import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {
-  MultipleChoiceInputCustomizationArgsBackendDict,
-  ItemSelectionInputCustomizationArgsBackendDict,
-} from 'interactions/customization-args-defs';
+import {StateBackendDict} from 'domain/state/state.model';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
-import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
-import {DragAndDropSortInputRulesService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
-
-const INTERACTION_ID_MULTIPLE_CHOICE =
-  'MultipleChoiceInput' as InteractionSpecsKey;
-const INTERACTION_ID_ITEM_SELECTION =
-  'ItemSelectionInput' as InteractionSpecsKey;
-const INTERACTION_ID_TEXT_INPUT = 'TextInput' as InteractionSpecsKey;
-const INTERACTION_ID_NUMERIC_INPUT = 'NumericInput' as InteractionSpecsKey;
-const INTERACTION_ID_FRACTION_INPUT = 'FractionInput' as InteractionSpecsKey;
-const INTERACTION_ID_NUMBER_WITH_UNITS =
-  'NumberWithUnits' as InteractionSpecsKey;
-const INTERACTION_ID_DRAG_AND_DROP_SORT =
-  'DragAndDropSortInput' as InteractionSpecsKey;
-const INTERACTION_ID_IMAGE_CLICK = 'ImageClickInput' as InteractionSpecsKey;
 
 @Component({
   selector: 'certificate-assessment-player-page',
@@ -99,16 +77,23 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   isLoadingQuestion = false;
   loadError = false;
   private inflightIndexes = new Set<number>();
-  // Answers keyed by question id; a null or missing value means the question
-  // was not answered yet.
-  answers: {[questionId: string]: string | null} = {};
+  /** Answers keyed by question id; a null or missing value means the
+   *  question was not answered yet. Values are InteractionAnswer typed to
+   *  match what interaction components provide via CurrentInteractionService. */
+  answers: {[questionId: string]: InteractionAnswer | null} = {};
+  /** Pre-created Interaction objects keyed by question id, built from the
+   *  state backend dict during loadQuestion(). */
+  interactions: {[questionId: string]: Interaction} = {};
+  /** Generated interaction HTML strings keyed by question id, produced by
+   *  ExplorationHtmlFormatterService.getInteractionHtml(). */
+  interactionHtmls: {[questionId: string]: string} = {};
+  focusLabel = '';
   // Derived fields bound by the conversation skin template. They are
   // recomputed whenever the current question index or the answers change.
   currentQuestion: AssessmentQuestion | null = null;
   totalQuestionCount = 0;
   progressPercentage = 0;
   isLastQuestion = false;
-  savedResponse = '';
 
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
@@ -116,17 +101,16 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     private windowDimensionsService: WindowDimensionsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private answerClassificationService: AnswerClassificationService,
-    private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
-    private itemSelectionInputRulesService: ItemSelectionInputRulesService,
-    private textInputRulesService: TextInputRulesService,
-    private numericInputRulesService: NumericInputRulesService,
-    private fractionInputRulesService: FractionInputRulesService,
-    private numberWithUnitsRulesService: NumberWithUnitsRulesService,
-    private dragAndDropSortInputRulesService: DragAndDropSortInputRulesService,
-    private imageClickInputRulesService: ImageClickInputRulesService
+    private currentInteractionService: CurrentInteractionService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private focusManagerService: FocusManagerService,
+    private interactionRulesRegistryService: InteractionRulesRegistryService
   ) {}
 
   ngOnInit(): void {
+    this.currentInteractionService.setOnSubmitFn(
+      this.handleInteractionSubmit.bind(this)
+    );
     this.loadQuestion(0);
     this.refreshComputedFields();
     if (this.showTimeExpiredModal) {
@@ -165,108 +149,57 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
         attemptQuestion.questionId
       )
       .then(response => {
-        this.questions[index] = this.convertStateDataToAssessmentQuestion(
+        this.buildQuestionFromStateData(
+          index,
           response.questionId,
           response.questionStateData
         );
-        this.isLoadingQuestion = false;
         this.loadError = false;
         this.refreshComputedFields();
       })
       .catch(() => {
-        this.isLoadingQuestion = false;
         this.loadError = true;
       })
       .finally(() => {
+        this.isLoadingQuestion = false;
         this.inflightIndexes.delete(index);
       });
   }
 
   /**
-   * Converts the question state data returned by the certificate question
-   * handler into the AssessmentQuestion shape rendered by the conversation
-   * skin. The interaction fields and options are rendered based on the
-   * interaction type of the question.
+   * Builds an AssessmentQuestion from the state data returned by the
+   * certificate question handler, and pre-creates the Interaction object
+   * and interaction HTML needed for rendering via oppia-interaction-display.
    */
-  private convertStateDataToAssessmentQuestion(
+  private buildQuestionFromStateData(
+    index: number,
     questionId: string,
     stateData: StateBackendDict
-  ): AssessmentQuestion {
-    const interaction = stateData.interaction;
-    const type = this.getQuestionType(interaction.id);
-    const options = this.extractOptions(interaction.customization_args);
-    return {
+  ): void {
+    const interaction = Interaction.createFromBackendDict(
+      stateData.interaction
+    );
+    this.interactions[questionId] = interaction;
+
+    this.focusLabel = this.focusManagerService.generateFocusLabel();
+    const interactionId = interaction.id as string;
+    this.interactionHtmls[questionId] =
+      this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        interaction.customizationArgs,
+        true,
+        this.focusLabel,
+        null
+      );
+
+    this.questions[index] = {
       id: questionId,
-      type,
+      type: this.getAssessmentQuestionType(interactionId),
       prompt: stateData.content.html,
       hint: '',
-      options,
-      placeholder: this.extractPlaceholder(interaction.customization_args),
+      options: [],
       stateData,
     };
-  }
-
-  private getQuestionType(
-    interactionId: InteractionSpecsKey | null
-  ): AssessmentQuestionType {
-    switch (interactionId) {
-      case INTERACTION_ID_MULTIPLE_CHOICE:
-        return 'multiple_choice';
-      case INTERACTION_ID_ITEM_SELECTION:
-        return 'multiple_select';
-      case INTERACTION_ID_TEXT_INPUT:
-        return 'text_input';
-      case INTERACTION_ID_NUMERIC_INPUT:
-        return 'numeric_input';
-      case INTERACTION_ID_FRACTION_INPUT:
-        return 'fraction_input';
-      case INTERACTION_ID_NUMBER_WITH_UNITS:
-        return 'number_with_units';
-      case INTERACTION_ID_DRAG_AND_DROP_SORT:
-        return 'drag_and_drop_sort';
-      case INTERACTION_ID_IMAGE_CLICK:
-        return 'image_click';
-      default:
-        return 'text_input';
-    }
-  }
-
-  /**
-   * Extracts the answer choices from the interaction customization args. The
-   * choices are only present for choice-based interactions (multiple choice
-   * and item selection).
-   */
-  private extractOptions(
-    customizationArgs: StateBackendDict['interaction']['customization_args']
-  ): AssessmentQuestionOption[] {
-    const choices = (
-      customizationArgs as
-        | MultipleChoiceInputCustomizationArgsBackendDict
-        | ItemSelectionInputCustomizationArgsBackendDict
-    ).choices?.value;
-    if (choices === undefined) {
-      return [];
-    }
-    return (choices as SubtitledHtmlBackendDict[]).map((choice, index) => ({
-      id: choice.content_id ?? `option_${index}`,
-      text: choice.html,
-      index,
-    }));
-  }
-
-  /**
-   * Extracts the input placeholder from the interaction customization args.
-   * Only free-response interactions (text and number input) provide one.
-   */
-  private extractPlaceholder(
-    customizationArgs: StateBackendDict['interaction']['customization_args']
-  ): string {
-    const placeholder = (
-      customizationArgs as {
-        placeholder?: {value: {content_id: string | null; unicode_str: string}};
-      }
-    ).placeholder?.value;
-    return placeholder?.unicode_str ?? '';
   }
 
   private isMobileScreenSize(): boolean {
@@ -324,59 +257,86 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   submitAssessment(): void {
     const answers = this.questions.map(question => {
-      const selectedAnswer = this.answers[question.id] ?? null;
-      const answerToSubmit =
-        selectedAnswer === null
-          ? ''
-          : this.getAnswerToSubmit(question, selectedAnswer);
+      const answer = this.answers[question.id] ?? null;
       let isCorrect = false;
-      if (selectedAnswer !== null) {
-        const state = State.createFromBackendDict(
-          question.id,
-          question.stateData
-        );
-        const interactionId = state.interaction.id as string;
-        const rulesService = this.getRulesService(interactionId);
-        const classificationAnswer = this.convertAnswerForClassification(
-          question,
-          selectedAnswer,
-          interactionId
-        );
+      if (answer !== null) {
+        const interaction = this.interactions[question.id];
+        const rulesService =
+          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+            interaction.id as string
+          );
         const result =
           this.answerClassificationService.getMatchingClassificationResult(
             question.id,
-            state.interaction,
-            classificationAnswer,
+            interaction,
+            answer,
             rulesService
           );
         isCorrect = result.outcome.labelledAsCorrect;
       }
+      const selectedAnswer =
+        answer !== null ? this.formatAnswerForBackend(answer) : undefined;
       return {
         question_id: question.id,
         is_correct: isCorrect,
-        ...(answerToSubmit !== '' ? {selected_answer: answerToSubmit} : {}),
+        ...(selectedAnswer !== undefined
+          ? {selected_answer: selectedAnswer}
+          : {}),
       };
     });
     this.assessmentSubmitted.emit(answers);
   }
 
   /**
-   * Returns the answer to store for the given question. Multiple-choice
-   * answers are submitted as the index of the selected choice, matching
-   * Oppia's multiple-choice answer format; all other answers are submitted
-   * as-is.
+   * Called when the interaction component submits an answer via
+   * CurrentInteractionService.onSubmit → onSubmitFn. Stores the typed
+   * answer only; navigation is triggered separately by the Next / Submit
+   * Assessment buttons in the conversation skin.
    */
-  private getAnswerToSubmit(
-    question: AssessmentQuestion,
-    selectedAnswer: string
-  ): string {
-    if (question.type !== 'multiple_choice') {
-      return selectedAnswer;
+  handleInteractionSubmit(answer: InteractionAnswer): void {
+    const question = this.getCurrentQuestion();
+    if (question === null) {
+      return;
     }
-    const selectedOption = question.options.find(
-      option => option.id === selectedAnswer
-    );
-    return selectedOption === undefined ? '' : String(selectedOption.index);
+    this.answers[question.id] = answer;
+    this.refreshComputedFields();
+  }
+
+  /**
+   * Returns the interaction HTML string for the current question, suitable
+   * for rendering via oppia-interaction-display.
+   */
+  getInteractionHtml(): string {
+    const question = this.getCurrentQuestion();
+    if (question === null) {
+      return '';
+    }
+    return this.interactionHtmls[question.id] ?? '';
+  }
+
+  /**
+   * Returns the last answer submitted for the current question. This is
+   * passed to the interaction component via parentScope so that the
+   * interaction can restore the previous answer on re-render (e.g. when
+   * the learner navigates back).
+   */
+  getLastAnswer(): InteractionAnswer | null {
+    const question = this.getCurrentQuestion();
+    if (question === null) {
+      return null;
+    }
+    return this.answers[question.id] ?? null;
+  }
+
+  /**
+   * Converts a typed InteractionAnswer into the string format expected by
+   * the backend submission payload.
+   */
+  private formatAnswerForBackend(answer: InteractionAnswer): string {
+    if (Array.isArray(answer)) {
+      return answer.join(',');
+    }
+    return String(answer);
   }
 
   getProgressPercentage(): number {
@@ -406,14 +366,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     return this.attempt?.questions.length ?? this.questions.length;
   }
 
-  getSavedResponse(): string {
-    const question = this.getCurrentQuestion();
-    if (question === null) {
-      return '';
-    }
-    return this.answers[question.id] ?? '';
-  }
-
   /**
    * Recomputes the derived fields bound by the conversation skin template
    * from the current question, attempt, and answers. This keeps the template
@@ -424,92 +376,34 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     this.totalQuestionCount = this.getTotalQuestionCount();
     this.progressPercentage = this.getProgressPercentage();
     this.isLastQuestion = this.isCurrentQuestionLast();
-    this.savedResponse = this.getSavedResponse();
-  }
-
-  updateResponse(response: string): void {
-    const question = this.getCurrentQuestion();
-    if (question === null) {
-      return;
-    }
-    this.answers[question.id] = response;
-    this.refreshComputedFields();
   }
 
   /**
-   * Converts the raw string answer stored by the player into the typed format
-   * expected by the interaction's rules service. Item-selection answers are
-   * split into arrays; numeric answers are parsed as numbers; multiple-choice
-   * answers are resolved to their option index.
+   * Converts an interaction id from the backend into the narrower assessment
+   * question type union used by the frontend model.
    */
-  private convertAnswerForClassification(
-    question: AssessmentQuestion,
-    rawAnswer: string,
+  private getAssessmentQuestionType(
     interactionId: string
-  ): InteractionAnswer {
+  ): AssessmentQuestionType {
     switch (interactionId) {
-      case INTERACTION_ID_MULTIPLE_CHOICE: {
-        const option = question.options.find(o => o.id === rawAnswer);
-        return option !== undefined ? option.index : rawAnswer;
-      }
-      case INTERACTION_ID_ITEM_SELECTION:
-        return rawAnswer.split(',').filter(Boolean);
-      case INTERACTION_ID_NUMERIC_INPUT: {
-        const numericValue = Number(rawAnswer);
-        return isNaN(numericValue) ? rawAnswer : numericValue;
-      }
-      case INTERACTION_ID_DRAG_AND_DROP_SORT:
-        return rawAnswer
-          .split(',')
-          .filter(Boolean)
-          .map(id => [id]);
-      case INTERACTION_ID_IMAGE_CLICK: {
-        try {
-          const parsed = JSON.parse(rawAnswer) as InteractionAnswer;
-          return parsed;
-        } catch {
-          return rawAnswer;
-        }
-      }
+      case 'MultipleChoiceInput':
+        return AssessmentQuestionTypes.MULTIPLE_CHOICE;
+      case 'ItemSelectionInput':
+        return AssessmentQuestionTypes.MULTIPLE_SELECT;
+      case 'TextInput':
+        return AssessmentQuestionTypes.TEXT_INPUT;
+      case 'NumericInput':
+        return AssessmentQuestionTypes.NUMERIC_INPUT;
+      case 'FractionInput':
+        return AssessmentQuestionTypes.FRACTION_INPUT;
+      case 'NumberWithUnits':
+        return AssessmentQuestionTypes.NUMBER_WITH_UNITS;
+      case 'DragAndDropSortInput':
+        return AssessmentQuestionTypes.DRAG_AND_DROP_SORT;
+      case 'ImageClickInput':
+        return AssessmentQuestionTypes.IMAGE_CLICK;
       default:
-        return rawAnswer;
-    }
-  }
-
-  /**
-   * Returns the concrete interaction rules service that corresponds to the
-   * given interaction id. Each service is providedIn: 'root' and injected
-   * via Angular DI.
-   */
-  private getRulesService(
-    interactionId: string
-  ): MultipleChoiceInputRulesService &
-    ItemSelectionInputRulesService &
-    TextInputRulesService &
-    NumericInputRulesService &
-    FractionInputRulesService &
-    NumberWithUnitsRulesService &
-    DragAndDropSortInputRulesService &
-    ImageClickInputRulesService {
-    switch (interactionId) {
-      case INTERACTION_ID_MULTIPLE_CHOICE:
-        return this.multipleChoiceInputRulesService;
-      case INTERACTION_ID_ITEM_SELECTION:
-        return this.itemSelectionInputRulesService;
-      case INTERACTION_ID_TEXT_INPUT:
-        return this.textInputRulesService;
-      case INTERACTION_ID_NUMERIC_INPUT:
-        return this.numericInputRulesService;
-      case INTERACTION_ID_FRACTION_INPUT:
-        return this.fractionInputRulesService;
-      case INTERACTION_ID_NUMBER_WITH_UNITS:
-        return this.numberWithUnitsRulesService;
-      case INTERACTION_ID_DRAG_AND_DROP_SORT:
-        return this.dragAndDropSortInputRulesService;
-      case INTERACTION_ID_IMAGE_CLICK:
-        return this.imageClickInputRulesService;
-      default:
-        return this.textInputRulesService;
+        return AssessmentQuestionTypes.TEXT_INPUT;
     }
   }
 }

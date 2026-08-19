@@ -18,17 +18,11 @@
  * question card, and navigation actions).
  */
 
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
@@ -36,85 +30,31 @@ import './certificate-assessment-conversation-skin.component.css';
   templateUrl: './certificate-assessment-conversation-skin.component.html',
   styleUrls: ['./certificate-assessment-conversation-skin.component.css'],
 })
-export class CertificateAssessmentConversationSkinComponent
-  implements OnInit, OnChanges
-{
+export class CertificateAssessmentConversationSkinComponent implements OnInit {
   @Input() currentQuestion!: AssessmentQuestion;
   @Input() currentQuestionIndex = 0;
   @Input() totalQuestions = 0;
   @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
-  @Input() savedResponse = '';
+  @Input() interactionHtml = '';
+  @Input() lastAnswer: InteractionAnswer | null = null;
 
   @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
   @Output() submitAssessment = new EventEmitter<void>();
-  @Output() responseChange = new EventEmitter<string>();
 
   OPPIA_AVATAR_IMAGE_URL!: string;
-  selectedOptionIds: string[] = [];
-  freeResponse = '';
 
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private currentInteractionService: CurrentInteractionService
+  ) {}
 
   ngOnInit(): void {
     this.OPPIA_AVATAR_IMAGE_URL =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-    this.hydrateResponseFromSavedResponse();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.currentQuestion || changes.savedResponse) {
-      this.hydrateResponseFromSavedResponse();
-    }
-  }
-
-  private hydrateResponseFromSavedResponse(): void {
-    this.freeResponse = '';
-    this.selectedOptionIds = [];
-    if (!this.savedResponse) {
-      return;
-    }
-    if (
-      this.currentQuestion?.type === 'multiple_choice' ||
-      this.currentQuestion?.type === 'multiple_select' ||
-      this.currentQuestion?.type === 'drag_and_drop_sort'
-    ) {
-      this.selectedOptionIds = this.savedResponse.split(',').filter(Boolean);
-    } else {
-      this.freeResponse = this.savedResponse;
-    }
-  }
-
-  isOptionSelected(optionId: string): boolean {
-    return this.selectedOptionIds.includes(optionId);
-  }
-
-  selectSingleChoice(optionId: string): void {
-    this.selectedOptionIds = [optionId];
-    this.responseChange.emit(optionId);
-  }
-
-  toggleMultipleSelect(optionId: string): void {
-    if (this.isOptionSelected(optionId)) {
-      this.selectedOptionIds = this.selectedOptionIds.filter(
-        id => id !== optionId
-      );
-    } else {
-      this.selectedOptionIds = [...this.selectedOptionIds, optionId];
-    }
-    this.responseChange.emit(this.selectedOptionIds.join(','));
-  }
-
-  updateFreeResponse(value: string): void {
-    this.freeResponse = value;
-    this.responseChange.emit(value);
-  }
-
-  getQuestionInputType(): string {
-    return this.currentQuestion?.type === 'numeric_input' ? 'number' : 'text';
   }
 
   onPreviousQuestion(): void {
@@ -122,10 +62,22 @@ export class CertificateAssessmentConversationSkinComponent
   }
 
   onNextQuestion(): void {
+    try {
+      this.currentInteractionService.submitAnswer();
+    } catch {
+      // SubmitAnswerFn may not be registered yet (e.g. ImageClickInput)
+      // or the interaction hasn't loaded. The answer (if any) was already
+      // captured via the interaction's own onSubmit -> handleInteractionSubmit.
+    }
     this.nextQuestion.emit();
   }
 
   onSubmitAssessment(): void {
+    try {
+      this.currentInteractionService.submitAnswer();
+    } catch {
+      // Same rationale as onNextQuestion.
+    }
     this.submitAssessment.emit();
   }
 }

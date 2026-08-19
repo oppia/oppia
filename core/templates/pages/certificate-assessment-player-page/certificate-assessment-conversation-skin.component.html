@@ -30,69 +30,13 @@
       </div>
     </div>
 
-    <div *ngIf="currentQuestion.type === 'multiple_choice'" class="certificate-assessment-options">
-      <label *ngFor="let option of currentQuestion.options" class="certificate-assessment-option-row">
-        <input type="radio" class="certificate-assessment-radio" [name]="currentQuestion.id" [checked]="isOptionSelected(option.id)"
-               (change)="selectSingleChoice(option.id)">
-        <span class="certificate-assessment-option-text">
-          <oppia-rte-output-display [rteString]="option.text"></oppia-rte-output-display>
-        </span>
-      </label>
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'multiple_select'" class="certificate-assessment-options">
-      <label *ngFor="let option of currentQuestion.options"
-             class="certificate-assessment-option-row">
-        <input type="checkbox" class="certificate-assessment-checkbox"
-               [checked]="isOptionSelected(option.id)"
-               (change)="toggleMultipleSelect(option.id)">
-        <span class="certificate-assessment-option-text">{{ option.text }}</span>
-      </label>
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'text_input' || currentQuestion.type === 'numeric_input' || currentQuestion.type === 'fraction_input' || currentQuestion.type === 'number_with_units'"
-         class="certificate-assessment-free-response">
-      <label class="certificate-assessment-free-response-label"
-             [for]="'certificate-assessment-free-response-input-' + currentQuestion.id"
-      >
-        {{ 'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_YOUR_ANSWER' | translate }}
-      </label>
-      <input
-             [id]="'certificate-assessment-free-response-input-' + currentQuestion.id"
-             [type]="getQuestionInputType()" class="certificate-assessment-free-response-input"
-             [placeholder]="currentQuestion.placeholder || ''"  [value]="freeResponse"
-             #freeResponseInput
-             (input)="updateFreeResponse(freeResponseInput.value)">
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'drag_and_drop_sort'" class="certificate-assessment-options">
-      <p class="text-muted mb-2">Select the correct order:</p>
-      <div *ngFor="let option of currentQuestion.options; let i = index"
-           class="certificate-assessment-option-row">
-        <label>
-          <input type="checkbox" class="certificate-assessment-checkbox"
-                 [checked]="isOptionSelected(option.id)"
-                 (change)="toggleMultipleSelect(option.id)">
-          <span class="certificate-assessment-option-text">
-            <oppia-rte-output-display [rteString]="option.text"></oppia-rte-output-display>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'image_click'" class="certificate-assessment-free-response">
-      <p class="text-muted mb-2">Click on the correct region of the image.</p>
-      <label class="certificate-assessment-free-response-label"
-             [for]="'certificate-assessment-image-input-' + currentQuestion.id"
-      >
-        {{ 'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_YOUR_ANSWER' | translate }}
-      </label>
-      <input
-             [id]="'certificate-assessment-image-input-' + currentQuestion.id"
-             type="text" class="certificate-assessment-free-response-input"
-             placeholder="Enter region name" [value]="freeResponse"
-             #freeResponseInput
-             (input)="updateFreeResponse(freeResponseInput.value)">
+    <div *ngIf="interactionHtml"
+         class="certificate-assessment-interaction conversation-skin-interaction-container">
+      <oppia-interaction-display
+        classStr="e2e-test-conversation-input"
+        [htmlData]="interactionHtml"
+        [parentScope]="this">
+      </oppia-interaction-display>
     </div>
   </div>
 

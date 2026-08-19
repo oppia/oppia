@@ -22,7 +22,11 @@ import {
   CertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   AvailableCertificateAssessmentOfferingBackendDict,
+  CertificateAssessmentQuestionData,
+  CertificateAssessmentQuestionStateBackendDict,
+  AssessmentQuestionTypes,
 } from './certificate-assessment.model';
+import {StateBackendDict} from 'domain/state/state.model';
 
 describe('Available Certificate Assessment Offering Data Model', () => {
   let backendDict: AvailableCertificateAssessmentOfferingBackendDict;
@@ -190,5 +194,72 @@ describe('Certificate Assessment Attempt Data Model', () => {
       {questionId: 'q1', questionVersion: 1},
       {questionId: 'q2', questionVersion: 2},
     ]);
+  });
+});
+
+describe('Certificate Assessment Question Data Model', () => {
+  it('should correctly create an instance via the constructor', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>What is 2+2?</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+    const question = new CertificateAssessmentQuestionData('q1', stateData);
+
+    expect(question.questionId).toEqual('q1');
+    expect(question.questionStateData).toBe(stateData);
+  });
+
+  it('should correctly create an instance from a backend dict', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>What is 3+3?</p>'},
+      interaction: {id: 'NumericInput'},
+    } as StateBackendDict;
+    const dict: CertificateAssessmentQuestionStateBackendDict = {
+      question_id: 'q2',
+      question_state_data: stateData,
+    };
+    const question =
+      CertificateAssessmentQuestionData.createFromBackendDict(dict);
+
+    expect(question.questionId).toEqual('q2');
+    expect(question.questionStateData).toBe(stateData);
+  });
+
+  it('should expose questionId via getter', () => {
+    const question = new CertificateAssessmentQuestionData(
+      'q3',
+      {} as StateBackendDict
+    );
+
+    expect(question.questionId).toEqual('q3');
+  });
+
+  it('should expose questionStateData via getter', () => {
+    const stateData = {
+      content: {content_id: 'c', html: ''},
+    } as StateBackendDict;
+    const question = new CertificateAssessmentQuestionData('q4', stateData);
+
+    expect(question.questionStateData).toBe(stateData);
+  });
+});
+
+describe('AssessmentQuestionTypes constants', () => {
+  it('should define all question type constants', () => {
+    expect(AssessmentQuestionTypes.MULTIPLE_CHOICE).toBe('multiple_choice');
+    expect(AssessmentQuestionTypes.MULTIPLE_SELECT).toBe('multiple_select');
+    expect(AssessmentQuestionTypes.TEXT_INPUT).toBe('text_input');
+    expect(AssessmentQuestionTypes.NUMERIC_INPUT).toBe('numeric_input');
+    expect(AssessmentQuestionTypes.FRACTION_INPUT).toBe('fraction_input');
+    expect(AssessmentQuestionTypes.NUMBER_WITH_UNITS).toBe('number_with_units');
+    expect(AssessmentQuestionTypes.DRAG_AND_DROP_SORT).toBe(
+      'drag_and_drop_sort'
+    );
+    expect(AssessmentQuestionTypes.IMAGE_CLICK).toBe('image_click');
+  });
+
+  it('should have exactly 8 constants', () => {
+    const keys = Object.keys(AssessmentQuestionTypes);
+    expect(keys.length).toBe(8);
   });
 });

@@ -28,6 +28,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 
 describe('CertificateAssessmentPlayerPageRootComponent', () => {
@@ -184,8 +185,11 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to start the certificate assessment.'
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
     );
   }));
 
@@ -226,6 +230,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   });
 
   it('should start a real attempt and switch to questions on startAssessment', fakeAsync(() => {
+    component.certificateId = 'cert-123';
     component.startAssessment();
     flushMicrotasks();
 
@@ -316,5 +321,100 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.showAssessmentInterruptCard).toBe(false);
     expect(component.currentStage).toBe('questions');
+  });
+
+  it('should switch to the intro stage on showIntro', () => {
+    component.currentStage = 'questions';
+
+    component.showIntro();
+
+    expect(component.currentStage).toBe('intro');
+  });
+
+  it('should load the classroom url fragment from the offering classroom', fakeAsync(() => {
+    const classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      Promise.resolve({classroomDict: {urlFragment: 'math'}})
+    );
+
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      TestBed.inject(ActivatedRoute),
+      alertsService,
+      certificateAssessmentOfferingBackendApiService,
+      classroomBackendApiServiceSpy,
+      {} as PageHeadService,
+      router,
+      translateService
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(
+      classroomBackendApiServiceSpy.getClassroomDataAsync
+    ).toHaveBeenCalledWith('math_classroom_01');
+    expect(component.classroomUrlFragment).toBe('math');
+  }));
+
+  it('should keep classroom url fragment empty when classroom API fails', fakeAsync(() => {
+    const classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      Promise.reject(new Error('Classroom not found'))
+    );
+
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      TestBed.inject(ActivatedRoute),
+      alertsService,
+      certificateAssessmentOfferingBackendApiService,
+      classroomBackendApiServiceSpy,
+      {} as PageHeadService,
+      router,
+      translateService
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.classroomUrlFragment).toBe('');
+    expect(component.isLoading).toBe(false);
+  }));
+
+  it('should default to the intro stage', () => {
+    expect(component.currentStage).toBe('intro');
+  });
+
+  it('should have the correct stage constants', () => {
+    expect(CertificateAssessmentPlayerPageConstants.STAGE_INTRO).toBe('intro');
+    expect(CertificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS).toBe(
+      'instructions'
+    );
+    expect(CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS).toBe(
+      'questions'
+    );
+  });
+
+  it('should initialize with isLoading true and hasError false', () => {
+    expect(component.isLoading).toBe(true);
+    expect(component.hasError).toBe(false);
+  });
+
+  it('should initialize attempt as null', () => {
+    expect(component.attempt).toBeNull();
+  });
+
+  it('should initialize showAssessmentInterruptCard as false', () => {
+    expect(component.showAssessmentInterruptCard).toBe(false);
+  });
+
+  it('should expose the certificateAssessmentPlayerPageConstants', () => {
+    expect(component.certificateAssessmentPlayerPageConstants).toBe(
+      CertificateAssessmentPlayerPageConstants
+    );
   });
 });
