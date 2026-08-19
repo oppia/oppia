@@ -65,10 +65,7 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
           certificateName: resultData.title,
           scorePercentage: resultData.total_score,
           topicBreakdown,
-          timeTakenMinutes:
-            resultData.time_taken_in_minutes !== null
-              ? Math.round(resultData.time_taken_in_minutes)
-              : null,
+          timeTakenMinutes: resultData.time_taken_in_minutes,
         };
       })
       .catch(() => {
