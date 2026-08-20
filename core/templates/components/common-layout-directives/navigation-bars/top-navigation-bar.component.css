@@ -418,7 +418,6 @@
 }
 .oppia-top-navigation-bar .oppia-navbar-profile-picture-container {
   margin-inline-start: 10px;
-  position: relative;
   text-align: end;
 }
  
@@ -533,118 +532,6 @@
   font-weight: bold;
   position: absolute;
 }
-.oppia-top-navigation-bar .oppia-navbar-creator-updates {
-  max-height: 220px;
-  overflow-y: auto;
-  padding: 8px 16px 12px;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-updates-heading {
-  color: #333;
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-card {
-  align-items: flex-start;
-  border-left: 3px solid #00645c;
-  display: flex;
-  gap: 4px;
-  margin-top: 8px;
-  padding: 8px 10px;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-card:hover,
-.oppia-top-navigation-bar .oppia-navbar-creator-update-card:focus-within {
-  background-color: #e8f5f3;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-link {
-  color: #333;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  text-decoration: none;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-link:hover,
-.oppia-top-navigation-bar .oppia-navbar-creator-update-link:focus {
-  text-decoration: none;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-preview {
-  color: #5f6368;
-  font-size: 12px;
-  line-height: 17px;
-  overflow-wrap: anywhere;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-preview.is-clamped {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all {
-  color: #00645c;
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 10px;
-  text-align: center;
-  text-decoration: none;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all:hover,
-.oppia-top-navigation-bar .oppia-navbar-creator-updates-view-all:focus {
-  text-decoration: underline;
-}
-.oppia-top-navigation-bar .oppia-creator-update-alert-dot {
-  background-color: #c92820;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  height: 12px;
-  position: absolute;
-  right: 17px;
-  top: 0px;
-  width: 12px;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-header {
-  align-items: baseline;
-  display: flex;
-  gap: 6px;
-  min-width: 0;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-lesson {
-  color: #333;
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-timestamp {
-  color: #757575;
-  display: block;
-  flex: 0 0 auto;
-  font-size: 11px;
-  white-space: nowrap;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-message {
-  color: #00645c;
-  font-size: 13px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-.oppia-top-navigation-bar .oppia-navbar-creator-update-preview-text {
-  color: #5f6368;
-  display: -webkit-box;
-  font-size: 12px;
-  line-height: 17px;
-  margin-top: 2px;
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;
   display: flex;

@@ -321,13 +321,13 @@ def get_lesson_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
-    filter = [status_filter] if status_filter else None
+    status_filters = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.LessonFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             exploration_id=exploration_id,
-            status_filter=filter,
+            status_filter=status_filters,
             date_from=date_from,
             date_to=date_to,
         )
@@ -467,7 +467,7 @@ def get_learner_feedback(
         return None
     if model.unread_response_count > 0:
         model.unread_response_count = 0
-        model.update_timestamps()
+        model.update_timestamps(update_last_updated_time=False)
         model.put()
     return _lesson_feedback_model_to_domain(model)
 
@@ -746,14 +746,14 @@ def get_platform_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
-    filter = [status_filter] if status_filter else None
+    status_filters = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.PlatformFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             destination_dashboard=dashboard_filter,
             exploration_id=exploration_id,
-            status_filter=filter,
+            status_filter=status_filters,
             date_from=date_from,
             date_to=date_to,
         )

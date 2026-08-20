@@ -134,7 +134,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         """
         return (
             cls.query(cls.author_id == user_id)
-            .filter(cls.deleted == False)
+            .filter(cls.deleted.IN([False]))
             .get(keys_only=True)
             is not None
         )
@@ -168,7 +168,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         user_data = {}
         feedback_models: Sequence[LessonFeedbackModel] = (
             cls.get_all()
-            .filter(cls.deleted == False)
+            .filter(cls.deleted.IN([False]))
             .filter(cls.author_id == user_id)
             .fetch()
         )

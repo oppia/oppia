@@ -53,15 +53,10 @@ import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {DateTimeFormatService} from 'services/date-time-format.service';
+
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
-import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
-import {
-  FeedbackModalType,
-  FeedbackStatus,
-  LessonFeedbackSummary,
-} from 'domain/feedback/feedback.model';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
 interface LanguageInfo {
   id: string;
@@ -156,17 +151,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
-  unreadMySuggestionsCount: number = 0;
-  unreadMySuggestionSummaries: LessonFeedbackSummary[] = [];
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   isWebFeedbackModalEnabled: boolean = false;
-  showCreatorUpdateDot: boolean = false;
-
-  // The maximum number of "Updates from Creators" cards shown at once
-  // in the profile dropdown. Additional unread updates are reachable
-  // via the "View all suggestions" link instead of being listed here.
-  readonly MAX_VISIBLE_CREATOR_UPDATES = 5;
-  private expandedCreatorUpdateIds: Set<string> = new Set();
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -223,7 +209,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private alertsService: AlertsService,
     private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
-    private feedbackBackendApiService: FeedbackBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
@@ -240,8 +225,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
     private signInEventService: SignInEventService,
-    private contentTranslationManagerService: ContentTranslationManagerService,
-    private dateTimeFormatService: DateTimeFormatService
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   ngOnInit(): void {
@@ -344,9 +328,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               }
             }
           );
-        }
-        if (this.isNewExplorationEditorFeedbackTabEnabled()) {
-          this.fetchUnreadMySuggestions();
         }
         if (usernameFromUserInfo) {
           this.username = usernameFromUserInfo;
@@ -714,89 +695,5 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     });
 
     modalRef.componentInstance.feedbackModalType = FeedbackModalType.SITE_ISSUE;
-  }
-
-  isNewExplorationEditorFeedbackTabEnabled(): boolean {
-    return this.platformFeatureService.status
-      .ExplorationEditorNewCreatorFeedbackTab.isEnabled;
-  }
-
-  onProfileMenuOpened(): void {
-    const seenIds = this.unreadMySuggestionSummaries.map(summary => summary.id);
-
-    this.windowRef.nativeWindow.sessionStorage.setItem(
-      'seenMySuggestionIds',
-      JSON.stringify(seenIds)
-    );
-
-    this.showCreatorUpdateDot = false;
-  }
-
-  getRelativeTime(millis: number): string {
-    return this.dateTimeFormatService.getRelativeTimeFromNow(millis);
-  }
-
-  fetchUnreadMySuggestions(): void {
-    this.feedbackBackendApiService
-      .fetchMyFeedbackListAsync()
-      .then(response => {
-        this.unreadMySuggestionSummaries = response.summaries.filter(
-          summary => summary.unread_response_count > 0
-        );
-
-        this.unreadMySuggestionsCount = this.unreadMySuggestionSummaries.reduce(
-          (count, summary) => count + summary.unread_response_count,
-          0
-        );
-
-        const seenIds: string[] = JSON.parse(
-          this.windowRef.nativeWindow.sessionStorage.getItem(
-            'seenMySuggestionIds'
-          ) || '[]'
-        );
-
-        this.showCreatorUpdateDot = this.unreadMySuggestionSummaries.some(
-          summary => !seenIds.includes(summary.id)
-        );
-      })
-      .catch(() => {
-        this.unreadMySuggestionsCount = 0;
-        this.unreadMySuggestionSummaries = [];
-        this.showCreatorUpdateDot = false;
-      });
-  }
-  getMySuggestionUpdateUrl(feedbackId: string): string {
-    return (
-      '/learner-dashboard?active_tab=my-suggestions&feedback_id=' + feedbackId
-    );
-  }
-
-  get visibleCreatorUpdates(): LessonFeedbackSummary[] {
-    return this.unreadMySuggestionSummaries.slice(
-      0,
-      this.MAX_VISIBLE_CREATOR_UPDATES
-    );
-  }
-
-  isCreatorUpdateExpanded(feedbackId: string): boolean {
-    return this.expandedCreatorUpdateIds.has(feedbackId);
-  }
-
-  toggleCreatorUpdateExpanded(feedbackId: string): void {
-    if (this.expandedCreatorUpdateIds.has(feedbackId)) {
-      this.expandedCreatorUpdateIds.delete(feedbackId);
-    } else {
-      this.expandedCreatorUpdateIds.add(feedbackId);
-    }
-  }
-
-  getCreatorUpdateMessage(summary: LessonFeedbackSummary): string {
-    if (summary.status === FeedbackStatus.FIXED) {
-      return (
-        'A creator fixed an error you reported. Thank you for helping ' +
-        'make Oppia better for everyone!'
-      );
-    }
-    return 'A creator responded to your feedback!';
   }
 }
