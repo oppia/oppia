@@ -441,27 +441,26 @@ def _build_version_data(
     }
 
 
-def _get_in_progress_attempt_for_learner(
-    learner_id: str,
+def _get_most_recent_attempt_for_learner_and_certificate(
+    learner_id: str, certificate_id: str
 ) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
-    """Returns the learner's in-progress assessment attempt, if any."""
-    return gae_models.CertificateAssessmentAttemptModel.query(
-        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id,
-        gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
-        == False,
-    ).get()
+    """Returns the learner's most recent attempt for a certificate, if any.
 
-
-def _get_active_attempt_for_learner(
-    learner_id: str,
-) -> gae_models.CertificateAssessmentAttemptModel:
-    """Returns the learner's active assessment attempt or raises."""
-    attempt_model = _get_in_progress_attempt_for_learner(learner_id)
-    if attempt_model is None:
-        raise utils.ValidationError(
-            'No active certificate assessment attempt was found.'
+    Attempts are ordered by their creation time because the storage model
+    does not index started_at, so it cannot be used as a query sort key.
+    Since attempts are created when they start, creation order matches start
+    order.
+    """
+    return (
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.certificate_id
+            == certificate_id,
         )
-    return attempt_model
+        .order(-gae_models.CertificateAssessmentAttemptModel.created_on)
+        .get()
+    )
 
 
 def _get_certificate_assessment_attempt_model(
@@ -550,18 +549,33 @@ def start_certificate_assessment_attempt(
     Raises:
         CertificateAssessmentAttemptNotReadyException. If the assessment can no
             longer be started because the question pool is invalid.
-        utils.ValidationError. If the learner already has an in-progress
-            attempt.
+        utils.ValidationError. If the learner started an attempt for this
+            certificate less than MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES minutes
+            ago.
     """
 
     def _start_txn() -> Tuple[
         certificate_assessment_domain.CertificateAssessmentAttempt,
         List[Dict[str, Union[str, int]]],
     ]:
-        if _get_in_progress_attempt_for_learner(learner_id) is not None:
-            raise utils.ValidationError(
-                'You already have an in-progress certificate assessment attempt.'
+        most_recent_attempt = (
+            _get_most_recent_attempt_for_learner_and_certificate(
+                learner_id, certificate_id
             )
+        )
+        if most_recent_attempt is not None:
+            time_since_last_attempt = (
+                datetime.datetime.utcnow() - most_recent_attempt.started_at
+            )
+            if time_since_last_attempt < datetime.timedelta(
+                minutes=(
+                    certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
+                )
+            ):
+                raise utils.ValidationError(
+                    'You just started an assessment before this time. '
+                    'Please try after this time.'
+                )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             certificate_id=certificate_id,
