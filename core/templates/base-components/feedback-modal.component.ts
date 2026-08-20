@@ -49,6 +49,7 @@ import {
   ReportType,
 } from 'domain/feedback/feedback.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -119,6 +120,7 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
+    private siteAnalyticsService: SiteAnalyticsService,
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional()
     private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
@@ -208,6 +210,24 @@ export class FeedbackModalComponent implements OnInit {
       });
     }
     this.showTechnicalLogsCheckbox = true;
+
+    switch (this.feedbackModalType) {
+      case FeedbackModalType.LESSON_FEEDBACK:
+        this.siteAnalyticsService.registerLessonFeedbackModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.LESSON_ISSUE:
+        this.siteAnalyticsService.registerLessonIssueModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.SITE_ISSUE:
+        this.siteAnalyticsService.registerWebsiteIssueModalOpenEvent();
+        break;
+    }
 
     try {
       const userInfo = await this.userService.getUserInfoAsync();
@@ -364,9 +384,14 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonIssueSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         this.category === 'broken_layout_or_image' ||
@@ -402,9 +427,14 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitLessonFeedbackAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitLessonFeedbackAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonFeedbackSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_SUCCESS'
@@ -439,10 +469,12 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
-      );
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerWebsiteIssueSubmittedEvent(response.id);
       const successMessage = this.translateService.instant(
         'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
       );
