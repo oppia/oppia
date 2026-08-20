@@ -1,8 +1,11 @@
 <section class="oppia-my-suggestions-tab">
-  <div *ngIf="errorMessage" class="oppia-my-suggestions-alert" role="alert">
-    {{errorMessage}}
-  </div>
-  <div *ngIf="feedbackSummaries.length === 0"
+  <oppia-loading-message
+    *ngIf="isLoading"
+    [message]="'Loading'">
+  </oppia-loading-message>
+
+  <ng-container *ngIf="!isLoading">
+  <div *ngIf="!selectedFeedbackId && feedbackSummaries.length === 0"
        class="oppia-my-suggestions-state">
     <span class="oppia-my-suggestions-empty-icon">
       <i class="far fa-comment fa-lg" aria-hidden="true"></i>
@@ -11,7 +14,7 @@
       Feedbacks you send to the Lessons team will appear here.
     </span>
     <oppia-classroom-button [classroom]="'math'"
-                            [buttonText]="'I18N_ACTION_EXPLORE_LESSONS'"
+                            [buttonText]="'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_CLASSROOM_SECTION_LINK'"
                             [variant]="'default'">
     </oppia-classroom-button>
   </div>
@@ -123,4 +126,5 @@
 
     </ng-container>
   </div>
+  </ng-container>
 </section>

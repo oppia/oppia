@@ -375,8 +375,8 @@
         *ngIf="authStatusResolved && userIsLoggedIn && !pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
-         (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
-         (keydown.enter)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
+         (click)="onProfileMenuOpened();"
+         (keydown.enter)="onProfileMenuOpened();"
          class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
          aria-label="User Menu"
          tabindex="0"
@@ -419,6 +419,7 @@
               {{ unreadThreadsCount }}
             </span>
           </div>
+          <div *ngIf="showCreatorUpdateDot" class="oppia-creator-update-alert-dot"></div>
         </div>
       </a>
       <ul ngbDropdownMenu
@@ -551,6 +552,43 @@
              class="dropdown-item nav-link e2e-test-report-site-problem-link">
               {{'I18N_FOOTER_REPORT_WEBSITE_ISSUE' | translate}}
           </a>
+        </li>
+        <hr class="oppia-top-right-menu-item-separator">
+        <li class="nav-item"
+            *ngIf="unreadMySuggestionSummaries.length > 0">
+          <div class="oppia-navbar-creator-updates">
+            <span class="oppia-navbar-creator-updates-heading">
+              Updates from Creators
+            </span>
+            <div *ngFor="let summary of visibleCreatorUpdates"
+                 class="oppia-navbar-creator-update-card">
+              <a class="oppia-navbar-creator-update-link"
+                 [href]="getMySuggestionUpdateUrl(summary.id)"
+                 (click)="closeSubmenuIfNotMobile($event)">
+                <div class="oppia-navbar-creator-update-header">
+                  <span class="oppia-navbar-creator-update-lesson">
+                    {{ summary.lesson_title }} |
+                  </span>
+                  <span class="oppia-navbar-creator-update-timestamp">
+                    {{ getRelativeTime(summary.last_updated_msecs) }}
+                  </span>
+                </div>
+                <span class="oppia-navbar-creator-update-message">
+                  {{ getCreatorUpdateMessage(summary) }}
+                </span>
+                <span *ngIf="summary.latest_response_preview"
+                      class="oppia-navbar-creator-update-preview-text">
+                  {{ summary.latest_response_preview }}
+                </span>
+              </a>
+            </div>
+            <a *ngIf="unreadMySuggestionSummaries.length > visibleCreatorUpdates.length"
+               class="oppia-navbar-creator-updates-view-all"
+               href="/learner-dashboard?active_tab=my-suggestions"
+               (click)="closeSubmenuIfNotMobile($event)">
+              View all updates ({{ unreadMySuggestionSummaries.length }})
+            </a>
+          </div>
         </li>
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">

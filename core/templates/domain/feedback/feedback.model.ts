@@ -46,6 +46,7 @@ export interface LessonFeedbackBackendDict {
 export interface LessonFeedbackSummary {
   id: string;
   feedback_text_preview: string;
+  latest_response_preview: string;
   status: FeedbackStatus;
   lesson_title: string;
   source: string;

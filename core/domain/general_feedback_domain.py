@@ -73,6 +73,7 @@ class LessonFeedbackSummaryDict(TypedDict):
 
     id: str
     feedback_text_preview: str
+    latest_response_preview: str
     status: str
     source: str
     lesson_title: str
@@ -247,9 +248,16 @@ class LessonFeedback:
         feedback_text_preview = self.feedback_text
         if len(feedback_text_preview) > 100:
             feedback_text_preview = feedback_text_preview[:97] + '...'
+        latest_response_preview = ''
+        if self.response_list:
+            latest_response_text = self.response_list[-1]['response_text']
+            latest_response_preview = latest_response_text
+            if len(latest_response_preview) > 100:
+                latest_response_preview = latest_response_preview[:97] + '...'
         return {
             'id': self.id,
             'feedback_text_preview': feedback_text_preview,
+            'latest_response_preview': latest_response_preview,
             'status': self.status,
             'source': feconf.SOURCE_LESSON,
             'lesson_title': lesson_title or 'Lesson not found',

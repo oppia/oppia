@@ -71,6 +71,7 @@ class MockPlatformFeatureService {
 const mockLessonFeedbackSummary: LessonFeedbackSummary = {
   id: 'lesson_feedback_1',
   feedback_text_preview: 'Lesson feedback',
+  latest_response_preview: '',
   status: FeedbackStatus.OPEN,
   source: ReportType.LESSON,
   lesson_title: 'exp_1',
@@ -921,6 +922,7 @@ describe('Feedback Tab Component', () => {
     const lessonFeedbackSummary: LessonFeedbackSummary = {
       id: 'id',
       feedback_text_preview: 'Need help with fractions',
+      latest_response_preview: '',
       status: FeedbackStatus.OPEN,
       source: ReportType.LESSON,
       lesson_title: 'exp_1',

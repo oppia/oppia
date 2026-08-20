@@ -1053,6 +1053,7 @@ describe('Learner dashboard page', () => {
         {
           id: 'feedback-1',
           feedback_text_preview: 'First feedback',
+          latest_response_preview: 'Creator response 1',
           status: FeedbackStatus.OPEN,
           lesson_title: 'Lesson 1',
           source: 'lesson',
@@ -1062,6 +1063,7 @@ describe('Learner dashboard page', () => {
         {
           id: 'feedback-2',
           feedback_text_preview: 'Second feedback',
+          latest_response_preview: 'Creator response 2',
           status: FeedbackStatus.OPEN,
           lesson_title: 'Lesson 2',
           source: 'lesson',
@@ -1071,6 +1073,7 @@ describe('Learner dashboard page', () => {
         {
           id: 'feedback-3',
           feedback_text_preview: 'Third feedback',
+          latest_response_preview: 'Creator response 3',
           status: FeedbackStatus.OPEN,
           lesson_title: 'Lesson 3',
           source: 'lesson',

@@ -465,10 +465,10 @@ def get_learner_feedback(
     )
     if model is None or model.author_id != author_id:
         return None
-
-    model.unread_response_count = 0
-    model.update_timestamps()
-    model.put()
+    if model.unread_response_count > 0:
+        model.unread_response_count = 0
+        model.update_timestamps()
+        model.put()
     return _lesson_feedback_model_to_domain(model)
 
 

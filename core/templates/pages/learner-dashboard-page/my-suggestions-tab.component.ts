@@ -32,9 +32,13 @@ import {
 } from 'domain/feedback/feedback.model';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {UrlService} from 'services/contextual/url.service';
+import {AlertsService} from 'services/alerts.service';
 import {LoaderService} from 'services/loader.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {MY_SUGGESTIONS_FILTER_CONFIG} from '../../domain/feedback/feedback.model';
 import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
+
+import './my-suggestions-tab.component.css';
 
 interface LearnerFeedbackStatusDetails {
   label: string;
@@ -81,7 +85,7 @@ export class MySuggestionsTabComponent implements OnInit {
   };
   selectedFeedbackId: string | null = null;
   selectedFeedback: LessonFeedbackDetailResponse | null = null;
-  errorMessage: string | null = null;
+  isLoading = true;
   learnerLessonFeedbackListState: LearnerFeedbackListState<LessonFeedbackSummary> =
     {
       summaries: [],
@@ -97,19 +101,24 @@ export class MySuggestionsTabComponent implements OnInit {
     private dateTimeFormatService: DateTimeFormatService,
     private urlService: UrlService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private alertService: AlertsService,
+    private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const urlParams = this.urlService.getUrlParams();
     const feedbackId = urlParams.feedback_id;
-    if (feedbackId) {
-      this.openFeedbackDetail(feedbackId);
-    } else {
-      this.fetchLearnerFeedbackPage();
+    try {
+      if (feedbackId) {
+        await this.openFeedbackDetail(feedbackId);
+      } else {
+        await this.fetchLearnerFeedbackPage();
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
-
   getDisplayedLearnerFeedbackSummaries(): LessonFeedbackSummary[] {
     return this.learnerLessonFeedbackListState.displayedSummaries;
   }
@@ -269,22 +278,23 @@ export class MySuggestionsTabComponent implements OnInit {
     );
   }
 
-  openFeedbackDetail(feedbackId: string): void {
+  async openFeedbackDetail(feedbackId: string): Promise<void> {
     this.selectedFeedbackId = feedbackId;
     this.selectedFeedback = null;
     this.loaderService.showLoadingScreen('Loading');
-    this.errorMessage = null;
-    this.feedbackBackendApiService
-      .fetchMyFeedbackDetailAsync(feedbackId)
-      .then(response => {
-        this.selectedFeedback = response;
-        this.markFeedbackSummaryAsRead(feedbackId);
-        this.loaderService.hideLoadingScreen();
-      })
-      .catch(() => {
-        this.errorMessage = 'Failed to load this suggestion.';
-        this.loaderService.hideLoadingScreen();
-      });
+
+    try {
+      const response =
+        await this.feedbackBackendApiService.fetchMyFeedbackDetailAsync(
+          feedbackId
+        );
+      this.selectedFeedback = response;
+      this.markFeedbackSummaryAsRead(feedbackId);
+    } catch (error) {
+      this.alertService.addWarning('Failed to load this suggestion.');
+    } finally {
+      this.loaderService.hideLoadingScreen();
+    }
   }
 
   canAddFollowUpNote(): boolean {
@@ -339,6 +349,11 @@ export class MySuggestionsTabComponent implements OnInit {
   goBackToListView(): void {
     this.selectedFeedbackId = null;
     this.selectedFeedback = null;
+    this.windowRef.nativeWindow.history.replaceState(
+      {},
+      '',
+      '/learner-dashboard'
+    );
     this.fetchLearnerFeedbackPage();
   }
 }

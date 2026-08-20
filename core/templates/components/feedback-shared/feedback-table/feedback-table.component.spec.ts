@@ -41,6 +41,7 @@ describe('FeedbackTableComponent', () => {
     component = fixture.componentInstance;
     component.feedbackCardConfig = {
       showCategory: true,
+      showLesson: true,
       showResponse: true,
       showLessonMetadata: true,
       showScreenshot: true,
@@ -104,6 +105,7 @@ describe('FeedbackTableComponent', () => {
         status: FeedbackStatus.OPEN,
         lesson_title: 'exp_1',
         feedback_text_preview: expectedFeedbackDescription,
+        latest_response_preview: 'Thanks for the report!',
         unread_response_count: 1,
         last_updated_msecs: 1000,
       },
