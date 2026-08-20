@@ -97,6 +97,7 @@
           <button aria-label="Go to my suggestions tab"
                   class="align-items-center d-inline-flex rounded oppia-learner-dash-sidebar_btn text-left w-100 e2e-test-my-suggestions-section"
                   tabindex="0"
+                  type="button"
                   [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS)">

@@ -127,10 +127,10 @@ export class FeedbackBackendApiService {
     if (statusFilter && statusFilter.length > 0) {
       params = params.set('status', statusFilter.join(','));
     }
-    if (dateFromMsecs) {
+    if (dateFromMsecs !== null) {
       params = params.set('date_from_msecs', String(dateFromMsecs));
     }
-    if (dateToMsecs) {
+    if (dateToMsecs !== null) {
       params = params.set('date_to_msecs', String(dateToMsecs));
     }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for add a follow up note modal
+ * @fileoverview Component for add a follow up note modal.
  */
 import {Component, Input} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
@@ -59,13 +59,13 @@ export class AddAFollowUpNoteModalComponent {
         7000,
         true
       );
+      this.closemodal();
     } catch (error) {
       this.alertService.addWarning(
         'Your follow up note has not been sent successfully'
       );
     } finally {
       this.isSubmittingFollowUp = false;
-      this.closemodal();
     }
   }
 }

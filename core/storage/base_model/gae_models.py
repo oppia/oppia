@@ -2248,7 +2248,7 @@ class BaseFeedbackModel(BaseModel):
         """
         query = cls.query()
         # Ignoring deleted threads as they are not relevant for operations.
-        query = query.filter(cls.deleted == False)
+        query = query.filter(cls.deleted.IN([False]))
 
         if author_id is not None:
             query = query.filter(cls.author_id == author_id)
