@@ -26,7 +26,7 @@ import {CertificateAssessmentOfferingBackendApiService} from './certificate-asse
 import {
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentOfferingData,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 describe('Certificate Assessment Offering backend api service', () => {
@@ -890,10 +890,13 @@ describe('Certificate Assessment Offering backend api service', () => {
     );
     expect(req.request.method).toEqual('GET');
     req.flush({
+      certificate_id: 'mock_certificate_id',
       title: 'Everyday Arithmetic & Number Confidence',
       total_score: 80,
+      time_taken_in_minutes: 35,
       attempt_data: {
         dummy_topic_id: {
+          topic_name: 'Place Values',
           total_related_questions: 5,
           total_correct_questions: 4,
         },
@@ -904,16 +907,54 @@ describe('Certificate Assessment Offering backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
+      certificate_id: 'mock_certificate_id',
       title: 'Everyday Arithmetic & Number Confidence',
       total_score: 80,
+      time_taken_in_minutes: 35,
       attempt_data: {
         dummy_topic_id: {
+          topic_name: 'Place Values',
           total_related_questions: 5,
           total_correct_questions: 4,
         },
       },
       is_submitted: true,
     });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should return null for the time taken of an unfinished result', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentResultAsync('mock_attempt_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      certificate_id: 'mock_certificate_id',
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 80,
+      time_taken_in_minutes: null,
+      attempt_data: {
+        dummy_topic_id: {
+          topic_name: 'Place Values',
+          total_related_questions: 5,
+          total_correct_questions: 4,
+        },
+      },
+      is_submitted: false,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      jasmine.objectContaining({time_taken_in_minutes: null})
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
