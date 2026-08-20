@@ -949,8 +949,8 @@ export class CurriculumAdmin extends TopicManager {
 
       await skillRow.locator(desktopSkillListItemOptions).click();
 
-      await this.expectElementToBeVisible(desktopDeleteSkillButton);
-      await this.clickOnElementWithSelector(desktopDeleteSkillButton);
+      // Direct locator click avoids the mouse.move(-1,-1) in clickOnElementWithSelector that triggers the dropdown's mouseleave close.
+      await skillRow.locator(desktopDeleteSkillButton).click();
 
       await this.expectElementToBeVisible(confirmSkillDeletionButton);
       await this.clickOnElementWithSelector(confirmSkillDeletionButton);
@@ -983,7 +983,7 @@ export class CurriculumAdmin extends TopicManager {
 
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
-    await this.clickOnElementWithSelector(desktopSkillQuestionTab);
+    await this.navigateToSkillQuestionEditorTab();
     await this.page.waitForLoadState('networkidle');
 
     while (true) {
