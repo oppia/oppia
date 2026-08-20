@@ -1033,9 +1033,6 @@ def send_role_notification_email(
     )
 
     # Return from here is sending editor role email is disabled.
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send editor role emails to users.')
-        return
 
     recipient_username = user_services.get_username(recipient_id)
     inviter_username = user_services.get_username(inviter_id)
@@ -1114,10 +1111,6 @@ def send_emails_to_subscribers(
         '- The Oppia Team<br>'
         '<br>%s'
     )
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send subscription emails to users.')
-        return
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id
@@ -1676,10 +1669,6 @@ def send_feedback_message_email(
         '<br>%s'
     )
 
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
-
     if not feedback_messages:
         return
 
@@ -1806,10 +1795,6 @@ def send_suggestion_email(
         '<br>%s'
     )
 
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
-
     author_username = user_services.get_username(author_id)
     can_users_receive_email = can_users_receive_thread_email(
         recipient_list, exploration_id, True
@@ -1880,10 +1865,6 @@ def send_instant_feedback_message_email(
         'The Oppia team<br>'
         '<br>%s'
     )
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
 
     sender_username = user_services.get_username(sender_id)
     recipient_username = user_services.get_username(recipient_id)
