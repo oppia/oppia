@@ -847,7 +847,7 @@ describe('Contributions and review component', () => {
         },
       });
 
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
       expect(
         contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
       ).toHaveBeenCalled();
@@ -1993,6 +1993,8 @@ describe('Contributions and review component', () => {
           id: '1',
           heading: 'Chapter 1',
           subheading: 'Topic 1 - Story 1',
+          labelText: '',
+          labelColor: '',
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 1',
@@ -2008,6 +2010,8 @@ describe('Contributions and review component', () => {
           id: '2',
           heading: 'Chapter 2',
           subheading: 'Topic 2 - Story 2',
+          labelText: '',
+          labelColor: '',
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 2',
