@@ -453,7 +453,11 @@ class PracticeSessionAccessValidationPage(
             NotFoundException. The arc ID was not found.
         """
         all_arcs = self._get_all_arcs_for_topic(topic)
-        if not arc_id.isdigit() or not 1 <= int(arc_id) <= len(all_arcs):
+        if (
+            not arc_id.isascii()
+            or not arc_id.isdigit()
+            or not 1 <= int(arc_id) <= len(all_arcs)
+        ):
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )

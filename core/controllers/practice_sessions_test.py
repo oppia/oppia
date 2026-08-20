@@ -747,6 +747,30 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
+    def test_get_returns_empty_for_non_ascii_arc_id(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/arc/%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '%D9%A1',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_for_emoji_arc_id(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/arc/%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '%F0%9F%98%80',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
     def test_get_node_skills_with_deleted_story_in_topic(self) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'

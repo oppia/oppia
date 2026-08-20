@@ -18,14 +18,19 @@
 
 import {
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  QueryList,
   SimpleChanges,
+  ViewChildren,
 } from '@angular/core';
 import {Subscription} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
+
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {AppConstants} from 'app.constants';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
@@ -45,6 +50,8 @@ import {LocalStorageService} from 'services/local-storage.service';
 import constants from 'assets/constants';
 import './topic-story-section.component.css';
 
+import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
+import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
 import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
 import {LessonProgressStatus} from './topic-lesson-card/topic-lesson-card.component';
 
@@ -155,6 +162,13 @@ export class TopicStorySectionComponent
   private pendingNavigationAdventureIndex: number | null = null;
   private completedAdventurePracticeArcIds: Set<string> = new Set();
   private hasHandledArcMasteredQueryParams: boolean = false;
+  private arcSkipModalRef: NgbModalRef | null = null;
+  private adventureMasteredModalRef: NgbModalRef | null = null;
+
+  @ViewChildren('lessonWrapper')
+  lessonWrappers!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('practiceWrapper')
+  practiceWrappers!: QueryList<ElementRef<HTMLElement>>;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -186,7 +200,7 @@ export class TopicStorySectionComponent
         'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
         {adventureNumber: adventureIndex + 1}
       );
-      this.showArcSkipConfirmationModal = true;
+      this.openArcSkipConfirmationModal();
       return;
     }
 
@@ -194,7 +208,7 @@ export class TopicStorySectionComponent
   }
 
   onArcSkipConfirmationCancel(): void {
-    this.showArcSkipConfirmationModal = false;
+    this.arcSkipModalRef = null;
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
@@ -209,7 +223,7 @@ export class TopicStorySectionComponent
       return;
     }
 
-    this.showArcSkipConfirmationModal = false;
+    this.arcSkipModalRef = null;
     this.selectLessonFromNavigation(
       this.pendingNavigationLessonNumber,
       this.pendingNavigationAdventureIndex
@@ -218,6 +232,44 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
+  }
+
+  private openArcSkipConfirmationModal(): void {
+    this.arcSkipModalRef = this.ngbModal.open(
+      ArcSkipConfirmationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-arc-skip-confirmation-modal',
+      }
+    );
+    this.arcSkipModalRef.componentInstance.adventureLabel =
+      this.pendingArcSkipTargetLabel;
+    this.arcSkipModalRef.componentInstance.confirmationMessage =
+      this.getArcSkipConfirmationMessage();
+    this.arcSkipModalRef.result.then(
+      () => this.onArcSkipConfirmationProceed(),
+      () => this.onArcSkipConfirmationCancel()
+    );
+  }
+
+  private openAdventureMasteredModal(): void {
+    this.adventureMasteredModalRef = this.ngbModal.open(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
+    this.adventureMasteredModalRef.componentInstance.title =
+      this.getAdventureMasteredTitle();
+    this.adventureMasteredModalRef.componentInstance.message =
+      this.getAdventureMasteredSubtitle();
+    this.adventureMasteredModalRef.result.then(
+      () => this.onAdventureMasteredContinue(),
+      () => {
+        this.adventureMasteredModalRef = null;
+      }
+    );
   }
 
   onAdventureMasteredContinue(): void {
@@ -235,7 +287,7 @@ export class TopicStorySectionComponent
         }
       }
     }
-    this.showAdventureMasteredModal = false;
+    this.adventureMasteredModalRef = null;
     this.masteredAdventureIndex = null;
     this.hasHandledArcMasteredQueryParams = true;
   }
@@ -386,11 +438,18 @@ export class TopicStorySectionComponent
 
     // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el =
-        document.getElementById('lesson-' + lessonNumber) ||
-        document.getElementById('coming-soon-lesson-' + lessonNumber);
-      if (el) {
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      const lessonEl = this.lessonWrappers.find(ref => {
+        const elId = ref.nativeElement.id;
+        return (
+          elId === 'lesson-' + lessonNumber ||
+          elId === 'coming-soon-lesson-' + lessonNumber
+        );
+      });
+      if (lessonEl) {
+        lessonEl.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     }, 300);
   }
@@ -467,9 +526,14 @@ export class TopicStorySectionComponent
   onNavigationPracticeSelected(arcId: string): void {
     // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('practice-card-' + arcId);
-      if (el) {
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      const practiceEl = this.practiceWrappers.find(
+        ref => ref.nativeElement.id === 'practice-card-' + arcId
+      );
+      if (practiceEl) {
+        practiceEl.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     }, 300);
   }
@@ -483,6 +547,7 @@ export class TopicStorySectionComponent
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private localStorageService: LocalStorageService,
+    private ngbModal: NgbModal,
     private translateService: TranslateService
   ) {}
 
@@ -946,7 +1011,7 @@ export class TopicStorySectionComponent
 
   private maybeShowAdventureMasteredModal(): void {
     if (
-      this.showAdventureMasteredModal ||
+      this.adventureMasteredModalRef !== null ||
       this.hasHandledArcMasteredQueryParams
     ) {
       return;
@@ -984,8 +1049,8 @@ export class TopicStorySectionComponent
     this.updateVisibleSections();
 
     this.hasHandledArcMasteredQueryParams = true;
-    this.showAdventureMasteredModal = true;
     this.masteredAdventureIndex = adventureIndex;
+    this.openAdventureMasteredModal();
   }
 
   private normalizeArcIdFromQueryValue(rawArcId: string): string | null {

@@ -11,7 +11,7 @@
       [showStudySkillsBreadcrumb]="activeView === VIEW_NAMES.STUDYGUIDE">
     </topic-header>
   </div>
-  <section *ngIf="activeView === VIEW_NAMES.STORY && canonicalStorySectionData.length"
+  <section *ngIf="!topicIsLoading && activeView === VIEW_NAMES.STORY && canonicalStorySectionData.length"
            class="redesigned-stories-section"
            aria-labelledby="redesigned-stories-section-heading">
     <h2 id="redesigned-stories-section-heading" class="visually-hidden">
@@ -32,7 +32,7 @@
       </topic-story-section>
     </div>
   </section>
-  <section *ngIf="activeView === VIEW_NAMES.STORY && !canonicalStorySectionData.length"
+  <section *ngIf="!topicIsLoading && activeView === VIEW_NAMES.STORY && !canonicalStorySectionData.length"
            class="redesigned-stories-section"
            aria-labelledby="redesigned-stories-section-coming-soon-heading">
     <mat-card [attr.dir]="'auto'" class="oppia-page-card practice-tab-not-available-card">
@@ -49,7 +49,8 @@
                       [subtopicsList]="subtopics"
                       [topicId]="topicId"
                       [topicUrlFragment]="topicUrlFragment"
-                      [topicName]="topicName">
+                      [topicName]="topicName"
+                      [class.redesigned-view]="true">
       </subtopics-list>
     </div>
   </section>

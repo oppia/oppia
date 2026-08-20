@@ -783,6 +783,30 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
+    def test_end_of_arc_page_with_non_ascii_arc_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '%D9%A1',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_emoji_arc_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '%F0%9F%98%80',
+            ),
+            expected_status_int=404,
+        )
+
     def test_lesson_practice_with_story_that_does_not_exist(self) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'

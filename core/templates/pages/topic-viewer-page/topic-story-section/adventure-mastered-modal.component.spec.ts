@@ -24,6 +24,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -32,6 +33,7 @@ import {AdventureMasteredModalComponent} from './adventure-mastered-modal.compon
 describe('AdventureMasteredModalComponent', () => {
   let component: AdventureMasteredModalComponent;
   let fixture: ComponentFixture<AdventureMasteredModalComponent>;
+  let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
 
   const createMockDialog = (
     focusableElements: HTMLElement[] = []
@@ -49,8 +51,14 @@ describe('AdventureMasteredModalComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    ngbActiveModal = jasmine.createSpyObj('NgbActiveModal', [
+      'close',
+      'dismiss',
+    ]);
+
     TestBed.configureTestingModule({
       declarations: [AdventureMasteredModalComponent, MockTranslatePipe],
+      providers: [{provide: NgbActiveModal, useValue: ngbActiveModal}],
     }).compileComponents();
   }));
 
@@ -81,28 +89,22 @@ describe('AdventureMasteredModalComponent', () => {
     ).toBe('I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_CONTINUE_BUTTON');
   });
 
-  it('should emit continue when onContinue is called', () => {
-    spyOn(component.continue, 'emit');
-
+  it('should close the modal when onContinue is called', () => {
     component.onContinue();
 
-    expect(component.continue.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should emit continue when Escape is pressed', () => {
-    spyOn(component.continue, 'emit');
-
+  it('should close the modal when Escape is pressed', () => {
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Escape'}));
 
-    expect(component.continue.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
   it('should ignore non-Escape keys', () => {
-    spyOn(component.continue, 'emit');
-
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
 
-    expect(component.continue.emit).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
   it('should move focus into the dialog on init', fakeAsync(() => {
@@ -135,7 +137,6 @@ describe('AdventureMasteredModalComponent', () => {
       'modalFocusRestoreElement',
       previouslyFocusedElement
     );
-    spyOn(component.continue, 'emit');
 
     component.onContinue();
 
@@ -192,6 +193,31 @@ describe('AdventureMasteredModalComponent', () => {
     expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
   });
 
+  it('should move focus to the last focusable element on Shift+Tab when the dialog is focused', () => {
+    const firstFocusableElement = createMockFocusableElement();
+    const lastFocusableElement = createMockFocusableElement();
+    const dialogElement = createMockDialog([
+      firstFocusableElement,
+      lastFocusableElement,
+    ]);
+    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
+    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
+      dialogElement
+    );
+
+    const shiftTabEvent = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      cancelable: true,
+    });
+    spyOn(shiftTabEvent, 'preventDefault');
+
+    component.onDialogTab(shiftTabEvent);
+
+    expect(lastFocusableElement.focus).toHaveBeenCalled();
+    expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
+  });
+
   it('should do nothing on Tab when no dialog is rendered', () => {
     Reflect.deleteProperty(component, 'dialog');
 
@@ -225,13 +251,12 @@ describe('AdventureMasteredModalComponent', () => {
     expect(enterEvent.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('should emit continue without restoring focus when no element was saved', () => {
+  it('should close the modal without restoring focus when no element was saved', () => {
     Reflect.set(component, 'modalFocusRestoreElement', null);
-    spyOn(component.continue, 'emit');
 
     component.onContinue();
 
-    expect(component.continue.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
     expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 });

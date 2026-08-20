@@ -98,6 +98,7 @@
             </p>
             <div *ngIf="isAdventureExpanded(adventureIdx)" class="adventure-lessons">
               <div class="story-lesson-card-wrapper"
+                   #lessonWrapper
                    [id]="'lesson-' + lessonCard.lessonNumber"
                    *ngFor="let lessonCard of adventureGroup.lessonCards">
                 <topic-lesson-card
@@ -122,6 +123,7 @@
               </div>
 
               <div class="story-practice-card-wrapper"
+                   #practiceWrapper
                    [id]="'practice-card-' + adventureGroup.arcId"
                    *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
                 <topic-adventure-end-test-card
@@ -142,6 +144,7 @@
 
       <ng-template #flatLessonList>
         <div class="story-lesson-card-wrapper"
+             #lessonWrapper
              [id]="'lesson-' + lessonCard.lessonNumber"
              *ngFor="let lessonCard of availableLessonCards">
           <topic-lesson-card
@@ -166,6 +169,7 @@
         </div>
 
         <div class="story-practice-card-wrapper"
+             #practiceWrapper
              id="practice-card-flat"
              *ngIf="isPracticeCardVisible">
           <topic-adventure-end-test-card
@@ -197,6 +201,7 @@
         </div>
         <div
              class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
+             #lessonWrapper
              [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
              *ngFor="let lessonCard of comingSoonLessonCards">
           <topic-lesson-card
@@ -229,18 +234,3 @@
     </div>
   </div>
 </section>
-
-<arc-skip-confirmation-modal
-                             *ngIf="showArcSkipConfirmationModal"
-                             [adventureLabel]="pendingArcSkipTargetLabel"
-                             [confirmationMessage]="getArcSkipConfirmationMessage()"
-                             (cancel)="onArcSkipConfirmationCancel()"
-                             (confirm)="onArcSkipConfirmationProceed()">
-</arc-skip-confirmation-modal>
-
-<adventure-mastered-modal
-                          *ngIf="showAdventureMasteredModal"
-                          [title]="getAdventureMasteredTitle()"
-                          [message]="getAdventureMasteredSubtitle()"
-                          (continue)="onAdventureMasteredContinue()">
-</adventure-mastered-modal>

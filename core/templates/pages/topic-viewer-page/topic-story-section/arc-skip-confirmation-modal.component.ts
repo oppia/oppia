@@ -20,13 +20,14 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   HostListener,
   Input,
   OnInit,
-  Output,
   ViewChild,
 } from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 import './arc-skip-confirmation-modal.component.css';
 
@@ -35,17 +36,22 @@ import './arc-skip-confirmation-modal.component.css';
   templateUrl: './arc-skip-confirmation-modal.component.html',
   styleUrls: ['./arc-skip-confirmation-modal.component.css'],
 })
-export class ArcSkipConfirmationModalComponent implements OnInit {
+export class ArcSkipConfirmationModalComponent
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // The label of the adventure that the navigation is trying to jump to,
   // e.g. "Adventure 2".
   @Input() adventureLabel!: string;
   // The message listing the adventures that will be skipped.
   @Input() confirmationMessage!: string;
-  @Output() cancel = new EventEmitter<void>();
-  @Output() confirm = new EventEmitter<void>();
 
   @ViewChild('dialog') private dialog!: ElementRef<HTMLElement>;
   private modalFocusRestoreElement: HTMLElement | null = null;
+
+  constructor(private ngbActiveModal: NgbActiveModal) {
+    super(ngbActiveModal);
+  }
 
   ngOnInit(): void {
     this.modalFocusRestoreElement =
@@ -58,12 +64,12 @@ export class ArcSkipConfirmationModalComponent implements OnInit {
 
   onCancel(): void {
     this.restoreModalFocus();
-    this.cancel.emit();
+    this.cancel();
   }
 
   onConfirm(): void {
     this.restoreModalFocus();
-    this.confirm.emit();
+    this.confirm();
   }
 
   onBackdropClick(): void {

@@ -20,13 +20,14 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   HostListener,
   Input,
   OnInit,
-  Output,
   ViewChild,
 } from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 import './adventure-mastered-modal.component.css';
 
@@ -35,13 +36,19 @@ import './adventure-mastered-modal.component.css';
   templateUrl: './adventure-mastered-modal.component.html',
   styleUrls: ['./adventure-mastered-modal.component.css'],
 })
-export class AdventureMasteredModalComponent implements OnInit {
+export class AdventureMasteredModalComponent
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() title!: string;
   @Input() message!: string;
-  @Output() continue = new EventEmitter<void>();
 
   @ViewChild('dialog') private dialog!: ElementRef<HTMLElement>;
   private modalFocusRestoreElement: HTMLElement | null = null;
+
+  constructor(private ngbActiveModal: NgbActiveModal) {
+    super(ngbActiveModal);
+  }
 
   ngOnInit(): void {
     this.modalFocusRestoreElement =
@@ -54,7 +61,7 @@ export class AdventureMasteredModalComponent implements OnInit {
 
   onContinue(): void {
     this.restoreModalFocus();
-    this.continue.emit();
+    this.confirm();
   }
 
   @HostListener('document:keydown', ['$event'])

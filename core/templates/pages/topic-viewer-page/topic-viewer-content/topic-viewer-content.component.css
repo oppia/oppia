@@ -1,7 +1,3 @@
-topic-viewer-content .oppia-navbar.headroom--unpinned {
-  transform: translateY(0%);
-}
-
 topic-viewer-content .oppia-redesigned-topic-viewer-container {
   background-color: #fff;
   min-height: 100vh;
@@ -10,14 +6,6 @@ topic-viewer-content .oppia-redesigned-topic-viewer-container {
 
 topic-viewer-content .redesigned-topic-viewer-content {
   padding: 24px 36px 0;
-}
-
-topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content {
-  background-color: #f4f6f7;
-  background-image: url('/assets/images/background/conversation_skin.svg');
-  background-position: top center;
-  background-repeat: repeat;
-  background-size: 1024px auto;
 }
 
 topic-viewer-content .redesigned-topic-viewer-content topic-header {
@@ -29,6 +17,14 @@ topic-viewer-content .redesigned-topic-viewer-content topic-header {
 
 topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content topic-header {
   max-width: 1160px;
+}
+
+topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content {
+  background-color: #f4f6f7;
+  background-image: url('/assets/images/background/conversation_skin.svg');
+  background-position: top center;
+  background-repeat: repeat;
+  background-size: 1024px auto;
 }
 
 topic-viewer-content .redesigned-stories-section {
@@ -52,24 +48,6 @@ topic-viewer-content .redesigned-secondary-section {
   padding-top: 24px;
 }
 
-topic-viewer-content .redesigned-secondary-section .oppia-page-card {
-  margin: 0 auto;
-  max-width: 1160px;
-  width: 100%;
-}
-
-topic-viewer-content .redesigned-secondary-section subtopics-list .oppia-page-card,
-topic-viewer-content .redesigned-secondary-section practice-tab .oppia-page-card {
-  margin-top: 0;
-}
-
-topic-viewer-content .redesigned-secondary-section subtopics-list .oppia-page-card.oppia-long-text,
-topic-viewer-content .redesigned-secondary-section practice-tab .oppia-page-card {
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
-
 topic-viewer-content .redesigned-studyguide-section {
   background-color: #f4f6f7;
   background-image: url('/assets/images/background/conversation_skin.svg');
@@ -79,53 +57,6 @@ topic-viewer-content .redesigned-studyguide-section {
   margin-top: 0;
   min-height: calc(100vh - 64px);
   padding: 24px 36px 56px;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .oppia-subtopics-list-container {
-  margin: 0 auto;
-  max-width: 1160px;
-  width: 100%;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .oppia-page-card,
-topic-viewer-content .redesigned-studyguide-section subtopics-list .oppia-page-card.oppia-long-text {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  margin: 0;
-  max-width: 100%;
-  padding: 0;
-  width: 100%;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .tab-title {
-  color: #00645c;
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin: 0 0 8px;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-  color: #4a4a4a;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.35;
-  margin-bottom: 24px;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopics-container {
-  display: grid;
-  gap: 28px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
-  justify-content: start;
-  margin-top: 0;
-}
-
-topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopic-summary-tile {
-  margin-right: 0;
 }
 
 topic-viewer-content .redesigned-stories-list {
@@ -159,14 +90,6 @@ topic-viewer-content .coming-soon-text {
     padding: 22px 28px 48px;
   }
 
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 34px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 18px;
-  }
-
   topic-viewer-content .redesigned-stories-section {
     padding: 26px 28px 52px;
   }
@@ -183,20 +106,6 @@ topic-viewer-content .coming-soon-text {
 
   topic-viewer-content .redesigned-studyguide-section {
     padding: 16px 16px 36px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 28px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 16px;
-    margin-bottom: 18px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopics-container {
-    gap: 18px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   topic-viewer-content .redesigned-stories-section {
@@ -221,21 +130,6 @@ topic-viewer-content .coming-soon-text {
 
   topic-viewer-content .redesigned-studyguide-section {
     padding: 16px 12px 34px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 25px;
-    line-height: 1.25;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  topic-viewer-content .redesigned-studyguide-section subtopics-list .subtopics-container {
-    gap: 16px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   topic-viewer-content .redesigned-stories-section {

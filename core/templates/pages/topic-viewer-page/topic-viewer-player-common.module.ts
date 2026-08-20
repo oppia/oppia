@@ -79,8 +79,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
-    ArcSkipConfirmationModalComponent,
-    AdventureMasteredModalComponent,
     TopicHeaderComponent,
     TopicViewerContentComponent,
   ],

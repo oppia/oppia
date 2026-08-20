@@ -472,9 +472,15 @@ export class LocalStorageService {
       return {};
     }
     try {
-      return JSON.parse(stringifiedSkippedAdventures) as {
-        [storyId: string]: number[];
-      };
+      const parsed = JSON.parse(stringifiedSkippedAdventures);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: number[]};
+      }
+      return {};
     } catch {
       return {};
     }
@@ -528,9 +534,15 @@ export class LocalStorageService {
       return {};
     }
     try {
-      return JSON.parse(stringifiedMasteredAdventures) as {
-        [storyId: string]: string[];
-      };
+      const parsed = JSON.parse(stringifiedMasteredAdventures);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: string[]};
+      }
+      return {};
     } catch {
       return {};
     }

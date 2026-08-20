@@ -17,11 +17,9 @@
  * both the learner-facing topic viewer page and the topic editor preview tab.
  */
 
-import {Component, Input, ViewEncapsulation} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
-
-import './topic-viewer-content.component.css';
 
 export interface TopicViewerStorySectionData {
   storyId: string;
@@ -39,11 +37,6 @@ export interface TopicViewerStorySectionData {
   selector: 'topic-viewer-content',
   templateUrl: './topic-viewer-content.component.html',
   styleUrls: ['./topic-viewer-content.component.css'],
-  // This component renders inside both the learner-facing topic viewer page
-  // and the topic editor preview, and its styles use plain element selectors
-  // that must match deep inside the host page.
-  // We need ViewEncapsulation.None because emulated encapsulation would scope the styles away.
-  encapsulation: ViewEncapsulation.None,
 })
 export class TopicViewerContentComponent {
   readonly VIEW_NAMES = {

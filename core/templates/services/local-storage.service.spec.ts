@@ -419,6 +419,42 @@ describe('LocalStorageService', () => {
       expect(localStorageService.getSkippedAdventures('story_4')).toEqual([]);
     });
 
+    it('should return an empty dict when skipped adventures root is null', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        'null'
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when skipped adventures root is a number', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        '42'
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when skipped adventures root is an array', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        '[1, 2, 3]'
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when skipped adventures root is a boolean', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        'true'
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    });
+
     it('should correctly save and retrieve mastered adventures', () => {
       expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
 
@@ -470,6 +506,42 @@ describe('LocalStorageService', () => {
       );
 
       expect(localStorageService.getMasteredAdventures('story_4')).toEqual([]);
+    });
+
+    it('should return an empty dict when mastered adventures root is null', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        'null'
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when mastered adventures root is a number', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        '42'
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when mastered adventures root is an array', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        '[1, 2, 3]'
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+    });
+
+    it('should return an empty dict when mastered adventures root is a boolean', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.MASTERED_ADVENTURES_KEY,
+        'false'
+      );
+
+      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
     });
   });
 });

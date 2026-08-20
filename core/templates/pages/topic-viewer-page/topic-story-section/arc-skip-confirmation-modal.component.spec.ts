@@ -24,6 +24,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -32,6 +33,7 @@ import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.c
 describe('ArcSkipConfirmationModalComponent', () => {
   let component: ArcSkipConfirmationModalComponent;
   let fixture: ComponentFixture<ArcSkipConfirmationModalComponent>;
+  let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
 
   const createMockDialog = (
     focusableElements: HTMLElement[] = []
@@ -49,8 +51,14 @@ describe('ArcSkipConfirmationModalComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    ngbActiveModal = jasmine.createSpyObj('NgbActiveModal', [
+      'close',
+      'dismiss',
+    ]);
+
     TestBed.configureTestingModule({
       declarations: [ArcSkipConfirmationModalComponent, MockTranslatePipe],
+      providers: [{provide: NgbActiveModal, useValue: ngbActiveModal}],
     }).compileComponents();
   }));
 
@@ -61,44 +69,34 @@ describe('ArcSkipConfirmationModalComponent', () => {
     component.confirmationMessage = 'Adventure 1 will be skipped';
   });
 
-  it('should emit cancel when onCancel is called', () => {
-    spyOn(component.cancel, 'emit');
-
+  it('should dismiss the modal when onCancel is called', () => {
     component.onCancel();
 
-    expect(component.cancel.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should emit confirm when onConfirm is called', () => {
-    spyOn(component.confirm, 'emit');
-
+  it('should close the modal when onConfirm is called', () => {
     component.onConfirm();
 
-    expect(component.confirm.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should emit cancel when the backdrop is clicked', () => {
-    spyOn(component.cancel, 'emit');
-
+  it('should dismiss the modal when the backdrop is clicked', () => {
     component.onBackdropClick();
 
-    expect(component.cancel.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should emit cancel when Escape is pressed', () => {
-    spyOn(component.cancel, 'emit');
-
+  it('should dismiss the modal when Escape is pressed', () => {
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Escape'}));
 
-    expect(component.cancel.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
   it('should ignore non-Escape keys', () => {
-    spyOn(component.cancel, 'emit');
-
     component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
 
-    expect(component.cancel.emit).not.toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).not.toHaveBeenCalled();
   });
 
   it('should move focus into the dialog on init', fakeAsync(() => {
@@ -131,7 +129,6 @@ describe('ArcSkipConfirmationModalComponent', () => {
       'modalFocusRestoreElement',
       previouslyFocusedElement
     );
-    spyOn(component.cancel, 'emit');
 
     component.onCancel();
 
@@ -149,7 +146,6 @@ describe('ArcSkipConfirmationModalComponent', () => {
       'modalFocusRestoreElement',
       previouslyFocusedElement
     );
-    spyOn(component.confirm, 'emit');
 
     component.onConfirm();
 
@@ -264,13 +260,12 @@ describe('ArcSkipConfirmationModalComponent', () => {
     expect(enterEvent.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('should emit cancel without restoring focus when no element was saved', () => {
+  it('should dismiss the modal without restoring focus when no element was saved', () => {
     Reflect.set(component, 'modalFocusRestoreElement', null);
-    spyOn(component.cancel, 'emit');
 
     component.onCancel();
 
-    expect(component.cancel.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
     expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 });

@@ -173,7 +173,7 @@ class PracticeSessionsPageDataHandler(
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        if arc_id.isdigit():
+        if arc_id.isascii() and arc_id.isdigit():
             arc_index = int(arc_id)
             if 1 <= arc_index <= len(arcs_with_stories):
                 return arcs_with_stories[arc_index - 1]

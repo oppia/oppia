@@ -27,9 +27,16 @@ class MockWindowRef {
     location: {
       assign: (url: string) => {},
     },
-    setTimeout: (callback: () => void, timeout: number): number =>
-      window.setTimeout(callback, timeout),
-    clearTimeout: (timeoutId: number): void => window.clearTimeout(timeoutId),
+    setTimeout: jasmine
+      .createSpy('setTimeout')
+      .and.callFake((callback: () => void, timeout: number): number =>
+        window.setTimeout(callback, timeout)
+      ),
+    clearTimeout: jasmine
+      .createSpy('clearTimeout')
+      .and.callFake((timeoutId: number): void =>
+        window.clearTimeout(timeoutId)
+      ),
   };
 }
 

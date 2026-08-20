@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ElementRef, NO_ERRORS_SCHEMA, QueryList} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
 import {EventEmitter} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 
 import {StoryNode} from 'domain/story/story-node.model';
@@ -78,6 +79,7 @@ describe('TopicStorySectionComponent', () => {
     };
   };
   let translateService: TranslateService;
+  let ngbModal: jasmine.SpyObj<NgbModal>;
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -139,6 +141,7 @@ describe('TopicStorySectionComponent', () => {
         confirm: jasmine.createSpy('confirm').and.returnValue(true),
       },
     };
+    ngbModal = jasmine.createSpyObj('NgbModal', ['open']);
 
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
@@ -174,6 +177,10 @@ describe('TopicStorySectionComponent', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService,
+        },
+        {
+          provide: NgbModal,
+          useValue: ngbModal,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -1362,7 +1369,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    spyOn(document, 'getElementById').and.returnValue(null);
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([]);
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 0});
 
@@ -1511,11 +1519,12 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    spyOn(document, 'getElementById').and.returnValue(null);
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([]);
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.showArcSkipConfirmationModal).toBe(true);
+    expect(component.arcSkipModalRef).not.toBeNull();
     expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
 
     component.onArcSkipConfirmationProceed();
@@ -1530,19 +1539,29 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should clear skip confirmation state on cancel', () => {
-    component.showArcSkipConfirmationModal = true;
+    const mockModalRef = {
+      result: Promise.resolve(),
+      componentInstance: {},
+    } as NgbModalRef;
+    ngbModal.open.and.returnValue(mockModalRef);
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
     component.onArcSkipConfirmationCancel();
 
-    expect(component.showArcSkipConfirmationModal).toBe(false);
+    expect(component.arcSkipModalRef).toBeNull();
   });
 
   it('should cancel skip confirmation on proceed when there is no pending navigation', () => {
-    component.showArcSkipConfirmationModal = true;
+    const mockModalRef = {
+      result: Promise.resolve(),
+      componentInstance: {},
+    } as NgbModalRef;
+    ngbModal.open.and.returnValue(mockModalRef);
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
     component.onArcSkipConfirmationProceed();
 
-    expect(component.showArcSkipConfirmationModal).toBe(false);
+    expect(component.arcSkipModalRef).toBeNull();
   });
 
   it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
@@ -1593,11 +1612,12 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureCompleted(0)).toBe(true);
     expect(component.isAdventureCompleted(1)).toBe(false);
 
-    spyOn(document, 'getElementById').and.returnValue(null);
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([]);
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.showArcSkipConfirmationModal).toBe(false);
+    expect(component.arcSkipModalRef).toBeNull();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
     expect(component.isAdventureExpanded(1)).toBe(true);
@@ -1625,7 +1645,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.showArcSkipConfirmationModal).toBe(true);
+    expect(component.arcSkipModalRef).not.toBeNull();
     expect(component.getArcSkipConfirmationMessage()).toBe(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
     );
@@ -1701,7 +1721,7 @@ describe('TopicStorySectionComponent', () => {
     ];
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
-    expect(component.showArcSkipConfirmationModal).toBe(true);
+    expect(component.arcSkipModalRef).not.toBeNull();
 
     component.visibleAdventureGroups[0].lessonCards[0].lessonProgressStatus =
       'completed';
@@ -2274,7 +2294,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    spyOn(document, 'getElementById').and.returnValue(null);
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([]);
 
     component.onNavigationLessonSelected({
       lessonNumber: 999,
@@ -2547,7 +2568,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.adventureMasteredModalRef).not.toBeNull();
     expect(component.masteredAdventureIndex).toBe(0);
     expect(component.getAdventureMasteredTitle()).toBe(
       'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE'
@@ -2619,7 +2640,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.adventureMasteredModalRef).not.toBeNull();
     expect(component.masteredAdventureIndex).toBe(0);
   }));
 
@@ -2629,12 +2650,13 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
     ];
     component.masteredAdventureIndex = 0;
-    component.showAdventureMasteredModal = true;
+    component.adventureMasteredModalRef =
+      {} as import('@ng-bootstrap/ng-bootstrap').NgbModalRef;
     component.toggleAdventure(0);
 
     component.onAdventureMasteredContinue();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
     expect(component.masteredAdventureIndex).toBeNull();
     expect(component.isAdventureExpanded(0)).toBe(false);
     expect(component.isAdventureExpanded(1)).toBe(true);
@@ -2672,12 +2694,15 @@ describe('TopicStorySectionComponent', () => {
       'practiceElement',
       ['scrollIntoView']
     );
-    spyOn(document, 'getElementById').and.returnValue(practiceElement);
+    practiceElement.id = 'practice-card-1';
+    component.practiceWrappers = new QueryList<ElementRef>();
+    component.practiceWrappers.reset([
+      {nativeElement: practiceElement} as ElementRef,
+    ]);
 
     component.onNavigationPracticeSelected('1');
     tick(300);
 
-    expect(document.getElementById).toHaveBeenCalledWith('practice-card-1');
     expect(practiceElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
@@ -2685,7 +2710,8 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should handle onNavigationPracticeSelected when element is not found', fakeAsync(() => {
-    spyOn(document, 'getElementById').and.returnValue(null);
+    component.practiceWrappers = new QueryList<ElementRef>();
+    component.practiceWrappers.reset([]);
 
     component.onNavigationPracticeSelected('999');
     tick(300);
@@ -2693,11 +2719,12 @@ describe('TopicStorySectionComponent', () => {
 
   it('should handle onAdventureMasteredContinue when masteredAdventureIndex is null', () => {
     component.masteredAdventureIndex = null;
-    component.showAdventureMasteredModal = true;
+    component.adventureMasteredModalRef =
+      {} as import('@ng-bootstrap/ng-bootstrap').NgbModalRef;
 
     component.onAdventureMasteredContinue();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
     expect(component.masteredAdventureIndex).toBeNull();
   });
 
@@ -2807,7 +2834,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.adventureMasteredModalRef).not.toBeNull();
     expect(component.isAdventurePracticeCompleted(0)).toBe(true);
   }));
 
@@ -2854,7 +2881,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
   }));
 
   it('should not show the mastered modal when arc_id is empty', fakeAsync(() => {
@@ -2900,7 +2927,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
   }));
 
   it('should not show the mastered modal when arc_id does not match any adventure', fakeAsync(() => {
@@ -2946,7 +2973,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
   }));
 
   it('should not show the mastered modal again after it has been handled', fakeAsync(() => {
@@ -3017,7 +3044,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.adventureMasteredModalRef).not.toBeNull();
 
     component.onAdventureMasteredContinue();
 
@@ -3030,7 +3057,7 @@ describe('TopicStorySectionComponent', () => {
     });
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.adventureMasteredModalRef).toBeNull();
   }));
 
   it('should forward the topic editor preview flag to the adventure navigation', () => {
@@ -3056,21 +3083,22 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
-    const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
-      null
-    );
+    component.practiceWrappers = new QueryList<ElementRef>();
+    component.practiceWrappers.reset([]);
 
     component.onNavigationPracticeSelected('1');
     tick(300);
-
-    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-1');
   }));
 
-  it('should scroll to lesson element when found by getElementById', fakeAsync(() => {
+  it('should scroll to lesson element when found by ViewChildren', fakeAsync(() => {
     const lessonElement = jasmine.createSpyObj<HTMLElement>('lessonElement', [
       'scrollIntoView',
     ]);
-    spyOn(document, 'getElementById').and.returnValue(lessonElement);
+    lessonElement.id = 'lesson-1';
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([
+      {nativeElement: lessonElement} as ElementRef,
+    ]);
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
@@ -3084,12 +3112,16 @@ describe('TopicStorySectionComponent', () => {
     });
   }));
 
-  it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
+  it('should scroll to practice card element when found by ViewChildren', fakeAsync(() => {
     const practiceElement = jasmine.createSpyObj<HTMLElement>(
       'practiceElement',
       ['scrollIntoView']
     );
-    spyOn(document, 'getElementById').and.returnValue(practiceElement);
+    practiceElement.id = 'practice-card-1';
+    component.practiceWrappers = new QueryList<ElementRef>();
+    component.practiceWrappers.reset([
+      {nativeElement: practiceElement} as ElementRef,
+    ]);
 
     component.onNavigationPracticeSelected('1');
     tick(300);
@@ -3202,7 +3234,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.adventureMasteredModalRef).not.toBeNull();
     expect(localStorageService.updateMasteredAdventures).toHaveBeenCalledWith(
       'story_id_1',
       ['1']
