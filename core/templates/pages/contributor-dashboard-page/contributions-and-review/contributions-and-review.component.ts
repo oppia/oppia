@@ -512,6 +512,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     modalRef.componentInstance.subheading = subheading;
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe(
       (queuedSuggestionSummary: {
+        target_type: string;
         target_id: string;
         suggestion_id: string;
         action_status: string;
