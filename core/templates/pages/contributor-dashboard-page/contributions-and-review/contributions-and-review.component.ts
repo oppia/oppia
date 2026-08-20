@@ -85,7 +85,6 @@ export interface Suggestion {
   author_name: string;
   language_code?: string;
   last_updated_msecs?: number;
-  target_type?: string;
   entity_content_html: string | null;
 }
 
@@ -114,6 +113,7 @@ export interface Opportunity {
   translationsCount?: number;
   inReviewCount?: number;
   progressPercentage?: string;
+  entityType?: string;
 }
 
 export interface GetOpportunitiesResponse {
@@ -193,6 +193,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   topicReady: boolean = false;
   commitTimeout?: NodeJS.Timeout;
   queuedSuggestionSummary: {
+    target_type: string;
     target_id: string;
     suggestion_id: string;
     action_status: string;
@@ -446,7 +447,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       (result: {
         action: string;
         reviewMessage: string;
-        skillDifficulty: string;
+        skillDifficulty: number;
         targetId: string;
         suggestionId: string;
       }) => {
@@ -816,7 +817,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
                 // that follows a click. Legacy opportunities carry no entity type
                 // and are always explorations.
                 entityType:
-                  opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
+                  opportunity.entityType ||
+                  AppConstants.ENTITY_TYPE.EXPLORATION,
               };
               opportunitiesDicts.push(opportunityDict);
             }
