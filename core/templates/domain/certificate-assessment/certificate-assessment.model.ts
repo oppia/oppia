@@ -35,7 +35,7 @@ export interface AssessmentResult {
   certificateName: string;
   scorePercentage: number;
   topicBreakdown: AssessmentResultTopicWiseBreakdown[];
-  timeTakenMinutes: number;
+  timeTakenMinutes: number | null;
 }
 
 // The shape of the topic-wise breakdown shown on the certificate assessment
