@@ -220,8 +220,6 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   private handleNetworkStateChange(isOnline: boolean): void {
     if (!isOnline) {
-      // eslint-disable-next-line no-console
-      console.log('[Assessment Timer] Network went offline.');
       // Pause the countdown so the disconnected duration is not counted
       // towards the assessment expiry time.
       if (
@@ -235,8 +233,6 @@ export class CertificateAssessmentPlayerPageRootComponent
       }
       return;
     }
-    // eslint-disable-next-line no-console
-    console.log('[Assessment Timer] Network is back online.');
     // Reconnected: surface the resume option instead of auto-resuming the
     // assessment. Do nothing if the assessment was not paused for a network
     // loss.
@@ -269,18 +265,10 @@ export class CertificateAssessmentPlayerPageRootComponent
     ) {
       return;
     }
-    // eslint-disable-next-line no-console
-    console.log(
-      `[Assessment Timer] Timer RESUMED from ${this.remainingTimeInSeconds}s.`
-    );
     this.startCountdown();
   }
 
   private pauseTimer(): void {
-    // eslint-disable-next-line no-console
-    console.log(
-      `[Assessment Timer] Timer PAUSED. Remaining time: ${this.remainingTimeInSeconds}s.`
-    );
     this.clearTimer();
   }
 
@@ -291,10 +279,6 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.timerId = window.setInterval(() => {
       if (this.remainingTimeInSeconds > 0) {
         this.remainingTimeInSeconds -= 1;
-        // eslint-disable-next-line no-console
-        console.log(
-          `[Assessment Timer] Tick. Remaining time: ${this.remainingTimeInSeconds}s.`
-        );
       }
       if (this.remainingTimeInSeconds === 0) {
         this.isTimeExpired = true;
