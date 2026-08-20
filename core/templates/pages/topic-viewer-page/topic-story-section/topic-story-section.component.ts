@@ -479,7 +479,7 @@ export class TopicStorySectionComponent
 
     // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
-      const lessonEl = this.lessonWrappers.find(ref => {
+      const lessonEl = this.lessonWrappers?.find(ref => {
         const elId = ref.nativeElement.id;
         return (
           elId === 'lesson-' + lessonNumber ||
@@ -567,7 +567,7 @@ export class TopicStorySectionComponent
   onNavigationPracticeSelected(arcId: string): void {
     // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const practiceEl = this.practiceWrappers.find(
+      const practiceEl = this.practiceWrappers?.find(
         ref => ref.nativeElement.id === 'practice-card-' + arcId
       );
       if (practiceEl) {
