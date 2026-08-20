@@ -705,17 +705,17 @@ MESSAGE_TYPE_SUGGESTION = 'suggestion'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 
 
-def default_salutation_html_fn(recipient_username: str) -> str:
+def get_default_salutation_html(recipient_username: str) -> str:
     """Returns the default HTML salutation for the given email recipient."""
     return f'Hi {recipient_username},'
 
 
-def default_signoff_html_fn(sender_username: str) -> str:
+def get_default_signoff_html(sender_username: str) -> str:
     """Returns the default HTML signoff for the given email sender."""
     return f'Thanks!<br>{sender_username} (Oppia moderator)'
 
 
-def default_email_subject_fn(exp_title: str) -> str:
+def get_default_email_subject(exp_title: str) -> str:
     """Returns the default email subject for the given exploration title."""
     return f'Your Oppia exploration "{exp_title}" has been unpublished'
 
@@ -725,10 +725,10 @@ VALID_MODERATOR_ACTIONS: Dict[
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': default_email_subject_fn,
+        'email_subject_fn': get_default_email_subject,
         'email_intent': 'unpublish_exploration',
-        'email_salutation_html_fn': default_salutation_html_fn,
-        'email_signoff_html_fn': default_signoff_html_fn,
+        'email_salutation_html_fn': get_default_salutation_html,
+        'email_signoff_html_fn': get_default_signoff_html,
     },
 }
 
