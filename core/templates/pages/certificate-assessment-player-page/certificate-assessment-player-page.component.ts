@@ -281,34 +281,7 @@ export class CertificateAssessmentPlayerPageComponent
     const loadedQuestions = this.questions.filter(
       (question): question is AssessmentQuestion => question !== undefined
     );
-    const answers = loadedQuestions.map(question => {
-      const answer = this.answers[question.id] ?? null;
-      let isCorrect = false;
-      if (answer !== null) {
-        const interaction = this.interactions[question.id];
-        const rulesService =
-          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-            interaction.id as string
-          );
-        const result =
-          this.answerClassificationService.getMatchingClassificationResult(
-            question.id,
-            interaction,
-            answer,
-            rulesService
-          );
-        isCorrect = result.outcome.labelledAsCorrect;
-      }
-      const selectedAnswer =
-        answer !== null ? this.formatAnswerForBackend(answer) : undefined;
-      return {
-        question_id: question.id,
-        is_correct: isCorrect,
-        ...(selectedAnswer !== undefined
-          ? {selected_answer: selectedAnswer}
-          : {}),
-      };
-    });
+    const answers = this.buildAnswers(loadedQuestions);
     const unansweredQuestionIndexes = loadedQuestions
       .map((question, index) => ({question, index}))
       .filter(({question}) => (this.answers[question.id] ?? null) === null)
@@ -337,7 +310,43 @@ export class CertificateAssessmentPlayerPageComponent
     }
     this.hasHandledTimeExpiry = true;
     this.openTimeExpiredModal();
-    this.submitAssessment();
+    const loadedQuestions = this.questions.filter(
+      (question): question is AssessmentQuestion => question !== undefined
+    );
+    this.assessmentSubmitted.emit(this.buildAnswers(loadedQuestions));
+  }
+
+  private buildAnswers(
+    loadedQuestions: AssessmentQuestion[]
+  ): SubmitCertificateAssessmentAnswerBackendDict[] {
+    return loadedQuestions.map(question => {
+      const answer = this.answers[question.id] ?? null;
+      let isCorrect = false;
+      if (answer !== null) {
+        const interaction = this.interactions[question.id];
+        const rulesService =
+          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+            interaction.id as string
+          );
+        const result =
+          this.answerClassificationService.getMatchingClassificationResult(
+            question.id,
+            interaction,
+            answer,
+            rulesService
+          );
+        isCorrect = result.outcome.labelledAsCorrect;
+      }
+      const selectedAnswer =
+        answer !== null ? this.formatAnswerForBackend(answer) : undefined;
+      return {
+        question_id: question.id,
+        is_correct: isCorrect,
+        ...(selectedAnswer !== undefined
+          ? {selected_answer: selectedAnswer}
+          : {}),
+      };
+    });
   }
 
   handleInteractionSubmit(answer: InteractionAnswer): void {
