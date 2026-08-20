@@ -98,14 +98,14 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
 
-def get_suggestion_translate_content_html(
+def get_translation_html_from_suggestion(
     suggestion: suggestion_registry.SuggestionTranslateContent,
 ) -> str:
     """Returns the HTML str from the given SuggestionTranslateContent object."""
     return suggestion.change_cmd.translation_html
 
 
-def get_suggestion_add_question_html(
+def get_question_html_from_suggestion(
     suggestion: suggestion_registry.SuggestionAddQuestion,
 ) -> str:
     """Returns the HTML str from the given SuggestionAddQuestion object."""
@@ -121,8 +121,8 @@ def get_suggestion_add_question_html(
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
 SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: get_suggestion_translate_content_html,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION: get_suggestion_add_question_html,
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: get_translation_html_from_suggestion,
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: get_question_html_from_suggestion,
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
