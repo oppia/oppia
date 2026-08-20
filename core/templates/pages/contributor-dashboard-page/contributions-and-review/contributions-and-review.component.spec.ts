@@ -617,7 +617,15 @@ describe('Contributions and review component', () => {
         contributionAndReviewService,
         'reviewQuestionSuggestion'
       ).and.callFake(
-        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+        (
+          _one: string,
+          _two: string,
+          _thre: string,
+          _four: string,
+          _five: number,
+          _six: (id: string) => void,
+          callBackfunction: () => void
+        ) => {
           callBackfunction();
           tick();
           return null;
@@ -647,7 +655,7 @@ describe('Contributions and review component', () => {
       let suggestion = {
         change_cmd: {
           skill_id: 'skill1',
-          question_dict: null,
+          question_dict: null as unknown as QuestionBackendDict,
           skill_difficulty: null,
           translation_html: ['suggestion_1', 'suggestion_2'],
         },
@@ -791,7 +799,7 @@ describe('Contributions and review component', () => {
             target_id: 'target_1',
             suggestion_id: 'suggestion_id',
             author_name: 'author',
-            exploration_content_html: null,
+            entity_content_html: null,
           },
         },
       };
@@ -899,7 +907,7 @@ describe('Contributions and review component', () => {
               skill_id: '',
               content_html: 'Content',
               translation_html: 'Translation',
-              question_dict: null,
+              question_dict: null as unknown as QuestionBackendDict,
               skill_difficulty: [],
             },
             status: 'review',
@@ -1000,7 +1008,7 @@ describe('Contributions and review component', () => {
               },
               status: '',
               author_name: 'author',
-              exploration_content_html: null,
+              entity_content_html: null,
             },
           },
         };
@@ -1046,7 +1054,15 @@ describe('Contributions and review component', () => {
         contributionAndReviewService,
         'reviewQuestionSuggestion'
       ).and.callFake(
-        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+        (
+          _one: string,
+          _two: string,
+          _thre: string,
+          _four: string,
+          _five: number,
+          _six: (id: string) => void,
+          callBackfunction: () => void
+        ) => {
           callBackfunction();
           tick();
           return null;
@@ -1972,7 +1988,7 @@ describe('Contributions and review component', () => {
       });
       flushMicrotasks();
 
-      expect(response.opportunitiesDicts).toEqual([
+      expect(response!.opportunitiesDicts).toEqual([
         {
           id: '1',
           heading: 'Chapter 1',
@@ -2002,7 +2018,7 @@ describe('Contributions and review component', () => {
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         } as unknown as Opportunity,
       ]);
-      expect(response.more).toEqual(false);
+      expect(response!.more).toEqual(false);
     }));
 
     it('should fetch suggestions using the entity type of the opened opportunity', fakeAsync(() => {
@@ -2044,7 +2060,7 @@ describe('Contributions and review component', () => {
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
       getReviewableSuggestionsSpy.calls.reset();
       component.activeEntityType = AppConstants.ENTITY_TYPE.SKILL;
-      component.activeExplorationId = null;
+      component.activeExplorationId = null as unknown as string;
 
       component.loadContributions(true);
       flushMicrotasks();
@@ -3081,7 +3097,7 @@ describe('Contributions and review component', () => {
             },
             status: 'review',
             author_name: 'author',
-            exploration_content_html: null,
+            entity_content_html: null,
           },
           details: {
             skill_description: 'skill_description',
@@ -3095,6 +3111,7 @@ describe('Contributions and review component', () => {
 
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3107,6 +3124,7 @@ describe('Contributions and review component', () => {
       // Now emit a new queued suggestion which should trigger the subscription logic.
       eventEmitter.emit({
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_2',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3145,7 +3163,7 @@ describe('Contributions and review component', () => {
             },
             status: 'review',
             author_name: 'author_1',
-            exploration_content_html: null,
+            entity_content_html: null,
           },
           details: {
             skill_description: 'skill_description',
@@ -3168,6 +3186,7 @@ describe('Contributions and review component', () => {
       const COMMIT_TIMEOUT_DURATION = 32000;
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3183,6 +3202,7 @@ describe('Contributions and review component', () => {
     it('should commit the queued Suggestion when commit function is called', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3192,16 +3212,16 @@ describe('Contributions and review component', () => {
         'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetType,
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
-          return Promise.resolve(successCallback());
+          return Promise.resolve(successCallback(''));
         }
       );
       component.contributions = {};
@@ -3224,16 +3244,16 @@ describe('Contributions and review component', () => {
         'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetType,
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
-          return Promise.resolve(successCallback());
+          return Promise.resolve(successCallback(''));
         }
       );
       component.contributions = {};
@@ -3263,19 +3283,21 @@ describe('Contributions and review component', () => {
         'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetType,
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          skillDifficulty,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          skillDifficulty: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
           return Promise.resolve(successCallback(suggestionId));
         }
       );
-      component.contributions = {suggestion_1: {}};
+      component.contributions = {
+        suggestion_1: {} as unknown as SuggestionDetails,
+      };
       spyOn(alertsService, 'addSuccessMessage');
       spyOn(alertsService, 'clearMessages');
       const removeSpy = spyOn(
@@ -3301,7 +3323,9 @@ describe('Contributions and review component', () => {
         'Suggestion accepted.'
       );
       expect(removeSpy).toHaveBeenCalledWith(['suggestion_1']);
-      expect(component.isCommitting).toBeFalse();
+      expect(
+        (component as unknown as {isCommitting: boolean}).isCommitting
+      ).toBeFalsy();
     });
 
     it('should warn when committing a queued skill suggestion fails', function () {
@@ -3317,14 +3341,14 @@ describe('Contributions and review component', () => {
         'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetType,
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
           // The service supplies a generic message for a skill review
           // failure, because that endpoint reports no reason of its own.
@@ -3350,12 +3374,15 @@ describe('Contributions and review component', () => {
         'Invalid Suggestion: Error updating suggestion'
       );
       expect(removeSpy).not.toHaveBeenCalled();
-      expect(component.isCommitting).toBeFalse();
+      expect(
+        (component as unknown as {isCommitting: boolean}).isCommitting
+      ).toBeFalsy();
     });
 
     it('should not call remove suggestion emitter if network call fails', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3365,14 +3392,14 @@ describe('Contributions and review component', () => {
         'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetType,
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
           return Promise.reject(errorCallback('error'));
         }
@@ -3393,6 +3420,7 @@ describe('Contributions and review component', () => {
     it('should not call remove suggestion emitter if network call fails', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3690,7 +3718,10 @@ describe('Contributions and review component', () => {
       } as unknown as Record<string, SuggestionDetails>;
 
       component._showTranslationSuggestionModal(
-        {suggestion_1: skillContribution},
+        {suggestion_1: skillContribution} as unknown as Record<
+          string,
+          ActiveContributionDict
+        >,
         'suggestion_1',
         true
       );
@@ -3710,6 +3741,7 @@ describe('Contributions and review component', () => {
   it('should clear commit timeout when committing queued suggestion', () => {
     component.queuedSuggestionSummary = {
       target_id: 'target',
+      target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
       suggestion_id: 'sug_id',
       action_status: 'accept',
       reviewer_message: 'msg',
@@ -3718,18 +3750,19 @@ describe('Contributions and review component', () => {
     component.commitTimeout = setTimeout(() => {}, 1000);
     spyOn(
       contributionAndReviewService,
-      'reviewExplorationSuggestion'
+      'reviewTranslationSuggestion'
     ).and.callFake(
       (
-        targetId: string,
-        suggestionId: string,
-        action: string,
-        message: string,
-        commitMessage: string,
-        successCb: () => void,
-        errorCb: () => void
+        _targetType: string,
+        _targetId: string,
+        _suggestionId: string,
+        _action: string,
+        _message: string,
+        _commitMessage: string | null,
+        successCb: (id: string) => void,
+        _errorCb: (err: string) => void
       ) => {
-        successCb();
+        successCb('');
       }
     );
     component.commitQueuedSuggestion();

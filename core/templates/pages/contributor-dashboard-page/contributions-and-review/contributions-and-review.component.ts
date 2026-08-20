@@ -957,7 +957,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     // have loaded anything, so only a later change to the filter needs to
     // close the open opportunity and reload.
     if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
-      this.activeExplorationId = null;
+      this.activeExplorationId = '';
       this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
     }
   }
