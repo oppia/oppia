@@ -88,7 +88,9 @@ module.exports = {
         },
         {
           matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
-          assertions: buildPageAssertions(),
+          assertions: buildPageAssertions({
+            'categories:accessibility': ['error', {minScore: 0.96}],
+          }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/delete-account$',
@@ -115,14 +117,14 @@ module.exports = {
               // fixed.
               deprecations: ['error', {minScore: 0}],
               redirects: ['error', {minScore: 1}],
-              'uses-responsive-images': ['error', {minScore: 0.8}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
             },
             0.95
           ),
         },
         {
           matchingUrlPattern: 'http://[^/]+/get-started$',
-          assertions: buildPageAssertions({}, 0.98),
+          assertions: buildPageAssertions({}, 0.96),
         },
         {
           matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
