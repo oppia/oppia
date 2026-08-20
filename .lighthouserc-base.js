@@ -30,12 +30,7 @@ module.exports = {
   // CI-stability flags for the Chrome instance managed by the puppeteerScript.
   // These match the flags already used by Karma in core/tests/karma.conf.ts.
   puppeteerLaunchOptions: {
-    args: [
-      '--no-sandbox',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-features=IsolateOrigins,site-per-process',
-    ],
+    args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
   },
   urls: LIGHTHOUSE_URLS_TO_RUN,
   basePerformanceAssertMatrix: {

@@ -174,6 +174,37 @@ def _get_lighthouse_environment() -> dict[str, str]:
     return env
 
 
+def _patch_lighthouse_target_manager() -> None:
+    """Patches lighthouse target-manager.js to handle Target.getTargetInfo
+    'Not allowed' errors from cross-origin iframes (e.g. Stripe, YouTube on
+    the donate page). Without this patch, Chrome's headless CDP rejects
+    Target.getTargetInfo for cross-origin targets and Lighthouse crashes."""
+    target_manager_path = os.path.join(
+        'node_modules',
+        'lighthouse',
+        'core',
+        'gather',
+        'driver',
+        'target-manager.js',
+    )
+    with open(target_manager_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    # Only patch if not already applied.
+    if '/Not allowed/' not in content:
+        content = content.replace(
+            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;",
+            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;\n"
+            "      // Chrome may reject Target.getTargetInfo for "
+            "cross-origin targets.\n"
+            "      if (/Not allowed/.test(err.message)) return;",
+        )
+        with open(target_manager_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.'
+        )
+
+
 def _run_lighthouse_checks_for_config(config_filename: str) -> None:
     """Runs the Lighthouse checks through the given Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
@@ -211,6 +242,7 @@ def _run_lighthouse_checks_for_config(config_filename: str) -> None:
 
 def run_lighthouse_checks() -> None:
     """Runs the Lighthouse checks through the Lighthouse configs."""
+    _patch_lighthouse_target_manager()
     for config_filename in (
         LIGHTHOUSE_CONFIG_FILENAME,
         LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
