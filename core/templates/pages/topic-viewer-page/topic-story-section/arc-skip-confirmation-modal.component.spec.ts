@@ -24,6 +24,10 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -267,5 +271,53 @@ describe('ArcSkipConfirmationModalComponent', () => {
 
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
     expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
+  });
+
+  describe('when opened as MatBottomSheet', () => {
+    let bottomSheetRef: jasmine.SpyObj<
+      MatBottomSheetRef<ArcSkipConfirmationModalComponent>
+    >;
+
+    beforeEach(waitForAsync(() => {
+      bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [ArcSkipConfirmationModalComponent, MockTranslatePipe],
+        providers: [
+          {provide: NgbActiveModal, useValue: ngbActiveModal},
+          {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+          {
+            provide: MAT_BOTTOM_SHEET_DATA,
+            useValue: {
+              adventureLabel: 'Adventure 2',
+              confirmationMessage: 'Adventure 1 will be skipped',
+            },
+          },
+        ],
+      }).compileComponents();
+    }));
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(ArcSkipConfirmationModalComponent);
+      component = fixture.componentInstance;
+    });
+
+    it('should read data from MAT_BOTTOM_SHEET_DATA', () => {
+      expect(component.adventureLabel).toBe('Adventure 2');
+      expect(component.confirmationMessage).toBe('Adventure 1 will be skipped');
+    });
+
+    it('should dismiss the bottom sheet on confirm', () => {
+      component.onConfirm();
+
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
+    });
+
+    it('should dismiss the bottom sheet on cancel', () => {
+      component.onCancel();
+
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    });
   });
 });

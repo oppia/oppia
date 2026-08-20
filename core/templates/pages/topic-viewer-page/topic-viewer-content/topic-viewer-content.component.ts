@@ -21,6 +21,8 @@ import {Component, Input} from '@angular/core';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 
+import './topic-viewer-content.component.css';
+
 export interface TopicViewerStorySectionData {
   storyId: string;
   storyTitle: string;

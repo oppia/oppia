@@ -24,6 +24,10 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ElementRef} from '@angular/core';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -258,5 +262,53 @@ describe('AdventureMasteredModalComponent', () => {
 
     expect(ngbActiveModal.close).toHaveBeenCalled();
     expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
+  });
+
+  describe('when opened as MatBottomSheet', () => {
+    let bottomSheetRef: jasmine.SpyObj<
+      MatBottomSheetRef<AdventureMasteredModalComponent>
+    >;
+
+    beforeEach(waitForAsync(() => {
+      bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [AdventureMasteredModalComponent, MockTranslatePipe],
+        providers: [
+          {provide: NgbActiveModal, useValue: ngbActiveModal},
+          {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+          {
+            provide: MAT_BOTTOM_SHEET_DATA,
+            useValue: {
+              title: 'Adventure 1 mastered',
+              message: 'You have completed all lessons',
+            },
+          },
+        ],
+      }).compileComponents();
+    }));
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+      component = fixture.componentInstance;
+    });
+
+    it('should read data from MAT_BOTTOM_SHEET_DATA', () => {
+      expect(component.title).toBe('Adventure 1 mastered');
+      expect(component.message).toBe('You have completed all lessons');
+    });
+
+    it('should dismiss the bottom sheet on confirm', () => {
+      component.onContinue();
+
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
+    });
+
+    it('should dismiss the bottom sheet on cancel', () => {
+      component.cancel();
+
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    });
   });
 });

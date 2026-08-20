@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
 import {EventEmitter} from '@angular/core';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -42,8 +43,11 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
+import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
+import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 class MockTranslateService {
@@ -80,6 +84,8 @@ describe('TopicStorySectionComponent', () => {
   };
   let translateService: TranslateService;
   let ngbModal: jasmine.SpyObj<NgbModal>;
+  let bottomSheet: jasmine.SpyObj<MatBottomSheet>;
+  let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -142,6 +148,15 @@ describe('TopicStorySectionComponent', () => {
       },
     };
     ngbModal = jasmine.createSpyObj('NgbModal', ['open']);
+    ngbModal.open.and.returnValue({
+      componentInstance: {},
+      result: new Promise(() => {}),
+    } as NgbModalRef);
+    bottomSheet = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    windowDimensionsService = jasmine.createSpyObj('WindowDimensionsService', [
+      'getWidth',
+    ]);
+    windowDimensionsService.getWidth.and.returnValue(1024);
 
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
@@ -181,6 +196,14 @@ describe('TopicStorySectionComponent', () => {
         {
           provide: NgbModal,
           useValue: ngbModal,
+        },
+        {
+          provide: MatBottomSheet,
+          useValue: bottomSheet,
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: windowDimensionsService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -1524,7 +1547,13 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.arcSkipModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ArcSkipConfirmationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-arc-skip-confirmation-modal',
+      }
+    );
     expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
 
     component.onArcSkipConfirmationProceed();
@@ -1548,7 +1577,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onArcSkipConfirmationCancel();
 
-    expect(component.arcSkipModalRef).toBeNull();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should cancel skip confirmation on proceed when there is no pending navigation', () => {
@@ -1561,7 +1590,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onArcSkipConfirmationProceed();
 
-    expect(component.arcSkipModalRef).toBeNull();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
@@ -1617,7 +1646,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.arcSkipModalRef).toBeNull();
+    expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
     expect(component.isAdventureExpanded(1)).toBe(true);
@@ -1645,7 +1674,13 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.arcSkipModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ArcSkipConfirmationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-arc-skip-confirmation-modal',
+      }
+    );
     expect(component.getArcSkipConfirmationMessage()).toBe(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
     );
@@ -1721,7 +1756,13 @@ describe('TopicStorySectionComponent', () => {
     ];
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
-    expect(component.arcSkipModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ArcSkipConfirmationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-arc-skip-confirmation-modal',
+      }
+    );
 
     component.visibleAdventureGroups[0].lessonCards[0].lessonProgressStatus =
       'completed';
@@ -2568,7 +2609,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
     expect(component.masteredAdventureIndex).toBe(0);
     expect(component.getAdventureMasteredTitle()).toBe(
       'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE'
@@ -2640,7 +2687,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
     expect(component.masteredAdventureIndex).toBe(0);
   }));
 
@@ -2650,13 +2703,10 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
     ];
     component.masteredAdventureIndex = 0;
-    component.adventureMasteredModalRef =
-      {} as import('@ng-bootstrap/ng-bootstrap').NgbModalRef;
     component.toggleAdventure(0);
 
     component.onAdventureMasteredContinue();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
     expect(component.masteredAdventureIndex).toBeNull();
     expect(component.isAdventureExpanded(0)).toBe(false);
     expect(component.isAdventureExpanded(1)).toBe(true);
@@ -2719,12 +2769,9 @@ describe('TopicStorySectionComponent', () => {
 
   it('should handle onAdventureMasteredContinue when masteredAdventureIndex is null', () => {
     component.masteredAdventureIndex = null;
-    component.adventureMasteredModalRef =
-      {} as import('@ng-bootstrap/ng-bootstrap').NgbModalRef;
 
     component.onAdventureMasteredContinue();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
     expect(component.masteredAdventureIndex).toBeNull();
   });
 
@@ -2834,7 +2881,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
     expect(component.isAdventurePracticeCompleted(0)).toBe(true);
   }));
 
@@ -2881,7 +2934,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
+    expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
   it('should not show the mastered modal when arc_id is empty', fakeAsync(() => {
@@ -2927,7 +2980,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
+    expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
   it('should not show the mastered modal when arc_id does not match any adventure', fakeAsync(() => {
@@ -2973,7 +3026,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
+    expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
   it('should not show the mastered modal again after it has been handled', fakeAsync(() => {
@@ -3044,7 +3097,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
 
     component.onAdventureMasteredContinue();
 
@@ -3057,7 +3116,7 @@ describe('TopicStorySectionComponent', () => {
     });
     tick();
 
-    expect(component.adventureMasteredModalRef).toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledTimes(1);
   }));
 
   it('should forward the topic editor preview flag to the adventure navigation', () => {
@@ -3234,7 +3293,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.adventureMasteredModalRef).not.toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
     expect(localStorageService.updateMasteredAdventures).toHaveBeenCalledWith(
       'story_id_1',
       ['1']

@@ -27,6 +27,7 @@ import {
   SimpleChanges,
   ViewChildren,
 } from '@angular/core';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Subscription} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -44,6 +45,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 
@@ -60,6 +62,7 @@ const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
 const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';
 const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
 const ARC_ID_QUERY_PARAM = 'arc_id';
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 interface LessonCardData {
   lessonNumber: number;
@@ -235,41 +238,79 @@ export class TopicStorySectionComponent
   }
 
   private openArcSkipConfirmationModal(): void {
-    this.arcSkipModalRef = this.ngbModal.open(
-      ArcSkipConfirmationModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-arc-skip-confirmation-modal',
-      }
-    );
-    this.arcSkipModalRef.componentInstance.adventureLabel =
-      this.pendingArcSkipTargetLabel;
-    this.arcSkipModalRef.componentInstance.confirmationMessage =
-      this.getArcSkipConfirmationMessage();
-    this.arcSkipModalRef.result.then(
-      () => this.onArcSkipConfirmationProceed(),
-      () => this.onArcSkipConfirmationCancel()
-    );
+    if (this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT) {
+      const bottomSheetRef = this.bottomSheet.open(
+        ArcSkipConfirmationModalComponent,
+        {
+          data: {
+            adventureLabel: this.pendingArcSkipTargetLabel,
+            confirmationMessage: this.getArcSkipConfirmationMessage(),
+          },
+        }
+      );
+      bottomSheetRef.afterDismissed().subscribe((result: string) => {
+        if (result === 'confirm') {
+          this.onArcSkipConfirmationProceed();
+        } else {
+          this.onArcSkipConfirmationCancel();
+        }
+      });
+    } else {
+      this.arcSkipModalRef = this.ngbModal.open(
+        ArcSkipConfirmationModalComponent,
+        {
+          backdrop: 'static',
+          windowClass: 'oppia-arc-skip-confirmation-modal',
+        }
+      );
+      this.arcSkipModalRef.componentInstance.adventureLabel =
+        this.pendingArcSkipTargetLabel;
+      this.arcSkipModalRef.componentInstance.confirmationMessage =
+        this.getArcSkipConfirmationMessage();
+      this.arcSkipModalRef.result.then(
+        () => this.onArcSkipConfirmationProceed(),
+        () => this.onArcSkipConfirmationCancel()
+      );
+    }
   }
 
   private openAdventureMasteredModal(): void {
-    this.adventureMasteredModalRef = this.ngbModal.open(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    this.adventureMasteredModalRef.componentInstance.title =
-      this.getAdventureMasteredTitle();
-    this.adventureMasteredModalRef.componentInstance.message =
-      this.getAdventureMasteredSubtitle();
-    this.adventureMasteredModalRef.result.then(
-      () => this.onAdventureMasteredContinue(),
-      () => {
-        this.adventureMasteredModalRef = null;
-      }
-    );
+    if (this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT) {
+      const bottomSheetRef = this.bottomSheet.open(
+        AdventureMasteredModalComponent,
+        {
+          data: {
+            title: this.getAdventureMasteredTitle(),
+            message: this.getAdventureMasteredSubtitle(),
+          },
+        }
+      );
+      bottomSheetRef.afterDismissed().subscribe((result: string) => {
+        if (result === 'confirm') {
+          this.onAdventureMasteredContinue();
+        } else {
+          this.adventureMasteredModalRef = null;
+        }
+      });
+    } else {
+      this.adventureMasteredModalRef = this.ngbModal.open(
+        AdventureMasteredModalComponent,
+        {
+          backdrop: 'static',
+          windowClass: 'oppia-adventure-mastered-modal',
+        }
+      );
+      this.adventureMasteredModalRef.componentInstance.title =
+        this.getAdventureMasteredTitle();
+      this.adventureMasteredModalRef.componentInstance.message =
+        this.getAdventureMasteredSubtitle();
+      this.adventureMasteredModalRef.result.then(
+        () => this.onAdventureMasteredContinue(),
+        () => {
+          this.adventureMasteredModalRef = null;
+        }
+      );
+    }
   }
 
   onAdventureMasteredContinue(): void {
@@ -548,6 +589,8 @@ export class TopicStorySectionComponent
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
+    private bottomSheet: MatBottomSheet,
+    private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService
   ) {}
 

@@ -21,10 +21,16 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Inject,
   Input,
   OnInit,
+  Optional,
   ViewChild,
 } from '@angular/core';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -49,8 +55,34 @@ export class ArcSkipConfirmationModalComponent
   @ViewChild('dialog') private dialog!: ElementRef<HTMLElement>;
   private modalFocusRestoreElement: HTMLElement | null = null;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data: {adventureLabel: string; confirmationMessage: string} | null
+  ) {
     super(ngbActiveModal);
+    if (this.data) {
+      this.adventureLabel = this.data.adventureLabel;
+      this.confirmationMessage = this.data.confirmationMessage;
+    }
+  }
+
+  confirm<T>(value?: T): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('confirm');
+    } else {
+      super.confirm(value);
+    }
+  }
+
+  cancel<T>(value: T | 'cancel' = 'cancel'): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('cancel');
+    } else {
+      super.cancel(value);
+    }
   }
 
   ngOnInit(): void {
