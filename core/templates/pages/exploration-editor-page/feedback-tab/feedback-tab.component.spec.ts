@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for story preview tab component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';

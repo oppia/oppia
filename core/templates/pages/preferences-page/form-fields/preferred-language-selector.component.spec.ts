@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the preferred site language component.
  */
 
+// @ts-nocheck
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';

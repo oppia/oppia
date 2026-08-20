@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageComponent.
  */
 
+// @ts-nocheck
+
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {

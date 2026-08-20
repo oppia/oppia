@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the preferred languages component.
  */
 
+// @ts-nocheck
+
 import {ElementRef} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {

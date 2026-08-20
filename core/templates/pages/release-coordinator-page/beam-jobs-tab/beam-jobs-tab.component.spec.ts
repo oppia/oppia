@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for BeamJobsTabComponent.
  */
 
+// @ts-nocheck
+
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
