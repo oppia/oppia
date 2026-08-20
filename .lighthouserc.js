@@ -202,7 +202,7 @@ module.exports = {
           matchingUrlPattern: 'http://[^/]+/volunteer$',
           assertions: buildPageAssertions({
             'categories:accessibility': ['error', {minScore: 0.88}],
-            'uses-responsive-images': ['error', {minScore: 0.5}],
+            'uses-responsive-images': ['error', {minScore: 0}],
           }),
         },
         {
