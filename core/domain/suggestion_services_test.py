@@ -603,6 +603,38 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'test description',
             )
 
+    def test_create_suggestion_with_generic_state_name_fails_if_content_id_not_found(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'invalid_content_id',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>New.</p>',
+            'data_format': 'html',
+        }
+
+        with self.assertRaisesRegex(
+            Exception, 'State Generic Content does not exist'
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.target_id,
+                exp.version,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
     def test_create_suggestion_with_generic_state_name_succeeds(self) -> None:
         """Test that creating a translation suggestion with state_name='Content'
         successfully resolves the correct state name from the content_id.
@@ -902,6 +934,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertNotIn(
             'hi', updated_opportunity.incomplete_translation_language_codes
         )
+
+    def test_create_translation_suggestion_with_invalid_target_type(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>Hindi</p>',
+            'data_format': 'html',
+        }
+        # A classroom is a translatable entity type but has no fetcher in
+        # get_entity_by_type_and_id, so the lookup raises a ValueError and the
+        # entity is skipped. It is also not an allowed suggestion target type,
+        # so creating a suggestion for it must fail validation.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_CLASSROOM,
+                'classroom_1',
+                1,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
 
     def test_skill_translation_stats_use_topic_of_the_opportunity(
         self,
@@ -2699,13 +2761,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('author_id', self.author_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
-    def test_get_translation_suggestions_in_review_by_exp_ids(self) -> None:
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+    def test_get_translation_suggestions_in_review_by_entity_ids(self) -> None:
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1, self.target_id_2, self.target_id_3], 'en'
         )
         self.assertEqual(len(suggestions), 0)
         self._create_translation_suggestion_with_language_code('en')
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1], 'en'
         )
         # Ruling out the possibility of None for mypy type checking.
@@ -3106,7 +3168,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(  # pylint: disable=line-too-long
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(  # pylint: disable=line-too-long
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )
@@ -3129,7 +3191,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )

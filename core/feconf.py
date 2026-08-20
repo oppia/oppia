@@ -1768,6 +1768,19 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_TOPIC,
 ]
 
+# Sentinel accepted as the target_type URL argument of the suggestion list
+# handlers, meaning "do not filter by target type". It is never stored on a
+# suggestion, so it is deliberately not part of
+# SUGGESTION_TARGET_TYPE_CHOICES.
+SUGGESTION_TARGET_TYPE_SENTINEL_ALL = 'all'
+
+# The target types accepted by the handlers that list suggestions. They also
+# accept the sentinel above, because a contributor can ask for translation
+# suggestions of every entity type at once.
+SUGGESTION_LIST_TARGET_TYPE_CHOICES = SUGGESTION_TARGET_TYPE_CHOICES + [
+    SUGGESTION_TARGET_TYPE_SENTINEL_ALL
+]
+
 TRANSLATABLE_ENTITY_TYPES = [
     ENTITY_TYPE_EXPLORATION,
     ENTITY_TYPE_TOPIC,
