@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Configuration for lighthouse-ci.
+ * @fileoverview Shared configuration and helpers for lighthouse-ci.
  */
 
 const dotenv = require('dotenv');
@@ -40,32 +40,55 @@ const basePerformanceAssertions = {
   'redirects-http': ['warn', {minScore: 1}],
 };
 
-const basePerformanceAssertMatrix = {
-  matchingUrlPattern: '.*',
-  assertions: {
-    // Performance category.
-    'first-contentful-paint': ['warn', {maxNumericValue: 1230000}],
-    'speed-index': ['warn', {maxNumericValue: 1230000}],
-    'largest-contentful-paint': ['warn', {maxNumericValue: 2500000}],
-    'total-blocking-time': ['warn', {maxNumericValue: 300}],
-    'cumulative-layout-shift': ['warn', {maxNumericValue: 0.1}],
-    'uses-optimized-images': ['error', {minScore: 1}],
-    'uses-rel-preconnect': ['error', {minScore: 0.5}],
-    'efficient-animated-content': ['error', {minScore: 1}],
-    // offscreen-images is asserted per-page because the audit consistently
-    // scores 0 in headless CI environments.
-    'server-response-time': ['off', {}],
-    // Best practices category.
-    'no-document-write': ['error', {minScore: 1}],
-    'geolocation-on-start': ['error', {minScore: 1}],
-    doctype: ['error', {minScore: 1}],
-    'notification-on-start': ['error', {minScore: 1}],
-    'paste-preventing-inputs': ['error', {minScore: 1}],
-    'image-aspect-ratio': ['error', {minScore: 1}],
-    'is-on-https': ['off', {}],
-    'uses-http2': ['off', {}],
-  },
-};
+/**
+ * Builds the catch-all assert matrix entry with performance metric thresholds.
+ *
+ * @param {Object} perfThresholds - Performance metric maxNumericValue thresholds
+ *   in milliseconds (CLS is unitless).
+ * @param {number} perfThresholds.fcp - First Contentful Paint.
+ * @param {number} perfThresholds.speedIndex - Speed Index.
+ * @param {number} perfThresholds.lcp - Largest Contentful Paint.
+ * @param {number} perfThresholds.tbt - Total Blocking Time.
+ * @param {number} perfThresholds.cls - Cumulative Layout Shift.
+ * @returns {Object} The catch-all assert matrix entry.
+ */
+function buildPerformanceCatchAll(perfThresholds) {
+  return {
+    matchingUrlPattern: '.*',
+    assertions: {
+      // Performance metrics — set to ideal "good" thresholds from
+      // web.dev/Core Web Vitals and Lighthouse scoring. Pages that don't
+      // meet these produce a warn-level violation; override per-page as
+      // needed and file cleanup issues.
+      'first-contentful-paint': ['warn', {maxNumericValue: perfThresholds.fcp}],
+      'speed-index': ['warn', {maxNumericValue: perfThresholds.speedIndex}],
+      'largest-contentful-paint': [
+        'warn',
+        {maxNumericValue: perfThresholds.lcp},
+      ],
+      'total-blocking-time': ['warn', {maxNumericValue: perfThresholds.tbt}],
+      'cumulative-layout-shift': [
+        'warn',
+        {maxNumericValue: perfThresholds.cls},
+      ],
+      'uses-optimized-images': ['error', {minScore: 1}],
+      'uses-rel-preconnect': ['error', {minScore: 0.5}],
+      'efficient-animated-content': ['error', {minScore: 1}],
+      // offscreen-images is asserted per-page because the audit
+      // consistently scores 0 in headless CI environments.
+      'server-response-time': ['off', {}],
+      // Best practices category.
+      'no-document-write': ['error', {minScore: 1}],
+      'geolocation-on-start': ['error', {minScore: 1}],
+      doctype: ['error', {minScore: 1}],
+      'notification-on-start': ['error', {minScore: 1}],
+      'paste-preventing-inputs': ['error', {minScore: 1}],
+      'image-aspect-ratio': ['error', {minScore: 1}],
+      'is-on-https': ['off', {}],
+      'uses-http2': ['off', {}],
+    },
+  };
+}
 
 /**
  * Builds the assertion object for a single page, merging base performance
@@ -87,18 +110,20 @@ function buildPageAssertions(overrides = {}, accessibilityMinScore = 1) {
 }
 
 /**
- * Builds the full assert matrix by prepending the base performance catch-all
+ * Builds the full assert matrix by prepending the performance catch-all
  * entry and then appending one entry per page.
  *
  * @param {Array} pageConfigs - Array of objects, each with:
  *   - matchingUrlPattern {string}: Regex pattern for the URL.
  *   - overrides {Object}: (optional) Page-specific audit overrides.
  *   - accessibilityMinScore {number}: (optional) Min accessibility score.
+ * @param {Object} perfThresholds - Performance metric thresholds for the
+ *   catch-all entry (fcp, speedIndex, lcp, tbt, cls).
  * @returns {Array} The full LHCI assert matrix.
  */
-function buildAssertMatrix(pageConfigs) {
+function buildAssertMatrix(pageConfigs, perfThresholds) {
   return [
-    basePerformanceAssertMatrix,
+    buildPerformanceCatchAll(perfThresholds),
     ...pageConfigs.map(
       ({matchingUrlPattern, overrides, accessibilityMinScore}) => ({
         matchingUrlPattern,
@@ -119,6 +144,5 @@ module.exports = {
     args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
   },
   urls: LIGHTHOUSE_URLS_TO_RUN,
-  basePerformanceAssertMatrix,
   basePerformanceAssertions,
 };
