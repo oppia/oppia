@@ -226,7 +226,6 @@ def _run_lighthouse_checks_for_config(config_filename: str) -> None:
     )
     stdout, stderr = process.communicate()
 
-    print('OUTPUT:')
     # Standard output is in bytes, we need to decode the line to
     # print it.
     print(stdout.decode('utf-8'))
@@ -240,6 +239,13 @@ def _run_lighthouse_checks_for_config(config_filename: str) -> None:
         sys.exit(1)
 
 
+def _get_form_factor_label(config_filename: str) -> str:
+    """Returns a human-readable form factor label for the given config."""
+    if 'desktop' in config_filename:
+        return 'DESKTOP'
+    return 'MOBILE'
+
+
 def run_lighthouse_checks() -> None:
     """Runs the Lighthouse checks through the Lighthouse configs."""
     _patch_lighthouse_target_manager()
@@ -247,11 +253,26 @@ def run_lighthouse_checks() -> None:
         LIGHTHOUSE_CONFIG_FILENAME,
         LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
     ):
-        print('Running Lighthouse checks for %s.' % config_filename)
+        form_factor = _get_form_factor_label(config_filename)
+        pages = os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(',')
+        separator = '=' * 70
+        print(
+            '\n\033[1;36m%s\n'
+            '  LIGHTHOUSE %s CHECKS (%d pages)\n'
+            '%s\033[0m' % (separator, form_factor, len(pages), separator)
+        )
+        print('Config: %s\n' % config_filename)
         _run_lighthouse_checks_for_config(config_filename)
+        print('\033[1;32m%s checks passed.\033[0m\n' % form_factor)
 
     pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
     all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
+    separator = '=' * 70
+    print(
+        '\n\033[1;36m%s\n'
+        '  LIGHTHOUSE SUMMARY\n'
+        '%s\033[0m' % (separator, separator)
+    )
     print(
         '\033[1m%s out of %s lighthouse checks run, see '
         'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
