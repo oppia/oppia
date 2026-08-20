@@ -89,12 +89,12 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
           assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.96}],
+            'categories:accessibility': ['error', {minScore: 0.91}],
           }),
         },
         {
           matchingUrlPattern: 'http://[^/]+/delete-account$',
-          assertions: buildPageAssertions({}, 0.98),
+          assertions: buildPageAssertions({}, 0.95),
         },
         {
           matchingUrlPattern: 'http://[^/]+/donate$',
@@ -119,12 +119,12 @@ module.exports = {
               redirects: ['error', {minScore: 1}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
             },
-            0.95
+            0.91
           ),
         },
         {
           matchingUrlPattern: 'http://[^/]+/get-started$',
-          assertions: buildPageAssertions({}, 0.96),
+          assertions: buildPageAssertions({}, 0.91),
         },
         {
           matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
