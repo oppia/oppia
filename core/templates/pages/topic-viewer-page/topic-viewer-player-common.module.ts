@@ -26,7 +26,10 @@ import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-sto
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
 import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
-import {TopicPracticeCardComponent} from './topic-story-section/topic-practice-card/topic-practice-card.component';
+import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end-test-card.component';
+import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
+import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
+import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -38,15 +41,21 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    TopicPracticeCardComponent,
+    AdventureEndTestCardComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
   ],
   entryComponents: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
-    TopicPracticeCardComponent,
+    AdventureEndTestCardComponent,
     LanguageSelectorComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
   ],
   exports: [
     StoriesListComponent,
@@ -54,7 +63,10 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    TopicPracticeCardComponent,
+    AdventureEndTestCardComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

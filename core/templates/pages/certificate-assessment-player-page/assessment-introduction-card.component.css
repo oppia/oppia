@@ -1,0 +1,162 @@
+.intro-card-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 0 24px 48px;
+}
+
+.intro-card {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  max-width: 720px;
+  padding: 32px 40px 40px;
+  width: 100%;
+  z-index: 1;
+}
+
+.certificate-title {
+  color: #00645c;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.certificate-description {
+  color: #333;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 24px 0;
+}
+
+.demonstrates-box {
+  background: #ededed;
+  border-radius: 4px;
+  margin-bottom: 28px;
+  padding: 16px 24px;
+}
+
+.demonstrates-heading {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.demonstrates-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.demonstrates-list li {
+  color: #333;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.topics-heading {
+  color: #333;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.topics-subtext {
+  color: #555;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.topics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.topic-tile {
+  border-radius: 4px;
+  flex: 1 1 130px;
+  height: 110px;
+  max-width: 130px;
+  min-width: 130px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Stubbed swatches used instead of topic thumbnail images. Colors below
+   are placeholders only and are not tied to real topic data yet. */
+.topic-tile.topic-color-1 {
+  background: #37474f;
+}
+
+.topic-tile.topic-color-2 {
+  background: #455a64;
+}
+
+.topic-tile.topic-color-3 {
+  background: #4e6b72;
+}
+
+.topic-tile.topic-color-4 {
+  background: #56656b;
+}
+
+.topic-tile-info {
+  bottom: 0;
+  padding: 8px 10px;
+  position: absolute;
+  width: 100%;
+}
+
+.topic-name {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 2px;
+}
+
+.topic-lessons {
+  color: #d4dadb;
+  font-size: 11px;
+  margin: 0;
+}
+
+.cta-row {
+  display: flex;
+  justify-content: center;
+}
+
+.continue-button {
+  background: #00645c;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  transition: background 0.15s ease-in-out;
+}
+
+.continue-button:hover {
+  background: #024f49;
+}
+
+.continue-button:focus-visible {
+  outline: 2px solid #024f49;
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments for narrow viewports. */
+@media (max-width: 480px) {
+  .intro-card {
+    padding: 24px 20px 32px;
+  }
+
+  .topic-tile {
+    flex: 1 1 45%;
+    max-width: none;
+  }
+}
