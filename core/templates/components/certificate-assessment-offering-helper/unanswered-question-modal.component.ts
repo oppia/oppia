@@ -45,9 +45,9 @@ export class UnansweredQuestionModalComponent {
 
   submitAnyway(): void {
     if (this.ngbActiveModal) {
-      this.ngbActiveModal.close();
+      this.ngbActiveModal.close('submit-anyway');
     } else if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss();
+      this.bottomSheetRef.dismiss('submit-anyway');
     }
   }
 }

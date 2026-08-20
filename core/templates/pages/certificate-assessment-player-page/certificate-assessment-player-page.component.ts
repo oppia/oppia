@@ -74,12 +74,6 @@ export class CertificateAssessmentPlayerPageComponent
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
 
-  // TODO(#24717-m2.18-m2.19): The showUnansweredQuestionModal flag is
-  // currently initialized with a default value. Update this flag based on the
-  // appropriate condition once the logic for determining when the modal should
-  // be shown is implemented.
-  showUnansweredQuestionModal = false;
-
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
   isLoadingQuestion = false;
@@ -114,9 +108,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.loadQuestion(0);
     this.refreshComputedFields();
-    if (this.showUnansweredQuestionModal) {
-      this.openUnansweredQuestionModal();
-    }
     if (this.isTimeExpired) {
       this.handleTimeExpiry();
     }
@@ -232,9 +223,23 @@ export class CertificateAssessmentPlayerPageComponent
       });
   }
 
-  openUnansweredQuestionModal(): void {
+  openUnansweredQuestionModal(
+    unansweredQuestionCount: number,
+    onGoBack: () => void,
+    onSubmitAnyway: () => void
+  ): void {
     if (this.isMobileScreenSize()) {
-      this.bottomSheet.open(UnansweredQuestionModalComponent);
+      const bottomSheetRef = this.bottomSheet.open(
+        UnansweredQuestionModalComponent
+      );
+      bottomSheetRef.instance.unansweredQuestionCount = unansweredQuestionCount;
+      bottomSheetRef.afterDismissed().subscribe(result => {
+        if (result === 'submit-anyway') {
+          onSubmitAnyway();
+        } else {
+          onGoBack();
+        }
+      });
       return;
     }
     const modalRef = this.ngbModal.open(UnansweredQuestionModalComponent, {
@@ -242,11 +247,17 @@ export class CertificateAssessmentPlayerPageComponent
       centered: true,
       windowClass: 'oppia-unanswered-question-modal',
     });
-    // The unanswered-question count is mocked until the backend is integrated.
-    modalRef.componentInstance.unansweredQuestionCount = 3;
-    // TODO(#24717-m2.19): Wire the submitAnyway and goBackToAssessment actions
-    // once the backend is integrated.
-    modalRef.result.catch(() => null);
+    modalRef.componentInstance.unansweredQuestionCount =
+      unansweredQuestionCount;
+    modalRef.result
+      .then(result => {
+        if (result === 'submit-anyway') {
+          onSubmitAnyway();
+        }
+      })
+      .catch(() => {
+        onGoBack();
+      });
   }
 
   nextQuestion(): void {
@@ -298,7 +309,26 @@ export class CertificateAssessmentPlayerPageComponent
           : {}),
       };
     });
-    this.assessmentSubmitted.emit(answers);
+    const unansweredQuestionIndexes = loadedQuestions
+      .map((question, index) => ({question, index}))
+      .filter(({question}) => (this.answers[question.id] ?? null) === null)
+      .map(({index}) => index);
+    if (unansweredQuestionIndexes.length === 0) {
+      this.assessmentSubmitted.emit(answers);
+      return;
+    }
+    const lastUnansweredQuestionIndex =
+      unansweredQuestionIndexes[unansweredQuestionIndexes.length - 1];
+    this.openUnansweredQuestionModal(
+      unansweredQuestionIndexes.length,
+      () => {
+        this.currentQuestionIndex = lastUnansweredQuestionIndex;
+        this.refreshComputedFields();
+      },
+      () => {
+        this.assessmentSubmitted.emit(answers);
+      }
+    );
   }
 
   private handleTimeExpiry(): void {

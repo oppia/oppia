@@ -1767,7 +1767,7 @@
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
     "I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON": "Close",
     "I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT": "Go back to assessment",
-    "I18N_UNANSWERED_QUESTION_MODAL_MESSAGE": "You have {{unansweredQuestionCount}} unanswered questions. Unanswered questions will be marked incorrect.",
+    "I18N_UNANSWERED_QUESTION_MODAL_MESSAGE": "You have <[unansweredQuestionCount]> unanswered questions. Unanswered questions will be marked incorrect.",
     "I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER": "to go back to the assessment or submit anyway.",
     "I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE": "Press",
     "I18N_UNANSWERED_QUESTION_MODAL_SUBMIT_BUTTON": "Submit Assessment",
