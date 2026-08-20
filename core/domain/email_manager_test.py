@@ -289,10 +289,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_role_notification_email(
                 self.editor_id,
@@ -304,7 +301,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -1825,10 +1822,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
                 self.exploration.id: {
@@ -1844,7 +1838,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -1863,7 +1857,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_that_email_not_sent_if_feedback_messages_are_empty(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
         with self.can_send_feedback_email_ctx:
@@ -1992,20 +1986,20 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        email_manager.send_suggestion_email(
-            self.exploration.title,
-            self.exploration.id,
-            self.new_user_id,
-            self.recipient_list,
-        )
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            email_manager.send_suggestion_email(
+                self.exploration.title,
+                self.exploration.id,
+                self.new_user_id,
+                self.recipient_list,
+            )
 
-        # Check that email is not sent.
-        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-        self.assertEqual(len(messages), 0)
+            # Check that email is not sent.
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2128,16 +2122,13 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
-        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
-            email_manager.send_emails_to_subscribers(
-                self.editor_id, self.exploration.id, self.exploration.title
-            )
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+        email_manager.send_emails_to_subscribers(
+            self.editor_id, self.exploration.id, self.exploration.title
+        )
 
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(len(messages), 0)
+        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -2251,10 +2242,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id,
@@ -2270,7 +2258,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2398,10 +2386,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_flag_exploration_email(
                 self.exploration.title,
@@ -2523,10 +2508,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             self.reviewer_id, True, False, False, False, False
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra'
@@ -2610,10 +2592,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             self.reviewer_id, True, False, False, False, False
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra'
@@ -2690,10 +2669,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             self.user_id, True, False, False, False, False
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             contributor_ranking_email_info = (
                 suggestion_registry.ContributorMilestoneEmailInfo(
@@ -3305,10 +3281,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             question_suggestion
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             with self.capture_logging(min_level=logging.ERROR) as logs:
                 with self.log_new_error_ctx:
@@ -3502,11 +3475,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -3585,11 +3554,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -3668,11 +3633,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -3751,11 +3712,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -3834,11 +3791,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -3917,11 +3870,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4000,11 +3949,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4097,11 +4042,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4243,11 +4184,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
@@ -4343,11 +4280,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4427,11 +4360,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4514,11 +4443,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4601,11 +4526,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4688,11 +4609,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4775,11 +4692,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4862,11 +4775,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -4961,11 +4870,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
@@ -5111,11 +5016,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
@@ -5272,11 +5173,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
@@ -5505,10 +5402,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             question_suggestion
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             with self.capture_logging(min_level=logging.ERROR) as logs:
                 with self.log_new_error_ctx:
@@ -5743,11 +5637,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
@@ -5855,11 +5745,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
@@ -5955,11 +5841,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
@@ -6070,11 +5952,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
@@ -6195,11 +6073,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
@@ -6356,11 +6230,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                with self.swap(
-                    utils,
-                    'get_current_utc_datetime',
-                    lambda: mocked_datetime_for_utcnow,
-                ):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id, self.admin_2_id],
@@ -6536,10 +6406,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         translation_suggestion.last_updated = submission_datetime
         return translation_suggestion
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             with self.capture_logging(min_level=logging.ERROR) as logs:
                 with self.log_new_error_ctx:
@@ -6653,11 +6520,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
-                utils,
-                'get_current_utc_datetime',
-                lambda: mocked_datetime_for_utcnow,
-            ):
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 reviewer_ids_by_language: DefaultDict[str, List[str]] = (
                     DefaultDict(list)
                 )
@@ -6835,10 +6698,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             with self.capture_logging(min_level=logging.ERROR) as logs:
                 with self.log_new_error_ctx:
@@ -7645,10 +7505,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL
@@ -7897,13 +7754,13 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         d_text = email_manager.get_moderator_unpublish_exploration_email()
         self.assertEqual(d_text, expected_draft_text_body)
 
-    @test_utils.set_platform_parameters([])
     def test_blank_draft_received_exploration_unpublish_exception_raised(
         self,
     ) -> None:
-        expected_draft_text_body = ''
-        d_text = email_manager.get_moderator_unpublish_exploration_email()
-        self.assertEqual(d_text, expected_draft_text_body)
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            expected_draft_text_body = ''
+            d_text = email_manager.get_moderator_unpublish_exploration_email()
+            self.assertEqual(d_text, expected_draft_text_body)
 
     @test_utils.set_platform_parameters(
         [
@@ -7960,22 +7817,22 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             self.question_submitter_id, True, False, False, False, False
         )
 
-    @test_utils.set_platform_parameters([])
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
         self,
     ) -> None:
-        email_manager.send_email_to_new_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            email_manager.send_email_to_new_cd_user(
+                self.translation_reviewer_id,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi',
+            )
 
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL
+            )
+            self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self,
     ) -> None:
@@ -7987,7 +7844,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             )
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -8206,18 +8063,18 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CD_USER
         )
 
-    @test_utils.set_platform_parameters([])
     def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_email_to_removed_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            email_manager.send_email_to_removed_cd_user(
+                self.translation_reviewer_id,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi',
+            )
 
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL
+            )
+            self.assertEqual(len(messages), 0)
 
     def test_remove_translation_reviewer_email_for_invalid_category(
         self,
@@ -8526,10 +8383,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         )
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_transactional_emails_is_false(
-        self,
-    ) -> None:
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
         with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL],
@@ -8545,7 +8399,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             )
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters([])
+    @test_utils.set_platform_parameters()
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_reminder_mail_to_notify_curriculum_admins([], [])
