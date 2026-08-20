@@ -39,13 +39,13 @@ import {UserService} from 'services/user.service';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

@@ -3907,6 +3907,44 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.get_content_html('Invalid state', 'hint_1')
 
+    def test_get_content_html_with_metadata_content_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.title = 'Exploration Title'
+        exploration.objective = 'Exploration Objective'
+        exploration.category = 'Algebra'
+        exploration.tags = ['algebra', 'math']
+
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_title'
+            ),
+            'Exploration Title',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_objective'
+            ),
+            'Exploration Objective',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_category'
+            ),
+            'Algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_0'
+            ),
+            'algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_1'
+            ),
+            'math',
+        )
+
     def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -4551,7 +4589,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.default_outcome.labelled_as_correct
         ) = True
 
-        (exploration.init_state.interaction.default_outcome.dest) = (
+        exploration.init_state.interaction.default_outcome.dest = (
             exploration.init_state_name
         )
 
@@ -4669,8 +4707,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         the old version yaml convert to latest Exploration object.
         It verifies whether the these objects are equal.
         """
-        old_version_yaml_content: str = (
-            """author_notes: ''
+        old_version_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -4786,7 +4823,6 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
         mock_import_module.return_value = 'mocked_memcache_key'
         exploration_id = 'mocked_memcache_key'
         old_version_exploration = create_old_schema_exploration(
@@ -5631,8 +5667,7 @@ version: 0
         )
     )
 
-    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = (
-        """author_notes: ''
+    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5777,7 +5812,6 @@ states_schema_version: 10000
 tags: []
 title: Title
 """
-    )
 
     EXP_ID: Final = 'An exploration_id'
 
@@ -5897,8 +5931,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V46: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V46: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6040,10 +6073,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V47: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V47: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6185,10 +6216,8 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V48: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V48: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6330,10 +6359,8 @@ states_schema_version: 43
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V49: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V49: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6477,10 +6504,8 @@ states_schema_version: 44
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V50: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V50: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6627,10 +6652,8 @@ states_schema_version: 45
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V51: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V51: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6777,10 +6800,8 @@ states_schema_version: 46
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V52: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V52: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6927,10 +6948,8 @@ states_schema_version: 47
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V53: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V53: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7077,10 +7096,8 @@ states_schema_version: 48
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V54: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V54: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7216,10 +7233,8 @@ states_schema_version: 49
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V55: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V55: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7354,10 +7369,8 @@ states_schema_version: 50
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V56: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V56: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7499,10 +7512,8 @@ states_schema_version: 51
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V58: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V58: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7646,10 +7657,8 @@ states_schema_version: 53
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V59: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V59: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7793,10 +7802,8 @@ states_schema_version: 55
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V61: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V61: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7931,14 +7938,12 @@ states_schema_version: 58
 tags: []
 title: Title
 """
-    )
 
     _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V61
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -8054,10 +8059,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -8157,7 +8160,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
@@ -8168,8 +8170,7 @@ version: 0
         self,
     ) -> None:
         """Tests the migration of DragAndDropSortInput rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8295,10 +8296,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8408,7 +8407,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
         )
@@ -8418,8 +8416,7 @@ version: 0
         self,
     ) -> None:
         """Tests the migration of unicode written translations rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8507,10 +8504,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8579,7 +8574,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
         )
@@ -8592,8 +8586,7 @@ version: 0
         `labelled_as_correct` should be false. Migrates the invalid data.
         """
 
-        sample_yaml_content_for_lab_as_correct: str = (
-            """author_notes: ''
+        sample_yaml_content_for_lab_as_correct: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8700,10 +8693,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_lab_as_correct: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_lab_as_correct: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8788,7 +8779,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_lab_as_correct
@@ -8802,8 +8792,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_rte: str = (
-            """author_notes: ''
+        sample_yaml_content_for_rte: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8950,13 +8939,11 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
         # pylint: disable=anomalous-backslash-in-string
-        latest_sample_yaml_content_for_rte: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_rte: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9068,7 +9055,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_rte
         )
@@ -9461,8 +9447,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_numeric_interac: str = (
-            """author_notes: ''
+        sample_yaml_content_for_numeric_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9758,7 +9743,6 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
@@ -9923,8 +9907,7 @@ version: 0
         data from version less than 58.
         """
 
-        sample_yaml_content_for_fraction_interac: str = (
-            """author_notes: ''
+        sample_yaml_content_for_fraction_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10172,7 +10155,6 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         latest_sample_yaml_content_for_fraction_interac: str = (
             """author_notes: ''
@@ -10336,8 +10318,7 @@ version: 0
             latest_sample_yaml_content_for_fraction_interac,
         )
 
-        sample_yaml_content_for_fraction_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_fraction_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10461,7 +10442,6 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         latest_sample_yaml_content_for_fraction_interac_2: str = (
             """author_notes: ''
@@ -12866,8 +12846,7 @@ version: 0
         """Tests the migration of invalid TextInput interaction exploration
         data from version less than 58.
         """
-        sample_yaml_content_for_text_interac_1: str = (
-            """author_notes: ''
+        sample_yaml_content_for_text_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13139,10 +13118,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_text_interac_1: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_text_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13317,7 +13294,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_text_interac_1
@@ -13326,8 +13302,7 @@ version: 0
             exploration.to_yaml(), latest_sample_yaml_content_for_text_interac_1
         )
 
-        sample_yaml_content_for_text_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_text_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13436,10 +13411,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_text_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_text_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13532,7 +13505,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_text_interac_2

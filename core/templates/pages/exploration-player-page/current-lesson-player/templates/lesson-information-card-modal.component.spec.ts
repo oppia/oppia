@@ -50,7 +50,7 @@ import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -165,7 +165,7 @@ describe('Lesson Information card modal component', () => {
       declarations: [
         LessonInformationCardModalComponent,
         MockTranslatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockLimitToPipe,
       ],

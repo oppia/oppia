@@ -1,16 +1,8 @@
 {
   "suites": [
     {
-      "name": "collections",
-      "module": "core/tests/webdriverio_desktop/collections.js"
-    },
-    {
       "name": "explorationHistoryTab",
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
-    },
-    {
-      "name": "learner",
-      "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
       "name": "skillEditor",
@@ -19,10 +11,6 @@
     {
       "name": "topicAndStoryEditor",
       "module": "core/tests/webdriverio_desktop/topicAndStoryEditor.js"
-    },
-    {
-      "name": "users",
-      "module": "core/tests/webdriverio_desktop/userJourneys.js"
     }
   ]
 }

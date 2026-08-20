@@ -16,8 +16,9 @@
  * @fileoverview Component for confirm question exit modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
@@ -25,7 +26,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
   templateUrl: './confirm-question-exit-modal.component.html',
 })
 export class ConfirmQuestionExitModalComponent extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private confirmQuestionExitBottomSheetRef?: MatBottomSheetRef<ConfirmQuestionExitModalComponent>
+  ) {
+    super(ngbActiveModal, confirmQuestionExitBottomSheetRef);
   }
 }
