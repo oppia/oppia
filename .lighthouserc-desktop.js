@@ -15,13 +15,12 @@
 /**
  * @fileoverview Configuration for lighthouse-ci desktop runs.
  *
- * This config runs the same pages and assertions as .lighthouserc.js but with
- * desktop emulation. It is executed as a separate `lhci autorun` invocation, so
- * its Lighthouse reports are collected and asserted independently of the mobile
- * runs.
+ * This config runs the same pages as .lighthouserc.js but with desktop
+ * emulation and its own assertion thresholds. The assertion matrix is defined
+ * independently so that desktop thresholds can diverge from mobile over time.
  */
 
-const mobileConfig = require('./.lighthouserc.js');
+const baseConfig = require('./.lighthouserc-base.js');
 
 // Desktop emulation metrics, matching the desktop preset in Lighthouse
 // (see node_modules/lighthouse/core/config/constants.js).
@@ -50,20 +49,253 @@ const DESKTOP_THROTTLING = {
 module.exports = {
   ci: {
     collect: {
-      ...mobileConfig['ci']['collect'],
+      numberOfRuns: baseConfig['numberOfRuns'],
+      puppeteerScript: baseConfig['puppeteerScript'],
+      url: baseConfig['urls'],
       settings: {
-        ...mobileConfig['ci']['collect']['settings'],
         formFactor: 'desktop',
         screenEmulation: DESKTOP_SCREEN_EMULATION,
         throttling: DESKTOP_THROTTLING,
         // Set to true so that Lighthouse uses the user agent associated with
         // the desktop form factor.
         emulatedUserAgent: true,
+        onlyCategories: [
+          'performance',
+          'accessibility',
+          'best-practices',
+          'seo',
+        ],
       },
     },
     assert: {
-      assertMatrix: mobileConfig['ci']['assert']['assertMatrix'],
+      assertMatrix: baseConfig.buildAssertMatrix([
+        {matchingUrlPattern: 'http://[^/]+/$'},
+        {
+          matchingUrlPattern: 'http://[^/]+/about$',
+          accessibilityMinScore: 0.88,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/admin$',
+          accessibilityMinScore: 0.93,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
+          accessibilityMinScore: 0.92,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/community-library$',
+          accessibilityMinScore: 0.91,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/contact$',
+          accessibilityMinScore: 0.95,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
+          accessibilityMinScore: 0.95,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
+          accessibilityMinScore: 0.88,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
+          accessibilityMinScore: 0.91,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/delete-account$',
+          accessibilityMinScore: 0.95,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/donate$',
+          overrides: {
+            // TODO(#17279): There is an error on the /donate page due to the
+            // embedded Stripe third-party component within it. Find a way to
+            // ignore that error.
+            'errors-in-console': ['error', {minScore: 0}],
+            // The YouTube embed on donate page loads images in jpg format,
+            // thus we need to allow one image.
+            'modern-image-formats': [
+              'error',
+              {maxLength: 1, strategy: 'pessimistic'},
+            ],
+            // The YouTube embed on donate page uses passive listeners.
+            'uses-passive-event-listeners': ['error', {minScore: 0}],
+            // TODO(#20286): There is a deprecated API on the /donate page due
+            // to the donorbox script, change the minScore to 1 once it is
+            // fixed.
+            deprecations: ['error', {minScore: 0}],
+            redirects: ['error', {minScore: 1}],
+            'uses-responsive-images': ['error', {minScore: 0.5}],
+          },
+          accessibilityMinScore: 0.91,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/get-started$',
+          accessibilityMinScore: 0.91,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+            'errors-in-console': ['error', {minScore: 1}],
+            'modern-image-formats': [
+              'error',
+              {maxLength: 0, strategy: 'pessimistic'},
+            ],
+            // We need to use passive event listeners on this page so that
+            // the page works correctly.
+            'uses-passive-event-listeners': ['error', {minScore: 0}],
+            // Sign up redirects logged-in user to learner dashboard page.
+            // Learner dashboard Page cannot be preloaded.
+            deprecations: ['error', {minScore: 1}],
+            redirects: ['error', {minScore: 0}],
+            'uses-responsive-images': ['error', {minScore: 0.8}],
+            // All images are offscreen on the learner dashboard.
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/license$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/moderator$',
+          accessibilityMinScore: 0.92,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/preferences$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.84}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/privacy-policy$',
+          accessibilityMinScore: 0.95,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/profile/username1$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.95}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$'},
+        {
+          matchingUrlPattern: 'http://[^/]+/teach$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+            'uses-responsive-images': ['error', {minScore: 0.5}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/terms$',
+          accessibilityMinScore: 0.95,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/thanks$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.95}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/volunteer$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.88}],
+            'uses-responsive-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/topics-and-skills-dashboard$',
+          overrides: {
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/story$', // pylint: disable=line-too-long
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$', // pylint: disable=line-too-long
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.95}],
+            'errors-in-console': ['error', {minScore: 0}],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/learn/math$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.95}],
+            // Classroom pages use JPEG images that are not next-gen formats.
+            'modern-image-formats': [
+              'error',
+              {maxLength: 1, strategy: 'pessimistic'},
+            ],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/create/.*$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.95}],
+            'errors-in-console': ['error', {minScore: 1}],
+            // TODO(#13465): Change this maxLength to 0 once images are
+            // migrated.
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            // We need to use passive event listeners on this page so that
+            // the page works correctly.
+            'uses-passive-event-listeners': ['error', {minScore: 0}],
+            // MIDI library uses some deprecated API.
+            deprecations: ['error', {minScore: 0}],
+            redirects: ['error', {minScore: 1}],
+            'uses-responsive-images': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/explore/.*$',
+          overrides: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+            // Explore page uses deprecated APIs from third-party scripts.
+            deprecations: ['error', {minScore: 0}],
+            // Explore page has images that are not in next-gen formats.
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            // All images are offscreen on the explore page.
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/topic_editor/.*$',
+          accessibilityMinScore: 0.92,
+        },
+        {
+          matchingUrlPattern: 'http://[^/]+/skill_editor/.*$',
+          accessibilityMinScore: 0.91,
+        },
+        {
+          matchingUrlPattern: '^http://[^/]+/story_editor/.*$',
+          accessibilityMinScore: 0.84,
+        },
+      ]),
     },
-    upload: mobileConfig['ci']['upload'],
+    upload: {
+      target: 'temporary-public-storage',
+    },
   },
 };

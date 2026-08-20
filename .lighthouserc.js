@@ -13,20 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Configuration for lighthouse-ci.
+ * @fileoverview Configuration for lighthouse-ci (mobile).
  */
 
 const baseConfig = require('./.lighthouserc-base.js');
-
-const buildPageAssertions = (overrides = {}, accessibilityMinScore = 1) => ({
-  ...baseConfig['basePerformanceAssertions'],
-  'categories:accessibility': ['error', {minScore: accessibilityMinScore}],
-  // TODO(#17560): Change the SEO category assertion from warn to error once
-  // real CI runs confirm which pages score 1.0. Some pages currently fail
-  // audits like meta-description and crawlable-anchors.
-  'categories:seo': ['warn', {minScore: 1}],
-  ...overrides,
-});
 
 module.exports = {
   ci: {
@@ -44,91 +34,75 @@ module.exports = {
       },
     },
     assert: {
-      assertMatrix: [
-        baseConfig['basePerformanceAssertMatrix'],
-        {
-          matchingUrlPattern: 'http://[^/]+/$',
-          assertions: buildPageAssertions(),
-        },
+      assertMatrix: baseConfig.buildAssertMatrix([
+        {matchingUrlPattern: 'http://[^/]+/$'},
         {
           matchingUrlPattern: 'http://[^/]+/about$',
-          assertions: buildPageAssertions({}, 0.88),
+          accessibilityMinScore: 0.88,
         },
         {
           matchingUrlPattern: 'http://[^/]+/admin$',
-          assertions: buildPageAssertions({}, 0.93),
+          accessibilityMinScore: 0.93,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
-          assertions: buildPageAssertions({}, 0.92),
+          accessibilityMinScore: 0.92,
         },
         {
           matchingUrlPattern: 'http://[^/]+/community-library$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.91}],
-          }),
+          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/contact$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.95}],
-          }),
+          accessibilityMinScore: 0.95,
         },
         {
           matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.95}],
-          }),
+          accessibilityMinScore: 0.95,
         },
         {
           matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.88}],
-          }),
+          accessibilityMinScore: 0.88,
         },
         {
           matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.91}],
-          }),
+          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/delete-account$',
-          assertions: buildPageAssertions({}, 0.95),
+          accessibilityMinScore: 0.95,
         },
         {
           matchingUrlPattern: 'http://[^/]+/donate$',
-          assertions: buildPageAssertions(
-            {
-              // TODO(#17279): There is an error on the /donate page due to the
-              // embedded Stripe third-party component within it. Find a way to
-              // ignore that error.
-              'errors-in-console': ['error', {minScore: 0}],
-              // The YouTube embed on donate page loads images in jpg format,
-              // thus we need to allow one image.
-              'modern-image-formats': [
-                'error',
-                {maxLength: 1, strategy: 'pessimistic'},
-              ],
-              // The YouTube embed on donate page uses passive listeners.
-              'uses-passive-event-listeners': ['error', {minScore: 0}],
-              // TODO(#20286): There is a deprecated API on the /donate page due
-              // to the donorbox script, change the minScore to 1 once it is
-              // fixed.
-              deprecations: ['error', {minScore: 0}],
-              redirects: ['error', {minScore: 1}],
-              'uses-responsive-images': ['error', {minScore: 0.5}],
-            },
-            0.91
-          ),
+          overrides: {
+            // TODO(#17279): There is an error on the /donate page due to the
+            // embedded Stripe third-party component within it. Find a way to
+            // ignore that error.
+            'errors-in-console': ['error', {minScore: 0}],
+            // The YouTube embed on donate page loads images in jpg format,
+            // thus we need to allow one image.
+            'modern-image-formats': [
+              'error',
+              {maxLength: 1, strategy: 'pessimistic'},
+            ],
+            // The YouTube embed on donate page uses passive listeners.
+            'uses-passive-event-listeners': ['error', {minScore: 0}],
+            // TODO(#20286): There is a deprecated API on the /donate page due
+            // to the donorbox script, change the minScore to 1 once it is
+            // fixed.
+            deprecations: ['error', {minScore: 0}],
+            redirects: ['error', {minScore: 1}],
+            'uses-responsive-images': ['error', {minScore: 0.5}],
+          },
+          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/get-started$',
-          assertions: buildPageAssertions({}, 0.91),
+          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.91}],
             'errors-in-console': ['error', {minScore: 1}],
             'modern-image-formats': [
@@ -145,108 +119,101 @@ module.exports = {
             'uses-responsive-images': ['error', {minScore: 0.8}],
             // All images are offscreen on the learner dashboard.
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/license$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.91}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/moderator$',
-          assertions: buildPageAssertions({}, 0.92),
+          accessibilityMinScore: 0.92,
         },
         {
           matchingUrlPattern: 'http://[^/]+/preferences$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.84}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/privacy-policy$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.95}],
-          }),
+          accessibilityMinScore: 0.95,
         },
         {
           matchingUrlPattern: 'http://[^/]+/profile/username1$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.95}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
-        {
-          matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$',
-          assertions: buildPageAssertions(),
-        },
+        {matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$'},
         {
           matchingUrlPattern: 'http://[^/]+/teach$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.91}],
             'uses-responsive-images': ['error', {minScore: 0.5}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/terms$',
-          assertions: buildPageAssertions({}, 0.95),
+          accessibilityMinScore: 0.95,
         },
         {
           matchingUrlPattern: 'http://[^/]+/thanks$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.95}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/volunteer$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.88}],
             'uses-responsive-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/topics-and-skills-dashboard$',
-          assertions: buildPageAssertions(
-            {
-              'offscreen-images': ['error', {minScore: 0}],
-            },
-            0.9
-          ),
+          overrides: {
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+          accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern:
             '^http://localhost:8181/learn/staging/dummy-topic-one/story$', // pylint: disable=line-too-long
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.91}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern:
             '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$', // pylint: disable=line-too-long
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.95}],
             'errors-in-console': ['error', {minScore: 0}],
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: '^http://localhost:8181/learn/math$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.95}],
             // Classroom pages use JPEG images that are not next-gen formats.
             'modern-image-formats': [
               'error',
               {maxLength: 1, strategy: 'pessimistic'},
             ],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/create/.*$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.95}],
             'errors-in-console': ['error', {minScore: 1}],
             // TODO(#13465): Change this maxLength to 0 once images are
@@ -262,11 +229,11 @@ module.exports = {
             deprecations: ['error', {minScore: 0}],
             redirects: ['error', {minScore: 1}],
             'uses-responsive-images': ['error', {minScore: 1}],
-          }),
+          },
         },
         {
           matchingUrlPattern: '^http://localhost:8181/explore/.*$',
-          assertions: buildPageAssertions({
+          overrides: {
             'categories:accessibility': ['error', {minScore: 0.91}],
             // Explore page uses deprecated APIs from third-party scripts.
             deprecations: ['error', {minScore: 0}],
@@ -277,23 +244,21 @@ module.exports = {
             ],
             // All images are offscreen on the explore page.
             'offscreen-images': ['error', {minScore: 0}],
-          }),
+          },
         },
         {
           matchingUrlPattern: 'http://[^/]+/topic_editor/.*$',
-          assertions: buildPageAssertions({
-            'categories:accessibility': ['error', {minScore: 0.92}],
-          }),
+          accessibilityMinScore: 0.92,
         },
         {
           matchingUrlPattern: 'http://[^/]+/skill_editor/.*$',
-          assertions: buildPageAssertions({}, 0.91),
+          accessibilityMinScore: 0.91,
         },
         {
           matchingUrlPattern: '^http://[^/]+/story_editor/.*$',
-          assertions: buildPageAssertions({}, 0.84),
+          accessibilityMinScore: 0.84,
         },
-      ],
+      ]),
     },
     upload: {
       target: 'temporary-public-storage',
