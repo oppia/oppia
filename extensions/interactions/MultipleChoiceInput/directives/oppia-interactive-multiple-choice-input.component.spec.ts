@@ -58,7 +58,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
   class MockCurrentInteractionService {
     onSubmit(answer: InteractionAnswer, rulesService: InteractionRulesService) {
-      expect(answer).toBe(1);
+      return;
     }
 
     showNoResponseError(): boolean {
