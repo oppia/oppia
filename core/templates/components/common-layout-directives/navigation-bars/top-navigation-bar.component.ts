@@ -56,7 +56,12 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
-import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  FeedbackModalType,
+  FeedbackStatus,
+  LessonFeedbackSummary,
+} from 'domain/feedback/feedback.model';
 
 interface LanguageInfo {
   id: string;
@@ -151,8 +156,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
+  unreadMySuggestionsCount: number = 0;
+  unreadMySuggestionSummaries: LessonFeedbackSummary[] = [];
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   isWebFeedbackModalEnabled: boolean = false;
+
+  // The maximum number of "Updates from Creators" cards shown at once
+  // in the profile dropdown. Additional unread updates are reachable
+  // via the "View all suggestions" link instead of being listed here.
+  readonly MAX_VISIBLE_CREATOR_UPDATES = 5;
+  private expandedCreatorUpdateIds: Set<string> = new Set();
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -209,6 +222,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private alertsService: AlertsService,
     private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
+    private feedbackBackendApiService: FeedbackBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,

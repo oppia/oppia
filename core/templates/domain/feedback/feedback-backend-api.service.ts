@@ -116,7 +116,7 @@ export class FeedbackBackendApiService {
 
   async fetchMyFeedbackListAsync(
     cursor: string | null = null,
-    statusFilter: string | null = null,
+    statusFilter: string[] | null = null,
     dateFromMsecs: number | null = null,
     dateToMsecs: number | null = null
   ): Promise<LessonFeedbackBackendResponse> {
@@ -124,8 +124,8 @@ export class FeedbackBackendApiService {
     if (cursor) {
       params = params.set('cursor', cursor);
     }
-    if (statusFilter) {
-      params = params.set('status', statusFilter);
+    if (statusFilter && statusFilter.length > 0) {
+      params = params.set('status', statusFilter.join(','));
     }
     if (dateFromMsecs) {
       params = params.set('date_from_msecs', String(dateFromMsecs));
@@ -144,6 +144,33 @@ export class FeedbackBackendApiService {
   ): Promise<LessonFeedbackDetailResponse> {
     const url = [this.myFeedbackUrl, encodeURIComponent(feedbackId)].join('/');
     return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async fetchLearnerLessonFeedbackListAsync(
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<LessonFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    let statuses: string[] | null = null;
+
+    if (filterState.status === FeedbackStatus.ALL) {
+      statuses = null;
+    } else if (filterState.status === FeedbackStatus.LESSON_UPDATED) {
+      statuses = [FeedbackStatus.FIXED];
+    } else if (filterState.status === FeedbackStatus.REVIEWED_BY_TEAM) {
+      statuses = [FeedbackStatus.COMPLIMENT, FeedbackStatus.NOT_ACTIONABLE];
+    } else {
+      statuses = [FeedbackStatus.OPEN];
+    }
+
+    return await this.fetchMyFeedbackListAsync(
+      cursor,
+      statuses,
+      dateFromMsecs,
+      dateToMsecs
+    );
   }
 
   async submitMyFeedbackFollowUpAsync(

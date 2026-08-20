@@ -25,7 +25,11 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import {CATEGORY_LABELS, SOURCE_LABELS} from 'domain/feedback/feedback.model';
+import {
+  CATEGORY_LABELS,
+  FeedbackStatus,
+  SOURCE_LABELS,
+} from 'domain/feedback/feedback.model';
 import type {
   PlatformFeedbackSummary,
   FeedbackCardConfig,
@@ -71,6 +75,16 @@ export class FeedbackTableComponent {
     }
 
     return feedback.feedback_text_preview;
+  }
+
+  getNotificationSummary(summary: LessonFeedbackSummary): string {
+    if (summary.status === FeedbackStatus.FIXED) {
+      return (
+        'A creator fixed an error you reported. Thank you for helping make ' +
+        'Oppia better for everyone!'
+      );
+    }
+    return 'A creator responded to your feedback!';
   }
 
   getFeedbackCategory(

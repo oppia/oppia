@@ -1,0 +1,126 @@
+<section class="oppia-my-suggestions-tab">
+  <div *ngIf="errorMessage" class="oppia-my-suggestions-alert" role="alert">
+    {{errorMessage}}
+  </div>
+  <div *ngIf="feedbackSummaries.length === 0"
+       class="oppia-my-suggestions-state">
+    <span class="oppia-my-suggestions-empty-icon">
+      <i class="far fa-comment fa-lg" aria-hidden="true"></i>
+    </span>
+    <span class="oppia-my-suggestions-state-text">
+      Feedbacks you send to the Lessons team will appear here.
+    </span>
+    <oppia-classroom-button [classroom]="'math'"
+                            [buttonText]="'I18N_ACTION_EXPLORE_LESSONS'"
+                            [variant]="'default'">
+    </oppia-classroom-button>
+  </div>
+
+
+  <div *ngIf="!selectedFeedbackId" class="oppia-my-suggestions-list-view">
+    <ng-container *ngIf="feedbackSummaries.length > 0">
+      <oppia-feedback-filter-bar [config]="learnerFeedbackFilterConfig"
+                                (filterChange)="onLearnerFeedbackFilterChange($event)">
+      </oppia-feedback-filter-bar>
+
+      <oppia-feedback-table class="oppia-feedback-table"
+      [feedbackCardConfig]="learnerLessonFeedbackCardConfig"
+                          [feedbackSummaries]="getDisplayedLearnerFeedbackSummaries()"
+                          [currentPage]="getLearnerFeedbackListCurrentPage()"
+                          [moreFeedbackAvailable]="getLearnerFeedbackListMoreAvailable()"
+                          (rowClick)="onLearnerFeedbackRowClick($event)"
+                          (nextPage)="onLearnerFeedbackNextPage()"
+                          (previousPage)="onLearnerFeedbackPreviousPage()">
+      </oppia-feedback-table>
+    </ng-container>
+  </div>
+  <div *ngIf="selectedFeedbackId"
+       class="oppia-my-suggestions-detail">
+    <div class="oppia-my-suggestions-detail-actions">
+      <button type="button"
+              class="oppia-my-suggestions-back"
+              (click)="goBackToListView()">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        Back to my suggestions
+      </button>
+
+      <button type="button"
+              class="oppia-my-suggestions-follow-up-button"
+              [disabled]="!canAddFollowUpNote()"
+              (click)="openFollowUpModal()">
+              Add a follow-up note
+      </button>
+    </div>
+
+    <ng-container *ngIf="selectedFeedback">
+      <div class="oppia-my-suggestions-lesson-context"
+      *ngIf="selectedFeedback.lesson_metadata as lesson">
+      <i class="fas fa-book" aria-hidden="true"></i>
+      <span>
+        You sent this while going through
+        <a [routerLink]="'/explore/' + lesson.exploration_id">
+          this lesson
+        </a>,
+        {{ getLessonStepDescription(lesson.state_name)}}.
+      </span>
+      </div>
+
+      <div class="oppia-my-suggestions-detail-header">
+        <div class="oppia-my-suggestions-meta-item">
+          <span class="oppia-my-suggestions-meta-label">
+            Status:
+          </span>
+          <span class="oppia-my-suggestions-row-status"
+                [ngClass]="getStatusDetails(selectedFeedback.status).className"
+                [attr.title]="getStatusDetails(selectedFeedback.status).tooltip">
+            {{ getStatusDetails(selectedFeedback.status).label }}
+          </span>
+        </div>
+        <div class="oppia-my-suggestions-meta-item oppia-my-suggestions-meta-item-date">
+          <span class="oppia-my-suggestions-meta-label">Submitted on:</span>
+          <span class="oppia-my-suggestions-date">
+            {{ formatDate(selectedFeedback.created_on_msecs) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="oppia-my-suggestions-thread">
+        <div class="oppia-my-suggestions-thread-item">
+          <span class="oppia-my-suggestions-avatar oppia-my-suggestions-avatar-you">
+            Y
+          </span>
+          <div class="oppia-my-suggestions-thread-content">
+            <div class="oppia-my-suggestions-thread-meta">
+              <span class="oppia-my-suggestions-thread-author">
+                Your feedback
+              </span>
+              <span class="oppia-my-suggestions-thread-date">
+                {{ formatDate(selectedFeedback.created_on_msecs) }}
+              </span>
+            </div>
+            <p>{{ selectedFeedback.feedback_text }}</p>
+          </div>
+        </div>
+
+        <div *ngFor="let response of selectedFeedback.response_list"
+             class="oppia-my-suggestions-thread-item oppia-my-suggestions-thread-item-creator">
+          <span class="oppia-my-suggestions-avatar oppia-my-suggestions-avatar-team">
+            <i class="far fa-comment" aria-hidden="true"></i>
+          </span>
+          <div class="oppia-my-suggestions-thread-content">
+            <div class="oppia-my-suggestions-thread-meta">
+              <span class="oppia-my-suggestions-thread-author">
+                Creator response
+              </span>
+              <span class="oppia-my-suggestions-thread-date">
+                {{ formatDate(response.responded_on) }}
+              </span>
+            </div>
+            <p>{{ response.response_text }}</p>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</section>

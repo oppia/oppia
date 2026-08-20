@@ -76,6 +76,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   readonly creatorReportFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: true,
+    showLesson: false,
     showResponse: false,
     showScreenshot: true,
     showLessonMetadata: true,
@@ -83,6 +84,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   };
   readonly creatorLessonFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: false,
+    showLesson: false,
     showResponse: true,
     showScreenshot: false,
     showLessonMetadata: true,

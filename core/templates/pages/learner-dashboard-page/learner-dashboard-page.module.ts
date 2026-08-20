@@ -20,7 +20,7 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {LessonCardModule} from 'components/summary-tile/lesson-card.module';
 import {CardDisplayComponent} from './card-display/card-display.component';
 import {ClassroomButtonComponent} from './classroom-button/classroom-button.component';
@@ -49,10 +49,14 @@ import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.componen
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgCircleProgressModule} from 'ng-circle-progress';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
+import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
+import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
+
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
+    FeedbackSharedModule,
     LessonCardModule,
     MatDialogModule,
     SkillCardModule,
@@ -98,6 +102,8 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
+    AddAFollowUpNoteModalComponent,
   ],
   entryComponents: [
     AddGoalsModalComponent,
@@ -120,6 +126,8 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
+    AddAFollowUpNoteModalComponent,
   ],
   providers: [LearnerDashboardActivityBackendApiService],
 })

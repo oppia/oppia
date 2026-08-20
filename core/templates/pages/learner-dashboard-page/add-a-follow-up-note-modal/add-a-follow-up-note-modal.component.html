@@ -1,0 +1,55 @@
+<div class="oppia-add-a-follow-up-note-modal">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Add a follow-up note
+    </h3>
+  </div>
+   <div class="modal-body">
+    <p class="oppia-follow-up-modal-helper">
+      A creator marked this as fixed. Let them know if it's resolved,
+      or add anything else you'd like them to know.
+    </p>
+
+    <div class="oppia-follow-up-modal-original">
+      <span class="oppia-follow-up-modal-original-label">
+        Your original feedback:
+      </span>
+      <p class="oppia-follow-up-modal-original-text">
+        {{ detailFeedback.feedback_text }}
+      </p>
+    </div>
+
+    <label for="mySuggestionsFollowUp"
+           class="oppia-follow-up-modal-label">
+           Your note
+    </label>
+    <textarea id="mySuggestionsFollowUp"
+              name="mySuggestionsFollowUp"
+              class="oppia-my-suggestions-textarea"
+              rows="4"
+              maxlength="2500"
+              placeholder="E.g. Thanks, that fixed it! or it's still happening on question 3."
+              [(ngModel)]="followUpText">
+      </textarea>
+
+        <div class="oppia-follow-up-modal-char-count">
+          {{ followUpText.length }}/2500
+        </div>
+
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  [disabled]="isSubmittingFollowUp"
+                  (click)="closemodal()">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="btn btn-success"
+                  (click)="submit()"
+                  [disabled]="isSubmittingFollowUp || !followUpText.trim()">
+          <span *ngIf="!isSubmittingFollowUp">Send note</span>
+          <span *ngIf="isSubmittingFollowUp">Sending...</span>
+          </button>
+        </div>
+   </div>
+</div>

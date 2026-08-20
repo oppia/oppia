@@ -76,7 +76,6 @@ class MyFeedbackListHandler(
             'status': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.STATUS_CHOICES,
                 },
                 'default_value': None,
             },
@@ -111,15 +110,20 @@ class MyFeedbackListHandler(
 
         assert self.normalized_request is not None
         req = self.normalized_request
+
+        status_filter = req.get('status')
+        status_filters = status_filter.split(',') if status_filter else None
+
         summaries, next_cursor, more = (
             general_feedback_services.get_learner_feedback_summaries(
                 author_id=self.user_id,
-                status_filter=req.get('status'),
+                status_filter=status_filters,
                 cursor=req.get('cursor'),
                 date_from_msecs=req.get('date_from_msecs'),
                 date_to_msecs=req.get('date_to_msecs'),
             )
         )
+
         self.render_json(
             {
                 'summaries': summaries,

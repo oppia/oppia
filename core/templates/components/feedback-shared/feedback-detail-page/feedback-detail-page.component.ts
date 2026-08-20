@@ -485,4 +485,15 @@ export class FeedbackDetailPageComponent {
     this.replyText = '';
     this.isSendingReply = false;
   }
+
+  getParentFeedbackUrl(feedback: LessonFeedbackDetailResponse): string | null {
+    if (!feedback.parent_feedback_id || !feedback.lesson_metadata) {
+      return null;
+    }
+
+    return (
+      `/create/${feedback.lesson_metadata.exploration_id}` +
+      `#/feedback/lesson_feedback/${feedback.parent_feedback_id}`
+    );
+  }
 }

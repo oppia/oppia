@@ -321,12 +321,13 @@ def get_lesson_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
+    filter = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.LessonFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             exploration_id=exploration_id,
-            status_filter=status_filter,
+            status_filter=filter,
             date_from=date_from,
             date_to=date_to,
         )
@@ -365,7 +366,7 @@ def get_lesson_feedback_summaries(
 
 def get_learner_feedback_summaries(
     author_id: str,
-    status_filter: Optional[str] = None,
+    status_filter: Optional[List[str]] = None,
     cursor: Optional[str] = None,
     date_from_msecs: Optional[float] = None,
     date_to_msecs: Optional[float] = None,
@@ -378,8 +379,8 @@ def get_learner_feedback_summaries(
 
     Args:
         author_id: str. The learner user ID.
-        status_filter: Optional[str]. If provided, only return feedback with
-            this status.
+        status_filter: Optional[List[str]]. If provided, only return feedback with
+            these status.
         cursor: Optional[str]. Pagination cursor from a previous response.
         date_from_msecs: Optional[float]. If provided, only return feedback
             created after this time.
@@ -411,6 +412,7 @@ def get_learner_feedback_summaries(
             status_filter=status_filter,
             date_from=date_from,
             date_to=date_to,
+            order_by_last_updated=True,
         )
     )
     # Here we use cast because LessonFeedbackModel.fetch_page() inherits its
@@ -744,13 +746,14 @@ def get_platform_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
+    filter = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.PlatformFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             destination_dashboard=dashboard_filter,
             exploration_id=exploration_id,
-            status_filter=status_filter,
+            status_filter=filter,
             date_from=date_from,
             date_to=date_to,
         )

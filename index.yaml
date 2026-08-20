@@ -717,3 +717,18 @@ indexes:
   - name: status
   - name: created_on
     direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: last_updated
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: status
+  - name: last_updated
+    direction: desc
