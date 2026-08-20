@@ -67,6 +67,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   // interrupt card does not render. In the future, this flag will change its
   // value based on whether an in-progress attempt is detected on page load.
   showAssessmentInterruptCard = false;
+  showAssessmentUnavailableModal = false;
   isLoading = true;
   hasError = false;
   remainingTimeInSeconds = 0;
@@ -158,12 +159,18 @@ export class CertificateAssessmentPlayerPageRootComponent
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
       this.startTimerIfReady();
     } catch {
-      this.alertsService.addWarning(
-        this.translateService.instant(
-          'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-        )
-      );
+      this.showAssessmentUnavailableModal = true;
     }
+  }
+
+  onGoToAvailableCertificates(): void {
+    this.showAssessmentUnavailableModal = false;
+    this.router.navigate([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        this.classroomUrlFragment
+      )}`,
+    ]);
   }
 
   async onAssessmentSubmitted(

@@ -204,12 +204,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -506,7 +501,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   }));
 
-  it('should show a warning when starting the attempt fails', fakeAsync(() => {
+  it('should show the unavailable modal when starting the attempt fails', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -515,12 +510,23 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
+  }));
+
+  it('should hide the unavailable modal and navigate to available certificates', fakeAsync(() => {
+    component.showAssessmentUnavailableModal = true;
+    component.classroomUrlFragment = 'math';
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
   }));
 
   it('should submit the attempt and navigate to the result page on assessmentSubmitted', fakeAsync(() => {
