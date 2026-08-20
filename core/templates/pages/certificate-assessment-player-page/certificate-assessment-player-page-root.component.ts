@@ -28,6 +28,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {PageHeadService} from 'services/page-head.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
@@ -72,12 +73,14 @@ export class CertificateAssessmentPlayerPageRootComponent
   isTimeExpired = false;
   private timerId: number | null = null;
   private hasStartedTimer = false;
+  private hasPausedForNetworkLoss = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private alertsService: AlertsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
     private router: Router,
     protected translateService: TranslateService
@@ -86,6 +89,12 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   async ngOnInit(): Promise<void> {
+    this.internetConnectivityService.startCheckingConnection();
+    this.directiveSubscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        isOnline => this.handleNetworkStateChange(isOnline)
+      )
+    );
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
@@ -182,14 +191,19 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   onRetryAssessment(): void {
     this.showAssessmentInterruptCard = false;
+    this.hasPausedForNetworkLoss = false;
     this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+    this.clearTimer();
+    this.hasStartedTimer = false;
+    this.remainingTimeInSeconds = 0;
   }
 
   onResumeAssessment(): void {
     this.showAssessmentInterruptCard = false;
+    this.hasPausedForNetworkLoss = false;
     this.currentStage =
       CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    this.startTimerIfReady();
+    this.resumeTimer();
   }
 
   onViewResults(): Promise<boolean> {
@@ -202,6 +216,29 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   ngOnDestroy(): void {
     this.clearTimer();
+  }
+
+  private handleNetworkStateChange(isOnline: boolean): void {
+    if (!isOnline) {
+      // Pause the countdown so the disconnected duration is not counted
+      // towards the assessment expiry time.
+      if (
+        this.currentStage ===
+          CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS &&
+        this.timerId !== null &&
+        !this.isTimeExpired
+      ) {
+        this.hasPausedForNetworkLoss = true;
+        this.pauseTimer();
+      }
+      return;
+    }
+    // Reconnected: surface the resume option instead of auto-resuming the
+    // assessment. Do nothing if the assessment was not paused for a network
+    // loss.
+    if (this.hasPausedForNetworkLoss && !this.isTimeExpired) {
+      this.showAssessmentInterruptCard = true;
+    }
   }
 
   private startTimerIfReady(): void {
@@ -217,6 +254,28 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.hasStartedTimer = true;
     this.remainingTimeInSeconds =
       this.certificateOffering.timeLimitInMinutes * 60;
+    this.startCountdown();
+  }
+
+  private resumeTimer(): void {
+    if (
+      this.remainingTimeInSeconds <= 0 ||
+      this.currentStage !==
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+    ) {
+      return;
+    }
+    this.startCountdown();
+  }
+
+  private pauseTimer(): void {
+    this.clearTimer();
+  }
+
+  private startCountdown(): void {
+    if (this.timerId !== null) {
+      return;
+    }
     this.timerId = window.setInterval(() => {
       if (this.remainingTimeInSeconds > 0) {
         this.remainingTimeInSeconds -= 1;

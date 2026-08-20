@@ -19,6 +19,7 @@
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import {EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
@@ -28,6 +29,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 
@@ -35,6 +37,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let component: CertificateAssessmentPlayerPageRootComponent;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
+  let internetConnectivityService: InternetConnectivityService;
+  let mockConnectionServiceEmitter: EventEmitter<boolean>;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
 
@@ -96,6 +100,17 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     const alertsServiceSpy = jasmine.createSpyObj('AlertsService', [
       'addWarning',
     ]);
+    mockConnectionServiceEmitter = new EventEmitter<boolean>();
+    const internetConnectivityServiceSpy = jasmine.createSpyObj(
+      'InternetConnectivityService',
+      ['startCheckingConnection', 'isOnline']
+    );
+    internetConnectivityServiceSpy.startCheckingConnection.and.returnValue(
+      undefined
+    );
+    internetConnectivityServiceSpy.isOnline.and.returnValue(true);
+    internetConnectivityServiceSpy.onInternetStateChange =
+      mockConnectionServiceEmitter;
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -112,6 +127,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       alertsServiceSpy,
       certificateAssessmentOfferingBackendApiServiceSpy,
       {} as ClassroomBackendApiService,
+      internetConnectivityServiceSpy,
       {} as PageHeadService,
       routerSpy,
       translateServiceSpy
@@ -119,6 +135,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     alertsService = alertsServiceSpy;
     certificateAssessmentOfferingBackendApiService =
       certificateAssessmentOfferingBackendApiServiceSpy;
+    internetConnectivityService = internetConnectivityServiceSpy;
     router = routerSpy;
     translateService = translateServiceSpy;
   };
@@ -358,6 +375,130 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toBeNull();
   }));
 
+  it('should pause the countdown and preserve remaining time when going offline', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    tick(5000);
+    expect(component.remainingTimeInSeconds).toBe(3595);
+
+    mockConnectionServiceEmitter.emit(false);
+
+    expect(
+      (component as unknown as {timerId: number | null}).timerId
+    ).toBeNull();
+    expect(component.remainingTimeInSeconds).toBe(3595);
+
+    tick(3000);
+    expect(component.remainingTimeInSeconds).toBe(3595);
+  }));
+
+  it('should not pause the countdown when offline outside the questions stage', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+
+    mockConnectionServiceEmitter.emit(false);
+
+    expect(
+      (component as unknown as {timerId: number | null}).timerId
+    ).toBeNull();
+  }));
+
+  it('should show the interrupt card when reconnecting after a network loss', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    mockConnectionServiceEmitter.emit(false);
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+
+    mockConnectionServiceEmitter.emit(true);
+    expect(component.showAssessmentInterruptCard).toBeTrue();
+  }));
+
+  it('should not show the interrupt card when reconnecting without a network loss', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+
+    mockConnectionServiceEmitter.emit(true);
+
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+    component.ngOnDestroy();
+  }));
+
+  it('should resume the countdown from the preserved time on resume', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    tick(5000);
+    mockConnectionServiceEmitter.emit(false);
+    expect(component.remainingTimeInSeconds).toBe(3595);
+
+    component.onResumeAssessment();
+
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.currentStage).toBe('questions');
+    tick(2000);
+    expect(component.remainingTimeInSeconds).toBe(3593);
+    component.ngOnDestroy();
+  }));
+
+  it('should reset timer state and go to the intro stage on retry', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+
+    (
+      component as unknown as {startTimerIfReady: () => void}
+    ).startTimerIfReady();
+    tick(5000);
+    mockConnectionServiceEmitter.emit(false);
+
+    component.onRetryAssessment();
+
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.currentStage).toBe('intro');
+    expect(component.remainingTimeInSeconds).toBe(0);
+    expect(
+      (component as unknown as {timerId: number | null}).timerId
+    ).toBeNull();
+    expect(
+      (component as unknown as {hasStartedTimer: boolean}).hasStartedTimer
+    ).toBeFalse();
+  }));
+
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
     component.onViewResults();
     flushMicrotasks();
@@ -501,6 +642,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       alertsService,
       certificateAssessmentOfferingBackendApiService,
       classroomBackendApiServiceSpy,
+      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
@@ -529,6 +671,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       alertsService,
       certificateAssessmentOfferingBackendApiService,
       classroomBackendApiServiceSpy,
+      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
