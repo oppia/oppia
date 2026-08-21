@@ -19,7 +19,6 @@
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
@@ -29,16 +28,15 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
-import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
+import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let component: CertificateAssessmentPlayerPageRootComponent;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
-  let internetConnectivityService: InternetConnectivityService;
-  let mockConnectionServiceEmitter: EventEmitter<boolean>;
+  let playerStateService: CertificateAssessmentPlayerStateService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
 
@@ -100,17 +98,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     const alertsServiceSpy = jasmine.createSpyObj('AlertsService', [
       'addWarning',
     ]);
-    mockConnectionServiceEmitter = new EventEmitter<boolean>();
-    const internetConnectivityServiceSpy = jasmine.createSpyObj(
-      'InternetConnectivityService',
-      ['startCheckingConnection', 'isOnline']
-    );
-    internetConnectivityServiceSpy.startCheckingConnection.and.returnValue(
-      undefined
-    );
-    internetConnectivityServiceSpy.isOnline.and.returnValue(true);
-    internetConnectivityServiceSpy.onInternetStateChange =
-      mockConnectionServiceEmitter;
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -122,20 +109,22 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
+    const playerStateServiceInstance =
+      new CertificateAssessmentPlayerStateService();
     component = new CertificateAssessmentPlayerPageRootComponent(
       TestBed.inject(ActivatedRoute),
       alertsServiceSpy,
       certificateAssessmentOfferingBackendApiServiceSpy,
+      playerStateServiceInstance,
       {} as ClassroomBackendApiService,
-      internetConnectivityServiceSpy,
       {} as PageHeadService,
       routerSpy,
       translateServiceSpy
     );
+    playerStateService = playerStateServiceInstance;
     alertsService = alertsServiceSpy;
     certificateAssessmentOfferingBackendApiService =
       certificateAssessmentOfferingBackendApiServiceSpy;
-    internetConnectivityService = internetConnectivityServiceSpy;
     router = routerSpy;
     translateService = translateServiceSpy;
   };
@@ -204,7 +193,12 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -255,243 +249,92 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
-  it('should start the countdown timer when questions are available', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.returnValue(123 as never);
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+  // Arms a fully running countdown through the state service: registers
+  // the attempt (moving the learner to the questions stage) and applies
+  // the offering's one-hour time limit, which starts the interval.
+  const armCountdown = (): void => {
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.configureForOffering(60);
+  };
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(window.setInterval).toHaveBeenCalled();
-  }));
-
-  it('should decrement the countdown and mark the assessment expired at zero', fakeAsync(() => {
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    expect(component.remainingTimeInSeconds).toBe(3600);
-
-    tick(2000);
-    expect(component.remainingTimeInSeconds).toBe(3598);
-    expect(component.isTimeExpired).toBeFalse();
-
-    tick(3598000);
-    expect(component.remainingTimeInSeconds).toBe(0);
+  it('should reset stale timing state only when a replacement attempt succeeds', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    spyOn(window, 'clearInterval').and.callThrough();
+    component.certificateId = 'cert-123';
+    armCountdown();
+    tick(3600000);
     expect(component.isTimeExpired).toBeTrue();
-  }));
 
-  it('should not start the countdown without an attempt', () => {
-    spyOn(window, 'setInterval');
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    expect(window.setInterval).not.toHaveBeenCalled();
-    expect(component.remainingTimeInSeconds).toBe(0);
-  });
-
-  it('should not start the countdown without a positive time limit', () => {
-    spyOn(window, 'setInterval');
-    component.attempt = mockAttempt;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    expect(window.setInterval).not.toHaveBeenCalled();
-    expect(component.remainingTimeInSeconds).toBe(0);
-  });
-
-  it('should not start the countdown outside the questions stage', () => {
-    spyOn(window, 'setInterval');
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    expect(window.setInterval).not.toHaveBeenCalled();
-    expect(component.remainingTimeInSeconds).toBe(0);
-  });
-
-  it('should not restart an already running countdown', () => {
-    spyOn(window, 'setInterval').and.returnValue(123 as never);
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    expect(window.setInterval).toHaveBeenCalledTimes(1);
-  });
-
-  it('should clear the countdown timer on destroy', fakeAsync(() => {
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).not.toBeNull();
-
-    component.ngOnDestroy();
-
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).toBeNull();
-  }));
-
-  it('should pause the countdown and preserve remaining time when going offline', fakeAsync(() => {
-    component.ngOnInit();
+    component.startAssessment();
     flushMicrotasks();
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    tick(5000);
-    expect(component.remainingTimeInSeconds).toBe(3595);
-
-    mockConnectionServiceEmitter.emit(false);
-
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).toBeNull();
-    expect(component.remainingTimeInSeconds).toBe(3595);
-
-    tick(3000);
-    expect(component.remainingTimeInSeconds).toBe(3595);
-  }));
-
-  it('should not pause the countdown when offline outside the questions stage', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
-
-    mockConnectionServiceEmitter.emit(false);
-
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).toBeNull();
-  }));
-
-  it('should show the interrupt card when reconnecting after a network loss', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    mockConnectionServiceEmitter.emit(false);
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-
-    mockConnectionServiceEmitter.emit(true);
-    expect(component.showAssessmentInterruptCard).toBeTrue();
-  }));
-
-  it('should not show the interrupt card when reconnecting without a network loss', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-
-    mockConnectionServiceEmitter.emit(true);
-
-    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.isTimeExpired).toBeFalse();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.clearInterval).toHaveBeenCalled();
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
     component.ngOnDestroy();
   }));
 
-  it('should resume the countdown from the preserved time on resume', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
+  it('should leave the existing time window untouched when starting a new attempt fails', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    component.certificateId = 'cert-123';
+    armCountdown();
+    tick(60000);
     (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    tick(5000);
-    mockConnectionServiceEmitter.emit(false);
-    expect(component.remainingTimeInSeconds).toBe(3595);
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
 
-    component.onResumeAssessment();
+    component.startAssessment();
+    flushMicrotasks();
 
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.currentStage).toBe('questions');
-    tick(2000);
-    expect(component.remainingTimeInSeconds).toBe(3593);
+    // A failed start request must neither wipe nor extend the current
+    // window: resetting is reserved for successfully begun attempts.
+    expect(component.isTimeExpired).toBeFalse();
+    expect(playerStateService.getAttempt()).toEqual(mockAttempt);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
     component.ngOnDestroy();
   }));
 
-  it('should reset timer state and go to the intro stage on retry', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-    component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    tick(5000);
-    mockConnectionServiceEmitter.emit(false);
+  it('should not touch timing state on retry and reset only when the new attempt begins', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    spyOn(window, 'clearInterval').and.callThrough();
+    component.certificateId = 'cert-123';
+    armCountdown();
+    tick(3600000);
+    expect(component.isTimeExpired).toBeTrue();
 
     component.onRetryAssessment();
 
+    // Retry is pure navigation: the learner goes back to the intro and
+    // the expired window lingers until a new attempt actually begins.
+    expect(component.currentStage).toBe(
+      CertificateAssessmentPlayerPageConstants.STAGE_INTRO
+    );
     expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.currentStage).toBe('intro');
-    expect(component.remainingTimeInSeconds).toBe(0);
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).toBeNull();
-    expect(
-      (component as unknown as {hasStartedTimer: boolean}).hasStartedTimer
-    ).toBeFalse();
+    expect(component.isTimeExpired).toBeTrue();
+    expect(window.clearInterval).toHaveBeenCalledTimes(1);
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.isTimeExpired).toBeFalse();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
+    component.ngOnDestroy();
+  }));
+
+  it('should clear the countdown timer on destroy', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    armCountdown();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+
+    component.ngOnDestroy();
+    tick(2000);
+
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(component.isTimeExpired).toBeFalse();
   }));
 
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
@@ -501,7 +344,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   }));
 
-  it('should show the unavailable modal when starting the attempt fails', fakeAsync(() => {
+  it('should show a warning when starting the attempt fails', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -510,46 +353,16 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
-  }));
-
-  it('should show an orange warning when the attempt is within the cooldown', fakeAsync(() => {
-    (
-      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
-    ).and.returnValue(
-      Promise.reject(
-        'You just started an assessment before this time. Please try after this time.'
-      )
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
     );
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'You just started an assessment before this time. Please try after this time.'
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
     );
-  }));
-
-  it('should hide the unavailable modal and navigate to available certificates', fakeAsync(() => {
-    component.showAssessmentUnavailableModal = true;
-    component.classroomUrlFragment = 'math';
-
-    component.onGoToAvailableCertificates();
-    flushMicrotasks();
-
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
-    expect(router.navigate).toHaveBeenCalledWith([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
-        ':classroomUrlFragment',
-        'math'
-      )}`,
-    ]);
   }));
 
   it('should submit the attempt and navigate to the result page on assessmentSubmitted', fakeAsync(() => {
-    component.attempt = mockAttempt;
+    playerStateService.beginNewAttempt(mockAttempt);
     const answers = [
       {question_id: 'question_1', is_correct: true, selected_answer: 'b'},
     ];
@@ -566,9 +379,36 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
+  it('should not suppress navigation when the timer expires during a pending submission', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    armCountdown();
+
+    const answers = [{question_id: 'question_1', is_correct: true}];
+    component.onAssessmentSubmitted(answers);
+    tick(3600000);
+    expect(component.isTimeExpired).toBeTrue();
+
+    component.onAssessmentSubmitted(answers);
+    expect(
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
+    ).toHaveBeenCalledTimes(1);
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalled();
+  }));
+
   it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
-    component.attempt = mockAttempt;
-    component.isTimeExpired = true;
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
     const answers = [{question_id: 'question_1', is_correct: true}];
 
     component.onAssessmentSubmitted(answers);
@@ -587,7 +427,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   }));
 
   it('should show a warning when submitting the attempt fails', fakeAsync(() => {
-    component.attempt = mockAttempt;
+    playerStateService.beginNewAttempt(mockAttempt);
     (
       certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -605,7 +445,64 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   }));
 
   it('should navigate to the result page when view results is requested', fakeAsync(() => {
-    component.attempt = mockAttempt;
+    playerStateService.beginNewAttempt(mockAttempt);
+
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should wait for an in-flight submission before navigating to results', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+
+    let viewResultsResolved = false;
+    component.onViewResults().then(() => {
+      viewResultsResolved = true;
+    });
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBeFalse();
+    expect(router.navigate).not.toHaveBeenCalled();
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBeTrue();
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should navigate to results once a failed submission settles', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+    flushMicrotasks();
+    expect(alertsService.addWarning).toHaveBeenCalled();
 
     component.onViewResults();
     flushMicrotasks();
@@ -626,8 +523,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   }));
 
   it('should reset to the intro stage on retry', () => {
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'questions';
+    playerStateService.showAssessmentInterruptCard = true;
+    playerStateService.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
     component.onRetryAssessment();
 
@@ -636,8 +534,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   });
 
   it('should resume to the questions stage on resume', () => {
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'intro';
+    playerStateService.showAssessmentInterruptCard = true;
 
     component.onResumeAssessment();
 
@@ -646,7 +543,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   });
 
   it('should switch to the intro stage on showIntro', () => {
-    component.currentStage = 'questions';
+    playerStateService.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
     component.showIntro();
 
@@ -666,8 +564,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       TestBed.inject(ActivatedRoute),
       alertsService,
       certificateAssessmentOfferingBackendApiService,
+      playerStateService,
       classroomBackendApiServiceSpy,
-      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
@@ -695,8 +593,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       TestBed.inject(ActivatedRoute),
       alertsService,
       certificateAssessmentOfferingBackendApiService,
+      playerStateService,
       classroomBackendApiServiceSpy,
-      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
