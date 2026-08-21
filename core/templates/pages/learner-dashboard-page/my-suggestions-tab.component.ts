@@ -16,7 +16,8 @@
  * @fileoverview Component for the My Suggestions tab in learner dashboard.
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
@@ -32,6 +33,7 @@ import {
 } from 'domain/feedback/feedback.model';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {AlertsService} from 'services/alerts.service';
 import {LoaderService} from 'services/loader.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -61,7 +63,6 @@ interface LearnerFeedbackListState<TSummary> {
   styleUrls: ['./my-suggestions-tab.component.css'],
 })
 export class MySuggestionsTabComponent implements OnInit {
-  @Input() feedbackSummaries: LessonFeedbackSummary[] = [];
   @Output() unreadCountChanged = new EventEmitter<number>();
   readonly learnerFeedbackFilterConfig = MY_SUGGESTIONS_FILTER_CONFIG;
   readonly learnerLessonFeedbackCardConfig: FeedbackCardConfig = {
@@ -103,7 +104,9 @@ export class MySuggestionsTabComponent implements OnInit {
     private feedbackBackendApiService: FeedbackBackendApiService,
     private ngbModal: NgbModal,
     private alertService: AlertsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private bottomSheet: MatBottomSheet,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -256,26 +259,27 @@ export class MySuggestionsTabComponent implements OnInit {
     });
   }
 
-  private markFeedbackSummaryAsRead(feedbackId: string): void {
-    this.feedbackSummaries = this.feedbackSummaries.map(summary => {
-      if (summary.id !== feedbackId) {
-        return summary;
-      }
-      return {
-        ...summary,
-        unread_response_count: 0,
-      };
-    });
-    this.emitUnreadCount();
-  }
+  private async markFeedbackSummaryAsRead(feedbackId: string): Promise<void> {
+    const markSummaryRead = (
+      summary: LessonFeedbackSummary
+    ): LessonFeedbackSummary =>
+      summary.id === feedbackId
+        ? {...summary, unread_response_count: 0}
+        : summary;
+    const state = this.learnerLessonFeedbackListState;
+    state.summaries = state.summaries.map(markSummaryRead);
+    state.displayedSummaries = state.displayedSummaries.map(markSummaryRead);
 
-  private emitUnreadCount(): void {
-    this.unreadCountChanged.emit(
-      this.feedbackSummaries.reduce(
-        (count, summary) => count + summary.unread_response_count,
-        0
-      )
-    );
+    // Re-fetch the authoritative global unread total so the shared count
+    // stays correct even when unread feedback exists beyond the pages that
+    // are currently loaded.
+    try {
+      const unreadCount =
+        await this.feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync();
+      this.unreadCountChanged.emit(unreadCount);
+    } catch {
+      // Leave the shared unread count unchanged when the refresh fails.
+    }
   }
 
   async openFeedbackDetail(feedbackId: string): Promise<void> {
@@ -292,7 +296,7 @@ export class MySuggestionsTabComponent implements OnInit {
         return;
       }
       this.selectedFeedback = response;
-      this.markFeedbackSummaryAsRead(feedbackId);
+      await this.markFeedbackSummaryAsRead(feedbackId);
     } catch (error) {
       this.alertService.addWarning('Failed to load this suggestion.');
     } finally {
@@ -305,6 +309,13 @@ export class MySuggestionsTabComponent implements OnInit {
   }
 
   openFollowUpModal(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.bottomSheet.open(AddAFollowUpNoteModalComponent, {
+        data: {detailFeedback: this.selectedFeedback},
+      });
+      return;
+    }
+
     const modalRef = this.ngbModal.open(AddAFollowUpNoteModalComponent, {
       backdrop: 'static',
     });

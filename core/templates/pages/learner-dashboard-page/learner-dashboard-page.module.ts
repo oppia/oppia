@@ -47,6 +47,7 @@ import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {NgCircleProgressModule} from 'ng-circle-progress';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
@@ -59,6 +60,7 @@ import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a
     FeedbackSharedModule,
     LessonCardModule,
     MatDialogModule,
+    MatBottomSheetModule,
     SkillCardModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

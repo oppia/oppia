@@ -15,7 +15,11 @@
 /**
  * @fileoverview Component for add a follow up note modal.
  */
-import {Component, Input} from '@angular/core';
+import {Component, Inject, Input, OnInit, Optional} from '@angular/core';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {AlertsService} from 'services/alerts.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {LessonFeedbackDetailResponse} from 'domain/feedback/feedback.model';
@@ -27,7 +31,7 @@ import './add-a-follow-up-note-modal.component.css';
   templateUrl: './add-a-follow-up-note-modal.component.html',
   styleUrls: ['./add-a-follow-up-note-modal.component.css'],
 })
-export class AddAFollowUpNoteModalComponent {
+export class AddAFollowUpNoteModalComponent implements OnInit {
   @Input() detailFeedback!: LessonFeedbackDetailResponse;
 
   followUpText: string = '';
@@ -36,12 +40,29 @@ export class AddAFollowUpNoteModalComponent {
   constructor(
     private alertService: AlertsService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private bottomSheetRef?: MatBottomSheetRef<AddAFollowUpNoteModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private bottomSheetData?: {detailFeedback: LessonFeedbackDetailResponse}
   ) {}
+
+  ngOnInit(): void {
+    // When opened as a bottom sheet, the detail feedback arrives through
+    // MAT_BOTTOM_SHEET_DATA instead of an input binding.
+    if (!this.detailFeedback && this.bottomSheetData) {
+      this.detailFeedback = this.bottomSheetData.detailFeedback;
+    }
+  }
 
   closemodal(): void {
     this.followUpText = '';
     this.isSubmittingFollowUp = false;
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+      return;
+    }
     this.ngbActiveModal.dismiss();
   }
 

@@ -185,7 +185,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             mock_fetch_page.call_args.kwargs['status_filter'],
-            feconf.STATUS_CHOICES_OPEN,
+            [feconf.STATUS_CHOICES_OPEN],
         )
         self.assertIsNotNone(mock_fetch_page.call_args.kwargs['date_from'])
         self.assertIsNotNone(mock_fetch_page.call_args.kwargs['date_to'])

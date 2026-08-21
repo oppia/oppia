@@ -218,6 +218,42 @@ class MyFeedbackDetailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json({'success': True})
 
 
+class MyFeedbackUnreadCountHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for the learner's global unread feedback response count.
+
+    GET /my_feedback/unread_count
+
+    Returns the total number of unread creator responses across all of the
+    learner's lesson feedback entries, independent of list pagination.
+
+    Access:
+        - Requires a logged-in learner.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns the learner's global unread response count."""
+        if self.user_id is None:
+            raise self.UnauthorizedUserException(
+                'You must be logged in to view feedback.'
+            )
+        self.render_json(
+            {
+                'unread_count': (
+                    general_feedback_services.get_learner_unread_feedback_count(
+                        author_id=self.user_id
+                    )
+                )
+            }
+        )
+
+
 class LessonFeedbackSubmitHandler(
     base.BaseHandler[
         general_feedback_domain.FeedbackSubmitPayloadDict,
@@ -475,6 +511,49 @@ class LessonFeedbackListHandler(
                 'next_cursor': next_cursor,
                 'more': more,
             }
+        )
+
+
+class FeedbackStatusCountsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles retrieval of per-status counts of lesson feedback and issue
+    reports for an exploration.
+
+    GET /feedbackstatuscounts/<exploration_id>
+
+    URL path args:
+        exploration_id: str. The exploration ID to retrieve counts for.
+
+    Response:
+        lesson_feedback_counts: dict. Maps each status in feconf.STATUS_CHOICES
+            to the number of lesson feedback entries with that status, plus a
+            'total' key.
+        platform_report_counts: dict. Maps each status in feconf.STATUS_CHOICES
+            to the number of issue reports with that status, plus a 'total'
+            key.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id: str) -> None:
+        """Returns per-status counts of feedback and reports."""
+        self.render_json(
+            general_feedback_services.get_feedback_and_report_status_counts(
+                exploration_id
+            )
         )
 
 

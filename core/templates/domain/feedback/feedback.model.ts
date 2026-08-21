@@ -256,6 +256,10 @@ export interface FeedbackSubmitResponse {
   id: string;
 }
 
+export interface MyFeedbackUnreadCountResponse {
+  unread_count: number;
+}
+
 export interface PlatformFeedbackSummary {
   id: string;
   report_message_preview: string;

@@ -18,10 +18,13 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
+import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoaderService} from 'services/loader.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
@@ -33,7 +36,6 @@ import {
   FeedbackStatus,
   LessonFeedbackDetailResponse,
   ReportType,
-  SuccessResponse,
 } from '../../domain/feedback/feedback.model';
 
 const mockLessonFeedbackSummary: LessonFeedbackSummary = {
@@ -64,14 +66,11 @@ const mockLessonFeedbackDetailResponse: LessonFeedbackDetailResponse = {
   created_on_msecs: 12345,
 };
 
-const mockSuccessResponse: SuccessResponse = {
-  success: true,
-};
-
 class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
+      componentInstance: {},
     };
   }
 }
@@ -79,13 +78,7 @@ class MockNgbModal {
 describe('My Suggestions Tab Component', () => {
   let component: MySuggestionsTabComponent;
   let fixture: ComponentFixture<MySuggestionsTabComponent>;
-  let alertsService: AlertsService;
-  let dateTimeFormatService: DateTimeFormatService;
-  let urlService: UrlService;
-  let windowRef: WindowRef;
-  let loaderService: LoaderService;
   let feedbackBackendApiService: FeedbackBackendApiService;
-  let ngbModal: NgbModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -112,11 +105,6 @@ describe('My Suggestions Tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MySuggestionsTabComponent);
     component = fixture.componentInstance;
-    alertsService = TestBed.inject(AlertsService);
-    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
-    urlService = TestBed.inject(UrlService);
-    windowRef = TestBed.inject(WindowRef);
-    loaderService = TestBed.inject(LoaderService);
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
   });
 
@@ -141,5 +129,104 @@ describe('My Suggestions Tab Component', () => {
   it('should return true if learner feedback list has more than one page', () => {
     component.learnerLessonFeedbackListState.moreAvailable = true;
     expect(component.getLearnerFeedbackListMoreAvailable()).toEqual(true);
+  });
+
+  it('should sync the shared unread count when reading feedback on a later page', async () => {
+    // The unread entry lives on a later page of the paginated list, so the
+    // refreshed global total must come from the backend rather than from the
+    // summaries currently loaded.
+    const laterPageSummary: LessonFeedbackSummary = {
+      ...mockLessonFeedbackSummary,
+      id: 'feedback_id',
+      unread_response_count: 2,
+    };
+    component.learnerLessonFeedbackListState.summaries = [laterPageSummary];
+    component.learnerLessonFeedbackListState.displayedSummaries = [
+      laterPageSummary,
+    ];
+
+    spyOn(
+      feedbackBackendApiService,
+      'fetchMyFeedbackDetailAsync'
+    ).and.returnValue(Promise.resolve(mockLessonFeedbackDetailResponse));
+    spyOn(
+      feedbackBackendApiService,
+      'fetchMyFeedbackUnreadCountAsync'
+    ).and.returnValue(Promise.resolve(2));
+    const emitSpy = spyOn(component.unreadCountChanged, 'emit');
+
+    await component.openFeedbackDetail('feedback_id');
+
+    expect(
+      feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync
+    ).toHaveBeenCalled();
+    expect(emitSpy).toHaveBeenCalledWith(2);
+    expect(
+      component.learnerLessonFeedbackListState.summaries[0]
+        .unread_response_count
+    ).toBe(0);
+    expect(
+      component.learnerLessonFeedbackListState.displayedSummaries[0]
+        .unread_response_count
+    ).toBe(0);
+  });
+
+  it('should not change the shared unread count when refreshing it fails', async () => {
+    const laterPageSummary: LessonFeedbackSummary = {
+      ...mockLessonFeedbackSummary,
+      id: 'feedback_id',
+      unread_response_count: 2,
+    };
+    component.learnerLessonFeedbackListState.summaries = [laterPageSummary];
+    component.learnerLessonFeedbackListState.displayedSummaries = [
+      laterPageSummary,
+    ];
+
+    spyOn(
+      feedbackBackendApiService,
+      'fetchMyFeedbackDetailAsync'
+    ).and.returnValue(Promise.resolve(mockLessonFeedbackDetailResponse));
+    spyOn(
+      feedbackBackendApiService,
+      'fetchMyFeedbackUnreadCountAsync'
+    ).and.returnValue(Promise.reject());
+    const emitSpy = spyOn(component.unreadCountChanged, 'emit');
+
+    await component.openFeedbackDetail('feedback_id');
+
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should open the follow-up note modal on wide screens', () => {
+    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    const bottomSheet = TestBed.inject(MatBottomSheet);
+    const bottomSheetSpy = spyOn(bottomSheet, 'open');
+    const ngbModal = TestBed.inject(NgbModal);
+    const ngbModalSpy = spyOn(ngbModal, 'open').and.callThrough();
+
+    component.openFollowUpModal();
+
+    expect(bottomSheetSpy).not.toHaveBeenCalled();
+    expect(ngbModalSpy).toHaveBeenCalled();
+  });
+
+  it('should open the follow-up note bottom sheet on narrow screens', () => {
+    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    const bottomSheet = TestBed.inject(MatBottomSheet);
+    const bottomSheetSpy = spyOn(bottomSheet, 'open');
+    const ngbModal = TestBed.inject(NgbModal);
+    const ngbModalSpy = spyOn(ngbModal, 'open');
+
+    component.openFollowUpModal();
+
+    expect(bottomSheetSpy).toHaveBeenCalledWith(
+      AddAFollowUpNoteModalComponent,
+      {
+        data: {detailFeedback: null},
+      }
+    );
+    expect(ngbModalSpy).not.toHaveBeenCalled();
   });
 });

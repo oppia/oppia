@@ -54,7 +54,6 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
-import {LessonFeedbackSummary} from 'domain/feedback/feedback.model';
 import './learner-dashboard-page.component.css';
 
 interface LearnerDashboardExplorationsData {
@@ -184,7 +183,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
   curatedExplorationIds = new Set<string>();
   unreadMySuggestionsCount: number = 0;
-  feedbackSummaries: LessonFeedbackSummary[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -647,13 +645,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   fetchUnreadMySuggestionsCount(): void {
     this.feedbackBackendApiService
-      .fetchMyFeedbackListAsync()
-      .then(response => {
-        this.feedbackSummaries = response.summaries;
-        this.unreadMySuggestionsCount = response.summaries.reduce(
-          (count, summary) => count + summary.unread_response_count,
-          0
-        );
+      .fetchMyFeedbackUnreadCountAsync()
+      .then(unreadCount => {
+        this.unreadMySuggestionsCount = unreadCount;
       })
       .catch(() => {
         this.unreadMySuggestionsCount = 0;

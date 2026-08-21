@@ -164,6 +164,17 @@ class LessonFeedbackUpdatePayloadDict(TypedDict):
     reply_text: Optional[str]
 
 
+class FeedbackStatusCountsDict(TypedDict):
+    """Per-status counts of lesson feedback and platform reports.
+
+    Each inner dict maps every status in feconf.STATUS_CHOICES to the number
+    of non-deleted entries with that status, plus a 'total' key.
+    """
+
+    lesson_feedback_counts: Dict[str, int]
+    platform_report_counts: Dict[str, int]
+
+
 class LessonFeedback:
     """Domain object for a learner lesson feedback submission.
 
@@ -253,7 +264,9 @@ class LessonFeedback:
             latest_response_text = self.response_list[-1]['response_text']
             latest_response_preview = latest_response_text
             if len(latest_response_preview) > 100:
-                latest_response_preview = latest_response_preview[:97] + '...'
+                latest_response_preview = '%s...' % (
+                    latest_response_preview[:97]
+                )
         return {
             'id': self.id,
             'feedback_text_preview': feedback_text_preview,

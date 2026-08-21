@@ -618,6 +618,21 @@ describe('Feedback backend api service', () => {
     expect(onSuccess).toHaveBeenCalledWith(detailLessonFeedbackResponse);
   }));
 
+  it('should fetch the global unread feedback response count', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync().then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' && request.url === '/my_feedback/unread_count'
+    );
+
+    req.flush({unread_count: 3});
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(3);
+  }));
+
   it('should be able to submit a FollowUo note from my suggestions tab', fakeAsync(() => {
     const onSuccess = jasmine.createSpy('onSuccess');
     feedbackBackendApiService

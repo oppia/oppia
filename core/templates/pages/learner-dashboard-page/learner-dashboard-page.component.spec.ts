@@ -504,6 +504,11 @@ describe('Learner dashboard page', () => {
         })
       );
 
+      spyOn(
+        feedbackBackendApiService,
+        'fetchMyFeedbackUnreadCountAsync'
+      ).and.returnValue(Promise.resolve(0));
+
       spyOn(urlService, 'getUrlParams').and.returnValue({
         active_tab: 'learner-groups',
       });
@@ -1048,58 +1053,53 @@ describe('Learner dashboard page', () => {
       });
     }));
 
-    it('should fetch feedback summaries and update the unreadMySuggestionsCount', fakeAsync(() => {
-      const feedbackSummaries: LessonFeedbackSummary[] = [
-        {
-          id: 'feedback-1',
-          feedback_text_preview: 'First feedback',
-          latest_response_preview: 'Creator response 1',
-          status: FeedbackStatus.OPEN,
-          lesson_title: 'Lesson 1',
-          source: 'lesson',
-          unread_response_count: 2,
-          last_updated_msecs: 100,
-        },
-        {
-          id: 'feedback-2',
-          feedback_text_preview: 'Second feedback',
-          latest_response_preview: 'Creator response 2',
-          status: FeedbackStatus.OPEN,
-          lesson_title: 'Lesson 2',
-          source: 'lesson',
-          unread_response_count: 3,
-          last_updated_msecs: 200,
-        },
-        {
-          id: 'feedback-3',
-          feedback_text_preview: 'Third feedback',
-          latest_response_preview: 'Creator response 3',
-          status: FeedbackStatus.OPEN,
-          lesson_title: 'Lesson 3',
-          source: 'lesson',
-          unread_response_count: 1,
-          last_updated_msecs: 300,
-        },
-      ];
-
+    it('should fetch the backend unread total for my suggestions', fakeAsync(() => {
       (
-        feedbackBackendApiService.fetchMyFeedbackListAsync as jasmine.Spy
-      ).and.returnValue(
-        Promise.resolve({
-          summaries: feedbackSummaries,
-          next_cursor: null,
-          more: false,
-        })
-      );
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(6));
 
       component.fetchUnreadMySuggestionsCount();
       flush();
 
       expect(
-        feedbackBackendApiService.fetchMyFeedbackListAsync
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync
       ).toHaveBeenCalled();
-      expect(component.feedbackSummaries).toEqual(feedbackSummaries);
       expect(component.unreadMySuggestionsCount).toBe(6);
+    }));
+
+    it('should count unread feedback on later pages via the backend total', fakeAsync(() => {
+      // The first page of the paginated list has no unread responses, but
+      // unread feedback exists on later pages. The indicator must reflect
+      // the backend-provided global total instead of the first-page sum.
+      const firstPageSummaries: LessonFeedbackSummary[] = [
+        {
+          id: 'feedback-1',
+          feedback_text_preview: 'First feedback',
+          latest_response_preview: '',
+          status: FeedbackStatus.OPEN,
+          lesson_title: 'Lesson 1',
+          source: 'lesson',
+          unread_response_count: 0,
+          last_updated_msecs: 100,
+        },
+      ];
+      (
+        feedbackBackendApiService.fetchMyFeedbackListAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          summaries: firstPageSummaries,
+          next_cursor: 'cursor-2',
+          more: true,
+        })
+      );
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(4));
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(component.unreadMySuggestionsCount).toBe(4);
     }));
 
     it('should set active section to my suggestions when my suggestions tab is active', fakeAsync(() => {
@@ -1133,11 +1133,11 @@ describe('Learner dashboard page', () => {
       expect(component.unreadMySuggestionsCount).toBe(1);
     });
 
-    it('should set unreadMySuggestionsCount to zero when fetching feedback summaries fails', fakeAsync(() => {
+    it('should set unreadMySuggestionsCount to zero when fetching the unread total fails', fakeAsync(() => {
       component.unreadMySuggestionsCount = 5;
 
       (
-        feedbackBackendApiService.fetchMyFeedbackListAsync as jasmine.Spy
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
       ).and.returnValue(Promise.reject());
 
       component.fetchUnreadMySuggestionsCount();

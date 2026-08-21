@@ -212,7 +212,7 @@
           </oppia-my-certificates-tab>
         </div>
         <div class="w-100" *ngIf="isNewExplorationEditorFeedbackTabEnabled() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS">
-          <oppia-my-suggestions-tab [feedbackSummaries]="feedbackSummaries"
+          <oppia-my-suggestions-tab
                                     (unreadCountChanged)="onMySuggestionsUnreadCountChanged($event)">
           </oppia-my-suggestions-tab>
         </div>

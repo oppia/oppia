@@ -2264,6 +2264,32 @@ class BaseFeedbackModel(BaseModel):
         return query
 
     @classmethod
+    def get_status_counts(
+        cls,
+        exploration_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Returns the number of non-deleted feedback entries per status.
+
+        Args:
+            exploration_id: Optional[str]. If provided, only entries belonging
+                to this exploration are counted.
+
+        Returns:
+            dict. Maps each status in feconf.STATUS_CHOICES to its count,
+            plus a 'total' key with the overall number of counted entries.
+        """
+        query = cls._get_filtered_query(exploration_id=exploration_id)
+        counts: Dict[str, int] = {status: 0 for status in feconf.STATUS_CHOICES}
+        total = 0
+        # A projection query is used to avoid fetching full entities, since
+        # only the status field is needed for counting.
+        for model in query.fetch(projection=['status']):
+            counts[model.status] += 1
+            total += 1
+        counts['total'] = total
+        return counts
+
+    @classmethod
     # Here we use type Any because subclasses can extend the filtered query with
     # model-specific keyword filters.
     def fetch_page(
@@ -2314,9 +2340,10 @@ class BaseFeedbackModel(BaseModel):
             )
             next_offset = offset + len(results)
 
-            # Check if there are more results.
+            # Check if there are more results. Only one entity is fetched
+            # since the result is used solely to compute the 'more' flag.
             next_results: Sequence[BaseFeedbackModel] = query.fetch(
-                offset=next_offset
+                1, offset=next_offset
             )
             more = len(next_results) > 0
 

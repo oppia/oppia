@@ -37,6 +37,7 @@ import {
   SuccessResponse,
   LessonFeedbackDetailResponse,
   FeedbackStatus,
+  MyFeedbackUnreadCountResponse,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
@@ -51,6 +52,7 @@ export class FeedbackBackendApiService {
   private lessonFeedbackUrl = '/feedback';
   private reportUrl = '/platform-feedback';
   private myFeedbackUrl = '/my_feedback';
+  private myFeedbackUnreadCountUrl = '/my_feedback/unread_count';
   private captchaConfigUrl = '/feedback_captcha_config_handler';
 
   constructor(
@@ -144,6 +146,13 @@ export class FeedbackBackendApiService {
   ): Promise<LessonFeedbackDetailResponse> {
     const url = [this.myFeedbackUrl, encodeURIComponent(feedbackId)].join('/');
     return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async fetchMyFeedbackUnreadCountAsync(): Promise<number> {
+    const response = await this.http
+      .get<MyFeedbackUnreadCountResponse>(this.myFeedbackUnreadCountUrl)
+      .toPromise();
+    return response.unread_count;
   }
 
   async fetchLearnerLessonFeedbackListAsync(

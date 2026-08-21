@@ -472,6 +472,24 @@ def get_learner_feedback(
     return _lesson_feedback_model_to_domain(model)
 
 
+def get_learner_unread_feedback_count(author_id: str) -> int:
+    """Returns the learner's global unread feedback response count.
+
+    The count spans every non-deleted lesson feedback entry authored by the
+    learner, regardless of status or list pagination, so it can be used as a
+    stable total for the My Suggestions tab indicator.
+
+    Args:
+        author_id: str. The learner user ID.
+
+    Returns:
+        int. The total number of unread creator responses.
+    """
+    return general_feedback_models.LessonFeedbackModel.get_total_unread_response_count(
+        author_id=author_id
+    )
+
+
 def _append_lesson_feedback_model_response(
     model: general_feedback_models.LessonFeedbackModel,
     response_text: str,
@@ -767,6 +785,41 @@ def get_platform_feedback_summaries(
         for model in model_list
     ]
     return summaries, next_cursor, more
+
+
+def get_feedback_and_report_status_counts(
+    exp_id: str,
+) -> general_feedback_domain.FeedbackStatusCountsDict:
+    """Returns per-status counts of lesson feedback and platform reports.
+
+    Counts every non-deleted LessonFeedbackModel and PlatformFeedbackModel
+    entry that belongs to the given exploration, grouped by moderation
+    status.
+
+    Args:
+        exp_id: str. The exploration id to retrieve counts for.
+
+    Returns:
+        FeedbackStatusCountsDict. A dict with two keys:
+            lesson_feedback_counts: dict mapping each status choice to the
+                number of lesson feedback entries with that status, plus a
+                'total' key.
+            platform_report_counts: dict mapping each status choice to the
+                number of issue reports with that status, plus a 'total'
+                key.
+    """
+    return {
+        'lesson_feedback_counts': (
+            general_feedback_models.LessonFeedbackModel.get_status_counts(
+                exploration_id=exp_id
+            )
+        ),
+        'platform_report_counts': (
+            general_feedback_models.PlatformFeedbackModel.get_status_counts(
+                exploration_id=exp_id
+            )
+        ),
+    }
 
 
 def _update_platform_feedback_model_status(
