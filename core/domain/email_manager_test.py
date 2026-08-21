@@ -2118,19 +2118,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
-    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        email_manager.send_emails_to_subscribers(
-            self.editor_id, self.exploration.id, self.exploration.title
-        )
-
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-        ]
-    )
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
