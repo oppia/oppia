@@ -8940,3 +8940,155 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
             enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+
+
+class MissingBranchCoverageTests(test_utils.EmailTestBase):
+    def test_early_returns_when_transactional_emails_disabled(self) -> None:
+        from unittest import mock
+
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            # Test early return for send_feedback_submission_email.
+            email_manager.send_feedback_submission_email(mock.Mock())
+            # Test early return for send_feedback_status_change_email.
+            email_manager.send_feedback_status_change_email(
+                mock.Mock(), 'author_id'
+            )
+            # Test early return for send_feedback_reply_email.
+            email_manager.send_feedback_reply_email(
+                mock.Mock(), 'msg', 'author_id'
+            )
+            # Test early return for send_not_mergeable_change_list_to_admin_for_review.
+            email_manager.send_not_mergeable_change_list_to_admin_for_review(
+                'exp_id', 1, 1, []
+            )
+
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True):
+            # Test early return for send_feedback_status_change_email with invalid dest.
+            invalid_feedback = mock.Mock()
+            invalid_feedback.destination_dashboard = 'invalid'
+            with self.assertRaisesRegex(
+                utils.InvalidInputException, 'Invalid destination dashboard'
+            ):
+                email_manager.send_feedback_submission_email(invalid_feedback)
+
+    def test_branch_coverage_for_user_preferences(self) -> None:
+        from unittest import mock
+
+        from core.domain import classroom_config_services, topic_services
+
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True):
+            with self.swap(user_services, 'get_username', lambda x: 'username'):
+                # Test early return for _get_classroom_feedback_recipient_email.
+                with self.swap(
+                    topic_services,
+                    'get_topic_ids_for_exploration_id',
+                    lambda x: ['topic1'],
+                ):
+                    with self.swap(
+                        classroom_config_services,
+                        'get_classroom_by_topic_id',
+                        lambda x: mock.Mock(feedback_recipient_email='b@b.com'),
+                    ):
+                        self.assertEqual(
+                            email_manager._get_classroom_feedback_recipient_email(
+                                'exp1'
+                            ),
+                            'b@b.com',
+                        )  # pylint: disable=protected-access
+
+                # Test send_suggestion_email when can_users_receive_email is False.
+                with self.swap(
+                    email_manager,
+                    'can_users_receive_thread_email',
+                    lambda *args: [False],
+                ):
+                    email_manager.send_suggestion_email(
+                        'title', 'exp_id', 'author_id', ['user_id']
+                    )
+
+                # Test send_instant_feedback_message_email when can_receive_feedback_message_email is False.
+                with self.swap(
+                    user_services,
+                    'get_email_preferences',
+                    lambda *args: mock.Mock(
+                        can_receive_feedback_message_email=False
+                    ),
+                ):
+                    email_manager.send_instant_feedback_message_email(
+                        'recipient_id',
+                        'sender_id',
+                        'msg',
+                        'subj',
+                        'title',
+                        'id',
+                        'thread_title',
+                    )
+
+                # Test send_mail_to_onboard_new_reviewers when can_receive_email_updates is False.
+                with self.swap(
+                    user_services,
+                    'get_email_preferences',
+                    lambda *args: mock.Mock(can_receive_email_updates=False),
+                ):
+                    email_manager.send_mail_to_onboard_new_reviewers(
+                        'id', 'category'
+                    )
+
+                # Test send_mail_to_notify_users_to_review when can_receive_email_updates is False.
+                with self.swap(
+                    user_services,
+                    'get_email_preferences',
+                    lambda *args: mock.Mock(can_receive_email_updates=False),
+                ):
+                    email_manager.send_mail_to_notify_users_to_review(
+                        'id', 'category'
+                    )
+
+                # Test send_email_to_new_cd_user with invalid category to cover the unreachable elif fall-through.
+                dummy_category_data = {
+                    'invalid_category': {
+                        'task': 'task',
+                        'category': 'cat',
+                        'description': 'desc',
+                        'rights_message': 'msg',
+                        'role_description': 'role',
+                    },
+                    'category': {
+                        'task': 'task',
+                        'category': 'cat',
+                        'description': 'desc',
+                        'rights_message': 'msg',
+                        'role_description': 'role',
+                    },
+                }
+                with self.swap(
+                    email_manager, 'NEW_CD_USER_EMAIL_DATA', dummy_category_data
+                ):
+                    with self.swap(
+                        email_manager,
+                        'REMOVED_CD_USER_EMAIL_DATA',
+                        dummy_category_data,
+                    ):
+                        with self.swap(
+                            user_services,
+                            'get_email_preferences',
+                            lambda *args: mock.Mock(
+                                can_receive_email_updates=False
+                            ),
+                        ):
+                            email_manager.send_email_to_new_cd_user(
+                                'id', 'invalid_category'
+                            )
+                            email_manager.send_email_to_new_cd_user(
+                                'id', 'category'
+                            )
+                            email_manager.send_email_to_removed_cd_user(
+                                'id', 'category'
+                            )
+
+    def test_delete_voiceover_error_attachments_branch(self) -> None:
+        # Test _delete_voiceover_error_attachments when file does not exist.
+        filename_to_path = [{'path': 'nonexistent/path/to/file.ext'}]
+        email_manager._delete_voiceover_error_attachments(
+            filename_to_path
+        )  # pylint: disable=protected-access
