@@ -1,4 +1,4 @@
-<div class="assessment-unavailable-overlay">
+<div class="assessment-unavailable-overlay" *ngIf="isVisible" (keydown)="containFocusWithinModal($event)">
   <div class="assessment-unavailable-card"
        role="dialog"
        aria-modal="true"
@@ -27,7 +27,7 @@
     </div>
 
     <div class="assessment-unavailable-actions">
-      <button type="button" class="btn btn-primary assessment-unavailable-action-button" (click)="onGoToAvailableCertificates()">
+      <button #goToCertificatesButton type="button" class="btn btn-primary assessment-unavailable-action-button" (click)="onGoToAvailableCertificates()">
         {{ 'I18N_ASSESSMENT_UNAVAILABLE_GO_TO_CERTIFICATES_BUTTON' | translate }}
       </button>
     </div>

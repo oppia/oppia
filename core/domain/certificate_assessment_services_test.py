@@ -836,7 +836,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+                datetime.datetime.utcnow()
+                - datetime.timedelta(minutes=4, seconds=30)
             ),
             finished_at=None,
             is_submitted=False,
@@ -848,8 +849,10 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             return_value={'is_valid': True},
         ), self.assertRaisesRegex(
             utils.ValidationError,
-            'You just started an assessment before this time. '
-            'Please try again in [0-9]+ minute',
+            r'You just started an assessment before this time. '
+            # The remaining wait is about 5 minutes and 30 seconds, so it
+            # must be reported rounded up to 6 minutes.
+            r'Please try again in 6 minute\(s\)\.',
         ):
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,

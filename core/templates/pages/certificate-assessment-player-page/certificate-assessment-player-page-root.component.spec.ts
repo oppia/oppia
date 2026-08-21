@@ -174,6 +174,76 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('intro');
   }));
 
+  it('should load the classroom fragment before starting a session attempt', fakeAsync(async () => {
+    await configureComponent('session');
+    const classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    let resolveClassroom!: (value: {
+      classroomDict: {urlFragment: string};
+    }) => void;
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      new Promise(resolve => {
+        resolveClassroom = resolve;
+      })
+    );
+
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.callFake(() => Promise.reject('Error'));
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      TestBed.inject(ActivatedRoute),
+      alertsService,
+      certificateAssessmentOfferingBackendApiService,
+      classroomBackendApiServiceSpy,
+      {} as PageHeadService,
+      router,
+      translateService
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(
+      classroomBackendApiServiceSpy.getClassroomDataAsync
+    ).toHaveBeenCalled();
+
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
+
+    resolveClassroom({classroomDict: {urlFragment: 'math'}});
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
+  }));
+
+  it('should not start a session attempt when the offering fails to load', fakeAsync(async () => {
+    await configureComponent('session');
+    (
+      certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.hasError).toBeTrue();
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
+  }));
+
   it('should stay on the intro stage when the session route fails to start an attempt', fakeAsync(async () => {
     await configureComponent('session');
     (

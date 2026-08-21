@@ -86,10 +86,10 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
-    if (currentRoute === 'session') {
+    await this.loadCertificateOffering();
+    if (currentRoute === 'session' && !this.hasError) {
       await this.startAssessment();
     }
-    await this.loadCertificateOffering();
   }
 
   private async loadCertificateOffering(): Promise<void> {

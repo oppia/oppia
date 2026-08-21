@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {AssessmentUnavailableModalComponent} from './assessment-unavailable-modal.component';
@@ -28,6 +29,7 @@ describe('AssessmentUnavailableModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [CommonModule],
       declarations: [AssessmentUnavailableModalComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -37,12 +39,72 @@ describe('AssessmentUnavailableModalComponent', () => {
   });
 
   it('should default to visible', () => {
-    expect(component.isVisible).toBeTrue();
+    expect(component.isVisible).toBe(true);
   });
 
-  it('should hide when isVisible is false', () => {
+  it('should render the overlay when visible', () => {
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.assessment-unavailable-overlay')
+    ).not.toBeNull();
+  });
+
+  it('should remove the overlay when isVisible is false', () => {
     component.isVisible = false;
-    expect(component.isVisible).toBeFalse();
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.assessment-unavailable-overlay')
+    ).toBeNull();
+  });
+
+  it('should move initial focus to the modal action button', () => {
+    fixture.detectChanges();
+
+    const actionButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.assessment-unavailable-action-button'
+    );
+    expect(document.activeElement).toBe(actionButton);
+  });
+
+  it('should not render a focusable action button when the modal is hidden', () => {
+    component.isVisible = false;
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector(
+        '.assessment-unavailable-action-button'
+      )
+    ).toBeNull();
+  });
+
+  it('should keep Tab focus within the modal', () => {
+    fixture.detectChanges();
+    const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+    spyOn(tabEvent, 'preventDefault');
+    spyOn(component.goToCertificatesButton.nativeElement, 'focus');
+
+    component.containFocusWithinModal(tabEvent);
+
+    expect(tabEvent.preventDefault).toHaveBeenCalled();
+    expect(
+      component.goToCertificatesButton.nativeElement.focus
+    ).toHaveBeenCalled();
+  });
+
+  it('should ignore non-Tab keys in the focus containment handler', () => {
+    fixture.detectChanges();
+    const enterEvent = new KeyboardEvent('keydown', {key: 'Enter'});
+    spyOn(enterEvent, 'preventDefault');
+    spyOn(component.goToCertificatesButton.nativeElement, 'focus');
+
+    component.containFocusWithinModal(enterEvent);
+
+    expect(enterEvent.preventDefault).not.toHaveBeenCalled();
+    expect(
+      component.goToCertificatesButton.nativeElement.focus
+    ).not.toHaveBeenCalled();
   });
 
   it('should emit goToAvailableCertificates when the button is clicked', () => {

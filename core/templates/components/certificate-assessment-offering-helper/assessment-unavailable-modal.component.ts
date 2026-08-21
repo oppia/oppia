@@ -17,7 +17,15 @@
  * cannot be started.
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import './assessment-unavailable-modal.component.css';
 
 @Component({
@@ -25,12 +33,34 @@ import './assessment-unavailable-modal.component.css';
   templateUrl: './assessment-unavailable-modal.component.html',
   styleUrls: ['./assessment-unavailable-modal.component.css'],
 })
-export class AssessmentUnavailableModalComponent {
+export class AssessmentUnavailableModalComponent implements AfterViewInit {
   @Input() isVisible = true;
+
+  @ViewChild('goToCertificatesButton')
+  goToCertificatesButton!: ElementRef<HTMLButtonElement>;
 
   @Output() goToAvailableCertificates = new EventEmitter<void>();
 
+  ngAfterViewInit(): void {
+    if (this.isVisible) {
+      this.moveFocusToActionButton();
+    }
+  }
+
+  containFocusWithinModal(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    event.preventDefault();
+    this.moveFocusToActionButton();
+  }
+
   onGoToAvailableCertificates(): void {
     this.goToAvailableCertificates.emit();
+  }
+
+  private moveFocusToActionButton(): void {
+    this.goToCertificatesButton.nativeElement.focus();
   }
 }

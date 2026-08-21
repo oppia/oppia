@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import datetime
 import json
+import math
 import secrets
 import sys
 
@@ -573,10 +574,12 @@ def start_certificate_assessment_attempt(
                 datetime.datetime.utcnow() - most_recent_attempt.started_at
             )
             if remaining_cooldown > datetime.timedelta(seconds=0):
-                remaining_minutes = int(
-                    remaining_cooldown.total_seconds() // 60
-                )
-                if remaining_minutes >= 1:
+                if remaining_cooldown >= datetime.timedelta(minutes=1):
+                    # Round up so the reported wait never ends before the
+                    # actual cooldown expires.
+                    remaining_minutes = int(
+                        math.ceil(remaining_cooldown.total_seconds() / 60)
+                    )
                     raise utils.ValidationError(
                         'You just started an assessment before this time. '
                         'Please try again in %d minute(s).' % remaining_minutes
