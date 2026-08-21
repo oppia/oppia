@@ -513,6 +513,25 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.showAssessmentUnavailableModal).toBeTrue();
   }));
 
+  it('should show an orange warning when the attempt is within the cooldown', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.reject(
+        'You just started an assessment before this time. Please try after this time.'
+      )
+    );
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.currentStage).toBe('intro');
+    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'You just started an assessment before this time. Please try after this time.'
+    );
+  }));
+
   it('should hide the unavailable modal and navigate to available certificates', fakeAsync(() => {
     component.showAssessmentUnavailableModal = true;
     component.classroomUrlFragment = 'math';

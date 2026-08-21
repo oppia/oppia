@@ -158,8 +158,18 @@ export class CertificateAssessmentPlayerPageRootComponent
       this.currentStage =
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
       this.startTimerIfReady();
-    } catch {
-      this.showAssessmentUnavailableModal = true;
+    } catch (error) {
+      const errorMessage =
+        typeof error === 'string' ? error : 'Something went wrong.';
+      if (
+        errorMessage.includes(
+          'You just started an assessment before this time.'
+        )
+      ) {
+        this.alertsService.addWarning(errorMessage);
+      } else {
+        this.showAssessmentUnavailableModal = true;
+      }
     }
   }
 

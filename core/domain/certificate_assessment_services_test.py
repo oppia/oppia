@@ -848,7 +848,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             return_value={'is_valid': True},
         ), self.assertRaisesRegex(
             utils.ValidationError,
-            'You just started an assessment before this time.',
+            'You just started an assessment before this time. '
+            'Please try again in [0-9]+ minute',
         ):
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
@@ -860,6 +861,71 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 recent_attempt.id
             )
         )
+
+    def test_start_certificate_assessment_attempt_rejects_attempt_with_seconds_of_cooldown_left(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id=created_offering.certificate_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {topic_id: 1},
+                'question_versions': {'dummy_question_id': 1},
+                'question_topic_links': {'dummy_question_id': [topic_id]},
+            },
+            started_at=(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(minutes=9, seconds=30)
+            ),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value={'is_valid': True},
+        ), self.assertRaisesRegex(
+            utils.ValidationError,
+            'You just started an assessment before this time. '
+            'Please try again in less than a minute.',
+        ):
+            certificate_assessment_services.start_certificate_assessment_attempt(
+                created_offering.certificate_id,
+                owner_id,
+            )
 
     def test_start_certificate_assessment_attempt_allows_attempt_after_cooldown(
         self,

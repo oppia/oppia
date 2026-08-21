@@ -564,17 +564,26 @@ def start_certificate_assessment_attempt(
             )
         )
         if most_recent_attempt is not None:
-            time_since_last_attempt = (
-                datetime.datetime.utcnow() - most_recent_attempt.started_at
-            )
-            if time_since_last_attempt < datetime.timedelta(
+            cooldown = datetime.timedelta(
                 minutes=(
                     certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
                 )
-            ):
+            )
+            remaining_cooldown = cooldown - (
+                datetime.datetime.utcnow() - most_recent_attempt.started_at
+            )
+            if remaining_cooldown > datetime.timedelta(seconds=0):
+                remaining_minutes = int(
+                    remaining_cooldown.total_seconds() // 60
+                )
+                if remaining_minutes >= 1:
+                    raise utils.ValidationError(
+                        'You just started an assessment before this time. '
+                        'Please try again in %d minute(s).' % remaining_minutes
+                    )
                 raise utils.ValidationError(
                     'You just started an assessment before this time. '
-                    'Please try after this time.'
+                    'Please try again in less than a minute.'
                 )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
