@@ -47,7 +47,10 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
-import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {
+  UnansweredQuestionModalComponent,
+  SUBMIT_ANYWAY_RESULT,
+} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -212,7 +215,7 @@ export class CertificateAssessmentPlayerPageComponent
       );
       bottomSheetRef.instance.unansweredQuestionCount = unansweredQuestionCount;
       bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result === 'submit-anyway') {
+        if (result === SUBMIT_ANYWAY_RESULT) {
           onSubmitAnyway();
         } else {
           onGoBack();
@@ -229,7 +232,7 @@ export class CertificateAssessmentPlayerPageComponent
       unansweredQuestionCount;
     modalRef.result
       .then(result => {
-        if (result === 'submit-anyway') {
+        if (result === SUBMIT_ANYWAY_RESULT) {
           onSubmitAnyway();
         }
       })
