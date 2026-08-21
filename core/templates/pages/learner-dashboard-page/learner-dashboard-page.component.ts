@@ -291,6 +291,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         }
         if (
           this.isShowRedesignedLearnerDashboardActive() &&
+          this.isNewExplorationEditorFeedbackTabEnabled() &&
           this.urlService.getUrlParams().active_tab === 'my-suggestions'
         ) {
           this.activeSection =

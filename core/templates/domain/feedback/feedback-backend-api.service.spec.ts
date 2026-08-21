@@ -568,7 +568,7 @@ describe('Feedback backend api service', () => {
     feedbackBackendApiService
       .fetchMyFeedbackListAsync(
         'cursor',
-        filterState2.status,
+        [filterState2.status],
         filterState2.dateRange.start.getTime(),
         filterState2.dateRange.end.getTime()
       )

@@ -288,6 +288,9 @@ export class MySuggestionsTabComponent implements OnInit {
         await this.feedbackBackendApiService.fetchMyFeedbackDetailAsync(
           feedbackId
         );
+      if (this.selectedFeedbackId !== feedbackId) {
+        return;
+      }
       this.selectedFeedback = response;
       this.markFeedbackSummaryAsRead(feedbackId);
     } catch (error) {

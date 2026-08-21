@@ -492,8 +492,8 @@ export class FeedbackDetailPageComponent {
     }
 
     return (
-      `/create/${feedback.lesson_metadata.exploration_id}` +
-      `#/feedback/lesson_feedback/${feedback.parent_feedback_id}`
+      `/create/${encodeURIComponent(feedback.lesson_metadata.exploration_id)}` +
+      `#/feedback/lesson_feedback/${encodeURIComponent(feedback.parent_feedback_id)}`
     );
   }
 }
