@@ -18,39 +18,17 @@
 
 import {Component, OnInit, Optional} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
-import './certificate-assessment-player-page.component.css';
+import type {CertificateAssessmentStage} from './certificate-assessment-player-page.constants';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
-
-export type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input';
-
-export interface AssessmentQuestionOption {
-  id: string;
-  text: string;
-}
-
-export interface AssessmentQuestion {
-  id: string;
-  type: AssessmentQuestionType;
-  prompt: string;
-  hint: string;
-  options: AssessmentQuestionOption[];
-  placeholder?: string;
-  correctAnswerText: string;
-}
-
-type AssessmentStage =
-  (typeof CertificateAssessmentPlayerPageConstants)[keyof typeof CertificateAssessmentPlayerPageConstants];
 
 @Component({
   selector: 'certificate-assessment-player-page',
@@ -61,7 +39,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   readonly certificateAssessmentPlayerPageConstants =
     CertificateAssessmentPlayerPageConstants;
   certificateId = '';
-  currentStage: AssessmentStage =
+  currentStage: CertificateAssessmentStage =
     CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
   // TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
   showAssessmentInterruptCard = false;
@@ -218,12 +196,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   submitAssessment(): void {
     const attemptId = `attempt-${Date.now()}`;
-    this.router.navigate([
-      '/certificate-assessment',
-      this.certificateId,
-      'result',
-      attemptId,
-    ]);
+    this.router.navigate(['/certificate-assessment-result', attemptId]);
   }
 
   getProgressPercentage(): number {
