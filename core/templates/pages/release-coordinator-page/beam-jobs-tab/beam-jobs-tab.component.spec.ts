@@ -113,7 +113,7 @@ describe('Beam Jobs Tab Component', () => {
               'cancelBeamJobRun',
               'getBeamJobRunOutput',
             ]
-          ) as jasmine.SpyObj<any>,
+          ) as jasmine.SpyObj<ReleaseCoordinatorBackendApiService>,
         },
       ],
     });

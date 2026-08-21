@@ -498,7 +498,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should not open any modal when both modal flags are false', () => {
     const ngbModal = TestBed.inject(NgbModal);
-    spyOn(ngbModal, 'open').and.callThrough();
+    ngbModal.open.calls.reset();
     component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = false;
     fixture.detectChanges();
