@@ -612,6 +612,8 @@ describe('Translation Modal Component', () => {
           successCallback()
       );
       component.ngOnInit();
+      component.activeWrittenTranslation = 'مرحبا بالجميع';
+
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
       expect(component.getUnicodeSchema().ui_config?.languageDirection).toBe(
         'rtl'
@@ -620,6 +622,7 @@ describe('Translation Modal Component', () => {
         (component.getSetOfStringsSchema().items as UnicodeSchema).ui_config
           ?.languageDirection
       ).toBe('rtl');
+      expect(component.activeWrittenTranslationAsString).toBe('مرحبا بالجميع');
     }));
 
     it('should get the unicode schema', () => {
