@@ -92,15 +92,47 @@ function buildPerformanceCatchAll(perfThresholds) {
 
 /**
  * Builds the assertion object for a single page, merging base performance
- * assertions with page-specific overrides.
+ * assertions with page-specific overrides and per-page performance thresholds.
  *
  * @param {Object} overrides - Page-specific audit overrides.
  * @param {number} accessibilityMinScore - Minimum accessibility score.
+ * @param {Object|null} pagePerfThresholds - Per-page performance metric
+ *   thresholds (fcp, speedIndex, lcp, tbt, cls). When provided, these override
+ *   the global catch-all thresholds for this page at error level.
  * @returns {Object} The merged assertion object.
  */
-function buildPageAssertions(overrides = {}, accessibilityMinScore = 1) {
+function buildPageAssertions(
+  overrides = {},
+  accessibilityMinScore = 1,
+  pagePerfThresholds = null
+) {
+  const perfAssertions = pagePerfThresholds
+    ? {
+        'first-contentful-paint': [
+          'error',
+          {maxNumericValue: pagePerfThresholds.fcp},
+        ],
+        'speed-index': [
+          'error',
+          {maxNumericValue: pagePerfThresholds.speedIndex},
+        ],
+        'largest-contentful-paint': [
+          'error',
+          {maxNumericValue: pagePerfThresholds.lcp},
+        ],
+        'total-blocking-time': [
+          'error',
+          {maxNumericValue: pagePerfThresholds.tbt},
+        ],
+        'cumulative-layout-shift': [
+          'error',
+          {maxNumericValue: pagePerfThresholds.cls},
+        ],
+      }
+    : {};
   return {
     ...basePerformanceAssertions,
+    ...perfAssertions,
     'categories:accessibility': ['error', {minScore: accessibilityMinScore}],
     // TODO(#17560): Change the SEO category assertion from warn to error once
     // real CI runs confirm which pages score 1.0.
@@ -117,6 +149,9 @@ function buildPageAssertions(overrides = {}, accessibilityMinScore = 1) {
  *   - matchingUrlPattern {string}: Regex pattern for the URL.
  *   - overrides {Object}: (optional) Page-specific audit overrides.
  *   - accessibilityMinScore {number}: (optional) Min accessibility score.
+ *   - pagePerfThresholds {Object}: (optional) Per-page performance thresholds
+ *     with keys fcp, speedIndex, lcp, tbt, cls. Overrides the global catch-all
+ *     at error level for this specific page.
  * @param {Object} perfThresholds - Performance metric thresholds for the
  *   catch-all entry (fcp, speedIndex, lcp, tbt, cls).
  * @returns {Array} The full LHCI assert matrix.
@@ -125,9 +160,18 @@ function buildAssertMatrix(pageConfigs, perfThresholds) {
   return [
     buildPerformanceCatchAll(perfThresholds),
     ...pageConfigs.map(
-      ({matchingUrlPattern, overrides, accessibilityMinScore}) => ({
+      ({
         matchingUrlPattern,
-        assertions: buildPageAssertions(overrides, accessibilityMinScore),
+        overrides,
+        accessibilityMinScore,
+        pagePerfThresholds,
+      }) => ({
+        matchingUrlPattern,
+        assertions: buildPageAssertions(
+          overrides,
+          accessibilityMinScore,
+          pagePerfThresholds
+        ),
       })
     ),
   ];

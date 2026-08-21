@@ -36,45 +36,124 @@ module.exports = {
     assert: {
       assertMatrix: baseConfig.buildAssertMatrix(
         [
-          {matchingUrlPattern: 'http://[^/]+/$'},
+          {
+            matchingUrlPattern: 'http://[^/]+/$',
+            pagePerfThresholds: {
+              fcp: 10700,
+              speedIndex: 10700,
+              lcp: 37700,
+              tbt: 1050,
+              cls: 0.1,
+            },
+          },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
+            pagePerfThresholds: {
+              fcp: 16100,
+              speedIndex: 16100,
+              lcp: 37900,
+              tbt: 510,
+              cls: 0.4,
+            },
             accessibilityMinScore: 0.88,
           },
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
+            pagePerfThresholds: {
+              fcp: 11100,
+              speedIndex: 11100,
+              lcp: 33400,
+              tbt: 720,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.93,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
+            pagePerfThresholds: {
+              fcp: 10600,
+              speedIndex: 12400,
+              lcp: 35100,
+              tbt: 860,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.92,
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
+            pagePerfThresholds: {
+              fcp: 10700,
+              speedIndex: 13700,
+              lcp: 35600,
+              tbt: 870,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.91,
           },
           {
             matchingUrlPattern: 'http://[^/]+/contact$',
+            pagePerfThresholds: {
+              fcp: 16500,
+              speedIndex: 16500,
+              lcp: 34600,
+              tbt: 590,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
+            pagePerfThresholds: {
+              fcp: 11100,
+              speedIndex: 11300,
+              lcp: 42500,
+              tbt: 800,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
+            pagePerfThresholds: {
+              fcp: 10600,
+              speedIndex: 12700,
+              lcp: 35700,
+              tbt: 950,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.88,
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
+            pagePerfThresholds: {
+              fcp: 16500,
+              speedIndex: 16500,
+              lcp: 34300,
+              tbt: 580,
+              cls: 0.52,
+            },
             accessibilityMinScore: 0.91,
           },
           {
             matchingUrlPattern: 'http://[^/]+/delete-account$',
+            pagePerfThresholds: {
+              fcp: 17000,
+              speedIndex: 17000,
+              lcp: 34900,
+              tbt: 750,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/donate$',
+            pagePerfThresholds: {
+              fcp: 16500,
+              speedIndex: 16500,
+              lcp: 36100,
+              tbt: 1650,
+              cls: 0.1,
+            },
             overrides: {
               // TODO(#17279): There is an error on the /donate page due to the
               // embedded Stripe third-party component within it. Find a way to
@@ -99,6 +178,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/get-started$',
+            pagePerfThresholds: {
+              fcp: 16500,
+              speedIndex: 16500,
+              lcp: 34200,
+              tbt: 630,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.91,
           },
           {

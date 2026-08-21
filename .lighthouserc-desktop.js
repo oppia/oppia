@@ -70,45 +70,124 @@ module.exports = {
     assert: {
       assertMatrix: baseConfig.buildAssertMatrix(
         [
-          {matchingUrlPattern: 'http://[^/]+/$'},
+          {
+            matchingUrlPattern: 'http://[^/]+/$',
+            pagePerfThresholds: {
+              fcp: 1930,
+              speedIndex: 2980,
+              lcp: 6660,
+              tbt: 200,
+              cls: 0.1,
+            },
+          },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
+            pagePerfThresholds: {
+              fcp: 2920,
+              speedIndex: 3780,
+              lcp: 7020,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.88,
           },
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
+            pagePerfThresholds: {
+              fcp: 1880,
+              speedIndex: 1880,
+              lcp: 5610,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.93,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
+            pagePerfThresholds: {
+              fcp: 1890,
+              speedIndex: 2090,
+              lcp: 6020,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.92,
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
+            pagePerfThresholds: {
+              fcp: 1890,
+              speedIndex: 3110,
+              lcp: 6160,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.91,
           },
           {
             matchingUrlPattern: 'http://[^/]+/contact$',
+            pagePerfThresholds: {
+              fcp: 2880,
+              speedIndex: 3170,
+              lcp: 6010,
+              tbt: 200,
+              cls: 0.29,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
+            pagePerfThresholds: {
+              fcp: 1970,
+              speedIndex: 3590,
+              lcp: 7190,
+              tbt: 200,
+              cls: 0.13,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-dashboard$',
+            pagePerfThresholds: {
+              fcp: 1850,
+              speedIndex: 2780,
+              lcp: 6220,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.88,
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
+            pagePerfThresholds: {
+              fcp: 2820,
+              speedIndex: 3030,
+              lcp: 5960,
+              tbt: 200,
+              cls: 0.34,
+            },
             accessibilityMinScore: 0.91,
           },
           {
             matchingUrlPattern: 'http://[^/]+/delete-account$',
+            pagePerfThresholds: {
+              fcp: 3050,
+              speedIndex: 3050,
+              lcp: 5870,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/donate$',
+            pagePerfThresholds: {
+              fcp: 2930,
+              speedIndex: 3780,
+              lcp: 6210,
+              tbt: 200,
+              cls: 0.34,
+            },
             overrides: {
               // TODO(#17279): There is an error on the /donate page due to the
               // embedded Stripe third-party component within it. Find a way to
@@ -133,6 +212,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/get-started$',
+            pagePerfThresholds: {
+              fcp: 2930,
+              speedIndex: 2930,
+              lcp: 5830,
+              tbt: 200,
+              cls: 0.38,
+            },
             accessibilityMinScore: 0.91,
           },
           {
