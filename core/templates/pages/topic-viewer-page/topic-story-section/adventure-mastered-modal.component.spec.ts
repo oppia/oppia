@@ -264,6 +264,12 @@ describe('AdventureMasteredModalComponent', () => {
     expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
   });
 
+  it('should dismiss the modal when cancel is called without bottomSheetRef', () => {
+    component.cancel();
+
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
   describe('when opened as MatBottomSheet', () => {
     let bottomSheetRef: jasmine.SpyObj<
       MatBottomSheetRef<AdventureMasteredModalComponent>

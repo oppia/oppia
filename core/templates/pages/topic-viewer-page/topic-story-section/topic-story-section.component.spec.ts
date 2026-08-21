@@ -3403,4 +3403,348 @@ describe('TopicStorySectionComponent', () => {
     expect(localStorageService.getMasteredAdventures).not.toHaveBeenCalled();
     expect(localStorageService.updateMasteredAdventures).not.toHaveBeenCalled();
   });
+
+  it('should open arc skip confirmation as bottom sheet on mobile', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(
+      ArcSkipConfirmationModalComponent,
+      jasmine.objectContaining({data: jasmine.any(Object)})
+    );
+    expect(ngbModal.open).not.toHaveBeenCalled();
+
+    tick(300);
+  }));
+
+  it('should open adventure mastered modal as bottom sheet on mobile', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      jasmine.objectContaining({data: jasmine.any(Object)})
+    );
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  }));
+
+  it('should call onArcSkipConfirmationProceed when bottom sheet confirms', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    let dismissCallback: (result: string) => void;
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({
+        subscribe: (cb: (result: string) => void) => {
+          dismissCallback = cb;
+        },
+      }),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    dismissCallback!('confirm');
+
+    expect(component.isAdventureSkipped(0)).toBe(true);
+    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+      'story_id_1',
+      [0]
+    );
+
+    tick(300);
+  }));
+
+  it('should call onArcSkipConfirmationCancel when bottom sheet is dismissed', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    let dismissCallback: (result: string) => void;
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({
+        subscribe: (cb: (result: string) => void) => {
+          dismissCallback = cb;
+        },
+      }),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    dismissCallback!('cancel');
+
+    expect(component.isAdventureSkipped(0)).toBe(false);
+
+    tick(300);
+  }));
+
+  it('should call onAdventureMasteredContinue when mastered bottom sheet confirms', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    let dismissCallback: (result: string) => void;
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({
+        subscribe: (cb: (result: string) => void) => {
+          dismissCallback = cb;
+        },
+      }),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    dismissCallback!('confirm');
+
+    expect(component.masteredAdventureIndex).toBeNull();
+    expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
+  }));
+
+  it('should clear mastered modal ref when mastered bottom sheet is dismissed', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(300);
+    let dismissCallback: (result: string) => void;
+    const mockBottomSheetRef = {
+      afterDismissed: () => ({
+        subscribe: (cb: (result: string) => void) => {
+          dismissCallback = cb;
+        },
+      }),
+    };
+    bottomSheet.open.and.returnValue(mockBottomSheetRef);
+
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    dismissCallback!('cancel');
+
+    expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
+  }));
 });

@@ -54,11 +54,9 @@ export class ArcSkipConfirmationModalComponent
 
   @ViewChild('dialog') private dialog!: ElementRef<HTMLElement>;
   private modalFocusRestoreElement: HTMLElement | null = null;
-  private bottomSheetRef: MatBottomSheetRef | null = null;
-
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    @Optional() bottomSheetRef: MatBottomSheetRef | null,
+    @Optional() protected bottomSheetRef: MatBottomSheetRef | null,
     @Optional()
     @Inject(MAT_BOTTOM_SHEET_DATA)
     private data: {adventureLabel: string; confirmationMessage: string} | null
