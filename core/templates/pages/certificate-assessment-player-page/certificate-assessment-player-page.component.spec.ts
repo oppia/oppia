@@ -172,7 +172,10 @@ const makeAttempt = (
     })),
   });
 
-const modalRef = (reject = false, resolveValue: unknown = null): NgbModalRef =>
+const modalRef = (
+  reject = false,
+  resolveValue: string | null = null
+): NgbModalRef =>
   ({
     componentInstance: {} as Record<string, unknown>,
     result: reject
@@ -180,7 +183,7 @@ const modalRef = (reject = false, resolveValue: unknown = null): NgbModalRef =>
       : Promise.resolve(resolveValue),
     close: () => {},
     dismiss: () => {},
-  }) as unknown as NgbModalRef;
+  }) as NgbModalRef;
 
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
@@ -575,14 +578,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
     component.isTimeExpired = true;
-    component.ngOnChanges({
-      isTimeExpired: {
-        currentValue: true,
-        previousValue: true,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    });
+    component.ngOnInit();
     expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
     expect(modalSpy.open).toHaveBeenCalledTimes(1);
   }));
@@ -591,6 +587,34 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     loadQ1();
     component.ngOnChanges({});
     expect(modalSpy.open).not.toHaveBeenCalled();
+  }));
+
+  it('should not handle time expiry again while the flag stays true', fakeAsync(() => {
+    loadQ1();
+    triggerTimeExpiry();
+    expect(modalSpy.open).toHaveBeenCalledTimes(1);
+
+    component.ngOnChanges({
+      isTimeExpired: {
+        currentValue: true,
+        previousValue: true,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+    expect(modalSpy.open).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should take no action when the desktop time-expired modal resolves without view-results', fakeAsync(() => {
+    loadQ1();
+    spyOn(component.viewResults, 'emit');
+    spyOn(component.assessmentEnded, 'emit');
+    modalSpy.open.and.returnValue(modalRef(false, null));
+    triggerTimeExpiry();
+    flushMicrotasks();
+
+    expect(component.viewResults.emit).not.toHaveBeenCalled();
+    expect(component.assessmentEnded.emit).not.toHaveBeenCalled();
   }));
 
   it('should handle time expiry on init when already expired', fakeAsync(() => {

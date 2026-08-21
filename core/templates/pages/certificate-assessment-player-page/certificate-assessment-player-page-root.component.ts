@@ -70,8 +70,13 @@ export class CertificateAssessmentPlayerPageRootComponent
   hasError = false;
   remainingTimeInSeconds = 0;
   isTimeExpired = false;
+  isSubmissionInProgress = false;
   private timerId: number | null = null;
+  private expiryTimestampMs: number | null = null;
   private hasStartedTimer = false;
+  // Tracks the most recent submission so that result navigation can wait
+  // until the final answers have actually been persisted.
+  private pendingSubmission: Promise<void> = Promise.resolve();
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -140,6 +145,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   async startAssessment(): Promise<void> {
+    this.resetTimerState();
     try {
       this.attempt =
         await this.certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync(
@@ -160,27 +166,36 @@ export class CertificateAssessmentPlayerPageRootComponent
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
   ): Promise<void> {
-    if (this.attempt === null) {
+    if (this.attempt === null || this.isSubmissionInProgress) {
       return;
     }
-    try {
-      await this.certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync(
-        this.attempt.attemptId,
-        answers
-      );
-      if (!this.isTimeExpired) {
-        await this.navigateToResultPage();
+    const submittedBeforeExpiry = !this.isTimeExpired;
+    const attemptId = this.attempt.attemptId;
+    this.isSubmissionInProgress = true;
+    this.pendingSubmission = (async () => {
+      try {
+        await this.certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync(
+          attemptId,
+          answers
+        );
+        if (submittedBeforeExpiry) {
+          await this.navigateToResultPage();
+        }
+      } catch {
+        this.alertsService.addWarning(
+          this.translateService.instant(
+            'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+          )
+        );
+      } finally {
+        this.isSubmissionInProgress = false;
       }
-    } catch {
-      this.alertsService.addWarning(
-        this.translateService.instant(
-          'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
-        )
-      );
-    }
+    })();
+    await this.pendingSubmission;
   }
 
   onRetryAssessment(): void {
+    this.resetTimerState();
     this.showAssessmentInterruptCard = false;
     this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
   }
@@ -192,7 +207,8 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.startTimerIfReady();
   }
 
-  onViewResults(): Promise<boolean> {
+  async onViewResults(): Promise<boolean> {
+    await this.pendingSubmission;
     return this.navigateToResultPage();
   }
 
@@ -215,11 +231,19 @@ export class CertificateAssessmentPlayerPageRootComponent
       return;
     }
     this.hasStartedTimer = true;
-    this.remainingTimeInSeconds =
-      this.certificateOffering.timeLimitInMinutes * 60;
+    const durationInSeconds = this.certificateOffering.timeLimitInMinutes * 60;
+    // Derive the remaining time from an absolute deadline rather than
+    // decrementing per callback, because browsers throttle intervals in
+    // inactive tabs and would otherwise let the assessment run longer than
+    // its configured duration.
+    this.expiryTimestampMs = Date.now() + durationInSeconds * 1000;
+    this.remainingTimeInSeconds = durationInSeconds;
     this.timerId = window.setInterval(() => {
-      if (this.remainingTimeInSeconds > 0) {
-        this.remainingTimeInSeconds -= 1;
+      if (this.expiryTimestampMs !== null) {
+        this.remainingTimeInSeconds = Math.max(
+          0,
+          Math.ceil((this.expiryTimestampMs - Date.now()) / 1000)
+        );
       }
       if (this.remainingTimeInSeconds === 0) {
         this.isTimeExpired = true;
@@ -233,6 +257,14 @@ export class CertificateAssessmentPlayerPageRootComponent
       window.clearInterval(this.timerId);
       this.timerId = null;
     }
+  }
+
+  private resetTimerState(): void {
+    this.clearTimer();
+    this.hasStartedTimer = false;
+    this.isTimeExpired = false;
+    this.remainingTimeInSeconds = 0;
+    this.expiryTimestampMs = null;
   }
 
   private async navigateToLearnerDashboard(): Promise<boolean> {

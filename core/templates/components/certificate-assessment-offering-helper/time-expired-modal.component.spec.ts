@@ -137,7 +137,7 @@ describe('TimeExpiredModalComponent', () => {
       const newComponentInstance = newFixture.componentInstance;
 
       newComponentInstance.viewResults();
-      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('view-results');
     });
   });
 });

@@ -243,30 +243,25 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
-  it('should start the countdown timer when questions are available', fakeAsync(() => {
+  it('should start the countdown timer when questions are available', () => {
     spyOn(window, 'setInterval').and.returnValue(123 as never);
     component.attempt = mockAttempt;
     component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.onResumeAssessment();
 
+    expect(component.currentStage).toBe(
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+    );
     expect(component.remainingTimeInSeconds).toBe(3600);
     expect(window.setInterval).toHaveBeenCalled();
-  }));
+  });
 
   it('should decrement the countdown and mark the assessment expired at zero', fakeAsync(() => {
     component.attempt = mockAttempt;
     component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.onResumeAssessment();
     expect(component.remainingTimeInSeconds).toBe(3600);
 
     tick(2000);
@@ -278,15 +273,25 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.isTimeExpired).toBeTrue();
   }));
 
+  it('should derive remaining time from the deadline when callbacks are throttled', fakeAsync(() => {
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+
+    component.onResumeAssessment();
+
+    tick(60000);
+
+    expect(component.remainingTimeInSeconds).toBe(3540);
+    expect(component.isTimeExpired).toBeFalse();
+
+    component.ngOnDestroy();
+  }));
+
   it('should not start the countdown without an attempt', () => {
     spyOn(window, 'setInterval');
     component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.onResumeAssessment();
 
     expect(window.setInterval).not.toHaveBeenCalled();
     expect(component.remainingTimeInSeconds).toBe(0);
@@ -295,67 +300,95 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   it('should not start the countdown without a positive time limit', () => {
     spyOn(window, 'setInterval');
     component.attempt = mockAttempt;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+    component.certificateOffering = new CertificateAssessmentOfferingData(
+      'cert-123',
+      'Everyday Arithmetic & Number Confidence',
+      'Certificate description.',
+      'math_classroom_01',
+      {topic_place_values: 1},
+      12,
+      0,
+      ['Understanding of numbers'],
+      'Available',
+      1
+    );
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.onResumeAssessment();
 
     expect(window.setInterval).not.toHaveBeenCalled();
     expect(component.remainingTimeInSeconds).toBe(0);
   });
 
-  it('should not start the countdown outside the questions stage', () => {
+  it('should not start the countdown outside the questions stage', fakeAsync(() => {
     spyOn(window, 'setInterval');
     component.attempt = mockAttempt;
-    component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.ngOnInit();
+    flushMicrotasks();
 
     expect(window.setInterval).not.toHaveBeenCalled();
     expect(component.remainingTimeInSeconds).toBe(0);
-  });
+  }));
 
   it('should not restart an already running countdown', () => {
     spyOn(window, 'setInterval').and.returnValue(123 as never);
     component.attempt = mockAttempt;
     component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
+    component.onResumeAssessment();
+    component.onResumeAssessment();
 
     expect(window.setInterval).toHaveBeenCalledTimes(1);
   });
 
+  it('should reset stale timer state when a replacement attempt starts', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.returnValue(123 as never);
+    spyOn(window, 'clearInterval');
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+
+    component.onResumeAssessment();
+    component.isTimeExpired = true;
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.isTimeExpired).toBeFalse();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.clearInterval).toHaveBeenCalled();
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
+  }));
+
+  it('should reset stale timer state on retry', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.returnValue(123 as never);
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+
+    component.onResumeAssessment();
+    component.isTimeExpired = true;
+
+    component.onRetryAssessment();
+    tick(2000);
+    expect(component.isTimeExpired).toBeFalse();
+    expect(component.remainingTimeInSeconds).toBe(0);
+
+    component.onResumeAssessment();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
+  }));
+
   it('should clear the countdown timer on destroy', fakeAsync(() => {
     component.attempt = mockAttempt;
     component.certificateOffering = mockOffering;
-    component.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
-    (
-      component as unknown as {startTimerIfReady: () => void}
-    ).startTimerIfReady();
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).not.toBeNull();
+    component.onResumeAssessment();
+    expect(component.remainingTimeInSeconds).toBe(3600);
 
     component.ngOnDestroy();
+    tick(2000);
 
-    expect(
-      (component as unknown as {timerId: number | null}).timerId
-    ).toBeNull();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(component.isTimeExpired).toBeFalse();
   }));
 
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
@@ -400,6 +433,35 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
+  it('should not suppress navigation when the timer expires during a pending submission', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    component.attempt = mockAttempt;
+    component.certificateOffering = mockOffering;
+    component.onResumeAssessment();
+
+    const answers = [{question_id: 'question_1', is_correct: true}];
+    component.onAssessmentSubmitted(answers);
+    tick(3600000);
+    expect(component.isTimeExpired).toBeTrue();
+
+    component.onAssessmentSubmitted(answers);
+    expect(
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
+    ).toHaveBeenCalledTimes(1);
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalled();
+  }));
+
   it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
     component.attempt = mockAttempt;
     component.isTimeExpired = true;
@@ -440,6 +502,63 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
   it('should navigate to the result page when view results is requested', fakeAsync(() => {
     component.attempt = mockAttempt;
+
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should wait for an in-flight submission before navigating to results', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    component.attempt = mockAttempt;
+    component.isTimeExpired = true;
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+
+    let viewResultsResolved = false;
+    component.onViewResults().then(() => {
+      viewResultsResolved = true;
+    });
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBeFalse();
+    expect(router.navigate).not.toHaveBeenCalled();
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBeTrue();
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should navigate to results once a failed submission settles', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+    component.attempt = mockAttempt;
+    component.isTimeExpired = true;
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+    flushMicrotasks();
+    expect(alertsService.addWarning).toHaveBeenCalled();
 
     component.onViewResults();
     flushMicrotasks();
