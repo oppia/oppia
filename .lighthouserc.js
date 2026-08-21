@@ -359,6 +359,13 @@ module.exports = {
           {
             matchingUrlPattern:
               '^http://localhost:8181/learn/staging/dummy-topic-one/story$', // pylint: disable=line-too-long
+            pagePerfThresholds: {
+              fcp: 10320,
+              speedIndex: 14360,
+              lcp: 38630,
+              tbt: 1510,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.91}],
               'offscreen-images': ['error', {minScore: 0}],
@@ -367,6 +374,13 @@ module.exports = {
           {
             matchingUrlPattern:
               '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$', // pylint: disable=line-too-long
+            pagePerfThresholds: {
+              fcp: 10610,
+              speedIndex: 10610,
+              lcp: 39500,
+              tbt: 1420,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.95}],
               'errors-in-console': ['error', {minScore: 0}],
@@ -375,6 +389,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: '^http://localhost:8181/learn/math$',
+            pagePerfThresholds: {
+              fcp: 10630,
+              speedIndex: 13500,
+              lcp: 36220,
+              tbt: 1490,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.95}],
               // Classroom pages use JPEG images that are not next-gen formats.
@@ -386,6 +407,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/create/.*$',
+            pagePerfThresholds: {
+              fcp: 10750,
+              speedIndex: 20450,
+              lcp: 64740,
+              tbt: 2580,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.95}],
               'errors-in-console': ['error', {minScore: 1}],
@@ -406,6 +434,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: '^http://localhost:8181/explore/.*$',
+            pagePerfThresholds: {
+              fcp: 10690,
+              speedIndex: 16120,
+              lcp: 56460,
+              tbt: 2630,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.91}],
               // Explore page uses deprecated APIs from third-party scripts.
@@ -421,14 +456,35 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/topic_editor/.*$',
+            pagePerfThresholds: {
+              fcp: 10610,
+              speedIndex: 17150,
+              lcp: 45020,
+              tbt: 1550,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.92,
           },
           {
             matchingUrlPattern: 'http://[^/]+/skill_editor/.*$',
+            pagePerfThresholds: {
+              fcp: 10600,
+              speedIndex: 17010,
+              lcp: 45430,
+              tbt: 1490,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.91,
           },
           {
             matchingUrlPattern: '^http://[^/]+/story_editor/.*$',
+            pagePerfThresholds: {
+              fcp: 10610,
+              speedIndex: 14040,
+              lcp: 36780,
+              tbt: 1230,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.84,
           },
         ],
