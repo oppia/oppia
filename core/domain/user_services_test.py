@@ -55,7 +55,7 @@ if MYPY:  # pragma: no cover
     )
 
 datastore_services = models.Registry.import_datastore_services()
-(auth_models, user_models, audit_models, suggestion_models) = (
+auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
         [
             models.Names.AUTH,
@@ -2169,6 +2169,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 ['user1', 'user2', 'user5', 'user6'],
             )
 
+    def test_update_user_group_with_different_username_casing_succeeds(
+        self,
+    ) -> None:
+        self._signup_test_users_and_create_user_groups()
+        self.signup('mixedcase@email.com', 'TestUser1')
+        user_groups_data = user_services.get_all_user_groups()
+
+        self.assertNotIn('TestUser1', user_groups_data[0].member_usernames)
+        user_services.update_user_group(
+            user_groups_data[0].user_group_id, 'USERGROUP1', ['testuser1']
+        )
+
+        updated_user_groups_data = user_services.get_all_user_groups()
+        self.assertIn('TestUser1', updated_user_groups_data[0].member_usernames)
+
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(
         self,
     ) -> None:
@@ -2616,8 +2631,7 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = 'exp_id0'
 
-    SAMPLE_EXPLORATION_YAML: Final = (
-        """
+    SAMPLE_EXPLORATION_YAML: Final = """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -2778,7 +2792,6 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
     def setUp(self) -> None:
         super().setUp()
