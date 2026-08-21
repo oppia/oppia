@@ -1073,12 +1073,12 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForLoadState('networkidle');
 
     while (true) {
-      const questionButton = await this.page.$(removeQuestion);
-      if (!questionButton) {
+      const questionLocator = this.page.locator(removeQuestion);
+      if (!(await questionLocator.count())) {
         break;
       }
 
-      await questionButton.click();
+      await questionLocator.first().click();
       await this.expectElementToBeVisible(removeQuestionConfirmationButton);
       await this.clickOnElementWithSelector(removeQuestionConfirmationButton);
       await this.expectElementToBeVisible(
