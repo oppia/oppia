@@ -408,6 +408,7 @@
   "I18N_DASHBOARD_OPEN_FEEDBACK": "Text of feedback icon shown in summary tile of an exploration in card view in the user's dashboard page.",
   "I18N_DASHBOARD_SKILL_PROFICIENCY": "Title for the skill proficiency subsection inside the progress tab in mobile view on learner dashboard page.",
   "I18N_DASHBOARD_STATS_AVERAGE_RATING": "Text shown on the stats card on the creator dashboard - This is a label for the Average Rating of the creator",
+  "I18N_DASHBOARD_STATS_FEEDBACK": "Text shown on the stats card on the creator dashboard - This is a label for the Feedback stats of the feedbacks of that exploration.",
   "I18N_DASHBOARD_STATS_OPEN_FEEDBACK": "Text shown on the stats card on the creator dashboard - This is a label for the Open Feedback threads concerning the creator.",
   "I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Text shown on the stats card on the creator dashboard - This is a label for the Total Plays of a creator's explorations.",
   "I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Text shown on the stats card on the creator dashboard - This is a label for the total subscriber count of a creator.\n{{Identical|Subscriber}}",
