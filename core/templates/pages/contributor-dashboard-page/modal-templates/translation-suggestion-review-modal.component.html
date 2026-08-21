@@ -137,12 +137,12 @@
     </p>
     <div class="oppia-suggestion-review-panel">
       <ul *ngIf="contentTypeIsSetOfStrings">
-        <li *ngFor="let item of explorationContentHtml; index as idx">
+        <li *ngFor="let item of entityContentHtml; index as idx">
           {{ item }}
         </li>
       </ul>
       <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
-                                [rteString]="explorationContentHtmlAsString">
+                                [rteString]="entityContentHtmlAsString">
       </oppia-rte-output-display>
     </div>
   </section>
