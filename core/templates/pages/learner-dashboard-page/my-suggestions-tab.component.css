@@ -3,9 +3,9 @@
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
   display: inline-grid;
+  min-height: calc(100vh - 150px);
   padding: 16px;
   width: 100%;
-  min-height: calc(100vh - 150px);
 }
 
 .oppia-feedback-table {
@@ -59,13 +59,13 @@
 }
 
 
-.oppia-my-suggestions-follow-up-button:hover:not(:disabled) {
-  background: #00645c;
-}
-
 .oppia-my-suggestions-follow-up-button:disabled {
   background: #9aa0a6;
   cursor: default;
+}
+
+.oppia-my-suggestions-follow-up-button:hover:not(:disabled) {
+  background: #00645c;
 }
 
 .oppia-my-suggestions-lesson-context {

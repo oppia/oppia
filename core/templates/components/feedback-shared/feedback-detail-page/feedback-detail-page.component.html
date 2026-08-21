@@ -52,15 +52,15 @@
               <span class="oppia-feedback-detail-field-value">{{ getFeedbackPlatformLabel(feedback) }}</span>
             </div>
             <div *ngIf="feedback.parent_feedback_id && feedback.lesson_metadata"
-                class="oppia-feedback-detail-field">
+                 class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">
                 Parent Feedback URL
               </span>
 
               <span class="oppia-feedback-detail-field-value">
                 <a
-                  class="oppia-feedback-detail-link"
-                  [href]="getParentFeedbackUrl(feedback)">
+                   class="oppia-feedback-detail-link"
+                   [href]="getParentFeedbackUrl(feedback)">
                   Link to parent feedback
                 </a>
               </span>

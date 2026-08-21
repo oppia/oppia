@@ -2283,7 +2283,10 @@ class BaseFeedbackModel(BaseModel):
         total = 0
         # A projection query is used to avoid fetching full entities, since
         # only the status field is needed for counting.
-        for model in query.fetch(projection=['status']):
+        status_models: Sequence[BaseFeedbackModel] = query.fetch(
+            projection=[cls.status]
+        )
+        for model in status_models:
             counts[model.status] += 1
             total += 1
         counts['total'] = total
@@ -2311,6 +2314,8 @@ class BaseFeedbackModel(BaseModel):
         with .fetch() instead of .fetch_page() to avoid the IN operator
         incompatibility with Datastore cursors.
         """
+        next_cursor_str: Optional[str] = None
+
         # When multiple statuses are provided, use offset-based pagination
         # to avoid the IN + fetch_page incompatibility. This follows the
         # pattern used by suggestion models in this codebase.
@@ -2347,7 +2352,6 @@ class BaseFeedbackModel(BaseModel):
             )
             more = len(next_results) > 0
 
-            next_cursor_str: Optional[str] = None
             if more:
                 next_cursor_str = str(next_offset)
 
@@ -2372,7 +2376,7 @@ class BaseFeedbackModel(BaseModel):
             page_size, start_cursor=start_cursor
         )
 
-        next_cursor_str: Optional[str] = None
+        next_cursor_str = None
         if len(results) < page_size:
             more = False
         elif next_cursor and more:

@@ -33,7 +33,10 @@ import {
 import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
-import {LessonFeedbackDetailResponse} from 'domain/feedback/feedback.model';
+import {
+  FeedbackStatus,
+  LessonFeedbackDetailResponse,
+} from 'domain/feedback/feedback.model';
 
 describe('AddAFollowUpNoteModalComponent', () => {
   let component: AddAFollowUpNoteModalComponent;
@@ -70,7 +73,7 @@ describe('AddAFollowUpNoteModalComponent', () => {
     detailFeedback = {
       id: 'test_report_id',
       feedback_text: 'Test report',
-      status: 'OPEN',
+      status: FeedbackStatus.OPEN,
       lesson_metadata: {
         exploration_id: 'test',
         exploration_version: 1,
@@ -152,7 +155,7 @@ describe('AddAFollowUpNoteModalComponent opened as a bottom sheet', () => {
     detailFeedback = {
       id: 'test_report_id',
       feedback_text: 'Test report',
-      status: 'OPEN',
+      status: FeedbackStatus.OPEN,
       lesson_metadata: {
         exploration_id: 'test',
         exploration_version: 1,

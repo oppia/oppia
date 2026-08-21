@@ -260,6 +260,20 @@ export interface MyFeedbackUnreadCountResponse {
   unread_count: number;
 }
 
+export interface FeedbackStatusCounts {
+  open: number;
+  fixed: number;
+  compliment: number;
+  not_actionable: number;
+  transferred_to_github: number;
+  total: number;
+}
+
+export interface FeedbackStatusCountsBackendResponse {
+  lesson_feedback_counts: FeedbackStatusCounts;
+  platform_report_counts: FeedbackStatusCounts;
+}
+
 export interface PlatformFeedbackSummary {
   id: string;
   report_message_preview: string;

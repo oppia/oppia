@@ -35,7 +35,9 @@ import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {throwError} from 'rxjs';
 import {
   CreatorFeedbackType,
+  FeedbackFilterState,
   FeedbackStatus,
+  FeedbackStatusCountsBackendResponse,
   LessonFeedbackDetailResponse,
   TechnicalTeamType,
 } from './feedback.model';
@@ -106,6 +108,17 @@ describe('Feedback backend api service', () => {
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
     creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
   };
+
+  const createLearnerFeedbackFilterState = (
+    status: FeedbackStatus,
+    dateRange: {start: Date | null; end: Date | null} = {start: null, end: null}
+  ): FeedbackFilterState => ({
+    searchText: '',
+    status,
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
+    dateRange,
+  });
 
   const detailedReportResponse = {
     id: 'test_report_id',
@@ -347,14 +360,151 @@ describe('Feedback backend api service', () => {
       next_cursor: 'cursor',
       more: false,
     });
-    flushMicrotasks();
 
+    flushMicrotasks();
     expect(onSuccess).toHaveBeenCalledWith({
       summaries: [],
       next_cursor: 'cursor',
       more: false,
     });
   }));
+
+  it('should omit optional query parameters when they are not provided', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService.fetchMyFeedbackListAsync().then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request => request.method === 'GET' && request.url === '/my_feedback'
+    );
+    expect(req.request.params.toString()).toBe('');
+
+    req.flush({summaries: [], next_cursor: null, more: false});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: null,
+      more: false,
+    });
+  }));
+
+  it('should omit the status parameter for an empty status list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchMyFeedbackListAsync(null, [])
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request => request.method === 'GET' && request.url === '/my_feedback'
+    );
+    expect(req.request.params.get('status')).toBeNull();
+
+    req.flush({summaries: [], next_cursor: null, more: false});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalled();
+  }));
+
+  it('should keep zero-millisecond date bounds in the request', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchMyFeedbackListAsync(null, null, 0, 0)
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request => request.method === 'GET' && request.url === '/my_feedback'
+    );
+    // Zero is a valid timestamp bound and must not be dropped from the query.
+    expect(req.request.params.get('date_from_msecs')).toBe('0');
+    expect(req.request.params.get('date_to_msecs')).toBe('0');
+
+    req.flush({summaries: [], next_cursor: null, more: false});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalled();
+  }));
+
+  it(
+    'should send no status filter when fetching learner feedback with' +
+      ' the all statuses filter',
+    fakeAsync(() => {
+      const onSuccess = jasmine.createSpy('onSuccess');
+      feedbackBackendApiService
+        .fetchLearnerLessonFeedbackListAsync(
+          createLearnerFeedbackFilterState(FeedbackStatus.ALL),
+          'cursor1'
+        )
+        .then(onSuccess);
+
+      const req = httpTestingController.expectOne(
+        request => request.method === 'GET' && request.url === '/my_feedback'
+      );
+      expect(req.request.params.get('status')).toBeNull();
+      expect(req.request.params.get('cursor')).toBe('cursor1');
+
+      req.flush({summaries: [], next_cursor: null, more: false});
+      flushMicrotasks();
+      expect(onSuccess).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should map the lesson updated learner filter to the fixed backend' +
+      ' status',
+    fakeAsync(() => {
+      feedbackBackendApiService.fetchLearnerLessonFeedbackListAsync(
+        createLearnerFeedbackFilterState(FeedbackStatus.LESSON_UPDATED)
+      );
+
+      const req = httpTestingController.expectOne(
+        request => request.method === 'GET' && request.url === '/my_feedback'
+      );
+      expect(req.request.params.get('status')).toBe(FeedbackStatus.FIXED);
+
+      req.flush({summaries: [], next_cursor: null, more: false});
+      flushMicrotasks();
+    })
+  );
+
+  it(
+    'should map the reviewed by team learner filter to the compliment and' +
+      ' not actionable backend statuses',
+    fakeAsync(() => {
+      feedbackBackendApiService.fetchLearnerLessonFeedbackListAsync(
+        createLearnerFeedbackFilterState(FeedbackStatus.REVIEWED_BY_TEAM)
+      );
+
+      const req = httpTestingController.expectOne(
+        request => request.method === 'GET' && request.url === '/my_feedback'
+      );
+      expect(req.request.params.get('status')).toBe(
+        `${FeedbackStatus.COMPLIMENT},${FeedbackStatus.NOT_ACTIONABLE}`
+      );
+
+      req.flush({summaries: [], next_cursor: null, more: false});
+      flushMicrotasks();
+    })
+  );
+
+  it(
+    'should map the open learner filter to the open backend status and pass' +
+      ' through date bounds',
+    fakeAsync(() => {
+      feedbackBackendApiService.fetchLearnerLessonFeedbackListAsync(
+        createLearnerFeedbackFilterState(FeedbackStatus.OPEN, {
+          start: new Date(1000),
+          end: new Date(2000),
+        })
+      );
+
+      const req = httpTestingController.expectOne(
+        request => request.method === 'GET' && request.url === '/my_feedback'
+      );
+      expect(req.request.params.get('status')).toBe(FeedbackStatus.OPEN);
+      expect(req.request.params.get('date_from_msecs')).toBe('1000');
+      expect(req.request.params.get('date_to_msecs')).toBe('2000');
+
+      req.flush({summaries: [], next_cursor: null, more: false});
+      flushMicrotasks();
+    })
+  );
 
   it('should fetch CORE technical dashboard report list', fakeAsync(() => {
     const onSuccess = jasmine.createSpy('onSuccess');
@@ -631,6 +781,42 @@ describe('Feedback backend api service', () => {
 
     flushMicrotasks();
     expect(onSuccess).toHaveBeenCalledWith(3);
+  }));
+
+  it('should fetch the feedback status counts for an exploration', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    const statusCountsResponse: FeedbackStatusCountsBackendResponse = {
+      lesson_feedback_counts: {
+        open: 2,
+        fixed: 1,
+        compliment: 0,
+        not_actionable: 0,
+        transferred_to_github: 0,
+        total: 3,
+      },
+      platform_report_counts: {
+        open: 1,
+        fixed: 0,
+        compliment: 0,
+        not_actionable: 1,
+        transferred_to_github: 0,
+        total: 2,
+      },
+    };
+    feedbackBackendApiService
+      .fetchLessonFeedbackStatusCountsAsync('exp_1')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/feedbackstatuscounts/exp_1'
+    );
+
+    req.flush(statusCountsResponse);
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(statusCountsResponse);
   }));
 
   it('should be able to submit a FollowUo note from my suggestions tab', fakeAsync(() => {

@@ -85,6 +85,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
         expected_dict: general_feedback_domain.LessonFeedbackSummaryDict = {
             'id': 'feedback_id',
             'feedback_text_preview': f'{"N" * 97}...',
+            'latest_response_preview': 'Pushed a fix in v4.',
             'status': 'open',
             'source': 'lesson',
             'lesson_title': 'exp1',

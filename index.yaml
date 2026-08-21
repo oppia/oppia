@@ -732,3 +732,15 @@ indexes:
   - name: status
   - name: last_updated
     direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
