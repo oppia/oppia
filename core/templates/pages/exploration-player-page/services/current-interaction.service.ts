@@ -89,7 +89,7 @@ export class CurrentInteractionService {
   // in 'null', the submit button will remain enabled (for the entire duration
   // of the current interaction).
   private static validityCheckFn: ValidityCheckFn | null = null;
-  private static onSubmitFn: OnSubmitFn;
+  private static onSubmitFn: OnSubmitFn | null = null;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -101,6 +101,15 @@ export class CurrentInteractionService {
      * @param {function(answer, interactionRulesService)} onSubmit
      */
     CurrentInteractionService.onSubmitFn = onSubmit;
+  }
+
+  clearOnSubmitFn(onSubmit: OnSubmitFn): void {
+    // Only clears the registered onSubmit callback if it is the exact
+    // callback passed in. This prevents a component being destroyed from
+    // removing a callback registered by a different component.
+    if (CurrentInteractionService.onSubmitFn === onSubmit) {
+      CurrentInteractionService.onSubmitFn = null;
+    }
   }
 
   registerCurrentInteraction(
@@ -145,6 +154,9 @@ export class CurrentInteractionService {
   ): void {
     for (let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
       CurrentInteractionService.presubmitHooks[i]();
+    }
+    if (CurrentInteractionService.onSubmitFn === null) {
+      throw new Error('No onSubmit function has been registered.');
     }
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
@@ -210,6 +222,13 @@ export class CurrentInteractionService {
       return false;
     }
     return !CurrentInteractionService.validityCheckFn();
+  }
+
+  isSubmitAnswerFnRegistered(): boolean {
+    // True if the current interaction registered a submit answer function.
+    // Interactions such as ImageClickInput register null because they submit
+    // answers via their own interaction handlers instead.
+    return CurrentInteractionService.submitAnswerFn !== null;
   }
 
   updateViewWithNewAnswer(): void {

@@ -44,6 +44,7 @@ export class InteractiveNumericInput implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() requireNonnegativeInputWithValue: string = '';
   @Input() allowExponentialNotationWithValue: string = '';
+  @Input() lastAnswer!: NumericInputAnswer | null;
   @Input() savedSolution!: NumericInputAnswer;
   @Input() labelForFocusTarget!: string;
   // Answer is empty string if the user has not yet entered an answer. This is
@@ -131,6 +132,12 @@ export class InteractiveNumericInput implements OnInit {
     this.requireNonnegativeInput = requireNonnegativeInput.value;
     this.allowExponentialNotation = allowExponentialNotation.value;
     this.answer = this.savedSolution !== undefined ? this.savedSolution : '';
+    this.answer =
+      this.lastAnswer !== null && this.lastAnswer !== undefined
+        ? this.lastAnswer
+        : this.savedSolution !== undefined
+          ? this.savedSolution
+          : '';
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
