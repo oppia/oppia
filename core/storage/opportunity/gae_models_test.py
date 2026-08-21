@@ -513,6 +513,15 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 2)
         self.assertFalse(more)
 
+        # Test filter by language_code only (entity_type=None).
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                None, None, 'hi', 10, None
+            )
+        )
+        self.assertEqual(len(results), 3)
+        self.assertFalse(more)
+
         # Test filter by different topic_id.
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
