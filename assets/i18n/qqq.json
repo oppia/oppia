@@ -947,7 +947,6 @@
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED": "Status label shown in the 'My Certificates' tab for certificate attempts that were passed. It is also used as a filter option.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION": "Text for the 'My Certificates' section in the learner dashboard.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION_HEADING": "Heading for the 'My Certificates' section in the learner dashboard, personalized with the learner's username.",
-  "I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_CLASSROOM_SECTION_LINK": "Text for the classroom section link in the My suggestions tab of learner dashboard - when user clicks on link, they are taken to classroom pages",
   "I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION": "Text for the 'My Suggestions' section in the learner dashboard.",
     "I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION_HEADING": "Heading for the 'My Suggestions' section in the learner dashboard, personalized with the learner's username.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_ATTEMPT_HEADING": "Column heading for the attempt number in the 'My Certificates' table in the learner dashboard.",

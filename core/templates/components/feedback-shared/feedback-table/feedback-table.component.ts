@@ -78,7 +78,10 @@ export class FeedbackTableComponent {
   }
 
   getNotificationSummary(summary: LessonFeedbackSummary): string {
-    if (summary.status === FeedbackStatus.FIXED) {
+    if (
+      summary.status === FeedbackStatus.FIXED ||
+      FeedbackStatus.LESSON_UPDATED
+    ) {
       return (
         'A creator fixed an error you reported. Thank you for helping make ' +
         'Oppia better for everyone!'

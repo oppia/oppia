@@ -26,8 +26,6 @@ import './classroom-button.component.css';
 export class ClassroomButtonComponent {
   @Input() classroom!: string;
   @Input() variant!: string;
-  @Input() buttonText: string =
-    'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK';
 
   classroomUrl: string = '';
 

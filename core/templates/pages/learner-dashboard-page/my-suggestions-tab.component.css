@@ -8,34 +8,6 @@
   min-height: calc(100vh - 150px);
 }
 
-
-.oppia-my-suggestions-state {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  justify-content: center;
-}
-
-.oppia-my-suggestions-state-text {
-  color: #1f1f1f;
-  font-size: 19px;
-  line-height: 20px;
-  text-align: center;
-}
-
-.oppia-my-suggestions-empty-icon {
-  align-items: center;
-  background: rgba(0, 100, 92, 0.08);
-  border-radius: 50%;
-  color: #00645c;
-  display: flex;
-  font-size: 20px;
-  height: 56px;
-  justify-content: center;
-  width: 56px;
-}
-
 .oppia-feedback-table {
   display: flex;
   height: 60vh;
