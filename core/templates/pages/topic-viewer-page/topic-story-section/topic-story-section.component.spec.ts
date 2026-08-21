@@ -2775,6 +2775,205 @@ describe('TopicStorySectionComponent', () => {
     expect(component.masteredAdventureIndex).toBeNull();
   });
 
+  it('should handle onAdventureMasteredContinue when mastered the last adventure', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+    ];
+    component.masteredAdventureIndex = 0;
+
+    component.onAdventureMasteredContinue();
+
+    expect(component.masteredAdventureIndex).toBeNull();
+    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+      true
+    );
+  });
+
+  it('should call onArcSkipConfirmationCancel when arc skip modal is rejected', fakeAsync(() => {
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    component.lessonWrappers = new QueryList<ElementRef>();
+    component.lessonWrappers.reset([]);
+
+    const rejectModalRef = {
+      result: Promise.reject(new Error('dismissed')),
+      componentInstance: {},
+    } as NgbModalRef;
+    ngbModal.open.and.returnValue(rejectModalRef);
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ArcSkipConfirmationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-arc-skip-confirmation-modal',
+      }
+    );
+
+    tick();
+
+    expect(Reflect.get(component, 'pendingNavigationLessonNumber')).toBeNull();
+    expect(
+      Reflect.get(component, 'pendingNavigationAdventureIndex')
+    ).toBeNull();
+  }));
+
+  it('should call onAdventureMasteredContinue when mastered modal is resolved', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    const resolveModalRef = {
+      result: Promise.resolve(),
+      componentInstance: {},
+    } as NgbModalRef;
+    ngbModal.open.and.returnValue(resolveModalRef);
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
+    expect(component.masteredAdventureIndex).toBeNull();
+    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+      true
+    );
+  }));
+
+  it('should clear mastered modal ref when mastered modal is rejected', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {status: 'Published'}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    const rejectModalRef = {
+      result: Promise.reject(new Error('dismissed')),
+      componentInstance: {},
+    } as NgbModalRef;
+    ngbModal.open.and.returnValue(rejectModalRef);
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      AdventureMasteredModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-adventure-mastered-modal',
+      }
+    );
+
+    tick(1);
+  }));
+
   it('should return false from isChapterPublished when getStatus returns null', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
@@ -3515,7 +3714,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should call onArcSkipConfirmationProceed when bottom sheet confirms', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
-    let dismissCallback: (result: string) => void;
+    let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
       afterDismissed: () => ({
         subscribe: (cb: (result: string) => void) => {
@@ -3565,7 +3764,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    dismissCallback!('confirm');
+    dismissCallback('confirm');
 
     expect(component.isAdventureSkipped(0)).toBe(true);
     expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
@@ -3578,7 +3777,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should call onArcSkipConfirmationCancel when bottom sheet is dismissed', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
-    let dismissCallback: (result: string) => void;
+    let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
       afterDismissed: () => ({
         subscribe: (cb: (result: string) => void) => {
@@ -3628,7 +3827,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    dismissCallback!('cancel');
+    dismissCallback('cancel');
 
     expect(component.isAdventureSkipped(0)).toBe(false);
 
@@ -3637,7 +3836,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should call onAdventureMasteredContinue when mastered bottom sheet confirms', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
-    let dismissCallback: (result: string) => void;
+    let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
       afterDismissed: () => ({
         subscribe: (cb: (result: string) => void) => {
@@ -3686,7 +3885,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    dismissCallback!('confirm');
+    dismissCallback('confirm');
 
     expect(component.masteredAdventureIndex).toBeNull();
     expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
@@ -3694,7 +3893,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should clear mastered modal ref when mastered bottom sheet is dismissed', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
-    let dismissCallback: (result: string) => void;
+    let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
       afterDismissed: () => ({
         subscribe: (cb: (result: string) => void) => {
@@ -3743,7 +3942,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    dismissCallback!('cancel');
+    dismissCallback('cancel');
 
     expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
   }));
