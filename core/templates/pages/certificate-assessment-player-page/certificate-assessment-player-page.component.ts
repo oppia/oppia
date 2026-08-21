@@ -50,6 +50,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -208,7 +209,10 @@ export class CertificateAssessmentPlayerPageComponent
     if (this.isMobileScreenSize()) {
       const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
       bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result === 'view-results') {
+        if (
+          result ===
+          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+        ) {
           this.viewResults.emit();
         } else {
           this.assessmentEnded.emit();
@@ -223,7 +227,10 @@ export class CertificateAssessmentPlayerPageComponent
     });
     modalRef.result
       .then(result => {
-        if (result === 'view-results') {
+        if (
+          result ===
+          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+        ) {
           this.viewResults.emit();
         }
       })

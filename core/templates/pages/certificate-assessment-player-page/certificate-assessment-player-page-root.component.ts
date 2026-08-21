@@ -31,13 +31,14 @@ import {AlertsService} from 'services/alerts.service';
 import {PageHeadService} from 'services/page-head.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
-
-type CertificateAssessmentStage =
-  (typeof CertificateAssessmentPlayerPageConstants)[keyof typeof CertificateAssessmentPlayerPageConstants];
+import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
+  // The state service is scoped to this component so that its countdown
+  // interval is torn down together with the page it belongs to.
+  providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
   extends BaseRootComponent
@@ -58,22 +59,10 @@ export class CertificateAssessmentPlayerPageRootComponent
   certificateId = '';
   certificateOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
-  attempt: CertificateAssessmentAttemptData | null = null;
   classroomUrlFragment = '';
-  currentStage: CertificateAssessmentStage =
-    CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
-  // TODO(#24717-M2.20): This flag value is by default set as false so the
-  // interrupt card does not render. In the future, this flag will change its
-  // value based on whether an in-progress attempt is detected on page load.
-  showAssessmentInterruptCard = false;
   isLoading = true;
   hasError = false;
-  remainingTimeInSeconds = 0;
-  isTimeExpired = false;
   isSubmissionInProgress = false;
-  private timerId: number | null = null;
-  private expiryTimestampMs: number | null = null;
-  private hasStartedTimer = false;
   // Tracks the most recent submission so that result navigation can wait
   // until the final answers have actually been persisted.
   private pendingSubmission: Promise<void> = Promise.resolve();
@@ -82,12 +71,34 @@ export class CertificateAssessmentPlayerPageRootComponent
     private activatedRoute: ActivatedRoute,
     private alertsService: AlertsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
     protected pageHeadService: PageHeadService,
     private router: Router,
     protected translateService: TranslateService
   ) {
     super(pageHeadService, translateService);
+  }
+
+  get currentStage(): string {
+    return this.certificateAssessmentPlayerStateService.currentStage;
+  }
+
+  get attempt(): CertificateAssessmentAttemptData | null {
+    return this.certificateAssessmentPlayerStateService.getAttempt();
+  }
+
+  get showAssessmentInterruptCard(): boolean {
+    return this.certificateAssessmentPlayerStateService
+      .showAssessmentInterruptCard;
+  }
+
+  get isTimeExpired(): boolean {
+    return this.certificateAssessmentPlayerStateService.isTimeExpired;
+  }
+
+  get remainingTimeInSeconds(): number {
+    return this.certificateAssessmentPlayerStateService.remainingTimeInSeconds;
   }
 
   async ngOnInit(): Promise<void> {
@@ -107,7 +118,9 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       await this.loadClassroomUrlFragment();
-      this.startTimerIfReady();
+      this.certificateAssessmentPlayerStateService.configureForOffering(
+        this.certificateOffering.timeLimitInMinutes
+      );
     } catch {
       this.hasError = true;
       await this.redirectToNotFound();
@@ -116,6 +129,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     }
   }
 
+  /** Sends the learner to the 404 page when the offering can't be loaded. */
   private async redirectToNotFound(): Promise<void> {
     try {
       await this.router.navigate([
@@ -136,24 +150,27 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   showInstructions(): void {
-    this.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS;
+    this.certificateAssessmentPlayerStateService.showInstructions();
   }
 
   showIntro(): void {
-    this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+    this.certificateAssessmentPlayerStateService.showIntro();
   }
 
+  /**
+   * Starts a new attempt on the server. The learner only moves to the
+   * questions once the server confirms the attempt; that confirmation is
+   * also what arms a fresh time window for them (see
+   * `beginNewAttempt`), so a failed start leaves any existing timing
+   * state untouched.
+   */
   async startAssessment(): Promise<void> {
-    this.resetTimerState();
     try {
-      this.attempt =
+      const attempt =
         await this.certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync(
           this.certificateId
         );
-      this.currentStage =
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-      this.startTimerIfReady();
+      this.certificateAssessmentPlayerStateService.beginNewAttempt(attempt);
     } catch {
       this.alertsService.addWarning(
         this.translateService.instant(
@@ -163,14 +180,20 @@ export class CertificateAssessmentPlayerPageRootComponent
     }
   }
 
+  /**
+   * Submits the learner's final answers exactly once and navigates to the
+   * result page, unless the submission raced against the expiry of the
+   * time window (in which case the auto-submit keeps them on the page).
+   */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
   ): Promise<void> {
-    if (this.attempt === null || this.isSubmissionInProgress) {
+    const attempt = this.attempt;
+    if (attempt === null || this.isSubmissionInProgress) {
       return;
     }
     const submittedBeforeExpiry = !this.isTimeExpired;
-    const attemptId = this.attempt.attemptId;
+    const attemptId = attempt.attemptId;
     this.isSubmissionInProgress = true;
     this.pendingSubmission = (async () => {
       try {
@@ -195,16 +218,11 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   onRetryAssessment(): void {
-    this.resetTimerState();
-    this.showAssessmentInterruptCard = false;
-    this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+    this.certificateAssessmentPlayerStateService.returnToIntroAfterRetry();
   }
 
   onResumeAssessment(): void {
-    this.showAssessmentInterruptCard = false;
-    this.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    this.startTimerIfReady();
+    this.certificateAssessmentPlayerStateService.resumeQuestionsStage();
   }
 
   async onViewResults(): Promise<boolean> {
@@ -217,54 +235,9 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   ngOnDestroy(): void {
-    this.clearTimer();
-  }
-
-  private startTimerIfReady(): void {
-    if (
-      this.hasStartedTimer ||
-      this.attempt === null ||
-      this.certificateOffering.timeLimitInMinutes <= 0 ||
-      this.currentStage !==
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-    ) {
-      return;
-    }
-    this.hasStartedTimer = true;
-    const durationInSeconds = this.certificateOffering.timeLimitInMinutes * 60;
-    // Derive the remaining time from an absolute deadline rather than
-    // decrementing per callback, because browsers throttle intervals in
-    // inactive tabs and would otherwise let the assessment run longer than
-    // its configured duration.
-    this.expiryTimestampMs = Date.now() + durationInSeconds * 1000;
-    this.remainingTimeInSeconds = durationInSeconds;
-    this.timerId = window.setInterval(() => {
-      if (this.expiryTimestampMs !== null) {
-        this.remainingTimeInSeconds = Math.max(
-          0,
-          Math.ceil((this.expiryTimestampMs - Date.now()) / 1000)
-        );
-      }
-      if (this.remainingTimeInSeconds === 0) {
-        this.isTimeExpired = true;
-        this.clearTimer();
-      }
-    }, 1000);
-  }
-
-  private clearTimer(): void {
-    if (this.timerId !== null) {
-      window.clearInterval(this.timerId);
-      this.timerId = null;
-    }
-  }
-
-  private resetTimerState(): void {
-    this.clearTimer();
-    this.hasStartedTimer = false;
-    this.isTimeExpired = false;
-    this.remainingTimeInSeconds = 0;
-    this.expiryTimestampMs = null;
+    // Stops the countdown before the base class unsubscribes its listeners.
+    this.certificateAssessmentPlayerStateService.ngOnDestroy();
+    super.ngOnDestroy();
   }
 
   private async navigateToLearnerDashboard(): Promise<boolean> {
@@ -274,12 +247,13 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   private async navigateToResultPage(): Promise<boolean> {
-    if (this.attempt === null) {
+    const attempt = this.attempt;
+    if (attempt === null) {
       return false;
     }
     return this.router.navigate([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
-      this.attempt.attemptId,
+      attempt.attemptId,
     ]);
   }
 }

@@ -14,8 +14,10 @@
 
 /**
  * @fileoverview Component for the certificate assessment conversation skin,
- * i.e. the question-by-question player screen (progress bar,
- * question card, and navigation actions).
+ * i.e. the question-by-question player screen (progress bar, question card,
+ * and navigation actions). It only renders the question UI and emits
+ * navigation events; the assessment time limit and its expiry are handled by
+ * the certificate assessment player page and its state service.
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';

@@ -47,6 +47,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -634,7 +635,12 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     loadQ1();
     spyOn(component.assessmentSubmitted, 'emit');
     spyOn(component.viewResults, 'emit');
-    modalSpy.open.and.returnValue(modalRef(false, 'view-results'));
+    modalSpy.open.and.returnValue(
+      modalRef(
+        false,
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      )
+    );
     triggerTimeExpiry();
     flushMicrotasks();
 
@@ -660,7 +666,8 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     spyOn(component.viewResults, 'emit');
     spyOn(component.assessmentEnded, 'emit');
     bottomSheetSpy.open.and.returnValue({
-      afterDismissed: () => of('view-results'),
+      afterDismissed: () =>
+        of(CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT),
     });
     triggerTimeExpiry();
     flushMicrotasks();
