@@ -55,6 +55,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {LessonFeedbackSummary} from 'domain/feedback/feedback.model';
+import './learner-dashboard-page.component.css';
 
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
