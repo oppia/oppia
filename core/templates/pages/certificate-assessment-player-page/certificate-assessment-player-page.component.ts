@@ -19,8 +19,8 @@
 import {
   Component,
   EventEmitter,
-  OnChanges,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Optional,
@@ -49,9 +49,12 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
-import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {
+  UnansweredQuestionModalComponent,
+  SUBMIT_ANYWAY_RESULT,
+} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import './certificate-assessment-player-page.component.css';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
@@ -74,6 +77,12 @@ export class CertificateAssessmentPlayerPageComponent
 
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
+
+  // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal flag is currently
+  // initialized with a default value. Update this flag based on the
+  // appropriate condition once the logic for determining when the modal should
+  // be shown is implemented.
+  showTimeExpiredModal = false;
 
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
@@ -109,6 +118,9 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.loadQuestion(0);
     this.refreshComputedFields();
+    if (this.showTimeExpiredModal) {
+      this.openTimeExpiredModal();
+    }
     if (this.isTimeExpired) {
       this.handleTimeExpiry();
     }
@@ -230,6 +242,18 @@ export class CertificateAssessmentPlayerPageComponent
       });
   }
 
+  private handleTimeExpiry(): void {
+    if (this.hasHandledTimeExpiry) {
+      return;
+    }
+    this.hasHandledTimeExpiry = true;
+    this.openTimeExpiredModal();
+    const loadedQuestions = this.questions.filter(
+      (question): question is AssessmentQuestion => question !== undefined
+    );
+    this.assessmentSubmitted.emit(this.buildAnswers(loadedQuestions));
+  }
+
   openUnansweredQuestionModal(
     unansweredQuestionCount: number,
     onGoBack: () => void,
@@ -241,7 +265,7 @@ export class CertificateAssessmentPlayerPageComponent
       );
       bottomSheetRef.instance.unansweredQuestionCount = unansweredQuestionCount;
       bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result === 'submit-anyway') {
+        if (result === SUBMIT_ANYWAY_RESULT) {
           onSubmitAnyway();
         } else {
           onGoBack();
@@ -258,7 +282,7 @@ export class CertificateAssessmentPlayerPageComponent
       unansweredQuestionCount;
     modalRef.result
       .then(result => {
-        if (result === 'submit-anyway') {
+        if (result === SUBMIT_ANYWAY_RESULT) {
           onSubmitAnyway();
         }
       })
@@ -288,45 +312,7 @@ export class CertificateAssessmentPlayerPageComponent
     const loadedQuestions = this.questions.filter(
       (question): question is AssessmentQuestion => question !== undefined
     );
-    const answers = this.buildAnswers(loadedQuestions);
-    const unansweredQuestionIndexes = loadedQuestions
-      .map((question, index) => ({question, index}))
-      .filter(({question}) => (this.answers[question.id] ?? null) === null)
-      .map(({index}) => index);
-    if (unansweredQuestionIndexes.length === 0) {
-      this.assessmentSubmitted.emit(answers);
-      return;
-    }
-    const lastUnansweredQuestionIndex =
-      unansweredQuestionIndexes[unansweredQuestionIndexes.length - 1];
-    this.openUnansweredQuestionModal(
-      unansweredQuestionIndexes.length,
-      () => {
-        this.currentQuestionIndex = lastUnansweredQuestionIndex;
-        this.refreshComputedFields();
-      },
-      () => {
-        this.assessmentSubmitted.emit(answers);
-      }
-    );
-  }
-
-  private handleTimeExpiry(): void {
-    if (this.hasHandledTimeExpiry) {
-      return;
-    }
-    this.hasHandledTimeExpiry = true;
-    this.openTimeExpiredModal();
-    const loadedQuestions = this.questions.filter(
-      (question): question is AssessmentQuestion => question !== undefined
-    );
-    this.assessmentSubmitted.emit(this.buildAnswers(loadedQuestions));
-  }
-
-  private buildAnswers(
-    loadedQuestions: AssessmentQuestion[]
-  ): SubmitCertificateAssessmentAnswerBackendDict[] {
-    return loadedQuestions.map(question => {
+    const answers = loadedQuestions.map(question => {
       const answer = this.answers[question.id] ?? null;
       let isCorrect = false;
       if (answer !== null) {
@@ -354,6 +340,29 @@ export class CertificateAssessmentPlayerPageComponent
           : {}),
       };
     });
+    const unansweredQuestionIndexes = this.questions
+      .map((question, index) => ({question, index}))
+      .filter(
+        ({question}) =>
+          question !== undefined && (this.answers[question.id] ?? null) === null
+      )
+      .map(({index}) => index);
+    if (unansweredQuestionIndexes.length === 0) {
+      this.assessmentSubmitted.emit(answers);
+      return;
+    }
+    const lastUnansweredQuestionIndex =
+      unansweredQuestionIndexes[unansweredQuestionIndexes.length - 1];
+    this.openUnansweredQuestionModal(
+      unansweredQuestionIndexes.length,
+      () => {
+        this.currentQuestionIndex = lastUnansweredQuestionIndex;
+        this.refreshComputedFields();
+      },
+      () => {
+        this.assessmentSubmitted.emit(answers);
+      }
+    );
   }
 
   handleInteractionSubmit(answer: InteractionAnswer): void {

@@ -266,7 +266,7 @@ describe('Current Interaction Service', () => {
   });
   it('should return false for no response error when no card is displayed', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
-      undefined as unknown as StateCard
+      undefined
     );
 
     expect(currentInteractionService.showNoResponseError()).toBe(false);
@@ -300,7 +300,7 @@ describe('Current Interaction Service', () => {
 
   it('should return false for invalid response error when no card is displayed', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
-      undefined as unknown as StateCard
+      undefined
     );
 
     expect(currentInteractionService.showInvalidResponseError()).toBe(false);
