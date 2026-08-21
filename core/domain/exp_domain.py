@@ -431,7 +431,15 @@ class ExplorationChange(change_domain.BaseChange):
                 'translation_html',
                 'data_format',
             ],
-            'optional_attribute_names': [],
+            'optional_attribute_names': [
+                # Auto-generation metadata: present only when a translation
+                # suggestion was populated via the AI auto-translate feature.
+                # These fields are optional so that all existing manual
+                # suggestions remain backward-compatible.
+                'was_auto_generated',
+                'auto_generation_provider',
+                'was_edited',
+            ],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
