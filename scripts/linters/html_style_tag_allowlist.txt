@@ -58,9 +58,7 @@ core/templates/pages/skill-editor-page/editor-tab/skill-prerequisite-skills-edit
 core/templates/pages/skill-editor-page/editor-tab/skill-preview-modal.component.html
 core/templates/pages/skill-editor-page/editor-tab/skill-rubrics-editor/skill-rubrics-editor.component.html
 core/templates/pages/skill-editor-page/modal-templates/add-misconception-modal.component.html
-core/templates/pages/story-editor-page/editor-tab/story-editor.component.html
 core/templates/pages/topic-editor-page/questions-tab/topic-questions-tab.component.html
-core/templates/pages/topic-editor-page/subtopic-editor/add-study-guide-section.component.html
 core/templates/pages/topic-editor-page/subtopic-editor/study-guide-section-editor.component.html
 core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.html
 core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.html
