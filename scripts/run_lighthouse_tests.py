@@ -229,12 +229,13 @@ def _run_lighthouse_checks_for_config(config_filename: str) -> None:
     # Standard output is in bytes, we need to decode the line to
     # print it.
     print(stdout.decode('utf-8'))
+    # LHCI writes all assertion results to stderr (both pass/fail/warn),
+    # so always print it.
+    stderr_decoded = stderr.decode('utf-8')
+    if stderr_decoded:
+        print(stderr_decoded)
     if process.returncode != 0:
         print('Return code: %s' % process.returncode)
-        print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
