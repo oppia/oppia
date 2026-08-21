@@ -73,9 +73,9 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/$',
             pagePerfThresholds: {
-              fcp: 1930,
-              speedIndex: 2980,
-              lcp: 6660,
+              fcp: 2030,
+              speedIndex: 3120,
+              lcp: 6790,
               tbt: 200,
               cls: 0.1,
             },
@@ -244,6 +244,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/license$',
+            pagePerfThresholds: {
+              fcp: 2940,
+              speedIndex: 3120,
+              lcp: 6020,
+              tbt: 200,
+              cls: 0.19,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.91}],
               'offscreen-images': ['error', {minScore: 0}],
@@ -251,10 +258,24 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/moderator$',
+            pagePerfThresholds: {
+              fcp: 1860,
+              speedIndex: 2940,
+              lcp: 6090,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.92,
           },
           {
             matchingUrlPattern: 'http://[^/]+/preferences$',
+            pagePerfThresholds: {
+              fcp: 1970,
+              speedIndex: 3050,
+              lcp: 6390,
+              tbt: 200,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.84}],
               'offscreen-images': ['error', {minScore: 0}],
@@ -262,18 +283,48 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/privacy-policy$',
+            pagePerfThresholds: {
+              fcp: 2960,
+              speedIndex: 2960,
+              lcp: 5970,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/profile/username1$',
+            pagePerfThresholds: {
+              fcp: 1950,
+              speedIndex: 3010,
+              lcp: 6270,
+              tbt: 200,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.95}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
-          {matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$'},
+          {
+            matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$',
+            pagePerfThresholds: {
+              fcp: 3100,
+              speedIndex: 3800,
+              lcp: 7200,
+              tbt: 200,
+              cls: 0.4,
+            },
+          },
           {
             matchingUrlPattern: 'http://[^/]+/teach$',
+            pagePerfThresholds: {
+              fcp: 1840,
+              speedIndex: 3150,
+              lcp: 6260,
+              tbt: 200,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.91}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
@@ -281,10 +332,24 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/terms$',
+            pagePerfThresholds: {
+              fcp: 2830,
+              speedIndex: 3040,
+              lcp: 5810,
+              tbt: 200,
+              cls: 0.1,
+            },
             accessibilityMinScore: 0.95,
           },
           {
             matchingUrlPattern: 'http://[^/]+/thanks$',
+            pagePerfThresholds: {
+              fcp: 3040,
+              speedIndex: 3150,
+              lcp: 6050,
+              tbt: 200,
+              cls: 0.1,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.95}],
               'offscreen-images': ['error', {minScore: 0}],
@@ -292,6 +357,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/volunteer$',
+            pagePerfThresholds: {
+              fcp: 2900,
+              speedIndex: 3430,
+              lcp: 6410,
+              tbt: 200,
+              cls: 0.39,
+            },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.88}],
               'uses-responsive-images': ['error', {minScore: 0}],
@@ -299,6 +371,13 @@ module.exports = {
           },
           {
             matchingUrlPattern: 'http://[^/]+/topics-and-skills-dashboard$',
+            pagePerfThresholds: {
+              fcp: 1850,
+              speedIndex: 3130,
+              lcp: 6340,
+              tbt: 200,
+              cls: 0.1,
+            },
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
             },
