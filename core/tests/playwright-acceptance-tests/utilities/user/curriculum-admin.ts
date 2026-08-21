@@ -106,7 +106,6 @@ const addDiagnosticTestSkillButton =
 const diagnosticTestSkillSelector =
   'select.e2e-test-diagnostic-test-skill-selector';
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
-const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
@@ -297,6 +296,89 @@ export class CurriculumAdmin extends TopicManager {
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.goto(editorUrl);
     showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    // Use DOM visibility of the desktop tab instead of isViewportAtMobileWidth()
+    // because CI mobile environments may report incorrect viewport dimensions.
+    const desktopTabVisible = await this.page.isVisible(
+      desktopSkillQuestionTab
+    );
+
+    if (desktopTabVisible) {
+      await this.clickAndWaitForNavigation(desktopSkillQuestionTab, true);
+    } else {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      // Changing only the URL hash triggers a same-document navigation in
+      // the browser (no reload, no re-run of the app's bootstrap code),
+      // so the app never re-evaluates the hash to switch tabs. A full
+      // reload is required to force the app to re-initialize and pick up
+      // the 'questions' tab from the updated hash.
+      await this.reloadPage();
+    }
+    await this.expectElementToBeVisible(addQuestionButton);
+  }
+
+  /**
+   * Navigate to the topic and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(topicAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Open the skill editor page for a skill.
+   * @param {string} skillName - The name of the skill to be opened in the editor.
+   */
+  async openSkillEditor(skillName: string): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(skillsTab);
+    await this.expectElementToBeVisible(skillSelector);
+    await this.clickOnElementWithSelectorAndText(skillSelector, skillName);
+    await this.expectElementToBeVisible(skillEditorCollapsibleCard);
+
+    expect(this.page.url()).toContain('/skill_editor/');
+  }
+
+  /**
+   * Open the topic editor page for a topic.
+   * @param {string} topicName - The name of the topic to be opened in the editor.
+   */
+  async openTopicEditor(topicName: string): Promise<void> {
+    const topicNameSelector = this.isViewportAtMobileWidth()
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(topicsTab);
+    await this.expectElementToBeVisible(topicNameSelector);
+
+    await Promise.all([
+      this.clickOnElementWithSelectorAndText(topicNameSelector, topicName),
+      this.page.waitForNavigation(),
+    ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
   }
 
   /**
@@ -949,8 +1031,12 @@ export class CurriculumAdmin extends TopicManager {
 
       await skillRow.locator(desktopSkillListItemOptions).click();
 
-      // Direct locator click avoids the mouse.move(-1,-1) in clickOnElementWithSelector that triggers the dropdown's mouseleave close.
-      await skillRow.locator(desktopDeleteSkillButton).click();
+      // Search the full page (not just skillRow) because the dropdown may render
+      // outside the .list-item container. Use waitFor to confirm visibility before
+      // clicking to avoid the race where the dropdown closes before the click lands.
+      const deleteBtn = this.page.locator(desktopDeleteSkillButton);
+      await deleteBtn.waitFor({state: 'visible'});
+      await deleteBtn.click();
 
       await this.expectElementToBeVisible(confirmSkillDeletionButton);
       await this.clickOnElementWithSelector(confirmSkillDeletionButton);
