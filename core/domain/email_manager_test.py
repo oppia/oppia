@@ -8990,11 +8990,11 @@ class MissingBranchCoverageTests(test_utils.EmailTestBase):
                         lambda x: mock.Mock(feedback_recipient_email='b@b.com'),
                     ):
                         self.assertEqual(
-                            email_manager._get_classroom_feedback_recipient_email(
+                            email_manager._get_classroom_feedback_recipient_email(  # pylint: disable=protected-access
                                 'exp1'
                             ),
                             'b@b.com',
-                        )  # pylint: disable=protected-access
+                        )
 
                 # Test send_suggestion_email when can_users_receive_email is False.
                 with self.swap(
@@ -9089,6 +9089,6 @@ class MissingBranchCoverageTests(test_utils.EmailTestBase):
     def test_delete_voiceover_error_attachments_branch(self) -> None:
         # Test _delete_voiceover_error_attachments when file does not exist.
         filename_to_path = [{'path': 'nonexistent/path/to/file.ext'}]
-        email_manager._delete_voiceover_error_attachments(
+        email_manager._delete_voiceover_error_attachments(  # pylint: disable=protected-access
             filename_to_path
-        )  # pylint: disable=protected-access
+        )
