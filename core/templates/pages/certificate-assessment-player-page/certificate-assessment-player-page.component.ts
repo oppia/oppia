@@ -287,9 +287,12 @@ export class CertificateAssessmentPlayerPageComponent
           : {}),
       };
     });
-    const unansweredQuestionIndexes = loadedQuestions
+    const unansweredQuestionIndexes = this.questions
       .map((question, index) => ({question, index}))
-      .filter(({question}) => (this.answers[question.id] ?? null) === null)
+      .filter(
+        ({question}) =>
+          question !== undefined && (this.answers[question.id] ?? null) === null
+      )
       .map(({index}) => index);
     if (unansweredQuestionIndexes.length === 0) {
       this.assessmentSubmitted.emit(answers);

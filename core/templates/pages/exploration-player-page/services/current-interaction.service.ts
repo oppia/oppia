@@ -161,7 +161,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
 
-  getDisplayedCard(): StateCard {
+  getDisplayedCard(): StateCard | undefined {
     const index = this.playerPositionService.getDisplayedCardIndex();
     return this.playerTranscriptService.getCard(index);
   }
