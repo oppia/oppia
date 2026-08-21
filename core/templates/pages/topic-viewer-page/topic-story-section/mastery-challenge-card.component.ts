@@ -16,7 +16,7 @@
  * @fileoverview Mastery challenge card displayed at the end of a story section.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './mastery-challenge-card.component.css';
@@ -28,12 +28,46 @@ import './mastery-challenge-card.component.css';
 })
 export class MasteryChallengeCardComponent {
   @Input() actionUrl: string = '#';
+  @Input() isUnlocked: boolean = false;
+  @Input() topicName: string = '';
+  @Output() masteryClicked = new EventEmitter<void>();
+
+  showLockedTooltip: boolean = false;
 
   constructor(private windowRef: WindowRef) {}
 
+  get displayTitle(): string {
+    return this.topicName
+      ? `Mastery Challenge: ${this.topicName}`
+      : 'Mastery Challenge';
+  }
+
+  onChallengeButtonClick(): void {
+    if (!this.isUnlocked) {
+      this.masteryClicked.emit();
+    }
+    this.navigateToAction();
+  }
+
+  onCardMouseEnter(): void {
+    this.showLockedTooltip = !this.isUnlocked;
+  }
+
+  onCardMouseLeave(): void {
+    this.showLockedTooltip = false;
+  }
+
   navigateToAction(): void {
-    if (this.actionUrl) {
+    if (this.hasActionUrl()) {
       this.windowRef.nativeWindow.location.assign(this.actionUrl);
     }
+  }
+
+  isActionDisabled(): boolean {
+    return this.isUnlocked && !this.hasActionUrl();
+  }
+
+  private hasActionUrl(): boolean {
+    return !!this.actionUrl && this.actionUrl !== '#';
   }
 }

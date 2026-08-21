@@ -194,32 +194,6 @@ describe('TopicLessonCardComponent', () => {
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });
 
-  it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 5;
-    expect(component.showCheckpointBar).toBeTrue();
-
-    component.lessonProgressStatus = 'in_progress';
-    component.totalCheckpointsCount = 3;
-    expect(component.showCheckpointBar).toBeTrue();
-
-    component.lessonProgressStatus = 'completed';
-    component.totalCheckpointsCount = 1;
-    expect(component.showCheckpointBar).toBeTrue();
-  });
-
-  it('should return false when lesson is coming_soon', () => {
-    component.lessonProgressStatus = 'coming_soon';
-    component.totalCheckpointsCount = 5;
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
-  it('should return false when totalCheckpointsCount is 0', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 0;
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
   it('should expose isComingSoonLesson based on lesson progress status', () => {
     component.lessonProgressStatus = 'coming_soon';
     expect(component.isComingSoonLesson).toBeTrue();
@@ -228,8 +202,7 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isComingSoonLesson).toBeFalse();
   });
 
-  it('should emit startLessonClick on start button click', () => {
-    spyOn(component, 'navigateTo');
+  it('should emit startLessonClick with lesson number and startUrl on start button click', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.lessonNumber = 3;
@@ -237,61 +210,66 @@ describe('TopicLessonCardComponent', () => {
 
     component.onStartButtonClick();
 
-    expect(component.startLessonClick.emit).toHaveBeenCalledWith(3);
-    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl: '/explore/123',
+    });
   });
 
   it('should not emit startLessonClick when startUrl is empty', () => {
-    spyOn(component, 'navigateTo');
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '';
 
     component.onStartButtonClick();
 
     expect(component.startLessonClick.emit).not.toHaveBeenCalled();
-    expect(component.navigateTo).not.toHaveBeenCalled();
   });
 
-  it('should navigate to startUrl directly when no fallback is needed', () => {
-    spyOn(component, 'navigateTo');
+  it('should emit startLessonClick with direct startUrl when no language selected', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.selectedTextLanguageCode = null;
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl: '/explore/123',
+    });
   });
 
-  it('should navigate with language query params when fallback CTA is needed', () => {
-    spyOn(component, 'navigateTo');
+  it('should emit startLessonClick with language query params when language is selected', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.selectedTextLanguageCode = 'fr';
     component.selectedVoiceoverLanguageCode = 'fr';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).toHaveBeenCalledWith(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr'
-    );
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl:
+        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr',
+    });
   });
 
-  it('should not navigate when startUrl is empty', () => {
-    spyOn(component, 'navigateTo');
+  it('should not emit startLessonClick when startUrl is empty', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).not.toHaveBeenCalled();
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
   });
 
-  it('should not navigate when lesson is coming soon', () => {
-    spyOn(component, 'navigateTo');
+  it('should not emit startLessonClick when lesson is coming soon', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.lessonProgressStatus = 'coming_soon';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).not.toHaveBeenCalled();
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
   });
 
   it('should update selectedTextLanguageCode', () => {

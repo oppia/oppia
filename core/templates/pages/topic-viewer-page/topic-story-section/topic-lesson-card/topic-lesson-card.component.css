@@ -188,24 +188,10 @@
   overflow-wrap: break-word;
 }
 
-.topic-lesson-card-progress {
-  height: 24px;
-  margin-left: var(--lesson-card-header-offset);
-  max-width: 296px;
-  min-width: 160px;
-  width: calc(100% - var(--lesson-card-header-offset));
-}
-
 .topic-lesson-card-footer {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%;
-}
-
-.topic-lesson-card-progress oppia-checkpoint-bar {
-  display: block;
-  height: 100%;
   width: 100%;
 }
 
@@ -243,6 +229,14 @@
   justify-content: center;
   min-width: 88px;
   padding: 0 12px;
+}
+
+.topic-lesson-card-secondary-button:disabled {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,

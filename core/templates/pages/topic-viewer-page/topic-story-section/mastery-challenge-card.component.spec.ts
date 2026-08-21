@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -65,6 +65,38 @@ describe('MasteryChallengeCardComponent', () => {
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
       '/practice/session/1'
     );
+  });
+
+  it('should navigate when clicked while locked (skip topic)', () => {
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+      '/practice/session/1'
+    );
+  });
+
+  it('should emit masteryClicked when clicked while locked', () => {
+    spyOn(component.masteryClicked, 'emit');
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+
+    expect(component.masteryClicked.emit).toHaveBeenCalled();
+  });
+
+  it('should not emit masteryClicked when clicked while unlocked', () => {
+    spyOn(component.masteryClicked, 'emit');
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = true;
+
+    component.onChallengeButtonClick();
+
+    expect(component.masteryClicked.emit).not.toHaveBeenCalled();
   });
 
   it('should not navigate when action URL is empty', () => {

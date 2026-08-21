@@ -52,6 +52,7 @@ export class AdventureNavigationComponent
   @Input() activeLessonNumber: number | null = null;
   @Output() lessonSelected = new EventEmitter<number>();
   @Output() practiceSelected = new EventEmitter<number>();
+  @Output() masteryChallengeClicked = new EventEmitter<void>();
 
   @ViewChild('scrollWrapper') scrollWrapper!: ElementRef<HTMLElement>;
 
@@ -60,6 +61,8 @@ export class AdventureNavigationComponent
   hasHorizontalOverflow: boolean = false;
 
   private scrollCheckTimeouts: ReturnType<typeof setTimeout>[] = [];
+
+  constructor() {}
 
   ngAfterViewInit(): void {
     // Defer checks to allow DOM to fully render.
@@ -144,5 +147,9 @@ export class AdventureNavigationComponent
 
   onPracticeClick(adventureIndex: number): void {
     this.practiceSelected.emit(adventureIndex);
+  }
+
+  onMasteryClick(): void {
+    this.masteryChallengeClicked.emit();
   }
 }

@@ -30,6 +30,7 @@ import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end
 import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
 import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
 import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
+import {MasteryChallengeLockedModalComponent} from './topic-story-section/mastery-challenge-locked-modal.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -45,6 +46,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
   ],
   entryComponents: [
     StoriesListComponent,
@@ -56,6 +58,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
   ],
   exports: [
     StoriesListComponent,
@@ -67,6 +70,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

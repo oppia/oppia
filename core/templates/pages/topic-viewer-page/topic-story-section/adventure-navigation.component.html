@@ -23,6 +23,7 @@
                                       class="adventure-navigation-clickable"
                                       (click)="onLessonClick(lesson.lessonNumber)"
                                       [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
+                                      [attr.title]="'Go to lesson ' + lesson.lessonNumber"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onLessonClick(lesson.lessonNumber)"
@@ -37,7 +38,8 @@
                                       [textColor]="adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onPracticeClick(adventureIdx)"
-                                      [attr.aria-label]="'Go to practice'"
+                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_PRACTICE_BADGE_ARIA_LABEL' | translate"
+                                      [attr.title]="'I18N_TOPIC_VIEWER_PRACTICE_BADGE_ARIA_LABEL' | translate"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onPracticeClick(adventureIdx)"
@@ -51,7 +53,15 @@
                                       [size]="'sm'"
                                       [backgroundColor]="'#fff7e8'"
                                       [borderColor]="'#f5a623'"
-                                      [textColor]="'#f5a623'">
+                                      [textColor]="'#f5a623'"
+                                      [class.adventure-navigation-clickable]="true"
+                                      (click)="onMasteryClick()"
+                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                      [attr.title]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                      role="button"
+                                      tabindex="0"
+                                      (keydown.enter)="onMasteryClick()"
+                                      (keydown.space)="onMasteryClick(); $event.preventDefault()">
         </topic-adventure-circle-badge>
       </div>
     </div>

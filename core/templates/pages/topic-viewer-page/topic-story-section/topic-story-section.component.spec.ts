@@ -219,14 +219,6 @@ describe('TopicStorySectionComponent', () => {
     return storySummarySpy as jasmine.SpyObj<StorySummary>;
   };
 
-  it('should expose story meta text helpers', () => {
-    component.lessonCount = 2;
-    component.practiceCount = 1;
-
-    expect(component.getStoryMetaText()).toBe('2 lessons');
-    expect(component.getStoryMetaAriaLabel()).toBe('2 lessons available');
-  });
-
   it('should set study guide url on init', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
   });
@@ -433,7 +425,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].lessonProgressStatus).toBe('in_progress');
   });
 
-  it('should load checkpoint counts from chapter progress service on init', async () => {
+  it('should load lesson cards from story summary on init', async () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -475,56 +467,6 @@ describe('TopicStorySectionComponent', () => {
     fixture.detectChanges();
 
     expect(component.lessonCards.length).toBe(1);
-    expect(component.lessonCards[0].totalCheckpointsCount).toBe(5);
-    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(3);
-  });
-
-  it('should preserve checkpoint counts after non-story input changes', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
-    );
-
-    const mockSummary = new ChapterProgressSummary('exp_1', 3, 1, false);
-    chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
-      mockSummary
-    );
-
-    component.storySummary = createStorySummarySpy(
-      ['Node title 1'],
-      [storyNodeSpy]
-    );
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'topic';
-    component.practiceCount = 0;
-
-    component.ngOnInit();
-    expect(component.lessonCards[0].totalCheckpointsCount).toBe(3);
-    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(1);
-
-    component.practiceCount = 1;
-    component.ngOnChanges({
-      practiceCount: new SimpleChange(0, 1, false),
-    });
-
-    expect(component.lessonCards[0].totalCheckpointsCount).toBe(3);
-    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(1);
   });
 
   it('should show adventure-end-test card when lesson cards exist and practice is enabled', () => {
@@ -727,19 +669,6 @@ describe('TopicStorySectionComponent', () => {
     expect(
       topicSessionFallbackLanguageService.clearSelection
     ).toHaveBeenCalledTimes(1);
-  });
-
-  it('should correctly singularize lesson and practice counts', () => {
-    component.lessonCount = 1;
-    component.practiceCount = 1;
-    expect(component.getLessonCountText()).toBe('1 lesson');
-    expect(component.getPracticeCountText()).toBe('1 practice');
-    expect(component.getStoryMetaAriaLabel()).toBe('1 lesson available');
-  });
-
-  it('should pluralize practice count text', () => {
-    component.practiceCount = 2;
-    expect(component.getPracticeCountText()).toBe('2 practices');
   });
 
   it('should construct practice card url when arcs and fragments are present', () => {
@@ -1003,7 +932,6 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.lessonCards.length).toBe(1);
-    expect(component.lessonCards[0].totalCheckpointsCount).toBe(0);
   });
 
   it('should return empty string for getAdventureCompletionText with invalid index', () => {
@@ -1077,13 +1005,6 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.getAdventureCompletionText(0)).toBe('1 of 2 completed');
-  });
-
-  it('should return practiceCount text without practice when practiceCount is 0', () => {
-    component.lessonCount = 3;
-    component.practiceCount = 0;
-    expect(component.getStoryMetaText()).toBe('3 lessons');
-    expect(component.getStoryMetaAriaLabel()).toBe('3 lessons available');
   });
 
   it('should mark lesson as coming_soon when exploration id is null', () => {
@@ -2180,8 +2101,6 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.lessonCards[0].lessonProgressStatus).toBe('completed');
-    expect(component.lessonCards[0].totalCheckpointsCount).toBe(5);
-    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(5);
   });
 
   it('should build lesson practice url with fragments', () => {

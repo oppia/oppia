@@ -70,7 +70,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() isNewLessonLabelVisible: boolean = false;
   @Input() isComingSoonSectionCard: boolean = false;
   @Input() navigatedLessonNumber: number | null = null;
-  @Output() startLessonClick = new EventEmitter<number>();
+  @Output() startLessonClick = new EventEmitter<{
+    lessonNumber: number;
+    startUrl: string;
+  }>();
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
@@ -136,19 +139,17 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.startLessonClick.emit(this.lessonNumber);
+    const resolvedUrl = this.selectedTextLanguageCode
+      ? this.getLessonStartUrlWithLanguageSelection(
+          this.selectedTextLanguageCode,
+          this.selectedVoiceoverLanguageCode
+        )
+      : this.startUrl;
 
-    if (!this.selectedTextLanguageCode) {
-      this.navigateTo(this.startUrl);
-      return;
-    }
-
-    this.navigateTo(
-      this.getLessonStartUrlWithLanguageSelection(
-        this.selectedTextLanguageCode,
-        this.selectedVoiceoverLanguageCode
-      )
-    );
+    this.startLessonClick.emit({
+      lessonNumber: this.lessonNumber,
+      startUrl: resolvedUrl,
+    });
   }
 
   onPracticeButtonClick(): void {

@@ -102,12 +102,13 @@
 
 .adventure-navigation-mastery-group {
   align-items: center;
-  border: 2.5px solid #f5a623;
   border-radius: 36px;
+  cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;
   padding: 8px 14px;
+  position: relative;
 }
 
 .adventure-navigation-clickable {

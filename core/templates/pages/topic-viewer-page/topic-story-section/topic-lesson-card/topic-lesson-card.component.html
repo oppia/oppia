@@ -45,13 +45,6 @@
     <div class="topic-lesson-card-footer"
          [class.collapsed]="!isExpanded"
          [class.coming-soon-footer]="isComingSoonSectionCard">
-      <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
-        <oppia-checkpoint-bar
-          [totalCheckpointsCount]="totalCheckpointsCount"
-          [visitedCheckpointsCount]="visitedCheckpointsCount"
-          [isReadOnly]="true">
-        </oppia-checkpoint-bar>
-      </div>
       <div class="topic-lesson-card-actions">
         <div class="topic-lesson-card-actions-left">
           <span
@@ -77,6 +70,7 @@
             <button class="topic-lesson-card-secondary-button"
                     type="button"
                     [disabled]="isComingSoonLesson || (!practiceUrl && !startUrl)"
+                    [title]="(isComingSoonLesson || (!practiceUrl && !startUrl)) ? ('I18N_TOPIC_VIEWER_PRACTICE_BADGE_TOOLTIP' | translate) : ''"
                     (click)="onPracticeButtonClick()">
               <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">edit</i>
               {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
