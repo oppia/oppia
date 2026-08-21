@@ -1031,16 +1031,19 @@ export class CurriculumAdmin extends TopicManager {
 
       await skillRow.locator(desktopSkillListItemOptions).click();
 
-      // Search the full page (not just skillRow) because the dropdown may render
-      // outside the .list-item container. Use waitFor to confirm visibility before
-      // clicking to avoid the race where the dropdown closes before the click lands.
-      const deleteBtn = this.page.locator(desktopDeleteSkillButton);
+      // Scope to skillRow first; fall back to full-page if not found (in case
+      // the dropdown portal renders outside the .list-item container).
+      let deleteBtn = skillRow.locator(desktopDeleteSkillButton);
+      if (!(await deleteBtn.count())) {
+        deleteBtn = this.page.locator(desktopDeleteSkillButton);
+      }
       await deleteBtn.waitFor({state: 'visible'});
       await deleteBtn.click();
 
       await this.expectElementToBeVisible(confirmSkillDeletionButton);
       await this.clickOnElementWithSelector(confirmSkillDeletionButton);
       await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+      await this.page.waitForLoadState('networkidle');
 
       showMessage(`Skill "${skillName}" has been successfully deleted.`);
     }
