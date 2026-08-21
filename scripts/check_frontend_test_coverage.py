@@ -50,7 +50,7 @@ EXCLUDED_DIRECTORIES = [
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @hardikgoyal2003 first.
-NOT_FULLY_COVERED_FILENAMES: List[str] = [
+NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
     'ck-editor-4-widgets.initializer.ts',
