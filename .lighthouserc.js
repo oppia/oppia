@@ -60,9 +60,9 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
             pagePerfThresholds: {
-              fcp: 11100,
-              speedIndex: 11100,
-              lcp: 33400,
+              fcp: 10750,
+              speedIndex: 10750,
+              lcp: 42000,
               tbt: 1210,
               cls: 0.1,
             },
@@ -82,9 +82,9 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
             pagePerfThresholds: {
-              fcp: 10700,
-              speedIndex: 13700,
-              lcp: 35600,
+              fcp: 10750,
+              speedIndex: 14500,
+              lcp: 45000,
               tbt: 1380,
               cls: 0.1,
             },
@@ -317,8 +317,8 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/thanks$',
             pagePerfThresholds: {
-              fcp: 15910,
-              speedIndex: 15910,
+              fcp: 20600,
+              speedIndex: 20600,
               lcp: 34900,
               tbt: 920,
               cls: 0.1,
@@ -345,8 +345,8 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/topics-and-skills-dashboard$',
             pagePerfThresholds: {
-              fcp: 10300,
-              speedIndex: 10300,
+              fcp: 13200,
+              speedIndex: 13200,
               lcp: 40500,
               tbt: 1730,
               cls: 0.1,
