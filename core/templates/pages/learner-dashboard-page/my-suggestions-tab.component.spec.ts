@@ -488,12 +488,12 @@ describe('My Suggestions Tab Component', () => {
     );
 
     component.learnerLessonFeedbackListState.moreAvailable = false;
-    component.onCreatorFeedbackNextPage();
+    component.onLearnerFeedbackNextPage();
     expect(listSpy).not.toHaveBeenCalled();
 
     component.learnerLessonFeedbackListState.moreAvailable = true;
     component.learnerLessonFeedbackListState.nextCursor = null;
-    component.onCreatorFeedbackNextPage();
+    component.onLearnerFeedbackNextPage();
     expect(listSpy).not.toHaveBeenCalled();
   });
 
@@ -510,7 +510,7 @@ describe('My Suggestions Tab Component', () => {
       Promise.resolve({summaries: [], next_cursor: null, more: false})
     );
 
-    component.onCreatorFeedbackNextPage();
+    component.onLearnerFeedbackNextPage();
     flushMicrotasks();
 
     expect(listSpy).toHaveBeenCalledWith(
@@ -537,7 +537,7 @@ describe('My Suggestions Tab Component', () => {
         Promise.resolve({summaries: [], next_cursor: 'cursor_3', more: true})
       );
 
-      component.onCreatorFeedbackNextPage();
+      component.onLearnerFeedbackNextPage();
       flushMicrotasks();
 
       // The history entry for page 3 already exists, so it is not duplicated.
@@ -557,7 +557,7 @@ describe('My Suggestions Tab Component', () => {
     );
 
     component.learnerLessonFeedbackListState.currentPage = 1;
-    component.onCreatorFeedbackPreviousPage();
+    component.onLearnerFeedbackPreviousPage();
 
     expect(listSpy).not.toHaveBeenCalled();
   });
@@ -573,7 +573,7 @@ describe('My Suggestions Tab Component', () => {
       Promise.resolve({summaries: [], next_cursor: 'cursor_2', more: true})
     );
 
-    component.onCreatorFeedbackPreviousPage();
+    component.onLearnerFeedbackPreviousPage();
     flushMicrotasks();
 
     expect(listSpy).toHaveBeenCalledWith(

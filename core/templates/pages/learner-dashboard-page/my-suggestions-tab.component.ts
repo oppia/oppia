@@ -232,7 +232,7 @@ export class MySuggestionsTabComponent implements OnInit {
     );
   }
 
-  onCreatorFeedbackNextPage(): void {
+  onLearnerFeedbackNextPage(): void {
     const state = this.learnerLessonFeedbackListState;
     if (!state.moreAvailable || !state.nextCursor) {
       return;
@@ -247,7 +247,7 @@ export class MySuggestionsTabComponent implements OnInit {
     });
   }
 
-  onCreatorFeedbackPreviousPage(): void {
+  onLearnerFeedbackPreviousPage(): void {
     const state = this.learnerLessonFeedbackListState;
     if (state.currentPage <= 1) {
       return;
