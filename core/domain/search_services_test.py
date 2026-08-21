@@ -322,6 +322,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(len(indexed_docs), 1)
+        self.assertEqual(indexed_docs[0]['language_code'], ['en'])
         self.assertEqual(indexed_docs[0]['translated_titles'], [])
         self.assertEqual(indexed_docs[0]['translated_objectives'], [])
         self.assertEqual(indexed_docs[0]['translated_tags'], [])
@@ -409,6 +410,11 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             indexed_docs[0]['translated_tags'],
             ['translated tag bn', 'translated tag hi'],
         )
+        # Verify language codes (original + languages with valid translations, sorted).
+        self.assertEqual(
+            indexed_docs[0]['language_code'],
+            ['bn', 'en', 'hi'],
+        )
 
         # 3. Test case: Exploration not found in explorations_dict (defensive check).
         indexed_docs = []
@@ -427,6 +433,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(len(indexed_docs), 1)
+        self.assertEqual(indexed_docs[0]['language_code'], ['en'])
         self.assertEqual(indexed_docs[0]['translated_titles'], [])
         self.assertEqual(indexed_docs[0]['translated_objectives'], [])
         self.assertEqual(indexed_docs[0]['translated_tags'], [])

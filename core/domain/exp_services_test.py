@@ -7354,7 +7354,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         initial_exp_doc = {
             'category': 'cat0',
             'id': 'id0',
-            'language_code': 'en',
+            'language_code': ['en'],
             'objective': 'An objective',
             'rank': 20,
             'tags': [],
@@ -7366,7 +7366,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         updated_exp_doc = {
             'category': 'cat1',
             'id': 'id0',
-            'language_code': 'en',
+            'language_code': ['en'],
             'objective': 'An objective',
             'rank': 20,
             'tags': [],

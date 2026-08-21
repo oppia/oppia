@@ -33,7 +33,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Final, List, Optional, Tuple, TypedDict
+from typing import Final, List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -71,7 +71,7 @@ class DomainSearchDict(TypedDict):
     """Dictionary representing the search dictionary of a domain object."""
 
     id: str
-    language_code: str
+    language_code: Union[str, List[str]]
     title: str
     category: str
     tags: List[str]
@@ -118,7 +118,7 @@ def _get_up_to_date_translation(
 
 def _get_translated_search_texts(
     exp_id: str, exp_version: int, num_tags: int
-) -> Tuple[List[str], List[str], List[str]]:
+) -> Tuple[List[str], List[str], List[str], List[str]]:
     """Returns the translated titles, objectives, and tags for an exploration.
 
     Args:
@@ -127,8 +127,8 @@ def _get_translated_search_texts(
         num_tags: int. The number of tags in the exploration.
 
     Returns:
-        tuple(list(str), list(str), list(str)). The sorted, de-duplicated
-        translated titles, translated objectives and translated tags.
+        tuple(list(str), list(str), list(str), list(str)). The sorted, de-duplicated
+        translated titles, translated objectives, translated tags, and translated language codes.
     """
     entity_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
@@ -139,14 +139,18 @@ def _get_translated_search_texts(
     translated_titles = set()
     translated_objectives = set()
     translated_tags = set()
+    translated_languages = set()
 
     for entity_translation in entity_translations:
+        has_valid_translation = False
+
         # Title translation.
         title_translation = _get_up_to_date_translation(
             entity_translation, feconf.EXPLORATION_TITLE_CONTENT_ID
         )
         if title_translation is not None:
             translated_titles.add(title_translation)
+            has_valid_translation = True
 
         # Objective translation.
         objective_translation = _get_up_to_date_translation(
@@ -154,6 +158,7 @@ def _get_translated_search_texts(
         )
         if objective_translation is not None:
             translated_objectives.add(objective_translation)
+            has_valid_translation = True
 
         # Tags translations.
         for idx in range(num_tags):
@@ -163,11 +168,16 @@ def _get_translated_search_texts(
             )
             if tag_translation is not None:
                 translated_tags.add(tag_translation)
+                has_valid_translation = True
+
+        if has_valid_translation:
+            translated_languages.add(entity_translation.language_code)
 
     return (
         sorted(list(translated_titles)),
         sorted(list(translated_objectives)),
         sorted(list(translated_tags)),
+        sorted(list(translated_languages)),
     )
 
 
@@ -189,13 +199,22 @@ def index_exploration_summaries(
     for exp_summary in indexable:
         exploration = explorations_dict.get(exp_summary.id)
         if exploration is not None:
-            translated_titles, translated_objectives, translated_tags = (
-                _get_translated_search_texts(
-                    exp_summary.id, exploration.version, len(exploration.tags)
-                )
+            (
+                translated_titles,
+                translated_objectives,
+                translated_tags,
+                translated_languages,
+            ) = _get_translated_search_texts(
+                exp_summary.id, exploration.version, len(exploration.tags)
             )
         else:
-            translated_titles, translated_objectives, translated_tags = (
+            (
+                translated_titles,
+                translated_objectives,
+                translated_tags,
+                translated_languages,
+            ) = (
+                [],
                 [],
                 [],
                 [],
@@ -207,6 +226,7 @@ def index_exploration_summaries(
                 translated_titles,
                 translated_objectives,
                 translated_tags,
+                translated_languages,
             )
         )
 
@@ -221,6 +241,7 @@ def _exp_summary_to_search_dict(
     translated_titles: List[str],
     translated_objectives: List[str],
     translated_tags: List[str],
+    translated_languages: List[str],
 ) -> ExplorationSearchDict:
     """Updates the dict to be returned, whether the given exploration is to
     be indexed for further queries or not.
@@ -230,6 +251,7 @@ def _exp_summary_to_search_dict(
         translated_titles: list(str). List of translated titles.
         translated_objectives: list(str). List of translated objectives.
         translated_tags: list(str). List of translated tags.
+        translated_languages: list(str). List of translated languages.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
@@ -237,7 +259,9 @@ def _exp_summary_to_search_dict(
     """
     doc: ExplorationSearchDict = {
         'id': exp_summary.id,
-        'language_code': exp_summary.language_code,
+        'language_code': sorted(
+            list(set([exp_summary.language_code] + translated_languages))
+        ),
         'title': exp_summary.title,
         'category': exp_summary.category,
         'tags': exp_summary.tags,

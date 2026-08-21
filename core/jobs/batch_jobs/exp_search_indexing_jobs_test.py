@@ -72,7 +72,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd',
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
@@ -118,7 +118,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd%s' % i,
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
@@ -176,7 +176,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd',
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
