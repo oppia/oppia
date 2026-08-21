@@ -35,6 +35,7 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   currentStage: CertificateAssessmentStage =
     CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
   showAssessmentInterruptCard = false;
+  showAssessmentUnavailableModal = false;
   remainingTimeInSeconds = 0;
   isTimeExpired = false;
 
@@ -105,7 +106,11 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
     this.showAssessmentInterruptCard = false;
     this.currentStage =
       CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    this.startTimerIfReady();
+    if (this.remainingTimeInSeconds > 0) {
+      this.resumeTimer();
+    } else {
+      this.startTimerIfReady();
+    }
   }
 
   ngOnDestroy(): void {
@@ -152,6 +157,53 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
       window.clearInterval(this.timerId);
       this.timerId = null;
     }
+  }
+
+  /**
+   * Stops the countdown without wiping the remaining time, so it can be
+   * continued later via `resumeTimer` (e.g. after a network reconnect while
+   * the learner was mid-assessment).
+   */
+  pauseTimer(): void {
+    if (this.timerId === null) {
+      return;
+    }
+    this.clearTimer();
+    this.hasStartedTimer = false;
+  }
+
+  /**
+   * Continues a previously paused countdown from whatever time remained,
+   * preserving the same absolute-deadline semantics as `startTimerIfReady`.
+   */
+  private resumeTimer(): void {
+    // If the countdown is already running (e.g. the learner returned to the
+    // intro but the window was intentionally left untouched), leave the live
+    // interval in place rather than starting a duplicate.
+    if (this.timerId !== null) {
+      return;
+    }
+    if (
+      this.attempt === null ||
+      this.remainingTimeInSeconds <= 0 ||
+      this.currentStage !==
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+    ) {
+      return;
+    }
+    this.hasStartedTimer = true;
+    const expiryTimestampMs = Date.now() + this.remainingTimeInSeconds * 1000;
+    this.expiryTimestampMs = expiryTimestampMs;
+    this.timerId = window.setInterval(() => {
+      this.remainingTimeInSeconds = Math.max(
+        0,
+        Math.ceil((expiryTimestampMs - Date.now()) / 1000)
+      );
+      if (this.remainingTimeInSeconds === 0) {
+        this.isTimeExpired = true;
+        this.clearTimer();
+      }
+    }, 1000);
   }
 
   /**

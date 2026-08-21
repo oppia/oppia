@@ -28,6 +28,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {PageHeadService} from 'services/page-head.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
@@ -60,6 +61,9 @@ export class CertificateAssessmentPlayerPageRootComponent
   certificateOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   classroomUrlFragment = '';
+  // Set while the assessment is disconnected so the interrupt card can offer
+  // a resume option once the connection returns.
+  hasPausedForNetworkLoss = false;
   isLoading = true;
   hasError = false;
   isSubmissionInProgress = false;
@@ -73,6 +77,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
     private router: Router,
     protected translateService: TranslateService
@@ -93,6 +98,11 @@ export class CertificateAssessmentPlayerPageRootComponent
       .showAssessmentInterruptCard;
   }
 
+  get showAssessmentUnavailableModal(): boolean {
+    return this.certificateAssessmentPlayerStateService
+      .showAssessmentUnavailableModal;
+  }
+
   get isTimeExpired(): boolean {
     return this.certificateAssessmentPlayerStateService.isTimeExpired;
   }
@@ -102,6 +112,12 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   async ngOnInit(): Promise<void> {
+    this.internetConnectivityService.startCheckingConnection();
+    this.directiveSubscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        isOnline => this.handleNetworkStateChange(isOnline)
+      )
+    );
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
@@ -171,12 +187,19 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       this.certificateAssessmentPlayerStateService.beginNewAttempt(attempt);
-    } catch {
-      this.alertsService.addWarning(
-        this.translateService.instant(
-          'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    } catch (error) {
+      const errorMessage =
+        typeof error === 'string' ? error : 'Something went wrong.';
+      if (
+        errorMessage.includes(
+          'You just started an assessment before this time.'
         )
-      );
+      ) {
+        this.alertsService.addWarning(errorMessage);
+      } else {
+        this.certificateAssessmentPlayerStateService.showAssessmentUnavailableModal =
+          true;
+      }
     }
   }
 
@@ -218,11 +241,47 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   onRetryAssessment(): void {
+    this.hasPausedForNetworkLoss = false;
     this.certificateAssessmentPlayerStateService.returnToIntroAfterRetry();
   }
 
   onResumeAssessment(): void {
+    this.hasPausedForNetworkLoss = false;
     this.certificateAssessmentPlayerStateService.resumeQuestionsStage();
+  }
+
+  onGoToAvailableCertificates(): void {
+    this.certificateAssessmentPlayerStateService.showAssessmentUnavailableModal =
+      false;
+    this.router.navigate([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        this.classroomUrlFragment
+      )}`,
+    ]);
+  }
+
+  /**
+   * Pauses the countdown while the learner is offline and, on reconnect,
+   * surfaces the interrupt card so they can resume the in-progress attempt
+   * rather than having the disconnected time count against their window.
+   */
+  private handleNetworkStateChange(isOnline: boolean): void {
+    if (!isOnline) {
+      if (
+        this.currentStage ===
+          CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS &&
+        !this.isTimeExpired
+      ) {
+        this.hasPausedForNetworkLoss = true;
+        this.certificateAssessmentPlayerStateService.pauseTimer();
+      }
+      return;
+    }
+    if (this.hasPausedForNetworkLoss && !this.isTimeExpired) {
+      this.certificateAssessmentPlayerStateService.showAssessmentInterruptCard =
+        true;
+    }
   }
 
   async onViewResults(): Promise<boolean> {
