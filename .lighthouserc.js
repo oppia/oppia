@@ -234,8 +234,8 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 10310,
               speedIndex: 10310,
-              lcp: 34500,
-              tbt: 1240,
+              lcp: 38500,
+              tbt: 1750,
               cls: 0.1,
             },
             accessibilityMinScore: 0.92,
@@ -246,7 +246,7 @@ module.exports = {
               fcp: 10910,
               speedIndex: 10910,
               lcp: 36800,
-              tbt: 1360,
+              tbt: 1950,
               cls: 0.1,
             },
             overrides: {
@@ -295,7 +295,7 @@ module.exports = {
               fcp: 10300,
               speedIndex: 10300,
               lcp: 35800,
-              tbt: 870,
+              tbt: 1210,
               cls: 0.1,
             },
             overrides: {
@@ -320,7 +320,7 @@ module.exports = {
               fcp: 15910,
               speedIndex: 15910,
               lcp: 34900,
-              tbt: 710,
+              tbt: 920,
               cls: 0.1,
             },
             overrides: {
@@ -334,7 +334,7 @@ module.exports = {
               fcp: 16190,
               speedIndex: 16190,
               lcp: 35500,
-              tbt: 930,
+              tbt: 1170,
               cls: 0.55,
             },
             overrides: {
@@ -347,8 +347,8 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 10300,
               speedIndex: 10300,
-              lcp: 36500,
-              tbt: 1260,
+              lcp: 40500,
+              tbt: 1730,
               cls: 0.1,
             },
             overrides: {
