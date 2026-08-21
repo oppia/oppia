@@ -20,6 +20,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 
 import './concept-card.component.css';
 
@@ -46,16 +47,22 @@ export class ConceptCardComponent implements OnInit {
 
   constructor(
     private conceptCardBackendApiService: ConceptCardBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService
   ) {}
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
+    let languageCode =
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+    if (
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+    ) {
+      languageCode =
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+    }
     this.conceptCardBackendApiService
-      .loadConceptCardsAsync(
-        this.skillIds,
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
-      )
+      .loadConceptCardsAsync(this.skillIds, languageCode)
       .then(
         conceptCardObjects => {
           conceptCardObjects.forEach(conceptCardObject => {
