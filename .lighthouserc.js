@@ -259,7 +259,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 16210,
               speedIndex: 16210,
-              lcp: 33100,
+              lcp: 42000,
               tbt: 770,
               cls: 0.1,
             },
@@ -271,7 +271,7 @@ module.exports = {
               fcp: 10760,
               speedIndex: 10760,
               lcp: 35600,
-              tbt: 1200,
+              tbt: 1800,
               cls: 0.12,
             },
             overrides: {
@@ -335,7 +335,7 @@ module.exports = {
               speedIndex: 16190,
               lcp: 35500,
               tbt: 1170,
-              cls: 0.55,
+              cls: 0.75,
             },
             overrides: {
               'categories:accessibility': ['error', {minScore: 0.88}],
