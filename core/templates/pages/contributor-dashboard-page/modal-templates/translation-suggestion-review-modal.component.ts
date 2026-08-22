@@ -80,7 +80,7 @@ export interface SuggestionChangeDict {
 export interface ActiveSuggestionDict {
   author_name: string;
   change_cmd: SuggestionChangeDict;
-  exploration_content_html: string | string[] | null;
+  entity_content_html: string | string[] | null;
   language_code: string;
   last_updated_msecs: number;
   status: string;
@@ -103,6 +103,7 @@ interface PendingSuggestionDict {
   action_status: string;
   reviewer_message: string;
   commit_message?: string;
+  target_type?: string;
 }
 
 enum ExpansionTabType {
@@ -126,7 +127,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentHtml!: string | string[];
   editedContent!: EditedContentDict;
   errorMessage!: string;
-  explorationContentHtml!: string | string[] | null;
+  entityContentHtml!: string | string[] | null;
   finalCommitMessage!: string;
   initialSuggestionId!: string;
   languageCode!: string;
@@ -346,8 +347,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.translationHtml = this.activeSuggestion.change_cmd.translation_html;
     this.status = this.activeSuggestion.status;
     this.contentHtml = this.activeSuggestion.change_cmd.content_html;
-    this.explorationContentHtml =
-      this.activeSuggestion.exploration_content_html;
+    this.entityContentHtml = this.activeSuggestion.entity_content_html;
     this.contentTypeIsHtml =
       this.activeSuggestion.change_cmd.data_format === 'html';
     this.contentTypeIsUnicode =
@@ -359,10 +359,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.reviewMessage = '';
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId).then(() => {
-        // No review message and no exploration content means the suggestion
-        // became obsolete and was auto-rejected in a batch job. See issue
-        // #16022.
-        if (!this.reviewMessage && !this.explorationContentHtml) {
+        // No review message and no entity content means the suggestion became
+        // obsolete and was auto-rejected in a batch job. See issue #16022.
+        // Only explorations are auto-rejected that way, and only exploration
+        // suggestions carry entity content at all, so the absence of content
+        // says nothing about a suggestion of any other entity type.
+        if (
+          this.activeSuggestion.target_type ===
+            AppConstants.ENTITY_TYPE.EXPLORATION &&
+          !this.reviewMessage &&
+          !this.entityContentHtml
+        ) {
           this.reviewMessage =
             AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG;
         }
@@ -431,12 +438,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       : this.contentHtml[0] || '';
   }
 
-  get explorationContentHtmlAsString(): string {
-    return typeof this.explorationContentHtml === 'string'
-      ? this.explorationContentHtml
-      : this.explorationContentHtml !== null
-        ? this.explorationContentHtml[0] || ''
-        : '';
+  get entityContentHtmlAsString(): string {
+    if (typeof this.entityContentHtml === 'string') {
+      return this.entityContentHtml;
+    }
+    if (Array.isArray(this.entityContentHtml)) {
+      return this.entityContentHtml[0] || '';
+    }
+    return '';
   }
 
   get updateIsDisabled(): boolean {
@@ -589,6 +598,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         action_status: AppConstants.ACTION_ACCEPT_SUGGESTION,
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
+        target_type: this.activeSuggestion.target_type,
       };
       this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
 
@@ -606,24 +616,44 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         'Translation'
       );
 
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        this.activeSuggestion.target_id,
-        this.activeSuggestionId,
+      this._reviewActiveSuggestion(
         AppConstants.ACTION_ACCEPT_SUGGESTION,
         reviewMessageForSubmitter,
-        this.finalCommitMessage,
-        () => {
-          this.alertsService.clearMessages();
-          this.alertsService.addSuccessMessage('Suggestion accepted.');
-          this.resolveSuggestionAndUpdateModal();
-        },
-        errorMessage => {
-          this.resolvingSuggestion = false;
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-        }
+        'Suggestion accepted.'
       );
     }
+  }
+
+  /**
+   * Sends the review of the active suggestion, using the suggestion's own
+   * target type so that every entity type is handled the same way here.
+   */
+  private _reviewActiveSuggestion(
+    action: string,
+    reviewMessage: string,
+    successMessage: string
+  ): void {
+    this.contributionAndReviewService.reviewTranslationSuggestion(
+      this.activeSuggestion.target_type,
+      this.activeSuggestion.target_id,
+      this.activeSuggestionId,
+      action,
+      reviewMessage,
+      // A rejected suggestion is not applied, so there is no commit to make.
+      action === AppConstants.ACTION_ACCEPT_SUGGESTION
+        ? this.finalCommitMessage
+        : null,
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage(successMessage);
+        this.resolveSuggestionAndUpdateModal();
+      },
+      errorMessage => {
+        this.resolvingSuggestion = false;
+        this.alertsService.clearWarnings();
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+      }
+    );
   }
 
   rejectAndReviewNext(reviewMessage: string): void {
@@ -643,6 +673,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           suggestion_id: this.activeSuggestionId,
           action_status: AppConstants.ACTION_REJECT_SUGGESTION,
           reviewer_message: reviewMessage || this.reviewMessage,
+          target_type: this.activeSuggestion.target_type,
         };
         this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
         this.resolveSuggestionAndUpdateModal();
@@ -659,26 +690,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           'Translation'
         );
 
-        // In case of rejection, the suggestion is not applied, so there is no
-        // commit message. Because there is no commit to make.
-        this.contributionAndReviewService.reviewExplorationSuggestion(
-          this.activeSuggestion.target_id,
-          this.activeSuggestionId,
+        this._reviewActiveSuggestion(
           AppConstants.ACTION_REJECT_SUGGESTION,
           reviewMessage || this.reviewMessage,
-          null,
-          () => {
-            this.alertsService.clearMessages();
-            this.alertsService.addSuccessMessage('Suggestion rejected.');
-            this.resolveSuggestionAndUpdateModal();
-          },
-          errorMessage => {
-            this.resolvingSuggestion = false;
-            this.alertsService.clearWarnings();
-            this.alertsService.addWarning(
-              `Invalid Suggestion: ${errorMessage}`
-            );
-          }
+          'Suggestion rejected.'
         );
       }
     }
@@ -700,13 +715,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  // Returns whether the active suggestion's exploration_content_html
+  // Returns whether the active suggestion's entity_content_html
   // differs from the content_html of the suggestion's change object.
   hasExplorationContentChanged(): boolean {
-    return !this.isHtmlContentEqual(
-      this.contentHtml,
-      this.explorationContentHtml
-    );
+    return !this.isHtmlContentEqual(this.contentHtml, this.entityContentHtml);
   }
 
   isHtmlContentEqual(
