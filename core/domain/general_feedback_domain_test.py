@@ -45,7 +45,7 @@ RESPONSE_LIST: List[general_feedback_domain.LessonFeedbackResponseDict] = [
         'responded_on': 1700000001000.0,
     },
     {
-        'response_text': 'Pushed a fix in v4.',
+        'response_text': 'N' * 110,
         'responded_on': 1700000002000.0,
     },
 ]
@@ -85,7 +85,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
         expected_dict: general_feedback_domain.LessonFeedbackSummaryDict = {
             'id': 'feedback_id',
             'feedback_text_preview': f'{"N" * 97}...',
-            'latest_response_preview': 'Pushed a fix in v4.',
+            'latest_response_preview': f'{"N" * 97}...',
             'status': 'open',
             'source': 'lesson',
             'lesson_title': 'exp1',

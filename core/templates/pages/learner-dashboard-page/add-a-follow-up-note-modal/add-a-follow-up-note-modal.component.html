@@ -1,18 +1,17 @@
 <div class="oppia-add-a-follow-up-note-modal">
   <div class="modal-header">
     <h3 class="modal-title">
-      Add a follow-up note
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_TITLE'| translate }}
     </h3>
   </div>
   <div class="modal-body">
     <p class="oppia-follow-up-modal-helper">
-      A creator marked this as fixed. Let them know if it's resolved,
-      or add anything else you'd like them to know.
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_INFO'| translate }}
     </p>
 
     <div class="oppia-follow-up-modal-original">
       <span class="oppia-follow-up-modal-original-label">
-        Your original feedback:
+        {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_ORIGINAL_LABEL'| translate }}
       </span>
       <p class="oppia-follow-up-modal-original-text">
         {{ detailFeedback.feedback_text }}
@@ -21,7 +20,7 @@
 
     <label for="mySuggestionsFollowUp"
            class="oppia-follow-up-modal-label">
-           Your note
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_ORIGINAL_NOTE'| translate }}
     </label>
     <textarea id="mySuggestionsFollowUp"
               name="mySuggestionsFollowUp"
@@ -41,14 +40,13 @@
               class="btn btn-secondary"
               [disabled]="isSubmittingFollowUp"
               (click)="closemodal()">
-        Cancel
+        {{ 'I18N_MODAL_CANCEL_BUTTON'| translate }}
       </button>
       <button type="submit"
               class="btn btn-success"
               (click)="submit()"
               [disabled]="isSubmittingFollowUp || !followUpText.trim()">
-        <span *ngIf="!isSubmittingFollowUp">Send note</span>
-        <span *ngIf="isSubmittingFollowUp">Sending...</span>
+        <span *ngIf="!isSubmittingFollowUp">{{ 'I18N_ADD_A_FOLLOW_UP_NOTE_SUBMIT_BUTTON'| translate }}</span>
       </button>
     </div>
   </div>

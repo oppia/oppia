@@ -26,14 +26,14 @@
                 class="oppia-my-suggestions-back"
                 (click)="goBackToListView()">
           <i class="fas fa-arrow-left" aria-hidden="true"></i>
-          Back to my suggestions
+          {{ 'I18N_BACK_TO_MY_SUGGESTIONS' | translate }}
         </button>
 
         <button type="button"
                 class="oppia-my-suggestions-follow-up-button"
                 [disabled]="!canAddFollowUpNote()"
                 (click)="openFollowUpModal()">
-          Add a follow-up note
+          {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_TITLE' | translate }}
         </button>
       </div>
 
@@ -42,9 +42,9 @@
              class="oppia-my-suggestions-lesson-context">
           <i class="fas fa-book" aria-hidden="true"></i>
           <span>
-            You sent this while going through
+            {{ 'I18N_MY_SUGGESTION_LESSON_METADATA_TEXT_START' | translate }}
             <a [routerLink]="'/explore/' + lesson.exploration_id">
-              this lesson
+              {{ 'I18N_MY_SUGGESTION_LESSON_METADATA_TEXT_MIDDLE' | translate }}
             </a>,
             {{ getLessonStepDescription(lesson.state_name)}}.
           </span>
@@ -53,7 +53,7 @@
         <div class="oppia-my-suggestions-detail-header">
           <div class="oppia-my-suggestions-meta-item">
             <span class="oppia-my-suggestions-meta-label">
-              Status:
+              {{'I18N_MY_SUGGESTION_STATUS_LABEL' | translate }}
             </span>
             <span class="oppia-my-suggestions-row-status"
                   [ngClass]="getStatusDetails(selectedFeedback.status).className"
@@ -62,7 +62,7 @@
             </span>
           </div>
           <div class="oppia-my-suggestions-meta-item oppia-my-suggestions-meta-item-date">
-            <span class="oppia-my-suggestions-meta-label">Submitted on:</span>
+            <span class="oppia-my-suggestions-meta-label">{{ 'I18N_MY_SUGGESTION_SUBMITTED_ON'| translate }}</span>
             <span class="oppia-my-suggestions-date">
               {{ formatDate(selectedFeedback.created_on_msecs) }}
             </span>
@@ -77,7 +77,7 @@
             <div class="oppia-my-suggestions-thread-content">
               <div class="oppia-my-suggestions-thread-meta">
                 <span class="oppia-my-suggestions-thread-author">
-                  Your feedback
+                  {{ 'I18N_MY_SUGGESTION_LEARNER_THREAD_HEADER' | translate }}
                 </span>
                 <span class="oppia-my-suggestions-thread-date">
                   {{ formatDate(selectedFeedback.created_on_msecs) }}
@@ -95,7 +95,7 @@
             <div class="oppia-my-suggestions-thread-content">
               <div class="oppia-my-suggestions-thread-meta">
                 <span class="oppia-my-suggestions-thread-author">
-                  Creator response
+                  {{ 'I18N_MY_SUGGESTION_CREATOR_THREAD_HEADER' | translate }}
                 </span>
                 <span class="oppia-my-suggestions-thread-date">
                   {{ formatDate(response.responded_on) }}
