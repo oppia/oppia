@@ -30,6 +30,7 @@ import {ToastrModule} from 'ngx-toastr';
 import {TranslationLanguageSelectorComponent} from './translation-language-selector/translation-language-selector.component';
 import {ReviewTranslationLanguageSelectorComponent} from './translation-language-selector/review-translation-language-selector.component';
 import {TranslationTopicSelectorComponent} from './translation-topic-selector/translation-topic-selector.component';
+import {EntityTypeSelectorComponent} from './entity-type-selector/entity-type-selector.component';
 import {LoginRequiredMessageComponent} from './login-required-message/login-required-message.component';
 import {LoginRequiredModalContent} from './modal-templates/login-required-modal.component';
 import {OpportunitiesListItemComponent} from './opportunities-list-item/opportunities-list-item.component';
@@ -70,6 +71,7 @@ import {RteHelperService} from 'services/rte-helper.service';
   declarations: [
     CertificateDownloadModalComponent,
     ContributorBadgesComponent,
+    EntityTypeSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
@@ -90,6 +92,7 @@ import {RteHelperService} from 'services/rte-helper.service';
   entryComponents: [
     CertificateDownloadModalComponent,
     ContributorBadgesComponent,
+    EntityTypeSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
