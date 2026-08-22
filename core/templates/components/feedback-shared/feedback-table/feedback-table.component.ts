@@ -83,6 +83,9 @@ export class FeedbackTableComponent {
     if (!('unread_response_count' in feedback)) {
       return null;
     }
+    if (feedback.unread_response_count === 0) {
+      return null;
+    }
     if (
       feedback.status === FeedbackStatus.FIXED ||
       feedback.status === FeedbackStatus.LESSON_UPDATED

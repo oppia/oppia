@@ -72,6 +72,7 @@ export class MySuggestionsTabComponent implements OnInit {
     showScreenshot: false,
     showLessonMetadata: false,
     showSessionInfo: false,
+    showNotificationSummary: true,
   };
 
   currentLearnerFeedbackFilterState: FeedbackFilterState = {

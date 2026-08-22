@@ -81,6 +81,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     showScreenshot: true,
     showLessonMetadata: true,
     showSessionInfo: false,
+    showNotificationSummary: false,
   };
   readonly creatorLessonFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: false,
@@ -89,6 +90,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     showScreenshot: false,
     showLessonMetadata: true,
     showSessionInfo: false,
+    showNotificationSummary: false,
   };
   readonly creatorFeedbackFilterConfig = CREATOR_DASHBOARD_FILTER_CONFIG;
 

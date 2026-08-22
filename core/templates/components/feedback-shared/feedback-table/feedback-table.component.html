@@ -43,7 +43,7 @@
             <span class="oppia-feedback-table-desc">
               {{ getFeedbackDescription(feedback) }}
             </span>
-            <span *ngIf="getNotificationSummary(feedback) as notificationSummary"
+            <span *ngIf="feedbackCardConfig.showNotificationSummary && getNotificationSummary(feedback) as notificationSummary"
                   class="oppia-my-suggestions-notification-summary">
               {{ notificationSummary }}
               <span class="oppia-my-suggestions-unread">

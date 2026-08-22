@@ -337,6 +337,7 @@ export interface FeedbackCardConfig {
   showScreenshot: boolean;
   showLessonMetadata: boolean;
   showSessionInfo: boolean;
+  showNotificationSummary: boolean;
 }
 
 export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
@@ -359,6 +360,7 @@ export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
   showLessonMetadata: true,
   showScreenshot: true,
   showSessionInfo: true,
+  showNotificationSummary: false,
 };
 
 export const CREATOR_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
