@@ -1097,11 +1097,20 @@ export class CurriculumAdmin extends TopicManager {
 
       await questionLocator.first().click();
       await this.expectElementToBeVisible(removeQuestionConfirmationButton);
+      // Register the API response listener before clicking confirm so we
+      // don't miss the request that removes the question-skill link.
+      const unlinkResponse = this.page.waitForResponse(
+        response =>
+          response.url().includes('/manage_question_skill_link/') &&
+          response.request().method() === 'PUT',
+        {timeout: 15000}
+      );
       await this.clickOnElementWithSelector(removeQuestionConfirmationButton);
       await this.expectElementToBeVisible(
         removeQuestionConfirmationButton,
         false
       );
+      await unlinkResponse;
       await this.page.reload({waitUntil: 'networkidle'});
     }
     showMessage(`All questions removed from skill "${skillName}".`);
