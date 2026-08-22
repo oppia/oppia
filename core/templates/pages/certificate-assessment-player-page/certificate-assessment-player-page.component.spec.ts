@@ -865,59 +865,61 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
   }));
 
+  const expiryChanges = (
+    currentValue: boolean,
+    previousValue: boolean
+  ): SimpleChanges => ({
+    isTimeExpired: {
+      currentValue,
+      previousValue,
+      firstChange: false,
+      isFirstChange: () => false,
+    },
+  });
+
   it('should handle time expiry on init when the attempt has expired', fakeAsync(() => {
     loadQ1();
-    spyOn(component, 'handleTimeExpiry');
     component.isTimeExpired = true;
     component.ngOnInit();
-    expect(component.handleTimeExpiry).toHaveBeenCalled();
+    // The expiry path opens the time-expired modal and submits the answers
+    // that were already loaded.
+    expect(modalSpy.open).toHaveBeenCalledWith(
+      TimeExpiredModalComponent,
+      jasmine.any(Object)
+    );
   }));
 
   it('should handle time expiry when isTimeExpired changes to true', () => {
-    spyOn(component, 'handleTimeExpiry');
-    const changes: SimpleChanges = {
-      isTimeExpired: {
-        currentValue: true,
-        previousValue: false,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    };
-    component.ngOnChanges(changes);
-    expect(component.handleTimeExpiry).toHaveBeenCalled();
+    component.ngOnChanges(expiryChanges(true, false));
+    expect(modalSpy.open).toHaveBeenCalledWith(
+      TimeExpiredModalComponent,
+      jasmine.any(Object)
+    );
   });
 
   it('should not handle time expiry when isTimeExpired changes to false', () => {
-    spyOn(component, 'handleTimeExpiry');
-    const changes: SimpleChanges = {
-      isTimeExpired: {
-        currentValue: false,
-        previousValue: true,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    };
-    component.ngOnChanges(changes);
-    expect(component.handleTimeExpiry).not.toHaveBeenCalled();
+    modalSpy.open.calls.reset();
+    component.ngOnChanges(expiryChanges(false, true));
+    expect(modalSpy.open).not.toHaveBeenCalled();
   });
 
   it('should open the modal and emit the submission when time expires', fakeAsync(() => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
-    spyOn(component, 'openTimeExpiredModal');
-    component.handleTimeExpiry();
-    expect(component.openTimeExpiredModal).toHaveBeenCalled();
+    component.ngOnChanges(expiryChanges(true, false));
+    expect(modalSpy.open).toHaveBeenCalledWith(
+      TimeExpiredModalComponent,
+      jasmine.any(Object)
+    );
     expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
-    expect(component.hasHandledTimeExpiry).toBe(true);
   }));
 
   it('should not re-open the modal or re-emit once time expiry is handled', fakeAsync(() => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
-    spyOn(component, 'openTimeExpiredModal');
-    component.handleTimeExpiry();
-    component.handleTimeExpiry();
-    expect(component.openTimeExpiredModal).toHaveBeenCalledTimes(1);
+    component.ngOnChanges(expiryChanges(true, false));
+    component.ngOnChanges(expiryChanges(true, false));
+    expect(modalSpy.open).toHaveBeenCalledTimes(1);
     expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
   }));
 
