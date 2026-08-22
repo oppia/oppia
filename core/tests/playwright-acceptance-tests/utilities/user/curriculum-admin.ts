@@ -1004,8 +1004,12 @@ export class CurriculumAdmin extends TopicManager {
 
         await item.locator(mobileSkillOptionsButton).click();
 
-        await this.expectElementToBeVisible(mobileDeleteSkillButton);
-        await this.clickOnElementWithSelector(mobileDeleteSkillButton);
+        // Use a direct locator click instead of clickOnElementWithSelector
+        // because the latter moves the mouse to (-1,-1) first, which
+        // triggers mouseleave on the dropdown and closes it.
+        const deleteBtn = this.page.locator(mobileDeleteSkillButton);
+        await deleteBtn.waitFor({state: 'visible'});
+        await deleteBtn.click();
 
         await this.expectElementToBeVisible(confirmSkillDeletionButton);
         // Register the DELETE response listener before clicking so we don't
@@ -1087,9 +1091,20 @@ export class CurriculumAdmin extends TopicManager {
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
     await this.navigateToSkillQuestionEditorTab();
-    await this.page.waitForLoadState('networkidle');
 
     while (true) {
+      // Poll the DOM until Angular finishes rendering after the questions-list
+      // API response. Either the remove icons appear (questions exist) or the
+      // "no questions" placeholder appears (skill is empty).
+      await this.page.waitForFunction(
+        () =>
+          document.querySelector('.link-off-icon') !== null ||
+          (document.body.textContent ?? '').includes(
+            'There are no questions in this skill'
+          ),
+        {timeout: 15000}
+      );
+
       const questionLocator = this.page.locator(removeQuestion);
       if (!(await questionLocator.count())) {
         break;
@@ -1097,8 +1112,6 @@ export class CurriculumAdmin extends TopicManager {
 
       await questionLocator.first().click();
       await this.expectElementToBeVisible(removeQuestionConfirmationButton);
-      // Register the API response listener before clicking confirm so we
-      // don't miss the request that removes the question-skill link.
       const unlinkResponse = this.page.waitForResponse(
         response =>
           response.url().includes('/manage_question_skill_link/') &&
@@ -1112,6 +1125,7 @@ export class CurriculumAdmin extends TopicManager {
       );
       await unlinkResponse;
       await this.page.reload({waitUntil: 'networkidle'});
+      await this.navigateToSkillQuestionEditorTab();
     }
     showMessage(`All questions removed from skill "${skillName}".`);
   }
