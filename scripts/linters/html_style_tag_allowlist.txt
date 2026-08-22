@@ -64,6 +64,7 @@ core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.compo
 core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.html
 core/templates/pages/topic-editor-page/topic-editor-page-root.component.html
 core/templates/pages/topic-editor-page/topic-editor-page.component.html
+core/templates/pages/topic-editor-page/subtopic-editor/add-study-guide-section.component.html
 core/templates/pages/topic-viewer-page/modals/practice-session-confirmation-modal.component.html
 core/templates/pages/topics-and-skills-dashboard-page/modals/assign-skill-to-topic-modal.component.html
 core/templates/pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component.html
