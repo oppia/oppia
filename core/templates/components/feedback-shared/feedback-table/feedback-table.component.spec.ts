@@ -67,6 +67,7 @@ describe('FeedbackTableComponent', () => {
       showLessonMetadata: true,
       showScreenshot: true,
       showSessionInfo: true,
+      showNotificationSummary: true,
     };
     fixture.detectChanges();
   });
