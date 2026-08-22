@@ -17,16 +17,7 @@
  * when they select a lesson in a later adventure from the navigation.
  */
 
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  Inject,
-  Input,
-  OnInit,
-  Optional,
-  ViewChild,
-} from '@angular/core';
+import {Component, Inject, Input, Optional} from '@angular/core';
 import {
   MAT_BOTTOM_SHEET_DATA,
   MatBottomSheetRef,
@@ -42,18 +33,10 @@ import './arc-skip-confirmation-modal.component.css';
   templateUrl: './arc-skip-confirmation-modal.component.html',
   styleUrls: ['./arc-skip-confirmation-modal.component.css'],
 })
-export class ArcSkipConfirmationModalComponent
-  extends ConfirmOrCancelModal
-  implements OnInit
-{
-  // The label of the adventure that the navigation is trying to jump to,
-  // e.g. "Adventure 2".
+export class ArcSkipConfirmationModalComponent extends ConfirmOrCancelModal {
   @Input() adventureLabel!: string;
-  // The message listing the adventures that will be skipped.
   @Input() confirmationMessage!: string;
 
-  @ViewChild('dialog') private dialog!: ElementRef<HTMLElement>;
-  private modalFocusRestoreElement: HTMLElement | null = null;
   protected bottomSheetRef: MatBottomSheetRef | undefined;
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -70,102 +53,31 @@ export class ArcSkipConfirmationModalComponent
     }
   }
 
-  confirm<T>(value?: T): void {
+  confirm(): void {
     if (this.bottomSheetRef) {
       this.bottomSheetRef.dismiss('confirm');
     } else {
-      super.confirm(value);
+      super.confirm();
     }
-  }
-
-  cancel<T>(value: T | 'cancel' = 'cancel'): void {
-    if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss('cancel');
-    } else {
-      super.cancel(value);
-    }
-  }
-
-  ngOnInit(): void {
-    this.modalFocusRestoreElement =
-      document.activeElement as HTMLElement | null;
-    // Defer focus so Angular has rendered the dialog into the DOM.
-    setTimeout(() => {
-      this.dialog?.nativeElement.focus();
-    }, 0);
   }
 
   onCancel(): void {
-    this.restoreModalFocus();
     this.cancel();
   }
 
   onConfirm(): void {
-    this.restoreModalFocus();
     this.confirm();
   }
 
   onBackdropClick(): void {
-    this.onCancel();
+    this.cancel();
   }
 
-  @HostListener('document:keydown', ['$event'])
-  onDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      this.onCancel();
+  cancel(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('cancel');
+    } else {
+      super.cancel();
     }
-  }
-
-  onDialogTab(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
-
-    const dialogElement = this.dialog?.nativeElement;
-    if (!dialogElement) {
-      return;
-    }
-
-    const focusableElements = this.getFocusableElements(dialogElement);
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      return;
-    }
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    const activeElement = document.activeElement as HTMLElement | null;
-
-    if (
-      event.shiftKey &&
-      (activeElement === firstFocusable || activeElement === dialogElement)
-    ) {
-      event.preventDefault();
-      lastFocusable.focus();
-    } else if (!event.shiftKey && activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  }
-
-  private getFocusableElements(dialogElement: HTMLElement): HTMLElement[] {
-    const focusableSelector = [
-      'a[href]',
-      'button:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-    ].join(',');
-    return Array.from(
-      dialogElement.querySelectorAll<HTMLElement>(focusableSelector)
-    );
-  }
-
-  private restoreModalFocus(): void {
-    if (this.modalFocusRestoreElement) {
-      this.modalFocusRestoreElement.focus();
-    }
-    this.modalFocusRestoreElement = null;
   }
 }

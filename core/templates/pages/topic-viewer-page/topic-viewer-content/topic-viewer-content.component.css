@@ -38,84 +38,21 @@
   padding: 28px 36px 56px;
 }
 
-.redesigned-stories-section .oppia-page-card,
-.redesigned-secondary-section .oppia-page-card {
+.redesigned-stories-section .oppia-page-card {
+  border-radius: 0.25em;
   margin: 0 auto;
   max-width: 1160px;
   width: 100%;
-}
-
-.redesigned-stories-section .oppia-page-card {
-  border-radius: 0.25em;
 }
 
 .redesigned-secondary-section {
   padding-top: 24px;
 }
 
-.redesigned-secondary-section subtopics-list .oppia-page-card,
-.redesigned-secondary-section practice-tab .oppia-page-card {
-  margin-top: 0;
-}
-
-.redesigned-secondary-section subtopics-list .oppia-page-card.oppia-long-text,
-.redesigned-secondary-section practice-tab .oppia-page-card {
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
-
 .redesigned-studyguide-section {
   margin-top: 0;
   min-height: calc(100vh - 64px);
   padding: 24px 36px 56px;
-}
-
-.redesigned-studyguide-section subtopics-list .oppia-subtopics-list-container {
-  margin: 0 auto;
-  max-width: 1160px;
-  width: 100%;
-}
-
-.redesigned-studyguide-section subtopics-list .oppia-page-card,
-.redesigned-studyguide-section subtopics-list .oppia-page-card.oppia-long-text {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  margin: 0;
-  max-width: 100%;
-  padding: 0;
-  width: 100%;
-}
-
-.redesigned-studyguide-section subtopics-list .tab-title {
-  color: #00645c;
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin: 0 0 8px;
-}
-
-.redesigned-studyguide-section subtopics-list .subtopic-subheading {
-  color: #4a4a4a;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.35;
-  margin-bottom: 24px;
-}
-
-.redesigned-studyguide-section subtopics-list .subtopics-container {
-  display: grid;
-  gap: 28px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
-  justify-content: start;
-  margin-top: 0;
-}
-
-.redesigned-studyguide-section subtopics-list .subtopic-summary-tile {
-  margin-right: 0;
 }
 
 .redesigned-stories-list {
@@ -149,14 +86,6 @@
     padding: 22px 28px 48px;
   }
 
-  .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 34px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 18px;
-  }
-
   .redesigned-stories-section {
     padding: 26px 28px 52px;
   }
@@ -173,20 +102,6 @@
 
   .redesigned-studyguide-section {
     padding: 16px 16px 36px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 28px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 16px;
-    margin-bottom: 18px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .subtopics-container {
-    gap: 18px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   .redesigned-stories-section {
@@ -211,21 +126,6 @@
 
   .redesigned-studyguide-section {
     padding: 16px 12px 34px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 25px;
-    line-height: 1.25;
-  }
-
-  .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  .redesigned-studyguide-section subtopics-list .subtopics-container {
-    gap: 16px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   .redesigned-stories-section {

@@ -22,6 +22,9 @@ import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
+const _setTimeout = setTimeout;
+const _clearTimeout = clearTimeout;
+
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -29,14 +32,14 @@ class MockWindowRef {
     },
     setTimeout: jasmine
       .createSpy('setTimeout')
-      .and.callFake((callback: () => void, timeout: number): number =>
-        window.setTimeout(callback, timeout)
-      ),
+      .and.callFake((callback: () => void, timeout: number): number => {
+        return _setTimeout(callback, timeout);
+      }),
     clearTimeout: jasmine
       .createSpy('clearTimeout')
-      .and.callFake((timeoutId: number): void =>
-        window.clearTimeout(timeoutId)
-      ),
+      .and.callFake((timeoutId: number): void => {
+        _clearTimeout(timeoutId);
+      }),
   };
 }
 

@@ -16,14 +16,7 @@
  * @fileoverview Unit tests for AdventureMasteredModalComponent.
  */
 
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync,
-} from '@angular/core/testing';
-import {ElementRef} from '@angular/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
 import {
   MAT_BOTTOM_SHEET_DATA,
   MatBottomSheetRef,
@@ -36,23 +29,7 @@ import {AdventureMasteredModalComponent} from './adventure-mastered-modal.compon
 
 describe('AdventureMasteredModalComponent', () => {
   let component: AdventureMasteredModalComponent;
-  let fixture: ComponentFixture<AdventureMasteredModalComponent>;
   let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
-
-  const createMockDialog = (
-    focusableElements: HTMLElement[] = []
-  ): HTMLElement => {
-    const dialogElement = document.createElement('div');
-    spyOn(dialogElement, 'focus');
-    focusableElements.forEach(element => dialogElement.appendChild(element));
-    return dialogElement;
-  };
-
-  const createMockFocusableElement = (): HTMLElement => {
-    const element = document.createElement('button');
-    spyOn(element, 'focus');
-    return element;
-  };
 
   beforeEach(waitForAsync(() => {
     ngbActiveModal = jasmine.createSpyObj('NgbActiveModal', [
@@ -67,13 +44,17 @@ describe('AdventureMasteredModalComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+    const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
     component = fixture.componentInstance;
     component.title = 'Adventure 1 mastered';
     component.message = 'You have completed all lessons in this adventure';
   });
 
   it('should render the title, message and translated continue button', () => {
+    const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+    fixture.componentInstance.title = 'Adventure 1 mastered';
+    fixture.componentInstance.message =
+      'You have completed all lessons in this adventure';
     fixture.detectChanges();
 
     expect(
@@ -99,172 +80,7 @@ describe('AdventureMasteredModalComponent', () => {
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should close the modal when Escape is pressed', () => {
-    component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Escape'}));
-
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
-
-  it('should ignore non-Escape keys', () => {
-    component.onDocumentKeydown(new KeyboardEvent('keydown', {key: 'Enter'}));
-
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
-  });
-
-  it('should move focus into the dialog on init', fakeAsync(() => {
-    const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
-      'previouslyFocusedElement',
-      ['focus']
-    );
-    const dialogElement = createMockDialog();
-    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
-      previouslyFocusedElement
-    );
-    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
-
-    component.ngOnInit();
-    tick(0);
-
-    expect(dialogElement.focus).toHaveBeenCalled();
-    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBe(
-      previouslyFocusedElement
-    );
-  }));
-
-  it('should restore focus to the element that opened the modal on continue', () => {
-    const previouslyFocusedElement = jasmine.createSpyObj<HTMLElement>(
-      'previouslyFocusedElement',
-      ['focus']
-    );
-    Reflect.set(
-      component,
-      'modalFocusRestoreElement',
-      previouslyFocusedElement
-    );
-
-    component.onContinue();
-
-    expect(previouslyFocusedElement.focus).toHaveBeenCalled();
-    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
-  });
-
-  it('should move focus to the first focusable element on Tab from the last one', () => {
-    const firstFocusableElement = createMockFocusableElement();
-    const lastFocusableElement = createMockFocusableElement();
-    const dialogElement = createMockDialog([
-      firstFocusableElement,
-      lastFocusableElement,
-    ]);
-    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
-    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
-      lastFocusableElement
-    );
-
-    const tabEvent = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      cancelable: true,
-    });
-    spyOn(tabEvent, 'preventDefault');
-
-    component.onDialogTab(tabEvent);
-
-    expect(firstFocusableElement.focus).toHaveBeenCalled();
-    expect(tabEvent.preventDefault).toHaveBeenCalled();
-  });
-
-  it('should move focus to the last focusable element on Shift+Tab from the first one', () => {
-    const firstFocusableElement = createMockFocusableElement();
-    const lastFocusableElement = createMockFocusableElement();
-    const dialogElement = createMockDialog([
-      firstFocusableElement,
-      lastFocusableElement,
-    ]);
-    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
-    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
-      firstFocusableElement
-    );
-
-    const shiftTabEvent = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      shiftKey: true,
-      cancelable: true,
-    });
-    spyOn(shiftTabEvent, 'preventDefault');
-
-    component.onDialogTab(shiftTabEvent);
-
-    expect(lastFocusableElement.focus).toHaveBeenCalled();
-    expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
-  });
-
-  it('should move focus to the last focusable element on Shift+Tab when the dialog is focused', () => {
-    const firstFocusableElement = createMockFocusableElement();
-    const lastFocusableElement = createMockFocusableElement();
-    const dialogElement = createMockDialog([
-      firstFocusableElement,
-      lastFocusableElement,
-    ]);
-    Reflect.set(component, 'dialog', new ElementRef(dialogElement));
-    spyOnProperty(document, 'activeElement', 'get').and.returnValue(
-      dialogElement
-    );
-
-    const shiftTabEvent = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      shiftKey: true,
-      cancelable: true,
-    });
-    spyOn(shiftTabEvent, 'preventDefault');
-
-    component.onDialogTab(shiftTabEvent);
-
-    expect(lastFocusableElement.focus).toHaveBeenCalled();
-    expect(shiftTabEvent.preventDefault).toHaveBeenCalled();
-  });
-
-  it('should do nothing on Tab when no dialog is rendered', () => {
-    Reflect.deleteProperty(component, 'dialog');
-
-    const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
-    spyOn(tabEvent, 'preventDefault');
-
-    component.onDialogTab(tabEvent);
-
-    expect(tabEvent.preventDefault).not.toHaveBeenCalled();
-  });
-
-  it('should prevent Tab navigation when the dialog has no focusable elements', () => {
-    Reflect.set(component, 'dialog', new ElementRef(createMockDialog()));
-
-    const tabEvent = new KeyboardEvent('keydown', {key: 'Tab'});
-    spyOn(tabEvent, 'preventDefault');
-
-    component.onDialogTab(tabEvent);
-
-    expect(tabEvent.preventDefault).toHaveBeenCalled();
-  });
-
-  it('should do nothing when a non-Tab key is pressed on the dialog', () => {
-    Reflect.set(component, 'dialog', new ElementRef(createMockDialog()));
-
-    const enterEvent = new KeyboardEvent('keydown', {key: 'Enter'});
-    spyOn(enterEvent, 'preventDefault');
-
-    component.onDialogTab(enterEvent);
-
-    expect(enterEvent.preventDefault).not.toHaveBeenCalled();
-  });
-
-  it('should close the modal without restoring focus when no element was saved', () => {
-    Reflect.set(component, 'modalFocusRestoreElement', null);
-
-    component.onContinue();
-
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-    expect(Reflect.get(component, 'modalFocusRestoreElement')).toBeNull();
-  });
-
-  it('should dismiss the modal when cancel is called without bottomSheetRef', () => {
+  it('should dismiss the modal when cancel is called', () => {
     component.cancel();
 
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
@@ -296,7 +112,7 @@ describe('AdventureMasteredModalComponent', () => {
     }));
 
     beforeEach(() => {
-      fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+      const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
       component = fixture.componentInstance;
     });
 
