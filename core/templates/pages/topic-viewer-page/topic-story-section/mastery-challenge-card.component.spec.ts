@@ -33,7 +33,7 @@ class MockWindowRef {
     setTimeout: jasmine
       .createSpy('setTimeout')
       .and.callFake((callback: () => void, timeout: number): number => {
-        return _setTimeout(callback, timeout);
+        return _setTimeout(callback, timeout) as unknown as number;
       }),
     clearTimeout: jasmine
       .createSpy('clearTimeout')
@@ -102,21 +102,21 @@ describe('MasteryChallengeCardComponent', () => {
 
   it('should report that the default placeholder is not an action URL', () => {
     expect(component.actionUrl).toBe('#');
-    expect(component.hasActionUrl()).toBeFalse();
+    expect(component.hasActionUrl()).toBeFalsy();
     component.actionUrl = '';
-    expect(component.hasActionUrl()).toBeFalse();
+    expect(component.hasActionUrl()).toBeFalsy();
     component.actionUrl = '/practice/session/1';
-    expect(component.hasActionUrl()).toBeTrue();
+    expect(component.hasActionUrl()).toBeTruthy();
   });
 
   it('should report the action button as disabled for an unlocked placeholder URL', () => {
     component.isUnlocked = true;
     component.actionUrl = '#';
 
-    expect(component.isActionDisabled()).toBeTrue();
+    expect(component.isActionDisabled()).toBeTruthy();
 
     component.actionUrl = '/practice/session/1';
-    expect(component.isActionDisabled()).toBeFalse();
+    expect(component.isActionDisabled()).toBeFalsy();
   });
 
   it('should show helper tooltip for 5 seconds for a locked challenge', fakeAsync(() => {
@@ -126,14 +126,14 @@ describe('MasteryChallengeCardComponent', () => {
 
     component.onChallengeButtonClick();
 
-    expect(component.showLockedTooltip).toBeTrue();
+    expect(component.showLockedTooltip).toBeTruthy();
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
 
     tick(4999);
-    expect(component.showLockedTooltip).toBeTrue();
+    expect(component.showLockedTooltip).toBeTruthy();
 
     tick(1);
-    expect(component.showLockedTooltip).toBeFalse();
+    expect(component.showLockedTooltip).toBeFalsy();
   }));
 
   it('should reset helper tooltip timer when clicked again while locked', fakeAsync(() => {
@@ -144,21 +144,21 @@ describe('MasteryChallengeCardComponent', () => {
 
     component.onChallengeButtonClick();
     tick(3000);
-    expect(component.showLockedTooltip).toBeTrue();
+    expect(component.showLockedTooltip).toBeTruthy();
 
     tick(2000);
-    expect(component.showLockedTooltip).toBeFalse();
+    expect(component.showLockedTooltip).toBeFalsy();
   }));
 
   it('should keep tooltip visible after destroy clears the timer', fakeAsync(() => {
     component.isUnlocked = false;
 
     component.onChallengeButtonClick();
-    expect(component.showLockedTooltip).toBeTrue();
+    expect(component.showLockedTooltip).toBeTruthy();
 
     component.ngOnDestroy();
     tick(5000);
 
-    expect(component.showLockedTooltip).toBeTrue();
+    expect(component.showLockedTooltip).toBeTruthy();
   }));
 });

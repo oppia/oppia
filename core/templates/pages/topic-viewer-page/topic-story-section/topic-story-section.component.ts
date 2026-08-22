@@ -259,6 +259,7 @@ export class TopicStorySectionComponent
       this.arcSkipModalRef = this.ngbModal.open(
         ArcSkipConfirmationModalComponent,
         {
+          backdrop: 'static',
           windowClass: 'oppia-arc-skip-confirmation-modal',
         }
       );
