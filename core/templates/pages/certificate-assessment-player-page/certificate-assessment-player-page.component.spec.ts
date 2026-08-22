@@ -17,7 +17,7 @@
  */
 
 import {CommonModule} from '@angular/common';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -46,6 +46,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -862,5 +863,90 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(registrySpy.getRulesServiceByInteractionId).toHaveBeenCalledWith(
       'TextInput'
     );
+  }));
+
+  it('should handle time expiry on init when the attempt has expired', fakeAsync(() => {
+    loadQ1();
+    spyOn(component, 'handleTimeExpiry');
+    component.isTimeExpired = true;
+    component.ngOnInit();
+    expect(component.handleTimeExpiry).toHaveBeenCalled();
+  }));
+
+  it('should handle time expiry when isTimeExpired changes to true', () => {
+    spyOn(component, 'handleTimeExpiry');
+    const changes: SimpleChanges = {
+      isTimeExpired: {
+        currentValue: true,
+        previousValue: false,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    };
+    component.ngOnChanges(changes);
+    expect(component.handleTimeExpiry).toHaveBeenCalled();
+  });
+
+  it('should not handle time expiry when isTimeExpired changes to false', () => {
+    spyOn(component, 'handleTimeExpiry');
+    const changes: SimpleChanges = {
+      isTimeExpired: {
+        currentValue: false,
+        previousValue: true,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    };
+    component.ngOnChanges(changes);
+    expect(component.handleTimeExpiry).not.toHaveBeenCalled();
+  });
+
+  it('should open the modal and emit the submission when time expires', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    spyOn(component, 'openTimeExpiredModal');
+    component.handleTimeExpiry();
+    expect(component.openTimeExpiredModal).toHaveBeenCalled();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
+    expect(component.hasHandledTimeExpiry).toBe(true);
+  }));
+
+  it('should not re-open the modal or re-emit once time expiry is handled', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    spyOn(component, 'openTimeExpiredModal');
+    component.handleTimeExpiry();
+    component.handleTimeExpiry();
+    expect(component.openTimeExpiredModal).toHaveBeenCalledTimes(1);
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should emit viewResults when the time-expired bottom sheet returns view results', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    bottomSheetSpy.open.and.returnValue({
+      afterDismissed: () =>
+        of(CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT),
+    });
+    spyOn(component.viewResults, 'emit');
+    component.showTimeExpiredModal = true;
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.viewResults.emit).toHaveBeenCalled();
+  }));
+
+  it('should emit viewResults when the time-expired modal returns view results', fakeAsync(() => {
+    loadQ1();
+    modalSpy.open.and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      ),
+    });
+    spyOn(component.viewResults, 'emit');
+    component.showTimeExpiredModal = true;
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.viewResults.emit).toHaveBeenCalled();
   }));
 });

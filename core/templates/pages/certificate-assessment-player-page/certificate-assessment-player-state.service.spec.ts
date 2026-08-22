@@ -258,4 +258,85 @@ describe('CertificateAssessmentPlayerStateService', () => {
     expect(() => service.ngOnDestroy()).not.toThrowError();
     expect(window.clearInterval).not.toHaveBeenCalled();
   });
+
+  it('should not throw when pausing a countdown that is not running', () => {
+    spyOnTimers();
+    expect(() => service.pauseTimer()).not.toThrowError();
+    expect(window.clearInterval).not.toHaveBeenCalled();
+  });
+
+  it('should start a fresh countdown when resuming with no remaining time', fakeAsync(() => {
+    spyOnTimers();
+    armCountdown();
+    tick(3600000);
+    expect(service.isTimeExpired).toBeTrue();
+    expect(service.remainingTimeInSeconds).toBe(0);
+
+    service.showAssessmentInterruptCard = true;
+    service.resumeQuestionsStage();
+
+    // With no time left, resume falls back to arming a new window, and the
+    // learner is taken back to the questions stage.
+    expect(service.showAssessmentInterruptCard).toBeFalse();
+    expect(service.currentStage).toBe(
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+    );
+    service.ngOnDestroy();
+  }));
+
+  it('should not resume a countdown without a valid attempt', () => {
+    spyOn(window, 'setInterval');
+    // timerId is null (no countdown armed) and the window still reports
+    // remaining time, but the attempt is gone, so resume must bail out
+    // rather than start a phantom interval.
+    (
+      service as unknown as {attempt: CertificateAssessmentAttemptData | null}
+    ).attempt = null;
+    service.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
+    (
+      service as unknown as {remainingTimeInSeconds: number}
+    ).remainingTimeInSeconds = 100;
+
+    (service as unknown as {resumeTimer: () => void}).resumeTimer();
+
+    expect(window.setInterval).not.toHaveBeenCalled();
+  });
+
+  it('should not start a duplicate timer when resuming an already-running countdown', fakeAsync(() => {
+    spyOnTimers();
+    armCountdown();
+    service.showAssessmentInterruptCard = true;
+
+    service.resumeQuestionsStage();
+
+    // The countdown was never paused, so resumeTimer leaves the live
+    // interval in place instead of starting a duplicate.
+    expect(window.setInterval).toHaveBeenCalledTimes(1);
+    service.ngOnDestroy();
+  }));
+
+  it('should resume the paused countdown when resuming with remaining time', fakeAsync(() => {
+    spyOnTimers();
+    armCountdown();
+    tick(30000);
+    expect(service.remainingTimeInSeconds).toBeLessThan(3600);
+
+    service.pauseTimer();
+    expect(window.clearInterval).toHaveBeenCalled();
+    service.showAssessmentInterruptCard = true;
+    service.resumeQuestionsStage();
+
+    // The countdown continues from where it was paused rather than starting
+    // a duplicate interval.
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
+    tick(2000);
+    expect(service.remainingTimeInSeconds).toBeGreaterThan(0);
+
+    // Run the resumed countdown all the way down so its expiry path is
+    // exercised too.
+    tick(3600000);
+    expect(service.isTimeExpired).toBeTrue();
+    service.ngOnDestroy();
+  }));
 });
