@@ -107,8 +107,8 @@
     },
     {
       "name": "exploration-editor/publish-the-exploration-with-an-interaction",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
