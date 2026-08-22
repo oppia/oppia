@@ -180,6 +180,10 @@ const mobileDiscardButtonSelector =
   'button.e2e-test-mobile-exploration-discard-tab';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -1815,6 +1819,51 @@ export class ExplorationEditor extends BaseUser {
     ]);
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(confirmDiscardButton, false);
+  }
+  /**
+   * Adds an Image Region interaction to the current exploration.
+   * @param {string} feedback - The feedback for the correct answer.
+   * @param {string} nextCard - The next card to navigate to.
+   */
+  async addImageInteraction(
+    feedback: string = 'Correct!',
+    nextCard?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.expectModalTitleToBe('Choose Interaction');
+    await this.clickOnElementWithText('Image Region');
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Image Region)'
+    );
+    await this.clickOnElementWithSelector(uploadImageButton);
+    await this.uploadFile(imageToUpload);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible('.btn-danger');
+    const imageContainer = await this.page.$('.btn-danger');
+    if (!imageContainer) {
+      throw new Error('Image region container not found.');
+    }
+    const box = await imageContainer.boundingBox();
+    if (!box) {
+      throw new Error('Could not get bounding box of image region container.');
+    }
+    // Select region from (5%, 50%) to (90%, 45%) of the container.
+    await this.page.mouse.move(
+      box.x + box.width * 0.05,
+      box.y + box.height * 0.5
+    );
+    await this.page.mouse.down();
+    await this.page.mouse.move(
+      box.x + box.width * 0.9,
+      box.y + box.height * 0.45
+    );
+    await this.page.mouse.up();
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    await this.expectModalTitleToBe('Add Response');
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
   }
 }
 
