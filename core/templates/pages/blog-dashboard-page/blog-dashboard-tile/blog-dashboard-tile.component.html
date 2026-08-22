@@ -55,5 +55,5 @@
   <span class="blog-dashboard-tile-subtitle d-contents col-sm-2 px-0 py-0">
     {{ lastUpdatedDateString }}
   </span>
-  <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+  <mat-divider [inset]="true" *ngIf="!isLastBlogPostInList"></mat-divider>
 </div>

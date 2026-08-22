@@ -269,10 +269,6 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 
-# The maximum number of activities allowed in the playlist of the learner. This
-# limit applies to both the explorations playlist and the collections playlist.
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
-
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
 
@@ -430,10 +426,14 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 DEFAULT_STATE_CONTENT_STR = ''
 
 # Content IDs and prefixes for exploration metadata.
+EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
 EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
 EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
+
+# Character limit for exploration title translation.
+EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT = 36
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -464,6 +464,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
@@ -543,6 +545,9 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
+
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
@@ -600,6 +605,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
+SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
+    'sensitive-firebase-auth-read-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
+)
+
 OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
@@ -629,6 +642,9 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = True
+# The default preference for Contributor Dashboard reviewer notification
+# emails when no stored email preference is available.
+DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
@@ -665,6 +681,9 @@ EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION = (
+    'web_user_feedback_message_notification'
+)
 EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
@@ -1008,7 +1027,6 @@ LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
 )
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
-LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -1021,6 +1039,7 @@ LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
+MY_FEEDBACK_URL = '/my_feedback'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1154,6 +1173,21 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = '/certificate_assessment_offerings_for_classroom_handler/<classroom_url_fragment>'
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
+)
+CERTIFICATE_QUESTION_HANDLER = (
+    '/certificate_question_handler/<attempt_id>/<question_id>'
 )
 
 # Event types.
@@ -1741,6 +1775,19 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_TOPIC,
 ]
 
+# Sentinel accepted as the target_type URL argument of the suggestion list
+# handlers, meaning "do not filter by target type". It is never stored on a
+# suggestion, so it is deliberately not part of
+# SUGGESTION_TARGET_TYPE_CHOICES.
+SUGGESTION_TARGET_TYPE_SENTINEL_ALL = 'all'
+
+# The target types accepted by the handlers that list suggestions. They also
+# accept the sentinel above, because a contributor can ask for translation
+# suggestions of every entity type at once.
+SUGGESTION_LIST_TARGET_TYPE_CHOICES = SUGGESTION_TARGET_TYPE_CHOICES + [
+    SUGGESTION_TARGET_TYPE_SENTINEL_ALL
+]
+
 TRANSLATABLE_ENTITY_TYPES = [
     ENTITY_TYPE_EXPLORATION,
     ENTITY_TYPE_TOPIC,
@@ -1967,3 +2014,7 @@ TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
         'donate',
     ]
 )
+
+DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM_EMAIL = 'web-leap-leads@oppia.org'
+DESTINATION_TECHNICAL_INTERNAL_TEAM_EMAIL = 'web-core-leads@oppia.org'

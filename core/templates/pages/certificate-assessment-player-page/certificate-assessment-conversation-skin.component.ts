@@ -13,34 +13,65 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the assessment conversation skin.
+ * @fileoverview Component for the certificate assessment conversation skin,
+ * i.e. the question-by-question player screen (progress bar, timer,
+ * question card, and navigation actions).
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-
-interface AssessmentQuestion {
-  prompt: string;
-  choices: string[];
-}
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
   selector: 'oppia-certificate-assessment-conversation-skin',
   templateUrl: './certificate-assessment-conversation-skin.component.html',
+  styleUrls: ['./certificate-assessment-conversation-skin.component.css'],
 })
-export class CertificateAssessmentConversationSkinComponent {
+export class CertificateAssessmentConversationSkinComponent implements OnInit {
   @Input() currentQuestion!: AssessmentQuestion;
   @Input() currentQuestionIndex = 0;
   @Input() totalQuestions = 0;
   @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
+  @Input() interactionHtml = '';
+
+  @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
   @Output() submitAssessment = new EventEmitter<void>();
 
+  OPPIA_AVATAR_IMAGE_URL!: string;
+
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private currentInteractionService: CurrentInteractionService
+  ) {}
+
+  ngOnInit(): void {
+    this.OPPIA_AVATAR_IMAGE_URL =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
+  }
+
+  onPreviousQuestion(): void {
+    this.previousQuestion.emit();
+  }
+
   onNextQuestion(): void {
+    // Interactions with their own submit handlers (e.g. ImageClickInput) do
+    // not register a submit function, so only submit when one is registered.
+    if (this.currentInteractionService.isSubmitAnswerFnRegistered()) {
+      this.currentInteractionService.submitAnswer();
+    }
     this.nextQuestion.emit();
   }
 
   onSubmitAssessment(): void {
+    if (this.currentInteractionService.isSubmitAnswerFnRegistered()) {
+      this.currentInteractionService.submitAnswer();
+    }
     this.submitAssessment.emit();
   }
 }

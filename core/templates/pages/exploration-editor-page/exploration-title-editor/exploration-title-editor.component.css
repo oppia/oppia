@@ -1,0 +1,23 @@
+.mat-form-field {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  exploration-title-editor p {
+    display: table;
+    margin-bottom: 0;
+    width: 100%;
+  }
+}
+
+.modal-body exploration-title-editor input {
+  width: 100%;
+}
+
+.modal-body exploration-objective-editor #explorationObjective {
+  width: 100%;
+}
+
+.modal-body exploration-title-editor #explorationTitle {
+  width: 100%;
+}

@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
@@ -149,7 +147,7 @@ class ExplorationImprovementsHandler(
                     issue_description,
                     status,
                     self.user_id,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                 )
             )
         improvements_services.put_tasks(task_entries_to_put)

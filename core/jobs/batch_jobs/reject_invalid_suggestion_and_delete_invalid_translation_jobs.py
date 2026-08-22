@@ -19,9 +19,7 @@ content and deleting translations for invalid content ID."""
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -487,7 +485,9 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                         suggestion.final_reviewer_id = (
                             feconf.SUGGESTION_BOT_USER_ID
                         )
-                        suggestion.last_updated = datetime.datetime.utcnow()
+                        suggestion.last_updated = (
+                            utils.get_current_utc_datetime()
+                        )
                         updated_suggestion_dicts.append(
                             {
                                 'updated_suggestion': suggestion,
