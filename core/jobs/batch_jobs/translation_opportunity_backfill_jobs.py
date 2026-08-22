@@ -27,6 +27,7 @@ from core.domain import (
     skill_fetchers,
     topic_domain,
     topic_fetchers,
+    translation_fetchers,
 )
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -70,7 +71,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 # The domain objects a translation opportunity can be built from. Both extend
 # translation_domain.BaseTranslatableObject, and both expose the version,
-# language_code and get_content_count() members the shared code below reads.
+# language_code, get_content_count() and get_translation_count() members the
+# shared code below reads.
 TranslatableEntity = Union[exp_domain.Exploration, skill_domain.Skill]
 
 # One element of the CoGroupByKey over an entity ID: the topic IDs the entity
@@ -162,16 +164,28 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
                 )
             )
 
+            # The count has to come from the entity, the same way
+            # translation_services.get_translation_counts computes it live.
+            # A translation model can hold entries for content the entity no
+            # longer has, or for content whose value is now empty, and neither
+            # is part of content_count. Counting the model's entries directly
+            # would let a stored count exceed content_count, which fails
+            # TranslationOpportunity validation when the opportunity is read.
             translation_counts = {}
             for translation_model in translations:
-                lang_code = translation_model.language_code
-                count = 0
-                for (
-                    translated_content
-                ) in translation_model.translations.values():
-                    if not translated_content['needs_update']:
-                        count += 1
-                translation_counts[lang_code] = count
+                entity_translation = (
+                    translation_fetchers.get_entity_translation_from_model(
+                        translation_model
+                    )
+                )
+                translation_counts[translation_model.language_code] = (
+                    entity.get_translation_count(
+                        entity_translation,
+                        override_metadata_feature_flag=(
+                            cls.OVERRIDE_METADATA_FEATURE_FLAG
+                        ),
+                    )
+                )
 
             audio_language_codes = set(
                 language['id']

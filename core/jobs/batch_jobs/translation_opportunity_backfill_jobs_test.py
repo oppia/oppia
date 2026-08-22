@@ -22,7 +22,13 @@ import re
 
 from core import feature_flag_list, feconf
 from core.constants import constants
-from core.domain import exp_domain, rights_manager, skill_domain, skill_services
+from core.domain import (
+    exp_domain,
+    opportunity_services,
+    rights_manager,
+    skill_domain,
+    skill_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_backfill_jobs
 from core.jobs.types import job_run_result
@@ -204,9 +210,9 @@ class TranslationOpportunityJobTestBase(
                 1,
                 'hi',
                 {
-                    'content_0': {
-                        'content_format': 'html',
-                        'content_value': '<p>Hola</p>',
+                    feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                        'content_format': 'unicode',
+                        'content_value': 'Hola',
                         'needs_update': False,
                     },
                     'content_1': {
@@ -247,6 +253,62 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
         self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
+
+    def test_translation_count_ignores_content_the_exploration_does_not_have(
+        self,
+    ) -> None:
+        # A translation model keeps its entries when the content they belong
+        # to is removed from the exploration, and it can also hold entries for
+        # content whose value is now empty. Neither is part of content_count,
+        # so counting the model's entries directly stores a count that is
+        # larger than content_count, and the stored opportunity then fails
+        # validation when the contributor dashboard reads it.
+        translation_model = translation_models.EntityTranslationsModel.create_new(
+            'exploration',
+            self.exp_id,
+            1,
+            'ar',
+            {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                    'content_format': 'unicode',
+                    'content_value': 'Arabic title',
+                    'needs_update': False,
+                },
+                'content_0': {
+                    'content_format': 'html',
+                    'content_value': '<p>Translation of empty content</p>',
+                    'needs_update': False,
+                },
+                'removed_content_id': {
+                    'content_format': 'html',
+                    'content_value': '<p>Translation of removed content</p>',
+                    'needs_update': False,
+                },
+            },
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, self.exp_id
+        )
+        self.assertEqual(model.content_count, 4)
+        self.assertEqual(model.translation_counts, {'hi': 1, 'ar': 1})
+        self.assertIn('ar', model.incomplete_translation_language_codes)
+        opportunity = (
+            opportunity_services.get_translation_opportunity_summary_from_model(
+                model
+            )
+        )
+        self.assertEqual(opportunity.translation_counts['ar'], 1)
 
     def test_create_translation_opportunity_with_supported_language_code(
         self,
@@ -556,12 +618,12 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 1,
                 'hi',
                 {
-                    'content': {
+                    'content_0': {
                         'content_format': 'html',
                         'content_value': '<p>Translated Content</p>',
                         'needs_update': False,
                     },
-                    'default_outcome': {
+                    'default_outcome_1': {
                         'content_format': 'html',
                         'content_value': '<p>Translated Feedback</p>',
                         'needs_update': True,
@@ -806,9 +868,9 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                 2,
                 'hi',
                 {
-                    'content_0': {
-                        'content_format': 'html',
-                        'content_value': '<p>Hola</p>',
+                    feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                        'content_format': 'unicode',
+                        'content_value': 'Hola',
                         'needs_update': False,
                     },
                     'content_1': {
@@ -1104,9 +1166,9 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             entity_version=1,
             language_code='hi',
             translations={
-                'rubric_explanation_0': {
-                    'content_format': 'html',
-                    'content_value': '<p>Hindi explanation</p>',
+                feconf.SKILL_DESCRIPTION_CONTENT_ID: {
+                    'content_format': 'unicode',
+                    'content_value': 'Hindi description',
                     'needs_update': False,
                 }
             },
@@ -1127,6 +1189,62 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.translation_counts, {'hi': 1})
+
+    def test_translation_count_ignores_content_the_skill_does_not_have(
+        self,
+    ) -> None:
+        # A skill's rubric explanations are not translatable content, and a
+        # skill whose explanation is empty does not count it either, so
+        # translations of them are not part of content_count. Counting the
+        # translation model's entries directly stores a count larger than
+        # content_count, and the stored opportunity then fails validation
+        # when the contributor dashboard reads it.
+        translation_model = translation_models.EntityTranslationsModel(
+            id=f'skill.{self.skill_id}.1.ar',
+            entity_type='skill',
+            entity_id=self.skill_id,
+            entity_version=1,
+            language_code='ar',
+            translations={
+                feconf.SKILL_DESCRIPTION_CONTENT_ID: {
+                    'content_format': 'unicode',
+                    'content_value': 'Arabic description',
+                    'needs_update': False,
+                },
+                'rubric_explanation_0': {
+                    'content_format': 'html',
+                    'content_value': '<p>Arabic explanation 1</p>',
+                    'needs_update': False,
+                },
+                'rubric_explanation_1': {
+                    'content_format': 'html',
+                    'content_value': '<p>Arabic explanation 2</p>',
+                    'needs_update': False,
+                },
+            },
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.SKILL, self.skill_id
+        )
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {'ar': 1})
+        opportunity = (
+            opportunity_services.get_translation_opportunity_summary_from_model(
+                model
+            )
+        )
+        self.assertEqual(opportunity.translation_counts['ar'], 1)
 
     def test_create_skill_translation_opportunity_returns_error_cases(
         self,
@@ -1165,9 +1283,9 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             entity_version=1,
             language_code='es',
             translations={
-                'rubric_explanation_0': {
-                    'content_format': 'html',
-                    'content_value': '<p>Spanish explanation</p>',
+                feconf.SKILL_DESCRIPTION_CONTENT_ID: {
+                    'content_format': 'unicode',
+                    'content_value': 'Spanish description',
                     'needs_update': True,
                 }
             },
@@ -1302,9 +1420,9 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             entity_version=1,
             language_code='hi',
             translations={
-                'rubric_explanation_0': {
-                    'content_format': 'html',
-                    'content_value': '<p>Hindi explanation</p>',
+                feconf.SKILL_DESCRIPTION_CONTENT_ID: {
+                    'content_format': 'unicode',
+                    'content_value': 'Hindi description',
                     'needs_update': False,
                 }
             },
