@@ -24,6 +24,7 @@ import {
   flushMicrotasks,
   waitForAsync,
 } from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
@@ -92,7 +93,7 @@ describe('My Suggestions Tab Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MySuggestionsTabComponent],
+      declarations: [MySuggestionsTabComponent, MockTranslatePipe],
       imports: [
         BaseModule,
         FeedbackSharedModule,

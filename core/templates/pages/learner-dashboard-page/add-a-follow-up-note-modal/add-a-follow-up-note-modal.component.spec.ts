@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
   MAT_BOTTOM_SHEET_DATA,
@@ -50,7 +51,7 @@ describe('AddAFollowUpNoteModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [AddAFollowUpNoteModalComponent],
+      declarations: [AddAFollowUpNoteModalComponent, MockTranslatePipe],
       providers: [AlertsService, FeedbackBackendApiService, NgbActiveModal],
     }).compileComponents();
   }));
@@ -172,7 +173,7 @@ describe('AddAFollowUpNoteModalComponent opened as a bottom sheet', () => {
     bottomSheetDismissSpy = spyOn(mockBottomSheetRef, 'dismiss');
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [AddAFollowUpNoteModalComponent],
+      declarations: [AddAFollowUpNoteModalComponent, MockTranslatePipe],
       providers: [
         AlertsService,
         FeedbackBackendApiService,
