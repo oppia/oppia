@@ -24,7 +24,7 @@ import {
   TranslationCoordinatorStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
-} from '../contributor-dashboard-admin-summary.model';
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 describe('Format contribution attributes service', () => {
   describe('when displaying the stats table', () => {

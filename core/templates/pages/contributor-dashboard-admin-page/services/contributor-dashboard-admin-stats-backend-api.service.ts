@@ -27,7 +27,7 @@ import {
   QuestionReviewerStats,
   TranslationCoordinatorStats,
   QuestionCoordinatorStats,
-} from '../contributor-dashboard-admin-summary.model';
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AppConstants} from 'app.constants';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';

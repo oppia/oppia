@@ -30,7 +30,7 @@ import {
   TranslationSubmitterStats,
   TranslationCoordinatorStats,
   QuestionCoordinatorStats,
-} from '../contributor-dashboard-admin-summary.model';
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AppConstants} from 'app.constants';
 
 export interface ContributorAttribute {

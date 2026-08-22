@@ -26,7 +26,7 @@ import {ContributorAttribute} from '../services/format-contributor-attributes.se
 import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
 import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContributorStats} from '../contributor-dashboard-admin-summary.model';
+import {ContributorStats} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';

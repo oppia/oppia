@@ -23,11 +23,11 @@ import {
   QuestionReviewerBackendDict,
   TranslationCoordinatorBackendDict,
   QuestionCoordinatorBackendDict,
-} from './services/contributor-dashboard-admin-stats-backend-api.service';
+} from '../../pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service';
 import {
   ContributorAttribute,
   FormatContributorAttributesService,
-} from './services/format-contributor-attributes.service';
+} from '../../pages/contributor-dashboard-admin-page/services/format-contributor-attributes.service';
 
 export type ContributorStats =
   | TranslationSubmitterStats
