@@ -144,15 +144,25 @@ export class CertificateAssessmentPlayerPageRootComponent
       this.currentStage =
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'string' ? error : 'Something went wrong.';
-      if (
-        errorMessage.includes(
-          'You just started an assessment before this time.'
-        )
-      ) {
-        this.alertsService.addWarning(errorMessage);
+      // The backend returns a structured error for cooldowns (with an I18N
+      // key and remaining_minutes) and a generic error otherwise; both are
+      // translated client-side so the user sees a localized string.
+      const errorBody = (
+        typeof error === 'object' && error !== null ? error : {}
+      ) as {error_type?: string; remaining_minutes?: number};
+      if (errorBody.error_type === 'cooldown') {
+        this.alertsService.addWarning(
+          this.translateService.instant(
+            'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+            {remainingMinutes: errorBody.remaining_minutes}
+          )
+        );
       } else {
+        this.alertsService.addWarning(
+          this.translateService.instant(
+            'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+          )
+        );
         this.showAssessmentUnavailableModal = true;
       }
     }

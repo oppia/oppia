@@ -318,13 +318,16 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.showAssessmentUnavailableModal).toBeTrue();
   }));
 
-  it('should show an orange warning when the attempt is within the cooldown', fakeAsync(() => {
+  it('should show a localized cooldown warning when the attempt is within the cooldown', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(
-      Promise.reject(
-        'You just started an assessment before this time. Please try after this time.'
-      )
+      Promise.reject({
+        error_type: 'cooldown',
+        remaining_minutes: 2,
+        error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+        status_code: 400,
+      })
     );
 
     component.startAssessment();
@@ -332,8 +335,12 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.currentStage).toBe('intro');
     expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+      {remainingMinutes: 2}
+    );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'You just started an assessment before this time. Please try after this time.'
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'
     );
   }));
 

@@ -294,6 +294,7 @@
     "I18N_CERTIFICATE_ASSESSMENT_RESULT_RETRY_BUTTON": "Retry Assessment",
     "I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL": "Score",
     "I18N_CERTIFICATE_ASSESSMENT_RESULT_TIME_TAKEN_LABEL": "Time Taken",
+    "I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR": "You just started an assessment before this time. Please try again in <[remainingMinutes]> minute(s).",
     "I18N_CERTIFICATE_ASSESSMENT_START_WARNING": "Failed to start the certificate assessment.",
     "I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING": "Failed to submit the certificate assessment.",
     "I18N_CERTIFICATE_ASSESSMENT_TOPICS_HEADING": "Recommended topics",

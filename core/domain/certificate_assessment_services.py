@@ -85,6 +85,23 @@ class CertificateAssessmentAttemptNotReadyException(Exception):
     pass
 
 
+class CertificateAssessmentAttemptCooldownException(Exception):
+    """Raised when a learner starts a new attempt during the cooldown window.
+
+    The message here is server-side only and intentionally not user-facing
+    English: the HTTP handler converts this into a structured response
+    (I18N key + remaining_minutes) so the frontend can render a translated
+    message via its translate pipes.
+    """
+
+    def __init__(self, remaining_minutes: int) -> None:
+        super().__init__(
+            'Assessment attempt blocked by cooldown; %d minute(s) remaining.'
+            % remaining_minutes
+        )
+        self.remaining_minutes = remaining_minutes
+
+
 class CertificateOfferingClassroomSummary(TypedDict):
     """Dict representation of a classroom-facing certificate offering."""
 
@@ -447,10 +464,13 @@ def _get_most_recent_attempt_for_learner_and_certificate(
 ) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
     """Returns the learner's most recent attempt for a certificate, if any.
 
-    Attempts are ordered by their creation time because the storage model
-    does not index started_at, so it cannot be used as a query sort key.
-    Since attempts are created when they start, creation order matches start
-    order.
+    Attempts are ordered by their creation time. We would prefer to sort by
+    started_at, but that property is not indexed (see
+    CertificateAssessmentAttemptModel.started_at) and Datastore cannot order
+    by a computed expression such as IF(started_at, -started_at,
+    -created_on), so started_at cannot be used as a query sort key. Since
+    attempts are created when they start, creation order matches start order,
+    so ordering by created_on yields the most recently started attempt.
     """
     return (
         gae_models.CertificateAssessmentAttemptModel.query(
@@ -574,19 +594,14 @@ def start_certificate_assessment_attempt(
                 datetime.datetime.utcnow() - most_recent_attempt.started_at
             )
             if remaining_cooldown > datetime.timedelta(seconds=0):
-                if remaining_cooldown >= datetime.timedelta(minutes=1):
-                    # Round up so the reported wait never ends before the
-                    # actual cooldown expires.
-                    remaining_minutes = int(
-                        math.ceil(remaining_cooldown.total_seconds() / 60)
-                    )
-                    raise utils.ValidationError(
-                        'You just started an assessment before this time. '
-                        'Please try again in %d minute(s).' % remaining_minutes
-                    )
-                raise utils.ValidationError(
-                    'You just started an assessment before this time. '
-                    'Please try again in less than a minute.'
+                # Round up so the reported wait never lapses before the actual
+                # cooldown expires, and never drop below one minute.
+                remaining_minutes = max(
+                    1,
+                    int(math.ceil(remaining_cooldown.total_seconds() / 60)),
+                )
+                raise CertificateAssessmentAttemptCooldownException(
+                    remaining_minutes
                 )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,

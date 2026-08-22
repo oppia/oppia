@@ -848,16 +848,16 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'validate_certificate_assessment_offering',
             return_value={'is_valid': True},
         ), self.assertRaisesRegex(
-            utils.ValidationError,
-            r'You just started an assessment before this time. '
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
             # The remaining wait is about 5 minutes and 30 seconds, so it
             # must be reported rounded up to 6 minutes.
-            r'Please try again in 6 minute\(s\)\.',
-        ):
+            r'Assessment attempt blocked by cooldown; 6 minute\(s\) remaining\.',
+        ) as context:
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
                 owner_id,
             )
+        self.assertEqual(context.exception.remaining_minutes, 6)
 
         self.assertIsNotNone(
             gae_models.CertificateAssessmentAttemptModel.get_by_id(
@@ -921,14 +921,14 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'validate_certificate_assessment_offering',
             return_value={'is_valid': True},
         ), self.assertRaisesRegex(
-            utils.ValidationError,
-            'You just started an assessment before this time. '
-            'Please try again in less than a minute.',
-        ):
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+            r'Assessment attempt blocked by cooldown; 1 minute\(s\) remaining\.',
+        ) as context:
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
                 owner_id,
             )
+        self.assertEqual(context.exception.remaining_minutes, 1)
 
     def test_start_certificate_assessment_attempt_allows_attempt_after_cooldown(
         self,
