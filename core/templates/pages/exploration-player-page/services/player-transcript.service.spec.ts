@@ -266,9 +266,9 @@ describe('Player transcript service', () => {
     );
     expect(pts.getNumCards()).toBe(2);
     expect(pts.getLastCard().getStateName()).toBe('Second state');
-    expect(pts.isLastCard(0)).toBe(false);
-    expect(pts.isLastCard(1)).toBe(true);
-    expect(pts.isLastCard(2)).toBe(false);
+    expect(pts.isLastCard(0)).toBeFalse();
+    expect(pts.isLastCard(1)).toBeTrue();
+    expect(pts.isLastCard(2)).toBeFalse();
     expect(pts.getLastStateName()).toBe('Second state');
 
     expect(pts.getNumSubmitsForLastCard()).toBe(0);

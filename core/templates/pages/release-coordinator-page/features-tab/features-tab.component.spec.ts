@@ -441,19 +441,19 @@ describe('Release coordinator page feature tab', function () {
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBe(false);
+      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
     });
 
     it("should not proceed if the user doesn't confirm", () => {
       mockConfirmResult(false);
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(featureFlag.forceEnableForAllUsers).toBe(false);
+      expect(featureFlag.forceEnableForAllUsers).toBeFalse();
 
       featureFlag.forceEnableForAllUsers = true;
       component.clearChanges(featureFlag);
 
-      expect(featureFlag.forceEnableForAllUsers).toBe(true);
+      expect(featureFlag.forceEnableForAllUsers).toBeTrue();
     });
   });
 
@@ -593,7 +593,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBe(true);
+        ).toBeTrue();
       }
     );
 
@@ -609,7 +609,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBe(false);
+        ).toBeFalse();
       }
     );
 
@@ -625,7 +625,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBe(true);
+        ).toBeTrue();
       }
     );
 
@@ -641,7 +641,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBe(true);
+        ).toBeTrue();
       }
     );
 
@@ -657,7 +657,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBe(false);
+        ).toBeFalse();
       }
     );
 
@@ -670,7 +670,7 @@ describe('Release coordinator page feature tab', function () {
           searchQuery: '',
           filteredUserGroups: [],
         } as FeatureFlagViewModel)
-      ).toBe(false);
+      ).toBeFalse();
     });
   });
 
@@ -833,7 +833,7 @@ describe('Release coordinator page feature tab', function () {
           searchQuery: '',
           filteredUserGroups: [],
         } as FeatureFlagViewModel)
-      ).toBe(false);
+      ).toBeFalse();
     });
 
     it('should return true if the feature is different from the backup instance', () => {
@@ -847,7 +847,7 @@ describe('Release coordinator page feature tab', function () {
           searchQuery: '',
           filteredUserGroups: [],
         } as FeatureFlagViewModel)
-      ).toBe(true);
+      ).toBeTrue();
     });
 
     it('should throw error if the feature name is not found', () => {
@@ -914,12 +914,12 @@ describe('Release coordinator page feature tab', function () {
   describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(true);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(true);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
     });
 
     it('should return false when dummy feature is disabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(false);
-      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBe(false);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
     });
   });
 

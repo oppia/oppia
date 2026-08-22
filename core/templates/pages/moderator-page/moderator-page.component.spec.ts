@@ -195,9 +195,9 @@ describe('Moderator Page Component', () => {
   });
 
   it('should tell if message is from exploration', () => {
-    expect(componentInstance.isMessageFromExploration(message)).toBe(true);
+    expect(componentInstance.isMessageFromExploration(message)).toBeTrue();
     message.entityType = 'other_than_exploration';
-    expect(componentInstance.isMessageFromExploration(message)).toBe(false);
+    expect(componentInstance.isMessageFromExploration(message)).toBeFalse();
   });
 
   it('should get exploration create url', () => {

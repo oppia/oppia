@@ -140,8 +140,8 @@ describe('Release coordinator page', () => {
       'when user navigates to release coordinator page',
     fakeAsync(() => {
       expect(component.statusMessage).toEqual('');
-      expect(component.submitButtonDisabled).toBe(true);
-      expect(component.memoryCacheDataFetched).toBe(false);
+      expect(component.submitButtonDisabled).toBeTrue();
+      expect(component.memoryCacheDataFetched).toBeFalse();
       expect(component.activeTab).toEqual(
         ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS
       );
@@ -149,7 +149,7 @@ describe('Release coordinator page', () => {
       tick();
 
       expect(pbbas.getPromoBarDataAsync).toHaveBeenCalled();
-      expect(component.promoBarConfigForm.enabled).toBe(true);
+      expect(component.promoBarConfigForm.enabled).toBeTrue();
     })
   );
 
@@ -193,7 +193,7 @@ describe('Release coordinator page', () => {
 
     expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
     expect(component.statusMessage).toEqual('Success! Memory Cache Flushed.');
-    expect(component.memoryCacheDataFetched).toBe(false);
+    expect(component.memoryCacheDataFetched).toBeFalse();
   }));
 
   it('should set error status when failed to flush memory cache', fakeAsync(() => {
@@ -226,7 +226,7 @@ describe('Release coordinator page', () => {
     expect(component.memoryCacheProfile.totalKeysStored).toEqual(
       testMemoryCacheProfile.total_keys_stored
     );
-    expect(component.memoryCacheDataFetched).toBe(true);
+    expect(component.memoryCacheDataFetched).toBeTrue();
     expect(component.statusMessage).toBe('Success!');
   }));
 
@@ -244,7 +244,7 @@ describe('Release coordinator page', () => {
 
   describe('user groups', () => {
     it('should load user groups on init', fakeAsync(() => {
-      expect(component.userGroups.length > 0).toBe(false);
+      expect(component.userGroups.length > 0).toBeFalse();
 
       component.ngOnInit();
       tick();
@@ -252,7 +252,7 @@ describe('Release coordinator page', () => {
       component.onUserGroupUserInputChange();
       component.onUserGroupInputChange();
 
-      expect(component.userGroups.length > 0).toBe(true);
+      expect(component.userGroups.length > 0).toBeTrue();
       expect(component.userInUserGroupValidationError).toEqual('');
       expect(component.userGroupValidationError).toEqual('');
     }));
@@ -261,9 +261,9 @@ describe('Release coordinator page', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.userGroupInEditMode).toBe(false);
+      expect(component.userGroupInEditMode).toBeFalse();
       component.setUserGroupInEditMode();
-      expect(component.userGroupInEditMode).toBe(true);
+      expect(component.userGroupInEditMode).toBeTrue();
     }));
 
     describe('when clicking on save button to update user group', () => {
@@ -488,9 +488,9 @@ describe('Release coordinator page', () => {
           },
         } as ElementRef;
 
-        expect(component.userInUserGroupValidationError.length > 0).toBe(false);
+        expect(component.userInUserGroupValidationError.length > 0).toBeFalse();
         component.addUserToUserGroup({value: 'User1'}, component.userGroups[0]);
-        expect(component.userInUserGroupValidationError.length > 0).toBe(true);
+        expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
       }));
     });
 
@@ -510,7 +510,7 @@ describe('Release coordinator page', () => {
         component.userGroups.some(
           userGroup => userGroup.userGroupId === 'userGroupId3'
         )
-      ).toBe(false);
+      ).toBeFalse();
     }));
 
     it('should not be removed when clicked on cancel button', fakeAsync(() => {
@@ -526,7 +526,7 @@ describe('Release coordinator page', () => {
 
       expect(
         component.userGroups.some(userGroup => userGroup.name === 'UserGroup1')
-      ).toBe(true);
+      ).toBeTrue();
     }));
 
     it('should set error message when user group not found', fakeAsync(() => {
@@ -543,7 +543,7 @@ describe('Release coordinator page', () => {
         component.userGroups.some(
           userGroup => userGroup.userGroupId === 'UserGroup10'
         )
-      ).toBe(false);
+      ).toBeFalse();
       expect(component.statusMessage).toBe(
         "User group with id 'userGroupId10' not found."
       );
@@ -568,7 +568,7 @@ describe('Release coordinator page', () => {
       expect(deleteUserGroupSpy).toHaveBeenCalled();
       expect(
         component.userGroups.some(userGroup => userGroup.name === 'UserGroup1')
-      ).toBe(true);
+      ).toBeTrue();
       expect(component.statusMessage).toBe(
         'Server error: Internal Server Error.'
       );
@@ -592,7 +592,7 @@ describe('Release coordinator page', () => {
         false
       );
       component.toggleUserGroupDetailsSection('userGroupId1');
-      expect(component.userGroupIdsToDetailsShowRecord.userGroupId1).toBe(true);
+      expect(component.userGroupIdsToDetailsShowRecord.userGroupId1).toBeTrue();
 
       component.toggleUserGroupDetailsSection('userGroupId1');
     }));
@@ -608,7 +608,7 @@ describe('Release coordinator page', () => {
         component.setUserGroupInEditMode();
         component.toggleUserGroupDetailsSection('userGroupId2');
 
-        expect(component.userGroupSaveError.length > 0).toBe(true);
+        expect(component.userGroupSaveError.length > 0).toBeTrue();
       })
     );
 
@@ -620,7 +620,7 @@ describe('Release coordinator page', () => {
         component.newUserGroupName = 'UserGroup1';
         component.addUserGroup();
 
-        expect(component.userGroupValidationError.length > 0).toBe(true);
+        expect(component.userGroupValidationError.length > 0).toBeTrue();
       }));
 
       it('should not add new user group when name fails the regex', fakeAsync(() => {
@@ -630,7 +630,7 @@ describe('Release coordinator page', () => {
         component.newUserGroupName = 'User_Group_1';
         component.addUserGroup();
 
-        expect(component.userGroupValidationError.length > 0).toBe(true);
+        expect(component.userGroupValidationError.length > 0).toBeTrue();
       }));
 
       it('should not update when the given user group is empty string', fakeAsync(() => {
@@ -642,7 +642,7 @@ describe('Release coordinator page', () => {
 
         expect(
           component.userGroups.some(userGroup => userGroup.name === '')
-        ).toBe(false);
+        ).toBeFalse();
       }));
 
       it('should update the user groups', fakeAsync(() => {
@@ -665,7 +665,7 @@ describe('Release coordinator page', () => {
           component.userGroups.some(
             userGroup => userGroup.name === 'UserGroup8'
           )
-        ).toBe(true);
+        ).toBeTrue();
       }));
 
       it('should fail in case of backend error', fakeAsync(() => {
@@ -686,7 +686,7 @@ describe('Release coordinator page', () => {
           component.userGroups.some(
             userGroup => userGroup.name === 'UserGroup10'
           )
-        ).toBe(false);
+        ).toBeFalse();
         expect(component.statusMessage).toBe(
           'Server error: Internal Server Error.'
         );
