@@ -17,7 +17,7 @@
  */
 
 import {CommonModule} from '@angular/common';
-import {EventEmitter, NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,

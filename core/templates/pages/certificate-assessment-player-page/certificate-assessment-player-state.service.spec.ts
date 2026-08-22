@@ -286,7 +286,7 @@ describe('CertificateAssessmentPlayerStateService', () => {
 
   it('should not resume a countdown without a valid attempt', () => {
     spyOn(window, 'setInterval');
-    // timerId is null (no countdown armed) and the window still reports
+    // TimerId is null (no countdown armed) and the window still reports
     // remaining time, but the attempt is gone, so resume must bail out
     // rather than start a phantom interval.
     (
