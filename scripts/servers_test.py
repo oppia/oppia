@@ -1251,6 +1251,20 @@ class GetChromedriverVersionTests(test_utils.TestBase):
                 '115.0.3626.123',
             )
 
+    def test_raises_exception_when_chrome_version_command_fails(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            raise OSError
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+
+        expected_regexp = 'Failed to execute "google-chrome --version" command'
+        with os_name_swap, check_output_swap:
+            with self.assertRaisesRegex(Exception, expected_regexp):
+                servers.get_chromedriver_version()
+
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[]
