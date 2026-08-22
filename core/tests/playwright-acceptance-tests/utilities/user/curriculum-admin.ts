@@ -1101,12 +1101,22 @@ export class CurriculumAdmin extends TopicManager {
 
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
+
+    // Register before navigating so we capture the questions-list API request
+    // that fires immediately when the tab mounts.
+    let questionsLoaded = this.page.waitForResponse(
+      response => response.url().includes('/questions_list_handler/'),
+      {timeout: 15000}
+    );
     await this.navigateToSkillQuestionEditorTab();
+    // Angular initialises questionSummariesForOneSkill as [] and shows the
+    // "no questions" placeholder before the API responds. We must wait for the
+    // real API response before reading the DOM, otherwise waitForFunction finds
+    // the placeholder immediately and the loop exits without unlinking anything.
+    await questionsLoaded;
 
     while (true) {
-      // Poll the DOM until Angular finishes rendering after the questions-list
-      // API response. Either the remove icons appear (questions exist) or the
-      // "no questions" placeholder appears (skill is empty).
+      // By now the API has responded; wait for Angular to update the DOM.
       await this.page.waitForFunction(
         () =>
           document.querySelector('.link-off-icon') !== null ||
@@ -1135,8 +1145,15 @@ export class CurriculumAdmin extends TopicManager {
         false
       );
       await unlinkResponse;
+
+      // Register before reload so we capture the questions-list API that fires
+      // when the page remounts on the questions tab.
+      questionsLoaded = this.page.waitForResponse(
+        response => response.url().includes('/questions_list_handler/'),
+        {timeout: 15000}
+      );
       await this.page.reload({waitUntil: 'networkidle'});
-      await this.navigateToSkillQuestionEditorTab();
+      await questionsLoaded;
     }
     showMessage(`All questions removed from skill "${skillName}".`);
   }
