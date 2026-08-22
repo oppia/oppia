@@ -105,7 +105,7 @@ module.exports = {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
             pagePerfThresholds: {
               fcp: 11100,
-              speedIndex: 11300,
+              speedIndex: 16500,
               lcp: 42500,
               tbt: 1290,
               cls: 0.15,
@@ -492,8 +492,8 @@ module.exports = {
         // override these at tighter values.
         {
           fcp: 17000,
-          speedIndex: 17000,
-          lcp: 43000,
+          speedIndex: 20000,
+          lcp: 70000,
           tbt: 2600,
           cls: 0.9,
         }

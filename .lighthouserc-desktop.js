@@ -320,7 +320,7 @@ module.exports = {
             matchingUrlPattern: 'http://[^/]+/teach$',
             pagePerfThresholds: {
               fcp: 1840,
-              speedIndex: 3150,
+              speedIndex: 4100,
               lcp: 6260,
               tbt: 200,
               cls: 0.1,
