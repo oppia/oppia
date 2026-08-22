@@ -39,7 +39,7 @@ from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
-from typing import Sequence, TypedDict
+from typing import cast, Sequence, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -857,7 +857,13 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 created_offering.certificate_id,
                 owner_id,
             )
-        self.assertEqual(context.exception.remaining_minutes, 6)
+        self.assertEqual(
+            cast(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                context.exception,
+            ).remaining_minutes,
+            6,
+        )
 
         self.assertIsNotNone(
             gae_models.CertificateAssessmentAttemptModel.get_by_id(
@@ -928,7 +934,13 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 created_offering.certificate_id,
                 owner_id,
             )
-        self.assertEqual(context.exception.remaining_minutes, 1)
+        self.assertEqual(
+            cast(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                context.exception,
+            ).remaining_minutes,
+            1,
+        )
 
     def test_start_certificate_assessment_attempt_allows_attempt_after_cooldown(
         self,
