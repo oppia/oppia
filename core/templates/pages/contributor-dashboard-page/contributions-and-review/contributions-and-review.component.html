@@ -107,19 +107,22 @@
           </select>
         </span>
       </div>
-      <lazy-loading *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && topicReady"
+      <lazy-loading *ngIf="activeExplorationId === null && isReviewTranslationsTab() && activeEntityType !== ENTITY_TYPE_SKILL && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && activeEntityType !== ENTITY_TYPE_SKILL && !isAccomplishmentsTabActive() && topicReady"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 (clickPinButton)="pinReviewableTranslationOpportunity($event)"
                                 (clickUnpinButton)="unpinReviewableTranslationOpportunity($event)"
                                 [labelRequired]="!activeReviewTab"
+                                [progressBarRequired]="true"
+                                [disableButtonOnComplete]="false"
+                                [opportunityType]="'translation'"
                                 [showOpportunityButton]="true"
                                 [showPinUnpinButton]="true"
                                 #opportunitiesList>
       </oppia-opportunities-list>
-      <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
-        <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
+      <div *ngIf="(activeExplorationId !== null || activeEntityType === ENTITY_TYPE_SKILL || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
+        <div *ngIf="isReviewTranslationsTab() && activeEntityType !== ENTITY_TYPE_SKILL" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
                   class="oppia-contributions-back-button mat-raised-button e2e-test-back-to-lesson-button">

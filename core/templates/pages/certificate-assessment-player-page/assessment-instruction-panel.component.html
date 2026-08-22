@@ -1,3 +1,7 @@
+<oppia-titled-background-banner [title]="bannerTitleI18nKey"
+                                [buttonText]="bannerButtonI18nKey"
+                                (bannerClick)="onBack()">
+</oppia-titled-background-banner>
 <div class="intro-card-container">
   <div class="intro-card">
     <h1 class="certificate-title">{{ certificateTitle | titlecase }}</h1>
@@ -8,7 +12,10 @@
 
     <ul class="instructions-list">
       <li>
-        {{ timeLimitInstructionI18nKey | translate: { minutes: assessmentDurationMinutes } }}
+        {{ timeLimitInstructionI18nKey | translate: { minutes: timeLimitInMinutes } }}
+      </li>
+      <li>
+        {{ questionCountInstructionI18nKey | translate: { questions: totalQuestions } }}
       </li>
       <li *ngFor="let instructionKey of staticInstructionI18nKeys">
         {{ instructionKey | translate }}
