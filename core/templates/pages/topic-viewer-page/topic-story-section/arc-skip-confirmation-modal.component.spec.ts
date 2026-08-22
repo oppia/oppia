@@ -50,28 +50,16 @@ describe('ArcSkipConfirmationModalComponent', () => {
     component.confirmationMessage = 'Adventure 1 will be skipped';
   });
 
-  it('should dismiss the modal when onCancel is called', () => {
-    component.onCancel();
-
-    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
-  });
-
-  it('should close the modal when onConfirm is called', () => {
-    component.onConfirm();
-
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
-
-  it('should dismiss the modal when the backdrop is clicked', () => {
-    component.onBackdropClick();
-
-    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
-  });
-
-  it('should dismiss the modal when cancel is called directly', () => {
+  it('should dismiss the modal when cancel is called', () => {
     component.cancel();
 
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
+  it('should close the modal when confirm is called', () => {
+    component.confirm();
+
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
   it('should render the title, message, and action buttons', () => {
@@ -135,13 +123,13 @@ describe('ArcSkipConfirmationModalComponent', () => {
     });
 
     it('should dismiss the bottom sheet on confirm', () => {
-      component.onConfirm();
+      component.confirm();
 
       expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
     });
 
     it('should dismiss the bottom sheet on cancel', () => {
-      component.onCancel();
+      component.cancel();
 
       expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
     });

@@ -68,8 +68,4 @@ export class AdventureMasteredModalComponent extends ConfirmOrCancelModal {
       super.cancel();
     }
   }
-
-  onContinue(): void {
-    this.confirm();
-  }
 }

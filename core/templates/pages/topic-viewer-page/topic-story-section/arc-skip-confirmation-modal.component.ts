@@ -61,18 +61,6 @@ export class ArcSkipConfirmationModalComponent extends ConfirmOrCancelModal {
     }
   }
 
-  onCancel(): void {
-    this.cancel();
-  }
-
-  onConfirm(): void {
-    this.confirm();
-  }
-
-  onBackdropClick(): void {
-    this.cancel();
-  }
-
   cancel(): void {
     if (this.bottomSheetRef) {
       this.bottomSheetRef.dismiss('cancel');
