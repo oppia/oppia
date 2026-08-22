@@ -486,8 +486,13 @@ export class FeedbackDetailPageComponent {
     this.isSendingReply = false;
   }
 
-  getParentFeedbackUrl(feedback: LessonFeedbackDetailResponse): string | null {
-    if (!feedback.parent_feedback_id || !feedback.lesson_metadata) {
+  getParentFeedbackUrl(
+    feedback: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string | null {
+    if (this.isPlatformFeedbackDetailResponse(feedback)) {
+      return null;
+    }
+    if (!feedback.parent_feedback_id) {
       return null;
     }
 

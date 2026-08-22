@@ -43,11 +43,11 @@
             <span class="oppia-feedback-table-desc">
               {{ getFeedbackDescription(feedback) }}
             </span>
-            <span *ngIf="feedback.unread_response_count > 0"
+            <span *ngIf="getNotificationSummary(feedback) as notificationSummary"
                   class="oppia-my-suggestions-notification-summary">
-              {{ getNotificationSummary(feedback) }}
+              {{ notificationSummary }}
               <span class="oppia-my-suggestions-unread">
-                {{ feedback.unread_response_count }}
+                {{ getUnreadResponseCount(feedback) }}
               </span>
             </span>
           </td>
@@ -58,7 +58,7 @@
 
           <td *ngIf="feedbackCardConfig.showLesson"
               class="oppia-feedback-table-td oppia-feedback-table-col-lesson-title">
-            {{ feedback.lesson_title }}
+            {{ getLessonTitle(feedback) }}
           </td>
 
           <td *ngIf="feedbackCardConfig.showCategory"

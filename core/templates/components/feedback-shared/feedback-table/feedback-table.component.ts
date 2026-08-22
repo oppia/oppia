@@ -77,10 +77,15 @@ export class FeedbackTableComponent {
     return feedback.feedback_text_preview;
   }
 
-  getNotificationSummary(summary: LessonFeedbackSummary): string {
+  getNotificationSummary(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string | null {
+    if (!('unread_response_count' in feedback)) {
+      return null;
+    }
     if (
-      summary.status === FeedbackStatus.FIXED ||
-      FeedbackStatus.LESSON_UPDATED
+      feedback.status === FeedbackStatus.FIXED ||
+      feedback.status === FeedbackStatus.LESSON_UPDATED
     ) {
       return (
         'A creator fixed an error you reported. Thank you for helping make ' +
@@ -88,6 +93,20 @@ export class FeedbackTableComponent {
       );
     }
     return 'A creator responded to your feedback!';
+  }
+
+  getUnreadResponseCount(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): number {
+    return 'unread_response_count' in feedback
+      ? feedback.unread_response_count
+      : 0;
+  }
+
+  getLessonTitle(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string {
+    return 'lesson_title' in feedback ? feedback.lesson_title : '';
   }
 
   getFeedbackCategory(

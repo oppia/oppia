@@ -22,9 +22,30 @@ import {FeedbackTableComponent} from './feedback-table.component';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
   FeedbackStatus,
+  LessonFeedbackSummary,
+  PlatformFeedbackSummary,
   ReportAnIssueCategory,
   ReportType,
 } from '../../../domain/feedback/feedback.model';
+
+const mockLessonFeedbackSummary: LessonFeedbackSummary = {
+  id: 'test_feedback_id',
+  source: ReportType.APP,
+  status: FeedbackStatus.OPEN,
+  lesson_title: 'exp_1',
+  feedback_text_preview: 'This is a test feedback',
+  latest_response_preview: 'Thanks for the report!',
+  unread_response_count: 1,
+  last_updated_msecs: 1000,
+};
+
+const mockPlatformFeedbackSummary: PlatformFeedbackSummary = {
+  id: 'test_feedback_id',
+  category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
+  source: ReportType.APP,
+  status: FeedbackStatus.OPEN,
+  report_message_preview: 'This is a test feedback',
+};
 
 describe('FeedbackTableComponent', () => {
   let component: FeedbackTableComponent;
@@ -115,6 +136,79 @@ describe('FeedbackTableComponent', () => {
     ).toBe(expectedFeedbackDescription);
     expect(component.getFeedbackCategory(component.feedbackSummaries[0])).toBe(
       null
+    );
+  });
+
+  it('should return lesson_title if feedback is a LessonFeedbackSummary', () => {
+    expect(component.getLessonTitle(mockLessonFeedbackSummary)).toBe(
+      mockLessonFeedbackSummary.lesson_title
+    );
+  });
+
+  it('should not return lesson_title if feedback is a PlatformFeedbackSummary', () => {
+    expect(component.getLessonTitle(mockPlatformFeedbackSummary)).toBe('');
+  });
+
+  it('should return 0 unread response count if feedback is a PlatformFeedbackSummary', () => {
+    expect(component.getUnreadResponseCount(mockPlatformFeedbackSummary)).toBe(
+      0
+    );
+  });
+
+  it('should return unread response count if feedback is a LessonFeedbackSummary', () => {
+    expect(component.getUnreadResponseCount(mockLessonFeedbackSummary)).toBe(1);
+  });
+
+  it('should return null if feedback has no unread response count', () => {
+    expect(component.getNotificationSummary(mockPlatformFeedbackSummary)).toBe(
+      null
+    );
+  });
+
+  it('should return null if unread response count is 0', () => {
+    const feedback = {
+      ...mockLessonFeedbackSummary,
+      unread_response_count: 0,
+    };
+
+    expect(component.getNotificationSummary(feedback)).toBe(null);
+  });
+
+  it('should return fixed message if feedback status is FIXED', () => {
+    const feedback = {
+      ...mockLessonFeedbackSummary,
+      status: FeedbackStatus.FIXED,
+      unread_response_count: 1,
+    };
+
+    expect(component.getNotificationSummary(feedback)).toBe(
+      'A creator fixed an error you reported. Thank you for helping make ' +
+        'Oppia better for everyone!'
+    );
+  });
+
+  it('should return fixed message if feedback status is LESSON_UPDATED', () => {
+    const feedback = {
+      ...mockLessonFeedbackSummary,
+      status: FeedbackStatus.LESSON_UPDATED,
+      unread_response_count: 1,
+    };
+
+    expect(component.getNotificationSummary(feedback)).toBe(
+      'A creator fixed an error you reported. Thank you for helping make ' +
+        'Oppia better for everyone!'
+    );
+  });
+
+  it('should return creator response message if feedback has an unread response', () => {
+    const feedback = {
+      ...mockLessonFeedbackSummary,
+      status: FeedbackStatus.OPEN,
+      unread_response_count: 1,
+    };
+
+    expect(component.getNotificationSummary(feedback)).toBe(
+      'A creator responded to your feedback!'
     );
   });
 });
