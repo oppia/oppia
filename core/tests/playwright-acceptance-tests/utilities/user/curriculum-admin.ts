@@ -990,22 +990,19 @@ export class CurriculumAdmin extends TopicManager {
 
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible('.e2e-test-mobile-skills-table');
-      const skillItems = await this.page.$$(mobileSkillItemSelector);
-      for (const item of skillItems) {
-        const nameEl = await item.$('.e2e-test-mobile-skill-name');
-        if (!nameEl) {
-          continue;
-        }
-        const name = await nameEl.evaluate(el => el.textContent?.trim() ?? '');
+      const skillItems = this.page.locator(mobileSkillItemSelector);
+      const count = await skillItems.count();
+      for (let i = 0; i < count; i++) {
+        const item = skillItems.nth(i);
+        const name =
+          (
+            await item.locator('.e2e-test-mobile-skill-name').textContent()
+          )?.trim() ?? '';
         if (name !== skillName) {
           continue;
         }
 
-        const optionsBtn = await item.$(mobileSkillOptionsButton);
-        if (!optionsBtn) {
-          throw new Error('Mobile skill options button not found.');
-        }
-        await optionsBtn.click();
+        await item.locator(mobileSkillOptionsButton).click();
 
         await this.expectElementToBeVisible(mobileDeleteSkillButton);
         await this.clickOnElementWithSelector(mobileDeleteSkillButton);
@@ -1013,6 +1010,7 @@ export class CurriculumAdmin extends TopicManager {
         await this.expectElementToBeVisible(confirmSkillDeletionButton);
         await this.clickOnElementWithSelector(confirmSkillDeletionButton);
         await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+        await this.page.waitForLoadState('networkidle');
 
         showMessage(`Skill "${skillName}" has been successfully deleted.`);
         return;
