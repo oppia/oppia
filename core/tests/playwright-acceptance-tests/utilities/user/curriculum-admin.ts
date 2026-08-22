@@ -302,6 +302,17 @@ export class CurriculumAdmin extends TopicManager {
    * Navigate to the question editor tab present in the skills tab.
    */
   async navigateToSkillQuestionEditorTab(): Promise<void> {
+    // If the URL hash already targets the questions tab (e.g. after a
+    // page.reload() that preserves the #/questions hash inside the loop in
+    // removeAllQuestionsFromTheSkill), skip the click. On desktop,
+    // clickAndWaitForNavigation would otherwise time out because clicking an
+    // already-active Angular route tab does not trigger a navigation event.
+    const currentHash = new URL(this.page.url()).hash;
+    if (currentHash.split('/')[1] === 'questions') {
+      await this.expectElementToBeVisible(addQuestionButton);
+      return;
+    }
+
     // Use DOM visibility of the desktop tab instead of isViewportAtMobileWidth()
     // because CI mobile environments may report incorrect viewport dimensions.
     const desktopTabVisible = await this.page.isVisible(
