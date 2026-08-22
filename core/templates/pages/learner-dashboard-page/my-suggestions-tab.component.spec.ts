@@ -25,6 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
 import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
 import {AlertsService} from 'services/alerts.service';
@@ -36,7 +37,8 @@ import {LoaderService} from 'services/loader.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {RouterTestingModule} from '@angular/router/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LearnerDashboardPageModule} from '../learner-dashboard-page/learner-dashboard-page.module';
+import {BaseModule} from '../../base-components/base.module';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {
   CreatorFeedbackType,
   FeedbackStatus,
@@ -90,8 +92,11 @@ describe('My Suggestions Tab Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      declarations: [MySuggestionsTabComponent],
       imports: [
-        LearnerDashboardPageModule,
+        BaseModule,
+        FeedbackSharedModule,
+        MatBottomSheetModule,
         HttpClientTestingModule,
         RouterTestingModule,
       ],
