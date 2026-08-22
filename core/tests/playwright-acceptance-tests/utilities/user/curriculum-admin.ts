@@ -1007,9 +1007,22 @@ export class CurriculumAdmin extends TopicManager {
         await this.expectElementToBeVisible(mobileDeleteSkillButton);
         await this.clickOnElementWithSelector(mobileDeleteSkillButton);
 
+        // Build a stable locator for the skill row so we can wait for it to
+        // detach after deletion (item.nth(i) would shift if rows reorder).
+        const mobileSkillRow = this.page
+          .locator(mobileSkillItemSelector)
+          .filter({
+            has: this.page.locator('.e2e-test-mobile-skill-name', {
+              hasText: skillName,
+            }),
+          });
+
         await this.expectElementToBeVisible(confirmSkillDeletionButton);
         await this.clickOnElementWithSelector(confirmSkillDeletionButton);
         await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+        // Wait for Angular to remove the row and for all network requests
+        // (including the DELETE call) to settle before navigating away.
+        await mobileSkillRow.waitFor({state: 'detached'});
         await this.page.waitForLoadState('networkidle');
 
         showMessage(`Skill "${skillName}" has been successfully deleted.`);
@@ -1041,6 +1054,9 @@ export class CurriculumAdmin extends TopicManager {
       await this.expectElementToBeVisible(confirmSkillDeletionButton);
       await this.clickOnElementWithSelector(confirmSkillDeletionButton);
       await this.expectElementToBeVisible(confirmSkillDeletionButton, false);
+      // Wait for Angular to remove the row and for all network requests
+      // (including the DELETE call) to settle before navigating away.
+      await skillRow.waitFor({state: 'detached'});
       await this.page.waitForLoadState('networkidle');
 
       showMessage(`Skill "${skillName}" has been successfully deleted.`);
