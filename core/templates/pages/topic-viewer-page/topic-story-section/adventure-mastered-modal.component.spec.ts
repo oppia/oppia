@@ -116,7 +116,7 @@ describe('AdventureMasteredModalComponent', () => {
     });
 
     it('should dismiss the bottom sheet on confirm', () => {
-      component.onContinue();
+      component.confirm();
 
       expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
     });
