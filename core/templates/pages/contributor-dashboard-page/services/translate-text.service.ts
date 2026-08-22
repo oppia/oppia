@@ -278,6 +278,9 @@ export class TranslateTextService {
         translation,
         imagesData,
         dataFormat,
+        false,
+        '',
+        false,
         this.activeEntityType
       )
       .then(
