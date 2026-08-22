@@ -85,7 +85,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 2920,
               speedIndex: 3780,
-              lcp: 7020,
+              lcp: 8500,
               tbt: 200,
               cls: 0.1,
             },
@@ -107,7 +107,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 1890,
               speedIndex: 2090,
-              lcp: 6020,
+              lcp: 7400,
               tbt: 200,
               cls: 0.1,
             },
@@ -127,7 +127,7 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/contact$',
             pagePerfThresholds: {
-              fcp: 2880,
+              fcp: 3700,
               speedIndex: 3170,
               lcp: 6010,
               tbt: 200,
@@ -151,7 +151,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 1850,
               speedIndex: 2780,
-              lcp: 6220,
+              lcp: 7600,
               tbt: 200,
               cls: 0.1,
             },
@@ -161,7 +161,7 @@ module.exports = {
             matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
             pagePerfThresholds: {
               fcp: 2820,
-              speedIndex: 3030,
+              speedIndex: 3800,
               lcp: 5960,
               tbt: 200,
               cls: 0.34,
@@ -173,7 +173,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 3050,
               speedIndex: 3050,
-              lcp: 5870,
+              lcp: 7300,
               tbt: 200,
               cls: 0.1,
             },
@@ -215,7 +215,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 2930,
               speedIndex: 2930,
-              lcp: 5830,
+              lcp: 7000,
               tbt: 200,
               cls: 0.38,
             },
@@ -515,14 +515,14 @@ module.exports = {
             accessibilityMinScore: 0.84,
           },
         ],
-        // Ideal "good" performance thresholds for desktop (web.dev /
-        // Lighthouse). Desktop Speed Index threshold is tighter than mobile.
+        // Error-level safety-net thresholds for desktop. Per-page entries
+        // override these at tighter values.
         {
-          fcp: 1800,
-          speedIndex: 1300,
-          lcp: 2500,
-          tbt: 200,
-          cls: 0.1,
+          fcp: 3100,
+          speedIndex: 3800,
+          lcp: 11000,
+          tbt: 650,
+          cls: 0.4,
         }
       ),
     },

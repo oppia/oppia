@@ -488,15 +488,14 @@ module.exports = {
             accessibilityMinScore: 0.84,
           },
         ],
-        // Ideal "good" performance thresholds for mobile (web.dev /
-        // Lighthouse). Pages that exceed these produce warn-level violations;
-        // override per-page as needed and file cleanup issues.
+        // Error-level safety-net thresholds for mobile. Per-page entries
+        // override these at tighter values.
         {
-          fcp: 1800,
-          speedIndex: 3400,
-          lcp: 2500,
-          tbt: 200,
-          cls: 0.1,
+          fcp: 17000,
+          speedIndex: 17000,
+          lcp: 43000,
+          tbt: 2600,
+          cls: 0.9,
         }
       ),
     },

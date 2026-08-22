@@ -56,19 +56,20 @@ function buildPerformanceCatchAll(perfThresholds) {
   return {
     matchingUrlPattern: '.*',
     assertions: {
-      // Performance metrics — set to ideal "good" thresholds from
-      // web.dev/Core Web Vitals and Lighthouse scoring. Pages that don't
-      // meet these produce a warn-level violation; override per-page as
-      // needed and file cleanup issues.
-      'first-contentful-paint': ['warn', {maxNumericValue: perfThresholds.fcp}],
-      'speed-index': ['warn', {maxNumericValue: perfThresholds.speedIndex}],
+      // Performance metrics — error-level safety net. Per-page thresholds
+      // override these at tighter values; these catch any unlisted page.
+      'first-contentful-paint': [
+        'error',
+        {maxNumericValue: perfThresholds.fcp},
+      ],
+      'speed-index': ['error', {maxNumericValue: perfThresholds.speedIndex}],
       'largest-contentful-paint': [
-        'warn',
+        'error',
         {maxNumericValue: perfThresholds.lcp},
       ],
-      'total-blocking-time': ['warn', {maxNumericValue: perfThresholds.tbt}],
+      'total-blocking-time': ['error', {maxNumericValue: perfThresholds.tbt}],
       'cumulative-layout-shift': [
-        'warn',
+        'error',
         {maxNumericValue: perfThresholds.cls},
       ],
       'uses-optimized-images': ['error', {minScore: 1}],
