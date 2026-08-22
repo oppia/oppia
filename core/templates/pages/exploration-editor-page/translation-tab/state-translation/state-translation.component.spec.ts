@@ -383,6 +383,29 @@ describe('State translation component', () => {
         }
       );
 
+      describe('empty default outcome feedback', () => {
+        it('should show the default outcome row when its feedback is non-empty', () => {
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).not.toBeNull();
+        });
+
+        it('should hide the default outcome row when its feedback is empty', () => {
+          component.stateDefaultOutcome.feedback.html = '';
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).toBeNull();
+        });
+      });
+
       it('should broadcast copy to ck editor when clicking on content', () => {
         spyOn(ckEditorCopyContentService, 'broadcastCopy').and.callFake(
           () => {}

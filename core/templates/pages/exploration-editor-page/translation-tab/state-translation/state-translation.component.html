@@ -199,7 +199,8 @@
 
       <div>
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
+          <li *ngIf="!stateDefaultOutcome.feedback.isEmpty()"
+              [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
               class="oppia-rule-block e2e-test-translation-feedback">
             <a class="oppia-rule-tab oppia-default-rule-tab e2e-test-feedback-{{ stateAnswerGroups.length }} oppia-translation-preview-list"
                (click)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
