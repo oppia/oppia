@@ -873,11 +873,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
    * decides its own type, because the "All" filter lists several entity types
    * side by side and the filter cannot say which one was clicked.
    */
-  private getEntityTypeForSuggestionFetch(): string {
+  private getEntityTypeForSuggestionFetch(): string | undefined {
     const activeOpportunity = this.opportunities.find(
       opportunity => opportunity.id === this.activeExplorationId
     );
-    return activeOpportunity?.entityType || this.activeEntityType;
+    const entityType = activeOpportunity?.entityType || this.activeEntityType;
+    return entityType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+      ? undefined
+      : entityType;
   }
 
   onClickBackToReviewableLessons(): void {

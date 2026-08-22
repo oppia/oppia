@@ -1987,8 +1987,8 @@ describe('Contributions and review component', () => {
         response = result;
       });
       flushMicrotasks();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(response!.opportunitiesDicts).toEqual([
+      const responseOpt = response as unknown as GetOpportunitiesResponse;
+      expect(responseOpt.opportunitiesDicts).toEqual([
         {
           id: '1',
           heading: 'Chapter 1',
@@ -2022,8 +2022,7 @@ describe('Contributions and review component', () => {
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         } as unknown as Opportunity,
       ]);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(response!.more).toEqual(false);
+      expect(responseOpt.more).toEqual(false);
     }));
 
     it('should fetch suggestions using the entity type of the opened opportunity', fakeAsync(() => {
