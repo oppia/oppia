@@ -1677,6 +1677,30 @@ def get_translation_suggestions_in_review_by_entity_ids(
     ]
 
 
+def get_question_suggestions_in_review_by_skill_ids(
+    skill_ids: List[str],
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+    """Returns question suggestions in review by skill IDs.
+
+    Args:
+        skill_ids: list(str). Skill IDs matching the target ID of the
+            question suggestions.
+
+    Returns:
+        list(Suggestion). A list of question suggestions in review with
+        target_id in skill_ids, or None if suggestion model does not exist.
+    """
+    if not skill_ids:
+        return []
+    suggestion_models_in_review = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
+        skill_ids
+    )
+    return [
+        get_suggestion_from_model(model) if model else None
+        for model in suggestion_models_in_review
+    ]
+
+
 def get_suggestions_with_editable_explorations(
     suggestions: Sequence[suggestion_registry.SuggestionTranslateContent],
 ) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
