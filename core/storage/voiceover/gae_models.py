@@ -294,6 +294,73 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
         )
 
 
+class LanguageAccentCodeToBeamJobRunModel(base_models.BaseModel):
+    """Model for tracking the Beam job run for a language-accent code."""
+
+    # The language-accent code for the Beam job run.
+    language_accent_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # The ID of the Beam job run for the language-accent code.
+    beam_job_run_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'beam_job_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @staticmethod
+    def generate_id(language_accent_code: str) -> str:
+        """Generates the ID for a language-accent Beam job run model.
+
+        Args:
+            language_accent_code: str. The language-accent code for the Beam
+                job run.
+
+        Returns:
+            str. The language-accent code used as the model ID.
+        """
+        return language_accent_code
+
+    @classmethod
+    def get_model(
+        cls, language_accent_code: str
+    ) -> LanguageAccentCodeToBeamJobRunModel:
+        """Gets the Beam job run model for a language-accent code."""
+        return cls.get_by_id(cls.generate_id(language_accent_code))
+
+    @classmethod
+    def create_new(
+        cls, language_accent_code: str, beam_job_run_id: str
+    ) -> LanguageAccentCodeToBeamJobRunModel:
+        """Creates a model for a language-accent Beam job run."""
+        return cls(
+            id=cls.generate_id(language_accent_code),
+            language_accent_code=language_accent_code,
+            beam_job_run_id=beam_job_run_id,
+        )
+
+
 class CachedAutomaticVoiceoversModel(base_models.BaseModel):
     """Model to store voiceover cache to prevent repeated voiceover synthesis
     for the same Oppia lesson texts.
