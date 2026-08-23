@@ -1620,7 +1620,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} subscriberCount - The expected number of subscribers.
    */
   async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
-    await this.page.waitForSelector(subscriberCountLabel, {visible: true});
+    await this.expectElementToBeVisible(subscriberCountLabel);
     const currentSubscriberCount = await this.page.$eval(
       subscriberCountLabel,
       element => element.textContent?.trim() || '0'
@@ -1639,9 +1639,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of total explorations.
    */
   async expectNumberOfExplorationsToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
     const titlesOnPage = await this.page.$$eval(
       explorationSummaryTileTitleSelector,
       elements => elements.map(el => el.textContent?.trim() || '')
@@ -1663,9 +1661,7 @@ export class ExplorationEditor extends BaseUser {
     explorationName: string,
     numberOfOccurrence: number = 1
   ): Promise<void> {
-    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
     const titlesOnPage = await this.page.$$eval(
       explorationSummaryTileTitleSelector,
       elements => elements.map(el => el.textContent?.trim() || '')
