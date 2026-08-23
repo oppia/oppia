@@ -325,5 +325,19 @@ describe('CertificateAssessmentPlayerStateService', () => {
       expect(service.remainingTimeInSeconds).toBe(3568);
       service.ngOnDestroy();
     }));
+
+    it('should mark the window expired when the resumed countdown reaches zero', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(30000);
+      service.pauseForNetworkLoss();
+      service.resumeQuestionsStage();
+
+      tick(3570000);
+
+      expect(service.remainingTimeInSeconds).toBe(0);
+      expect(service.isTimeExpired).toBeTrue();
+      expect(window.clearInterval).toHaveBeenCalled();
+    }));
   });
 });
