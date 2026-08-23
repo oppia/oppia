@@ -1127,11 +1127,11 @@ describe('Certificate Assessment Offering backend api service', () => {
         error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
         error_type: 'cooldown',
         remaining_minutes: 6,
-        status_code: 400,
+        status_code: 429,
       },
       {
-        status: 400,
-        statusText: 'Bad Request',
+        status: 429,
+        statusText: 'Too Many Requests',
       }
     );
 
@@ -1142,7 +1142,7 @@ describe('Certificate Assessment Offering backend api service', () => {
       error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
       error_type: 'cooldown',
       remaining_minutes: 6,
-      status_code: 400,
+      status_code: 429,
     });
   }));
 

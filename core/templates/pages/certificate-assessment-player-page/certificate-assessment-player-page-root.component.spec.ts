@@ -430,7 +430,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
         error_type: 'cooldown',
         remaining_minutes: 2,
         error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
-        status_code: 400,
+        status_code: 429,
       })
     );
 

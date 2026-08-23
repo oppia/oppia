@@ -570,7 +570,7 @@ def start_certificate_assessment_attempt(
     Raises:
         CertificateAssessmentAttemptNotReadyException. If the assessment can no
             longer be started because the question pool is invalid.
-        utils.ValidationError. If the learner started an attempt for this
+        CertificateAssessmentAttemptCooldownException. If the learner started an attempt for this
             certificate less than MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES minutes
             ago.
     """

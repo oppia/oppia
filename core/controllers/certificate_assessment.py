@@ -461,13 +461,13 @@ class StartCertificateAssessmentHandler(
         ) as e:
             # Surface a structured error so the frontend can translate it via
             # its translate pipes, instead of a hardcoded English string.
-            self.error(400)
+            self.error(429)
             self.render_json(
                 {
                     'error': ('I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'),
                     'error_type': 'cooldown',
                     'remaining_minutes': e.remaining_minutes,
-                    'status_code': 400,
+                    'status_code': 429,
                 }
             )
             return

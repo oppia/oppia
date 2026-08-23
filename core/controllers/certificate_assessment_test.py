@@ -974,13 +974,13 @@ class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         ) as render_json_mock:
             handler.post()
 
-        error_mock.assert_called_once_with(400)
+        error_mock.assert_called_once_with(429)
         render_json_mock.assert_called_once_with(
             {
                 'error': 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
                 'error_type': 'cooldown',
                 'remaining_minutes': 6,
-                'status_code': 400,
+                'status_code': 429,
             }
         )
 
