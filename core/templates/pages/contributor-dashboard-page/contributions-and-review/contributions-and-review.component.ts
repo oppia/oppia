@@ -720,6 +720,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       });
   }
 
+  loadReviewableTranslationOpportunitiesCount(): Promise<number> {
+    return this.contributionOpportunitiesService.getReviewableTranslationOpportunitiesCountAsync(
+      this.translationTopicService.getActiveTopicName(),
+      this.languageCode
+    );
+  }
+
   pinReviewableTranslationOpportunity(dict: Record<string, string>): void {
     const topicName = dict.topic_name;
     const explorationId = dict.exploration_id;

@@ -110,6 +110,7 @@
       <lazy-loading *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && topicReady"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
+                                [loadOpportunitiesCount]="loadReviewableTranslationOpportunitiesCount.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 (clickPinButton)="pinReviewableTranslationOpportunity($event)"
                                 (clickUnpinButton)="unpinReviewableTranslationOpportunity($event)"

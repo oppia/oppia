@@ -1019,6 +1019,85 @@ class TranslatableTextHandler(
         )
 
 
+class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of OpportunitiesCountHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: Optional[str]
+    topic_name: Optional[str]
+
+
+class OpportunitiesCountHandler(
+    base.BaseHandler[
+        Dict[str, str], OpportunitiesCountHandlerNormalizedRequestDict
+    ]
+):
+    """Provides counts for opportunities available in different categories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'opportunity_type': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                },
+                'default_value': None,
+            },
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self, opportunity_type: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            opportunity_type: str. The type of opportunity to count.
+
+        Raises:
+            NotFoundException. The opportunity_type is not valid.
+        """
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException
+
+        language_code = self.normalized_request.get('language_code')
+        topic_name = self.normalized_request.get('topic_name')
+
+        if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
+            count = opportunity_services.get_skill_opportunities_count()
+        elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+            if language_code is None:
+                raise self.InvalidInputException('language_code is required')
+            count = opportunity_services.get_translation_opportunities_count(
+                language_code, topic_name
+            )
+        elif opportunity_type == 'reviewable_translation':
+            if language_code is None:
+                raise self.InvalidInputException('language_code is required')
+            # For reviewable translations, we just return the full count
+            # since the reviewer tab actually fetches all and paginates on the frontend.
+            # We use the same filter as the list fetcher.
+            count = opportunity_services.get_translation_opportunities_count(
+                language_code, topic_name
+            )
+        else:
+            raise self.NotFoundException
+
+        self.values = {'total_count': count}
+        self.render_json(self.values)
+
+
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of MachineTranslationStateTextsHandler's
     normalized_request dictionary.

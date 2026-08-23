@@ -53,6 +53,7 @@ export enum FeatureNames {
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
   TechnicalFeedbackDashboardEnabled = 'technical_feedback_dashboard_enabled',
   StoryEditorArcs = 'story_editor_arcs',
+  EnableDropdownPagination = 'enable_dropdown_pagination',
 }
 
 export interface FeatureStatusSummaryBackendDict {

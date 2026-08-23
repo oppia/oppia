@@ -23,6 +23,7 @@ import {TranslationTopicService} from 'pages/exploration-editor-page/translation
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-list-item.component';
 import {AppConstants} from 'app.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
 import './opportunities-list.component.css';
@@ -44,6 +45,7 @@ export class OpportunitiesListComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() loadOpportunities?: ExplorationOpportunitiesFetcherFunction;
+  @Input() loadOpportunitiesCount?: (searchQuery?: string) => Promise<number>;
   @Input() loadMoreOpportunities!: ExplorationOpportunitiesFetcherFunction;
   @Input() opportunityHeadingTruncationLength!: number;
   @Input() opportunityType!: string;
@@ -79,12 +81,19 @@ export class OpportunitiesListComponent {
   more: boolean = false;
   userIsOnLastPage: boolean = true;
   languageCode: string = '';
+  dropdownPaginationEnabled: boolean = false;
+  totalPages: number = 0;
+
+  get pageNumbers(): number[] {
+    return Array.from({length: this.totalPages}, (_, i) => i + 1);
+  }
 
   constructor(
     private zone: NgZone,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
     private readonly translationLanguageService: TranslationLanguageService,
-    private readonly translationTopicService: TranslationTopicService
+    private readonly translationTopicService: TranslationTopicService,
+    private readonly platformFeatureService: PlatformFeatureService
   ) {
     this.init();
   }
@@ -142,6 +151,8 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
+    this.dropdownPaginationEnabled =
+      this.platformFeatureService.status.EnableDropdownPagination.isEnabled;
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
     this.fetchAndLoadOpportunities();
@@ -249,6 +260,13 @@ export class OpportunitiesListComponent {
     if (!this.loadOpportunities) {
       return;
     }
+
+    if (this.dropdownPaginationEnabled && this.loadOpportunitiesCount) {
+      this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
+        this.totalPages = Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE);
+      });
+    }
+
     this.loadOpportunities(this.searchQuery).then(
       ({opportunitiesDicts, more}) => {
         // This ngZone run closure will not be required after \
@@ -280,23 +298,30 @@ export class OpportunitiesListComponent {
     if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
-      this.loadMoreOpportunities(this.searchQuery).then(
-        ({opportunitiesDicts, more}) => {
+
+      const fetchUntilNeeded = async () => {
+        while (endIndex > this.opportunities.length && this.more) {
+          const {opportunitiesDicts, more} = await this.loadMoreOpportunities(
+            this.searchQuery
+          );
           this.more = more;
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          this.visibleOpportunities = this.opportunities.slice(
-            startIndex,
-            endIndex
-          );
-          this.loadingOpportunityData = false;
-          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-            this.opportunities,
-            this.OPPORTUNITIES_PAGE_SIZE,
-            pageNumber,
-            this.more
-          );
         }
-      );
+      };
+
+      fetchUntilNeeded().then(() => {
+        this.visibleOpportunities = this.opportunities.slice(
+          startIndex,
+          endIndex
+        );
+        this.loadingOpportunityData = false;
+        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+          this.opportunities,
+          this.OPPORTUNITIES_PAGE_SIZE,
+          pageNumber,
+          this.more
+        );
+      });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
         startIndex,

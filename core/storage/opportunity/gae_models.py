@@ -186,6 +186,32 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return cls.query(cls.topic_id == topic_id).fetch()
 
+    @classmethod
+    def count_translation_opportunities(
+        cls,
+        language_code: str,
+        topic_name: Optional[str],
+    ) -> int:
+        """Returns the total count of translation opportunities matching
+        the given filters, without fetching full entities.
+
+        Args:
+            language_code: str. The language for which translation
+                opportunities are to be counted.
+            topic_name: str or None. The topic for which translation
+                opportunities should be counted. If None or empty, count
+                translation opportunities from all topics.
+
+        Returns:
+            int. The total number of matching translation opportunities.
+        """
+        query = cls.query(
+            cls.incomplete_translation_language_codes == language_code
+        )
+        if topic_name:
+            query = query.filter(cls.topic_name == topic_name)
+        return query.count()
+
 
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
@@ -279,6 +305,16 @@ class SkillOpportunityModel(base_models.BaseModel):
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results,
         )
+
+    @classmethod
+    def count_skill_opportunities(cls) -> int:
+        """Returns the total count of all skill opportunities, without
+        fetching full entities.
+
+        Returns:
+            int. The total number of skill opportunities.
+        """
+        return cls.get_all().count()
 
 
 class TranslationOpportunityModel(base_models.BaseModel):
@@ -435,6 +471,41 @@ class TranslationOpportunityModel(base_models.BaseModel):
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results,
         )
+
+    @classmethod
+    def count_by_entity_type_and_topic(
+        cls,
+        entity_type: Optional[str],
+        topic_id: Optional[str],
+        language_code: str,
+    ) -> int:
+        """Returns the total count of translation opportunities matching
+        the given filters, without fetching full entities.
+
+        Args:
+            entity_type: str or None. The type of the entity. If None, all
+                entity types are included.
+            topic_id: str or None. The ID of the topic to filter by. If
+                None, all topics are included.
+            language_code: str. The language code to filter by.
+
+        Returns:
+            int. The total number of matching translation opportunities.
+        """
+        if entity_type:
+            query = cls.query(
+                cls.entity_type == entity_type,
+                cls.incomplete_translation_language_codes == language_code,
+            )
+        else:
+            query = cls.query(
+                cls.incomplete_translation_language_codes == language_code,
+            )
+
+        if topic_id:
+            query = query.filter(cls.topic_ids == topic_id)
+
+        return query.count()
 
     @classmethod
     def get_by_entity_ids(
