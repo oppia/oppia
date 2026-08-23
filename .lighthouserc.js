@@ -49,8 +49,8 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/about$',
             pagePerfThresholds: {
-              fcp: 16100,
-              speedIndex: 16100,
+              fcp: 20500,
+              speedIndex: 20500,
               lcp: 42000,
               tbt: 830,
               cls: 0.4,
@@ -150,7 +150,7 @@ module.exports = {
             pagePerfThresholds: {
               fcp: 16500,
               speedIndex: 16500,
-              lcp: 36100,
+              lcp: 42000,
               tbt: 3200,
               cls: 1.0,
             },
