@@ -19,11 +19,13 @@
 import {
   Component,
   EventEmitter,
+  OnChanges,
   Input,
   OnDestroy,
   OnInit,
   Optional,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -48,6 +50,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -58,24 +61,25 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent
-  implements OnInit, OnDestroy
+  implements OnInit, OnChanges, OnDestroy
 {
   @Input() attempt: CertificateAssessmentAttemptData | null = null;
   @Input() classroomUrlFragment = '';
+  @Input() isTimeExpired = false;
   @Output() assessmentSubmitted = new EventEmitter<
     SubmitCertificateAssessmentAnswerBackendDict[]
   >();
+  @Output() viewResults = new EventEmitter<void>();
+  @Output() assessmentEnded = new EventEmitter<void>();
 
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
 
-  // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal and
-  // showUnansweredQuestionModal flags are currently initialized with default
-  // values. Update these flags based on the appropriate conditions once the
-  // logic for determining when the modals should be shown or hidden is
-  // implemented.
+  // TODO(#24717-m2.18-m2.19): The showUnansweredQuestionModal flag is
+  // currently initialized with a default value. Update this flag based on the
+  // appropriate condition once the logic for determining when the modal should
+  // be shown is implemented.
   showUnansweredQuestionModal = false;
-  showTimeExpiredModal = false;
 
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
@@ -90,6 +94,7 @@ export class CertificateAssessmentPlayerPageComponent
   totalQuestionCount = 0;
   progressPercentage = 0;
   isLastQuestion = false;
+  hasHandledTimeExpiry = false;
   private handleSubmitFn: OnSubmitFn;
 
   constructor(
@@ -110,11 +115,20 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.loadQuestion(0);
     this.refreshComputedFields();
-    if (this.showTimeExpiredModal) {
-      this.openTimeExpiredModal();
-    }
     if (this.showUnansweredQuestionModal) {
       this.openUnansweredQuestionModal();
+    }
+    if (this.isTimeExpired) {
+      this.handleTimeExpiry();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.isTimeExpired?.currentValue === true &&
+      !changes.isTimeExpired?.previousValue
+    ) {
+      this.handleTimeExpiry();
     }
   }
 
@@ -193,7 +207,17 @@ export class CertificateAssessmentPlayerPageComponent
 
   openTimeExpiredModal(): void {
     if (this.isMobileScreenSize()) {
-      this.bottomSheet.open(TimeExpiredModalComponent);
+      const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
+      bottomSheetRef.afterDismissed().subscribe(result => {
+        if (
+          result ===
+          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+        ) {
+          this.viewResults.emit();
+        } else {
+          this.assessmentEnded.emit();
+        }
+      });
       return;
     }
     const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
@@ -201,9 +225,18 @@ export class CertificateAssessmentPlayerPageComponent
       centered: true,
       windowClass: 'oppia-time-expired-modal',
     });
-    // TODO(#24717-m2.19): Wire the viewResult and dismiss actions once the
-    // backend is integrated.
-    modalRef.result.catch(() => null);
+    modalRef.result
+      .then(result => {
+        if (
+          result ===
+          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+        ) {
+          this.viewResults.emit();
+        }
+      })
+      .catch(() => {
+        this.assessmentEnded.emit();
+      });
   }
 
   openUnansweredQuestionModal(): void {
@@ -273,6 +306,15 @@ export class CertificateAssessmentPlayerPageComponent
       };
     });
     this.assessmentSubmitted.emit(answers);
+  }
+
+  private handleTimeExpiry(): void {
+    if (this.hasHandledTimeExpiry) {
+      return;
+    }
+    this.hasHandledTimeExpiry = true;
+    this.openTimeExpiredModal();
+    this.submitAssessment();
   }
 
   handleInteractionSubmit(answer: InteractionAnswer): void {
