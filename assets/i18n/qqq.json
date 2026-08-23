@@ -188,7 +188,7 @@
   "I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT": "Instruction explaining that restarting the assessment begins a new attempt.",
   "I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME": "Instruction telling the learner questions are shown one at a time.",
   "I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED": "Instruction warning the learner that progress is lost if they exit or lose connection before submitting.",
-  "I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT": "Instruction explaining how many questions the assessment contains.",
+  "I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT": "Instruction telling the learner how many questions the assessment contains. 'questions' is the numeric question count.",
   "I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS": "Instruction telling the learner they can review and change answers before submitting.",
   "I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT": "Instruction telling the learner how many minutes they have to complete the assessment. 'minutes' is the numeric time limit.",
   "I18N_ASSESSMENT_INSTRUCTION_UNANSWERED_MARKED_INCORRECT": "Instruction warning the learner that unanswered questions are marked incorrect.",
