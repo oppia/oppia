@@ -106,7 +106,6 @@ var LOGIN_URL_SUFFIX = '/login';
 var LOGOUT_URL_SUFFIX = '/logout';
 var MODERATOR_URL_SUFFIX = '/moderator';
 var BLOG_PAGE_URL_SUFFIX = '/blog';
-var BLOG_PAGE_SEARCH_URL_PREFIX = '/blog/search/find';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
@@ -369,7 +368,6 @@ exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
 exports.BLOG_PAGE_URL_SUFFIX = BLOG_PAGE_URL_SUFFIX;
-exports.BLOG_PAGE_SEARCH_URL_PREFIX = BLOG_PAGE_SEARCH_URL_PREFIX;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;

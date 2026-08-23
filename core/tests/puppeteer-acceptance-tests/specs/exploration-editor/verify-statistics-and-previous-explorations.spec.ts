@@ -62,7 +62,6 @@ describe('Exploration Editor', function () {
     'should display created explorations and their statistics on the creator dashboard after creating, playing, and rating as a logged-in user',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Rational Numbers');
       await loggedInUser.playLessonFromSearchResults('Rational Numbers');
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'

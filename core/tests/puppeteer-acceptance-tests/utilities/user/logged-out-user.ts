@@ -417,8 +417,6 @@ const blogTagContainerSelector = '.e2e-test-blog-tag-container';
 const blogPostTagSelector = '.e2e-test-blog-post-tag';
 const blogSearchInputSelector = '.e2e-test-search-input';
 const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
-const blogTagFilterSelector = '.e2e-test-tag-filter-component';
-const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const blogPaginationSelector = '.e2e-test-pagination';
 const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
 const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
@@ -1130,33 +1128,6 @@ export class LoggedOutUser extends BaseUser {
 
     if (!contentFound) {
       throw new Error(`No results found containing "${text}"`);
-    }
-  }
-
-  /**
-   * Function to filter blog posts by a tag
-   */
-  async filterBlogPostsByTag(tagName: string): Promise<void> {
-    await this.page.waitForSelector(blogTagFilterSelector, {
-      visible: true,
-    });
-    await this.typeInInputField(
-      '.e2e-test-tag-filter-selection-input',
-      tagName
-    );
-    await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
-    await this.page.waitForSelector(blogTagFilterDropdownSelector, {
-      hidden: true,
-    });
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
-
-    const url = new URL(this.page.url());
-    const queryParam = url.searchParams.get('tags');
-
-    if (queryParam !== `("${tagName}")`) {
-      throw new Error(
-        `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
-      );
     }
   }
 
@@ -4127,20 +4098,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.page.waitForSelector(searchInputSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
-  }
-
   /**
    * Filters lessons by multiple categories.
    * @param {string[]} categoryNames - The names of the categories to filter by.

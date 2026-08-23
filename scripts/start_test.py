@@ -240,11 +240,6 @@ class MainTests(unittest.TestCase):
         )
         self.mock_redis = self.patcher_servers_managed_redis.start()
 
-        self.patcher_servers_managed_es = mock.patch(
-            'scripts.start.servers.managed_elasticsearch_dev_server'
-        )
-        self.mock_es = self.patcher_servers_managed_es.start()
-
         self.patcher_servers_managed_dev_appserver = mock.patch(
             'scripts.start.servers.managed_dev_appserver'
         )
@@ -308,7 +303,6 @@ class MainTests(unittest.TestCase):
         # Mock context managers to avoid starting real services.
         for cm in [
             self.mock_redis,
-            self.mock_es,
             self.mock_ng_build,
             self.mock_firebase,
             self.mock_datastore,
@@ -322,7 +316,6 @@ class MainTests(unittest.TestCase):
         self.patcher_install.stop()
         self.patcher_build.stop()
         self.patcher_servers_managed_redis.stop()
-        self.patcher_servers_managed_es.stop()
         self.patcher_servers_managed_dev_appserver.stop()
         self.patcher_common_write_hashes.stop()
         self.patcher_servers_managed_ng_build.stop()
@@ -342,7 +335,6 @@ class MainTests(unittest.TestCase):
             (8181, 'GAE dev appserver'),
             (8000, 'GAE dev appserver admin port'),
             (6379, 'Redis server'),
-            (9200, 'ElasticSearch server'),
             (9099, 'Firebase auth emulator'),
             (8089, 'Cloud Datastore emulator'),
         ]
@@ -358,7 +350,7 @@ class MainTests(unittest.TestCase):
             mock_print.assert_called_with(
                 [
                     'ERROR',
-                    'Could not start new server. The following ports are already in use and need to be available: 8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), 6379 (Redis server), 9200 (ElasticSearch server), 9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)',
+                    'Could not start new server. The following ports are already in use and need to be available: 8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), 6379 (Redis server), 9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)',
                 ]
             )
 
@@ -450,7 +442,6 @@ class MainTests(unittest.TestCase):
                     '8181 (GAE dev appserver), '
                     '8000 (GAE dev appserver admin port), '
                     '6379 (Redis server), '
-                    '9200 (ElasticSearch server), '
                     '9099 (Firebase auth emulator), '
                     '8089 (Cloud Datastore emulator)'
                 ),

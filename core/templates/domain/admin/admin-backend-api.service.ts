@@ -348,10 +348,6 @@ export class AdminBackendApiService {
   }
 
   // Admin Misc Tab Services.
-  async clearSearchIndexAsync(): Promise<void> {
-    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL);
-  }
-
   async regenerateOpportunitiesRelatedToTopicAsync(
     topicId: string
   ): Promise<{opportunities_count: number}> {

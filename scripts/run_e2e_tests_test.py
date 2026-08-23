@@ -241,7 +241,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -314,7 +313,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -464,7 +462,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -525,7 +522,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -587,7 +583,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -651,7 +646,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -713,7 +707,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             [
-                'managed_elasticsearch_dev_server',
                 'managed_firebase_auth_emulator',
                 'managed_dev_appserver',
                 'managed_redis_server',
@@ -762,7 +755,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self._swap_servers(
                 [
                     'managed_redis_server',
-                    'managed_elasticsearch_dev_server',
                     'managed_dev_appserver',
                     'managed_webdriverio_server',
                     'managed_cloud_datastore_emulator',
@@ -841,7 +833,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self._swap_servers(
                 [
                     'managed_redis_server',
-                    'managed_elasticsearch_dev_server',
                     'managed_dev_appserver',
                     'managed_webdriverio_server',
                     'managed_cloud_datastore_emulator',

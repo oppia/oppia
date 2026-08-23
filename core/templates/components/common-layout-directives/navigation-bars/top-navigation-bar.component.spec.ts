@@ -32,7 +32,6 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
-import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
@@ -120,7 +119,6 @@ describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
-  let searchService: SearchService;
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let userService: UserService;
@@ -223,7 +221,6 @@ describe('TopNavigationBarComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopNavigationBarComponent);
     component = fixture.componentInstance;
-    searchService = TestBed.inject(SearchService);
     wds = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     userService = TestBed.inject(UserService);
@@ -246,9 +243,6 @@ describe('TopNavigationBarComponent', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
-    spyOn(searchService, 'onSearchBarLoaded').and.returnValue(
-      new EventEmitter<string>()
-    );
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',
       'default-image-url-webp',
@@ -265,7 +259,6 @@ describe('TopNavigationBarComponent', () => {
     component.ngOnInit();
     tick(10);
 
-    searchService.onSearchBarLoaded.emit();
     tick(101);
 
     fixture.whenStable().then(() => {

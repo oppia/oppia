@@ -92,15 +92,6 @@ describe('Logged-out User', function () {
   );
 
   it(
-    'should be able to search blog posts by tags',
-    async function () {
-      await loggedOutUser.filterBlogPostsByTag('Community');
-      await loggedOutUser.expectBlogSearchResultsToHaveTag('Community');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should be able to search blog posts by keywords',
     async function () {
       await loggedOutUser.filterBlogPostsByKeyword('Education');

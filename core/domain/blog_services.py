@@ -29,7 +29,6 @@ from core.domain import (
     blog_domain,
     html_cleaner,
     role_services,
-    search_services,
     user_domain,
     user_services,
 )
@@ -41,7 +40,6 @@ from typing import (
     Literal,
     Optional,
     Sequence,
-    Tuple,
     TypedDict,
     overload,
 )
@@ -51,13 +49,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
-
-# The maximum number of iterations allowed for populating the results of a
-# search query.
-MAX_ITERATIONS = 10
-
-# Name for the blog post search index.
-SEARCH_INDEX_BLOG_POSTS = search_services.SEARCH_INDEX_BLOG_POSTS
 
 
 class BlogPostChangeDict(TypedDict):
@@ -412,26 +403,6 @@ def get_blog_post_rights(
     return get_blog_post_rights_from_model(model)
 
 
-def get_total_number_of_matching_blog_posts(
-    query_string: str, tags: List[str]
-) -> int:
-    """Returns the total number of blog posts matching the search query and tags."""
-    valid_blog_post_ids: List[str] = []
-    search_offset: Optional[int] = None
-
-    for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = 1000
-
-        batch_ids, search_offset = get_blog_post_ids_matching_query(
-            query_string, tags, size=remaining_to_fetch, offset=search_offset
-        )
-        valid_blog_post_ids.extend(batch_ids)
-
-        if search_offset is None:
-            break
-    return len(valid_blog_post_ids)
-
-
 def get_published_blog_post_summaries_by_user_id(
     user_id: str, max_limit: int, offset: int = 0
 ) -> List[blog_domain.BlogPostSummary]:
@@ -545,8 +516,6 @@ def publish_blog_post(blog_post_id: str) -> None:
     _save_blog_post_summary(blog_post_summary)
     _save_blog_post(blog_post)
 
-    index_blog_post_summaries_given_ids([blog_post_id])
-
 
 def unpublish_blog_post(blog_post_id: str) -> None:
     """Marks the given blog post as unpublished or draft.
@@ -572,8 +541,6 @@ def unpublish_blog_post(blog_post_id: str) -> None:
     blog_post_rights.blog_post_is_published = False
     save_blog_post_rights(blog_post_rights)
 
-    search_services.delete_blog_post_summary_from_search_index(blog_post_id)
-
 
 def delete_blog_post(blog_post_id: str) -> None:
     """Deletes all the models related to a blog post.
@@ -585,8 +552,6 @@ def delete_blog_post(blog_post_id: str) -> None:
     blog_models.BlogPostModel.get(blog_post_id).delete()
     blog_models.BlogPostSummaryModel.get(blog_post_id).delete()
     blog_models.BlogPostRightsModel.get(blog_post_id).delete()
-
-    search_services.delete_blog_post_summary_from_search_index(blog_post_id)
 
 
 def _save_blog_post_summary(
@@ -945,113 +910,6 @@ def update_blog_models_author_and_published_on_date(
 
     blog_post_rights.editor_ids.append(blog_post.author_id)
     save_blog_post_rights(blog_post_rights)
-
-
-def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
-    """Indexes the blog post summaries corresponding to the given blog post ids.
-
-    Args:
-        blog_post_ids: list(str). List of ids of the blog post summaries to be
-            indexed.
-    """
-
-    blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
-    blog_post_models = blog_models.BlogPostModel.get_multi(blog_post_ids)
-    blog_post_content_id_to_content_map = {}
-    for model in blog_post_models:
-        if model:
-            blog_post_content_id_to_content_map[model.id] = (
-                html_cleaner.strip_html_tags(model.content)
-            )
-    valid_summaries = []
-    for summary in blog_post_summaries:
-        if summary is not None:
-            if summary.id in blog_post_content_id_to_content_map:
-                summary.summary = blog_post_content_id_to_content_map[
-                    summary.id
-                ]
-
-            valid_summaries.append(summary)
-    if len(valid_summaries) > 0:
-        search_services.index_blog_post_summaries(valid_summaries)
-
-
-def get_blog_post_ids_matching_query(
-    query_string: str, tags: List[str], size: int, offset: Optional[int] = None
-) -> Tuple[List[str], Optional[int]]:
-    """Returns a list with all blog post ids matching the given search query
-    string, as well as a search offset for future fetches.
-
-    This method returns exactly
-    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE results if
-    there are at least that many, otherwise it returns all remaining results.
-    (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search offset.
-
-    Args:
-        query_string: str. A search query string.
-        tags: list(str). The list of tags to query for. If it is empty, no tags
-            filter is applied to the results. If it is not empty, then a result
-            is considered valid if it matches at least one of these tags.
-        size: int. The maximum number of blog post summary domain objects to
-            be returned if there are at least that many, otherwise it contains
-            all results.
-        offset: int or None. Optional offset from which to start the search
-            query. If no offset is supplied, the first N results matching
-            the query are returned.
-
-    Returns:
-        2-tuple of (valid_blog_post_ids, search_offset). Where:
-            valid_blog_post_ids : list(str). A list with all
-                blog post ids matching the given search query string,
-                as well as a search offset for future fetches.
-                The list contains exactly 'size' number of results if there are
-                at least that many, otherwise it contains all remaining results.
-                (If this behaviour does not occur, an error will be logged.)
-            search_offset: int. Search offset for future fetches.
-    """
-    valid_blog_post_ids: List[str] = []
-    search_offset: Optional[int] = offset
-
-    for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = size - len(valid_blog_post_ids)
-
-        blog_post_ids, search_offset = (
-            search_services.search_blog_post_summaries(
-                query_string, tags, remaining_to_fetch, offset=search_offset
-            )
-        )
-
-        invalid_blog_post_ids = []
-        for ind, model in enumerate(
-            blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)
-        ):
-            if model is not None:
-                valid_blog_post_ids.append(blog_post_ids[ind])
-            else:
-                invalid_blog_post_ids.append(blog_post_ids[ind])
-
-        if (
-            len(valid_blog_post_ids)
-            == feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
-        ) or search_offset is None:
-            break
-
-        if len(invalid_blog_post_ids) > 0:
-            logging.error(
-                'Search index contains stale blog post ids: %s'
-                % ', '.join(invalid_blog_post_ids)
-            )
-
-    if (
-        len(valid_blog_post_ids)
-        < feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
-    ) and search_offset is not None:
-        logging.error(
-            'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS)
-        )
-    return (valid_blog_post_ids, search_offset)
 
 
 def create_blog_author_details_model(user_id: str) -> None:

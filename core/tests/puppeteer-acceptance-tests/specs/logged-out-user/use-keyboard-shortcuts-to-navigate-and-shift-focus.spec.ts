@@ -123,7 +123,6 @@ describe('Logged-out User', function () {
       // Expects the focus to be on category dropdown in the Community Library page.
       await loggedOutUser.verifyFocusAfterShortcut('c');
 
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
       // Skips to the main content.

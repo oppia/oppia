@@ -339,7 +339,6 @@ def main(args: Optional[List[str]] = None) -> None:
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())

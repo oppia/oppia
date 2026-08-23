@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     blog_author_details_migration_jobs,
-    blog_post_search_indexing_jobs,
     blog_validation_jobs,
     classroom_migration_jobs,
     collection_info_jobs,
@@ -31,7 +30,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     dummy_jobs,
     email_deletion_jobs,
     exp_migration_jobs,
-    exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,
     firebase_server_sync_jobs,
     math_interactions_audit_jobs,

@@ -36,7 +36,6 @@ from core.domain import (
     question_fetchers,
     recommendations_services,
     rights_manager,
-    search_services,
     skill_services,
     stats_domain,
     stats_services,
@@ -4005,54 +4004,6 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             params=payload,
             expected_status_int=404,
         )
-
-
-class ClearSearchIndexTest(test_utils.GenericTestBase):
-    """Tests that search index gets cleared."""
-
-    def test_clear_search_index(self) -> None:
-        exp_services.load_demo('0')
-        result_explorations = search_services.search_explorations(
-            'Welcome', [], [], 2
-        )[0]
-        self.assertEqual(result_explorations, ['0'])
-        collection_services.load_demo('0')
-        result_collections = search_services.search_collections(
-            'Welcome', [], [], 2
-        )[0]
-        self.assertEqual(result_collections, ['0'])
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        user_id_a = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        blog_post = blog_services.create_new_blog_post(user_id_a)
-        change_dict: blog_services.BlogPostChangeDict = {
-            'title': 'Welcome to Oppia',
-            'thumbnail_filename': 'thumbnail.svg',
-            'content': 'Hello Blog Authors',
-            'tags': ['Math', 'Science'],
-        }
-        blog_services.update_blog_post(blog_post.id, change_dict)
-        blog_services.publish_blog_post(blog_post.id)
-
-        csrf_token = self.get_new_csrf_token()
-        generated_exps_response = self.post_json(
-            '/adminhandler',
-            {'action': 'clear_search_index'},
-            csrf_token=csrf_token,
-        )
-        self.assertEqual(generated_exps_response, {})
-        result_explorations = search_services.search_explorations(
-            'Welcome', [], [], 2
-        )[0]
-        self.assertEqual(result_explorations, [])
-        result_collections = search_services.search_collections(
-            'Welcome', [], [], 2
-        )[0]
-        self.assertEqual(result_collections, [])
-        result_blog_posts = search_services.search_blog_post_summaries(
-            'Welcome', [], 2
-        )[0]
-        self.assertEqual(result_blog_posts, [])
 
 
 class SendDummyMailTest(test_utils.GenericTestBase):

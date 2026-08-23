@@ -45,9 +45,6 @@ core/templates/pages/learner-group-pages/templates/learner-group-preferences-mod
 core/templates/pages/learner-group-pages/templates/remove-item-modal.component.html
 core/templates/pages/learner-group-pages/templates/syllabus-addition-success-modal.component.html
 core/templates/pages/library-page/classroom-card/classroom-card.component.html
-core/templates/pages/library-page/search-bar/search-bar.component.html
-core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.html
-core/templates/pages/library-page/search-results/search-results.component.html
 core/templates/pages/license-page/license-page.component.html
 core/templates/pages/login-page/login-page.component.html
 core/templates/pages/maintenance-page/maintenance-page.component.html

@@ -144,12 +144,6 @@ describe('Logged-out User', function () {
     'should be able to search and filter blog posts',
     async function () {
       await interestedPartnerOrg.navigateToBlogPage();
-      await interestedPartnerOrg.filterBlogPostsByTag('International');
-      await interestedPartnerOrg.expectBlogSearchResultsToHaveTag(
-        'International'
-      );
-
-      await interestedPartnerOrg.navigateToBlogPage();
       await interestedPartnerOrg.filterBlogPostsByKeyword('International');
       await interestedPartnerOrg.expectBlogSearchResultsToContain(
         'International'

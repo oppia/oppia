@@ -541,71 +541,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
         self.assertEqual(list(popen_calls[0].kwargs.keys()), ['shell', 'env'])
 
-    def test_managed_elasticsearch_dev_server(self) -> None:
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
 
-        self.exit_stack.enter_context(
-            servers.managed_elasticsearch_dev_server()
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(
-            popen_calls[0].program_args,
-            f'{common.ES_PATH}/bin/elasticsearch -q -E xpack.security.enabled=false -E cluster.routing.allocation.disk.threshold_enabled=false',
-        )
-        self.assertEqual(
-            popen_calls[0].kwargs,
-            {
-                'shell': True,
-                'env': {
-                    'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-                    'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
-                },
-            },
-        )
-
-    def test_start_server_removes_elasticsearch_data(self) -> None:
-        check_function_calls = {'shutil_rmtree_is_called': False}
-
-        old_os_path_exists = os.path.exists
-
-        def mock_os_remove_files(  # pylint: disable=unused-argument
-            file_path: str,
-        ) -> None:
-            check_function_calls['shutil_rmtree_is_called'] = True
-
-        def mock_os_path_exists(
-            file_path: str,
-        ) -> bool:  # pylint: disable=unused-argument
-            if file_path == common.ES_PATH_DATA_DIR:
-                return True
-            return old_os_path_exists(file_path)
-
-        self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                subprocess, 'call', value=scripts_test_utils.PopenStub()
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap(shutil, 'rmtree', mock_os_remove_files)
-        )
-        self.exit_stack.enter_context(
-            self.swap(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_elasticsearch_dev_server()
-        )
-        self.exit_stack.close()
-
-        self.assertTrue(check_function_calls['shutil_rmtree_is_called'])
+class PopenStub:
 
     def test_managed_redis_server(self) -> None:
         original_os_remove = os.remove

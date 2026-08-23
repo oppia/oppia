@@ -24,7 +24,7 @@ import {LibraryFooterComponent} from './library-footer.component';
 class MockWindowRef {
   nativeWindow = {
     location: {
-      pathname: '/search/find',
+      pathname: '/community-library',
     },
   };
 }
@@ -57,6 +57,6 @@ describe('Library footer component', () => {
 
   it('should initialize', () => {
     componentInstance.ngOnInit();
-    expect(componentInstance.footerIsDisplayed).toBeFalse();
+    expect(componentInstance.footerIsDisplayed).toBeTrue();
   });
 });

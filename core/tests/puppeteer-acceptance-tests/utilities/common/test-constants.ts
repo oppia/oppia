@@ -124,8 +124,7 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
-    TeacherStoryTaggedBlogsLink:
-      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    TeacherStoryTaggedBlogsLink: '/blog',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:

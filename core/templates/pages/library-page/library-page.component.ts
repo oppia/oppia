@@ -38,7 +38,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
-import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {LibraryPageConstants} from './library-page.constants';
 import {
@@ -115,7 +114,6 @@ export class LibraryPageComponent {
     private keyboardShortcutService: KeyboardShortcutService,
     private libraryPageBackendApiService: LibraryPageBackendApiService,
     private loaderService: LoaderService,
-    private searchService: SearchService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
@@ -281,19 +279,6 @@ export class LibraryPageComponent {
   showFullResultsPage(categories: string[], fullResultsUrl: string): void {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
-    } else {
-      let selectedCategories: Record<string, boolean> = {};
-      for (let i = 0; i < categories.length; i++) {
-        selectedCategories[categories[i]] = true;
-      }
-
-      let targetSearchQueryUrl = this.searchService.getSearchUrlQueryString(
-        '',
-        selectedCategories,
-        {}
-      );
-      this.windowRef.nativeWindow.location.href =
-        '/search/find?q=' + targetSearchQueryUrl;
     }
   }
 
@@ -317,10 +302,7 @@ export class LibraryPageComponent {
 
   setPageTitle(): void {
     let titleKey = 'I18N_LIBRARY_PAGE_TITLE';
-    if (
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH
-    ) {
+    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
       titleKey = 'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE';
     }
 

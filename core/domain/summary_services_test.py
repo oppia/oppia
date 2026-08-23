@@ -1250,10 +1250,6 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
-        exp_services.index_explorations_given_ids(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3, self.EXP_ID4]
-        )
-
     def test_get_exploration_metadata_dicts(self) -> None:
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert
@@ -1343,22 +1339,6 @@ class CollectionNodeMetadataDictsTest(
                 'objective': 'An objective 4',
                 'title': 'Exploration 4 Bob title',
             },
-        ]
-        self.assertEqual(expected_metadata_dicts, metadata_dicts)
-
-    def test_exp_metadata_dicts_matching_query(self) -> None:
-        metadata_dicts, _ = (
-            summary_services.get_exp_metadata_dicts_matching_query(
-                'Exploration 1', None, self.albert
-            )
-        )
-
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID1,
-                'objective': 'An objective 1',
-                'title': 'Exploration 1 Albert title',
-            }
         ]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 

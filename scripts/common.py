@@ -74,7 +74,6 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '8.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -117,16 +116,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = os.path.join(
     CURR_DIR, os.pardir, 'firebase_emulator_cache'
-)
-
-ES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION
-)
-ES_PATH_CONFIG_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config'
-)
-ES_PATH_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data'
 )
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
@@ -214,10 +203,8 @@ ACCEPTANCE_TEST_CONFIG_FILE_PATH = os.path.join(
 )
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
-ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
     GAE_PORT_FOR_E2E_TESTING,
-    ELASTICSEARCH_SERVER_PORT,
 ]
 
 

@@ -2508,21 +2508,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.expectElementToBeVisible(searchInputSelector);
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.mouse.move(-1, -1); // Move mouse away to prevent hover effects from blocking the search input.
-    }
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: 'load'});
-  }
-
   /**
    * Selects and opens a topic by its name.
    * @param {string} topicName - The name of the topic to select and open.

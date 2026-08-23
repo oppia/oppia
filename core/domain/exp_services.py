@@ -57,7 +57,6 @@ from core.domain import (
     recommendations_services,
     rights_domain,
     rights_manager,
-    search_services,
     state_domain,
     stats_domain,
     stats_services,
@@ -153,9 +152,6 @@ class SnapshotsMetadataDict(TypedDict):
     created_on_ms: float
 
 
-# Name for the exploration search index.
-SEARCH_INDEX_EXPLORATIONS: Final = 'explorations'
-
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS: Final = 10
@@ -222,93 +218,6 @@ def get_exploration_titles_and_categories(
                 'category': exploration.category,
             }
     return result
-
-
-def get_exploration_ids_matching_query(
-    query_string: str,
-    categories: List[str],
-    language_codes: List[str],
-    offset: Optional[int] = None,
-) -> Tuple[List[str], Optional[int]]:
-    """Returns a list with all exploration ids matching the given search query
-    string, as well as a search offset for future fetches.
-
-    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
-    there are at least that many, otherwise it returns all remaining results.
-    (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search offset.
-
-    Args:
-        query_string: str. A search query string.
-        categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these categories.
-        language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        offset: int or None. Optional offset from which to start the search
-            query. If no offset is supplied, the first N results matching
-            the query are returned.
-
-    Returns:
-        2-tuple of (returned_exploration_ids, search_offset). Where:
-            returned_exploration_ids : list(str). A list with all
-                exploration ids matching the given search query string,
-                as well as a search offset for future fetches.
-                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
-                results if there are at least that many, otherwise it
-                contains all remaining results. (If this behaviour does
-                not occur, an error will be logged.)
-            search_offset: int. Search offset for future fetches.
-    """
-    returned_exploration_ids: List[str] = []
-    search_offset = offset
-
-    for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
-            returned_exploration_ids
-        )
-
-        exp_ids, search_offset = search_services.search_explorations(
-            query_string,
-            categories,
-            language_codes,
-            remaining_to_fetch,
-            offset=search_offset,
-        )
-
-        invalid_exp_ids = []
-        for ind, model in enumerate(
-            exp_models.ExpSummaryModel.get_multi(exp_ids)
-        ):
-            if model is not None:
-                returned_exploration_ids.append(exp_ids[ind])
-            else:
-                invalid_exp_ids.append(exp_ids[ind])
-
-        if (
-            len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-            or search_offset is None
-        ):
-            break
-
-        logging.error(
-            'Search index contains stale exploration ids: %s'
-            % ', '.join(invalid_exp_ids)
-        )
-
-    if (
-        len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-        and search_offset is not None
-    ):
-        logging.error(
-            'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS)
-        )
-
-    return (returned_exploration_ids, search_offset)
 
 
 def get_top_rated_exploration_summaries(
@@ -1761,9 +1670,6 @@ def delete_explorations(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None, exploration_ids
     )
 
-    # Delete the explorations from search.
-    search_services.delete_explorations_from_search_index(exploration_ids)
-
     # Delete the exploration summaries, recommendations and opportunities
     # regardless of whether or not force_deletion is True.
     delete_exploration_summaries(exploration_ids)
@@ -3195,16 +3101,7 @@ def index_explorations_given_ids(exp_ids: List[str]) -> None:
     Args:
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
-    exploration_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
-        exp_ids
-    )
-    search_services.index_exploration_summaries(
-        [
-            exploration_summary
-            for exploration_summary in exploration_summaries
-            if exploration_summary is not None
-        ]
-    )
+    pass
 
 
 def is_voiceover_change_list(

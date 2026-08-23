@@ -16,14 +16,12 @@
 
 from __future__ import annotations
 
-import logging
-
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import blog_domain, blog_services, user_services
 
-from typing import Dict, Final, List, Optional, Tuple, TypedDict
+from typing import Dict, Final, List, Optional, TypedDict
 
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
@@ -112,51 +110,6 @@ def _get_blog_card_summary_dicts_for_homepage(
             }
         summary_dicts.append(card_summary_dict)
     return summary_dicts
-
-
-def _get_matching_blog_card_summary_dicts(
-    query_string: str, tags: list[str], size: int, search_offset: Optional[int]
-) -> Tuple[List[blog_domain.BlogPostSummary], Optional[int]]:
-    """Given the details of a query and a search offset, returns a list of
-    matching blog card summary domain objects that satisfy the query.
-
-    Args:
-        query_string: str. The search query string (this is what the user
-            enters).
-        tags: list(str). The list of tags to query for. If it is empty, no
-            tags filter is applied to the results. If it is not empty, then
-            a result is considered valid if it matches at least one of these
-            tags.
-        size: int. The maximum number of blog post summary domain objects to
-            be returned.
-        search_offset: int or None. Offset indicating where, in the list of
-            blog post summaries search results, to start the search from.
-            If None, blog post summaries search results are returned from
-            beginning.
-
-    Returns:
-        tuple. A tuple consisting of two elements:
-            - list(dict). Each element in this list is a blog post summary
-            domain object, representing a search result to popoulate data on
-            blog card.
-            - int. The blog post search index offset from which to start the
-                next search.
-    """
-    blog_post_ids, new_search_offset = (
-        blog_services.get_blog_post_ids_matching_query(
-            query_string, tags, size, offset=search_offset
-        )
-    )
-    blog_post_summaries = blog_services.get_blog_post_summary_models_by_ids(
-        blog_post_ids
-    )
-    if len(blog_post_summaries) == feconf.DEFAULT_QUERY_LIMIT:
-        logging.error(
-            '%s blog post summaries were fetched to load the search/filter by '
-            'result page. You may be running up against the default query '
-            'limits.' % feconf.DEFAULT_QUERY_LIMIT
-        )
-    return blog_post_summaries, new_search_offset
 
 
 class BlogHomepageDataHandlerNormalizedRequestDict(TypedDict):
@@ -401,90 +354,4 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'summary_dicts': blog_post_summary_dicts,
             }
         )
-        self.render_json(self.values)
-
-
-class BlogPostSearchHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of BlogPostSearchHandler's normalized_request
-    dictionary.
-    """
-
-    q: str
-    tags: str
-    offset: Optional[int]
-
-
-class BlogPostSearchHandler(
-    base.BaseHandler[Dict[str, str], BlogPostSearchHandlerNormalizedRequestDict]
-):
-    """Provides blog cards for blog search page based on query provided and
-    applied tag filters.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'q': {'schema': {'type': 'basestring'}, 'default_value': ''},
-            'tags': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [
-                        {'id': 'is_search_query_string'},
-                        {
-                            'id': 'is_regex_matched',
-                            'regex_pattern': '[\\-\\w+()"\\s]*',
-                        },
-                    ],
-                },
-                'default_value': '',
-            },
-            'offset': {'schema': {'type': 'int'}, 'default_value': None},
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Searches for blog posts based on a query and tags."""
-        assert self.normalized_request is not None
-        query_string = utils.get_formatted_query_string(
-            self.normalized_request['q']
-        )
-
-        # If there is a tags parameter, it should be in the following form:
-        # tags=("GSOC" OR "Math"), tags=("Algebra" OR "Geometry" OR "Maths")
-        # tags=("GSOC")
-        tags_string = self.normalized_request['tags']
-        tags = utils.convert_filter_parameter_string_into_list(tags_string)
-
-        search_offset = self.normalized_request.get('offset')
-
-        blog_post_summaries, new_search_offset = (
-            _get_matching_blog_card_summary_dicts(
-                query_string,
-                tags,
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                search_offset,
-            )
-        )
-        blog_post_summary_dicts = _get_blog_card_summary_dicts_for_homepage(
-            blog_post_summaries
-        )
-        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
-
-        total_matching_blog_posts = (
-            blog_services.get_total_number_of_matching_blog_posts(
-                query_string, tags
-            )
-        )
-
-        self.values.update(
-            {
-                'blog_post_summaries_list': blog_post_summary_dicts,
-                'search_offset': new_search_offset,
-                'list_of_default_tags': list_of_default_tags,
-                'total_matching_blog_posts': total_matching_blog_posts,
-            }
-        )
-
         self.render_json(self.values)
