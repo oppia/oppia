@@ -16,7 +16,7 @@
  * @fileoverview Component for the error 404 page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -26,7 +26,8 @@ import {PageTitleService} from 'services/page-title.service';
 @Component({
   selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./error-404-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
