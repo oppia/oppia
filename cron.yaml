@@ -47,3 +47,6 @@ cron:
 - description: daily job to delete expired PlatformFeedbackModel entries together with their associated FeedbackSessionLogModel entries and uploaded screenshots
   url: /cron/feedback/platform_feedback_cleanup
   schedule: every day 02:00
+- description: weekly job to delete abandoned in-progress certificate assessment attempts whose deadline has passed
+  url: /cron/certificate_assessments/attempt_cleanup
+  schedule: every tuesday 9:00

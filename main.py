@@ -1678,6 +1678,10 @@ URLS.extend(
             r'/cron/feedback/platform_feedback_cleanup',
             cron.CronPlatformFeedbackCleanupHandler,
         ),
+        get_redirect_route(
+            r'/cron/certificate_assessments/attempt_cleanup',
+            cron.CronCertificateAssessmentAttemptCleanupHandler,
+        ),
     )
 )
 

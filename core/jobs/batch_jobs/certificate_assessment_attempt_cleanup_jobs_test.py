@@ -223,6 +223,64 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNotNone(kept_model)
 
+    def test_deletes_only_the_abandoned_attempts_of_one_offering(self) -> None:
+        """When several attempts share one offering, only those past their
+        deadline should be deleted.
+        """
+        offering_model = _create_offering_model(self, 'cert_1', 20)
+        abandoned_attempt = _create_attempt_model(
+            self,
+            'attempt_abandoned',
+            'cert_1',
+            datetime.datetime.utcnow() - datetime.timedelta(hours=3),
+        )
+        active_attempt = _create_attempt_model(
+            self,
+            'attempt_active',
+            'cert_1',
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
+        )
+        submitted_attempt = _create_attempt_model(
+            self,
+            'attempt_submitted',
+            'cert_1',
+            datetime.datetime.utcnow() - datetime.timedelta(days=30),
+            is_submitted=True,
+        )
+        self.put_multi(
+            [
+                offering_model,
+                abandoned_attempt,
+                active_attempt,
+                submitted_attempt,
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CertificateAssessmentAttemptModels deleted: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Deleted CertificateAssessmentAttemptModel with ID: '
+                    'attempt_abandoned.'
+                ),
+            ]
+        )
+
+        deleted_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
+            'attempt_abandoned', strict=False
+        )
+        self.assertIsNone(deleted_model)
+        kept_active_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
+            'attempt_active'
+        )
+        self.assertIsNotNone(kept_active_model)
+        kept_submitted_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
+            'attempt_submitted'
+        )
+        self.assertIsNotNone(kept_submitted_model)
+
     def test_keeps_attempt_without_matching_offering(self) -> None:
         """An attempt whose offering no longer exists has no computable
         deadline and should be left untouched.
