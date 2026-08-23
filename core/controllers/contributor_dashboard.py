@@ -1071,6 +1071,7 @@ class OpportunitiesCountHandler(
         ):
             raise self.NotFoundException
 
+        assert self.normalized_request is not None
         language_code = self.normalized_request.get('language_code')
         topic_name = self.normalized_request.get('topic_name')
 

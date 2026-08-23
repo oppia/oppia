@@ -261,10 +261,17 @@ export class OpportunitiesListComponent {
       return;
     }
 
-    if (this.dropdownPaginationEnabled && this.loadOpportunitiesCount) {
-      this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
-        this.totalPages = Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE);
-      });
+    if (this.dropdownPaginationEnabled) {
+      if (this.loadOpportunitiesCount) {
+        this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
+          this.totalPages = Math.max(
+            1,
+            Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE)
+          );
+        });
+      } else {
+        this.totalPages = 1;
+      }
     }
 
     this.loadOpportunities(this.searchQuery).then(
@@ -274,9 +281,26 @@ export class OpportunitiesListComponent {
         this.zone.run(() => {
           this.opportunities = opportunitiesDicts;
           this.more = more;
+
+          if (!this.more && this.dropdownPaginationEnabled) {
+            this.totalPages = Math.max(
+              1,
+              Math.ceil(
+                this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE
+              )
+            );
+            if (this.activePageNumber > this.totalPages) {
+              this.activePageNumber = this.totalPages;
+            }
+          }
+
+          const startIndex =
+            (this.activePageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+          const endIndex = this.activePageNumber * this.OPPORTUNITIES_PAGE_SIZE;
+
           this.visibleOpportunities = this.opportunities.slice(
-            0,
-            this.OPPORTUNITIES_PAGE_SIZE
+            startIndex,
+            endIndex
           );
           this.userIsOnLastPage = this.calculateUserIsOnLastPage(
             this.opportunities,
@@ -291,8 +315,8 @@ export class OpportunitiesListComponent {
   }
 
   gotoPage(pageNumber: number): void {
-    const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
-    const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
+    let startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+    let endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     // Load new opportunities based on endIndex as the backend can return
     // opportunities greater than the page size. See issue #14004.
     if (endIndex >= this.opportunities.length && this.more) {
@@ -310,6 +334,18 @@ export class OpportunitiesListComponent {
       };
 
       fetchUntilNeeded().then(() => {
+        if (!this.more && this.dropdownPaginationEnabled) {
+          this.totalPages = Math.max(
+            1,
+            Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
+          );
+          if (pageNumber > this.totalPages) {
+            pageNumber = this.totalPages;
+            startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+            endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
+          }
+        }
+
         this.visibleOpportunities = this.opportunities.slice(
           startIndex,
           endIndex
@@ -321,20 +357,33 @@ export class OpportunitiesListComponent {
           pageNumber,
           this.more
         );
+        this.activePageNumber = pageNumber;
       });
     } else {
+      if (!this.more && this.dropdownPaginationEnabled) {
+        this.totalPages = Math.max(
+          1,
+          Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
+        );
+        if (pageNumber > this.totalPages) {
+          pageNumber = this.totalPages;
+          startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+          endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
+        }
+      }
+
       this.visibleOpportunities = this.opportunities.slice(
         startIndex,
         endIndex
       );
+      this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+        this.opportunities,
+        this.OPPORTUNITIES_PAGE_SIZE,
+        pageNumber,
+        this.more
+      );
+      this.activePageNumber = pageNumber;
     }
-    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-      this.opportunities,
-      this.OPPORTUNITIES_PAGE_SIZE,
-      pageNumber,
-      this.more
-    );
-    this.activePageNumber = pageNumber;
   }
 
   calculateUserIsOnLastPage(

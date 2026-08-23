@@ -1809,7 +1809,7 @@ def _build_entity_id_to_translation_suggestion_in_review_count(
     """
     entity_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
     suggestions_in_review = (
-        suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
+        suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
             entity_ids, language_code
         )
     )
