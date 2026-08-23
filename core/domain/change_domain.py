@@ -225,15 +225,7 @@ class BaseChange:
                 break
 
         for attribute_name in cmd_attribute_names:
-            # Only set the attribute when the key is explicitly present in
-            # the dict. Using change_dict.get() would set absent optional
-            # attributes to None, which would then appear in to_dict() output
-            # (since hasattr() returns True for None-valued attrs). By
-            # skipping absent keys entirely, hasattr() returns False and
-            # to_dict() omits those fields — keeping manual suggestions
-            # backward-compatible.
-            if attribute_name in change_dict:
-                setattr(self, attribute_name, change_dict[attribute_name])
+            setattr(self, attribute_name, change_dict.get(attribute_name))
 
     def validate_dict(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
