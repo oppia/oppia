@@ -30,7 +30,11 @@ import {
   FeedbackCardConfig,
   FeedbackSessionInfo,
   FeedbackStatus,
+  LessonFeedbackResponse,
+  LessonFeedbackDetailResponse,
   PlatformFeedbackDetailResponse,
+  ReportAnIssueCategory,
+  ReportType,
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
@@ -53,25 +57,29 @@ export class FeedbackDetailPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private windowRef: WindowRef
   ) {}
-  @Input() feedbackDetailResponse!: PlatformFeedbackDetailResponse;
+  @Input() feedbackDetailResponse:
+    | LessonFeedbackDetailResponse
+    | PlatformFeedbackDetailResponse
+    | null = null;
   @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
   @Input() screenshotDataUrl: string | null = null;
+  @Input() statusOptions!: FeedbackStatus[];
   @Output() goBack = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<FeedbackStatus>();
+  @Output() messageSend = new EventEmitter<string>();
   @Output() githubTransfer = new EventEmitter<string>();
 
   readonly categoryLabels = CATEGORY_LABELS;
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly sourceLabels = SOURCE_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
-  readonly statusOptions = Object.values(FeedbackStatus);
   readonly transferredToGithubStatus = FeedbackStatus.TRANSFERRED_TO_GITHUB;
 
   replyText: string = '';
   isSendingReply: boolean = false;
 
-  getPlatformLabel(platform: string): string {
-    return platform === 'web' ? 'Web' : 'Android';
+  getPlatformLabel(platform: string | null): string {
+    return platform === 'android' ? 'Android' : 'Web';
   }
 
   formatDate(timestamp: number): string {
@@ -104,7 +112,10 @@ export class FeedbackDetailPageComponent {
   }
 
   get sessionInfo(): FeedbackSessionInfo | null {
-    return this.feedbackDetailResponse?.session_info ?? null;
+    if (this.isPlatformFeedbackDetailResponse(this.feedbackDetailResponse)) {
+      return this.feedbackDetailResponse.session_info;
+    }
+    return null;
   }
 
   getCategoryLabel(category: string | null): string {
@@ -115,7 +126,47 @@ export class FeedbackDetailPageComponent {
   }
 
   getSourceLabel(source: string): string {
-    return this.sourceLabels[source] || source;
+    return this.sourceLabels[source] || 'Lesson';
+  }
+
+  getFeedbackCategory(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): ReportAnIssueCategory | null {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? response.category
+      : null;
+  }
+
+  getFeedbackSourceLabel(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? this.getSourceLabel(response.source)
+      : this.getSourceLabel(ReportType.LESSON);
+  }
+
+  getFeedbackPlatformLabel(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string {
+    return this.getPlatformLabel(
+      this.isPlatformFeedbackDetailResponse(response) ? response.platform : null
+    );
+  }
+
+  getFeedbackPageUrl(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string | null {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? response.page_url
+      : null;
+  }
+
+  getFeedbackResponses(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): LessonFeedbackResponse[] {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? []
+      : response.response_list;
   }
 
   getDestinationLabel(
@@ -124,6 +175,20 @@ export class FeedbackDetailPageComponent {
     return destinationDashboard === 'curriculum'
       ? 'Creator'
       : this.teamLabels[destinationDashboard];
+  }
+
+  getFeedbackMessage(): string {
+    const response = this.feedbackDetailResponse;
+
+    if (response === null) {
+      return '';
+    }
+
+    if (this.isPlatformFeedbackDetailResponse(response)) {
+      return response.report_message;
+    }
+
+    return response.feedback_text;
   }
 
   onStatusOptionClick(status: FeedbackStatus): void {
@@ -135,8 +200,20 @@ export class FeedbackDetailPageComponent {
     this.statusChange.emit(status);
   }
 
+  private isPlatformFeedbackDetailResponse(
+    response:
+      | PlatformFeedbackDetailResponse
+      | LessonFeedbackDetailResponse
+      | null
+  ): response is PlatformFeedbackDetailResponse {
+    return response !== null && 'report_message' in response;
+  }
+
   getGithubIssueUrl(): string {
     const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return '';
+    }
     const title = response
       ? `[BUG]: User feedback report: ${this.getCategoryLabel(
           response.category
@@ -145,29 +222,44 @@ export class FeedbackDetailPageComponent {
     const params = new URLSearchParams();
     params.append('template', '6_technical_feedback_report.yml');
     params.append('title', title);
-    params.append('describe-the-bug', this.getGithubIssueDescription());
+    params.append('describe-the-bug', this.getGithubIssueDescription(response));
     params.append('page-url', response?.page_url || 'Not provided');
-    params.append('steps-to-reproduce', this.getGithubIssueSteps());
-    params.append('expected-behavior', this.getGithubIssueExpectedBehavior());
-    params.append('screenshots-videos', this.getGithubIssueScreenshotDetails());
-    params.append('device', this.getGithubIssueDevice());
-    params.append('operating-system', this.getGithubIssueOperatingSystem());
-    params.append('browsers', this.getGithubIssueBrowserName());
-    params.append('browser-version', this.getGithubIssueBrowserVersion());
-    params.append('additional-context', this.getGithubIssueAdditionalContext());
+    params.append('steps-to-reproduce', this.getGithubIssueSteps(response));
+    params.append(
+      'expected-behavior',
+      this.getGithubIssueExpectedBehavior(response)
+    );
+    params.append(
+      'screenshots-videos',
+      this.getGithubIssueScreenshotDetails(response)
+    );
+    params.append('device', this.getGithubIssueDevice(response));
+    params.append(
+      'operating-system',
+      this.getGithubIssueOperatingSystem(response)
+    );
+    params.append('browsers', this.getGithubIssueBrowserName(response));
+    params.append(
+      'browser-version',
+      this.getGithubIssueBrowserVersion(response)
+    );
+    params.append(
+      'additional-context',
+      this.getGithubIssueAdditionalContext(response)
+    );
 
     return `https://github.com/oppia/oppia/issues/new?${params.toString()}`;
   }
 
-  private getGithubIssueDescription(): string {
-    const response = this.feedbackDetailResponse;
-
+  private getGithubIssueDescription(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return [
       response.report_message,
       '',
       'Transferred from the Oppia Technical feedback dashboard.',
       `Report ID: ${response.id}`,
-      `Feedback report: ${this.getFeedbackReportUrl()}`,
+      `Feedback report: ${this.getFeedbackReportUrl(response)}`,
       `Submitted: ${this.formatDate(response.created_on_msecs)}`,
       `Source: ${this.getSourceLabel(response.source)}`,
       `Category: ${this.getCategoryLabel(response.category)}`,
@@ -176,8 +268,9 @@ export class FeedbackDetailPageComponent {
     ].join('\n');
   }
 
-  private getFeedbackReportUrl(): string {
-    const response = this.feedbackDetailResponse;
+  private getFeedbackReportUrl(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     const reportPath = `/technical-feedback-dashboard/${encodeURIComponent(
       response.destination_dashboard
     )}/${encodeURIComponent(response.id)}`;
@@ -185,9 +278,9 @@ export class FeedbackDetailPageComponent {
     return `${this.windowRef.nativeWindow.location.origin}${reportPath}`;
   }
 
-  private getGithubIssueSteps(): string {
-    const response = this.feedbackDetailResponse;
-
+  private getGithubIssueSteps(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     const issueLines = [
       '1. Review the transferred feedback report details.',
       `2. Open the reported page: ${response.page_url || 'Not provided'}`,
@@ -209,12 +302,15 @@ export class FeedbackDetailPageComponent {
     return issueLines.join('\n');
   }
 
-  private getGithubIssueExpectedBehavior(): string {
+  private getGithubIssueExpectedBehavior(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return 'The reported user-facing problem should not occur.';
   }
 
-  private getGithubIssueScreenshotDetails(): string {
-    const response = this.feedbackDetailResponse;
+  private getGithubIssueScreenshotDetails(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     if (!response.screenshot_filename) {
       return 'No screenshot was attached to this report.';
     }
@@ -232,9 +328,9 @@ export class FeedbackDetailPageComponent {
     ].join('\n');
   }
 
-  private getGithubIssueAdditionalContext(): string {
-    const response = this.feedbackDetailResponse;
-
+  private getGithubIssueAdditionalContext(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return [
       '## Feedback metadata',
       '',
@@ -252,21 +348,27 @@ export class FeedbackDetailPageComponent {
       '## Session logs',
       '',
       '```json',
-      this.getGithubIssueSessionLogJson(),
+      this.getGithubIssueSessionLogJson(response),
       '```',
     ].join('\n');
   }
 
-  private getGithubIssueBrowserVersion(): string {
-    return this.getBrowserDetailsFromUserAgent().version;
+  private getGithubIssueBrowserVersion(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    return this.getBrowserDetailsFromUserAgent(response).version;
   }
 
-  private getGithubIssueBrowserName(): string {
-    return this.getBrowserDetailsFromUserAgent().name;
+  private getGithubIssueBrowserName(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    return this.getBrowserDetailsFromUserAgent(response).name;
   }
 
-  private getGithubIssueOperatingSystem(): string {
-    const userAgent = this.getUserAgent();
+  private getGithubIssueOperatingSystem(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return 'Other';
     }
@@ -294,8 +396,10 @@ export class FeedbackDetailPageComponent {
     return 'Other';
   }
 
-  private getGithubIssueDevice(): string {
-    const userAgent = this.getUserAgent();
+  private getGithubIssueDevice(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return 'Desktop';
     }
@@ -305,8 +409,10 @@ export class FeedbackDetailPageComponent {
       : 'Desktop';
   }
 
-  private getBrowserDetailsFromUserAgent(): BrowserDetails {
-    const userAgent = this.getUserAgent();
+  private getBrowserDetailsFromUserAgent(
+    response: PlatformFeedbackDetailResponse
+  ): BrowserDetails {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return {
         name: 'Other',
@@ -352,14 +458,16 @@ export class FeedbackDetailPageComponent {
     };
   }
 
-  private getUserAgent(): string | null {
-    return (
-      this.feedbackDetailResponse?.session_info?.environment?.user_agent ?? null
-    );
+  private getUserAgent(
+    response: PlatformFeedbackDetailResponse
+  ): string | null {
+    return response?.session_info?.environment.user_agent ?? null;
   }
 
-  private getGithubIssueSessionLogJson(): string {
-    const sessionInfo = this.feedbackDetailResponse?.session_info;
+  private getGithubIssueSessionLogJson(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const sessionInfo = response?.session_info;
     if (!sessionInfo) {
       return 'No session logs were attached to this report.';
     }
@@ -367,9 +475,14 @@ export class FeedbackDetailPageComponent {
     return JSON.stringify(sessionInfo, null, 2) ?? 'Unable to serialize logs.';
   }
 
-  // TODO(#24716): Stub right now, will be done in the creator feedback tab and
-  // My suggestions tab's PR.
   onReplySend(): void {
-    return;
+    const replyText = this.replyText.trim();
+    if (!replyText) {
+      return;
+    }
+    this.isSendingReply = true;
+    this.messageSend.emit(replyText);
+    this.replyText = '';
+    this.isSendingReply = false;
   }
 }
