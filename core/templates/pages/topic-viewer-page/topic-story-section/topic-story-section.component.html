@@ -75,6 +75,7 @@
                 [startUrl]="lessonCard.startUrl"
                 [studyUrl]="studyGuideUrl"
                 [practiceUrl]="lessonCard.practiceUrl"
+                [hasPracticeQuestions]="lessonCard.hasPracticeQuestions"
                 [lessonNumber]="lessonCard.lessonNumber"
                 [adventureAccentColor]="adventureGroup.accentColor"
                 [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
@@ -93,13 +94,14 @@
                  #practiceCardWrapper
                  *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
               <topic-adventure-end-test-card
-                [practiceTitle]="practiceCard.practiceTitle"
-                [practiceDescription]="practiceCard.practiceDescription"
+                [practiceTitle]="getPracticeTitle(adventureIdx)"
+                [practiceDescription]="getPracticeDescription(adventureIdx)"
                 [thumbnailUrl]="practiceCard.thumbnailUrl"
                 [studyUrl]="practiceCard.studyUrl"
                 [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
                 [cardAccentColor]="adventureGroup.accentColor"
-                [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)">
+                [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)"
+                [hasPracticeQuestions]="adventureGroup.hasPracticeQuestions">
               </topic-adventure-end-test-card>
             </div>
           </div>
@@ -118,6 +120,7 @@
             [startUrl]="lessonCard.startUrl"
             [studyUrl]="studyGuideUrl"
             [practiceUrl]="lessonCard.practiceUrl"
+            [hasPracticeQuestions]="lessonCard.hasPracticeQuestions"
             [lessonNumber]="lessonCard.lessonNumber"
             [adventureAccentColor]="'#00645c'"
             [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
@@ -142,7 +145,8 @@
             [studyUrl]="practiceCard.studyUrl"
             [cardBackgroundColor]="'#ecf7f6'"
             [cardAccentColor]="'#0b776d'"
-            [practiceUrl]="practiceCard.practiceUrl">
+            [practiceUrl]="practiceCard.practiceUrl"
+            [hasPracticeQuestions]="practiceCard.hasPracticeQuestions">
           </topic-adventure-end-test-card>
         </div>
       </ng-template>
@@ -176,6 +180,7 @@
             [startUrl]="lessonCard.startUrl"
             [studyUrl]="studyGuideUrl"
             [practiceUrl]="lessonCard.practiceUrl"
+            [hasPracticeQuestions]="lessonCard.hasPracticeQuestions"
             [lessonNumber]="lessonCard.lessonNumber"
             [adventureAccentColor]="'#6b7280'"
             [isActiveLesson]="false"

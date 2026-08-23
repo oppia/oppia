@@ -724,28 +724,17 @@ describe('TopicLessonCardComponent', () => {
   it('should navigate to practiceUrl when provided', () => {
     spyOn(component, 'navigateTo');
     component.practiceUrl = '/practice/123';
-    component.startUrl = '/explore/123';
+    component.hasPracticeQuestions = true;
 
     component.onPracticeButtonClick();
 
     expect(component.navigateTo).toHaveBeenCalledWith('/practice/123');
   });
 
-  it('should fallback to startUrl when practiceUrl is empty', () => {
+  it('should not navigate when practice questions are unavailable', () => {
     spyOn(component, 'navigateTo');
-    component.practiceUrl = '';
-    component.startUrl = '/explore/123';
-
-    component.onPracticeButtonClick();
-
-    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
-  });
-
-  it('should not navigate when lesson is coming soon', () => {
-    spyOn(component, 'navigateTo');
-    component.lessonProgressStatus = 'coming_soon';
     component.practiceUrl = '/practice/123';
-    component.startUrl = '/explore/123';
+    component.hasPracticeQuestions = false;
 
     component.onPracticeButtonClick();
 

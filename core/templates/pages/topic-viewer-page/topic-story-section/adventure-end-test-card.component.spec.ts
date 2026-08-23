@@ -129,6 +129,26 @@ describe('AdventureEndTestCardComponent', () => {
     }).not.toThrowError();
   });
 
+  it('should navigate to practice when questions are available', () => {
+    spyOn(component, 'navigateTo');
+    component.practiceUrl = '/practice/session';
+    component.hasPracticeQuestions = true;
+
+    component.onPracticeButtonClick();
+
+    expect(component.navigateTo).toHaveBeenCalledWith('/practice/session');
+  });
+
+  it('should not navigate when practice questions are unavailable', () => {
+    spyOn(component, 'navigateTo');
+    component.practiceUrl = '/practice/session';
+    component.hasPracticeQuestions = false;
+
+    component.onPracticeButtonClick();
+
+    expect(component.navigateTo).not.toHaveBeenCalled();
+  });
+
   it('should return provided practice description', () => {
     component.practiceDescription = 'Practice solving algebra problems.';
 

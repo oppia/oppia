@@ -35,6 +35,7 @@ export class AdventureEndTestCardComponent implements OnInit {
   @Input() thumbnailUrl: string = '';
   @Input() studyUrl: string = '';
   @Input() practiceUrl: string = '';
+  @Input() hasPracticeQuestions: boolean = false;
   @Input() cardBackgroundColor: string = '#ecf7f6';
   @Input() cardAccentColor: string = '#0b776d';
 
@@ -54,6 +55,13 @@ export class AdventureEndTestCardComponent implements OnInit {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
     }
+  }
+
+  onPracticeButtonClick(): void {
+    if (!this.hasPracticeQuestions) {
+      return;
+    }
+    this.navigateTo(this.practiceUrl);
   }
 
   getResolvedDescription(): string {

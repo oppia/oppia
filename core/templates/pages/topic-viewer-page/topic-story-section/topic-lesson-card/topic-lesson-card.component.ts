@@ -53,6 +53,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() startUrl: string = '';
   @Input() studyUrl: string = '';
   @Input() practiceUrl: string = '';
+  @Input() hasPracticeQuestions: boolean = false;
   @Input() adventureAccentColor: string = '#00645c';
   @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus:
@@ -153,10 +154,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onPracticeButtonClick(): void {
-    if (this.isComingSoonLesson) {
+    if (!this.hasPracticeQuestions) {
       return;
     }
-    this.navigateTo(this.practiceUrl || this.startUrl);
+    this.navigateTo(this.practiceUrl);
   }
 
   onStudyButtonClick(): void {

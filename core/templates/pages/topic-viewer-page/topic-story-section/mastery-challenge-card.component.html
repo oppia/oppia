@@ -1,7 +1,5 @@
 <div class="mastery-challenge-card"
-     [attr.aria-label]="displayTitle"
-     (mouseenter)="onCardMouseEnter()"
-     (mouseleave)="onCardMouseLeave()">
+  [attr.aria-label]="displayTitle">
   <div class="mastery-challenge-icon" aria-hidden="true">
     <img class="mastery-challenge-icon-image"
          src="/assets/images/icons/mastery-challenge-trophy.svg"
@@ -16,6 +14,8 @@
           type="button"
           [class.mastery-challenge-button-locked]="!isUnlocked"
           [disabled]="isActionDisabled()"
+      (mouseenter)="onCardMouseEnter()"
+      (mouseleave)="onCardMouseLeave()"
           (click)="onChallengeButtonClick()">
     <span class="mastery-challenge-button-icon" aria-hidden="true">★</span>
     <span>{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_BUTTON' | translate }}</span>

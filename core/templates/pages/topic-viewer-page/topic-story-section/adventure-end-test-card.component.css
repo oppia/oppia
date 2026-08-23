@@ -89,6 +89,10 @@
   justify-content: flex-end;
 }
 
+.adventure-end-test-card-practice-button-wrapper {
+  display: inline-flex;
+}
+
 .adventure-end-test-card-practice-button {
   align-items: center;
   background: #00645c;

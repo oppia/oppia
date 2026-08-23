@@ -239,6 +239,10 @@
   opacity: 0.7;
 }
 
+.topic-lesson-card-practice-button-wrapper {
+  display: inline-flex;
+}
+
 .topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,
 .topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button {
   background: #d7d8de;
@@ -486,6 +490,10 @@
 
   .topic-lesson-card-secondary-button {
     height: 40px;
+    width: 100%;
+  }
+
+  .topic-lesson-card-practice-button-wrapper {
     width: 100%;
   }
 

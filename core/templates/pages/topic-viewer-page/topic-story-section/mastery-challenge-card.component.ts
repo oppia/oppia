@@ -29,7 +29,6 @@ import './mastery-challenge-card.component.css';
 export class MasteryChallengeCardComponent {
   @Input() actionUrl: string = '#';
   @Input() isUnlocked: boolean = false;
-  @Input() topicName: string = '';
   @Output() masteryClicked = new EventEmitter<void>();
 
   showLockedTooltip: boolean = false;
@@ -37,9 +36,7 @@ export class MasteryChallengeCardComponent {
   constructor(private windowRef: WindowRef) {}
 
   get displayTitle(): string {
-    return this.topicName
-      ? `Mastery Challenge: ${this.topicName}`
-      : 'Mastery Challenge';
+    return 'Mastery Challenge';
   }
 
   onChallengeButtonClick(): void {
