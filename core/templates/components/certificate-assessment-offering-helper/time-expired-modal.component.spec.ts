@@ -22,6 +22,7 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {TimeExpiredModalComponent} from './time-expired-modal.component';
+import {CertificateAssessmentPlayerPageConstants} from '../../pages/certificate-assessment-player-page/certificate-assessment-player-page.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('TimeExpiredModalComponent', () => {
@@ -113,7 +114,9 @@ describe('TimeExpiredModalComponent', () => {
   describe('viewResults', () => {
     it('should close NgbActiveModal when available', () => {
       component.viewResults();
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     });
 
     it('should close the modal when the action button is clicked', () => {
@@ -123,7 +126,9 @@ describe('TimeExpiredModalComponent', () => {
 
       viewResultsButton.triggerEventHandler('click', null);
 
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     });
 
     it('should dismiss MatBottomSheetRef when NgbActiveModal is not available', () => {
@@ -137,7 +142,9 @@ describe('TimeExpiredModalComponent', () => {
       const newComponentInstance = newFixture.componentInstance;
 
       newComponentInstance.viewResults();
-      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     });
   });
 });
