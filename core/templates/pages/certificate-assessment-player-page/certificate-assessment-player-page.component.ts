@@ -84,6 +84,12 @@ export class CertificateAssessmentPlayerPageComponent
   // be shown is implemented.
   showTimeExpiredModal = false;
 
+  // TODO(#24717-m2.18-m2.19): The showUnansweredQuestionModal flag is
+  // currently initialized with a default value. Update this flag based on the
+  // appropriate condition once the logic for determining when the modal should
+  // be shown is implemented.
+  showUnansweredQuestionModal = false;
+
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
   isLoadingQuestion = false;

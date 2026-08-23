@@ -258,7 +258,6 @@ describe('CertificateAssessmentPlayerStateService', () => {
     expect(() => service.ngOnDestroy()).not.toThrowError();
     expect(window.clearInterval).not.toHaveBeenCalled();
   });
-
   it('should not throw when pausing a countdown that is not running', () => {
     spyOnTimers();
     expect(() => service.pauseTimer()).not.toThrowError();
