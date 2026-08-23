@@ -174,6 +174,7 @@ def _get_lighthouse_environment() -> dict[str, str]:
     return env
 
 
+# Upstream issue: https://github.com/GoogleChrome/lighthouse/issues/17180
 def _patch_lighthouse_target_manager() -> None:
     """Patches lighthouse target-manager.js to handle Target.getTargetInfo
     'Not allowed' errors from cross-origin iframes (e.g. Stripe, YouTube on

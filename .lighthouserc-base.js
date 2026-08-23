@@ -75,8 +75,6 @@ function buildPerformanceCatchAll(perfThresholds) {
       'uses-optimized-images': ['error', {minScore: 1}],
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
-      // offscreen-images is asserted per-page because the audit
-      // consistently scores 0 in headless CI environments.
       'server-response-time': ['off', {}],
       // Best practices category.
       'no-document-write': ['error', {minScore: 1}],
@@ -135,8 +133,6 @@ function buildPageAssertions(
     ...basePerformanceAssertions,
     ...perfAssertions,
     'categories:accessibility': ['error', {minScore: accessibilityMinScore}],
-    // TODO(#17560): Change the SEO category assertion from warn to error once
-    // real CI runs confirm which pages score 1.0.
     'categories:seo': ['warn', {minScore: 1}],
     ...overrides,
   };

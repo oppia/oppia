@@ -189,9 +189,6 @@ module.exports = {
               cls: 0.51,
             },
             overrides: {
-              // TODO(#17279): There is an error on the /donate page due to the
-              // embedded Stripe third-party component within it. Find a way to
-              // ignore that error.
               'errors-in-console': ['error', {minScore: 0}],
               // The YouTube embed on donate page loads images in jpg format,
               // thus we need to allow one image.
@@ -201,9 +198,6 @@ module.exports = {
               ],
               // The YouTube embed on donate page uses passive listeners.
               'uses-passive-event-listeners': ['error', {minScore: 0}],
-              // TODO(#20286): There is a deprecated API on the /donate page due
-              // to the donorbox script, change the minScore to 1 once it is
-              // fixed.
               deprecations: ['error', {minScore: 0}],
               redirects: ['error', {minScore: 1}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
