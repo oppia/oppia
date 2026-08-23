@@ -178,7 +178,8 @@ def _patch_lighthouse_target_manager() -> None:
     """Patches lighthouse target-manager.js to handle Target.getTargetInfo
     'Not allowed' errors from cross-origin iframes (e.g. Stripe, YouTube on
     the donate page). Without this patch, Chrome's headless CDP rejects
-    Target.getTargetInfo for cross-origin targets and Lighthouse crashes."""
+    Target.getTargetInfo for cross-origin targets and Lighthouse crashes.
+    """
     target_manager_path = os.path.join(
         'node_modules',
         'lighthouse',
@@ -192,11 +193,11 @@ def _patch_lighthouse_target_manager() -> None:
     # Only patch if not already applied.
     if '/Not allowed/' not in content:
         content = content.replace(
-            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;",
-            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;\n"
-            "      // Chrome may reject Target.getTargetInfo for "
-            "cross-origin targets.\n"
-            "      if (/Not allowed/.test(err.message)) return;",
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;',
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;\n'
+            '      // Chrome may reject Target.getTargetInfo for '
+            'cross-origin targets.\n'
+            '      if (/Not allowed/.test(err.message)) return;',
         )
         with open(target_manager_path, 'w', encoding='utf-8') as f:
             f.write(content)

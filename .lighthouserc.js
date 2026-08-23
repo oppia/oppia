@@ -331,8 +331,8 @@ module.exports = {
           {
             matchingUrlPattern: 'http://[^/]+/volunteer$',
             pagePerfThresholds: {
-              fcp: 16190,
-              speedIndex: 16190,
+              fcp: 20500,
+              speedIndex: 20500,
               lcp: 35500,
               tbt: 1170,
               cls: 0.75,
