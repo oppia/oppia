@@ -1,7 +1,24 @@
-import { BaseUser } from '../common/playwright-utils';
-import testConstants, { BlogRoles } from '../common/test-constants';
-import { showMessage } from '../common/show-message';
-import { Page } from '@playwright/test';
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility methods for a blog admin in Playwright acceptance tests.
+ */
+import {BaseUser} from '../common/playwright-utils';
+import testConstants, {BlogRoles} from '../common/test-constants';
+import {showMessage} from '../common/show-message';
+import {Page} from '@playwright/test';
 const roleInput = 'input#label-target-update-form-name';
 const editorInput = 'input#label-target-form-reviewer-username';
 const limitInput = 'input#float-input';
@@ -21,7 +38,10 @@ export class BlogAdmin extends BaseUser {
     user: string,
     role: BlogRoles
   ): Promise<void> {
-    await this.page.selectOption('select#label-target-update-form-role-select', role);
+    await this.page.selectOption(
+      'select#label-target-update-form-role-select',
+      role
+    );
     await this.typeInInputField(roleInput, user);
     await this.clickOnElementWithSelector(updateBtn);
     await this.expectElementToBeClickable(updateBtn, false);
@@ -34,21 +54,20 @@ export class BlogAdmin extends BaseUser {
     await this.expectElementToBeClickable(removeBtn, false);
   }
 
-async setMaximumTagLimitTo(limit: number): Promise<void> {
+  async setMaximumTagLimitTo(limit: number): Promise<void> {
     await this.expectElementToBeVisible(limitInput);
     await this.clearAllTextFrom(limitInput);
     await this.typeInInputField(limitInput, limit.toString());
     await this.clickOnElementWithText(saveTxt);
-    
+
     const msg1 = this.page.getByText('Saving...');
-    await msg1.waitFor({ state: 'visible' });
-    
+    await msg1.waitFor({state: 'visible'});
+
     const msg2 = this.page.getByText('Data saved successfully.');
-    await msg2.waitFor({ state: 'visible' });
-    
+    await msg2.waitFor({state: 'visible'});
+
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
-
 
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
     await this.expectElementToBeVisible(limitInput);

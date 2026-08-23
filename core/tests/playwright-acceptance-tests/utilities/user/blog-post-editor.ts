@@ -1,3 +1,20 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility methods for a blog post editor in Playwright acceptance tests.
+ */
 import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
@@ -163,7 +180,7 @@ export class BlogPostEditor extends BaseUser {
     const contents = await this.page.locator(titleHelp).allTextContents();
     const hasText = contents.some(val => val.includes(help));
     if (!hasText) {
-      throw new Error(`Expected help text not found`);
+      throw new Error('Expected help text not found');
     }
   }
 
@@ -217,9 +234,9 @@ export class BlogPostEditor extends BaseUser {
       if (!isPresent) {
         throw new Error('Expected pasted text to be present');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       const newErr = new Error(`Failed to verify pasted content: ${err}`);
-      newErr.stack = err.stack;
+      newErr.stack = (err as Error).stack;
       throw newErr;
     }
   }
@@ -248,7 +265,7 @@ export class BlogPostEditor extends BaseUser {
         return;
       }
     }
-    throw new Error(`Draft not found.`);
+    throw new Error('Draft not found.');
   }
 
   async deleteDraftBlogPostWithTitle(title: string): Promise<void> {
@@ -339,7 +356,7 @@ export class BlogPostEditor extends BaseUser {
     await this.page.keyboard.press('Tab');
     const val = await this.page.locator(titleInp).inputValue();
     if (val !== title) {
-      throw new Error(`Title is not updated!`);
+      throw new Error('Title is not updated!');
     }
   }
 
@@ -436,9 +453,12 @@ export class BlogPostEditor extends BaseUser {
   async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
     const el = this.page.locator(editBody);
     await el.waitFor({state: 'visible'});
-
+    // This throws "type error". We need to suppress this error because it is required for testing.
     // @ts-ignore: Bypassing strict Puppeteer types in rte-editor.ts until it is migrated
-    const rte: any = new RTEEditor(this.page, el);
+    const rte = new RTEEditor(this.page, el) as unknown as Record<
+      string,
+      (...args: unknown[]) => Promise<void>
+    >;
 
     await rte.clickOnTextArea();
     await rte.changeFormatTo('heading');
@@ -504,7 +524,7 @@ export class BlogPostEditor extends BaseUser {
       throw new Error('User is able to publish the blog post');
     }
     if (msg !== actMsg) {
-      throw new Error(`Expected warning message is not same as the actual`);
+      throw new Error('Expected warning message is not same as the actual');
     }
     showMessage('User is unable to publish the blog post because ' + actMsg);
   }
@@ -512,9 +532,9 @@ export class BlogPostEditor extends BaseUser {
   async expectNumberOfBlogPostsToBe(num: number): Promise<void> {
     const total = await this.page.locator(listBlogs).count();
     if (total !== num) {
-      throw new Error(`Number of blog posts is not equal`);
+      throw new Error('Number of blog posts is not equal');
     }
-    showMessage(`Number of blog posts is equal`);
+    showMessage('Number of blog posts is equal');
   }
 
   async navigateToPublishTab(): Promise<void> {
@@ -535,11 +555,11 @@ export class BlogPostEditor extends BaseUser {
       }
     }
     if (num === 0) {
-      throw new Error(`Draft blog post does not exist!`);
+      throw new Error('Draft blog post does not exist!');
     } else if (num > 1) {
-      throw new Error(`Draft blog post exists more than once!`);
+      throw new Error('Draft blog post exists more than once!');
     }
-    showMessage(`Draft blog post exists!`);
+    showMessage('Draft blog post exists!');
   }
 
   async expectPublishedBlogPostWithTitleToBePresent(
@@ -558,11 +578,11 @@ export class BlogPostEditor extends BaseUser {
       }
     }
     if (num === 0) {
-      throw new Error(`Blog post does not exist!`);
+      throw new Error('Blog post does not exist!');
     } else if (num > 1) {
-      throw new Error(`Blog post exists more than once!`);
+      throw new Error('Blog post exists more than once!');
     }
-    showMessage(`Published blog post exists!`);
+    showMessage('Published blog post exists!');
   }
 
   async expectBlogDashboardAccessToBeUnauthorized(): Promise<void> {
@@ -572,7 +592,7 @@ export class BlogPostEditor extends BaseUser {
       showMessage('User unauthorized to access blog dashboard!');
     } catch (err) {
       throw new Error(
-        `No unauthorization error on accessing the blog dashboard page!`
+        'No unauthorization error on accessing the blog dashboard page!'
       );
     }
   }
@@ -583,7 +603,7 @@ export class BlogPostEditor extends BaseUser {
       await this.page.locator(authorModal).waitFor();
       showMessage('User authorized to access blog dashboard!');
     } catch (err) {
-      throw new Error(`User unauthorized to access blog dashboard!`);
+      throw new Error('User unauthorized to access blog dashboard!');
     }
   }
 
