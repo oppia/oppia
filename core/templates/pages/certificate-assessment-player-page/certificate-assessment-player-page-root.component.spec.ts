@@ -664,20 +664,28 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   }));
 
   it('should pause the countdown when the learner goes offline', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
     spyOn(playerStateService, 'pauseForNetworkLoss');
     (
       internetConnectivityService.onInternetStateChange as EventEmitter<boolean>
     ).emit(false);
 
     expect(playerStateService.pauseForNetworkLoss).toHaveBeenCalled();
+    component.ngOnDestroy();
   }));
 
   it('should surface the interrupt card when the learner reconnects after a pause', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
     spyOn(playerStateService, 'handleReconnect');
     (
       internetConnectivityService.onInternetStateChange as EventEmitter<boolean>
     ).emit(true);
 
     expect(playerStateService.handleReconnect).toHaveBeenCalled();
+    component.ngOnDestroy();
   }));
 });
