@@ -110,10 +110,13 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
         Returns:
             bool. Whether the attempt should be treated as abandoned.
         """
-        deadline = attempt_model.started_at + datetime.timedelta(
-            minutes=(
-                time_limit_in_minutes
-                + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_GRACE_PERIOD_MINUTES
+        deadline: datetime.datetime = (
+            attempt_model.started_at
+            + datetime.timedelta(
+                minutes=(
+                    time_limit_in_minutes
+                    + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_GRACE_PERIOD_MINUTES
+                )
             )
         )
         current_time = datetime.datetime.now(datetime.timezone.utc).replace(
