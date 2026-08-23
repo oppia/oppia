@@ -30,7 +30,7 @@ import {StateCard} from '../../../domain/state_card/state-card.model';
 import {PageContextService} from '../../../services/page-context.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -40,15 +40,7 @@ describe('Current Interaction Service', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
-  const displayedCard = new StateCard(
-    '',
-    '',
-    '',
-    {} as Interaction,
-    [],
-    {} as RecordedVoiceovers,
-    ''
-  );
+  const displayedCard = new StateCard('', '', '', {} as Interaction, [], '');
 
   // This mock is required since PageContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -107,6 +99,35 @@ describe('Current Interaction Service', () => {
     );
   });
 
+  it('should properly clear the registered onSubmitFn', () => {
+    let answerState = null;
+    let dummyOnSubmitFn: OnSubmitFn = (answer: Object) => {
+      answerState = answer;
+    };
+
+    currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
+    currentInteractionService.clearOnSubmitFn(dummyOnSubmitFn);
+    expect(() => {
+      currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
+    }).toThrowError('No onSubmit function has been registered.');
+    expect(answerState).toBeNull();
+  });
+
+  it('should not clear an onSubmitFn registered by another component', () => {
+    let answerState = null;
+    let firstOnSubmitFn: OnSubmitFn = (answer: Object) => {
+      answerState = answer;
+    };
+    let secondOnSubmitFn: OnSubmitFn = () => {
+      answerState = 'second';
+    };
+
+    currentInteractionService.setOnSubmitFn(firstOnSubmitFn);
+    currentInteractionService.clearOnSubmitFn(secondOnSubmitFn);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
+    expect(answerState).toEqual(DUMMY_ANSWER);
+  });
+
   it('should handle case where validityCheckFn is null', () => {
     let dummySubmitAnswerFn = () => {
       return false;
@@ -121,6 +142,20 @@ describe('Current Interaction Service', () => {
   it('should handle case where submitAnswerFn is null', () => {
     currentInteractionService.registerCurrentInteraction(null, null);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
+  });
+
+  it('should report whether a submit answer function is registered', () => {
+    const dummySubmitAnswerFn = () => {
+      return false;
+    };
+    currentInteractionService.registerCurrentInteraction(
+      dummySubmitAnswerFn,
+      null
+    );
+    expect(currentInteractionService.isSubmitAnswerFnRegistered()).toBe(true);
+
+    currentInteractionService.registerCurrentInteraction(null, null);
+    expect(currentInteractionService.isSubmitAnswerFnRegistered()).toBe(false);
   });
 
   it('should properly register and clear presubmit hooks', () => {
@@ -150,8 +185,15 @@ describe('Current Interaction Service', () => {
   });
 
   it('should throw error on submitting when submitAnswerFn is null', () => {
-    let interaction = new Interaction([], [], {}, null, [], null, null);
-    let recordedVoiceovers = new RecordedVoiceovers({});
+    let interaction = new Interaction(
+      [],
+      [],
+      {} as InteractionCustomizationArgs,
+      null,
+      [],
+      null,
+      null
+    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
@@ -159,7 +201,6 @@ describe('Current Interaction Service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         interaction,
-        recordedVoiceovers,
         ''
       )
     );
@@ -212,9 +253,7 @@ describe('Current Interaction Service', () => {
 
     currentInteractionService.updateCurrentAnswer('answer');
 
-    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(
-      'answer'
-    );
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledWith('answer');
   });
 
   it('should check if "no response error" should be displayed', () => {
@@ -223,7 +262,7 @@ describe('Current Interaction Service', () => {
     );
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
-    expect(currentInteractionService.showNoResponseError()).toBeTrue();
+    expect(currentInteractionService.showNoResponseError()).toBe(true);
   });
   it('should update answer validity using updateAnswerIsValid', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
@@ -247,8 +286,8 @@ describe('Current Interaction Service', () => {
       false
     );
 
-    expect(currentInteractionService.showInvalidResponseError()).toBeTrue();
-    expect(currentInteractionService.showInvalidResponseError()).toBeFalse();
+    expect(currentInteractionService.showInvalidResponseError()).toBe(true);
+    expect(currentInteractionService.showInvalidResponseError()).toBe(false);
     expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
   });
 });

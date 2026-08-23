@@ -117,6 +117,24 @@ oppia-exploration-summary-tile .oppia-exploration-dashboard-card .layout-row {
   justify-content: space-between;
   max-width: 100%;
 }
+
+oppia-exploration-summary-tile .tags-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+oppia-exploration-summary-tile .tag-badge {
+  background: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
 @media (max-width: 480px) {
   oppia-exploration-summary-tile .exploration-summary-btn {
     font-size: 13px;

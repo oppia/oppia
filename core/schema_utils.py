@@ -114,6 +114,7 @@ def normalize_against_schema(
     Raises:
         Exception. The object fails to validate against the schema.
         AssertionError. The validation for schema validators fails.
+        InvalidInputException. The schema validators fail.
     """
     # Here we use type Any because 'normalized_obj' can be of type int, str,
     # Dict, List and other types too.
@@ -319,7 +320,7 @@ def normalize_against_schema(
                     not validator_func(normalized_obj, **kwargs)
                     and not expect_invalid_default_value
                 ):
-                    raise AssertionError(
+                    raise utils.InvalidInputException(
                         'Validation failed: %s (%s) for object %s'
                         % (validator['id'], kwargs, normalized_obj)
                     )

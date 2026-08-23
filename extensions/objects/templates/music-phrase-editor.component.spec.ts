@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {AlertsService} from 'services/alerts.service';
 import {MusicPhraseEditorComponent} from './music-phrase-editor.component';
 
@@ -26,7 +26,7 @@ describe('MusicPhraseEditorComponent', () => {
   let fixture: ComponentFixture<MusicPhraseEditorComponent>;
   let alertsService: AlertsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MusicPhraseEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

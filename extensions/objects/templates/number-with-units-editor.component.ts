@@ -19,6 +19,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
@@ -39,7 +40,10 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   errorMessageI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
-  constructor(private eventBusService: EventBusService) {
+  constructor(
+    private eventBusService: EventBusService,
+    private numberConversionService: NumberConversionService
+  ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
@@ -55,7 +59,12 @@ export class NumberWithUnitsEditorComponent implements OnInit {
 
   updateValue(newValue: string): void {
     try {
-      let numberWithUnits = NumberWithUnits.fromRawInputString(newValue);
+      const decimalSeparator =
+        this.numberConversionService.currentDecimalSeparator();
+      let numberWithUnits = NumberWithUnits.fromRawInputString(
+        newValue,
+        decimalSeparator
+      );
       this.value = numberWithUnits;
       this.valueChanged.emit(this.value);
       this.eventBusGroup.emit(

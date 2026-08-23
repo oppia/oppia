@@ -120,7 +120,7 @@ describe('Outcome Destination If Stuck Editor', () => {
     component.ngOnInit();
     tick(10);
 
-    expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
+    expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s\-]+$/);
     expect(component.destinationChoices).toEqual([
       {
         id: null,

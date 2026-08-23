@@ -3,6 +3,9 @@
 {
   "compilerOptions": {
     "lib": ["es2017", "dom", "dom.iterable", "webworker"],
+    "module": "es2020",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "es6",
     "noEmit": true,
     "noImplicitAny": true,

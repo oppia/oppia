@@ -447,6 +447,7 @@ describe('Question backend Api service', () => {
         id: '',
         question_state_data: {
           classifier_model_id: null,
+          inapplicable_skill_misconception_ids: [],
           param_changes: [],
           solicit_answer_details: false,
           content: {
@@ -559,6 +560,7 @@ describe('Question backend Api service', () => {
           classifier_model_id: null,
           param_changes: [],
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: '2',
             html: 'Question 2',

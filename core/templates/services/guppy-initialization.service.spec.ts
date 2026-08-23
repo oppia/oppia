@@ -20,12 +20,6 @@ import {TestBed} from '@angular/core/testing';
 
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
-declare global {
-  interface Window {
-    Guppy: Guppy;
-  }
-}
-
 class MockGuppy {
   constructor(id: string, config: Object) {}
 
@@ -62,7 +56,13 @@ describe('GuppyInitializationService', () => {
     mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
 
+    const guppySpy = spyOn(MockGuppy.prototype, 'configure');
     guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x=y');
+
+    expect(guppySpy).toHaveBeenCalledWith(
+      'empty_content',
+      '\\color{grey}{\\small \\text{placeholder}}'
+    );
 
     let guppyDivs = document.querySelectorAll('.guppy-div-creator');
     for (let i = 0; i < guppyDivs.length; i++) {

@@ -28,10 +28,12 @@ import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
+import './lesson-card.component.css';
 
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
+  styleUrls: ['./lesson-card.component.css'],
 })
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
@@ -204,8 +206,16 @@ export class LessonCardComponent implements OnInit {
       collectionModel.thumbnailIconUrl
     );
 
-    // TODO(#18384): Get correct progress and state for button text.
-    this.progress = this.isCommunityLessonComplete ? 100 : 0;
+    // Calculate progress from completed node counts.
+    let progress = 0;
+    if (this.isCommunityLessonComplete) {
+      progress = 100;
+    } else if (collectionModel.nodeCount > 0) {
+      progress = Math.floor(
+        (collectionModel.completedNodeCount / collectionModel.nodeCount) * 100
+      );
+    }
+    this.progress = progress;
     this.title = collectionModel.title;
     this.lessonUrl = `/collection/${collectionModel.id}`;
     this.lessonTopic = 'Collections';
@@ -218,8 +228,20 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    // TODO(#18384): Get correct progress and state for button text.
-    this.progress = this.isCommunityLessonComplete ? 100 : 0;
+    // Calculate progress from checkpoint counts.
+    let progress = 0;
+    if (this.isCommunityLessonComplete) {
+      progress = 100;
+    } else if (explorationModel.totalCheckpointsCount > 0) {
+      const visitedCheckpoints = Math.max(
+        explorationModel.visitedCheckpointsCount - 1,
+        0
+      );
+      progress = Math.floor(
+        (visitedCheckpoints / explorationModel.totalCheckpointsCount) * 100
+      );
+    }
+    this.progress = progress;
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
     this.lessonTopic = 'Community Lesson';

@@ -29,7 +29,7 @@ describe('Editable collection backend API service', () => {
   let httpTestingController: HttpTestingController;
   // Sample collection object returnable from the backend.
   let sampleDataResults = {
-    collection: {
+    collection_dict: {
       id: '0',
       title: 'Collection Under Test',
       category: 'Test',
@@ -104,7 +104,7 @@ describe('Editable collection backend API service', () => {
 
     flushMicrotasks();
 
-    let collectionObject = Collection.create(sampleDataResults.collection);
+    let collectionObject = Collection.create(sampleDataResults.collection_dict);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
@@ -173,16 +173,16 @@ describe('Editable collection backend API service', () => {
     flushMicrotasks();
     expect(collection.id).toBe('0');
 
-    collectionDict.collection.title = 'New Title';
-    collectionDict.collection.version = 2;
-    collection = Collection.create(collectionDict.collection);
+    collectionDict.collection_dict.title = 'New Title';
+    collectionDict.collection_dict.version = 2;
+    collection = Collection.create(collectionDict.collection_dict);
 
     // Send a request to update collection.
     editableCollectionBackendApiService
       .updateCollectionAsync(
-        collectionDict.collection.id,
-        collectionDict.collection.version,
-        collectionDict.collection.title,
+        collectionDict.collection_dict.id,
+        collectionDict.collection_dict.version,
+        collectionDict.collection_dict.title,
         []
       )
       .then(successHandler, failHandler);
@@ -235,8 +235,8 @@ describe('Editable collection backend API service', () => {
     editableCollectionBackendApiService
       .updateCollectionAsync(
         'invalidId',
-        collectionDict.collection.version,
-        collectionDict.collection.title,
+        collectionDict.collection_dict.version,
+        collectionDict.collection_dict.title,
         []
       )
       .then(successHandler, failHandler);

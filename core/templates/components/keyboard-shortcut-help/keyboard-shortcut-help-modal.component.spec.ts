@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  async,
+  waitForAsync,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -41,7 +41,7 @@ describe('KeyboardShortcutHelpModalComponent', () => {
   let ngbActiveModal: NgbActiveModal;
   let urlService: UrlService;
   let pageContextService: PageContextService;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [KeyboardShortcutHelpModalComponent],
       providers: [

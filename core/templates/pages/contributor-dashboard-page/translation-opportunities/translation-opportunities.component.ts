@@ -16,9 +16,18 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-import {Component, Injector} from '@angular/core';
+import {
+  Component,
+  Injector,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {PageContextService} from 'services/page-context.service';
@@ -38,16 +47,19 @@ import {TranslateTextService} from '../services/translate-text.service';
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
-export class TranslationOpportunitiesComponent {
+export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
   opportunityType = 'translation';
   languageSelected = false;
+  userIsReviewer = false;
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
@@ -74,27 +86,50 @@ export class TranslationOpportunitiesComponent {
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
     const untranslatableOpportunitiesDicts: TranslationOpportunity[] = [];
-    for (const index in opportunities) {
-      const opportunity = opportunities[index];
+    for (const opportunity of opportunities) {
       const subheading = opportunity.getOpportunitySubheading();
       const heading = opportunity.getOpportunityHeading();
       const languageCode =
         this.translationLanguageService.getActiveLanguageCode();
-      const progressPercentage =
-        opportunity.getTranslationProgressPercentage(languageCode);
+      const reviewerOnlyContentCount =
+        opportunity.getReviewerOnlyContentCount();
+      let totalCount = opportunity.getContentCount();
+      let translationsCount = opportunity.getTranslationsCount(languageCode);
+      const inReviewCount =
+        opportunity.getTranslationsInReviewCount(languageCode);
+
+      if (!this.userIsReviewer) {
+        totalCount -= reviewerOnlyContentCount;
+      }
+
+      let progressPercentage = 0;
+      if (totalCount > 0) {
+        progressPercentage = Math.min(
+          (translationsCount / totalCount) * 100,
+          100
+        );
+      }
+
       const opportunityDict: TranslationOpportunity = {
         id: opportunity.getExplorationId(),
         heading: heading,
         subheading: subheading,
         progressPercentage: progressPercentage.toFixed(2),
         actionButtonTitle: 'Translate',
-        inReviewCount: opportunity.getTranslationsInReviewCount(languageCode),
-        totalCount: opportunity.getContentCount(),
-        translationsCount: opportunity.getTranslationsCount(languageCode),
+        inReviewCount: inReviewCount,
+        totalCount: totalCount,
+        translationsCount: translationsCount,
+        reviewerOnlyContentCount: reviewerOnlyContentCount,
+        // An opportunity's entity type comes from the opportunity itself, not
+        // from the dashboard filter, since the filter can be set to "all".
+        // Legacy opportunities carry no entity type and are always
+        // explorations.
+        entityType:
+          opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
-        opportunityDict.translationsCount + opportunityDict.inReviewCount ===
+        opportunityDict.translationsCount + opportunityDict.inReviewCount >=
         opportunityDict.totalCount
       ) {
         untranslatableOpportunitiesDicts.push(opportunityDict);
@@ -133,16 +168,42 @@ export class TranslationOpportunitiesComponent {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
+
+    const updateReviewerStatus = async () => {
+      this.languageSelected = false;
+      const activeLanguageCode =
+        this.translationLanguageService.getActiveLanguageCode();
+      if (activeLanguageCode) {
+        const userContributionRights =
+          await this.userService.getUserContributionRightsDataAsync();
+        if (userContributionRights) {
+          this.userIsReviewer =
+            userContributionRights.can_review_translation_for_language_codes.includes(
+              activeLanguageCode
+            );
+        }
+        this.languageSelected = true;
+      }
+    };
+
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
-      () => (this.languageSelected = true)
+      async () => {
+        await updateReviewerStatus();
+      }
     );
     if (this.translationLanguageService.getActiveLanguageCode()) {
-      this.languageSelected = true;
+      updateReviewerStatus();
     } else {
       this.OPPIA_AVATAR_IMAGE_URL =
         this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/avatar/oppia_avatar_100px.svg'
         );
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
     }
   }
 
@@ -153,7 +214,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName()
+        this.translationTopicService.getActiveTopicName(),
+        this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
@@ -165,7 +227,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName()
+        this.translationTopicService.getActiveTopicName(),
+        this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }

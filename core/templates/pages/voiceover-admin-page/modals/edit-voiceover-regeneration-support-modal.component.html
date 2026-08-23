@@ -4,7 +4,7 @@
 <div class="modal-body">
   <div *ngIf="supportsAutogeneration && languageCodePresentInConstants">
     <p>
-      <strong>⏳ coming soon: </strong>This action will cause voiceovers to be regenerated for all existing
+      This action will cause voiceovers to be regenerated for all existing
       <strong>{{languageDescription}}</strong>
       translations in each curated exploration.
 
@@ -13,9 +13,8 @@
         <strong>{{languageDescription}}</strong> translation, the estimated cost for regenerating all voiceovers is approximately
         <strong>$16 USD.</strong>
       </i>
-
-      Do you want to continue?
     </p>
+    <p>Do you want to continue?</p>
   </div>
   <div *ngIf="!supportsAutogeneration">
     <p>

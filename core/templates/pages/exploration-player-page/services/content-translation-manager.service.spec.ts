@@ -24,7 +24,10 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {Interaction} from 'domain/exploration/interaction.model';
+import {
+  Interaction,
+  InteractionBackendDict,
+} from 'domain/exploration/interaction.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
@@ -44,6 +47,7 @@ import {ContentTranslationLanguageService} from '../services/content-translation
 import {AudioPreloaderService} from '../services/audio-preloader.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {Exploration} from 'domain/exploration/exploration.model';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -230,7 +234,7 @@ describe('Content translation manager service', () => {
       },
     };
 
-    let interactionDict = {
+    let interactionDict: InteractionBackendDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -444,7 +448,7 @@ describe('Content translation manager service', () => {
     spyOn(audioPreloaderService, 'kickOffAudioPreloader');
     spyOn(ctms, 'getCurrentStateName').and.returnValue('State1');
 
-    audioPreloaderService.exploration = {};
+    audioPreloaderService.exploration = {} as Exploration;
 
     ctms.initLessonTranslations();
     tick();
@@ -486,7 +490,8 @@ describe('Content translation manager service', () => {
       'getLanguageOptionsForDropdown'
     ).and.returnValue(languageOptions);
 
-    audioPreloaderService.exploration = undefined;
+    (audioPreloaderService as {exploration?: Exploration}).exploration =
+      undefined;
 
     ctms.initLessonTranslations();
 
@@ -515,7 +520,8 @@ describe('Content translation manager service', () => {
     ).and.returnValue(languageOptions);
     spyOn(voiceoverBackendApiService, 'fetchVoiceoverAdminDataAsync');
 
-    audioPreloaderService.exploration = undefined;
+    (audioPreloaderService as {exploration?: Exploration}).exploration =
+      undefined;
 
     ctms.initLessonTranslations();
 

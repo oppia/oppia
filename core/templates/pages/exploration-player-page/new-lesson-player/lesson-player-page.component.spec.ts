@@ -352,7 +352,7 @@ describe('New Lesson Player Page', () => {
     spyOn(componentInstance, 'onLanguageChange').and.returnValue(mockModalRef);
     spyOn(i18nService, 'handleLanguageUpdate');
 
-    let languageChangeCallback: (languageCode: string) => void;
+    let languageChangeCallback: (languageCode: string) => void = () => {};
     spyOn(
       contentTranslationManagerService.onLanguageChange,
       'subscribe'
@@ -404,7 +404,7 @@ describe('New Lesson Player Page', () => {
     spyOn(componentInstance, 'onLanguageChange').and.returnValue(undefined);
     spyOn(i18nService, 'handleLanguageUpdate');
 
-    let languageChangeCallback: (languageCode: string) => void;
+    let languageChangeCallback: (languageCode: string) => void = () => {};
     spyOn(
       contentTranslationManagerService.onLanguageChange,
       'subscribe'

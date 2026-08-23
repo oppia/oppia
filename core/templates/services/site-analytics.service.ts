@@ -37,6 +37,8 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 })
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
+  private isUserInfoInitialized = false;
+  private readonly userInfoInitializationPromise: Promise<void>;
 
   constructor(
     private windowRef: WindowRef,
@@ -50,12 +52,16 @@ export class SiteAnalyticsService {
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
-    this._initializeLoginStatus();
+    this.userInfoInitializationPromise = this._initializeLoginStatus();
   }
 
   private async _initializeLoginStatus(): Promise<void> {
-    await this.userService.getUserInfoAsync();
-    this._pushLoginStatusToDataLayer();
+    try {
+      await this.userService.getUserInfoAsync();
+    } finally {
+      this.isUserInfoInitialized = true;
+      this._pushLoginStatusToDataLayer();
+    }
   }
 
   private _pushLoginStatusToDataLayer(): void {
@@ -77,8 +83,15 @@ export class SiteAnalyticsService {
     eventName: string,
     eventParameters: Record<string, string | number | boolean> = {}
   ): void {
+    // Wait for user info initialization before emitting analytics
+    // events to avoid incorrect auth state reporting.
+    if (!this.isUserInfoInitialized) {
+      this.userInfoInitializationPromise.then(() => {
+        this._sendEventToGoogleAnalytics(eventName, eventParameters);
+      });
+      return;
+    }
     const loginStatus = this._getLoginStatus();
-
     const updatedEventParameters = {
       ...eventParameters,
       login_status: loginStatus,
@@ -642,6 +655,24 @@ export class SiteAnalyticsService {
     });
   }
 
+  registerCampaignBannerDonateButtonClick(): void {
+    this._sendEventToGoogleAnalytics(
+      'financial_literacy_campaign_banner_donate_button_click',
+      {
+        page_path: this.windowRef.nativeWindow.location.pathname,
+      }
+    );
+  }
+
+  registerCampaignBannerVisibility(): void {
+    this._sendEventToGoogleAnalytics(
+      'financial_literacy_campaign_banner_shown',
+      {
+        page_path: this.windowRef.nativeWindow.location.pathname,
+      }
+    );
+  }
+
   registerClickFooterButtonEvent(
     buttonName: NavbarAndFooterGATrackingPages
   ): void {
@@ -729,5 +760,50 @@ export class SiteAnalyticsService {
         topic_id: topicId,
       }
     );
+  }
+
+  registerLessonFeedbackModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerLessonIssueModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerWebsiteIssueModalOpenEvent(): void {
+    this._sendEventToGoogleAnalytics('website_issue_modal_open', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerLessonFeedbackSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerLessonIssueSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerWebsiteIssueSubmittedEvent(feedbackId: string): void {
+    this._sendEventToGoogleAnalytics('website_issue_submitted', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      feedbackId: feedbackId,
+    });
   }
 }

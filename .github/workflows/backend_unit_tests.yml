@@ -25,8 +25,20 @@ concurrency:
          || github.ref || github.run_id }}
   cancel-in-progress: true
 jobs:
+  setup_merge_sha:
+    name: Capture develop SHA
+    runs-on: ubuntu-22.04
+    outputs:
+      develop_sha: ${{ steps.get_sha.outputs.sha }}
+    steps:
+      - name: Get latest develop SHA
+        id: get_sha
+        run: |
+          SHA=$(git ls-remote https://github.com/oppia/oppia.git refs/heads/develop | awk '{print $1}')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
   run_backend_associated_test_file_checks:
     name: Verify associated test files
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
     if: ${{ ! (
@@ -38,7 +50,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Run backend associated test file check
+
         run: python -m scripts.check_backend_associated_test_file
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
@@ -48,6 +63,7 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   run_tests:
     name: Shard ${{ matrix.shard }}
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
     if: ${{ ! (
@@ -63,7 +79,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Run backend test shard
+
         id: run_backend_test_shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
@@ -89,13 +108,15 @@ jobs:
           retention-days: 1
   check_combined_coverage:
     name: Check coverage
-    needs: run_tests
+    needs: [run_tests, setup_merge_sha]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Download coverage report for shard 1
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/download-artifact@v4
@@ -150,13 +171,15 @@ jobs:
       pull-requests: write
   check_backend_test_times:
     name: Check test times
-    needs: run_tests
+    needs: [run_tests, setup_merge_sha]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Download time report for shard 1
         uses: actions/download-artifact@v4
         with:

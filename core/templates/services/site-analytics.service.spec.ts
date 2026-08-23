@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -47,7 +47,11 @@ describe('Site Analytics Service', () => {
       'getLastPageViewTime',
       'setLastPageViewTime',
     ]);
-    const userServiceSpy = jasmine.createSpyObj('UserService', ['isLoggedIn']);
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'isLoggedIn',
+      'getUserInfoAsync',
+    ]);
+    userServiceSpy.getUserInfoAsync.and.returnValue(Promise.resolve());
     TestBed.configureTestingModule({
       providers: [
         SiteAnalyticsService,
@@ -75,7 +79,8 @@ describe('Site Analytics Service', () => {
   });
 
   describe('when tested using gtag spy', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await Promise.resolve();
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
     });
 
@@ -693,6 +698,38 @@ describe('Site Analytics Service', () => {
       });
     });
 
+    it('should wait for user info before sending event if login state is unresolved', fakeAsync(() => {
+      let resolveUserInfoPromise!: () => void;
+      const userInfoPromise = new Promise<void>(resolve => {
+        resolveUserInfoPromise = resolve;
+      });
+
+      userService.getUserInfoAsync.and.returnValue(userInfoPromise);
+      userService.isLoggedIn.and.returnValue(false);
+
+      const delayedInitSas = new SiteAnalyticsService(
+        ws,
+        localStorageService,
+        userService
+      );
+
+      delayedInitSas.registerCommunityLessonStarted(explorationId);
+      expect(gtagSpy).not.toHaveBeenCalled();
+
+      userService.isLoggedIn.and.returnValue(true);
+      resolveUserInfoPromise();
+      flushMicrotasks();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'community_lesson_started',
+        {
+          exploration_id: explorationId,
+          login_status: 'logged_in',
+        }
+      );
+    }));
+
     it('should register classroom page viewed', () => {
       spyOn(
         sas as unknown as {_sendEventToGoogleAnalytics: Function},
@@ -1076,6 +1113,100 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'diagnostic_test_started', {
         classroom_name: classroomName,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register campaign page Donate CTA button click event', () => {
+      sas.registerCampaignBannerDonateButtonClick();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_donate_button_click',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register campaign page shown event', () => {
+      sas.registerCampaignBannerVisibility();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_shown',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson feedback modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonFeedbackModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_modal_open',
+        {
+          exploration_id: expId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonIssueModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_modal_open', {
+        exploration_id: expId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      sas.registerWebsiteIssueModalOpenEvent();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'website_issue_modal_open',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson feedback modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonFeedbackSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_submitted',
+        {
+          exploration_id: expId,
+          feedbackId: feedbackId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonIssueSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_submitted', {
+        exploration_id: expId,
+        feedbackId: feedbackId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      const feedbackId: string = 'feedback_id';
+      sas.registerWebsiteIssueSubmittedEvent(feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'website_issue_submitted', {
+        page_path: pathname,
+        feedbackId: feedbackId,
         login_status: 'logged_in',
       });
     });

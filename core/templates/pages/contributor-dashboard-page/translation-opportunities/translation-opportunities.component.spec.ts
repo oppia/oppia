@@ -33,6 +33,7 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
+import {AppConstants} from 'app.constants';
 import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {OpportunitiesListComponent} from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
@@ -42,6 +43,7 @@ import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-
 import {TranslationOpportunitiesComponent} from './translation-opportunities.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {LazyLoadingComponent} from 'components/common-layout-directives/common-elements/lazy-loading.component';
 import {CkEditorCopyToolbarComponent} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -58,6 +60,22 @@ class MockUserService {
       isLoggedIn: () => true,
     } as UserInfo);
   }
+
+  getUserContributionRightsDataAsync(): Promise<{
+    can_review_translation_for_language_codes: string[];
+  }> {
+    return Promise.resolve({
+      can_review_translation_for_language_codes: [],
+    });
+  }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    EnableTranslationOppsWithNewOppModels: {
+      isEnabled: false,
+    },
+  };
 }
 
 describe('Translation opportunities component', () => {
@@ -116,6 +134,10 @@ describe('Translation opportunities component', () => {
           provide: UserService,
           useClass: MockUserService,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -156,6 +178,7 @@ describe('Translation opportunities component', () => {
         },
         language_code: 'en',
         is_pinned: false,
+        reviewer_only_content_count: 0,
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
@@ -171,6 +194,7 @@ describe('Translation opportunities component', () => {
         },
         language_code: 'en',
         is_pinned: false,
+        reviewer_only_content_count: 0,
       }),
     ];
 
@@ -192,7 +216,7 @@ describe('Translation opportunities component', () => {
 
     component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeFalse();
+      expect(more).toBe(false);
     });
   });
 
@@ -209,7 +233,7 @@ describe('Translation opportunities component', () => {
     });
     component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeTrue();
+      expect(more).toBe(true);
     });
 
     spyOn(
@@ -224,7 +248,7 @@ describe('Translation opportunities component', () => {
       .loadMoreOpportunitiesAsync()
       .then(({opportunitiesDicts, more}) => {
         expect(opportunitiesDicts.length).toBe(2);
-        expect(more).toBeFalse();
+        expect(more).toBe(false);
       });
   });
 
@@ -247,7 +271,7 @@ describe('Translation opportunities component', () => {
         opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
           opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
           opportunitiesDicts[opportunitiesDicts.length - 1].totalCount
-      ).toBeTrue();
+      ).toBe(true);
       expect(opportunitiesDicts).toEqual([
         {
           id: '2',
@@ -258,6 +282,8 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
+          reviewerOnlyContentCount: 0,
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
           id: '1',
@@ -268,6 +294,8 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
+          reviewerOnlyContentCount: 0,
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
     }
@@ -299,6 +327,8 @@ describe('Translation opportunities component', () => {
         inReviewCount: 2,
         totalCount: 4,
         translationsCount: 2,
+        reviewerOnlyContentCount: 0,
+        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -309,6 +339,8 @@ describe('Translation opportunities component', () => {
         inReviewCount: 4,
         totalCount: 10,
         translationsCount: 4,
+        reviewerOnlyContentCount: 0,
+        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -326,6 +358,8 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
+          reviewerOnlyContentCount: 0,
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
           id: '2',
@@ -336,8 +370,93 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
+          reviewerOnlyContentCount: 0,
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
+    }
+  );
+
+  it(
+    'should subtract reviewer_only_content_count from totalCount for ' +
+      'non-reviewers',
+    () => {
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue('en');
+
+      // The component defaults to userIsReviewer = false.
+      const opportunitiesWithListContent = [
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '1',
+          topic_name: 'topic_1',
+          story_title: 'Story title 1',
+          chapter_title: 'Chapter title 1',
+          content_count: 10,
+          translation_counts: {
+            en: 3,
+          },
+          translation_in_review_counts: {
+            en: 0,
+          },
+          language_code: 'en',
+          is_pinned: false,
+          reviewer_only_content_count: 4,
+        }),
+      ];
+
+      const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesWithListContent,
+        more: false,
+      });
+
+      // For non-reviewers, totalCount should be 10 - 4 = 6.
+      expect(opportunitiesDicts[0].totalCount).toEqual(6);
+      // ProgressPercentage = (3 / 6) * 100 = 50.00.
+      expect(opportunitiesDicts[0].progressPercentage).toEqual('50.00');
+    }
+  );
+
+  it(
+    'should not subtract reviewer_only_content_count from totalCount for ' +
+      'reviewers',
+    () => {
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue('en');
+
+      component.userIsReviewer = true;
+
+      const opportunitiesWithListContent = [
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '1',
+          topic_name: 'topic_1',
+          story_title: 'Story title 1',
+          chapter_title: 'Chapter title 1',
+          content_count: 10,
+          translation_counts: {
+            en: 3,
+          },
+          translation_in_review_counts: {
+            en: 0,
+          },
+          language_code: 'en',
+          is_pinned: false,
+          reviewer_only_content_count: 4,
+        }),
+      ];
+
+      const {opportunitiesDicts} = component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesWithListContent,
+        more: false,
+      });
+
+      // For reviewers, totalCount should remain 10 (no subtraction).
+      expect(opportunitiesDicts[0].totalCount).toEqual(10);
+      // ProgressPercentage = (3 / 10) * 100 = 30.00.
+      expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
     }
   );
 
@@ -403,16 +522,37 @@ describe('Translation opportunities component', () => {
   );
 
   it('should show translation opportunities when language is changed', fakeAsync(() => {
-    spyOn(
-      translationLanguageService,
-      'getActiveLanguageCode'
-    ).and.callThrough();
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     component.ngOnInit();
     expect(component.languageSelected).toBe(false);
 
     activeLanguageChangedEmitter.emit();
+    // The subscribe callback is async and sets languageSelected after
+    // awaiting updateReviewerStatus(). Tick to flush the microtask queue.
+    tick();
 
     expect(component.languageSelected).toBe(true);
   }));
+
+  it('should emit reloadOpportunitiesEventEmitter when activeEntityType changes', () => {
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+    component.ngOnChanges({
+      activeEntityType: {
+        currentValue: 'skill',
+        previousValue: 'exploration',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
+  });
 });

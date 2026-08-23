@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the blog post page.
  */
 
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit, Input, ViewEncapsulation} from '@angular/core';
 import {BlogPostPageData} from 'domain/blog/blog-homepage-backend-api.service';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import {BlogPostData} from 'domain/blog/blog-post.model';
@@ -29,11 +29,11 @@ import {BlogPostPageService} from './services/blog-post-page.service';
 import {UserService} from 'services/user.service';
 import dayjs from 'dayjs';
 
-import './blog-post-page.component.css';
-
 @Component({
   selector: 'oppia-blog-post-page',
   templateUrl: './blog-post-page.component.html',
+  styleUrls: ['./blog-post-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogPostPageComponent implements OnInit {
   @Input() blogPostPageData!: BlogPostPageData;

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for view learner group assigned syllabus tab.
  */
 
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -34,7 +34,7 @@ import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -165,7 +165,7 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
       declarations: [
         LearnerGroupViewAssignedSyllabusComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA],

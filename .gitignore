@@ -15,7 +15,6 @@ extensions/classifiers/proto/*.js
 .git/*
 third_party/*
 assets/hashes.json
-backend_prod_files/*
 local_compiled_js/*
 local_compiled_js_for_test/*
 core/templates/prod/*
@@ -68,6 +67,7 @@ temp-tsconfig-strict.json
 # directories for dev and prod. Resource directories for prod are generated
 # via build.py and should not be committed to the repo.
 build/*
+backend_prod_files/*
 
 # .python-version is generated dynamically so needs to be ignored.
 .python-version

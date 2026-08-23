@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -43,7 +43,7 @@ describe('Contributor dashboard admin navbar component', () => {
   const profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ContributorDashboardAdminNavbarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [ContributorDashboardAdminNavbarComponent],

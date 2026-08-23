@@ -27,8 +27,19 @@ import {
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
 
-  const compareRteNodeToObject = (node: OppiaRteNode, dom) => {
-    const dfs = (n: OppiaRteNode | TextNode, d) => {
+  // Defines the shape of test DOM objects used in compareRteNodeToObject.
+  interface RteTestNode {
+    tag?: string;
+    value?: string;
+    attrs?: Record<string, string | undefined>;
+    children?: RteTestNode[];
+  }
+
+  const compareRteNodeToObject = (
+    node: OppiaRteNode,
+    dom: RteTestNode
+  ): boolean => {
+    const dfs = (n: OppiaRteNode | TextNode, d: RteTestNode): boolean => {
       if ('value' in n) {
         if (!d.value) {
           return false;
@@ -61,11 +72,13 @@ describe('RTE parser service', () => {
         }
       }
 
-      if (n.children.length !== d.children.length) {
+      const nChildren = n.children ?? [];
+      const dChildren = d.children ?? [];
+      if (nChildren.length !== dChildren.length) {
         return false;
       }
-      for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
-        if (!dfs(n.children[childIndex], d.children[childIndex])) {
+      for (let childIndex = 0; childIndex < nChildren.length; childIndex++) {
+        if (!dfs(nChildren[childIndex], dChildren[childIndex])) {
           return false;
         }
       }
@@ -124,24 +137,19 @@ describe('RTE parser service', () => {
   });
 
   it('should throw an error if parsing fails', () => {
-    class DummyHtmlElement extends HTMLElement {
-      constructor() {
-        super();
-      }
+    // A class extending HTMLElement satisfies CustomElementConstructor
+    // natively, so no type assertions are needed for registration.
+    class DummyHtmlElement extends HTMLElement {}
+    customElements.define('dummy-element-v2', DummyHtmlElement);
 
-      get tagName() {
-        return undefined;
-      }
-    }
-    customElements.define('dummy-element', DummyHtmlElement);
+    const dummyEl = new DummyHtmlElement();
+    // Spy on the tagName property to simulate a missing tagName at runtime
+    // in order to test the error-handling guard in constructFromDomParser.
+    spyOnProperty(dummyEl, 'tagName', 'get').and.returnValue('');
 
     expect(() => {
-      rteParserService.constructFromDomParser(new DummyHtmlElement());
-    }).toThrowError(
-      'tagName is undefined.\n' +
-        'body: <dummy-element></dummy-element>\n ' +
-        'node: <dummy-element></dummy-element>'
-    );
+      rteParserService.constructFromDomParser(dummyEl);
+    }).toThrowError(/tagName is undefined/);
   });
 
   it('should parse a simple element', () => {

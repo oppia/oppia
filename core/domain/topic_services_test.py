@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import os
+from unittest import mock
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -28,7 +29,11 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     question_domain,
+    question_services,
     rights_manager,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
     story_domain,
     story_fetchers,
     story_services,
@@ -46,14 +51,14 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import topic_models
+    from mypy_imports import opportunity_models, topic_models
 
-(topic_models, story_models) = models.Registry.import_models(
-    [models.Names.TOPIC, models.Names.STORY]
+opportunity_models, topic_models, story_models = models.Registry.import_models(
+    [models.Names.OPPORTUNITY, models.Names.TOPIC, models.Names.STORY]
 )
 
 
@@ -1291,6 +1296,44 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
 
+    def test_unpublish_story_temporarily_sets_unpublish_type(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.story_id_1,
+            self.user_id_admin,
+            topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id_1:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+                )
+
+    def test_unpublish_story_permanently_sets_unpublish_type(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.story_id_1,
+            self.user_id_admin,
+            topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id_1:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+                )
+
     def test_invalid_publish_and_unpublish_story(self) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -1427,6 +1470,166 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin
             )
+
+    def _create_story_with_node_and_exploration(
+        self,
+        story_id: str,
+        story_title: str,
+        exp_id: str,
+    ) -> str:
+        """Creates a story with a single node linked to an exploration.
+
+        Args:
+            story_id: str. The story ID.
+            story_title: str. The story title.
+            exp_id: str. The exploration ID.
+
+        Returns:
+            str. The node ID of the created node.
+        """
+        self.save_new_story(
+            story_id, self.user_id, self.TOPIC_ID, title=story_title
+        )
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, story_id
+        )
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Chapter 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': exp_id,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin, story_id, change_list, 'Added story node.'
+        )
+        self.save_new_default_exploration(
+            exp_id, self.user_id_admin, title='title'
+        )
+        self.publish_exploration(self.user_id_admin, exp_id)
+        return 'node_1'
+
+    def test_publish_story_fails_when_skill_has_less_than_10_questions(
+        self,
+    ) -> None:
+        story_id = 'storskill1'
+        exp_id = 'skill_check1'
+        node_id = self._create_story_with_node_and_exploration(
+            story_id, 'Story With Skill', exp_id
+        )
+
+        skill_id = 'skill_1'
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
+                    'old_value': cast(List[str], []),
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin,
+            story_id,
+            change_list,
+            'Added skill to node.',
+        )
+
+        with self.swap_to_always_return(
+            question_services, 'get_total_question_count_for_skill_ids', 9
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Skill %s has only 9 questions. Each skill linked to a '
+                'story node must have at least 10 questions before '
+                'publishing.' % skill_id,
+            ):
+                topic_services.publish_story(
+                    self.TOPIC_ID, story_id, self.user_id_admin
+                )
+
+    def test_publish_story_succeeds_when_skill_has_at_least_10_questions(
+        self,
+    ) -> None:
+        story_id = 'stor10qids'
+        exp_id = 'exp10q'
+        node_id = self._create_story_with_node_and_exploration(
+            story_id, 'Story With Enough Questions', exp_id
+        )
+
+        skill_id = 'skill_1'
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
+                    'old_value': cast(List[str], []),
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin,
+            story_id,
+            change_list,
+            'Added skill to node.',
+        )
+
+        with self.swap_to_always_return(
+            question_services, 'get_total_question_count_for_skill_ids', 10
+        ):
+            topic_services.publish_story(
+                self.TOPIC_ID, story_id, self.user_id_admin
+            )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertTrue(
+            any(
+                ref.story_id == story_id and ref.story_is_published
+                for ref in topic.canonical_story_references
+            )
+        )
+
+    def test_publish_story_succeeds_when_no_acquired_skill_ids(self) -> None:
+        story_id = 'stornoskls'
+        exp_id = 'expnoskls'
+        self._create_story_with_node_and_exploration(
+            story_id, 'Story Without Skills', exp_id
+        )
+
+        topic_services.publish_story(
+            self.TOPIC_ID, story_id, self.user_id_admin
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertTrue(
+            any(
+                ref.story_id == story_id and ref.story_is_published
+                for ref in topic.canonical_story_references
+            )
+        )
 
     def test_update_topic(self) -> None:
         # Save a dummy image on filesystem, to be used as thumbnail.
@@ -2497,6 +2700,86 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Removed %s from uncategorized skill ids' % self.skill_id_1,
         )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_add_and_delete_uncategorized_skill_with_new_models(self) -> None:
+        self.save_new_skill(
+            'skill_id_3', self.user_id_admin, description='Skill 3'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_3'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_3', strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, [self.TOPIC_ID])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
+
+        topic_services.delete_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_3'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_3', strict=False
+        )
+        assert model is not None
+        self.assertEqual(model.topic_ids, [])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_uncategorized_skill_when_skill_in_another_topic_with_new_models(
+        self,
+    ) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.user_id,
+            name='Topic Two',
+            description='Description',
+            url_fragment='topic-two',
+        )
+        self.save_new_skill(
+            'skill_id_4', self.user_id_admin, description='Skill 4'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_4'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, topic_id_2, 'skill_id_4'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_4', strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(
+            sorted(model.topic_ids), sorted([self.TOPIC_ID, topic_id_2])
+        )
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
+
+        topic_services.delete_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_4'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_4', strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, [topic_id_2])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
+
     def test_delete_canonical_story(self) -> None:
         topic_services.delete_canonical_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1
@@ -2630,6 +2913,70 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id, strict=False
             )
         )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_topic_with_new_models(self) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.user_id,
+            name='Topic Two',
+            description='Description',
+            url_fragment='topic-two',
+        )
+        self.save_new_skill(
+            'skill_id_5', self.user_id_admin, description='Skill 5'
+        )
+        self.save_new_skill(
+            'skill_id_6', self.user_id_admin, description='Skill 6'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_5'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_6'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, topic_id_2, 'skill_id_6'
+        )
+        model_5_before = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_5', strict=False
+        )
+        self.assertIsNotNone(model_5_before)
+        assert model_5_before is not None
+        self.assertEqual(model_5_before.topic_ids, [self.TOPIC_ID])
+        self.assertEqual(model_5_before.content_count, 1)
+
+        model_6_before = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_6', strict=False
+        )
+        self.assertIsNotNone(model_6_before)
+        assert model_6_before is not None
+        self.assertEqual(
+            sorted(model_6_before.topic_ids),
+            sorted([self.TOPIC_ID, topic_id_2]),
+        )
+        self.assertEqual(model_6_before.content_count, 1)
+
+        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+
+        model_5 = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_5', strict=False
+        )
+        assert model_5 is not None
+        self.assertEqual(model_5.topic_ids, [])
+        self.assertEqual(model_5.content_count, 1)
+
+        model_6 = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_6', strict=False
+        )
+        assert model_6 is not None
+        self.assertEqual(model_6.topic_ids, [topic_id_2])
+        self.assertEqual(model_6.content_count, 1)
 
     def test_delete_subtopic_with_skill_ids(self) -> None:
         changelist = [
@@ -2843,6 +3190,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             topic_services.check_can_edit_topic(self.user_admin, topic_rights)
+        )
+
+    def test_admin_can_edit_questions_in_topic(self) -> None:
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(
+            topic_services.check_can_edit_question(
+                self.user_admin, topic_rights
+            )
         )
 
     def test_filter_published_topic_ids(self) -> None:
@@ -3252,6 +3608,189 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name'
             )
+
+    def test_does_not_save_topic_with_superseding_skill_in_subtopic(
+        self,
+    ) -> None:
+        self.save_new_skill('supersede2', self.user_id)
+        self.save_new_skill('has_superseding2', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic(
+            1,
+            'Test Subtopic',
+            [],
+            'image.svg',
+            '#FFFFFF',
+            None,
+            'test-subtopic',
+        )
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede2',
+            description='desc',
+            url_fragment='topic-url-supersede',
+            uncategorized_skill_ids=['has_superseding2'],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        move_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                    'old_subtopic_id': None,
+                    'new_subtopic_id': 1,
+                    'skill_id': 'has_superseding2',
+                }
+            )
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, move_changelist, 'Move skill to subtopic.'
+        )
+        skill_changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede2',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id,
+            'has_superseding2',
+            skill_changelist,
+            'Merging skill.',
+        )
+        update_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'desc',
+                    'new_value': 'updated desc',
+                }
+            )
+        ]
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding2\' in subtopic \'Test Subtopic\' '
+            'has a superseding skill \'supersede2\'',
+        ):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, update_changelist, 'Update topic.'
+            )
+
+    def test_does_not_add_skill_with_superseding_skill_to_topic(self) -> None:
+        self.save_new_skill('supersede', self.user_id)
+        self.save_new_skill('has_superseding', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'has_superseding', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede',
+            description='desc',
+            url_fragment='topic-url-frag',
+            uncategorized_skill_ids=[],
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding\' in uncategorized skills has a superseding skill \'supersede\'',
+        ):  # pylint:disable=line-too-long
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic_id, 'has_superseding'
+            )
+
+    def test_find_superseded_skill_in_topic_returns_skill(
+        self,
+    ) -> None:
+        self.save_new_skill('superseding_skill', self.user_id)
+        self.save_new_skill('skill_to_merge', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'superseding_skill',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'skill_to_merge', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic With Superseding',
+            description='desc',
+            url_fragment='topic-with-super',
+            uncategorized_skill_ids=['skill_to_merge'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result.id, 'skill_to_merge')
+
+    def test_find_superseded_skill_in_topic_returns_none(
+        self,
+    ) -> None:
+        self.save_new_skill('regular_skill', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic Without Superseding',
+            description='desc',
+            url_fragment='topic-no-super',
+            uncategorized_skill_ids=['regular_skill'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNone(result)
+
+    def test_find_superseded_skill_in_topic_skips_none_skills(
+        self,
+    ) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic For None Skill Test',
+            description='desc',
+            url_fragment='topic-none-test',
+            uncategorized_skill_ids=['dummy_skill_id'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        with self.swap(
+            skill_fetchers,
+            'get_multi_skills',
+            lambda skill_ids, strict=True: [None],
+        ):
+            result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNone(result)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -4119,6 +4658,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 ],
                 'is_published': True,
                 'can_edit_topic': True,
+                'can_edit_question': True,
                 'classroom': None,
                 'total_upcoming_chapters_count': 0,
                 'total_overdue_chapters_count': 0,
@@ -4206,6 +4746,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     ],
                     'is_published': True,
                     'can_edit_topic': True,
+                    'can_edit_question': True,
                     'classroom': None,
                     'total_upcoming_chapters_count': 0,
                     'total_overdue_chapters_count': 0,
@@ -4359,6 +4900,55 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
+    def test_get_topic_ids_for_exploration_id(self) -> None:
+        topic_summary_1 = mock.Mock()
+        topic_summary_2 = mock.Mock()
+
+        topic_summary_1.id = 'topic_1'
+        topic_summary_1.published_story_exploration_mapping = {
+            'story_1': ['exp_1', 'exp_2'],
+        }
+        topic_summary_2.id = 'topic_2'
+        topic_summary_2.published_story_exploration_mapping = {
+            'story_2': ['exp_3', 'exp_4'],
+        }
+
+        get_all_topic_summaries_mock = mock.Mock(
+            return_value=[topic_summary_1, topic_summary_2]
+        )
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            get_all_topic_summaries_mock,
+        ):
+            topic_ids = topic_services.get_topic_ids_for_exploration_id('exp_3')
+
+        get_all_topic_summaries_mock.assert_called_once_with()
+        self.assertEqual(topic_ids, ['topic_2'])
+
+    def test_get_topic_ids_for_exploration_id_returns_empty_list_when_not_found(
+        self,
+    ) -> None:
+        topic_summary = mock.Mock()
+        topic_summary.id = 'topic_1'
+        topic_summary.published_story_exploration_mapping = {
+            'story_1': ['other_exp_id'],
+        }
+
+        get_all_topic_summaries_mock = mock.Mock(return_value=[topic_summary])
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            get_all_topic_summaries_mock,
+        ):
+            topic_ids = topic_services.get_topic_ids_for_exploration_id(
+                'exp_id'
+            )
+
+        self.assertEqual(topic_ids, [])
+
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
@@ -4434,6 +5024,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
         story_reference_dict = {
             'story_id': 'story_id',
             'story_is_published': False,
+            'story_unpublish_type': None,
         }
         model = topic_models.TopicModel(
             id='topic_id',

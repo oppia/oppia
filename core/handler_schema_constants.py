@@ -50,7 +50,6 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     # Oppia root page is the unified entry for page routes to the frontend.
     # So, it should exempted from schema validation.
     'OppiaRootPage',
-    'OppiaLightweightRootPage',
 ]
 
 # HANDLER_CLASS_NAMES_WITH_NO_SCHEMA is addressed everywhere in the

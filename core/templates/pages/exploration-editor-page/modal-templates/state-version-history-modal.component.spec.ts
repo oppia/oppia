@@ -109,6 +109,7 @@ describe('State version history modal', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -121,7 +122,7 @@ describe('State version history modal', () => {
       'canShowBackwardStateDiffData'
     ).and.returnValue(true);
 
-    expect(component.canExploreBackwardVersionHistory()).toBeTrue();
+    expect(component.canExploreBackwardVersionHistory()).toBe(true);
   });
 
   it('should get whether we can explore forward version history', () => {
@@ -129,7 +130,7 @@ describe('State version history modal', () => {
       true
     );
 
-    expect(component.canExploreForwardVersionHistory()).toBeTrue();
+    expect(component.canExploreForwardVersionHistory()).toBe(true);
   });
 
   it('should get the last edited version number', () => {
@@ -415,12 +416,12 @@ describe('State version history modal', () => {
       'fetchStateVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBeFalse();
+    expect(component.validationErrorIsShown).toBe(false);
 
     component.fetchPreviousVersionHistory();
     tick();
 
-    expect(component.validationErrorIsShown).toBeTrue();
+    expect(component.validationErrorIsShown).toBe(true);
   }));
 
   it('should update the left and right side yaml strings on initialization', fakeAsync(() => {

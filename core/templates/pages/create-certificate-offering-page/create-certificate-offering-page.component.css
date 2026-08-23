@@ -1,0 +1,51 @@
+.oppia-create-certificate-offering {
+  margin: 0 auto 0 auto;
+  max-width: 1080px;
+  padding-bottom: 40px;
+  text-align: left;
+  width: 90%;
+}
+
+.oppia-create-certificate-offering .oppia-create-certificate-offering-title {
+  color: #00609c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 26px;
+  padding-top: 60px;
+}
+
+.oppia-create-certificate-offering .oppia-create-certificate-offering-progress {
+  margin: auto;
+  margin-left: -30px;
+  margin-top: 40px;
+  max-width: 1120px;
+}
+
+.oppia-create-certificate-offering .oppia-certificate-offering-tab-container {
+  margin-top: -30px;
+  min-height: 440px;
+  position: relative;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-create-certificate-offering {
+    background: #fff;
+    width: 100%;
+  }
+
+  .oppia-create-certificate-offering .oppia-create-certificate-offering-title {
+    padding: 60px 20px 0;
+  }
+
+  .oppia-create-certificate-offering .oppia-certificate-offering-tab-container {
+    box-shadow: unset;
+    padding: 32px 20px 30px 20px;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .oppia-create-certificate-offering .oppia-create-certificate-offering-progress
+  .oppia-learner-group-progressbar li:before {
+    left: -30%;
+    width: 60%;
+  }
+}

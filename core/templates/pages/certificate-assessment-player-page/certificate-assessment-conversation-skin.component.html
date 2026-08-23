@@ -1,0 +1,74 @@
+<div class="certificate-assessment-conversation-skin">
+
+  <div class="oppia-question-player-card certificate-assessment-progress-card">
+    <div class="certificate-assessment-question-player-progress">
+      <div class="certificate-assessment-progress-fill"
+           [ngStyle]="{'width': progressPercentage + '%'}">
+      </div>
+    </div>
+    <div class="certificate-assessment-progress-meta">
+      <span class="certificate-assessment-current-progress">
+        {{
+          'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_CURRENT_PROGRESS'
+            | translate: {progressPercentage: progressPercentage}
+        }}
+      </span>
+    </div>
+  </div>
+
+  <div class="oppia-question-player-card certificate-assessment-question-card">
+    <div class="certificate-assessment-question-counter">
+      Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}
+    </div>
+    <div class="certificate-assessment-question-header">
+      <div class="certificate-assessment-avatar">
+        <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+      </div>
+      <div class="certificate-assessment-prompt-pill">
+        <oppia-rte-output-display [rteString]="currentQuestion.prompt">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+
+    <div *ngIf="interactionHtml"
+         class="certificate-assessment-interaction conversation-skin-interaction-container">
+      <oppia-interaction-display
+        classStr="e2e-test-conversation-input"
+        [htmlData]="interactionHtml"
+        [parentScope]="this">
+      </oppia-interaction-display>
+    </div>
+  </div>
+
+  <div class="certificate-assessment-actions">
+    <button *ngIf="currentQuestionIndex > 0"
+            type="button"
+            class="certificate-assessment-navigation-link"
+            (click)="onPreviousQuestion()">
+      <span class="certificate-assessment-navigation-arrow">&#8592;</span>
+      {{
+        'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_BACK_BUTTON'
+          | translate
+      }}
+    </button>
+    <span *ngIf="currentQuestionIndex === 0"></span>
+
+    <button *ngIf="!isLastQuestion" type="button"
+            class="certificate-assessment-navigation-link"
+            (click)="onNextQuestion()">
+      {{
+        'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON'
+          | translate
+      }}
+      <span class="certificate-assessment-navigation-arrow">&#8594;</span>
+    </button>
+    <button *ngIf="isLastQuestion" type="submit"
+            class="btn certificate-assessment-primary-button"
+            (click)="onSubmitAssessment()">
+      {{
+        'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_SUBMIT_ASSESSMENT_BUTTON'
+          | translate
+      }}
+    </button>
+  </div>
+</div>

@@ -26,10 +26,12 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ValidatorsService} from 'services/validators.service';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
+import './collection-node-creator.component.css';
 
 @Component({
   selector: 'oppia-collection-node-creator',
   templateUrl: './collection-node-creator.component.html',
+  styleUrls: ['./collection-node-creator.component.css'],
 })
 export class CollectionNodeCreatorComponent {
   // This property is initialized using Angular lifecycle hooks

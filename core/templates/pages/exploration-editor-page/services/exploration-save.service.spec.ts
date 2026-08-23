@@ -20,7 +20,10 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ExplorationChangeAddState} from 'domain/exploration/exploration-draft.model';
+import {
+  ExplorationChange,
+  ExplorationChangeAddState,
+} from 'domain/exploration/exploration-draft.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -175,7 +178,6 @@ describe(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
       ).and.stub();
-      spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics').and.stub();
     });
 
     it('should open version mismatch modal', fakeAsync(() => {
@@ -227,11 +229,13 @@ describe(
       'should open confirm discard changes modal when clicked ' +
         'on discard changes button',
       fakeAsync(() => {
-        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-          return {
-            result: Promise.resolve(),
-          } as NgbModalRef;
-        });
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+          (dlg: object, opt: object) => {
+            return {
+              result: Promise.resolve(),
+            } as NgbModalRef;
+          }
+        );
         spyOn(changeListService, 'discardAllChanges').and.returnValue(
           Promise.resolve()
         );
@@ -364,7 +368,6 @@ describe(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
       ).and.stub();
-      spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics').and.stub();
     });
 
     it('should not open version mismatch modal', fakeAsync(() => {
@@ -575,7 +578,6 @@ describe(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
       ).and.stub();
-      spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics').and.stub();
     });
 
     it('should call error callback', fakeAsync(() => {
@@ -627,6 +629,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      inapplicable_skill_misconception_ids: [],
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}',
@@ -676,6 +679,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      inapplicable_skill_misconception_ids: [],
       content: {
         content_id: 'content',
         html: 'content',
@@ -725,6 +729,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      inapplicable_skill_misconception_ids: [],
       content: {
         content_id: 'content',
         html: 'content',
@@ -774,6 +779,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      inapplicable_skill_misconception_ids: [],
       content: {
         content_id: 'content',
         html: 'content',
@@ -877,6 +883,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
               location: {
                 reload() {},
               },
+              gtag: () => {},
             },
           },
         },
@@ -917,7 +924,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
       siteAnalyticsService,
       'registerSavePlayableExplorationEvent'
     ).and.stub();
-    spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics').and.stub();
   });
 
   it('should open exploration save modal', fakeAsync(() => {
@@ -1138,7 +1144,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
   );
 
   it('should get change list content ID', () => {
-    let changeList = [
+    let changeList: ExplorationChange[] = [
       {
         cmd: 'edit_state_property',
         state_name: 'Hola',

@@ -33,6 +33,7 @@ describe('Diagnostic test questions model', () => {
     let questionBackendDict1: QuestionBackendDict = {
       id: '',
       question_state_data: {
+        inapplicable_skill_misconception_ids: [],
         classifier_model_id: null,
         param_changes: [],
         solicit_answer_details: false,
@@ -143,6 +144,7 @@ describe('Diagnostic test questions model', () => {
     let questionBackendDict2: QuestionBackendDict = {
       id: '',
       question_state_data: {
+        inapplicable_skill_misconception_ids: [],
         classifier_model_id: null,
         param_changes: [],
         solicit_answer_details: false,

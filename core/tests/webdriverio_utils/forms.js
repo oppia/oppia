@@ -702,7 +702,56 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
   var codeMirrorLineBackgroundLocator = '.CodeMirror-linebackground';
   // The number of lines to scroll between reading different sections of
   // CodeMirror's text.
-  var NUMBER_OF_LINES_TO_SCROLL = 15;
+  var NUMBER_OF_LINES_TO_SCROLL = 5;
+  var CODEMIRROR_UPDATE_WAIT_MSECS = 10000;
+  var CODEMIRROR_UPDATE_POLL_MSECS = 250;
+
+  var _getTextFromCodeMirrorApi = async function (compareHighLighting) {
+    return await browser.execute(
+      (codeMirrorCodeElement, compareHighLighting) => {
+        var codeMirrorElement = codeMirrorCodeElement.closest('.CodeMirror');
+        var codeMirror = codeMirrorElement && codeMirrorElement.CodeMirror;
+        if (!codeMirror) {
+          return null;
+        }
+
+        var diffDict = {};
+        var diffViews =
+          codeMirror.state && codeMirror.state.diffViews
+            ? codeMirror.state.diffViews
+            : [];
+        var diffView = diffViews.length > 0 ? diffViews[0] : null;
+        var chunks = diffView ? diffView.chunks : [];
+        var isOriginalPane = diffView && codeMirror === diffView.orig;
+
+        for (
+          var lineIndex = codeMirror.firstLine();
+          lineIndex <= codeMirror.lastLine();
+          lineIndex++
+        ) {
+          var highlighted = false;
+          if (compareHighLighting && diffView) {
+            for (var i = 0; i < chunks.length; i++) {
+              var chunk = chunks[i];
+              var from = isOriginalPane ? chunk.origFrom : chunk.editFrom;
+              var to = isOriginalPane ? chunk.origTo : chunk.editTo;
+              if (lineIndex >= from && lineIndex < to) {
+                highlighted = true;
+                break;
+              }
+            }
+          }
+          diffDict[lineIndex + 1] = {
+            text: codeMirror.getLine(lineIndex),
+            highlighted: highlighted,
+          };
+        }
+        return diffDict;
+      },
+      elem,
+      compareHighLighting
+    );
+  };
 
   /**
    * This recursive function is used by expectTextWithHighlightingToBe().
@@ -721,7 +770,28 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
   var _compareText = async function (compareDict, compareHighLighting) {
     var scrollTo = 0;
     var prevScrollTop = -1;
-    var actualDiffDict = {};
+    var actualDiffDict = await _getTextFromCodeMirrorApi(compareHighLighting);
+    if (actualDiffDict === null) {
+      actualDiffDict = {};
+    }
+    if (Object.keys(actualDiffDict).length > 0) {
+      for (var lineNumber in compareDict) {
+        if (!actualDiffDict.hasOwnProperty(lineNumber)) {
+          throw new Error(
+            'Line ' + lineNumber + ' was not found in CodeMirror'
+          );
+        }
+        expect(actualDiffDict[lineNumber].text).toEqual(
+          compareDict[lineNumber].text
+        );
+        if (compareHighLighting) {
+          expect(actualDiffDict[lineNumber].highlighted).toEqual(
+            compareDict[lineNumber].highlighted
+          );
+        }
+      }
+      return;
+    }
     var scrollBarWebElement = null;
     var scrollBarElements = await $$('.CodeMirror-vscrollbar');
     if (codeMirrorPaneToScroll === 'first') {
@@ -734,35 +804,35 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       // This is used to match and scroll the text in codemirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
-      await browser.execute(scrollTo => {
-        var el = document.querySelector('.CodeMirror-vscrollbar');
-        if (el) {
-          el.scrollTop = scrollTo;
-        }
-      }, scrollTo);
+      var paneIndex =
+        codeMirrorPaneToScroll === 'first' ? 0 : scrollBarElements.length - 1;
+      await browser.execute(
+        (scrollTo, index) => {
+          var els = document.querySelectorAll('.CodeMirror-vscrollbar');
+          var el = els[index];
+          if (el) {
+            el.scrollTop = scrollTo;
+          }
+        },
+        scrollTo,
+        paneIndex
+      );
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(100);
       var lineHeight = await elem
         .$(codeMirrorLineNumberLocator)
-        .getAttribute('clientHeight');
-      var currentScrollTop = await scrollBarWebElement.scrollIntoView();
-      if (currentScrollTop === prevScrollTop) {
-        break;
-      } else {
-        prevScrollTop = currentScrollTop;
-      }
+        .getProperty('clientHeight');
+      var currentScrollTop = await scrollBarWebElement.getProperty('scrollTop');
 
-      var numberOfElements = Object.keys(compareDict).length;
-      await waitFor.numberOfElementsToBe(
-        elem,
-        'Line Number Elements',
-        numberOfElements,
-        '.CodeMirror-linenumber'
-      );
       var lineNumberElements = await elem.$$('.CodeMirror-linenumber');
       var totalCount = lineNumberElements.length;
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = lineNumberElements[i];
         await waitFor.elementToBeClickable(lineNumberElement);
         var lineNumber = await lineNumberElement.getText();
+        if (!lineNumber) {
+          continue;
+        }
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -779,9 +849,16 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
           highlighted: isHighlighted,
         };
       }
+      if (currentScrollTop === prevScrollTop) {
+        break;
+      }
+      prevScrollTop = currentScrollTop;
       scrollTo = scrollTo + lineHeight * NUMBER_OF_LINES_TO_SCROLL;
     }
     for (var lineNumber in compareDict) {
+      if (!actualDiffDict.hasOwnProperty(lineNumber)) {
+        throw new Error('Line ' + lineNumber + ' was not found in CodeMirror');
+      }
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text
       );
@@ -790,6 +867,30 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
           compareDict[lineNumber].highlighted
         );
       }
+    }
+  };
+
+  var _codeMirrorApiContainsExpectedLines = async function (compareDict) {
+    var actualDiffDict = await _getTextFromCodeMirrorApi(false);
+    if (actualDiffDict === null || Object.keys(actualDiffDict).length === 0) {
+      return true;
+    }
+    for (var lineNumber in compareDict) {
+      if (!actualDiffDict.hasOwnProperty(lineNumber)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  var _waitForCodeMirrorApiToLoadExpectedLines = async function (compareDict) {
+    var endTime = Date.now() + CODEMIRROR_UPDATE_WAIT_MSECS;
+    while (Date.now() < endTime) {
+      if (await _codeMirrorApiContainsExpectedLines(compareDict)) {
+        return;
+      }
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(CODEMIRROR_UPDATE_POLL_MSECS);
     }
   };
 
@@ -807,6 +908,7 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
+      await _waitForCodeMirrorApiToLoadExpectedLines(expectedTextDict);
       await _compareText(expectedTextDict, true);
     },
     /**
@@ -826,6 +928,7 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
           checked: false,
         };
       }
+      await _waitForCodeMirrorApiToLoadExpectedLines(expectedDict);
       await _compareText(expectedDict, false);
     },
   };

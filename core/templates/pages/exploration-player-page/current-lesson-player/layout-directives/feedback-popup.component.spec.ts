@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -54,7 +54,7 @@ describe('FeedbackPopupComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [FeedbackPopupComponent, MockTranslatePipe],

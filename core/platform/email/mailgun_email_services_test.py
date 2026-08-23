@@ -22,7 +22,7 @@ import os
 import textwrap
 from unittest import mock
 
-from core.domain import platform_parameter_list
+from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -442,3 +442,29 @@ class EmailTests(test_utils.GenericTestBase):
             timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertFalse(resp)
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
+    @mock.patch('requests.post')
+    def test_send_email_to_mailgun_raises_exception_for_permanent_4xx_error(
+        self, mock_post: mock.Mock
+    ) -> None:
+        """Test that a standard 4xx error raises a permanent error."""
+        mock_response = mock.Mock()
+        mock_response.status_code = 400
+        mock_response.text = 'Bad Request: Invalid Email'
+        mock_post.return_value = mock_response
+
+        with self.swap_api_key_secrets_return_secret:
+            with self.assertRaisesRegex(
+                email_services.PermanentEmailSendingError,
+                'Mailgun returned a permanent error 400: Bad Request: Invalid Email',
+            ):
+                mailgun_email_services.send_email_to_recipients(
+                    'a@example.com',
+                    ['bad-email@@example.com'],
+                    'Test Subject',
+                    'plaintext',
+                    'html body',
+                )

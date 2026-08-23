@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -43,7 +43,7 @@ describe('Learner Story Summary Tile Component', () => {
   }
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,

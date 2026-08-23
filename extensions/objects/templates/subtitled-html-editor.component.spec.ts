@@ -18,7 +18,7 @@
 
 import {ChangeDetectorRef} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledHtmlEditorComponent} from './subtitled-html-editor.component';
 
@@ -27,7 +27,7 @@ describe('SubtitledHtmlEditorComponent', () => {
   let fixture: ComponentFixture<SubtitledHtmlEditorComponent>;
   let mockValue = new SubtitledHtml('<p>test</p>', null);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SubtitledHtmlEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

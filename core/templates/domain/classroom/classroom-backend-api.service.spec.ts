@@ -48,6 +48,7 @@ describe('Classroom backend API service', function () {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-one',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -72,6 +73,7 @@ describe('Classroom backend API service', function () {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-two',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -83,6 +85,7 @@ describe('Classroom backend API service', function () {
     classroom_id: 'mathid',
     name: 'Math',
     url_fragment: 'math',
+    feedback_recipient_email: 'user@email.com',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
@@ -105,6 +108,7 @@ describe('Classroom backend API service', function () {
     classroom_id: 'math_classroom_id',
     name: 'math',
     url_fragment: 'math',
+    feedback_recipient_email: 'user@email.com',
     course_details: 'Curated math foundations course.',
     topic_list_intro: 'Start from the basics with our first topic.',
     topic_id_to_prerequisite_topic_ids: {},
@@ -136,6 +140,7 @@ describe('Classroom backend API service', function () {
       responseDictionaries.classroom_id,
       responseDictionaries.name,
       responseDictionaries.url_fragment,
+      responseDictionaries.feedback_recipient_email,
       responseDictionaries.topic_summary_dicts,
       responseDictionaries.course_details,
       responseDictionaries.topic_list_intro,
@@ -319,6 +324,7 @@ describe('Classroom backend API service', function () {
       classroom_id: 'math_classroom_id',
       name: 'math',
       url_fragment: 'math',
+      feedback_recipient_email: 'user@email.com',
       course_details: 'Curated math foundations course.',
       teaser_text: 'Learn math',
       topic_list_intro: 'Start from the basics with our first topic.',
@@ -340,6 +346,7 @@ describe('Classroom backend API service', function () {
       classroomId: 'math_classroom_id',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: 'Curated math foundations course.',
       teaserText: 'Learn math',
       topicListIntro: 'Start from the basics with our first topic.',
@@ -463,10 +470,15 @@ describe('Classroom backend API service', function () {
     let classroomId = 'history_classroom_id';
     let classroomName = 'history';
     let classroomUrlFragment = 'history';
+    let classroomFeedbackRecipientEmail = 'user@email.com';
     let result = {new_classroom_id: classroomId};
 
     service
-      .createNewClassroomAsync(classroomName, classroomUrlFragment)
+      .createNewClassroomAsync(
+        classroomName,
+        classroomUrlFragment,
+        classroomFeedbackRecipientEmail
+      )
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/classroom_admin/create_new');
     expect(req.request.method).toEqual('POST');
@@ -488,9 +500,14 @@ describe('Classroom backend API service', function () {
     let service = classroomBackendApiService;
     let classroomName = '';
     let classroomUrlFragment = 'history';
+    let classroomFeedbackRecipientEmail = 'user@email.com';
 
     service
-      .createNewClassroomAsync(classroomName, classroomUrlFragment)
+      .createNewClassroomAsync(
+        classroomName,
+        classroomUrlFragment,
+        classroomFeedbackRecipientEmail
+      )
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/classroom_admin/create_new');
     expect(req.request.method).toEqual('POST');
@@ -642,6 +659,7 @@ describe('Classroom backend API service', function () {
           topic_id: 'topic1',
           classroom_name: 'math',
           classroom_url_fragment: 'math',
+          feedback_recipient_email: 'user@email.com',
         },
       ],
     });
@@ -720,8 +738,16 @@ describe('Classroom backend API service', function () {
 
   it('should update classroom index mappings successfully', fakeAsync(() => {
     const mappings = [
-      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
-      {classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2},
+      {
+        classroom_id: 'classroom_1',
+        classroom_name: 'Math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'classroom_2',
+        classroom_name: 'Science',
+        classroom_index: 2,
+      },
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');
@@ -733,7 +759,7 @@ describe('Classroom backend API service', function () {
 
     const req = httpTestingController.expectOne('/update_classrooms_order');
     expect(req.request.method).toEqual('PUT');
-    expect(req.request.body instanceof FormData).toBeTrue();
+    expect(req.request.body instanceof FormData).toBe(true);
 
     req.flush(null);
 
@@ -745,7 +771,11 @@ describe('Classroom backend API service', function () {
 
   it('should handle error during classroom index mappings update', fakeAsync(() => {
     const mappings = [
-      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
+      {
+        classroom_id: 'classroom_1',
+        classroom_name: 'Math',
+        classroom_index: 1,
+      },
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');

@@ -351,16 +351,19 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome
     );
     const expectedWarnings = answerGroups[0].rules.map(
-      (_: AnswerGroup, index: number) => ({
+      (_: Rule, index: number) => ({
         type: WARNING_TYPES.ERROR,
         message:
           `Learner answer ${index + 1} from Oppia response 1 will never be matched` +
           ' because it is not in simplest form',
       })
     );
-    var warningsMessages = warnings.map(warning => warning.message);
-    var expectedWarningsMessages = expectedWarnings.map(
-      warning => warning.message
+    const warningsMessages = warnings.map(
+      warning => (warning as {message: string}).message
+    );
+
+    const expectedWarningsMessages = expectedWarnings.map(
+      warning => (warning as {message: string}).message
     );
     expectedWarningsMessages.forEach(message => {
       expect(warningsMessages).toContain(message);

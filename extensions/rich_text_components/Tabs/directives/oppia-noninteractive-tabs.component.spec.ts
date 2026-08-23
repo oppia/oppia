@@ -18,7 +18,7 @@
 
 import {SimpleChanges} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveTabs} from './oppia-noninteractive-tabs.component';
 import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +33,7 @@ describe('NoninteractiveTabs', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgbNavModule],
       declarations: [NoninteractiveTabs],

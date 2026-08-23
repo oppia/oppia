@@ -90,6 +90,10 @@ export default {
     PendingAccountDeletion: 'http://localhost:8181/pending-account-deletion',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    RobotsTxt: 'http://localhost:8181/robots.txt',
+    SitemapXml: 'http://localhost:8181/sitemap.xml',
+    Teachers: 'http://localhost:8181/teachers',
+    Parents: 'http://localhost:8181/parents',
     VoiceoverAdmin: 'http://localhost:8181/voiceover-admin',
     splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
@@ -98,9 +102,8 @@ export default {
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
-    VolunteerForm:
-      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-    VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
+    VolunteerIdealistPage:
+      'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
       'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',

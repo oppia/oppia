@@ -128,6 +128,7 @@ describe('Teach Oppia Modal Component', () => {
       solution: null,
     },
     linked_skill_id: null,
+    inapplicable_skill_misconception_ids: null,
     param_changes: [],
     solicit_answer_details: false,
     card_is_checkpoint: false,
@@ -297,6 +298,14 @@ describe('Teach Oppia Modal Component', () => {
       );
     });
 
+    it('should throw error when interaction id is null in confirmAnswerAssignment', () => {
+      component.interactionId = null;
+
+      expect(() => component.confirmAnswerAssignment(0)).toThrowError(
+        'Cannot confirm answer assignment for a state with no interaction.'
+      );
+    });
+
     it('should return when its type is not default_outcome', () => {
       component.unresolvedAnswers = [
         {
@@ -369,15 +378,50 @@ describe('Teach Oppia Modal Component', () => {
       spyOn(
         trainingModalService,
         'openTrainUnresolvedAnswerModal'
-      ).and.callFake(
-        function (InteractionAnswer, interactionId, answerIndex) {}
-      );
+      ).and.callFake(function (
+        interactionAnswer: InteractionAnswer,
+        interactionId: string,
+        answerIndex: number
+      ) {});
 
       component.openTrainUnresolvedAnswerModal(0);
 
       expect(
         trainingModalService.openTrainUnresolvedAnswerModal
       ).toHaveBeenCalled();
+    });
+
+    it('should throw error when interaction id is null in openTrainUnresolvedAnswerModal', () => {
+      stateInteractionIdService.savedMemento = null;
+
+      expect(() => component.openTrainUnresolvedAnswerModal(0)).toThrowError(
+        'Cannot open training modal for a state with no interaction.'
+      );
+    });
+
+    it('should throw error when interaction id is null in finishTrainingCallback', fakeAsync(() => {
+      let finishTrainingResult = {
+        answerIndex: 0,
+        answer: 'answer Data for truncateInputBasedOnInteractionAnswerType',
+      };
+      component.interactionId = null;
+
+      expect(() => {
+        onchange.emit(finishTrainingResult);
+        tick();
+      }).toThrowError(
+        'Cannot confirm answer assignment for a state with no interaction.'
+      );
+    }));
+
+    it('should throw error when interaction id is null in ngOnInit', () => {
+      stateInteractionIdService.savedMemento = null;
+
+      expect(() => {
+        component.ngOnInit();
+      }).toThrowError(
+        'Cannot initialize rules service for a state with no interaction.'
+      );
     });
 
     it('should show Unresolved Answers', () => {

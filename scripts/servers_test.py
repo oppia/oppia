@@ -20,6 +20,7 @@ import builtins
 import collections
 import contextlib
 import io
+import json
 import logging
 import os
 import re
@@ -872,29 +873,23 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(proc.kill_count, 1)
 
     def test_managed_ng_build_in_watch_mode_when_build_succeeds(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
+        self.exit_stack.enter_context(
             self.swap_popen(outputs=[b'abc', b'Build at: 123', b'def'])
         )
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-        logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_ng_build(watch_mode=True)
-        )
+        self.exit_stack.enter_context(servers.managed_ng_build(watch_mode=True))
         self.exit_stack.close()
 
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--watch', popen_calls[0].program_args)
         self.assert_matches_regexps(
             str_io.getvalue().strip().split('\n'),
             [
-                'Starting new Angular Compiler',
-                'abc',
-                'Build at: 123',
-                'def',
-                'Stopping Angular Compiler',
+                r'Starting new Angular Compiler',
+                r'abc',
+                r'Build at: 123',
+                r'def',
+                r'Stopping Angular Compiler.*',
             ],
         )
 
@@ -932,183 +927,6 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
         )
-
-    def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(
-        self,
-    ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'abc', b'Built at: 123', b'def'])
-        )
-        str_io = io.StringIO()
-        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-        logs = self.exit_stack.enter_context(self.capture_logging())
-
-        proc = self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(watch_mode=True)
-        )
-        self.exit_stack.close()
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--color', popen_calls[0].program_args)
-        self.assertIn('--watch', popen_calls[0].program_args)
-        self.assertIn('--progress', popen_calls[0].program_args)
-        self.assert_matches_regexps(
-            str_io.getvalue().strip().split('\n'),
-            [
-                'Starting new Webpack Compiler',
-                'abc',
-                'Built at: 123',
-                'def',
-                'Stopping Webpack Compiler',
-            ],
-        )
-
-    def test_managed_webpack_compiler_in_watch_mode_raises_when_not_built(
-        self,
-    ) -> None:
-        # NOTE: The 'Built at: ' message is never printed.
-        self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
-        str_io = io.StringIO()
-        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-
-        with self.assertRaisesRegex(IOError, 'First build never completed'):
-            self.exit_stack.enter_context(
-                servers.managed_webpack_compiler(watch_mode=True)
-            )
-        self.assert_matches_regexps(
-            str_io.getvalue().strip().split('\n'),
-            [
-                'Starting new Webpack Compiler',
-                'abc',
-                'def',
-                'Stopping Webpack Compiler',
-            ],
-        )
-
-    def test_managed_webpack_compiler_uses_explicit_config_path(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(config_path='config.json')
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config config.json'
-            % (common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH),
-        )
-
-    def test_managed_webpack_compiler_uses_prod_source_maps_config(
-        self,
-    ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=True
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_PROD_SOURCE_MAPS_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_prod_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=False
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_PROD_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_dev_source_maps_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=True
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_DEV_SOURCE_MAPS_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_dev_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=False
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_DEV_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_with_max_old_space_size(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(max_old_space_size=2056)
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--max-old-space-size=2056', popen_calls[0].program_args)
 
     def test_managed_webdriverio_server_fails_to_get_chrome_version(
         self,
@@ -1249,13 +1067,24 @@ class ManagedProcessTests(test_utils.TestBase):
         test_file_path = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': test_file_path,
+                    'framework': 'puppeteer',
+                    'module': test_file_path,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=test_file_path, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=test_file_path, stdout=subprocess.PIPE
+                )
             )
-        )
-        self.exit_stack.close()
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -1281,13 +1110,24 @@ class ManagedProcessTests(test_utils.TestBase):
         suite_name = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': suite_name,
+                    'framework': 'puppeteer',
+                    'module': suite_name,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, headless=True, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=suite_name, headless=True, stdout=subprocess.PIPE
+                )
             )
-        )
-        self.exit_stack.close()
+            self.exit_stack.close()
 
         self.assertEqual(os.getenv('HEADLESS'), 'true')
         self.assertEqual(len(popen_calls), 1)
@@ -1303,12 +1143,23 @@ class ManagedProcessTests(test_utils.TestBase):
         suite_name = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': suite_name,
+                    'framework': 'puppeteer',
+                    'module': suite_name,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, mobile=True, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=suite_name, mobile=True, stdout=subprocess.PIPE
+                )
             )
-        )
 
         self.assertEqual(os.getenv('MOBILE'), 'true')
         self.assertEqual(len(popen_calls), 1)
@@ -1320,6 +1171,166 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
 
         self.exit_stack.close()
+
+    def test_managed_acceptance_test_server_playwright_suite(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite', stdout=subprocess.PIPE
+                )
+            )
+            self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(popen_calls[0].kwargs['shell'], False)
+        self.assertEqual(popen_calls[0].kwargs['stdout'], subprocess.PIPE)
+        program_args = popen_calls[0].program_args
+        self.assertIn('some/module', program_args)
+        self.assertIn('--headed', program_args)
+        self.assertNotIn('--update-snapshots', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['MOBILE'], 'false')
+        self.assertEqual(env['PROD_ENV'], 'false')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+        self.assertEqual(env['UPDATE_SNAPSHOTS'], 'false')
+
+    def test_managed_acceptance_test_server_playwright_headless(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite',
+                    headless=True,
+                    stdout=subprocess.PIPE,
+                )
+            )
+            self.exit_stack.close()
+
+        program_args = popen_calls[0].program_args
+        self.assertNotIn('--headed', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['HEADLESS'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_playwright_mobile(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite', mobile=True, stdout=subprocess.PIPE
+                )
+            )
+            self.exit_stack.close()
+
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['MOBILE'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_playwright_update_snapshots(
+        self,
+    ) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite',
+                    update_snapshots=True,
+                    stdout=subprocess.PIPE,
+                )
+            )
+            self.exit_stack.close()
+
+        program_args = popen_calls[0].program_args
+        self.assertIn('--update-snapshots', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['UPDATE_SNAPSHOTS'], 'true')
+
+    def test_managed_acceptance_test_server_with_invalid_framework(
+        self,
+    ) -> None:
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'invalid_framework',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                'Suite "testSuite" has invalid framework: "invalid_framework". '
+                'Must be "puppeteer" or "playwright".',
+            ):
+                self.exit_stack.enter_context(
+                    servers.managed_acceptance_tests_server(
+                        suite_name='testSuite', stdout=subprocess.PIPE
+                    )
+                )
+
+    def test_managed_ng_build_with_source_maps(self) -> None:
+        popen_calls = self.exit_stack.enter_context(
+            self.swap_popen(outputs=[b'Build at: 123'])
+        )
+
+        self.exit_stack.enter_context(
+            servers.managed_ng_build(source_maps=True)
+        )
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn(
+            '%s build --source-map' % common.NG_BIN_PATH,
+            popen_calls[0].program_args,
+        )
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):

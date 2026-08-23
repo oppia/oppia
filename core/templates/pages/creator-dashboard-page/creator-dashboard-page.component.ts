@@ -287,4 +287,14 @@ export class CreatorDashboardPageComponent {
     // must be either a function or undefined".
     return 0;
   }
+
+  truncate(input: string, length: number): string {
+    if (length <= 0) {
+      return input;
+    }
+    if (input.length > length) {
+      return input.substring(0, length) + '...';
+    }
+    return input;
+  }
 }

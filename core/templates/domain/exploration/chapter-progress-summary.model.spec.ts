@@ -21,6 +21,7 @@ import {ChapterProgressSummary} from './chapter-progress-summary.model';
 describe('Chapter Progress Summary', () => {
   it('should correctly convert backend dict to object', () => {
     const chapterProgressSummaryDict = {
+      exploration_id: 'exp_1',
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
       is_chapter_complete: false,
@@ -30,6 +31,7 @@ describe('Chapter Progress Summary', () => {
       chapterProgressSummaryDict
     );
 
+    expect(chapterProgressSummary.explorationId).toEqual('exp_1');
     expect(chapterProgressSummary.totalCheckpoints).toEqual(6);
     expect(chapterProgressSummary.visitedCheckpoints).toEqual(4);
     expect(chapterProgressSummary.isChapterComplete).toBeFalse();

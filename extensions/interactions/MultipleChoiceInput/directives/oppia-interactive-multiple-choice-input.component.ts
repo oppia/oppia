@@ -41,10 +41,11 @@ import '../static/multiple_choice_input.css';
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
-  @Input() choicesWithValue: string;
-  @Input() showChoicesInShuffledOrderWithValue: string;
-  choices: ChoiceWithIndex[];
-  answer;
+  @Input() choicesWithValue!: string;
+  @Input() showChoicesInShuffledOrderWithValue!: string;
+  @Input() lastAnswer!: number | null;
+  choices!: ChoiceWithIndex[];
+  answer: number | null = null;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;
@@ -112,30 +113,25 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   ngOnInit(): void {
     this.choices = this.getOrderedChoices();
 
-    this.answer = null;
+    this.answer = this.lastAnswer !== undefined ? this.lastAnswer : null;
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(),
       () => this.validate()
     );
   }
 
-  selectAnswer(event: MouseEvent, answer: string): void {
+  selectAnswer(event: MouseEvent, answer: string | null): void {
     event.preventDefault();
     if (answer === null) {
       return;
     }
     this.errorMessageI18nKey = '';
-    // Deselect previously selected option.
-    var selectedElement = document.querySelector(
-      'button.multiple-choice-option.selected'
-    );
-    if (selectedElement) {
-      selectedElement.classList.remove('selected');
-    }
-    // Selected current option.
-    (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+  }
+
+  isSelectedChoice(choice: ChoiceWithIndex): boolean {
+    return this.answer !== null && this.answer === choice.originalIndex;
   }
 
   @HostListener('document:keydown.enter', ['$event'])

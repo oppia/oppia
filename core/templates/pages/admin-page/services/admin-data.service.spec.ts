@@ -59,6 +59,7 @@ describe('Admin Data Service', () => {
         total_published_node_count: 10,
         url_fragment: 'topicurlfrag',
         can_edit_topic: false,
+        can_edit_question: false,
         is_published: false,
         total_upcoming_chapters_count: 1,
         total_overdue_chapters_count: 1,

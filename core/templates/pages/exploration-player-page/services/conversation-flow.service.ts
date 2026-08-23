@@ -75,15 +75,15 @@ import {Interaction} from 'domain/exploration/interaction.model';
 interface AnswerResponseData {
   displayedCard: StateCard;
   editorPreviewMode: boolean;
-  nextCard: StateCard;
+  nextCard: StateCard | null;
   refreshInteraction: boolean;
   feedbackHtml: string;
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   remainOnCurrentCard: boolean;
-  taggedSkillMisconceptionId: string;
-  wasOldStateInitial: boolean;
-  isFirstHit: boolean;
+  taggedSkillMisconceptionId: string | null;
+  wasOldStateInitial: boolean | null;
+  isFirstHit: boolean | null;
   isFinalQuestion: boolean;
   nextCardIfReallyStuck: StateCard | null;
   focusLabel: string;
@@ -99,6 +99,9 @@ interface AnswerResponseData {
 })
 export class ConversationFlowService {
   nextCardIfStuck!: StateCard | null;
+  // Tracks the state name where the learner was originally stuck, used for
+  // navigation back to the farthest discovered state after completing revision.
+  originalStuckStateName: string | null = null;
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard!: StateCard;
@@ -406,15 +409,15 @@ export class ConversationFlowService {
       answer,
       interactionRulesService,
       (
-        nextCard: StateCard,
+        nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
         refresherExplorationId: string | null,
-        missingPrerequisiteSkillId: string,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
         isFinalQuestion: boolean,
         nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
@@ -454,7 +457,7 @@ export class ConversationFlowService {
    */
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === null &&
+      this.displayedCard.getStateName() === '' &&
       !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;
@@ -553,7 +556,7 @@ export class ConversationFlowService {
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === null &&
+      this.displayedCard.getStateName() === '' &&
       !this.explorationModeService.isInQuestionMode();
     if (
       conceptCardIsBeingShown &&
@@ -605,6 +608,32 @@ export class ConversationFlowService {
         this._changeCard(indexOfRevisionCard);
         return;
       }
+    }
+    // Handle returning from a stuck state redirect.
+    // If we have an originalStuckStateName, it means the learner was redirected
+    // to an earlier card for revision. After completing it, create a fresh card
+    // for the original stuck state so the learner can try again without seeing
+    // their old failed attempts.
+    if (this.originalStuckStateName !== null) {
+      const stuckStateName = this.originalStuckStateName;
+      // Clear the tracking before navigating.
+      this.originalStuckStateName = null;
+
+      // If the next card is indeed the stuck state, we apply the fix to create
+      // a fresh card.
+      if (nextCard.getStateName() === stuckStateName) {
+        // Create a fresh StateCard for the stuck state so the learner can try again
+        // without seeing their old failed attempts.
+        const freshStuckCard =
+          this.explorationEngineService.getStateCardByName(stuckStateName);
+        // Set it as the next card and show it.
+        this.setNextStateCard(freshStuckCard);
+        this.showPendingCard();
+        return;
+      }
+      // If nextCard is NOT the stuck state (e.g., the learner moved PAST the stuck state
+      // to the end of the lesson), we just proceed with the normal flow (displayed below),
+      // effectively ignoring the stuck state tracking since we have moved on.
     }
     /* This is for the following situation:
         if A->B->C is the arrangement of cards and C redirected to A,
@@ -993,7 +1022,9 @@ export class ConversationFlowService {
       // to next card. Therefore this.answerIsCorrect needs
       // to be set to false before it proceeds to next card.
       this.answerIsCorrect = false;
-      this.showPendingCard();
+      // Use showUpcomingCard to ensure stuck state return navigation
+      // logic is executed (if originalStuckStateName is set).
+      this.showUpcomingCard();
     }
     this.currentInteractionService.clearPresubmitHooks();
   }
@@ -1232,6 +1263,32 @@ export class ConversationFlowService {
     timeAtServerCall,
     currentEngineService,
   }: AnswerResponseData): void {
+    // NextCard is null only in question player mode on the final question.
+    // In that context isPresentingIsolatedQuestions() returns true, so all
+    // blocks below that use nextCard are already guarded. We handle question
+    // player specific logic here and return early to satisfy strict typing.
+    if (nextCard === null) {
+      this.setNextCardIfStuck(nextCardIfReallyStuck);
+      if (this.explorationModeService.isInQuestionPlayerMode()) {
+        this.questionPlayerEngineService.recordAnswerSubmitted(
+          this.questionPlayerEngineService.getCurrentQuestion(),
+          !remainOnCurrentCard,
+          taggedSkillMisconceptionId
+        );
+        if (!remainOnCurrentCard) {
+          this._moveToNewCard(feedbackHtml, isFinalQuestion);
+        } else {
+          this._giveFeedbackAndStayOnCurrentCard(
+            feedbackHtml,
+            missingPrerequisiteSkillId,
+            refreshInteraction,
+            refresherExplorationId
+          );
+        }
+      }
+      return;
+    }
+
     this.setNextStateCard(nextCard);
     this.setNextCardIfStuck(nextCardIfReallyStuck);
 
@@ -1250,7 +1307,7 @@ export class ConversationFlowService {
           nextCard.getStateName(),
           lastAnswer,
           this.learnerParamsService.getAllParams(),
-          isFirstHit,
+          isFirstHit ?? false,
           String(completedChaptersCount && completedChaptersCount + 1),
           String(this.playerTranscriptService.getNumCards()),
           currentEngineService.getLanguageCode()
@@ -1617,6 +1674,26 @@ export class ConversationFlowService {
    */
   setNextCardIfStuck(card: StateCard | null): void {
     this.nextCardIfStuck = card;
+  }
+
+  /**
+   * Retrieves the original stuck state name where the learner was redirected from.
+   * Used for navigation back to the farthest discovered state after revision.
+   *
+   * @returns {string | null} The original stuck state name, or null if not set.
+   */
+  getOriginalStuckStateName(): string | null {
+    return this.originalStuckStateName;
+  }
+
+  /**
+   * Sets the original stuck state name for tracking where the learner was
+   * before being redirected for revision.
+   *
+   * @param {string | null} stateName - The state name where the learner was stuck.
+   */
+  setOriginalStuckStateName(stateName: string | null): void {
+    this.originalStuckStateName = stateName;
   }
 
   /**

@@ -472,12 +472,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 'managed_cloud_datastore_emulator',
             ],
         )
-        self._swap_servers(
-            ['managed_webpack_compiler'],
-            special_overrides={
-                'managed_webpack_compiler': (mock_managed_process, None, False)
-            },
-        )
 
         self._swap_servers(
             ['managed_webdriverio_server'],

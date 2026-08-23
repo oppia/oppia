@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the blog post page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -31,11 +31,11 @@ import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
 import {UserService} from 'services/user.service';
 
-import './blog-author-profile-page.component.css';
-
 @Component({
   selector: 'oppia-blog-author-page',
   templateUrl: './blog-author-profile-page.component.html',
+  styleUrls: ['./blog-author-profile-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogAuthorProfilePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -155,9 +155,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     );
   }
 
-  onPageChange(): void {
-    this.calculateFirstPostOnPageNum();
-    this.calculateLastPostOnPageNum();
+  onPageChange(page = this.page): void {
+    this.page = page;
+    this.calculateFirstPostOnPageNum(page);
+    this.calculateLastPostOnPageNum(page);
     this.loadPage();
   }
 

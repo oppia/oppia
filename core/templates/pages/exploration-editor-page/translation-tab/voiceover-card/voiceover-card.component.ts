@@ -53,11 +53,13 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
-import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
+import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import './voiceover-card.component.css';
 
 @Component({
   selector: 'oppia-voiceover-card',
   templateUrl: './voiceover-card.component.html',
+  styleUrls: ['./voiceover-card.component.css'],
 })
 export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   @ViewChild('visualized') visualized!: ElementRef<Element>;
@@ -131,7 +133,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private explorationStatesService: ExplorationStatesService,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
-    private voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService
+    private voiceoverRegenerationJobService: VoiceoverRegenerationJobService
   ) {}
 
   ngOnInit(): void {
@@ -141,7 +143,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.languageAccentCodeIsSelected = this.languageAccentCode !== 'undefined';
     this.voiceoverAdminConfigIsLoading = true;
 
-    this.voiceoverRegenerationTaskMappingService.init(
+    this.voiceoverRegenerationJobService.init(
       this.pageContextService.getExplorationId()
     );
 
@@ -152,7 +154,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
         this.updateLanguageCode();
-        this.voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes =
+        this.voiceoverRegenerationJobService.currentLanguageAccentCodes =
           this.voiceoverLanguageManagementService.getAutogeneratableLanguageAccents(
             this.languageCode
           );
@@ -171,14 +173,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.translationLanguageService.onActiveLanguageAccentChanged.subscribe(
         () => {
           let newLanguageAccentCode =
-            this.localStorageService.getLastSelectedLanguageAccentCode() as string;
+            this.translationLanguageService.getActiveLanguageAccentCode() as string;
           this.updateLanguageAccentCode(newLanguageAccentCode);
         }
       )
     );
 
     this.directiveSubscriptions.add(
-      this.voiceoverRegenerationTaskMappingService.onNewRegenerationRequest.subscribe(
+      this.voiceoverRegenerationJobService.onNewRegenerationRequest.subscribe(
         () => {
           this.updateAutomaticVoiceoverWithRegenerationStatus();
         }
@@ -216,10 +218,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           isVoiceoverAutogenerationEnabledByAdmins;
       });
 
-    this.pollingSub =
-      this.voiceoverRegenerationTaskMappingService.status$.subscribe(() => {
+    this.pollingSub = this.voiceoverRegenerationJobService.status$.subscribe(
+      () => {
         this.updateAutomaticVoiceoverWithRegenerationStatus();
-      });
+      }
+    );
 
     setInterval(() => {
       if (
@@ -335,7 +338,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   updateAutomaticVoiceoverWithRegenerationStatus(): void {
     const voiceoverGenerationStatus =
-      this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      this.voiceoverRegenerationJobService.getContentRegenerationStatus(
         this.languageAccentCode,
         this.activeContentId
       );
@@ -891,7 +894,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           this.activeEntityVoiceoversInstance
         );
 
-        this.voiceoverRegenerationTaskMappingService.updateContentRegenerationStatus(
+        this.voiceoverRegenerationJobService.updateContentRegenerationStatus(
           this.languageAccentCode,
           this.activeContentId,
           'SUCCEEDED'

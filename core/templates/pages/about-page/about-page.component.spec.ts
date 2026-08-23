@@ -215,34 +215,20 @@ describe('About Page', () => {
   it('should ensure all items in featuresData array have panelIsCollapsed property as true', () => {
     expect(
       component.featuresData.every(item => item.panelIsCollapsed === true)
-    ).toBeTrue();
+    ).toBe(true);
   });
 
   it('should toggle the panels at given index', () => {
     component.expandPanel(1);
-    expect(component.featuresData[1].panelIsCollapsed).toBeFalse();
+    expect(component.featuresData[1].panelIsCollapsed).toBe(false);
     component.closePanel(1);
-    expect(component.featuresData[1].panelIsCollapsed).toBeTrue();
+    expect(component.featuresData[1].panelIsCollapsed).toBe(true);
   });
 
-  it('should return correct static image url when calling getStaticImageUrl', () => {
-    expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image'
+  it('should return the correct static image url', () => {
+    expect(component.getStaticImageUrl('/path/to/image.png')).toBe(
+      '/assets/images/path/to/image.png'
     );
-  });
-
-  it('should return the correct image set', () => {
-    const imageName = '/about/testImageName';
-    const imageExt = 'png';
-
-    const expectedImageSet =
-      '/assets/images/about/testImageName1x.png 1x, ' +
-      '/assets/images/about/testImageName15x.png 1.5x, ' +
-      '/assets/images/about/testImageName2x.png 2x';
-
-    const result = component.getImageSet(imageName, imageExt, [1, 1.5, 2]);
-
-    expect(result).toBe(expectedImageSet);
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -279,44 +265,14 @@ describe('About Page', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it('should get the correct RTL status if the current language is not RTL', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       false
     );
-    expect(component.isLanguageRTL()).toBeFalse();
-  });
-
-  it('should move the correct volunteer carousel to the previous slide', () => {
-    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
-      'prev',
-    ]);
-    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
-
-    component.screenType = 'mobile';
-    component.moveCarouselToPreviousSlide();
-    expect(component.volunteerCarouselMobile.prev).toHaveBeenCalled();
-
-    component.screenType = 'desktop';
-    component.moveCarouselToPreviousSlide();
-    expect(component.volunteerCarousel.prev).toHaveBeenCalled();
-  });
-
-  it('should move the correct volunteer carousel to the next slide', () => {
-    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
-      'next',
-    ]);
-    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
-
-    component.screenType = 'mobile';
-    component.moveCarouselToNextSlide();
-    expect(component.volunteerCarouselMobile.next).toHaveBeenCalled();
-
-    component.screenType = 'desktop';
-    component.moveCarouselToNextSlide();
-    expect(component.volunteerCarousel.next).toHaveBeenCalled();
+    expect(component.isLanguageRTL()).toBe(false);
   });
 
   it('should record analytics when Explore Lessons is clicked', () => {

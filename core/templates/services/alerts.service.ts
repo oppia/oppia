@@ -29,6 +29,7 @@ export interface Message {
   type: string;
   content: string;
   timeout: number;
+  closeButton?: boolean;
 }
 
 @Injectable({
@@ -42,41 +43,31 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  // TODO(#8472): Remove static when migration is complete.
-  // Until then, we need to use static so that the two instances of the service
-  // created by our hybrid app (one for Angular, the other for AngularJS) can
-  // refer to the same objects.
-  private static warnings: Warning[] = [];
+  private _warnings: Warning[] = [];
+  private _messages: Message[] = [];
+
   get warnings(): Warning[] {
-    return AlertsService.warnings;
+    return this._warnings;
   }
 
-  private static messages: Message[] = [];
   get messages(): Message[] {
-    return AlertsService.messages;
+    return this._messages;
   }
-
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {
-    // Since warnings and messages are static, clearing them in the constructor
-    // retain "instance-like" behavior.
-    this.clearWarnings();
-    this.clearMessages();
-  }
-
+  constructor(private log: LoggerService) {}
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
   addWarning(warning: string): void {
     this.log.error(warning);
-    if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
+    if (this._warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
     }
-    this.warnings.push({
+    this._warnings.push({
       type: 'warning',
       content: warning,
     });
@@ -97,17 +88,17 @@ export class AlertsService {
    * @param {Object} warningToDelete - The warning message to be deleted.
    */
   deleteWarning(warningToDelete: Warning): void {
-    const filteredWarnings = this.warnings.filter(
+    const filteredWarnings = this._warnings.filter(
       w => w.content !== warningToDelete.content
     );
-    this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
+    this._warnings.splice(0, this._warnings.length, ...filteredWarnings);
   }
 
   /**
    * Clears all warnings.
    */
   clearWarnings(): void {
-    this.warnings.splice(0, this.warnings.length);
+    this._warnings.splice(0, this._warnings.length);
   }
 
   /**
@@ -116,26 +107,31 @@ export class AlertsService {
    * @param {string} message - Message content
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addMessage(type: string, message: string, timeoutMilliseconds: number): void {
-    if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
+  addMessage(
+    type: string,
+    message: string,
+    timeoutMilliseconds: number,
+    closeButton: boolean = false
+  ): void {
+    if (this._messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
-    this.messages.push({
+    this._messages.push({
       type: type,
       content: message,
       timeout: timeoutMilliseconds,
+      closeButton: closeButton,
     });
   }
-
   /**
    * Deletes the message from the messages list.
    * @param {Object} messageToDelete - Message to be deleted.
    */
   deleteMessage(messageToDelete: Message): void {
-    const isMessageToKeep = (m: Message) =>
+    const isMessageToKeep = (m: Message): boolean =>
       m.type !== messageToDelete.type || m.content !== messageToDelete.content;
-    const filteredMessages = this.messages.filter(isMessageToKeep);
-    this.messages.splice(0, this.messages.length, ...filteredMessages);
+    const filteredMessages = this._messages.filter(isMessageToKeep);
+    this._messages.splice(0, this._messages.length, ...filteredMessages);
   }
 
   /**
@@ -155,17 +151,21 @@ export class AlertsService {
    * @param {string} message - Success message to display
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
+  addSuccessMessage(
+    message: string,
+    timeoutMilliseconds?: number,
+    closeButton: boolean = false
+  ): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 3000;
     }
-    this.addMessage('success', message, timeoutMilliseconds);
+    this.addMessage('success', message, timeoutMilliseconds, closeButton);
   }
 
   /**
    * Clears all messages.
    */
   clearMessages(): void {
-    this.messages.splice(0, this.messages.length);
+    this._messages.splice(0, this._messages.length);
   }
 }

@@ -32,9 +32,11 @@ import {BlogAuthorDetailsEditorComponent} from './modal-templates/author-detail-
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import './blog-dashboard-page.component.css';
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html',
+  styleUrls: ['./blog-dashboard-page.component.css'],
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

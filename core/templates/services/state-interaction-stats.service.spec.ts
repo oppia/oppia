@@ -177,6 +177,7 @@ describe('State Interaction Stats Service', () => {
       solicit_answer_details: false,
       card_is_checkpoint: false,
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
     };
 
     mockState = State.createFromBackendDict('Hola', stateDict);
@@ -185,7 +186,7 @@ describe('State Interaction Stats Service', () => {
   it('should support improvements overview for states with text-input', () => {
     expect(
       stateInteractionStatsService.stateSupportsImprovementsOverview(mockState)
-    ).toBeTrue();
+    ).toBe(true);
   });
 
   it('should throw error if state name does not exist', fakeAsync(async () => {

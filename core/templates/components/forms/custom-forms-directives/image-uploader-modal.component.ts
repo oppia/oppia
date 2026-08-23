@@ -30,11 +30,13 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './image-uploader-modal.component.css';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-image-uploader-modal',
   templateUrl: './image-uploader-modal.component.html',
+  styleUrls: ['./image-uploader-modal.component.css'],
 })
 export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() imageUploaderParameters!: ImageUploaderParameters;
@@ -64,6 +66,16 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     private svgSanitizerService: SvgSanitizerService
   ) {
     super(ngbActiveModal);
+  }
+
+  // Public wrapper for the SVG sanitizer service's getIssueURL method.
+  // This is needed because Angular strict template checking does not
+  // allow direct access to private class members from templates.
+  getIssueURL(invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  }): string {
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
   }
 
   private _getAspectRatio(): number {

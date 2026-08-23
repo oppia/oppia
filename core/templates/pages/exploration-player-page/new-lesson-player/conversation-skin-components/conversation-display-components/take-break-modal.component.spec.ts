@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TakeBreakModalComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {TakeBreakModalComponent} from './take-break-modal.component';
@@ -37,7 +37,7 @@ describe('TakeBreakModalComponent', function () {
   let fixture: ComponentFixture<TakeBreakModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, TakeBreakModalComponent],
       providers: [

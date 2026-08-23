@@ -16,20 +16,57 @@
  * @fileoverview Module for the CkEditor4 components.
  */
 
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
-import {StoriesListComponent} from './stories-list/topic-viewer-stories-list.component';
+import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
+import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
+import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
+import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
+import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end-test-card.component';
+import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
+import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
+import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [CommonModule, MatCardModule, SharedComponentsModule],
-  declarations: [StoriesListComponent, SubtopicsListComponent],
-  entryComponents: [StoriesListComponent, SubtopicsListComponent],
-  exports: [StoriesListComponent, SubtopicsListComponent],
+  imports: [CommonModule, FormsModule, MatCardModule, SharedComponentsModule],
+  declarations: [
+    StoriesListComponent,
+    SubtopicsListComponent,
+    TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    LanguageSelectorComponent,
+    AdventureEndTestCardComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
+  ],
+  entryComponents: [
+    StoriesListComponent,
+    SubtopicsListComponent,
+    TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    AdventureEndTestCardComponent,
+    LanguageSelectorComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
+  ],
+  exports: [
+    StoriesListComponent,
+    SubtopicsListComponent,
+    TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    LanguageSelectorComponent,
+    AdventureEndTestCardComponent,
+    AdventureCircleBadgeComponent,
+    AdventureNavigationComponent,
+    MasteryChallengeCardComponent,
+  ],
 })
 export class TopicPlayerViewerCommonModule {}

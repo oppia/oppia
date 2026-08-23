@@ -17,7 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -69,7 +74,7 @@ class MockNgbModal {
 }
 
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
-class MockParameterizeRuleDescriptionPipe {
+class MockParameterizeRuleDescriptionPipe implements PipeTransform {
   transform(
     rule: Rule | null,
     interactionId: string | null,
@@ -79,21 +84,21 @@ class MockParameterizeRuleDescriptionPipe {
   }
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
-class MockWrapTextWithEllipsisPipe {
+class MockWrapTextWithEllipsisPipe implements PipeTransform {
   transform(input: string, characterCount: number): string {
     return '';
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
 }
 
 @Pipe({name: 'convertToPlainText'})
-class MockConvertToPlainTextPipe {
+class MockConvertToPlainTextPipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }
@@ -120,7 +125,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -137,7 +142,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -160,8 +165,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -173,10 +178,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -190,8 +197,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -226,6 +233,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -301,7 +309,7 @@ describe('State translation component', () => {
     explorationStatesService.init(explorationState1, false);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -374,6 +382,29 @@ describe('State translation component', () => {
           ]);
         }
       );
+
+      describe('empty default outcome feedback', () => {
+        it('should show the default outcome row when its feedback is non-empty', () => {
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).not.toBeNull();
+        });
+
+        it('should hide the default outcome row when its feedback is empty', () => {
+          component.stateDefaultOutcome.feedback.html = '';
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).toBeNull();
+        });
+      });
 
       it('should broadcast copy to ck editor when clicking on content', () => {
         spyOn(ckEditorCopyContentService, 'broadcastCopy').and.callFake(
@@ -693,12 +724,11 @@ describe('State translation component', () => {
             AnswerGroup.createNew(
               [],
               Outcome.createNew('unused', '1', 'Feedback text', []),
-              Outcome.createNew('unused', '1', 'Feedback text', []),
-              null,
+              [],
               '0'
             ),
             '1',
-            null,
+            [],
             true
           )
         ).toBe('[] Feedback text');
@@ -728,7 +758,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -742,7 +772,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -765,8 +795,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -778,10 +808,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -795,8 +827,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -831,6 +863,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -908,7 +941,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1141,7 +1174,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -1155,7 +1188,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -1178,8 +1211,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1191,10 +1224,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1208,8 +1243,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -1244,6 +1279,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -1256,7 +1292,7 @@ describe('State translation component', () => {
       classifier_model_id: 'null',
       card_is_checkpoint: false,
       interaction: {
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         id: 'TextInput',
         customization_args: {
           placeholder: {
@@ -1271,8 +1307,8 @@ describe('State translation component', () => {
         },
         answer_groups: [],
         default_outcome: {
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'default',
@@ -1308,6 +1344,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -1385,7 +1422,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1441,15 +1478,21 @@ describe('State translation component', () => {
   });
 
   it('should update correct translation with updateTranslatedContent', () => {
-    component.activeTranslatedContent = new TranslatedContent();
+    component.activeTranslatedContent = new TranslatedContent(
+      '',
+      'html',
+      false
+    );
+
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
     translationTabActiveModeService.isVoiceoverModeActive = jasmine
       .createSpy()
       .and.returnValue(false);
+
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'
@@ -1462,10 +1505,28 @@ describe('State translation component', () => {
     );
   });
 
+  it('should return when activeContentId is null in updateTranslatedContent', () => {
+    translationTabActiveModeService.isVoiceoverModeActive = jasmine
+      .createSpy()
+      .and.returnValue(false);
+
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+      new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
+    spyOn(
+      translationTabActiveContentIdService,
+      'getActiveContentId'
+    ).and.returnValue(null);
+
+    component.updateTranslatedContent();
+
+    expect(component.activeTranslatedContent).toBeUndefined();
+  });
+
   it('should format TranslatableSetOfNormalizedString values', () => {
     expect(
       component.getHumanReadableRuleInputValues(
-        {normalizedStrSet: ['input1', 'input2'], unicodeStrSet: null},
+        {normalizedStrSet: ['input1', 'input2'], unicodeStrSet: []},
         'TranslatableSetOfNormalizedString'
       )
     ).toEqual('[input1, input2]');
@@ -1474,7 +1535,7 @@ describe('State translation component', () => {
   it('should format TranslatableSetOfUnicodeString values', () => {
     expect(
       component.getHumanReadableRuleInputValues(
-        {normalizedStrSet: null, unicodeStrSet: ['input1', 'input2']},
+        {normalizedStrSet: [], unicodeStrSet: ['input1', 'input2']},
         'TranslatableSetOfUnicodeString'
       )
     ).toEqual('[input1, input2]');
@@ -1482,7 +1543,13 @@ describe('State translation component', () => {
 
   it('should throw an error on invalid type', () => {
     expect(() => {
-      component.getHumanReadableRuleInputValues(null, 'InvalidType');
+      component.getHumanReadableRuleInputValues(
+        {
+          normalizedStrSet: [],
+          unicodeStrSet: [],
+        },
+        'InvalidType'
+      );
     }).toThrowError('The InvalidType type is not implemented.');
   });
 
@@ -1515,6 +1582,14 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
+  it('should return original html when contentId is empty', () => {
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', '')
+    );
+
+    expect(htmlData).toBe('<p>HTML data</p>');
+  });
+
   it('should return unicode when translation tab is active', () => {
     spyOn(
       translationTabActiveModeService,
@@ -1528,9 +1603,20 @@ describe('State translation component', () => {
     expect(unicodeData).toBe('This is the unicode');
   });
 
+  it('should return unicode when contentId is empty', () => {
+    const subtitledObject = SubtitledUnicode.createFromBackendDict({
+      content_id: '',
+      unicode_str: 'This is the unicode',
+    });
+
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+
+    expect(unicodeData).toBe('This is the unicode');
+  });
+
   it('should return translation html when translation available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1543,7 +1629,7 @@ describe('State translation component', () => {
 
   it('should return unicode when translation is empty in voiceover mode', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1556,7 +1642,7 @@ describe('State translation component', () => {
 
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1569,7 +1655,7 @@ describe('State translation component', () => {
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1701,21 +1787,15 @@ describe('State translation component', () => {
     const mockinteractionCustomizationArgTranslatableContent = [
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_1',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_1'),
       },
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_2',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_2'),
       },
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_3',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_3'),
       },
     ];
 
@@ -1780,10 +1860,10 @@ describe('State translation component', () => {
       expect(component.getActiveTab()).toBe('content');
     });
 
-    it('should return active tab name as null when contentId is null', () => {
+    it('should return content tab name when contentId is null', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.returnValue(null);
 
-      expect(component.getActiveTab()).toBe(null);
+      expect(component.getActiveTab()).toBe(component.TAB_ID_CONTENT);
     });
   });
 });
@@ -1798,6 +1878,7 @@ describe('State translation component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let entityTranslationsService: EntityTranslationsService;
   let explorationState1 = {
     Introduction: {
       content: {
@@ -1808,7 +1889,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -1825,7 +1906,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -1848,8 +1929,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1863,8 +1944,8 @@ describe('State translation component', () => {
           {
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1878,8 +1959,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -1914,20 +1995,21 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
   let explorationState4 = {
     Introduction: {
       classifier_model_id: null,
-      card_is_checkpoint: null,
+      card_is_checkpoint: false,
       content: {
         content_id: 'content_1',
         html: 'Introduction Content',
       },
       interaction: {
         default_outcome: null,
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         solution: null,
         id: 'TextInput',
         customization_args: {
@@ -1947,6 +2029,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -2024,6 +2107,7 @@ describe('State translation component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
@@ -2108,7 +2192,196 @@ describe('State translation component', () => {
         component.TAB_ID_CONTENT = 'some_id';
         component.stateInteractionId = null;
 
-        expect(component.isDisabled('any')).toBeTrue();
+        expect(component.isDisabled('any')).toBe(true);
+      });
+
+      it('should return false for unknown tab in isDisabled', () => {
+        component.stateInteractionId = 'TextInput';
+
+        expect(component.isDisabled('unknown_tab')).toBe(false);
+      });
+
+      it('should correctly identify RTL languages', () => {
+        (
+          translationLanguageService.getActiveLanguageCode as jasmine.Spy
+        ).and.returnValue('ar');
+
+        expect(component.isTranslationLanguageRTL()).toBe(true);
+      });
+
+      it('should correctly identify LTR languages', () => {
+        (
+          translationLanguageService.getActiveLanguageCode as jasmine.Spy
+        ).and.returnValue('en');
+
+        expect(component.isTranslationLanguageRTL()).toBe(false);
+      });
+
+      it('should return when activeContentId is empty in onTabClick', () => {
+        component.stateContent = SubtitledHtml.createDefault('', '');
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.onTabClick(component.TAB_ID_CONTENT);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return when hint contentId is empty', () => {
+        component.stateHints = [
+          {
+            hintContent: SubtitledHtml.createDefault('Hint', ''),
+          },
+        ] as Hint[];
+
+        component.activeHintIndex = null;
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.changeActiveHintIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return when answer group feedback contentId is empty', () => {
+        component.stateAnswerGroups = [
+          {
+            outcome: {
+              feedback: SubtitledHtml.createDefault('', ''),
+            },
+          },
+        ] as AnswerGroup[];
+
+        component.stateDefaultOutcome = {
+          feedback: SubtitledHtml.createDefault('', ''),
+        } as Outcome;
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.changeActiveAnswerGroupIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return empty string for invalid subtitled content', () => {
+        const summary = component.getSubtitledContentSummary(
+          {} as SubtitledHtml
+        );
+
+        expect(summary).toBe('');
+      });
+
+      it('should skip rule inputs with empty contentId', () => {
+        component.stateAnswerGroups = [
+          {
+            rules: [
+              {
+                inputs: {
+                  x: {
+                    contentId: '',
+                  },
+                },
+              },
+            ],
+          },
+        ] as unknown as AnswerGroup[];
+
+        const result = component.getInteractionRuleTranslatableContents();
+
+        expect(result.length).toBe(0);
+      });
+
+      it('should return when state name is null in initStateTranslation', () => {
+        (stateEditorService.getActiveStateName as jasmine.Spy).and.returnValue(
+          null
+        );
+
+        expect(() => {
+          component.initStateTranslation();
+        }).not.toThrowError();
+      });
+
+      it('should return original html when html contentId is empty', () => {
+        entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+          new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
+        const result = component.getRequiredHtml(
+          SubtitledHtml.createDefault('<p>Sample HTML</p>', '')
+        );
+
+        expect(result).toBe('<p>Sample HTML</p>');
+      });
+
+      it('should return original unicode when unicode contentId is empty', () => {
+        entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+          new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
+        const subtitledUnicode = SubtitledUnicode.createDefault(
+          'Sample unicode',
+          ''
+        );
+
+        const result = component.getRequiredUnicode(subtitledUnicode);
+
+        expect(result).toBe('Sample unicode');
+      });
+
+      it('should return when active content id is undefined', () => {
+        translationTabActiveModeService.isVoiceoverModeActive = jasmine
+          .createSpy()
+          .and.returnValue(false);
+
+        spyOn(
+          translationTabActiveContentIdService,
+          'getActiveContentId'
+        ).and.returnValue(undefined);
+
+        expect(() => {
+          component.updateTranslatedContent();
+        }).not.toThrowError();
+      });
+
+      it('should return empty summary when interactionId is empty', () => {
+        const outcome = {
+          hasNonemptyFeedback: () => true,
+          feedback: {
+            html: 'Feedback',
+          },
+        } as Outcome;
+
+        const result = component.summarizeDefaultOutcome(
+          outcome,
+          '',
+          0,
+          'short'
+        );
+
+        expect(result).toBe('');
+      });
+
+      it('should return when customization arg contentId is empty', () => {
+        component.interactionCustomizationArgTranslatableContent = [
+          {
+            name: 'test',
+            content: SubtitledUnicode.createDefault('unicode', ''),
+          },
+        ];
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.activeCustomizationArgContentIndex = -1;
+
+        component.changeActiveCustomizationArgContentIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
       });
     }
   );

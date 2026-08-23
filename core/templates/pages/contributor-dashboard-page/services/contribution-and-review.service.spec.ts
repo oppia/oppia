@@ -24,6 +24,7 @@ import {
   FetchSuggestionsResponse,
 } from './contribution-and-review.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {
   ContributionAndReviewBackendApiService,
   ContributorCertificateInfo,
@@ -32,6 +33,7 @@ import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
@@ -181,7 +183,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -226,7 +228,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion4Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeFalse();
+          expect(response.more).toBe(false);
         });
     }));
 
@@ -256,7 +258,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -277,7 +279,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
     }));
   });
@@ -290,6 +292,7 @@ describe('Contribution and review service', () => {
             from_date: '1 Nov 2022',
             to_date: '1 Dec 2022',
             contribution_hours: 1.0,
+            contribution_word_count: 300,
             team_lead: 'Test User',
             language: 'Hindi',
           },
@@ -314,6 +317,47 @@ describe('Contribution and review service', () => {
           expect(definedData.from_date).toEqual('1 Nov 2022');
           expect(definedData.to_date).toEqual('1 Dec 2022');
           expect(definedData.contribution_hours).toEqual(1.0);
+          expect(definedData.contribution_word_count).toEqual(300);
+          expect(definedData.team_lead).toEqual('Test User');
+          expect(definedData.language).toEqual('Hindi');
+        });
+
+      expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+    });
+
+    it('should download the contributor certificate when contribution time is less than 1 hour', async () => {
+      downloadContributorCertificateAsyncSpy.and.returnValue(
+        Promise.resolve({
+          certificate_data: {
+            from_date: '1 Nov 2022',
+            to_date: '1 Dec 2022',
+            contribution_hours: 0.01,
+            contribution_word_count: 3,
+            team_lead: 'Test User',
+            language: 'Hindi',
+          },
+        })
+      );
+
+      await cars
+        .downloadContributorCertificateAsync(
+          'user',
+          'translate_content',
+          'hi',
+          '2022-01-01',
+          '2022-01-02'
+        )
+        .then(response => {
+          const data = response.certificate_data;
+
+          expect(data).not.toBeNull();
+
+          // Type assertion needed to satisfy type checker.
+          const definedData = data as ContributorCertificateInfo;
+          expect(definedData.from_date).toEqual('1 Nov 2022');
+          expect(definedData.to_date).toEqual('1 Dec 2022');
+          expect(definedData.contribution_hours).toEqual(0.01);
+          expect(definedData.contribution_word_count).toEqual(3);
           expect(definedData.team_lead).toEqual('Test User');
           expect(definedData.language).toEqual('Hindi');
         });
@@ -365,7 +409,10 @@ describe('Contribution and review service', () => {
         0,
         'sort_key',
         null,
-        'topicName'
+        'topicName',
+        // Question suggestions always target skills, so no entity type
+        // filter is forwarded for them.
+        undefined
       );
     });
   });
@@ -492,6 +539,7 @@ describe('Contribution and review service', () => {
               id: 'Continue',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: true,
@@ -516,6 +564,7 @@ describe('Contribution and review service', () => {
               id: 'EndExploration',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: false,
@@ -696,9 +745,163 @@ describe('Contribution and review service', () => {
         });
       }
     );
+
+    it(
+      'should fetch translation suggestions for a skill without ' +
+        'loading an exploration',
+      async () => {
+        const skillFetchResponse = {
+          suggestions: [
+            {
+              suggestion_type: 'translate_content',
+              suggestion_id: 'skill_suggestion_1',
+              target_type: 'skill',
+              target_id: 'skill_1',
+              status: 'review',
+              author_name: 'author',
+              change_cmd: {
+                state_name: 'Generic Content',
+                content_id: 'content_0',
+              },
+              last_updated_msecs: 0,
+            },
+          ],
+          target_id_to_opportunity_dict: {
+            skill_1: 'skill opportunity',
+          },
+          next_offset: 1,
+        };
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(skillFetchResponse)
+        );
+
+        const response = await cars.fetchTranslationSuggestionsAsync(
+          'skill_1',
+          AppConstants.ENTITY_TYPE.SKILL
+        );
+
+        expect(response).toEqual({
+          suggestionIdToDetails: {
+            skill_suggestion_1: {
+              suggestion: skillFetchResponse.suggestions[0],
+              details: 'skill opportunity',
+            },
+          },
+          more: false,
+        });
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'skill_1',
+          null,
+          AppConstants.ENTITY_TYPE.SKILL
+        );
+        // A skill translation review never needs exploration state data, so
+        // the exploration must not be fetched.
+        expect(fetchExplorationSpy).not.toHaveBeenCalled();
+      }
+    );
   });
 
-  describe('reviewExplorationSuggestion', () => {
+  describe('reviewTranslationSuggestion', () => {
+    let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
+    let onFailure: jasmine.Spy<(errorMessage: string) => void>;
+
+    beforeEach(() => {
+      onSuccess = jasmine.createSpy('onSuccess');
+      onFailure = jasmine.createSpy('onFailure');
+    });
+
+    it('should review an exploration suggestion through the exploration endpoint', fakeAsync(() => {
+      spyOn(carbas, 'reviewExplorationSuggestionAsync').and.returnValue(
+        Promise.resolve()
+      );
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        'exp_1',
+        'suggestion_1',
+        'accept',
+        'review message',
+        'commit message',
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
+        'exp_1',
+        'suggestion_1',
+        {
+          action: 'accept',
+          review_message: 'review message',
+          commit_message: 'commit message',
+        }
+      );
+      expect(onSuccess).toHaveBeenCalledWith('suggestion_1');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should review a skill suggestion through the skill endpoint without a commit message', fakeAsync(() => {
+      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
+        Promise.resolve()
+      );
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'skill_1',
+        'suggestion_1',
+        'accept',
+        'review message',
+        'commit message',
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      // The commit message is dropped, because accepting a skill translation
+      // does not create a new version of the skill.
+      expect(carbas.reviewSkillSuggestionAsync).toHaveBeenCalledWith(
+        'skill_1',
+        'suggestion_1',
+        {
+          action: 'accept',
+          review_message: 'review message',
+        }
+      );
+      expect(onSuccess).toHaveBeenCalledWith('suggestion_1');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should report a generic message when a skill review fails', fakeAsync(() => {
+      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
+        Promise.reject()
+      );
+
+      cars.reviewTranslationSuggestion(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'skill_1',
+        'suggestion_1',
+        'reject',
+        'review message',
+        null,
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      // The skill endpoint reports no reason for a failure, so the caller is
+      // given a message it can show as is.
+      expect(onFailure).toHaveBeenCalledWith(
+        ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+      );
+      expect(onSuccess).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('reviewTranslationSuggestion for an exploration', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
@@ -721,7 +924,8 @@ describe('Contribution and review service', () => {
           Promise.resolve()
         );
 
-        cars.reviewExplorationSuggestion(
+        cars.reviewTranslationSuggestion(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           'abc',
           'pqr',
           'accept',
@@ -752,7 +956,8 @@ describe('Contribution and review service', () => {
           })
         );
 
-        cars.reviewExplorationSuggestion(
+        cars.reviewTranslationSuggestion(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           'abc',
           'pqr',
           'accept',
@@ -774,11 +979,11 @@ describe('Contribution and review service', () => {
     );
   });
 
-  describe('reviewSkillSuggestion', () => {
+  describe('reviewQuestionSuggestion', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
-      skill_difficulty: 'easy',
+      skill_difficulty: 0.3,
     };
 
     let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
@@ -797,12 +1002,12 @@ describe('Contribution and review service', () => {
           Promise.resolve()
         );
 
-        cars.reviewSkillSuggestion(
+        cars.reviewQuestionSuggestion(
           'abc',
           'pqr',
           'accept',
           'review message',
-          'easy',
+          0.3,
           onSuccess,
           onFailure
         );
@@ -826,12 +1031,12 @@ describe('Contribution and review service', () => {
           Promise.reject()
         );
 
-        cars.reviewSkillSuggestion(
+        cars.reviewQuestionSuggestion(
           'abc',
           'pqr',
           'accept',
           'review message',
-          'easy',
+          0.3,
           onSuccess,
           onFailure
         );
@@ -913,7 +1118,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    const questionStateData = {
+    const questionStateData: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -958,6 +1163,7 @@ describe('Contribution and review service', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -1207,6 +1413,7 @@ describe('Contribution and review service', () => {
           id: 'Continue',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
@@ -1231,6 +1438,7 @@ describe('Contribution and review service', () => {
           id: 'EndExploration',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -1383,6 +1591,41 @@ describe('Contribution and review service', () => {
       );
 
       expect(sortedTranslationCards).toEqual(translationSuggestions);
+    });
+
+    it('should prepend generic (metadata) translation suggestions at the beginning', () => {
+      const states = States.createFromBackendDict(statesBackendDict);
+      const suggestionsWithGeneric = [
+        ...translationSuggestions,
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_generic',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: AppConstants.DEFAULT_SUGGESTION_STATE_NAME,
+            content_id: 'exploration_title',
+            new_value: {
+              html: 'translated title',
+            },
+            old_value: {
+              html: 'original title',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+      ] as unknown as SuggestionBackendDict[];
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        suggestionsWithGeneric,
+        states,
+        'First State'
+      );
+
+      expect(sortedTranslationCards.length).toBe(7);
+      expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
     });
   });
 });

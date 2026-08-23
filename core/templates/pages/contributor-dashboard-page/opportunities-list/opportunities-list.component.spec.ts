@@ -597,6 +597,23 @@ describe('Opportunities List Component', () => {
       expect(component.opportunities.length).toEqual(19);
       expect(component.activePageNumber).toBe(2);
     }));
+
+    it('should debounce search query changes and reload opportunities', fakeAsync(() => {
+      component.init();
+      component.ngOnInit();
+      tick();
+
+      spyOn(component, 'fetchAndLoadOpportunities').and.callThrough();
+
+      component.onSearchQueryChange('math');
+      expect(component.searchQuery).not.toEqual('math');
+
+      tick(300);
+
+      expect(component.searchQuery).toEqual('math');
+      expect(component.activePageNumber).toBe(1);
+      expect(component.fetchAndLoadOpportunities).toHaveBeenCalled();
+    }));
   });
 
   describe('when clicking on pin-unpin icon', () => {

@@ -1,0 +1,27 @@
+.oppia-ck-editor-copy-toolbar-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.oppia-ck-editor-copy-toolbar-tip-button-active {
+  background-color: #000;
+  color: #fff;
+}
+.oppia-ck-editor-copy-toolbar-label {
+  color: #505050;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.oppia-ck-editor-copy-toolbar-label a:focus {
+  text-decoration: underline;
+}
+.oppia-ck-editor-copy-toolbar-tip-sublabel {
+  color: #757575;
+}
+@media screen and (max-width: 700px) {
+  .oppia-ck-editor-copy-toolbar-label,
+  .oppia-ck-editor-copy-toolbar-tip-sublabel {
+    font-size: 16px;
+  }
+}

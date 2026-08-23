@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BackgroundMaskService} from '../../../../../services/stateful/background-mask.service';
 import {ExplorationHtmlFormatterService} from '../../../../../services/exploration-html-formatter.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -25,7 +25,6 @@ import {PlayerTranscriptService} from '../../../services/player-transcript.servi
 import {NewInputResponsePairComponent} from './new-input-response-pair.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 import {NgbModule, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {RecordedVoiceovers} from '../../../../../domain/exploration/recorded-voiceovers.model';
 import {StateCard} from '../../../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../../../domain/exploration/interaction.model';
 import {AppConstants} from '../../../../../app.constants';
@@ -63,7 +62,7 @@ describe('NewInputResponsePairComponent', () => {
   let numberConversionService: NumberConversionService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, NgbModule, BrowserAnimationsModule],
       declarations: [NewInputResponsePairComponent, MockTranslatePipe],
@@ -156,7 +155,6 @@ describe('NewInputResponsePairComponent', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       )
     );
@@ -182,7 +180,7 @@ describe('NewInputResponsePairComponent', () => {
         isHint: true,
       };
 
-      expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
+      expect(component.isVideoRteElementPresentInResponse()).toBe(false);
     }
   );
 
@@ -361,21 +359,21 @@ describe('NewInputResponsePairComponent', () => {
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).not.toBeTruthy();
+    expect(document.querySelector('ngb-popover-window')).toBeNull();
 
     const popover = fixture.debugElement
       .query(By.directive(NgbPopover))
       .injector.get(NgbPopover);
-    expect(popover).toBeTruthy();
+    expect(popover).not.toBeNull();
     popover.toggle();
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).toBeTruthy();
+    expect(document.querySelector('ngb-popover-window')).not.toBeNull();
 
     const popoverContent = document.querySelector(
       '.oppia-answer-popup oppia-interaction-display'
     );
-    expect(popoverContent).toBeTruthy();
+    expect(popoverContent).not.toBeNull();
   });
 });

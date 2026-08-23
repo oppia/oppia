@@ -53,9 +53,9 @@ class AuthServicesTests(test_utils.GenericTestBase):
             'full_user_1',
             '12345',
             [constants.DEFAULT_LANGUAGE_CODE],
-            None,
-            None,
-            None,
+            'en',
+            'en',
+            'en',
             user_id=self.full_user_id,
         )
         self.modifiable_profile_user_data = [
@@ -63,17 +63,17 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 'profile_user_1',
                 '12345',
                 [constants.DEFAULT_LANGUAGE_CODE],
-                None,
-                None,
-                None,
+                'en',
+                'en',
+                'en',
             ),
             user_domain.ModifiableUserData(
                 'profile_user_2',
                 '12345',
                 [constants.DEFAULT_LANGUAGE_CODE],
-                None,
-                None,
-                None,
+                'en',
+                'en',
+                'en',
             ),
         ]
 
@@ -251,22 +251,6 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ],
             ['uid1', 'uid2', 'uid3'],
         )
-
-    def test_get_all_external_accounts(self) -> None:
-        mock_accounts = [
-            auth_domain.ExternalAccount('aid1', 'email1@example.com', True),
-            auth_domain.ExternalAccount('aid2', 'email2@example.com', False),
-            auth_domain.ExternalAccount('aid3', 'email3@example.com', True),
-        ]
-
-        with self.swap(
-            platform_auth_services,
-            'get_all_external_accounts',
-            lambda: mock_accounts,
-        ):
-            self.assertItemsEqual(
-                auth_services.get_all_external_accounts(), mock_accounts
-            )
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,

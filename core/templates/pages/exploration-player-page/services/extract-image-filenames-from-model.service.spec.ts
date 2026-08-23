@@ -101,6 +101,7 @@ describe('Extracting Image file names in the state service', () => {
           solicit_answer_details: false,
           classifier_model_id: null,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         'State 3': {
           param_changes: [],
@@ -125,6 +126,7 @@ describe('Extracting Image file names in the state service', () => {
           solicit_answer_details: false,
           classifier_model_id: null,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         Introduction: {
           classifier_model_id: null,
@@ -225,6 +227,7 @@ describe('Extracting Image file names in the state service', () => {
           linked_skill_id: null,
           solicit_answer_details: false,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         'State 4': {
           param_changes: [],
@@ -345,6 +348,7 @@ describe('Extracting Image file names in the state service', () => {
           solicit_answer_details: false,
           classifier_model_id: null,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         'State 5': {
           classifier_model_id: null,
@@ -554,6 +558,7 @@ describe('Extracting Image file names in the state service', () => {
           solicit_answer_details: false,
           linked_skill_id: null,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         'State 6': {
           param_changes: [],
@@ -679,6 +684,7 @@ describe('Extracting Image file names in the state service', () => {
           solicit_answer_details: false,
           classifier_model_id: null,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
         'State 7': {
           param_changes: [],
@@ -800,6 +806,7 @@ describe('Extracting Image file names in the state service', () => {
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
         },
       },
       param_specs: {},
@@ -820,7 +827,7 @@ describe('Extracting Image file names in the state service', () => {
         auto_tts_enabled: false,
         edits_allowed: true,
       },
-    };
+    } as ExplorationBackendDict;
 
     ImageFilenamesInExploration = {
       'State 1': [],

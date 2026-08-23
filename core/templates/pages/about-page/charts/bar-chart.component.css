@@ -4,14 +4,14 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-
 .oppia-bar-chart .charts-css.bar {
   --labels-size: 220px;
+  margin-left: var(--labels-size); 
+  width: calc(100% - var(--labels-size));
 }
 
 .oppia-bar-chart .charts-css th {
   padding: 0 30px 0 0;
-  width: 40%;
 }
 
 .oppia-bar-chart .charts-css.bar tbody tr td {
@@ -20,7 +20,8 @@
 }
 
 .oppia-bar-chart .charts-css.bar tr {
-  padding: 0;
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
 .oppia-bar-chart .charts-css.bar .data {
@@ -133,5 +134,4 @@
     font-size: 8px;
     line-height: normal;
   }
-
 }

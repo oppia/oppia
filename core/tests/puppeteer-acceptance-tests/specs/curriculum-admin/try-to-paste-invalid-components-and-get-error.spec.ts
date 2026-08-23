@@ -21,7 +21,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -29,18 +28,8 @@ const ROLES = testConstants.Roles;
 describe('Blog Editor and curriculum admin', function () {
   let blogPostEditor: BlogPostEditor;
   let curriculumAdmin: CurriculumAdmin;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-    // Enable the feature flag.
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
-    );
     blogPostEditor = await UserFactory.createNewUser(
       'blogPostEditor',
       'blog_post_editor@example.com',

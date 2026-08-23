@@ -21,6 +21,7 @@ import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
+import {StateBackendDict} from 'domain/state/state.model';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
@@ -97,7 +98,7 @@ describe('Version history service', () => {
   it('should insert state version history', () => {
     expect(versionHistoryService.fetchedStateData.length).toEqual(0);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -133,19 +134,11 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -158,7 +151,7 @@ describe('Version history service', () => {
   });
 
   it('should reset state version history', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -194,19 +187,11 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -240,9 +225,9 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(
-      versionHistoryService.shouldFetchNewMetadataVersionHistory()
-    ).toBeTrue();
+    expect(versionHistoryService.shouldFetchNewMetadataVersionHistory()).toBe(
+      true
+    );
 
     versionHistoryService.insertMetadataVersionHistoryData(
       4,
@@ -255,13 +240,13 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(
-      versionHistoryService.shouldFetchNewMetadataVersionHistory()
-    ).toBeFalse();
+    expect(versionHistoryService.shouldFetchNewMetadataVersionHistory()).toBe(
+      false
+    );
   });
 
   it('should find whether new state version history data should be fetched', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -297,39 +282,31 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
 
-    expect(
-      versionHistoryService.shouldFetchNewStateVersionHistory()
-    ).toBeTrue();
+    expect(versionHistoryService.shouldFetchNewStateVersionHistory()).toBe(
+      true
+    );
 
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(5, stateData, '');
 
-    expect(
-      versionHistoryService.shouldFetchNewStateVersionHistory()
-    ).toBeFalse();
+    expect(versionHistoryService.shouldFetchNewStateVersionHistory()).toBe(
+      false
+    );
   });
 
   it('should get whether we should show backward state diff data', () => {
-    expect(versionHistoryService.canShowBackwardStateDiffData()).toBeFalse();
+    expect(versionHistoryService.canShowBackwardStateDiffData()).toBe(false);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -365,29 +342,21 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
 
-    expect(versionHistoryService.canShowBackwardStateDiffData()).toBeTrue();
+    expect(versionHistoryService.canShowBackwardStateDiffData()).toBe(true);
   });
 
   it('should get whether we should show backward metadata diff data', () => {
-    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBeFalse();
+    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBe(false);
 
     const explorationMetadata = new ExplorationMetadata(
       'title',
@@ -415,13 +384,13 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBeTrue();
+    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBe(true);
   });
 
   it('should get whether we should show foward state diff data', () => {
-    expect(versionHistoryService.canShowForwardStateDiffData()).toBeFalse();
+    expect(versionHistoryService.canShowForwardStateDiffData()).toBe(false);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -457,19 +426,11 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -478,11 +439,11 @@ describe('Version history service', () => {
     versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
     versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
 
-    expect(versionHistoryService.canShowForwardStateDiffData()).toBeTrue();
+    expect(versionHistoryService.canShowForwardStateDiffData()).toBe(true);
   });
 
   it('should get whether we should show foward metadata diff data', () => {
-    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBeFalse();
+    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBe(false);
 
     const explorationMetadata = new ExplorationMetadata(
       'title',
@@ -517,11 +478,11 @@ describe('Version history service', () => {
     versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
     versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
 
-    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBeTrue();
+    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBe(true);
   });
 
   it('should get backward state diff data', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -557,19 +518,11 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -581,7 +534,7 @@ describe('Version history service', () => {
   });
 
   it('should get forward state diff data', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -617,19 +570,11 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
+      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');

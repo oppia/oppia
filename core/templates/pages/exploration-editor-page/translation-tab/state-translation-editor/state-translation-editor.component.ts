@@ -20,11 +20,13 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
@@ -37,6 +39,7 @@ import {ChangeListService} from 'pages/exploration-editor-page/services/change-l
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import './state-translation-editor.component.css';
 
 interface HTMLSchema {
   type: string;
@@ -56,6 +59,7 @@ interface ListSchema {
 @Component({
   selector: 'oppia-state-translation-editor',
   templateUrl: './state-translation-editor.component.html',
+  styleUrls: ['./state-translation-editor.component.css'],
 })
 export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -91,6 +95,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private explorationStatesService: ExplorationStatesService,
     private changeListService: ChangeListService,
     private externalSaveService: ExternalSaveService,
+    private externalRteSaveService: ExternalRteSaveService,
     private graphDataService: GraphDataService,
     private ngbModal: NgbModal,
     private stateEditorService: StateEditorService,
@@ -98,7 +103,8 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private translationStatusService: TranslationStatusService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private pageContextService: PageContextService,
-    private entityVoiceoversService: EntityVoiceoversService
+    private entityVoiceoversService: EntityVoiceoversService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
@@ -237,6 +243,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveTranslationButtonClicked(): void {
+    this.externalRteSaveService.onExternalRteSave.emit();
     this.activeWrittenTranslation = this
       .activeWrittenTranslation as TranslatedContent;
     this.activeWrittenTranslation.needsUpdate = false;
@@ -297,5 +304,9 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isTranslationLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isLanguageRTL(this.languageCode);
   }
 }

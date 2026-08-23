@@ -17,7 +17,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -68,7 +68,7 @@ describe('Thumbnail Component', () => {
     'JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+';
 
   const invalidBase64data = 'data:image/svg+xml;base64,This is invalid %3D';
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ThumbnailDisplayComponent],

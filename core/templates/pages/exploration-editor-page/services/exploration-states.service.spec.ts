@@ -148,6 +148,7 @@ describe('ExplorationStatesService', () => {
           solicit_answer_details: false,
           classifier_model_id: '0',
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -236,6 +237,26 @@ describe('ExplorationStatesService', () => {
     );
     expect(
       explorationStatesService.getSolicitAnswerDetailsMemento('Hola')
-    ).toBeTrue();
+    ).toBe(true);
+  });
+
+  describe('.getAllNonEmptyContentIdsByStateName', () => {
+    it('should exclude content ids whose html is empty', () => {
+      // In the Hola state, "content" has html '' (empty) while
+      // "feedback_1" has non-empty html, so only "content" should
+      // be dropped by the non-empty variant.
+      const allContentIds =
+        explorationStatesService.getAllContentIdsByStateName('Hola');
+      const nonEmptyContentIds =
+        explorationStatesService.getAllNonEmptyContentIdsByStateName('Hola');
+
+      // The existing method still includes the empty "content" field.
+      expect(allContentIds).toContain('content');
+
+      // The new method drops the empty "content" field...
+      expect(nonEmptyContentIds).not.toContain('content');
+      // ...but keeps the non-empty "feedback_1" field.
+      expect(nonEmptyContentIds).toContain('feedback_1');
+    });
   });
 });

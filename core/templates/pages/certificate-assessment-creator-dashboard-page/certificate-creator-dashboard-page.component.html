@@ -1,0 +1,105 @@
+<background-banner></background-banner>
+<div class="container position-relative oppia-certificate-creator-dashboard">
+  <div class="oppia-certificate-creator-hero">
+    <div class="oppia-certificate-creator-title-block">
+      <h1 tabindex="0">
+        Certificate Creator Dashboard
+      </h1>
+    </div>
+    <button type="button" class="btn btn-primary oppia-new-certificate-btn"
+            [routerLink]="createCertificateOfferingRoute">
+      + New Certificate
+    </button>
+  </div>
+
+  <div class="card shadow-sm border-0 oppia-certificate-creator-card">
+    <div class="card-header bg-white border-0 d-flex justify-content-center align-items-center gap-2 py-3 fs-4 mt-1">
+      <h2 class="m-0">Certificates</h2>
+      <span *ngIf="!isLoading; else loadingCount" class="badge oppia-total-badge fs-4">
+        {{ certificateOfferings.length }} Total
+      </span>
+      <ng-template #loadingCount>
+        <span class="badge oppia-total-badge fs-4">
+          <mat-spinner diameter="18"></mat-spinner>
+        </span>
+      </ng-template>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="isLoading" class="text-center py-5 text-muted">
+        <mat-spinner class="mx-auto mb-3" diameter="28"></mat-spinner>
+        Loading certificates...
+      </div>
+      <div *ngIf="!isLoading && certificateOfferings.length === 0"
+           class="text-center py-5 text-muted">
+        No certificate created yet.
+      </div>
+      <div *ngIf="!isLoading && certificateOfferings.length > 0" class="table-responsive p-2">
+        <table class="table table-hover align-middle mb-0 oppia-certificate-creator-table">
+          <caption class="visually-hidden">
+            List of certificates with status and actions
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="oppia-title-th" >Certificate Title</th>
+              <th scope="col">Topics</th>
+              <th scope="col">Time</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let certificateOffering of paginatedCertificateOfferings">
+              <td class="oppia-title-cell">
+                <span class="oppia-certificate-title">{{ certificateOffering.title }}</span>
+              </td>
+              <td>
+                <span class="oppia-topics-count">{{ certificateOffering.topicsLabel }}</span>
+              </td>
+              <td>{{ certificateOffering.timeLabel }}</td>
+              <td class="oppia-status-cell">
+                <span class="badge oppia-status-badge" [ngClass]="{
+                    'oppia-status-available': certificateOffering.status.toLowerCase().includes('available'),
+                    'oppia-status-blocked': certificateOffering.status.toLowerCase().includes('blocked'),
+                    'oppia-status-not-ready': certificateOffering.status.toLowerCase().includes('not ready') || certificateOffering.status.toLowerCase().includes('not_ready')
+                  }">
+                  {{ getHumanReadableStatus(certificateOffering.status) }}
+                </span>
+              </td>
+              <td class="oppia-actions-cell">
+                <div class="d-flex justify-content-center gap-2 oppia-action-buttons">
+                  <button type="button" class="btn btn-sm oppia-edit-btn"
+                          [routerLink]="getEditCertificateOfferingRoute(certificateOffering.certificateId)">
+                    Edit
+                  </button>
+                  <button type="button" class="btn btn-sm oppia-delete-btn"
+                          (click)="openDeleteCertificateOfferingModal(certificateOffering.certificateId)">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!isLoading && certificateOfferings.length > 0"
+           class="d-flex justify-content-between align-items-center px-4 py-3 oppia-table-footer">
+        <span class="text-muted small">
+          Showing {{ firstCertificateNumber }} to {{ finalCertificateNumber }} of {{ totalCertificateOfferings }} certificates
+        </span>
+        <div class="oppia-pagination-controls" aria-label="Certificate pagination">
+          <button type="button" class="btn btn-sm oppia-pagination-button" [disabled]="!canGoToPreviousPage()"
+                  (click)="goToPreviousPage()">
+            &lt; Previous
+          </button>
+          <span class="oppia-pagination-count" aria-live="polite">
+            {{ currentPage }}
+          </span>
+          <button type="button" class="btn btn-sm oppia-pagination-button" [disabled]="!canGoToNextPage()"
+                  (click)="goToNextPage()">
+            Next &gt;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

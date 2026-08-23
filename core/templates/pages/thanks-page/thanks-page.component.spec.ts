@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ThanksPageComponent} from './thanks-page.component';
 
@@ -25,7 +25,7 @@ describe('Thanks page', function () {
   let component: ThanksPageComponent;
   let fixture: ComponentFixture<ThanksPageComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ThanksPageComponent],
       schemas: [NO_ERRORS_SCHEMA],

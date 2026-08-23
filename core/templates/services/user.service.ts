@@ -146,7 +146,9 @@ export class UserService {
     return this.getUserInfoAsync().then(userInfo => {
       return (
         userInfo.isLoggedIn() &&
-        (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+        (userInfo.isCurriculumAdmin() ||
+          userInfo.isTopicManager() ||
+          userInfo.isQuestionAdmin())
       );
     });
   }

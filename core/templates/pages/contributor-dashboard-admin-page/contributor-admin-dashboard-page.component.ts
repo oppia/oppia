@@ -23,6 +23,7 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  ViewEncapsulation,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
@@ -87,6 +88,7 @@ export const PICK_FORMATS = {
     {provide: DateAdapter, useClass: ISODatePickerAdapter},
     {provide: MAT_DATE_FORMATS, useValue: PICK_FORMATS},
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
   @ViewChild('languageDropdown', {static: false})

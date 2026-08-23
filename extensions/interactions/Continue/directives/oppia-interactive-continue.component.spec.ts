@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the Continue button interaction.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {OppiaInteractiveContinue} from './oppia-interactive-continue.component';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {PageContextService} from 'services/page-context.service';
@@ -72,7 +72,7 @@ describe('OppiaInteractiveContinue', () => {
 
     // This cannot be taken outside and made common since it results in
     // karma coverage reporting that lines are not covered.
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [OppiaInteractiveContinue],
         providers: [
@@ -135,7 +135,7 @@ describe('OppiaInteractiveContinue', () => {
 
     // This cannot be taken outside and made common since it results in
     // karma coverage reporting that lines are not covered.
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [OppiaInteractiveContinue],
         providers: [

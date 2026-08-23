@@ -38,6 +38,7 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {DateTimeFormatService} from '../../../../services/date-time-format.service';
 import {ProgressUrlService} from '../../services/progress-url.service';
@@ -49,7 +50,7 @@ import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -98,6 +99,10 @@ class MockPlayerPositionService {
   getDisplayedCardIndex(): number {
     return this.displayedCardIndex;
   }
+}
+
+class MockSignInEventService {
+  onUserSignIn = new EventEmitter<void>();
 }
 
 class MockWindowRef {
@@ -160,7 +165,7 @@ describe('Lesson Information card modal component', () => {
       declarations: [
         LessonInformationCardModalComponent,
         MockTranslatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockLimitToPipe,
       ],
@@ -187,6 +192,10 @@ describe('Lesson Information card modal component', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService,
+        },
+        {
+          provide: SignInEventService,
+          useClass: MockSignInEventService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -520,7 +529,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.closeSaveProgressMenu();
 
-    expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
+    expect(componentInstance.saveProgressMenuIsShown).toBe(false);
   });
 
   it('should return 0% when no checkpoints are completed', () => {
@@ -557,9 +566,13 @@ describe('Lesson Information card modal component', () => {
 
     let cards: StateCard[] = [];
     for (let i = 0; i < numCards; i++) {
-      cards.push({
-        getStateName: jasmine.createSpy('getStateName').and.returnValue(i),
-      });
+      const cardSpy = jasmine.createSpyObj<StateCard>('StateCard', [
+        'getStateName',
+      ]);
+
+      (cardSpy.getStateName as jasmine.Spy).and.returnValue(String(i));
+
+      cards.push(cardSpy);
     }
 
     spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {

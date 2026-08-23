@@ -524,3 +524,32 @@ class RegistryUnitTest(test_utils.TestBase):
             ),
         ):
             models.Platform().import_models([models.Names.BASE_MODEL])
+
+    def test_import_models_translation(self) -> None:
+        """Tests import_models function with translation option."""
+        from core.storage.translation import gae_models as translation_models
+
+        expected_translation_models = (translation_models,)
+        self.assertEqual(
+            expected_translation_models,
+            self.registry_instance.import_models([models.Names.TRANSLATION]),
+        )
+
+    def test_import_machine_translate_services_in_dev_mode(self) -> None:
+        """Tests import the machine translate services function in dev mode."""
+        from core.platform.translate import translate_emulator
+
+        self.assertEqual(
+            translate_emulator,
+            self.registry_instance.import_machine_translate_services(),
+        )
+
+    def test_import_machine_translate_services_in_prod_mode(self) -> None:
+        """Tests import the machine translate services function in prod mode."""
+        from core.platform.translate import azure_translate_services
+
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            self.assertEqual(
+                azure_translate_services,
+                self.registry_instance.import_machine_translate_services(),
+            )

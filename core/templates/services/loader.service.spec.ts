@@ -16,14 +16,19 @@
  * @fileoverview Unit tests for loader service.
  */
 
-import {LoaderService} from 'services/loader.service';
+import {LoaderService} from './loader.service';
 import {Subscription} from 'rxjs';
+import {TestBed} from '@angular/core/testing';
 
 describe('Loader Service', () => {
-  const loaderService = new LoaderService();
-  let loadingMessage: string = '';
+  let loaderService: LoaderService;
+  let loadingMessage = '';
   let subscriptions: Subscription;
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [LoaderService],
+    });
+    loaderService = TestBed.inject(LoaderService);
     subscriptions = new Subscription();
     subscriptions.add(
       loaderService.onLoadingMessageChange.subscribe(

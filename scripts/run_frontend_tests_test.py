@@ -501,9 +501,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn('Running test in production environment', self.print_arr)
-        self.assertIn(
-            ['--prod_env', '--minify_third_party_libs_only'], self.build_args
-        )
+        self.assertIn(['--prod_env', '--skip_ng_build'], self.build_args)
 
     def test_coverage_checks_are_not_run_when_frontend_tests_fail(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
@@ -577,6 +575,20 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.assertIsNone(result)
 
             file_path = 'another_file.md'
+            result = run_frontend_tests.get_file_spec(file_path)
+            self.assertIsNone(result)
+
+    def test_get_file_spec_with_puppeteer_acceptance_spec(self) -> None:
+        def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            file_path = (
+                'core/tests/puppeteer-acceptance-tests/specs/'
+                'logged-in-learner/'
+                'manage-community-lesson-progress-in-home-learner-dashboard'
+                '.spec.ts'
+            )
             result = run_frontend_tests.get_file_spec(file_path)
             self.assertIsNone(result)
 

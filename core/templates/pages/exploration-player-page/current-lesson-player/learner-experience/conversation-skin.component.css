@@ -70,7 +70,8 @@ oppia-conversation-skin .supplemental-card-parent-container {
   max-width: 650px;
   /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
       below should be changed to match. */
-  min-width: 360px;
+  /* This min-width is set to auto to prevent the supplemental card from overflowing on small mobile devices (e.g. iPhone SE). */
+  min-width: auto;
   position: relative;
   width: 42%;
   z-index: 3;
@@ -126,17 +127,20 @@ oppia-conversation-skin .supplemental-card-parent-container {
   margin-right: 10px;
 }
 
-oppia-conversation-skin .oppia-button-raised.mat-raised-raised {
+button.oppia-button-raised.e2e-test-next-lesson-button.mat-focus-indicator.mat-raised-button.mat-button-base {
   align-items: center;
   background-color: #0d48a1;
+  border: none;
   display: flex;
   height: 32px;
   justify-content: center;
+  padding: 0;
   width: 32px;
 }
 
 oppia-conversation-skin .oppia-button-icon {
   color: #fff;
+  font-size: 42px;
 }
 
 .oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
@@ -173,7 +177,8 @@ oppia-conversation-skin .oppia-button-icon {
   .conversation-skin-supplemental-card-container {
     left: 50%;
     margin: 60px auto 0 auto;
-    min-width: 360px;
+    /* This min-width is set to auto to prevent the supplemental card from overflowing on small mobile devices (e.g. iPhone SE). */
+    min-width: auto;
     position: absolute;
     transform: translateX(-50%);
     width: 100%;

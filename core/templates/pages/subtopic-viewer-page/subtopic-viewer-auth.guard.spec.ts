@@ -69,7 +69,7 @@ describe('SubtopicViewerAuthGuard', () => {
     );
   });
 
-  it('should allow users to access the subtopic viewer page', fakeAsync(done => {
+  it('should allow users to access the subtopic viewer page', fakeAsync(() => {
     let avbas = spyOn(
       accessValidationBackendApiService,
       'validateAccessToSubtopicViewerPage'
@@ -88,7 +88,7 @@ describe('SubtopicViewerAuthGuard', () => {
 
     tick();
 
-    expect(canActivateResult).toBeTrue();
+    expect(canActivateResult).toBe(true);
     expect(avbas).toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
@@ -112,7 +112,7 @@ describe('SubtopicViewerAuthGuard', () => {
 
     tick();
 
-    expect(canActivateResult).toBeFalse();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);

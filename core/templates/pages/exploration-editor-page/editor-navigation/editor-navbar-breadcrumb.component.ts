@@ -30,20 +30,7 @@ import {RouterService} from '../services/router.service';
 })
 export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  navbarTitle!: string;
-  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: object = {
-    main: 'Edit',
-    translation: 'Translation',
-    preview: 'Preview',
-    settings: 'Settings',
-    stats: 'Statistics',
-    improvements: 'Improvements',
-    history: 'History',
-    feedback: 'Feedback',
-  };
+  navbarTitle: string | null = null;
 
   constructor(
     private explorationTitleService: ExplorationTitleService,
@@ -58,32 +45,26 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     );
   }
 
-  getCurrentTabName(): string {
-    const that = this;
-    type TabNamesToHumanReadableNamesKeys =
-      keyof typeof that._TAB_NAMES_TO_HUMAN_READABLE_NAMES;
-    if (!this.routerService.getActiveTabName()) {
-      return '';
-    } else {
-      return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-        this.routerService.getActiveTabName() as TabNamesToHumanReadableNamesKeys
-      ];
-    }
-  }
-
   ngOnInit(): void {
+    this.setNavbarTitle();
     this.directiveSubscriptions.add(
       this.explorationTitleService.onExplorationPropertyChanged.subscribe(
-        propertyName => {
-          const _MAX_TITLE_LENGTH = 20;
-          this.navbarTitle = String(this.explorationTitleService.savedMemento);
-          if (this.navbarTitle.length > _MAX_TITLE_LENGTH) {
-            this.navbarTitle =
-              this.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...';
-          }
+        () => {
+          this.setNavbarTitle();
         }
       )
     );
+  }
+
+  setNavbarTitle(): void {
+    if (
+      this.explorationTitleService.savedMemento === undefined ||
+      this.explorationTitleService.savedMemento === null
+    ) {
+      this.navbarTitle = null;
+      return;
+    }
+    this.navbarTitle = String(this.explorationTitleService.savedMemento);
   }
 
   ngOnDestroy(): void {

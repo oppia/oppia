@@ -25,6 +25,7 @@ import {
   ViewChild,
   ChangeDetectorRef,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -36,7 +37,6 @@ import {ExplorationPlayerConstants} from '../../current-lesson-player/exploratio
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 
-import './supplemental-card.component.css';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
@@ -44,6 +44,7 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
   selector: 'oppia-supplemental-card',
   templateUrl: './supplemental-card.component.html',
   styleUrls: ['./supplemental-card.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

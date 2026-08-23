@@ -138,6 +138,39 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
         )
 
+    def test_get_skill_by_id_raises_when_strict_and_skill_not_found(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'No skill exists with ID: nonexistent_id'
+        ):
+            skill_fetchers.get_skill_by_id('nonexistent_id', strict=True)
+
+    def test_get_multi_skills_with_strict_false_skips_missing_skills(
+        self,
+    ) -> None:
+        skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}, '3': {}}}
+            ),
+            translation_domain.WrittenTranslations.from_dict(
+                {'translations_mapping': {'1': {}, '2': {}, '3': {}}}
+            ),
+        )
+        self.save_new_skill(
+            'skill_exists',
+            self.USER_ID,
+            description='Existing Skill',
+            misconceptions=[],
+            skill_contents=skill_contents,
+        )
+        skills = skill_fetchers.get_multi_skills(
+            ['skill_exists', 'non_existent_skill'], strict=False
+        )
+        self.assertEqual(len(skills), 1)
+        self.assertEqual(skills[0].id, 'skill_exists')
+
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
         self,
     ) -> None:

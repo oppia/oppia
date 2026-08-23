@@ -694,4 +694,52 @@ describe('TextInputValidationService', () => {
       },
     ]);
   });
+
+  it('should catch redundant Equals rules preceded by Contains rules', () => {
+    // Rule 1: Contains 'factor'
+    // Rule 2: Equals 'factors' — redundant because 'factors'.includes('factor')
+    let answerGroups = [
+      createAnswerGroupByRules([
+        Rule.createFromBackendDict(
+          {
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['factor'],
+              },
+            },
+          },
+          'TextInput'
+        ),
+        Rule.createFromBackendDict(
+          {
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['factors'],
+              },
+            },
+          },
+          'TextInput'
+        ),
+      ]),
+    ];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 is redundant because it ' +
+          'is already covered by learner answer 1 from Oppia response 1.',
+      },
+    ]);
+  });
 });

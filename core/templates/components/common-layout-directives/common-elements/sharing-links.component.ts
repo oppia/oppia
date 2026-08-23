@@ -27,10 +27,12 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ExplorationEmbedButtonModalComponent} from 'components/button-directives/exploration-embed-button-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
+import './sharing-links.component.css';
+
 @Component({
   selector: 'sharing-links',
   templateUrl: './sharing-links.component.html',
-  styleUrls: [],
+  styleUrls: ['./sharing-links.component.css'],
 })
 export class SharingLinksComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

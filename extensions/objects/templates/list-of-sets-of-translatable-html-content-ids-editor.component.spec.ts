@@ -17,14 +17,14 @@
  * editor.
  */
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ListOfSetsOfTranslatableHtmlContentIdsEditorComponent} from './list-of-sets-of-translatable-html-content-ids-editor.component';
 
 describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
   let component: ListOfSetsOfTranslatableHtmlContentIdsEditorComponent;
   let fixture: ComponentFixture<ListOfSetsOfTranslatableHtmlContentIdsEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ListOfSetsOfTranslatableHtmlContentIdsEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

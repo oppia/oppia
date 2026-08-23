@@ -250,107 +250,6 @@
         </div>
       </div>
     </div>
-    <div tabindex="0" class="playlist-section e2e-test-play-later-section">
-      <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
-      </h1>
-      <div *ngIf="noPlaylistActivity">
-        <h2 [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></h2>
-        <oppia-primary-button [customClasses]="'btn oppia-dashboard-intro-button'"
-                              [buttonHref]="communityLibraryUrl"
-                              [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
-        </oppia-primary-button>
-      </div>
-      <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
-        <div class="pagination">
-          <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
-             (click)="changePageByOne(moveToPrevPage, 'playlist')">
-          </i>
-          <span class="pagination-dot">
-            <span class="pagination-number">
-              {{pageNumberInPlaylist}}
-            </span>
-          </span>
-          <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page"
-             (click)="changePageByOne(moveToNextPage, 'playlist')">
-          </i>
-        </div>
-      </div>
-      <div *ngIf="totalLessonsInPlaylist.length !== 0">
-        <div class="summary-container">
-          <div *ngFor="let summaryTile of displayLessonsInPlaylist.slice(startIndexInPlaylist, endIndexInPlaylist)"
-               class="oppia-summary-tile-container"
-               (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
-               (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
-            <div *ngIf="getTileType(summaryTile) === 'exploration'">
-              <i class="remove-icon fa fa-times e2e-test-remove-from-playlist-btn"
-                 *ngIf="summaryTile.toggle || windowIsNarrow"
-                 aria-hidden="true"
-                 (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
-                 ngbTooltip="Remove"
-                 container="body"
-                 placement="top">
-              </i>
-              <oppia-exploration-summary-tile [explorationId]="summaryTile.id"
-                                              [explorationTitle]="summaryTile.title"
-                                              [lastUpdatedMsec]="summaryTile.lastUpdatedMsec"
-                                              [objective]="summaryTile.objective"
-                                              [category]="summaryTile.category"
-                                              [ratings]="summaryTile.ratings"
-                                              [numViews]="summaryTile.numViews"
-                                              [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                                              [thumbnailBgColor]="summaryTile.thumbnailBgColor">
-              </oppia-exploration-summary-tile>
-            </div>
-            <div *ngIf="getTileType(summaryTile) === 'collection'">
-              <i class="remove-icon fa fa-times"
-                 *ngIf="summaryTile.toggle || windowIsNarrow"
-                 aria-hidden="true"
-                 (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
-                 ngbTooltip="Remove"
-                 container="body"
-                 placement="top">
-              </i>
-              <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
-                                             [getCollectionTitle]="summaryTile.title"
-                                             [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
-                                             [getObjective]="summaryTile.objective"
-                                             [getNodeCount]="summaryTile.nodeCount"
-                                             [getCategory]="summaryTile.category"
-                                             [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                                             [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
-              </oppia-collection-summary-tile>
-            </div>
-          </div>
-          <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
-            <div class="pagination-bottom">
-              <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
-                 (click)="changePageByOne(moveToPrevPage, 'playlist')">
-              </i>
-              <span class="pagination-dot">
-                <span class="pagination-number">
-                  {{pageNumberInPlaylist}}
-                </span>
-              </span>
-              <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page"
-                 (click)="changePageByOne(moveToNextPage, 'playlist')">
-              </i>
-            </div>
-          </div>
-          <div class="oppia-toggle-button-section" *ngIf="totalLessonsInPlaylist.length > 3 && !windowIsNarrow">
-            <button class="btn oppia-toggle-btn"
-                    (click)="handleShowMore('playlist')"
-                    *ngIf="!showMoreInSection['playlist']">
-              <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
-            </button>
-            <button class="btn oppia-toggle-btn"
-                    (click)="handleShowMore('playlist')"
-                    *ngIf="showMoreInSection['playlist']">
-              <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
     <div tabindex="0" class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
       <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></h1>
       <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
@@ -398,7 +297,7 @@
   </ng-container>
   <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <ng-container *ngIf="!isLearnerStateEmpty(); else empty">
-      <div tabindex="0" class="oppia-learner-dash-section e2e-test-learner-dash-section" *ngIf="totalIncompleteLessonsList.length !== 0 || partiallyLearntTopicsList.length !== 0">
+      <div tabindex="0" class="oppia-learner-dash-section e2e-test-learner-dash-section" *ngIf="partiallyLearntTopicsList.length !== 0">
         <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
         <div class="incomplete-section e2e-test-incomplete-community-lessons-section w-100" >
           <!--TODO(#18384): Display all lessons in topic or just the most recent/last?-->
@@ -409,39 +308,15 @@
               </ng-container>
             </ng-container>
           </oppia-card-display>
-          <oppia-card-display *ngIf="totalIncompleteLessonsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [controlType]="'toggle'">
-            <ng-container *ngFor="let summaryTile of totalIncompleteLessonsList">
-              <lesson-card [story]="summaryTile"> </lesson-card>
-            </ng-container>
-          </oppia-card-display>
-          <oppia-card-display *ngIf="partiallyLearntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_SKILLS'" [numCards]="partialTopicMastery.reduce(getTotalSkillCards, 0)" [controlType]="'toggle'">
-            <ng-container *ngFor="let topicObj of partialTopicMastery">
-              <ng-container *ngFor="let subtopic of topicObj.topic.subtopics; index as i">
-                <oppia-skill-card [topic]="topicObj.topic" [progress]="topicObj.progress[i]" [subtopic]="subtopic"></oppia-skill-card>
-              </ng-container>
-            </ng-container>
-          </oppia-card-display>
         </div>
       </div>
-      <div tabindex="0" class="oppia-learner-dash-section e2e-test-learner-dash-section w-100" *ngIf="totalCompletedLessonsList.length !== 0 || learntTopicsList.length !== 0">
+      <div tabindex="0" class="oppia-learner-dash-section e2e-test-learner-dash-section w-100"  *ngIf="learntTopicsList.length !== 0">
         <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
          <!--TODO(#18384): Display all lessons in topic or just the most recent/last?-->
         <oppia-card-display *ngIf="learntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM'" [numCards]="learntTopicMastery.length" [controlType]="'toggle'">
           <ng-container *ngFor="let topicObj of learntTopicMastery">
             <ng-container *ngFor="let story of topicObj.topic.canonicalStorySummaryDicts; index as i">
               <lesson-card [story]="story" [topic]="topicObj.topic.name" [isGoal]="completedGoalIds.has(topicObj.id)"> </lesson-card>
-            </ng-container>
-          </ng-container>
-        </oppia-card-display>
-        <oppia-card-display *ngIf="totalCompletedLessonsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [controlType]="'toggle'">
-          <ng-container *ngFor="let summaryTile of totalCompletedLessonsList">
-            <lesson-card [story]="summaryTile" [isCommunityLessonComplete]="true"> </lesson-card>
-          </ng-container>
-        </oppia-card-display>
-        <oppia-card-display *ngIf="learntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_SKILLS'" [numCards]="learntTopicMastery.reduce(getTotalSkillCards, 0)" [controlType]="'toggle'">
-          <ng-container *ngFor="let topicObj of learntTopicMastery">
-            <ng-container *ngFor="let subtopic of topicObj.topic.subtopics; index as i">
-              <oppia-skill-card [topic]="topicObj.topic" [progress]="topicObj.progress[i]" [subtopic]="subtopic"></oppia-skill-card>
             </ng-container>
           </ng-container>
         </oppia-card-display>

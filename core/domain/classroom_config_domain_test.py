@@ -44,6 +44,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'classroom_id',
             'math',
             'math',
+            'user@email.com',
             'Curated math foundations course.',
             'Learn math through fun stories!',
             'Start from the basics with our first topic.',
@@ -62,6 +63,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'classroom_id': 'classroom_id',
             'name': 'math',
             'url_fragment': 'math',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated math foundations course.',
             'teaser_text': 'Learn math through fun stories!',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -207,6 +209,30 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Classroom URL Fragment field should not exceed 20 characters, '
             'received %s.' % self.classroom.url_fragment
         )
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_invalid_feedback_recipient_email_should_raise_exception(
+        self,
+    ) -> None:
+        self.classroom.feedback_recipient_email = 1  # type: ignore[assignment]
+        error_msg = (
+            'Expected feedback_recipient_email of the classroom to be a '
+            'string, received: 1.'
+        )
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
+        self.classroom.feedback_recipient_email = ''
+        error_msg = 'feedback_recipient_email field should not be empty'
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
+        self.classroom.feedback_recipient_email = 'invalid-email'
+        error_msg = 'Invalid feedback_recipient_email: invalid-email.'
         with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.classroom.validate(strict=True)
 

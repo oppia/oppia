@@ -29,6 +29,7 @@ import {
 } from 'interactions/answer-defs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-units.component';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 
@@ -42,6 +43,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() labelForFocusTarget!: string;
+  @Input() lastAnswer!: NumberWithUnitsAnswer | null;
   @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
@@ -58,7 +60,8 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private focusManagerService: FocusManagerService,
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private numberConversionService: NumberConversionService
   ) {
     this.componentSubscriptions.add(
       this.answerChanged
@@ -79,7 +82,9 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.savedSolution !== undefined) {
+    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
+      this.answer = NumberWithUnits.fromDict(this.lastAnswer).toString();
+    } else if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
       savedSolution = NumberWithUnits.fromDict(
         savedSolution as NumberWithUnitsAnswer
@@ -119,7 +124,12 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         this.currentInteractionService.updateAnswerIsValid(false);
         return;
       }
-      const numberWithUnits = NumberWithUnits.fromRawInputString(this.answer);
+      const decimalSeparator =
+        this.numberConversionService.currentDecimalSeparator();
+      const numberWithUnits = NumberWithUnits.fromRawInputString(
+        this.answer,
+        decimalSeparator
+      );
       this.currentInteractionService.onSubmit(
         numberWithUnits,
         this.numberWithUnitsRulesService as NumberWithUnitsRulesService

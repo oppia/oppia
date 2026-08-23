@@ -19,9 +19,8 @@
 from __future__ import annotations
 
 import copy
-import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import story_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import story_migration_jobs
@@ -61,8 +60,8 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             node_titles=['title1', 'title2'],
-            story_model_last_updated=datetime.datetime.utcnow(),
-            story_model_created_on=datetime.datetime.utcnow(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         topic_model = self.create_model(
@@ -108,6 +107,14 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
+            'arcs': [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1111'],
+                }
+            ],
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -274,8 +281,8 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             node_titles=['title1', 'title2'],
-            story_model_last_updated=datetime.datetime.utcnow(),
-            story_model_created_on=datetime.datetime.utcnow(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         topic_model = self.create_model(
@@ -321,6 +328,14 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
+            'arcs': [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1111'],
+                }
+            ],
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type

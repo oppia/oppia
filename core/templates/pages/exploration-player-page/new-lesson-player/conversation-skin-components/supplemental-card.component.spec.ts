@@ -44,7 +44,7 @@ import {
 import {SupplementalCardComponent} from './supplemental-card.component';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
+import {InteractionCustomizationArgs} from '../../../../../../extensions/interactions/customization-args-defs';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
@@ -60,14 +60,20 @@ describe('Supplemental card component', () => {
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let voiceoverPlayerService: VoiceoverPlayerService;
-  let recordedVoiceovers = new RecordedVoiceovers({});
   let mockStateCard = new StateCard(
     'state_name',
     'html',
     'html',
-    {} as Interaction,
+    new Interaction(
+      [],
+      [],
+      {} as InteractionCustomizationArgs,
+      null,
+      [],
+      'TextInput',
+      null
+    ),
     [],
-    recordedVoiceovers,
     ''
   );
 
@@ -125,7 +131,7 @@ describe('Supplemental card component', () => {
       imageUrl
     );
     spyOn(currentInteractionService, 'registerPresubmitHook').and.callFake(
-      callb => {
+      (callb: () => void) => {
         callb();
       }
     );
@@ -179,7 +185,7 @@ describe('Supplemental card component', () => {
   it('should clear help card', () => {
     componentInstance.clearHelpCard();
     expect(componentInstance.helpCardHtml).toBeNull();
-    expect(componentInstance.helpCardHasContinueButton).toBeFalse();
+    expect(componentInstance.helpCardHasContinueButton).toBe(false);
     expect(componentInstance.maxHelpCardHeightSeen).toEqual(0);
   });
 
@@ -200,10 +206,10 @@ describe('Supplemental card component', () => {
       () => innerHeight
     );
 
-    expect(componentInstance.isHelpCardTall()).toBeFalse();
+    expect(componentInstance.isHelpCardTall()).toBe(false);
 
     innerHeight = 100;
-    expect(componentInstance.isHelpCardTall()).toBeTrue();
+    expect(componentInstance.isHelpCardTall()).toBe(true);
   });
 
   it('should update help card bottom position', () => {
@@ -258,9 +264,16 @@ describe('Supplemental card component', () => {
       'state_name',
       'new content',
       'html',
-      {} as Interaction,
+      new Interaction(
+        [],
+        [],
+        {} as InteractionCustomizationArgs,
+        null,
+        [],
+        'TextInput',
+        null
+      ),
       [],
-      recordedVoiceovers,
       ''
     );
     const changes: SimpleChanges = {

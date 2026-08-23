@@ -44,6 +44,7 @@ describe('Classroom data model', () => {
         topic_model_created_on: 20160101,
         topic_model_last_updated: 20160110,
         can_edit_topic: true,
+        can_edit_question: true,
         is_published: true,
         url_fragment: 'some-url-fragment',
         classroom: 'math',
@@ -60,6 +61,7 @@ describe('Classroom data model', () => {
       'mathid',
       'Math',
       'math',
+      'user@email.com',
       topicSummaryDicts,
       'Course Details',
       'Topics Covered',
@@ -72,6 +74,7 @@ describe('Classroom data model', () => {
     );
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getUrlFragment()).toEqual('math');
+    expect(classroomData.getFeedbackRecipientEmail()).toEqual('user@email.com');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
@@ -86,5 +89,7 @@ describe('Classroom data model', () => {
     expect(classroomData.getBannerData().filename).toEqual('banner.png');
     expect(classroomData.getBannerData().size_in_bytes).toEqual(100);
     expect(classroomData.getBannerData().bg_color).toEqual('transparent');
+    expect(classroomData.getPublicClassroomsCount()).toEqual(1);
+    expect(classroomData.getClassroomId()).toEqual('mathid');
   });
 });

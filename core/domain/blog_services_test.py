@@ -464,7 +464,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         assert blog_post is not None
         self.assertEqual(blog_post.to_dict(), expected_blog_post.to_dict())
 
-    def test_get_blog_posy_by_invalid_url(self) -> None:
+    def test_get_blog_post_by_invalid_url(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
@@ -632,7 +632,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = utils.get_current_utc_datetime()
         model.update_timestamps()
         model.put()
 
@@ -670,7 +670,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = utils.get_current_utc_datetime()
         model.update_timestamps()
         model.put()
 

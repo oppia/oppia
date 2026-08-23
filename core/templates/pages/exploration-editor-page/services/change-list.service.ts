@@ -61,9 +61,11 @@ export type StatePropertyValues =
   | boolean
   | Hint[]
   | InteractionCustomizationArgs
+  | null
   | Outcome
   | ParamChange[]
   | string
+  | string[]
   | SubtitledHtml
   | BaseTranslatableObject;
 export type StatePropertyDictValues =
@@ -74,6 +76,7 @@ export type StatePropertyDictValues =
   | OutcomeBackendDict
   | ParamChangeBackendDict[]
   | string
+  | string[]
   | SubtitledHtmlBackendDict;
 export type StatePropertyNames =
   | 'answer_groups'

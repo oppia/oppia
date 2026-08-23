@@ -44,7 +44,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.verbose_mode_enabled = False
-        self.dependencies_file = io.StringIO('{"dependencies":{"frontend":{}}}')
         self.package_file = io.StringIO(
             '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
             '"guppy-dev":"git+https://github.com/oppia/guppy#f509e",'
@@ -63,11 +62,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             _: List[str],
             encoding: str = 'utf-8',  # pylint: disable=unused-argument
         ) -> io.StringIO:
-            if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
-                file = self.dependencies_file
-            elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
-                file = self.package_file
-            return file
+            if path == other_files_linter.PACKAGE_JSON_FILE_PATH:
+                return self.package_file
+            raise ValueError('Unexpected file path: %s' % path)
 
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
@@ -99,6 +96,94 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('App dev file', error_messages.name)
             self.assertFalse(error_messages.failed)
 
+    def test_check_skip_files_in_app_dev_yaml_without_section(self) -> None:
+        """Passes when no '# Third party files:' section exists."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Some unrelated config',
+                '',
+                'random_setting: true',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+            expected = ['SUCCESS  App dev file check passed']
+            self.assertEqual(error_messages.get_report(), expected)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_skip_files_in_app_dev_yaml_ignores_non_entries(self) -> None:
+        """Tests that blank lines, comments and non '- ' lines are ignored."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '',
+                # Blank line should be ignored.
+                '# Some explanation',
+                # Comment should be ignored.
+                'random_text',
+                # Not a '- ' entry, should be ignored.
+                '- third_party/static/bootstrap-5.3.3/',
+                # Valid entry.
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+            expected_error_messages = ['SUCCESS  App dev file check passed']
+            self.assertEqual(
+                error_messages.get_report(), expected_error_messages
+            )
+            self.assertEqual('App dev file', error_messages.name)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_skip_files_in_app_dev_yaml_with_no_entries(self) -> None:
+        """Tests that file passes when no skip entries are present."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '# Only comments present',
+                '',
+                'some_random_text',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+            expected_error_messages = ['SUCCESS  App dev file check passed']
+            self.assertEqual(
+                error_messages.get_report(), expected_error_messages
+            )
+            self.assertEqual('App dev file', error_messages.name)
+            self.assertFalse(error_messages.failed)
+
     def test_check_invalid_pattern_in_app_dev_yaml(self) -> None:
         def mock_readlines(
             unused_self: str, unused_filepath: str
@@ -123,87 +208,34 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('App dev file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
-    def test_check_valid_pattern(self) -> None:
+    def test_check_multiple_invalid_patterns_in_app_dev_yaml(self) -> None:
         def mock_readlines(
             unused_self: str, unused_filepath: str
         ) -> Tuple[str, ...]:
             return (
-                '// This is a comment.',
-                'plugins: [',
-                '   new HtmlWebpackPlugin({',
-                '       chunks: [\'about\'],',
-                '       filename: \'about-page.mainpage.html\',',
-                '       meta: defaultMeta,',
-                '       template: commonPrefix + \'/pages/about-page/about-page'
-                '.mainpage.html\',',
-                '       minify: htmlMinifyConfig,',
-                '       inject: false',
-                '}),]',
+                '# Third party files:',
+                '- third_party/static/bootstrap-5.3/',
+                '- third_party/static/jquery-3/',
             )
 
         readlines_swap = self.swap(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
+
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
-            ).check_webpack_config_file()
-        expected_error_messages = ['SUCCESS  Webpack config file check passed']
-        self.assertEqual(error_messages.get_report(), expected_error_messages)
-        self.assertEqual('Webpack config file', error_messages.name)
-        self.assertFalse(error_messages.failed)
+            ).check_skip_files_in_app_dev_yaml()
 
-    def test_check_invalid_pattern_with_some_keys_missing(self) -> None:
-        def mock_readlines(
-            unused_self: str, unused_filepath: str
-        ) -> Tuple[str, ...]:
-            return (
-                'plugins: [',
-                '   new HtmlWebpackPlugin({',
-                '       chunks: [\'about\'],',
-                '       filename: \'about-page.mainpage.html\',',
-                '       minify: htmlMinifyConfig,',
-                '       inject: false',
-                '}),]',
-            )
-
-        readlines_swap = self.swap(
-            run_lint_checks.FileCache, 'readlines', mock_readlines
+        self.assertEqual(len(error_messages.get_report()), 3)
+        self.assertTrue(
+            'Pattern on line 2 doesn\'t match any file or directory'
+            in error_messages.get_report()[0]
         )
-        with readlines_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE
-            ).check_webpack_config_file()
-        expected_error_messages = [
-            'Line 2: The following keys: meta, template are missing in '
-            'HtmlWebpackPlugin block in webpack.common.config.ts',
-            'FAILED  Webpack config file check failed',
-        ]
-        self.assertEqual(error_messages.get_report(), expected_error_messages)
-        self.assertEqual('Webpack config file', error_messages.name)
-        self.assertTrue(error_messages.failed)
-
-    def test_check_invalid_pattern_without_all_keys(self) -> None:
-        def mock_readlines(
-            unused_self: str, unused_filepath: str
-        ) -> Tuple[str, ...]:
-            return ('plugins: [', '   new HtmlWebpackPlugin({', '}),]')
-
-        readlines_swap = self.swap(
-            run_lint_checks.FileCache, 'readlines', mock_readlines
+        self.assertTrue(
+            'Pattern on line 3 doesn\'t match any file or directory'
+            in error_messages.get_report()[1]
         )
-        with readlines_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE
-            ).check_webpack_config_file()
-        expected_error_messages = [
-            'Line 2: The following keys: chunks, filename, meta, template,'
-            ' minify, inject are missing in HtmlWebpackPlugin block in '
-            'webpack.common.config.ts',
-            'FAILED  Webpack config file check failed',
-        ]
-        self.assertEqual(error_messages.get_report(), expected_error_messages)
-        self.assertEqual('Webpack config file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
     def test_check_third_party_libs_type_defs(self) -> None:
@@ -367,6 +399,196 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 FILE_CACHE
             ).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
+
+    def test_check_duplicate_method_names_in_user_utilities_no_duplicates(
+        self,
+    ) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'logged-in-user.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async addHint(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('logged-in-user.ts'):
+                return '\n'.join(
+                    [
+                        'export class LoggedInUser extends BaseUser {',
+                        '  async expectToBeOnPage(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'SUCCESS  Duplicate method names in user utilities check passed'
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertFalse(task_results.failed)
+
+    def test_check_duplicate_method_names_in_user_utilities_with_duplicates(
+        self,
+    ) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'logged-out-user.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async continueToNextCard(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('logged-out-user.ts'):
+                return '\n'.join(
+                    [
+                        'export class LoggedOutUser extends BaseUser {',
+                        '  async continueToNextCard(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'Method "continueToNextCard" is defined in multiple user '
+            'utility files: exploration-editor.ts, logged-out-user.ts. '
+            'Rename to disambiguate, following the convention '
+            '{action}In{PageContext}Page.',
+            'FAILED  Duplicate method names in user utilities check failed',
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertTrue(task_results.failed)
+
+    def test_check_duplicate_method_names_in_user_utilities_ignores_non_ts(
+        self,
+    ) -> None:
+        """Non-.ts files in the directory (e.g. the duplicate-functions
+        report itself) must not be scanned for method names.
+        """
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'duplicate-functions.md']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async addHint(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'SUCCESS  Duplicate method names in user utilities check passed'
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertFalse(task_results.failed)
+
+    def test_check_duplicate_method_names_flags_private_methods_too(
+        self,
+    ) -> None:
+        """Edge case: two different classes with a same-named private
+        method should still be flagged, since the check is name-based
+        across files rather than access-modifier-aware.
+        """
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['curriculum-admin.ts', 'topic-manager.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('curriculum-admin.ts'):
+                return '\n'.join(
+                    [
+                        'export class CurriculumAdmin extends BaseUser {',
+                        '  private async waitForSave(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('topic-manager.ts'):
+                return '\n'.join(
+                    [
+                        'export class TopicManager extends BaseUser {',
+                        '  private async waitForSave(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+        self.assertTrue(task_results.failed)
+        self.assertTrue(
+            any(
+                'waitForSave' in message
+                for message in task_results.get_report()
+            )
+        )
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(

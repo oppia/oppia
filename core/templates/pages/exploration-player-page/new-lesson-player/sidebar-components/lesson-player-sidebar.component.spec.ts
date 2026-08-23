@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {LessonPlayerSidebarComponent} from './lesson-player-sidebar.component';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {
@@ -37,6 +37,7 @@ import {BehaviorSubject} from 'rxjs';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {PageContextService} from '../../../../services/page-context.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -45,12 +46,21 @@ import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+  };
 }
 
 describe('LessonPlayerSidebarComponent', () => {
@@ -58,6 +68,7 @@ describe('LessonPlayerSidebarComponent', () => {
   let fixture: ComponentFixture<LessonPlayerSidebarComponent>;
   let mockMobileMenuService: Partial<MobileMenuService>;
   let pageContextService: PageContextService;
+  let platformFeatureService: MockPlatformFeatureService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlService: UrlService;
@@ -89,7 +100,7 @@ describe('LessonPlayerSidebarComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         LessonPlayerSidebarComponent,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockTranslatePipe,
       ],
       providers: [
@@ -101,6 +112,10 @@ describe('LessonPlayerSidebarComponent', () => {
         {
           provide: MobileMenuService,
           useValue: mockMobileMenuService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: TranslateService,
@@ -127,6 +142,7 @@ describe('LessonPlayerSidebarComponent', () => {
     fixture = TestBed.createComponent(LessonPlayerSidebarComponent);
     component = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -140,6 +156,10 @@ describe('LessonPlayerSidebarComponent', () => {
     mockWindowDimensionsService = TestBed.inject(
       WindowDimensionsService
     ) as jasmine.SpyObj<WindowDimensionsService>;
+  });
+
+  afterEach(() => {
+    window.sessionStorage.clear();
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {
@@ -231,6 +251,37 @@ describe('LessonPlayerSidebarComponent', () => {
     hackyExpDescTranslationIsDisplayed =
       component.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
+  });
+
+  it('should check WebfeedbackModal feature flag is enabled', () => {
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = true;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = false;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+  });
+
+  it('should open report an issue modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
+    component.showReportAnIssueModal();
+
+    expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+  });
+
+  it('should open send a lesson feedback modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
+    component.showSendLessonFeedbackModal();
+    expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
   });
 
   it('should show share lesson modal on mobile', () => {
@@ -351,5 +402,30 @@ describe('LessonPlayerSidebarComponent', () => {
   it('should get is user logged in', () => {
     spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
     expect(component.isUserLoggedIn()).toBeTrue();
+  });
+
+  it('should reopen the lesson feedback modal when the session storage flag is present', () => {
+    spyOn(window.sessionStorage, 'getItem').and.returnValue('true');
+    const removeItemSpy = spyOn(window.sessionStorage, 'removeItem');
+    const showModalSpy = spyOn(component, 'showSendLessonFeedbackModal');
+
+    component.ngOnInit();
+
+    expect(window.sessionStorage.getItem).toHaveBeenCalledWith(
+      'reopenLessonFeedbackModal'
+    );
+    expect(showModalSpy).toHaveBeenCalled();
+    expect(removeItemSpy).toHaveBeenCalledWith('reopenLessonFeedbackModal');
+  });
+
+  it('should not reopen the lesson feedback modal when the session storage flag is absent', () => {
+    spyOn(window.sessionStorage, 'getItem').and.returnValue(null);
+    const removeItemSpy = spyOn(window.sessionStorage, 'removeItem');
+    const showModalSpy = spyOn(component, 'showSendLessonFeedbackModal');
+
+    component.ngOnInit();
+
+    expect(showModalSpy).not.toHaveBeenCalled();
+    expect(removeItemSpy).not.toHaveBeenCalled();
   });
 });

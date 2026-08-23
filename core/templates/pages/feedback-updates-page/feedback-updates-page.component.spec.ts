@@ -20,7 +20,7 @@ import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summ
 
 import {FeedbackUpdatesPageComponent} from './feedback-updates-page.component';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -30,7 +30,13 @@ import {
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -49,14 +55,14 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
-class MockSlicePipe {
+class MockSlicePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -186,7 +192,7 @@ describe('Feedback updates page', () => {
   });
 
   describe('when succesfully fetching feedback updates data', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
         imports: [
@@ -200,7 +206,7 @@ describe('Feedback updates page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           LoadingDotsComponentStub,
         ],
@@ -837,7 +843,7 @@ describe('Feedback updates page', () => {
   });
 
   describe('when fetching dashboard data fails', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           BrowserAnimationsModule,
@@ -850,7 +856,7 @@ describe('Feedback updates page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           LoadingDotsComponentStub,
         ],

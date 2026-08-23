@@ -42,19 +42,30 @@ E2E_CI_TEST_SUITE_CONFIG_FILE_PATH = os.path.join(
 ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
     os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs'
 )
-ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD = os.path.join(
-    os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs-old'
+PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
+    os.getcwd(), 'core', 'tests', 'playwright-acceptance-tests', 'specs'
 )
 E2E_WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js'
 )
 
 
-class TestSuiteDict(TypedDict):
-    """Dictionary representing a test suite."""
+class TestSuiteDictBase(TypedDict):
+    """Base dictionary representing a test suite with required fields."""
 
     name: str
     module: str
+
+
+# TODO(#26296): Remove the TestSuiteDictBase class once the
+# migration from e2e to acceptance tests is complete
+# and e2e tests are removed.
+class TestSuiteDict(TestSuiteDictBase, total=False):
+    """Dictionary representing a test suite, with an optional framework field.
+    The framework field is only present for acceptance tests to distinguish
+    between puppeteer and playwright during incremental migration."""
+
+    framework: str
 
 
 def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
@@ -115,8 +126,12 @@ def get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
     webdriverio_desktop_files = os.path.join(
         os.getcwd(), 'core', 'tests', 'webdriverio_desktop'
     )
-    for file_name in os.listdir(webdriverio_files):
-        webdriverio_test_suite_modules.append(file_name)
+    if os.path.exists(webdriverio_files):
+        # The webdriverio directory may not exist if all its test files have
+        # been migrated to Puppeteer acceptance tests. The os.path.exists
+        # check prevents os.listdir from raising a FileNotFoundError.
+        for file_name in os.listdir(webdriverio_files):
+            webdriverio_test_suite_modules.append(file_name)
     for file_name in os.listdir(webdriverio_desktop_files):
         webdriverio_test_suite_modules.append(file_name)
 
@@ -191,12 +206,12 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
         specs directory.
     """
     acceptance_test_suites: List[TestSuiteDict] = []
-    for test_specs_directory in [
-        ACCEPTANCE_TEST_SPECS_DIRECTORY,
-        ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD,
+    for test_specs_directory, framework in [
+        (ACCEPTANCE_TEST_SPECS_DIRECTORY, 'puppeteer'),
+        (PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY, 'playwright'),
     ]:
         acceptance_test_files = glob.glob(
-            os.path.join(test_specs_directory, '**/*.spec.ts')
+            os.path.join(test_specs_directory, '**/*.spec.ts'), recursive=True
         )
 
         for module in acceptance_test_files:
@@ -212,6 +227,7 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
                 {
                     'name': acceptance_test_suite_name,
                     'module': os.path.relpath(module, os.getcwd()),
+                    'framework': framework,
                 }
             )
     return sorted(acceptance_test_suites, key=lambda x: x['name'])

@@ -48,8 +48,9 @@ export interface FetchQuestionBackendResponse {
   user_email: string;
   username: string;
 }
-export interface UpdateEditableQuestionBackendResponse {
-  questionDict: QuestionBackendDict;
+// The backend response key uses snake_case per Oppia's backend convention.
+export interface QuestionBackendResponse {
+  question_dict: QuestionBackendDict;
 }
 export interface FetchQuestionResponse {
   questionObject: Question;
@@ -143,78 +144,6 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  private async _updateQuestionAsync(
-    questionId: string,
-    questionVersion: string,
-    commitMessage: string,
-    changeList: BackendChangeObject[],
-    successCallback: (value: QuestionBackendDict) => void,
-    errorCallback: (reason?: string) => void
-  ): Promise<QuestionBackendDict> {
-    return new Promise((resolve, reject) => {
-      let editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {
-          question_id: questionId,
-        }
-      );
-
-      let putData = {
-        version: questionVersion,
-        commit_message: commitMessage,
-        change_list: changeList,
-      };
-      this.http
-        .put<UpdateEditableQuestionBackendResponse>(
-          editableQuestionDataUrl,
-          putData
-        )
-        .toPromise()
-        .then(
-          response => {
-            let questionDict = cloneDeep(response.questionDict);
-            successCallback(
-              // The returned data is an updated question dict.
-              questionDict
-            );
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error.error);
-          }
-        );
-    });
-  }
-
-  private async _editQuestionSkillLinksAsync(
-    questionId: string,
-    skillIdsTaskArray: SkillLinkageModificationsArray[],
-    successCallback: (value: void) => void,
-    errorCallback: (reason?: string) => void
-  ): Promise<Question> {
-    return new Promise((resolve, reject) => {
-      var editQuestionSkillLinkUrl =
-        this.urlInterpolationService.interpolateUrl(
-          QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
-          {
-            question_id: questionId,
-          }
-        );
-      this.http
-        .put(editQuestionSkillLinkUrl, {
-          skill_ids_task_list: skillIdsTaskArray,
-        })
-        .toPromise()
-        .then(
-          response => {
-            successCallback();
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error.error);
-          }
-        );
-    });
-  }
-
   async createQuestionAsync(
     skillIds: string[],
     skillDifficulties: number[],
@@ -239,18 +168,31 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  async editQuestionSkillLinksAsync(
+  editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[]
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this._editQuestionSkillLinksAsync(
-        questionId,
-        skillIdsTaskArray,
-        resolve,
-        reject
+  ): Promise<Question> {
+    const editQuestionSkillLinkUrl =
+      this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
+        {
+          question_id: questionId,
+        }
       );
-    });
+
+    return this.http
+      .put<QuestionBackendResponse>(editQuestionSkillLinkUrl, {
+        skill_ids_task_list: skillIdsTaskArray,
+      })
+      .toPromise()
+      .then(
+        response => {
+          return Question.createFromBackendDict(response.question_dict);
+        },
+        errorResponse => {
+          return Promise.reject(errorResponse.error.error);
+        }
+      );
   }
 
   /**
@@ -263,21 +205,35 @@ export class EditableQuestionBackendApiService {
    * the success callback, if one is provided to the returned promise
    * object. Errors are passed to the error callback, if one is provided.
    */
-  async updateQuestionAsync(
+  updateQuestionAsync(
     questionId: string,
     questionVersion: string,
     commitMessage: string,
     changeList: BackendChangeObject[]
-  ): Promise<QuestionBackendDict> {
-    return new Promise((resolve, reject) => {
-      this._updateQuestionAsync(
-        questionId,
-        questionVersion,
-        commitMessage,
-        changeList,
-        resolve,
-        reject
+  ): Promise<Question> {
+    const editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+      {
+        question_id: questionId,
+      }
+    );
+
+    const putData = {
+      version: questionVersion,
+      commit_message: commitMessage,
+      change_list: changeList,
+    };
+
+    return this.http
+      .put<QuestionBackendResponse>(editableQuestionDataUrl, putData)
+      .toPromise()
+      .then(
+        response => {
+          return Question.createFromBackendDict(response.question_dict);
+        },
+        errorResponse => {
+          return Promise.reject(errorResponse.error.error);
+        }
       );
-    });
   }
 }
