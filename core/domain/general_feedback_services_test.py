@@ -281,7 +281,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         assert updated_feedback is not None
         self.assertEqual(updated_feedback.status, feconf.STATUS_CHOICES_FIXED)
         self.assertEqual(updated_feedback.response_list, [])
-        self.assertEqual(updated_feedback.unread_response_count, 0)
+        self.assertEqual(updated_feedback.unread_response_count, 1)
 
     def test_update_lesson_feedback_returns_none_for_missing_feedback(
         self,

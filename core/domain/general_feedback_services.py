@@ -553,17 +553,22 @@ def update_lesson_feedback(
         raise ValueError('Invalid exploration ID: %s' % exp_id)
     old_status = model.status
     model.status = new_status
+    status_changed_to_fixed = (
+        old_status != new_status and new_status == feconf.STATUS_CHOICES_FIXED
+    )
     if reply_text is not None:
         _append_lesson_feedback_model_response(
             model=model,
             response_text=reply_text,
             responder_id=responder_id,
         )
+    elif status_changed_to_fixed:
+        model.unread_response_count += 1
     model.update_timestamps()
     model.put()
     feedback = _lesson_feedback_model_to_domain(model)
 
-    if old_status != new_status:
+    if status_changed_to_fixed:
         email_manager.send_feedback_status_change_email(
             feedback,
             author_id=model.author_id,
