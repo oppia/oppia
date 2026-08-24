@@ -1,7 +1,7 @@
 <nav class="topic-header-breadcrumbs" aria-label="Breadcrumb">
   <div class="topic-header-breadcrumbs-desktop">
     <ng-container *ngIf="!showStudySkillsBreadcrumb; else studySkillsBreadcrumb">
-      <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
+      <a href="/learn">{{ 'I18N_TOPIC_VIEWER_CLASSROOM_BREADCRUMB_LABEL' | translate }}</a>
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && !isLanguageRTL()"></i>
       <i class="fa fa-angle-left" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && isLanguageRTL()"></i>
       <a *ngIf="classroomName || classroomUrlFragment" [href]="getClassroomUrl()">
@@ -12,8 +12,8 @@
           <bdi>{{ capitalizedClassroomUrlFragment }}</bdi>
         </ng-template>
       </a>
-      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
-      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && !isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && isLanguageRTL()"></i>
       <span class="topic-header-breadcrumb-current" aria-current="page">
         <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
         <ng-template #rawTopicName>{{ topicName }}</ng-template>

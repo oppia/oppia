@@ -554,7 +554,7 @@ export class TopicStorySectionComponent
         : 'Adventure 1';
 
     return {
-      practiceTitle: firstAdventureTitle,
+      practiceTitle: `${firstAdventureTitle} Review & Test`,
       practiceDescription:
         this.adventureGroups.length > 1
           ? `Test what you have learned in ${firstAdventureTitle} to unlock the next adventure.`
@@ -642,9 +642,11 @@ export class TopicStorySectionComponent
   }
 
   getPracticeTitle(adventureIndex: number): string {
-    return adventureIndex < this.visibleAdventureGroups.length
-      ? this.visibleAdventureGroups[adventureIndex].adventureTitle
-      : `Adventure ${adventureIndex + 1}`;
+    const title =
+      adventureIndex < this.visibleAdventureGroups.length
+        ? this.visibleAdventureGroups[adventureIndex].adventureTitle
+        : `Adventure ${adventureIndex + 1}`;
+    return `${title} Review & Test`;
   }
 
   getPracticeDescription(adventureIndex: number): string {

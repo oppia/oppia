@@ -102,6 +102,21 @@ describe('TopicHeaderComponent', () => {
     expect(component.classroomUrlFragment).toBe('math');
   });
 
+  it('should update the classroom breadcrumb when inputs arrive late', () => {
+    component.classroomName = null;
+    component.classroomUrlFragment = '';
+    fixture.detectChanges();
+
+    component.classroomName = 'math';
+    component.classroomUrlFragment = 'math';
+    fixture.detectChanges();
+
+    const classroomBreadcrumb = fixture.nativeElement.querySelector(
+      '.topic-header-breadcrumbs-desktop a[href="/learn/math"]'
+    );
+    expect(classroomBreadcrumb.textContent.trim()).toBe('Math');
+  });
+
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
     expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith();

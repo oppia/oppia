@@ -328,6 +328,7 @@
   "I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "The subheading for the search bar at the bottom of the classroom page.",
   "I18N_CLASSROOM_PAGE_TOPICS_COVERED": "The header displayed above the topics list section in the classroom page.",
   "I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT": "The text we show in the classrooms page breadcrumbs.",
+  "I18N_TOPIC_VIEWER_CLASSROOM_BREADCRUMB_LABEL": "The link to the classrooms page shown at the start of the topic viewer breadcrumb.",
   "I18N_COLLECTION_EDITOR_PAGE_TITLE": "The title displayed on the browser tab when on the collection editor page and the collection is not untitled.",
   "I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE": "The title displayed on the browser tab when on the collection editor page and the collection is untitled.",
   "I18N_COLLECTION_PLAYER_PAGE_BEGIN": "Part of heading displayed on collection player page - It is shown when explorations are not started in a collection.",

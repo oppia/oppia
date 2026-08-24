@@ -317,6 +317,15 @@ describe('TopicStorySectionComponent', () => {
     hasPracticeQuestions: false,
   });
 
+  it('should include review and test in the practice title', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Fractions', [createLessonCard(1, 'not_started')]),
+    ];
+
+    expect(component.getPracticeTitle(0)).toBe('Fractions Review & Test');
+    expect(component.getPracticeTitle(1)).toBe('Adventure 2 Review & Test');
+  });
+
   it('should set study guide url on init', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
   });

@@ -41,13 +41,19 @@ export class TopicHeaderComponent implements OnInit {
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
   classroomNameTranslationKey!: string;
-  capitalizedClassroomName: string = '';
-  capitalizedClassroomUrlFragment: string = '';
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService
   ) {}
+
+  get capitalizedClassroomName(): string {
+    return this.capitalize(this.classroomName ?? '');
+  }
+
+  get capitalizedClassroomUrlFragment(): string {
+    return this.capitalize(this.classroomUrlFragment);
+  }
 
   ngOnInit(): void {
     this.topicNameTranslationKey =
@@ -70,15 +76,11 @@ export class TopicHeaderComponent implements OnInit {
         this.i18nLanguageCodeService.getClassroomTranslationKeys(
           this.classroomName
         ).name;
-      this.capitalizedClassroomName =
-        this.classroomName.charAt(0).toUpperCase() +
-        this.classroomName.slice(1);
     }
-    if (this.classroomUrlFragment) {
-      this.capitalizedClassroomUrlFragment =
-        this.classroomUrlFragment.charAt(0).toUpperCase() +
-        this.classroomUrlFragment.slice(1);
-    }
+  }
+
+  private capitalize(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
