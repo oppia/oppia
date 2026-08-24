@@ -34,7 +34,10 @@
           <certificate-assessment-player-page *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
                                               [attempt]="attempt"
                                               [classroomUrlFragment]="classroomUrlFragment"
-                                              (assessmentSubmitted)="onAssessmentSubmitted($event)">
+                                              [isTimeExpired]="isTimeExpired"
+                                              (assessmentSubmitted)="onAssessmentSubmitted($event)"
+                                              (viewResults)="onViewResults()"
+                                              (assessmentEnded)="onAssessmentEnded()">
           </certificate-assessment-player-page>
         </div>
       </div>

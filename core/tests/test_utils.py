@@ -867,13 +867,24 @@ class ElasticSearchStub:
                     result_docs = [doc for doc in result_docs if v in doc[k]]
             else:
                 for k, v in f['match'].items():
-                    # In explorations and collections, 'doc[k]' is a single
-                    # language or category to which the exploration or
-                    # collection belongs, 'v' is a string of all the languages
-                    # or categories (separated by space eg. 'en hi') in which if
-                    # doc[k] is present, the 'doc' should be returned.
-                    # Therefore, we check using 'doc[k] in v'.
-                    result_docs = [doc for doc in result_docs if doc[k] in v]
+                    # 'v' is a string of all the requested languages or
+                    # categories, separated by spaces (eg. '"en" "hi"'). A
+                    # collection's value is a single string, while an
+                    # exploration's language_code is a list, because an
+                    # exploration is indexed under its own language and every
+                    # language it has an up-to-date translation in. The doc
+                    # matches if any of its values appears in 'v', which is how
+                    # Elasticsearch treats an array field in a match query.
+                    result_docs = [
+                        doc
+                        for doc in result_docs
+                        if any(
+                            value in v
+                            for value in (
+                                doc[k] if isinstance(doc[k], list) else [doc[k]]
+                            )
+                        )
+                    ]
 
         if terms:
             filtered_docs = []
