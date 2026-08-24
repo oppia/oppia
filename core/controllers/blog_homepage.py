@@ -20,18 +20,8 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import blog_domain, blog_services, user_services
-from core.platform import models
 
-import datetime
-
-from typing import Dict, Final, List, Optional, Sequence, TypedDict
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import blog_models
-
-(blog_models,) = models.Registry.import_models([models.Names.BLOG])
-datastore_services = models.Registry.import_datastore_services()
+from typing import Dict, Final, List, Optional, TypedDict
 
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
@@ -246,26 +236,9 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # might contain the blog post which is currently being viewed.
         target_tags = authors_blog_post_dict['tags']
         limit = MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1
-        blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
-            blog_models.BlogPostSummaryModel.query()
-            .filter(
-                blog_models.BlogPostSummaryModel.published_on
-                >= datetime.datetime(2000, 1, 1)
-            )
-            .filter(
-                datastore_services.any_of(
-                    *[
-                        blog_models.BlogPostSummaryModel.tags == tag
-                        for tag in target_tags
-                    ]
-                )
-            )
-            .fetch(limit)
+        summaries = blog_services.get_published_blog_post_summaries_by_tags(
+            target_tags, limit
         )
-        summaries = [
-            blog_services.get_blog_post_summary_from_model(model)
-            for model in blog_post_summary_models
-        ]
 
         if len(summaries) < MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1:
             summary_ids = [summary.id for summary in summaries]

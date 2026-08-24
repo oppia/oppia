@@ -3095,11 +3095,13 @@ def get_scaled_average_rating(ratings: Dict[str, int]) -> float:
     return 1 + 4 * wilson_score_lower_bound
 
 
-def index_explorations_given_ids(exp_ids: List[str]) -> None:
-    """Indexes the explorations corresponding to the given exploration ids.
+def index_explorations_given_ids(
+    exp_ids: List[str],  # pylint: disable=unused-argument
+) -> None:
+    """No-op. Previously indexed explorations into Elasticsearch.
 
     Args:
-        exp_ids: list(str). List of ids of the explorations to be indexed.
+        exp_ids: list(str). List of ids of the explorations (unused).
     """
     pass
 

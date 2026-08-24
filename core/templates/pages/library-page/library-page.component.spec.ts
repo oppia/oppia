@@ -969,18 +969,4 @@ describe('Library Page Component', () => {
 
     expect(componentInstance.loadLibraryData).toHaveBeenCalled();
   }));
-
-  it('should not reload library data on site language change in search mode', fakeAsync(() => {
-    spyOn(componentInstance, 'loadLibraryData');
-    componentInstance.ngOnInit();
-    tick();
-
-    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
-    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
-
-    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
-    tick();
-
-    expect(componentInstance.loadLibraryData).not.toHaveBeenCalled();
-  }));
 });

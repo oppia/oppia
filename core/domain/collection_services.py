@@ -1527,7 +1527,9 @@ def load_demo(collection_id: str) -> None:
     logging.info('Collection with id %s was loaded.' % collection_id)
 
 
-def index_collections_given_ids(collection_ids: List[str]) -> None:
+def index_collections_given_ids(
+    collection_ids: List[str],  # pylint: disable=unused-argument
+) -> None:
     """A no-op that accepts the given collection ids.
 
     Args:

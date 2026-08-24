@@ -19,14 +19,9 @@
 from __future__ import annotations
 
 import datetime
-import logging
 
-from core import feconf, utils
-from core.domain import (
-    blog_domain,
-    blog_services,
-    user_services,
-)
+from core import utils
+from core.domain import blog_domain, blog_services, user_services
 from core.platform import models
 from core.tests import test_utils
 

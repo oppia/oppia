@@ -19,12 +19,22 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
-from core.domain import (
-    summary_services,
-    user_services,
-)
+from core.domain import summary_services, user_services
 
 from typing import Dict, List, Optional, TypedDict
+
+# Schema for the language the returned exploration metadata is displayed in.
+# This is the learner's site language, so it is restricted to the languages the
+# site itself is available in.
+DISPLAY_IN_LANGUAGE_CODE_SCHEMA = {
+    'schema': {
+        'type': 'basestring',
+        'choices': [
+            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+        ],
+    },
+    'default_value': None,
+}
 
 
 class OldLibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -39,29 +49,50 @@ class OldLibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
 
 
-class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class LibraryIndexHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LibraryIndexHandler's
+    normalized_request dictionary.
+    """
+
+    display_in_language_code: Optional[str]
+
+
+class LibraryIndexHandler(
+    base.BaseHandler[Dict[str, str], LibraryIndexHandlerNormalizedRequestDict]
+):
     """Provides data for the default library index page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
+        }
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
+        display_in_language_code = self.normalized_request.get(
+            'display_in_language_code'
+        )
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups(
-            [constants.DEFAULT_LANGUAGE_CODE]
+            [constants.DEFAULT_LANGUAGE_CODE],
+            display_in_language_code=display_in_language_code,
         )
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
                 [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
+                display_in_language_code=display_in_language_code,
             )
         )
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
+                [constants.DEFAULT_LANGUAGE_CODE],
+                display_in_language_code=display_in_language_code,
             )
         )
 
@@ -118,6 +149,7 @@ class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
     """
 
     group_name: str
+    display_in_language_code: Optional[str]
 
 
 class LibraryGroupIndexHandler(
@@ -139,7 +171,8 @@ class LibraryGroupIndexHandler(
                         feconf.LIBRARY_GROUP_TOP_RATED,
                     ],
                 }
-            }
+            },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 
@@ -149,13 +182,17 @@ class LibraryGroupIndexHandler(
         # TODO(sll): Support index pages for other language codes.
         assert self.normalized_request is not None
         group_name = self.normalized_request['group_name']
+        display_in_language_code = self.normalized_request.get(
+            'display_in_language_code'
+        )
         activity_list = []
         header_i18n_id = ''
 
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (
                 summary_services.get_recently_published_exp_summary_dicts(
-                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE,
+                    display_in_language_code=display_in_language_code,
                 )
             )
             if recently_published_summary_dicts:
@@ -167,6 +204,7 @@ class LibraryGroupIndexHandler(
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [constants.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
+                    display_in_language_code=display_in_language_code,
                 )
             )
             if top_rated_activity_summary_dicts:
@@ -205,8 +243,9 @@ class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    stringified_exp_ids: str
+    stringified_exp_ids: List[str]
     include_private_explorations: Optional[bool]
+    display_in_language_code: Optional[str]
 
 
 class ExplorationSummariesHandler(
@@ -229,6 +268,7 @@ class ExplorationSummariesHandler(
                 'schema': {'type': 'bool'},
                 'default_value': False,
             },
+            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
         }
     }
 
@@ -239,6 +279,9 @@ class ExplorationSummariesHandler(
         exp_ids = self.normalized_request['stringified_exp_ids']
         include_private_exps = self.normalized_request.get(
             'include_private_explorations'
+        )
+        display_in_language_code = self.normalized_request.get(
+            'display_in_language_code'
         )
 
         editor_user_id = self.user_id if include_private_exps else None
@@ -253,13 +296,16 @@ class ExplorationSummariesHandler(
         if include_private_exps:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids, user=self.user
+                    exp_ids,
+                    user=self.user,
+                    display_in_language_code=display_in_language_code,
                 )
             )
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids
+                    exp_ids,
+                    display_in_language_code=display_in_language_code,
                 )
             )
         self.values.update({'summaries': summaries})

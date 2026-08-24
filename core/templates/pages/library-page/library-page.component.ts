@@ -370,11 +370,8 @@ export class LibraryPageComponent {
     this.i18nLanguageCodeSubscription =
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         // The tiles show exploration metadata in the site language, so the
-        // data is fetched again when the learner changes that language. In
-        // search mode the tiles come from the search bar's own query instead.
-        if (this.pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
-          this.loadLibraryData();
-        }
+        // data is fetched again when the learner changes that language.
+        this.loadLibraryData();
       });
 
     this.resizeSubscription = this.windowDimensionsService

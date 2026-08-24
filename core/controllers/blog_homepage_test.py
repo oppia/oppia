@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
 from core.constants import constants
 from core.domain import blog_services

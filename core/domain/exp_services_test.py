@@ -43,7 +43,6 @@ from core.domain import (
     stats_services,
     story_domain,
     story_services,
-    subscription_services,
     suggestion_services,
     topic_fetchers,
     topic_services,
@@ -6574,6 +6573,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
     EXP_ID_1: Final = 'eid1'
     EXP_ID_2: Final = 'eid2'
+    USER_ID_1: Final = 'user_1'
+    USER_ID_2: Final = 'user_2'
 
     COMMIT_ALBERT_CREATE_EXP_1: Final = {
         'version': 1,

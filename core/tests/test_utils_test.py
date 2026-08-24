@@ -950,8 +950,6 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
     def test_jpeg_image_yields_false(self) -> None:
         self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
-        self.assertEqual(hits[0]['_id'], 'duplicate_id_1')
-        self.assertEqual(hits[0]['_source']['data'], 'first_doc')
 
 
 class EmailMockTests(test_utils.EmailTestBase):

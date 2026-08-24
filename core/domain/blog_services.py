@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 import html
-import logging
 import re
 
 from core import feconf, utils
@@ -49,6 +48,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BlogPostChangeDict(TypedDict):
@@ -237,6 +237,34 @@ def get_blog_post_summary_models_by_ids(
         for model in blog_post_summary_models
         if model is not None
     ]
+
+
+def get_published_blog_post_summaries_by_tags(
+    tags: List[str], limit: int
+) -> List[blog_domain.BlogPostSummary]:
+    """Returns published blog post summaries matching the given tags.
+
+    Args:
+        tags: list(str). The list of tags to filter by.
+        limit: int. The maximum number of results to return.
+
+    Returns:
+        list(BlogPostSummary). The matching published blog post summaries.
+    """
+    query = blog_models.BlogPostSummaryModel.query().filter(
+        blog_models.BlogPostSummaryModel.published_on
+        >= datetime.datetime(2000, 1, 1)
+    )
+    if tags:
+        query = query.filter(
+            datastore_services.any_of(
+                *[blog_models.BlogPostSummaryModel.tags == tag for tag in tags]
+            )
+        )
+    models_result: Sequence[blog_models.BlogPostSummaryModel] = query.fetch(
+        limit
+    )
+    return [get_blog_post_summary_from_model(model) for model in models_result]
 
 
 def get_blog_post_summary_models_list_by_user_id(
