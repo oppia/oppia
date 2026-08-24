@@ -17,8 +17,8 @@
         <oppia-feedback-chip [value]="feedback.status"
                              [type]="'status'">
         </oppia-feedback-chip>
-        <oppia-feedback-chip *ngIf="feedback.category"
-                             [value]="feedback.category"
+        <oppia-feedback-chip *ngIf="getFeedbackCategory(feedback)"
+                             [value]="getFeedbackCategory(feedback)"
                              [type]="'category'">
         </oppia-feedback-chip>
       </div>
@@ -39,25 +39,25 @@
               <span class="oppia-feedback-detail-field-label">Status</span>
               <span class="oppia-feedback-detail-field-value">{{ statusLabels[feedback.status] }}</span>
             </div>
-            <div class="oppia-feedback-detail-field" *ngIf="feedback.category">
+            <div class="oppia-feedback-detail-field" *ngIf="getFeedbackCategory(feedback) as category">
               <span class="oppia-feedback-detail-field-label">Category</span>
-              <span class="oppia-feedback-detail-field-value">{{ categoryLabels[feedback.category] }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ categoryLabels[category] }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">Source</span>
-              <span class="oppia-feedback-detail-field-value">{{ sourceLabels[feedback.source] }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getFeedbackSourceLabel(feedback) }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">Platform</span>
-              <span class="oppia-feedback-detail-field-value">{{ getPlatformLabel(feedback.platform) }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getFeedbackPlatformLabel(feedback) }}</span>
             </div>
-            <div class="oppia-feedback-detail-field" *ngIf="feedback.page_url">
+            <div class="oppia-feedback-detail-field" *ngIf="getFeedbackPageUrl(feedback) as pageUrl">
               <span class="oppia-feedback-detail-field-label">Page URL</span>
-              <a [href]="feedback.page_url"
+              <a [href]="pageUrl"
                  target="_blank"
                  rel="noopener noreferrer"
                  class="oppia-feedback-detail-field-value oppia-feedback-detail-link">
-                {{ feedback.page_url }}
+                {{ pageUrl }}
               </a>
             </div>
             <div class="oppia-feedback-detail-screenshot" *ngIf="screenshotDataUrl">
@@ -140,7 +140,7 @@
 
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
-            <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
+            <div class="oppia-feedback-detail-message-text">{{ getFeedbackMessage() }}</div>
           </oppia-feedback-detail-section>
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
@@ -148,6 +148,31 @@
                                          [isCollapsible]="true"
                                          iconClass="fas fa-comments"
                                          class="oppia-feedback-detail-replies-bar">
+            <ng-container *ngIf="getFeedbackResponses(feedback) as responses">
+              <div *ngIf="responses.length === 0"
+                   class="oppia-feedback-response-empty">
+                No replies yet.
+              </div>
+
+              <div *ngIf="responses.length > 0"
+                   class="oppia-feedback-response-list">
+                <div *ngFor="let response of responses"
+                     class="oppia-feedback-response">
+
+                  <div class="oppia-feedback-response-header">
+                    <span class="oppia-feedback-response-author">Creator</span>
+                    <span class="oppia-feedback-response-date">
+                      {{ formatDate(response.responded_on) }}
+                    </span>
+                  </div>
+
+                  <div class="oppia-feedback-response-text">
+                    {{ response.response_text }}
+                  </div>
+
+                </div>
+              </div>
+            </ng-container>
           </oppia-feedback-detail-section>
 
           <div class="oppia-feedback-detail-actions-bar">

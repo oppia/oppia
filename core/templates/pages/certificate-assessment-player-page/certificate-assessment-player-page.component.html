@@ -1,28 +1,27 @@
-<div class="certificate-assessment-page-container">
-<!-- TODO(#24717-M2.15): Add certificate-assessment-titled-shared-background-banner component. -->
-  <oppia-assessment-introduction-card *ngIf="currentStage === 'intro'"
-                                      [certificateId]="certificateId"
-                                      (continue)="showInstructions()">
-  </oppia-assessment-introduction-card>
-
-  <oppia-assessment-instruction-panel *ngIf="currentStage === 'instructions'"
-                                      (startAssessment)="startAssessment()">
-  </oppia-assessment-instruction-panel>
-
-  <oppia-certificate-assessment-conversation-skin *ngIf="currentStage === 'questions'"
-                                                  [currentQuestion]="getCurrentQuestion()"
-                                                  [currentQuestionIndex]="currentQuestionIndex"
-                                                  [totalQuestions]="mockQuestions.length"
-                                                  [progressPercentage]="getProgressPercentage()"
-                                                  [isLastQuestion]="isCurrentQuestionLast()"
-                                                  [savedResponse]="getSavedResponse()"
-                                                  (previousQuestion)="previousQuestion()"
-                                                  (nextQuestion)="nextQuestion()"
-                                                  (submitAssessment)="submitAssessment()"
-                                                  (responseChange)="updateResponse($event)">
-  </oppia-certificate-assessment-conversation-skin>
-
-  <oppia-certificate-assessment-result-card *ngIf="currentStage === 'result'"
-                                            [certificateId]="certificateId">
-  </oppia-certificate-assessment-result-card>
+<oppia-titled-background-banner [title]="bannerTitleI18nKey"
+                                [buttonText]="bannerButtonI18nKey"
+                                [buttonRoute]="classroomUrlFragment ? ['/learn', classroomUrlFragment, 'certificate-offering-available'] : ['/learn']">
+</oppia-titled-background-banner>
+<div *ngIf="isLoadingQuestion" class="text-center py-3 text-muted">
+  <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
 </div>
+<div *ngIf="loadError" class="text-center py-3 text-danger">
+  <p>Failed to load the question. Please try again later.</p>
+  <button type="button"
+          class="btn certificate-assessment-primary-button"
+          (click)="retryLoadQuestion()">
+    Retry
+  </button>
+</div>
+<oppia-certificate-assessment-conversation-skin #conversationSkin
+                                                *ngIf="!isLoadingQuestion && currentQuestion"
+                                                [currentQuestion]="currentQuestion"
+                                                [currentQuestionIndex]="currentQuestionIndex"
+                                                [totalQuestions]="totalQuestionCount"
+                                                [progressPercentage]="progressPercentage"
+                                                [isLastQuestion]="isLastQuestion"
+                                                [interactionHtml]="getInteractionHtml()"
+                                                (previousQuestion)="previousQuestion()"
+                                                (nextQuestion)="nextQuestion()"
+                                                (submitAssessment)="submitAssessment()">
+</oppia-certificate-assessment-conversation-skin>

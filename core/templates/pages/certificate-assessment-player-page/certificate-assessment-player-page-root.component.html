@@ -9,7 +9,38 @@
       </ul>
     </navbar-breadcrumb>
     <content>
-      <certificate-assessment-player-page></certificate-assessment-player-page>
+      <div class="certificate-assessment-page-container position-relative">
+        <oppia-assessment-interrupt *ngIf="showAssessmentInterruptCard"
+                                    (retryAssessment)="onRetryAssessment()"
+                                    (resumeAssessment)="onResumeAssessment()">
+        </oppia-assessment-interrupt>
+        <div *ngIf="isLoading" class="text-center py-3 text-muted">
+          <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
+        </div>
+        <div *ngIf="!isLoading && !hasError">
+          <oppia-assessment-introduction-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
+                                              [certificateOffering]="certificateOffering"
+                                              (continue)="showInstructions()">
+          </oppia-assessment-introduction-card>
+
+          <oppia-assessment-instruction-panel *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS"
+                                              [certificateTitle]="certificateOffering.title"
+                                              [timeLimitInMinutes]="certificateOffering.timeLimitInMinutes"
+                                              [totalQuestions]="certificateOffering.totalQuestions"
+                                              (back)="showIntro()"
+                                              (startAssessment)="startAssessment()">
+          </oppia-assessment-instruction-panel>
+
+          <certificate-assessment-player-page *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
+                                              [attempt]="attempt"
+                                              [classroomUrlFragment]="classroomUrlFragment"
+                                              [isTimeExpired]="isTimeExpired"
+                                              (assessmentSubmitted)="onAssessmentSubmitted($event)"
+                                              (viewResults)="onViewResults()"
+                                              (assessmentEnded)="onAssessmentEnded()">
+          </certificate-assessment-player-page>
+        </div>
+      </div>
     </content>
     <page-footer></page-footer>
   </oppia-base-content>

@@ -256,3 +256,16 @@ oppia-feedback-updates-page .oppia-pagination-button {
 .oppia-diagram-spinning-button {
   margin: 0 auto;
 }
+
+.oppia-profile-alignment {
+  vertical-align: middle;
+}
+
+.oppia-box-size {
+  padding: 2px 10px;
+}
+
+.feedback-updates-content-row {
+  display: flex;
+  justify-content: center;
+}

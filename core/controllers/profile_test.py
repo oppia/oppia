@@ -453,6 +453,33 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscription_list']), 0)
         self.logout()
 
+    def test_can_update_profile_name_for_certificate(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        self.assertEqual(response['profile_name_for_certificate'], '')
+
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'profile_name_for_certificate',
+                        'data': 'Custom Certificate Name',
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        self.assertEqual(
+            response['profile_name_for_certificate'], 'Custom Certificate Name'
+        )
+
+        self.logout()
+
     def test_can_update_profile_picture_data_url(self) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
