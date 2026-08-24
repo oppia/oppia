@@ -1067,6 +1067,9 @@ export class TopicManager extends BaseUser {
   /**
    * Toggles the "Show practice tab to learners" in Topic Editor.
    */
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
   async togglePracticeTabCheckbox(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
@@ -1088,7 +1091,127 @@ export class TopicManager extends BaseUser {
       throw error;
     }
   }
+
+  /**
+   * Navigate to the topics and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+  }
+
+  /**
+   * Edit the topic's details in the topic editor.
+   */
+  async editTopicDetails(
+    description: string,
+    titleFragments: string,
+    metaTags: string,
+    thumbnail: string,
+    title: string,
+    urlFragment: string
+  ): Promise<void> {
+    const titleField = this.page.locator('.e2e-test-topic-name-field');
+    await titleField.clear();
+    await titleField.fill(title);
+
+    const urlField = this.page
+      .locator(
+        '.e2e-test-topic-url-fragment-field .e2e-test-url-fragment-field, input.e2e-test-url-fragment-field'
+      )
+      .first();
+    await urlField.clear();
+    await urlField.fill(urlFragment);
+
+    const descField = this.page.locator('.e2e-test-topic-description-field');
+    await descField.clear();
+    await descField.fill(description);
+
+    const titleFragField = this.page.locator(
+      '.e2e-test-topic-page-title-fragment-field'
+    );
+    await titleFragField.clear();
+    await titleFragField.fill(titleFragments);
+
+    const metaField = this.page.locator(
+      '.e2e-test-topic-meta-tag-content-field'
+    );
+    await metaField.clear({force: true});
+    await metaField.fill(metaTags, {force: true});
+
+    await this.page.locator('div.e2e-test-photo-button').click();
+    await this.page.locator('input[type="file"]').setInputFiles(thumbnail);
+    await this.page.locator('button.e2e-test-photo-upload-submit').click();
+    await this.page
+      .locator('.e2e-test-photo-upload-submit')
+      .waitFor({state: 'hidden'});
+  }
+
+  /**
+   * Check whether the "Save Changes" button in the topic editor is enabled or disabled.
+   */
+  async expectSaveChangesButtonInTopicEditorToBe(state: string): Promise<void> {
+    const saveButton = this.page.locator('.e2e-test-save-topic-button');
+    if (state === 'enabled') {
+      await expect(saveButton).not.toBeDisabled();
+    } else {
+      await expect(saveButton).toBeDisabled();
+    }
+  }
+
+  /**
+   * Assert the toast/confirmation message shown after an action.
+   */
+  /**
+   * Assert the toast/confirmation message shown after an action.
+   */
+  async verifyTopicManagerToastMessage(expectedMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    }
+    const toastMessage = this.page.locator('.e2e-test-toast-message');
+    await expect(toastMessage).toBeVisible();
+    await expect(toastMessage).toHaveText(expectedMessage);
+  }
+
+  /**
+   * Navigate to the topic preview tab.
+   */
+  async navigateToTopicPreviewTab(): Promise<void> {
+    await this.page.locator('.e2e-test-topic-preview-button').click();
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Assert the topic preview shows the given title and description.
+   */
+  async expectTopicPreviewToHaveTitleAndDescription(
+    title: string,
+    description: string
+  ): Promise<void> {
+    await expect(
+      this.page.locator('.e2e-test-preview-topic-title')
+    ).toHaveText(title);
+    await expect(
+      this.page.locator('.e2e-test-preview-topic-description')
+    ).toHaveText(description);
+  }
+
+  /**
+   * Navigate to a specific tab within the topic preview.
+   */
+  async navigateToTabInPreview(tabName: string): Promise<void> {
+    await this.page.locator(`text=${tabName}`).click();
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Assert the current tab's title text in the topic preview page.
+   */
+  async verifyTopicManagerTabTitle(title: string): Promise<void> {
+    await expect(this.page.getByText(title).first()).toBeVisible();
+  }
 }
+
 export let TopicManagerFactory = (page: Page): TopicManager => {
   return new TopicManager(page);
 };

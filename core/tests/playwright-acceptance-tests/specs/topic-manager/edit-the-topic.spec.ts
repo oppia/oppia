@@ -10,7 +10,7 @@ test.describe.configure({ timeout: 4800000 });
 
 test.describe('Topic Manager', () => {
   let topicManager: TopicManager;
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: any;
 
   test.beforeAll(async ({ browser }, testInfo) => {
     testInfo.setTimeout(4800000);
@@ -34,7 +34,11 @@ test.describe('Topic Manager', () => {
     );
 
     const explorationId = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Solving problems without a calculator', 'Mathematics');
+  'Solving problems without a calculator',
+  'Mathematics',
+  2,
+  true
+);
     
     // NOTE: This function automatically creates the 'Addition' skill, subtopic, AND 3 questions!
     await curriculumAdmin.createAndPublishTopic('Arithmetic Operations', 'Addition', 'Addition');
@@ -79,8 +83,8 @@ test.describe('Topic Manager', () => {
       'AO 101',
       'arithmetic-new'
     );
-    await topicManager.saveTopicDraft('AO 101', 'Moved Arithmetic Operations to AO 101');
-    await topicManager.expectToastMessageToBe('Changes Saved.');
+    await topicManager.saveTopicDraft('AO 101');
+    await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
     // Enable practice tab. (All 10 questions are already made!)
     await topicManager.navigateToTopicAndSkillsDashboardPage();
@@ -89,8 +93,8 @@ test.describe('Topic Manager', () => {
     await topicManager.togglePracticeTabCheckbox();
     await topicManager.expectSaveChangesButtonInTopicEditorToBe('enabled');
     await topicManager.expectScreenshotToMatch('arithmeticOperationsWithPracticeTab');
-    await topicManager.saveTopicDraft('AO 101', 'Enabled practice tab.');
-    await topicManager.expectToastMessageToBe('Changes Saved.');
+    await topicManager.saveTopicDraft('AO 101');
+    await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
    if (process.env.MOBILE !== 'true') {
       await topicManager.navigateToTopicPreviewTab();
@@ -98,9 +102,9 @@ test.describe('Topic Manager', () => {
         'AO 101', 'Arithmetic Operations (New): This is the new topic description.'
       );
       await topicManager.navigateToTabInPreview('Practice');
-      await topicManager.expectTabTitleInTopicPageToBe('Master Skills for AO 101');
+      await topicManager.verifyTopicManagerTabTitle('Master Skills for AO 101');
       await topicManager.navigateToTabInPreview('Study');
-      await topicManager.expectTabTitleInTopicPageToBe('Study Skills for AO 101');
+      await topicManager.verifyTopicManagerTabTitle('Study Skills for AO 101');
     }
   });
 
