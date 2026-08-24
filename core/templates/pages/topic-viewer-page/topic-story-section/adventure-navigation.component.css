@@ -1,0 +1,186 @@
+.adventure-navigation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.adventure-navigation-scroll-area {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.adventure-navigation-wrapper {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 8px 0 4px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  /* Hide native scrollbar — arrows replace it */
+  scrollbar-width: none;
+}
+
+.adventure-navigation-wrapper--centered {
+  justify-content: center;
+}
+
+.adventure-navigation-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.adventure-navigation-arrow {
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 34px;
+  height: 40px;
+  justify-content: center;
+  outline: none;
+  padding: 0;
+  width: 34px;
+  z-index: 2;
+}
+
+.adventure-navigation-arrow:hover {
+  color: #000;
+}
+
+.adventure-navigation-arrow:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
+
+.adventure-navigation-arrow--left {
+  order: -1;
+}
+
+.adventure-navigation-arrow--right {
+  order: 1;
+}
+
+.adventure-navigation-arrow .material-icons {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.adventure-navigation-hint {
+  color: #3730a3;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 4px 0 12px;
+  text-align: center;
+}
+
+.adventure-navigation-hint-arrow {
+  display: inline-block;
+  margin: 0 4px;
+}
+
+.adventure-navigation-group {
+  align-items: center;
+  border: 2.5px solid;
+  border-radius: 36px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  padding: 8px 14px;
+}
+
+.adventure-navigation-mastery {
+  flex: 0 0 auto;
+}
+
+.adventure-navigation-mastery-group {
+  align-items: center;
+  border: 2.5px solid #f5a623;
+  border-radius: 36px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  padding: 8px 14px;
+}
+
+.adventure-navigation-clickable {
+  cursor: pointer;
+}
+
+.adventure-navigation-clickable:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .adventure-navigation-wrapper {
+    gap: 8px;
+    margin: 6px 0 4px;
+  }
+
+  .adventure-navigation-group {
+    gap: 8px;
+    padding: 6px 12px;
+  }
+
+  .adventure-navigation-mastery-group {
+    padding: 6px 12px;
+  }
+
+  .adventure-navigation-arrow {
+    flex: 0 0 28px;
+    height: 36px;
+    width: 28px;
+  }
+
+  .adventure-navigation-arrow .material-icons {
+    font-size: 32px;
+  }
+
+  .adventure-navigation-hint {
+    font-size: 13px;
+    margin: 4px 0 10px;
+  }
+}
+
+@media (max-width: 450px) {
+  .adventure-navigation-wrapper {
+    gap: 6px;
+    margin: 4px 0 2px;
+  }
+
+  .adventure-navigation-group {
+    gap: 6px;
+    padding: 5px 10px;
+  }
+
+  .adventure-navigation-mastery-group {
+    padding: 5px 10px;
+  }
+
+  .adventure-navigation-arrow {
+    flex: 0 0 24px;
+    height: 32px;
+    width: 24px;
+  }
+
+  .adventure-navigation-arrow .material-icons {
+    font-size: 28px;
+  }
+
+  .adventure-navigation-hint {
+    font-size: 12px;
+    margin: 2px 0 8px;
+  }
+
+  .adventure-navigation-hint-arrow {
+    margin: 0 2px;
+  }
+}

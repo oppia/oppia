@@ -69,6 +69,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {RemoveQuestionSkillLinkModalComponent} from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import './questions-list.component.css';
 
 interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];
@@ -78,6 +79,7 @@ interface GroupedSkillSummaries {
 @Component({
   selector: 'oppia-questions-list',
   templateUrl: './questions-list.component.html',
+  styleUrls: ['./questions-list.component.css'],
 })
 export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() allSkillSummaries!: ShortSkillSummary[];

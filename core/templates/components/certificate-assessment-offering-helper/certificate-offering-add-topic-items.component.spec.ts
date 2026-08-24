@@ -27,7 +27,7 @@ import {
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -44,6 +44,7 @@ describe('Certificate Offering Add Topic Items Component', () => {
       'math_classroom_id',
       'Math',
       'math',
+      'user@email.com',
       [
         {
           id: 'topic_1',
@@ -180,6 +181,22 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(thumbnailImage).not.toBeNull();
     expect(thumbnailImage?.getAttribute('src')).toContain(
       'thumb://topic_1/thumb.svg'
+    );
+  }));
+
+  it('should capitalize the classroom label in the topic step', fakeAsync(() => {
+    flushMicrotasks();
+    component.classroomName = 'math classroom';
+
+    fixture.detectChanges();
+
+    const classroomLabel: HTMLElement | null =
+      fixture.nativeElement.querySelector(
+        '.oppia-certificate-offering-classroom-label'
+      );
+
+    expect(classroomLabel?.textContent?.trim()).toEqual(
+      'Classroom: Math Classroom'
     );
   }));
 
@@ -441,5 +458,48 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(component.classroomLoadErrorMessage).toEqual('');
     expect(component.selectedTopicIds.has('topic_1')).toBeTrue();
     expect(component.selectedTopics).toEqual([]);
+  }));
+
+  it('should show loading state while topics are fetched', fakeAsync(() => {
+    let resolveClassroomData: (value: ClassroomData) => void = () => {};
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'math_classroom_id',
+          name: 'Math',
+          url_fragment: 'math',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveClassroomData = resolve;
+      })
+    );
+
+    component.classroomId = 'math_classroom_id';
+    component.ngOnChanges({
+      classroomId: {
+        currentValue: 'math_classroom_id',
+        previousValue: '',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.isLoadingTopics).toBeTrue();
+    resolveClassroomData(classroomData);
+    flushMicrotasks();
+    expect(component.isLoadingTopics).toBeFalse();
   }));
 });

@@ -82,6 +82,17 @@
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
           </button>
         </li>
+        <li *ngIf="isCertificateAssessmentEnabled()">
+          <button aria-label="Go to my certificates tab"
+                  class="align-items-center d-inline-flex rounded oppia-learner-dash-sidebar_btn text-left w-100 e2e-test-my-certificates-section"
+                  tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES)">
+            <span aria-hidden="true" class="fas fa-certificate fa-lg"></span>
+            {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES | translate }}
+          </button>
+        </li>
       </ol>
     </nav>
     <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow && !isShowRedesignedLearnerDashboardActive()" headroom>
@@ -133,7 +144,6 @@
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
-                          [totalLessonsInPlaylists]="totalLessonsInPlaylists"
                           (setActiveSection)="setActiveSection($event)">
           </oppia-home-tab>
         </div>
@@ -172,8 +182,6 @@
                                        [incompleteCollectionsList]="incompleteCollectionsList"
                                        [completedExplorationsList]="completedExplorationsList"
                                        [completedCollectionsList]="completedCollectionsList"
-                                       [explorationPlaylist]="explorationPlaylist"
-                                       [collectionPlaylist]="collectionPlaylist"
                                        [subscriptionsList]="subscriptionsList"
                                        [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                                        [learntTopicsList]="learntTopicsList"
@@ -183,6 +191,10 @@
                                        [subtopicMasteries]="subtopicMasteries">
           </oppia-progress-tab>
         </div>
+        <div class="w-100" *ngIf="isCertificateAssessmentEnabled() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES">
+          <oppia-my-certificates-tab>
+          </oppia-my-certificates-tab>
+        </div>
       </div>
     </div>
     <div class="col-md-2 oppia-learner-dashboard-side-content"
@@ -191,17 +203,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .oppia-profile-alignment {
-    vertical-align: middle;
-  }
-  .oppia-box-size {
-    padding: 2px 10px;
-  }
-  .col-md-3 {
-    flex: 0 0 25%;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-</style>

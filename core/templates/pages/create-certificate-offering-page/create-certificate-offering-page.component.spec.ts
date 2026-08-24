@@ -29,7 +29,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {
   CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
@@ -174,7 +174,7 @@ describe('Create Certificate Offering Page Component', () => {
 
     component.navigateBackToDashboard();
 
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   });
 
   it('should save certificate offering successfully and navigate away', fakeAsync(() => {
@@ -200,13 +200,16 @@ describe('Create Certificate Offering Page Component', () => {
     expect(modalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
     );
+    expect(modalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
         asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY,
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should create certificate offering and show post-result modal', fakeAsync(() => {
@@ -238,6 +241,9 @@ describe('Create Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(firstModalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
         asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE,
@@ -247,7 +253,7 @@ describe('Create Certificate Offering Page Component', () => {
     expect(secondModalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should not navigate or show alert if certificate creation returns falsy value', fakeAsync(() => {

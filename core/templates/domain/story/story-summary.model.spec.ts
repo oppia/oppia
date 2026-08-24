@@ -133,8 +133,8 @@ describe('Story summary model', () => {
       arcs: [
         {
           id: 'arc_1',
-          title: 'Arc Title',
-          description: 'Arc Description',
+          title: 'Adventure Title',
+          description: 'Adventure Description',
           node_ids: ['node_1', 'node_2'],
         },
       ],
@@ -146,8 +146,8 @@ describe('Story summary model', () => {
     const arcs = storySummary.getArcs();
     expect(arcs.length).toEqual(1);
     expect(arcs[0].id).toEqual('arc_1');
-    expect(arcs[0].title).toEqual('Arc Title');
-    expect(arcs[0].description).toEqual('Arc Description');
+    expect(arcs[0].title).toEqual('Adventure Title');
+    expect(arcs[0].description).toEqual('Adventure Description');
     expect(arcs[0].node_ids).toEqual(['node_1', 'node_2']);
   });
 
@@ -170,8 +170,8 @@ describe('Story summary model', () => {
       arcs: [
         {
           id: 'arc_1',
-          title: 'Arc Title',
-          description: 'Arc Description',
+          title: 'Adventure Title',
+          description: 'Adventure Description',
           node_ids: ['node_1', 'node_2'],
         },
       ],
@@ -186,7 +186,7 @@ describe('Story summary model', () => {
     arcs[0].title = 'Mutated title';
     nodeTitles.push('Chapter 3');
 
-    expect(storySummary.getArcs()[0].title).toEqual('Arc Title');
+    expect(storySummary.getArcs()[0].title).toEqual('Adventure Title');
     expect(storySummary.getNodeTitles()).toEqual(['Chapter 1', 'Chapter 2']);
   });
 });

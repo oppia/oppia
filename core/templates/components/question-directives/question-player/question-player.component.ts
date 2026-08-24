@@ -41,6 +41,7 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './question-player.component.css';
 
 export interface QuestionData {
   linkedSkillIds: string[];
@@ -94,6 +95,7 @@ export interface QuestionPlayerConfig {
 @Component({
   selector: 'oppia-question-player',
   templateUrl: './question-player.component.html',
+  styleUrls: ['./question-player.component.css'],
 })
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks

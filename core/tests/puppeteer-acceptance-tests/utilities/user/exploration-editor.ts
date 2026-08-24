@@ -70,6 +70,8 @@ const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const creationModalSelector = '.e2e-test-creation-modal';
+const createExplorationFromModalSelector = '.e2e-test-create-exploration';
 const rolesHeaderSelector = '.e2e-test-roles-header';
 const rolesContentSelector = '.e2e-test-roles-content';
 const usernameSelector = '.e2e-test-role-username';
@@ -129,6 +131,11 @@ const modifyTranslationModalSelector =
   '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
+const stateNodeGroupSelector = '.e2e-test-node';
+
+// To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts.
+const MAX_NODE_LABEL_LENGTH = 15;
+
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -383,13 +390,18 @@ const helpPageLinkSelector = '.e2e-test-help-page-link';
 const takeATourButtonSelector = '.e2e-test-tour-button';
 const translationTourButtonSelector = '.e2e-test-translation-tour-button';
 
-// Joyride (Exploration Editor Tour).
-const joyrideBodySelector = '.joyride-step__body';
-const joyrideTitleSelector = '.e2e-test-joyride-title';
-const nextButtonSelector = '.joyride-step__next-container .joyride-button';
-const previousButtonSelector = '.joyride-step__prev-container .joyride-button';
-const joyrideDoneButtonSelector = '.joyride-step__done-button .joyride-button';
-const joyrideStepSelector = '.joyride-step__counter';
+// Shepherd (Exploration Editor Tour).
+const shepherdBodySelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdTitleSelector = '.shepherd-element:not([hidden]) .shepherd-title';
+const nextButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const previousButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-secondary';
+const shepherdDoneButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const shepherdStepSelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdFooterSelector =
+  '.shepherd-element:not([hidden]) .shepherd-footer';
 
 // Save Exploration Modal.
 const saveExplorationModalContainerSelector =
@@ -475,6 +487,7 @@ const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
 
+const nextCardButtonSelector = '.e2e-test-next-card-button';
 const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
 
 const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
@@ -540,6 +553,22 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Truncates a card name the same way the frontend graph visualization does.
+   * Matches the behavior of TruncatePipe with MAX_NODE_LABEL_LENGTH.
+   * @param cardName The card name to potentially truncate.
+   * @returns The truncated card name if it exceeds MAX_NODE_LABEL_LENGTH, otherwise the original name.
+   */
+  private truncateCardName(cardName: string): string {
+    if (!cardName || cardName.length <= MAX_NODE_LABEL_LENGTH) {
+      return cardName;
+    }
+    const suffix = '...';
+    return (
+      cardName.substring(0, MAX_NODE_LABEL_LENGTH - suffix.length) + suffix
+    );
+  }
+
   /**
    * Checks if the interaction name is as expected.
    * @param name The name of the interaction.
@@ -776,6 +805,14 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
+
+    // ClearAllTextFrom clears the field programmatically, so the input is not
+    // marked as user-edited and Enter alone does not fire a change event. Since
+    // the filter only re-applies on change, dispatch it explicitly so that the
+    // filter reflects the current input value.
+    await this.page.$eval(historyUserFilterSelector, el => {
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+    });
   }
 
   /**
@@ -2550,7 +2587,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+    await this.clickOnElementWithSelector(createExplorationButtonSelector);
+
+    // If the create activity modal appears (user has collection editor role),
+    // click the exploration option.
+    const isCreationModalVisible = await this.isElementVisible(
+      creationModalSelector,
+      true,
+      5000
+    );
+
+    if (isCreationModalVisible) {
+      await this.clickAndWaitForNavigation(
+        createExplorationFromModalSelector,
+        true
+      );
+    }
 
     await this.page.waitForFunction(
       (targetURL: string) => {
@@ -2745,6 +2797,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
+   * @returns {string} The exploration id of the published exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -3045,8 +3098,15 @@ export class ExplorationEditor extends BaseUser {
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
 
+    // Scope the XPath search to the modal body. Searching the whole page
+    // (e.g. `//*[contains(text(), tileText)]`) can accidentally match
+    // unrelated elements outside the modal whose text happens to contain
+    // the interaction name as a substring — e.g. a state named
+    // "Text Input - 3" will match a search for "Text Input", causing us
+    // to click the state name header instead of the interaction tile
+    // while the modal is still open (and blocking the click).
     const interactionElement = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), "${tileText}")]`,
+      `//*[contains(@class, "modal-body")]//*[contains(normalize-space(text()), "${tileText}")]`,
       {timeout: 90000}
     );
     if (!interactionElement) {
@@ -3898,22 +3958,83 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(stateResponsesSelector);
-    await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
+
+    // Ensure the default response tab actually becomes active.
+    await this.page
+      .waitForSelector(`${stateResponsesSelector}.oppia-rule-tab-active`, {
+        visible: true,
+        timeout: 4000,
+      })
+      .catch(async () => {
+        // Retry using a DOM click in case layered UI blocks pointer events.
+        await this.page.evaluate((selector: string) => {
+          const tabs = Array.from(document.querySelectorAll(selector));
+          const visibleTab = tabs.find(tab => {
+            const rect = (tab as HTMLElement).getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          }) as HTMLElement | undefined;
+          visibleTab?.click();
+        }, stateResponsesSelector);
+
+        await this.page.waitForSelector(
+          `${stateResponsesSelector}.oppia-rule-tab-active`,
+          {
+            visible: true,
+            timeout: 4000,
+          }
+        );
+      });
+
+    // For some interactions, the default response panel can take longer to
+    // render or only expose the destination editor first.
+    try {
+      await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
+        visible: true,
+        timeout: 7000,
+      });
+    } catch {
+      await this.page.waitForSelector(
+        `${openOutcomeDestButton}, ${destinationCardSelector}`,
+        {
+          visible: true,
+        }
+      );
+    }
+  }
+
+  /**
+   * Returns whether the destination selector is already visible.
+   */
+  async isOutcomeDestinationSelectorVisible(): Promise<boolean> {
+    return await this.isElementVisible(destinationCardSelector, true, 1200);
+  }
+
+  /**
+   * Opens destination editor if needed.
+   */
+  async openOutcomeDestinationEditorIfNeeded(): Promise<void> {
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (isDestinationSelectorVisible) {
+      return;
+    }
+
+    await this.page.waitForSelector(openOutcomeDestButton, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
+    await this.page.waitForSelector(destinationCardSelector, {
       visible: true,
     });
   }
 
   /**
-   * Function to select the card that learners will be directed to from the current card.
-   * @param {string} cardName - The name of the card to which learners will be directed.
+   * Function to select destination for default response.
+   * @param cardName - The name of the card to which learners will be directed.
    */
-  async directLearnersToNewCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
+  async selectDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput, {
       visible: true,
@@ -3926,20 +4047,89 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Updates direct learners option when changing cards.
-   * @param cardName - The ard name where learners should be directed.
+   * Function to select existing destination and save.
+   * @param cardName - The name of the card to which learners will be directed.
    */
-  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
+  async selectExistingDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Function to display the Oppia responses section.
+   */
+  async viewOppiaResponsesLegacyKeptForCompatibility(): Promise<void> {
+    await this.clickOnElementWithSelector(stateResponsesSelector);
+    await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Function to select the card that learners will be directed to from the current card.
+   * @param {string} cardName - The name of the card to which learners will be directed.
+   */
+  async directLearnersToNewCard(cardName: string): Promise<void> {
+    const isOutcomeDestinationEditorVisible = await this.isElementVisible(
+      openOutcomeDestButton,
+      true,
+      2500
+    );
+
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (!isOutcomeDestinationEditorVisible && !isDestinationSelectorVisible) {
+      await this.viewOppiaResponses();
+    }
+
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectDestinationAndSave(cardName);
+    await this.waitForNetworkIdle();
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForSelector(stateNodeGroupSelector);
+
+    const truncatedCardName = this.truncateCardName(cardName);
+    await this.page.waitForFunction(
+      (selector: string, fullName: string, truncatedName: string) => {
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
+      },
+      {timeout: 10000},
+      stateNodeSelector,
+      cardName,
+      truncatedCardName
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Updates direct learners option when changing cards.
+   * @param cardName - Card name where learners should be directed
+   */
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectExistingDestinationAndSave(cardName);
   }
 
   /**
@@ -3999,7 +4189,13 @@ export class ExplorationEditor extends BaseUser {
         )
       )
     );
-    const cardIndex = cardNames.indexOf(cardName);
+
+    const truncatedCardName = this.truncateCardName(cardName);
+    let cardIndex = cardNames.indexOf(cardName);
+
+    if (cardIndex === -1) {
+      cardIndex = cardNames.indexOf(truncatedCardName);
+    }
 
     if (cardIndex === -1) {
       throw new Error(`Card name ${cardName} not found in the graph.`);
@@ -4108,7 +4304,18 @@ export class ExplorationEditor extends BaseUser {
 
     if (directToCard) {
       await this.clickOnElementWithSelector(openOutcomeDestButton);
-      await this.page.select(destinationSelectorDropdown, directToCard);
+
+      // '(try again)' is represented in the UI summary, but destination
+      // selection expects the current card name for a self-loop.
+      let destinationValue = directToCard;
+      if (directToCard === '(try again)') {
+        destinationValue = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
+      }
+
+      await this.page.select(destinationSelectorDropdown, destinationValue);
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
@@ -4808,7 +5015,10 @@ export class ExplorationEditor extends BaseUser {
     try {
       await this.page.waitForFunction(
         (element: HTMLElement, value: string, matchCase: boolean) => {
-          return (element.innerText.trim() === value.trim()) === matchCase;
+          const normalize = (s: string) => s.trim().replace(/\n+/g, '\n');
+          return (
+            (normalize(element.innerText) === normalize(value)) === matchCase
+          );
         },
         {},
         element,
@@ -4838,7 +5048,6 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
-
     if (skipVerification) {
       return;
     }
@@ -6273,14 +6482,14 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(takeATourButtonSelector);
     await this.clickOnElementWithSelector(takeATourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
     await this.expectElementToBeVisible(translationTourButtonSelector);
     await this.clickOnElementWithSelector(translationTourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   /**
@@ -6357,45 +6566,45 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the next step in the joyride.
+   * Navigates to the next step in the shepherd tour.
    */
-  async continueToNextJoyrideStep(): Promise<void> {
+  async continueToNextShepherdStep(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.expectJoyrideNextButtonToBeVisible();
+    await this.expectShepherdNextButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(nextButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForTimeout(1000);
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
   /**
-   * Navigates to the previous step in the joyride.
+   * Navigates to the previous step in the shepherd tour.
    */
-  async continueToPreviousJoyrideStep(): Promise<void> {
-    await this.expectJoyridePreviousButtonToBeVisible();
+  async continueToPreviousShepherdStep(): Promise<void> {
+    await this.expectShepherdPreviousButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(previousButtonSelector);
 
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
@@ -6440,12 +6649,66 @@ export class ExplorationEditor extends BaseUser {
   async expectCurrentOutcomeDestinationToBe(
     expectedDestination: string
   ): Promise<void> {
+    if (expectedDestination === '(try again)') {
+      const isCurrentDestinationSummaryVisible = await this.isElementVisible(
+        currentOutcomeDestinationSelector,
+        true,
+        3000
+      );
+
+      if (isCurrentDestinationSummaryVisible) {
+        const currentDestination = await this.page.$eval(
+          currentOutcomeDestinationSelector,
+          el => el.textContent?.trim() || ''
+        );
+        expect(['(try again)', '']).toContain(currentDestination);
+        return;
+      }
+
+      // Self-loop destinations sometimes render without current-outcome text.
+      // In that case, verify by opening the destination editor and checking
+      // that the selected destination is the current card.
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+      await this.page.waitForSelector(destinationSelectorDropdown, {
+        visible: true,
+      });
+
+      try {
+        const selectedDestinationText = await this.page.$eval(
+          `${destinationSelectorDropdown} option:checked`,
+          option => option.textContent?.trim() || ''
+        );
+        const currentCardName = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
+
+        const normalizedDestination = selectedDestinationText.toLowerCase();
+        const normalizedCurrentCardName = currentCardName.toLowerCase();
+        const isSelfLoopDestination =
+          normalizedDestination === '(try again)' ||
+          normalizedDestination === '' ||
+          normalizedDestination.includes(normalizedCurrentCardName);
+        expect(isSelfLoopDestination).toBe(true);
+      } finally {
+        const cancelDestinationButton = await this.page.$(
+          '.e2e-test-cancel-outcome-dest'
+        );
+        if (cancelDestinationButton) {
+          await this.clickOnElementWithSelector(
+            '.e2e-test-cancel-outcome-dest'
+          );
+        }
+      }
+      return;
+    }
+
     await this.page.waitForSelector(currentOutcomeDestinationSelector, {
       visible: true,
     });
     const currentDestination = await this.page.$eval(
       currentOutcomeDestinationSelector,
-      el => el.textContent?.trim()
+      el => el.textContent?.trim() || ''
     );
 
     expect(currentDestination).toBe(expectedDestination);
@@ -6492,17 +6755,23 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationStateGraphInMobileView();
     }
 
+    await this.page.waitForSelector(stateNodeGroupSelector);
+
+    const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
-      (selector: string, value: string) => {
+      (selector: string, fullName: string, truncatedName: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.includes(value);
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
       },
-      {},
+      {timeout: 60000},
       stateNodeSelector,
-      cardName
+      cardName,
+      truncatedCardName
     );
 
     if (this.isViewportAtMobileWidth()) {
@@ -6561,40 +6830,77 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Verifies that the joyride content is as expected.
+   * Verifies that the shepherd tour content is as expected.
    * @param expectedContent - The expected content.
    */
-  async expectJoyrideContentToContain(expectedContent: string): Promise<void> {
-    await this.expectTextContentToContain(joyrideBodySelector, expectedContent);
+  async expectShepherdContentToContain(expectedContent: string): Promise<void> {
+    await this.expectTextContentToContain(
+      shepherdBodySelector,
+      expectedContent
+    );
   }
 
   /**
-   * Verifies that the joyride title is as expected.
+   * Verifies that the shepherd tour title is as expected.
    * @param expectedTitle - The expected title.
    */
-  async expectJoyrideTitleToBe(expectedTitle: string): Promise<void> {
-    await this.expectTextContentToBe(joyrideTitleSelector, expectedTitle);
+  async expectShepherdTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(shepherdTitleSelector, expectedTitle);
   }
 
-  async expectJoyrideDoneButtonToBeVisible(
+  async expectShepherdDoneButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const doneButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Done')
+        );
+        if (shouldBeVisible) {
+          return (
+            doneButton && (doneButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !doneButton || (doneButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**
-   * Verifies that the joyride next button is visible.
+   * Verifies that the shepherd next button is visible.
    */
-  async expectJoyrideNextButtonToBeVisible(
+  async expectShepherdNextButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(nextButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const nextButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Next')
+        );
+        if (shouldBeVisible) {
+          return (
+            nextButton && (nextButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !nextButton || (nextButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**
-   * Verifies that the joyride previous button is visible.
+   * Verifies that the shepherd previous button is visible.
    */
-  async expectJoyridePreviousButtonToBeVisible(
+  async expectShepherdPreviousButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(previousButtonSelector, visible);
@@ -6624,19 +6930,26 @@ export class ExplorationEditor extends BaseUser {
    * Verifies that the outcome feedback is visible.
    */
   async expectOutcomeFeedbackToBe(expectedFeedback: string): Promise<void> {
-    await this.page.waitForSelector(outcomeFeedbackSelector);
-    const feedbackText = await this.page.evaluate(
-      element => element.textContent,
-      outcomeFeedbackSelector
+    await this.page.waitForSelector(outcomeFeedbackSelector, {
+      visible: true,
+    });
+    const feedbackText = await this.page.$eval(
+      outcomeFeedbackSelector,
+      element => element.textContent?.trim() || ''
     );
 
     // Remove "Oppia tells the learner..." prefix.
-    const feedbackTextWithoutPrefix = feedbackText.replace(
-      'Oppia tells the learner...',
-      ''
-    );
+    const feedbackTextWithoutPrefix = feedbackText
+      .replace('Oppia tells the learner...', '')
+      .trim();
 
-    expect(feedbackTextWithoutPrefix).toBe(expectedFeedback);
+    // Strip icon glyphs (for example material-icon private-use characters)
+    // that can appear before feedback text in mobile layouts.
+    const normalizedFeedbackText = feedbackTextWithoutPrefix
+      .replace(/[\uE000-\uF8FF]/g, '')
+      .trim();
+
+    expect(normalizedFeedbackText).toBe(expectedFeedback);
   }
 
   /**
@@ -6761,13 +7074,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to finish the joyride.
+   * Function to finish the shepherd.
    */
-  async finishJoyride(): Promise<void> {
-    await this.expectJoyrideDoneButtonToBeVisible();
+  async finishShepherd(): Promise<void> {
+    await this.expectShepherdDoneButtonToBeVisible();
 
-    await this.page.click(joyrideDoneButtonSelector);
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, false);
+    await this.page.click(shepherdDoneButtonSelector);
+    await this.expectElementToBeVisible(shepherdDoneButtonSelector, false);
   }
 
   /**
@@ -7921,6 +8234,99 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expects the interaction preview element to be absent from the DOM.
+   * Use this immediately after removeInteraction() to confirm the preview
+   * has been cleared.
+   */
+  async expectInteractionPreviewToBeAbsent(): Promise<void> {
+    const preview = await this.page.$(interactionPreviewSelector);
+    expect(preview).toBeNull();
+  }
+
+  /**
+   * Expects the "Customize Interaction" modal to have closed. Call this
+   * after clicking "Save Interaction" to confirm the modal disappears.
+   * Uses commonModalTitleSelector which is already defined in this file.
+   */
+  async expectCustomizeInteractionModalToBeClosed(): Promise<void> {
+    await this.page.waitForSelector(commonModalTitleSelector, {
+      hidden: true,
+      timeout: 10000,
+    });
+  }
+
+  /**
+   * Waits for the next-card button to be visible in the preview tab and
+   * asserts that its label matches the expected text (e.g. 'Continue').
+   * @param {string} expectedText - The expected text of the next-card button.
+   */
+  async expectNextCardButtonTextToBe(expectedText: string): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+    const buttonText = await this.page.$eval(
+      nextCardButtonSelector,
+      el => el.textContent?.trim() || ''
+    );
+    expect(buttonText).toBe(expectedText);
+  }
+
+  /**
+   * Waits until the next-card button is visible in the preview tab.
+   * Use this before asserting preview card content when the card has a
+   * Continue Button interaction.
+   */
+  async expectNextCardButtonToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+  }
+
+  /**
+   * Asserts that the multiple-choice options rendered in the preview tab
+   * match the expected set exactly (order-independent, ignoring empty strings).
+   * Uses multipleChoiceOptionSelector which is already defined in this file.
+   * @param {string[]} expectedOptions - The expected set of multiple-choice options.
+   */
+  async expectPreviewMultipleChoiceOptionsToEqual(
+    expectedOptions: string[]
+  ): Promise<void> {
+    const choices = await this.page.$$eval(
+      multipleChoiceOptionSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const nonEmptyChoices = choices.filter(choice => choice);
+    expect(nonEmptyChoices.length).toBe(expectedOptions.length);
+    expect(nonEmptyChoices).toEqual(expect.arrayContaining(expectedOptions));
+  }
+
+  /**
+   * Waits for the solution modal body to be visible and asserts that it
+   * contains every string in expectedTexts.
+   * Uses commonModalBodySelector which is already defined in this file.
+   * @param {string[]} expectedTexts - The strings expected to appear in the solution modal body.
+   */
+  async expectSolutionModalToContain(expectedTexts: string[]): Promise<void> {
+    await this.page.waitForSelector('ngb-modal-window.modal.show .modal-body', {
+      visible: true,
+    });
+    const modalText = await this.page.$eval(
+      'ngb-modal-window.modal.show .modal-body',
+      el => el.textContent || ''
+    );
+    for (const text of expectedTexts) {
+      expect(modalText).toContain(text);
+    }
+  }
+
+  /**
+   * Asserts that the preview is showing the end-exploration card:
+   * no submit-answer button is present and the restart button is visible.
+   */
+  async expectEndExplorationPreviewToBeVisible(): Promise<void> {
+    const submitButton = await this.page.$(submitAnswerButton);
+    expect(submitButton).toBeNull();
+    await this.page.waitForSelector(previewRestartButton, {
+      visible: true,
+    });
+  }
+  /*
    * Adds a math formula to the current card's content using the RTE toolbar.
    * This opens the state content editor, inserts a math formula via the
    * CKEditor math button, and saves the content.

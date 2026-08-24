@@ -38,10 +38,9 @@ export class FeedbackSessionInfoService {
   private static readonly MAX_ERROR_MESSAGE_LENGTH = 1000;
   private static consolePatched = false;
   private static activeInstance: FeedbackSessionInfoService | null = null;
-  private recentConsoleErrors: FeedbackSessionInfo['console_logs_json'] = [];
-  private recentFailedRequests: FeedbackSessionInfo['failed_requests_json'] =
-    [];
-  private recentNavigationHistory: FeedbackSessionInfo['navigation_history_json'] =
+  private recentConsoleErrors: FeedbackSessionInfo['console_logs'] = [];
+  private recentFailedRequests: FeedbackSessionInfo['failed_requests'] = [];
+  private recentNavigationHistory: FeedbackSessionInfo['navigation_history'] =
     [];
 
   constructor(
@@ -147,7 +146,7 @@ export class FeedbackSessionInfoService {
   }
 
   private pushNavigationEntry(
-    entry: FeedbackSessionInfo['navigation_history_json'][number]
+    entry: FeedbackSessionInfo['navigation_history'][number]
   ): void {
     this.recentNavigationHistory.push(entry);
     if (
@@ -159,7 +158,7 @@ export class FeedbackSessionInfoService {
   }
 
   private pushConsoleLog(
-    entry: FeedbackSessionInfo['console_logs_json'][number]
+    entry: FeedbackSessionInfo['console_logs'][number]
   ): void {
     this.recentConsoleErrors.push({
       ...entry,
@@ -190,7 +189,7 @@ export class FeedbackSessionInfoService {
   }
 
   private pushFailedRequest(
-    entry: FeedbackSessionInfo['failed_requests_json'][number]
+    entry: FeedbackSessionInfo['failed_requests'][number]
   ): void {
     this.recentFailedRequests.push(entry);
     if (
@@ -271,10 +270,10 @@ export class FeedbackSessionInfoService {
       } as const,
     };
     return {
-      console_logs_json: [...this.recentConsoleErrors],
-      failed_requests_json: [...this.recentFailedRequests],
-      navigation_history_json: [...this.recentNavigationHistory],
-      environment_json: environmentInfo,
+      console_logs: [...this.recentConsoleErrors],
+      failed_requests: [...this.recentFailedRequests],
+      navigation_history: [...this.recentNavigationHistory],
+      environment: environmentInfo,
     };
   }
 }

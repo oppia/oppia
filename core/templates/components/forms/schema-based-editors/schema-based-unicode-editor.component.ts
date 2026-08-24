@@ -48,10 +48,12 @@ import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {validate} from 'components/forms/validators/schema-validators';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
+import './schema-based-unicode-editor.component.css';
 
 @Component({
   selector: 'schema-based-unicode-editor',
   templateUrl: './schema-based-unicode-editor.component.html',
+  styleUrls: ['./schema-based-unicode-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

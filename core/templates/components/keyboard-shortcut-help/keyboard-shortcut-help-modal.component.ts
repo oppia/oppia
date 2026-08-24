@@ -20,11 +20,12 @@ import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
 import {PageContextService} from 'services/page-context.service';
+import './keyboard-shortcut-help-modal.component.css';
 
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./keyboard-shortcut-help-modal.component.css'],
 })
 export class KeyboardShortcutHelpModalComponent implements OnInit {
   constructor(

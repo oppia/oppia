@@ -17,10 +17,12 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import './html-select.component.css';
 
 @Component({
   selector: 'oppia-html-select',
   templateUrl: './html-select.component.html',
+  styleUrls: ['./html-select.component.css'],
 })
 export class HtmlSelectComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -30,6 +30,7 @@ import './post-certificate-offering-result-modal.component.css';
 @Component({
   selector: 'oppia-post-certificate-offering-result-modal',
   templateUrl: './post-certificate-offering-result-modal.component.html',
+  styleUrls: ['./post-certificate-offering-result-modal.component.css'],
 })
 export class PostCertificateOfferingResultModalComponent {
   @Input() action: CertificateOfferingResultAction =

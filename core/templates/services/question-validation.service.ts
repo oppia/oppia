@@ -167,6 +167,58 @@ export class QuestionValidationService {
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
     }
+    if (this.hasDuplicateCorrectAndIncorrectFeedback(question)) {
+      return 'Feedback for correct and incorrect answers must be different.';
+    }
     return null;
+  }
+
+  // Returns true if the same non-empty feedback text is used for both a
+  // correct outcome and an incorrect outcome (including the default
+  // '[All other answers]' outcome).
+  private hasDuplicateCorrectAndIncorrectFeedback(question: Question): boolean {
+    const interaction = question.getStateData().interaction;
+    // Normalize the feedback HTML down to its visible text so that
+    // markup-only or whitespace-only differences (e.g. 'ok' vs '<p>ok</p>'
+    // vs '<p> ok </p>') are still treated as duplicates.
+    const normalizeFeedback = (html: string): string => {
+      return html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    };
+    const correctFeedbacks = new Set<string>();
+    const incorrectFeedbacks = new Set<string>();
+    for (const answerGroup of interaction.answerGroups) {
+      const feedbackHtml = normalizeFeedback(answerGroup.outcome.feedback.html);
+      if (feedbackHtml.length === 0) {
+        continue;
+      }
+      if (answerGroup.outcome.labelledAsCorrect) {
+        correctFeedbacks.add(feedbackHtml);
+      } else {
+        incorrectFeedbacks.add(feedbackHtml);
+      }
+    }
+    if (interaction.defaultOutcome !== null) {
+      const defaultFeedbackHtml = normalizeFeedback(
+        interaction.defaultOutcome.feedback.html
+      );
+      if (defaultFeedbackHtml.length > 0) {
+        if (interaction.defaultOutcome.labelledAsCorrect) {
+          correctFeedbacks.add(defaultFeedbackHtml);
+        } else {
+          incorrectFeedbacks.add(defaultFeedbackHtml);
+        }
+      }
+    }
+    for (const feedbackHtml of correctFeedbacks) {
+      if (incorrectFeedbacks.has(feedbackHtml)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

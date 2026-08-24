@@ -19,8 +19,20 @@
  * based on the provided feedback modal type.
  */
 
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+  Optional,
+  Inject,
+} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {FeedbackScreenshotStagingService} from 'domain/feedback/feedback-screenshot-staging.service';
@@ -34,8 +46,10 @@ import {
   LessonFeedbackModel,
   FeedbackModalType,
   LessonFeedbackMetadata,
+  ReportType,
 } from 'domain/feedback/feedback.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -61,11 +75,17 @@ interface TurnstileWindow extends Window {
   turnstile?: TurnstileApi;
 }
 
+interface FeedbackModalData {
+  feedbackModalType: FeedbackModalType;
+}
+
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
+  styleUrls: ['./feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
+  readonly ReportAnIssueCategory = ReportAnIssueCategory;
   @Input() feedbackModalType!: FeedbackModalType;
   readonly MAX_REPORT_MESSAGE_LENGTH = 2500;
   @ViewChild('turnstileContainer')
@@ -100,7 +120,13 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal
+    private siteAnalyticsService: SiteAnalyticsService,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data?: FeedbackModalData
   ) {}
 
   get isLessonFeedbackMode(): boolean {
@@ -173,7 +199,35 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.data) {
+      this.feedbackModalType = this.data.feedbackModalType;
+    }
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.feedbackBottomSheetRef?.dismiss();
+        }
+      });
+    }
     this.showTechnicalLogsCheckbox = true;
+
+    switch (this.feedbackModalType) {
+      case FeedbackModalType.LESSON_FEEDBACK:
+        this.siteAnalyticsService.registerLessonFeedbackModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.LESSON_ISSUE:
+        this.siteAnalyticsService.registerLessonIssueModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.SITE_ISSUE:
+        this.siteAnalyticsService.registerWebsiteIssueModalOpenEvent();
+        break;
+    }
 
     try {
       const userInfo = await this.userService.getUserInfoAsync();
@@ -210,7 +264,8 @@ export class FeedbackModalComponent implements OnInit {
     this.category = category;
 
     this.showTechnicalLogsCheckbox =
-      category === 'broken_layout_or_image' || category === 'other_or_not_sure';
+      category === ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE ||
+      category === ReportAnIssueCategory.OTHER_OR_NOT_SURE;
   }
 
   onScreenshotFileReceived(file: File): void {
@@ -255,8 +310,7 @@ export class FeedbackModalComponent implements OnInit {
       this.formError = this.translateService.instant(
         'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG',
         {
-          length: this.feedbackText.length,
-          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
+          characterCount: `${this.feedbackText.length}/${this.MAX_REPORT_MESSAGE_LENGTH}`,
         }
       );
       return false;
@@ -313,7 +367,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: this.feedbackText,
       explorationContext: {
         explorationId: lessonFeedbackMetadata.explorationId,
@@ -330,9 +384,14 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonIssueSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         this.category === 'broken_layout_or_image' ||
@@ -341,7 +400,7 @@ export class FeedbackModalComponent implements OnInit {
           ? 'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
           : 'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -358,7 +417,7 @@ export class FeedbackModalComponent implements OnInit {
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const feedbackPayload = LessonFeedbackModel.createForSubmission({
       feedbackText: this.feedbackText,
-      lesson_metadata_json: {
+      lesson_metadata: {
         explorationId: lessonFeedbackMetadata.explorationId,
         explorationVersion: lessonFeedbackMetadata.explorationVersion,
         stateName: lessonFeedbackMetadata.stateName,
@@ -368,14 +427,19 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitLessonFeedbackAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitLessonFeedbackAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonFeedbackSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -394,7 +458,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'site',
+      source: ReportType.APP,
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,
@@ -405,14 +469,16 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
-      );
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerWebsiteIssueSubmittedEvent(response.id);
       const successMessage = this.translateService.instant(
         'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -494,6 +560,10 @@ export class FeedbackModalComponent implements OnInit {
     this.captchaToken = '';
     this.captchaSubmitError = null;
     this.removeScreenshot();
-    this.ngbActiveModal.dismiss();
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.dismiss();
+    } else {
+      this.ngbActiveModal.dismiss();
+    }
   }
 }

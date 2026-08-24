@@ -28,6 +28,7 @@ from core.controllers import base
 from core.domain import (
     android_services,
     blog_services,
+    certificate_assessment_services,
     classroom_config_services,
     email_manager,
     feature_flag_services,
@@ -2883,6 +2884,63 @@ def require_user_id_else_redirect_to_homepage(
     return test_login
 
 
+def can_access_certificate_assessment_attempt_result(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator that checks whether the user can access a certificate
+    assessment attempt result.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+        whether the user can access the given attempt.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_certificate_assessment_attempt_result(
+        self: _SelfBaseHandlerType, attempt_id: str, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the user can access the given attempt.
+
+        Args:
+            attempt_id: str. The ID of the certificate assessment attempt.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            NotFoundException. The attempt does not exist.
+            UnauthorizedUserException. The user does not own the attempt.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        try:
+            attempt = certificate_assessment_services.get_certificate_attempt(
+                attempt_id
+            )
+        except (
+            certificate_assessment_services.CertificateAssessmentAttemptNotFoundException
+        ) as e:
+            raise self.NotFoundException(str(e)) from e
+
+        if attempt.learner_id != self.user_id:
+            raise self.UnauthorizedUserException(
+                'You do not have permission to access this certificate '
+                'assessment attempt result.'
+            )
+
+        return handler(self, attempt_id, **kwargs)
+
+    return test_can_access_certificate_assessment_attempt_result
+
+
 def can_edit_topic(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -5131,3 +5189,285 @@ def can_access_certificate_dashboard(
         return handler(self, **kwargs)
 
     return test_can_access_certificate_dashboard
+
+
+def can_submit_assessment_response(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the current learner can submit the attempt.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks whether the current
+        learner can submit the assessment attempt.
+
+    Raises:
+        base.UserFacingExceptions.NotLoggedInException. If the learner is not
+            logged in.
+        base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+            does not belong to the learner.
+        base.UserFacingExceptions.InvalidInputException. If the attempt has
+            already been submitted.
+        base.UserFacingExceptions.NotFoundException. If the attempt cannot be
+            found.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_submit(
+        self: _SelfBaseHandlerType, attempt_id: str, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the current learner can submit the assessment attempt.
+
+        Args:
+            attempt_id: str. The ID of the assessment attempt.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            base.UserFacingExceptions.NotLoggedInException. If the learner is
+                not logged in.
+            base.UserFacingExceptions.UnauthorizedUserException. If the
+                attempt does not belong to the learner.
+            base.UserFacingExceptions.InvalidInputException. If the attempt has
+                already been submitted.
+            base.UserFacingExceptions.NotFoundException. If the attempt cannot
+                be found.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        try:
+            attempt = certificate_assessment_services.get_certificate_assessment_attempt(
+                attempt_id
+            )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
+        if attempt.learner_id != self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permission to submit this assessment.'
+            )
+        if attempt.is_submitted:
+            raise self.InvalidInputException(
+                'This assessment has already been submitted.'
+            )
+        return handler(self, attempt_id, **kwargs)
+
+    return test_can_submit
+
+
+def can_access_certificate_assessment_attempt(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check access to a learner's certificate assessment attempt.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks whether the current
+        learner can access a question from the certificate assessment attempt.
+
+    Raises:
+        base.UserFacingExceptions.NotLoggedInException. If the learner is not
+            logged in.
+        base.UserFacingExceptions.NotFoundException. If the attempt cannot be
+            found.
+        base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+            does not belong to the learner.
+        base.UserFacingExceptions.InvalidInputException. If the attempt has
+            already been submitted or the question does not belong to the
+            attempt.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access(
+        self: _SelfBaseHandlerType,
+        attempt_id: str,
+        question_id: str,
+        **kwargs: Any,
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the current learner can access a question from the
+        certificate assessment attempt.
+
+        Args:
+            attempt_id: str. The ID of the assessment attempt.
+            question_id: str. The ID of the question.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            base.UserFacingExceptions.NotLoggedInException. If the learner is
+                not logged in.
+            base.UserFacingExceptions.NotFoundException. If the attempt cannot
+                be found.
+            base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+                does not belong to the learner.
+            base.UserFacingExceptions.InvalidInputException. If the attempt has
+                already been submitted or the question does not belong to the
+                attempt.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        try:
+            attempt = certificate_assessment_services.get_certificate_assessment_attempt(
+                attempt_id
+            )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
+        if attempt.learner_id != self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permission to access this assessment.'
+            )
+        if attempt.is_submitted:
+            raise self.InvalidInputException(
+                'This assessment has already been submitted.'
+            )
+        if question_id not in attempt.version_data['question_versions']:
+            raise self.InvalidInputException(
+                'Question is not part of this assessment.'
+            )
+        return handler(self, attempt_id, question_id, **kwargs)
+
+    return test_can_access
+
+
+def can_access_technical_feedback_dashboard(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access the technical feedback dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the technical feedback dashboard page.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_technical_feedback_dashboard(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user is logged in and can access the technical feedback dashboard
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the technical feedback dashboard.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD in (
+            self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access technical feedback dashboard page.'
+        )
+
+    return test_can_access_technical_feedback_dashboard
+
+
+def can_access_platform_feedback_reports(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Checks whether the user can access platform feedback reports.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access PlatformFeedbackModel reports.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_platform_feedback_reports(
+        self: _SelfBaseHandlerType,
+        dashboard: str,
+        dashboard_id: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the user can access the requested feedback dashboard.
+
+        Args:
+            dashboard: str. The requested dashboard.
+            dashboard_id: str. Exploration ID for creator dashboards and a
+                team ID for technical dashboards.
+            *args: list(*). Positional arguments for the decorated handler.
+            **kwargs: *. Keyword arguments for the decorated handler.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            InvalidInputException. The technical feedback team dashboard_id is
+                not a valid choice.
+            NotLoggedInException. The user is not logged in. Raised indirectly by
+                can_edit_exploration and
+                can_access_technical_feedback_dashboard.
+            UnauthorizedUserException. The requested dashboard is invalid.
+        """
+
+        if dashboard == feconf.DESTINATION_CURRICULUM:
+
+            # Here we use type Any because the decorated handler may receive
+            # handler-specific keyword arguments.
+            def wrapped_handler(
+                handler_self: _SelfBaseHandlerType,
+                unused_exploration_id: str = '',
+                **unused_kwargs: Any,
+            ) -> _GenericHandlerFunctionReturnType:
+                """Calls the original handler after exploration access checks."""
+                return handler(
+                    handler_self, dashboard, dashboard_id, *args, **kwargs
+                )
+
+            return can_edit_exploration(wrapped_handler)(self, dashboard_id)
+
+        else:
+            if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
+                raise self.InvalidInputException(
+                    f'Invalid technical feedback team: {dashboard_id}.'
+                )
+
+            # Here we use type Any because the decorated handler may receive
+            # handler-specific keyword arguments.
+            def wrapped_technical_handler(
+                handler_self: _SelfBaseHandlerType,
+                unused_exploration_id: str = '',
+                **unused_kwargs: Any,
+            ) -> _GenericHandlerFunctionReturnType:
+                """Calls the original handler after dashboard access checks."""
+                return handler(
+                    handler_self, dashboard, dashboard_id, *args, **kwargs
+                )
+
+            return can_access_technical_feedback_dashboard(
+                wrapped_technical_handler
+            )(self)
+
+    return test_can_access_platform_feedback_reports

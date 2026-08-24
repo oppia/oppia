@@ -147,7 +147,7 @@ module.exports = {
         '.select2',
         '.CodeMirror',
         '.toast',
-        '.joyride',
+        '.shepherd',
         '.mat',
       ];
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
@@ -184,7 +184,7 @@ module.exports = {
         '.select2',
         '.CodeMirror',
         '.toast',
-        '.joyride',
+        '.shepherd',
         '.mat',
       ];
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {

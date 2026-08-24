@@ -1417,6 +1417,87 @@ describe('SvgEditor with image save destination as local storage', () => {
     expect(addedText.fill).toBe('#000');
   });
 
+  it('should preserve newlines between multiple tspan elements', () => {
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const tspan1 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan1.textContent = 'Goal';
+    const tspan2 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan2.textContent = 'How';
+    const tspan3 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan3.textContent = 'to cook';
+    textElement.appendChild(tspan1);
+    textElement.appendChild(tspan2);
+    textElement.appendChild(tspan3);
+
+    const fabricObj = new fabric.Text('GoalHowto cook', {
+      left: 50,
+      top: 50,
+      width: 100,
+    });
+
+    component.diagramWidth = 450;
+    component.loadTextObject(textElement, fabricObj);
+
+    const lastObj =
+      component.canvas.getObjects()[component.canvas.getObjects().length - 1];
+    expect(lastObj.get('text')).toBe('Goal\nHow\nto cook');
+  });
+
+  it('should preserve newlines between tspan elements with fill styles', () => {
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const tspan1 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan1.textContent = 'Goal';
+    tspan1.style.fill = 'red';
+    tspan1.style.stroke = 'black';
+    tspan1.style.strokeWidth = '1';
+    const tspan2 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan2.textContent = 'Total';
+    tspan2.style.fill = 'blue';
+    const tspan3 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan3.textContent = 'Text';
+    textElement.appendChild(tspan1);
+    textElement.appendChild(tspan2);
+    textElement.appendChild(tspan3);
+
+    const fabricObj = new fabric.Text('GoalTotalText', {
+      left: 50,
+      top: 50,
+      width: 100,
+    });
+
+    component.diagramWidth = 450;
+    component.loadTextObject(textElement, fabricObj);
+
+    const lastObj =
+      component.canvas.getObjects()[component.canvas.getObjects().length - 1];
+    // Colored tspans should still get newlines between them.
+    expect(lastObj.get('text')).toBe('Goal\nTotal\nText');
+  });
+
   it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
     var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -1435,5 +1516,22 @@ describe('SvgEditor with image save destination as local storage', () => {
     );
     component.setSavedSvgFilename('test.svg', true);
     expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should scale down selection in centerContent only when selection dimensions exceed canvas', () => {
+    spyOn(component.canvas, 'getWidth').and.returnValue(490);
+    spyOn(component.canvas, 'getHeight').and.returnValue(490);
+    const mockRect = new fabric.Rect({
+      width: 600,
+      height: 400,
+      strokeWidth: 0,
+    });
+    component.canvas.add(mockRect);
+    spyOn(component.canvas, 'setActiveObject').and.callThrough();
+    spyOn(component.canvas, 'discardActiveObject').and.callThrough();
+
+    component.centerContent();
+
+    expect(mockRect.scaleX).toBeCloseTo(490 / 600, 3);
   });
 });

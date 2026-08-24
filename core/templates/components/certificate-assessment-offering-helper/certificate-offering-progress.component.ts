@@ -37,6 +37,7 @@ import './certificate-offering-progress.component.css';
 @Component({
   selector: 'oppia-certificate-offering-progress',
   templateUrl: './certificate-offering-progress.component.html',
+  styleUrls: ['./certificate-offering-progress.component.css'],
 })
 export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
   @Input() pageTitle: string = '';

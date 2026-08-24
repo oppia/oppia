@@ -18,7 +18,6 @@ runs:
           /home/runner/work/oppia/oppia/webpack_bundles
           /home/runner/work/oppia/oppia/app.yaml
           /home/runner/work/oppia/oppia/assets/hashes.json
-          /home/runner/work/oppia/oppia/backend_prod_files
           /home/runner/work/oppia/oppia/dist
           /home/runner/work/oppia/oppia/third_party/generated
     - name: Build Webpack (prod)
