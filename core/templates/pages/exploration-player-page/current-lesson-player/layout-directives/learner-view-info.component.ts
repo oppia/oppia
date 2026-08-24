@@ -165,10 +165,8 @@ export class LearnerViewInfoComponent {
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.explorationTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.explorationTitleTranslationKey
     );
   }
 

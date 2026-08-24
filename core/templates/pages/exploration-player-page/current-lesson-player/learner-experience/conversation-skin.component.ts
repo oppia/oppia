@@ -565,10 +565,8 @@ export class ConversationSkinComponent {
   isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
     let recommendedExpTitleTranslationKey =
       this.getRecommendedExpTitleTranslationKey(explorationId);
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        recommendedExpTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      recommendedExpTitleTranslationKey
     );
   }
 
