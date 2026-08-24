@@ -536,7 +536,7 @@
 	"I18N_LEAVE_LEARNER_GROUP_MODAL_HEADER": "Poistutaanko oppijaryhmästä?",
 	"I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON": "Jatka vieraana",
 	"I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED": "Anna kuvaus ennen lähettämistä.",
-	"I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG": "Palautteessa saa olla enintään {{maxLength}} merkkiä.",
+	"I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG": "Palautteessa saa olla enintään <[characterCount]> merkkiä.",
 	"I18N_LESSON_FEEDBACK_MODAL_BUTTON": "Lähetä palautetta oppitunnista",
 	"I18N_LESSON_FEEDBACK_MODAL_SAFETY_NOTICE": "Älä sisällytä palautteeseesi nimiä, puhelinnumeroita tai sähköpostiosoitteita turvallisuussyistä. Tekijöiden vastaukset tai päivitykset näkyvät oppituntien hallintapaneelissasi.",
 	"I18N_LESSON_FEEDBACK_MODAL_TEXTAREA_PLACEHOLDER": "Kirjoita kommenttisi tähän! Mistä pidit? Onko sinulla ideoita tämän oppitunnin parantamiseksi?",
