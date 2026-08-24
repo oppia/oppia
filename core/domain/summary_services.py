@@ -688,9 +688,7 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
         summary_dicts: List[DisplayableSummaryDictsType] = []
 
         # Query collections from the datastore by category and language.
-        collection_models_result: Sequence[
-            collection_models.CollectionSummaryModel
-        ] = (
+        collection_query = (
             collection_models.CollectionSummaryModel.query()
             .filter(
                 collection_models.CollectionSummaryModel.status
@@ -704,7 +702,9 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
                     ]
                 )
             )
-            .filter(
+        )
+        if language_codes:
+            collection_query = collection_query.filter(
                 datastore_services.any_of(
                     *[
                         collection_models.CollectionSummaryModel.language_code
@@ -713,10 +713,12 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
                     ]
                 )
             )
-            .order(
-                -collection_models.CollectionSummaryModel.collection_model_last_updated
-            )
-            .fetch(8)
+        collection_models_result: Sequence[
+            collection_models.CollectionSummaryModel
+        ] = collection_query.order(
+            -collection_models.CollectionSummaryModel.collection_model_last_updated
+        ).fetch(
+            8
         )
         collection_summaries = [
             collection_services.get_collection_summary_from_model(m)
@@ -727,7 +729,7 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
         )
 
         # Query explorations from the datastore by category and language.
-        exp_models_result: Sequence[exp_models.ExpSummaryModel] = (
+        exp_query = (
             exp_models.ExpSummaryModel.query()
             .filter(
                 exp_models.ExpSummaryModel.status
@@ -745,7 +747,9 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
                     ]
                 )
             )
-            .filter(
+        )
+        if language_codes:
+            exp_query = exp_query.filter(
                 datastore_services.any_of(
                     *[
                         exp_models.ExpSummaryModel.language_code == lc
@@ -753,14 +757,18 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
                     ]
                 )
             )
-            .order(-exp_models.ExpSummaryModel.scaled_average_rating)
-            .fetch(8)
+        exp_models_result: Sequence[exp_models.ExpSummaryModel] = (
+            exp_query.order(
+                -exp_models.ExpSummaryModel.scaled_average_rating
+            ).fetch(8)
         )
         exp_summaries = [
             exp_fetchers.get_exploration_summary_from_model(m)
             for m in exp_models_result
         ]
         summary_dicts.extend(get_displayable_exp_summary_dicts(exp_summaries))
+
+        summary_dicts = summary_dicts[:8]
 
         if not summary_dicts:
             continue
