@@ -313,6 +313,9 @@ const solutionFloatTextField =
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const createQuestionButton = 'div.e2e-test-create-question';
+const questionDifficultyHeaderSelector = '.e2e-test-question-difficulty-header';
+const questionDifficultyContainerSelector =
+  '.e2e-test-question-difficulty-container';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
@@ -715,11 +718,63 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Create a basic algebra question in the skill editor page.
+   * Adds questions to a skill with an explicit difficulty distribution, so
+   * that certificate readiness checks see the intended Easy/Medium/Hard
+   * coverage instead of only default-difficulty questions.
+   * @param {string} skillName - The name of the skill.
+   * @param {Object} questionCountsByDifficulty - The number of questions to
+   * create at each difficulty level.
    */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
+  async createQuestionsForSkillWithDifficulties(
+    skillName: string,
+    questionCountsByDifficulty: {Easy: number; Medium: number; Hard: number}
+  ): Promise<void> {
+    const difficulties: ('Easy' | 'Medium' | 'Hard')[] = [
+      'Easy',
+      'Medium',
+      'Hard',
+    ];
+    for (const difficulty of difficulties) {
+      for (let i = 0; i < questionCountsByDifficulty[difficulty]; i++) {
+        await this.addBasicAlgebraQuestionToSkill(skillName, difficulty);
+      }
+    }
+  }
+
+  /**
+   * Create a basic algebra question in the skill editor page.
+   * @param {string} skillName - The name of the skill.
+   * @param {'Easy'|'Medium'|'Hard'} difficulty - The difficulty level at
+   * which the question is linked to the skill. The difficulty radio is only
+   * rendered for levels that have a rubric explanation, so rubrics must be
+   * filled before calling this function with 'Easy' or 'Hard'.
+   */
+  async addBasicAlgebraQuestionToSkill(
+    skillName: string,
+    difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
+  ): Promise<void> {
     await this.openSkillEditor(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
+    // The difficulty section loads asynchronously with the question editor,
+    // so wait for its header before selecting a level.
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(questionDifficultyContainerSelector))
+    ) {
+      await this.clickOnElementWithSelector(questionDifficultyHeaderSelector);
+      await this.expectElementToBeVisible(questionDifficultyContainerSelector);
+    }
+    const difficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
+    await this.clickOnElementWithSelector(difficultySelector);
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && element.classList.contains('mat-radio-checked');
+      },
+      {},
+      difficultySelector
+    );
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.typeInInputField(richTextAreaField, 'Add 1+2');
@@ -2717,18 +2772,18 @@ export class CurriculumAdmin extends TopicManager {
    * Creates the curriculum setup needed for certificate assessment tests.
    * The helper keeps the requested question counts grouped by rubric
    * difficulty so the acceptance spec can declare the intended coverage.
-   * @param {Array<{
+   * @param {{
    *   topicName: string;
    *   subtopicName: string;
    *   skillName: string;
    *   questionCountsByDifficulty: {Easy: number; Medium: number; Hard: number};
-   *   rubricDifficulties: Array<'Easy' | 'Medium' | 'Hard'>;
-   * }>} skillConfigs - The skills to create and publish.
+   *   rubricDifficulties: ('Easy' | 'Medium' | 'Hard')[];
+   * }[]} skillConfigs - The skills to create and publish.
    * @param {string} classroomName - The classroom name to create.
    * @param {string} classroomUrlFragment - The classroom URL fragment.
    */
   async createCertificateAssessmentTestSetup(
-    skillConfigs: Array<{
+    skillConfigs: {
       topicName: string;
       subtopicName: string;
       skillName: string;
@@ -2737,8 +2792,8 @@ export class CurriculumAdmin extends TopicManager {
         Medium: number;
         Hard: number;
       };
-      rubricDifficulties: Array<'Easy' | 'Medium' | 'Hard'>;
-    }>,
+      rubricDifficulties: ('Easy' | 'Medium' | 'Hard')[];
+    }[],
     classroomName: string,
     classroomUrlFragment: string,
     classroomIntro: string,
@@ -2770,11 +2825,9 @@ export class CurriculumAdmin extends TopicManager {
       }
 
       await this.publishUpdatedSkill(`Added rubrics for ${config.skillName}.`);
-      await this.createQuestionsForSkill(
+      await this.createQuestionsForSkillWithDifficulties(
         config.skillName,
-        config.questionCountsByDifficulty.Easy +
-          config.questionCountsByDifficulty.Medium +
-          config.questionCountsByDifficulty.Hard
+        config.questionCountsByDifficulty
       );
       await this.assignSkillToSubtopicInTopicEditor(
         config.skillName,

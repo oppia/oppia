@@ -487,11 +487,11 @@ describe('Certificate Assessment', function () {
     );
     await curriculumAdmin.expectElementContentToContain(
       certificateReviewContainer,
-      'Place Values: No hard difficulty questions available'
+      'Place Values: Only 1 hard questions (minimum 8 required)'
     );
     await curriculumAdmin.expectElementContentToContain(
       topicReadinessHardCellSelector,
-      '0 / 8'
+      '1 / 8'
     );
     await curriculumAdmin.expectElementContentToContain(
       topicReadinessRowSelector,
