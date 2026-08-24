@@ -204,6 +204,11 @@ describe('Certificate Assessment', function () {
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
     );
+
+    await curriculumAdmin.expectScreenshotToMatch(
+      'noCertificateCreatedYet',
+      __dirname
+    );
   });
 
   it('should create a certificate offering and show it on the dashboard', async function () {
@@ -252,6 +257,10 @@ describe('Certificate Assessment', function () {
       `${certificateOutcomeInput}:last-of-type`,
       'Ability to perform basic arithmetic accurately'
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateDetailsFilled',
+      __dirname
+    );
 
     await curriculumAdmin.clickOnElementWithSelector(createDetailsNextButton);
     await curriculumAdmin.expectElementToBeVisible(topicRowSelector);
@@ -261,6 +270,10 @@ describe('Certificate Assessment', function () {
       selectedTopicsSummary,
       TWO_TOPICS_SELECTED
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateTopicsSelected',
+      __dirname
+    );
     await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
 
     await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
@@ -268,12 +281,20 @@ describe('Certificate Assessment', function () {
       reviewOverallStatusSelector,
       'Requirements Met'
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateReviewRequirementsMet',
+      __dirname
+    );
     await curriculumAdmin.clickOnElementWithSelector(
       certificateReviewSaveButton
     );
     await curriculumAdmin.expectTextContentToBe(
       '.e2e-test-modal-header',
       'Publish Certificate'
+    );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'publishCertificateModal',
+      __dirname
     );
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
@@ -294,6 +315,10 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.expectTextContentToBe(
       certificateStatusSelector,
       'Available'
+    );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateDashboardWithCertificate',
+      __dirname
     );
   });
 
@@ -382,21 +407,22 @@ describe('Certificate Assessment', function () {
       TWO_TOPICS_SELECTED
     );
 
-    // Remove 'Addition and Subtraction' from the selected topics.
     await clickRemoveTopicButton('Addition and Subtraction');
     await curriculumAdmin.expectTextContentToBe(
       selectedTopicsSummary,
       ONE_TOPIC_SELECTED
     );
     await expectTopicToNotBeSelected('Addition and Subtraction');
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateTopicRemoved',
+      __dirname
+    );
 
-    // Add 'Fraction' to the selected topics.
     await clickAddTopicButton('Fraction');
     await curriculumAdmin.expectTextContentToBe(
       selectedTopicsSummary,
       TWO_TOPICS_SELECTED
     );
-    // await expectTopicToBeSelected('Fraction');
     await curriculumAdmin.clickOnElementWithSelector(topicsNextButton);
 
     await curriculumAdmin.expectElementToBeVisible(certificateReviewContainer);
@@ -471,6 +497,10 @@ describe('Certificate Assessment', function () {
       topicReadinessRowSelector,
       'Not Ready'
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateReviewRequirementsNotMet',
+      __dirname
+    );
 
     await curriculumAdmin.clickOnElementWithSelector(
       certificateReviewSaveButton
@@ -510,6 +540,10 @@ describe('Certificate Assessment', function () {
       '.e2e-test-modal-header',
       'Delete Certificate'
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'deleteCertificateModal',
+      __dirname
+    );
     await curriculumAdmin.clickOnElementWithSelector(
       deleteCertificateConfirmButton
     );
@@ -524,6 +558,10 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.expectElementToBeVisible(
       certificateRowSelector,
       false
+    );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'certificateDashboardWithoutCertificate',
+      __dirname
     );
   });
 
