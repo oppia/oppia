@@ -97,7 +97,7 @@ describe('Certificate Assessment', function () {
     topicName: string
   ): Promise<void> => {
     await curriculumAdmin.page.waitForFunction(
-      (topicName, cardSelector) => {
+      (topicName: string, cardSelector: string) => {
         const cards = Array.from(
           document.querySelectorAll<HTMLElement>(cardSelector)
         );
