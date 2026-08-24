@@ -120,7 +120,11 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
 )
 
 LIGHTHOUSE_PAGES_PER_SHARD: Final = 12
-LIGHTHOUSE_MODULES: Final = ('.lighthouserc.js', '.lighthouserc-desktop.js')
+LIGHTHOUSE_MODULES: Final = (
+    '.lighthouserc.js',
+    '.lighthouserc-desktop.js',
+    '.lighthouserc-base.js',
+)
 # The primary Lighthouse module is used as the module identifier for the
 # Lighthouse test suites.
 LIGHTHOUSE_MODULE: Final = '.lighthouserc.js'

@@ -68,7 +68,7 @@ const seedBlankPagesForLighthouseRuns = async function (
   const numberOfRuns = Number(context.options.numberOfRuns) || 1;
 
   let pages = await browser.pages();
-  for (let i = pages.length; i < numberOfRuns; i++) {
+  for (let i = pages.length; i <= numberOfRuns; i++) {
     const blankPage = await browser.newPage();
     await blankPage.goto('about:blank');
   }

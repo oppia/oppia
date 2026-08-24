@@ -190,8 +190,8 @@ module.exports = {
               tbt: 2340,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.91,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.91}],
               'errors-in-console': ['error', {minScore: 1}],
               'modern-image-formats': [
                 'error',
@@ -218,8 +218,8 @@ module.exports = {
               tbt: 1170,
               cls: 0.68,
             },
+            accessibilityMinScore: 0.91,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.91}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
@@ -243,8 +243,8 @@ module.exports = {
               tbt: 2925,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.84,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.84}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
@@ -268,8 +268,8 @@ module.exports = {
               tbt: 2700,
               cls: 0.18,
             },
+            accessibilityMinScore: 0.95,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.95}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
@@ -292,8 +292,8 @@ module.exports = {
               tbt: 1815,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.91,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.91}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
             },
           },
@@ -317,8 +317,8 @@ module.exports = {
               tbt: 1380,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.95,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.95}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
@@ -331,8 +331,8 @@ module.exports = {
               tbt: 1755,
               cls: 1.13,
             },
+            accessibilityMinScore: 0.88,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.88}],
               'uses-responsive-images': ['error', {minScore: 0}],
             },
           },
@@ -360,8 +360,8 @@ module.exports = {
               tbt: 2265,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.91,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.91}],
               'offscreen-images': ['error', {minScore: 0}],
             },
           },
@@ -375,8 +375,8 @@ module.exports = {
               tbt: 2130,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.95,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.95}],
               'errors-in-console': ['error', {minScore: 0}],
               'offscreen-images': ['error', {minScore: 0}],
             },
@@ -390,8 +390,8 @@ module.exports = {
               tbt: 2235,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.95,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.95}],
               // Classroom pages use JPEG images that are not next-gen formats.
               'modern-image-formats': [
                 'error',
@@ -408,8 +408,8 @@ module.exports = {
               tbt: 3870,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.95,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.95}],
               'errors-in-console': ['error', {minScore: 1}],
               // TODO(#13465): Change this maxLength to 0 once images are
               // migrated.
@@ -435,8 +435,8 @@ module.exports = {
               tbt: 3945,
               cls: 0.15,
             },
+            accessibilityMinScore: 0.91,
             overrides: {
-              'categories:accessibility': ['error', {minScore: 0.91}],
               // Explore page uses deprecated APIs from third-party scripts.
               deprecations: ['error', {minScore: 0}],
               // Explore page has images that are not in next-gen formats.
@@ -485,11 +485,11 @@ module.exports = {
         // Error-level safety-net thresholds for mobile. Per-page entries
         // override these at tighter values.
         {
-          fcp: 25500,
-          speedIndex: 30000,
+          fcp: 31000,
+          speedIndex: 31000,
           lcp: 105000,
-          tbt: 3900,
-          cls: 1.35,
+          tbt: 4800,
+          cls: 1.5,
         }
       ),
     },

@@ -473,7 +473,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests.run_lighthouse_checks()
 
         self.assertIn(
-            '\033[1m2 out of 3 lighthouse checks run, see '
+            '\033[1m2 out of 3 lighthouse pages run (mobile + desktop), see '
             'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
             'for more information.\033[0m',
             self.print_arr,

@@ -277,7 +277,7 @@ def run_lighthouse_checks() -> None:
         '%s\033[0m' % (separator, separator)
     )
     print(
-        '\033[1m%s out of %s lighthouse checks run, see '
+        '\033[1m%s out of %s lighthouse pages run (mobile + desktop), see '
         'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
         'for more information.\033[0m' % (pages_count, all_pages_count)
     )
