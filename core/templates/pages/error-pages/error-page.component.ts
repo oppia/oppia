@@ -25,10 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   selector: 'error-page',
   templateUrl: './error-page.component.html',
   styleUrls: ['./error-page.component.css'],
-  // We need ViewEncapsulation.None because the "home page" and "issue
-  // tracker" links are injected via [innerHTML] from a translation string,
-  // and Angular does not apply component-scoped style attributes to
-  // innerHTML-injected content, so scoped styles cannot reach them.
+  // We need ViewEncapsulation.None because the "home page" and "issue tracker" links are injected via [innerHTML] from a translation string,and Angular does not apply component-scoped style attributes to innerHTML-injected content, so scoped styles cannot reach them.
   encapsulation: ViewEncapsulation.None,
 })
 export class ErrorPageComponent implements OnInit {

@@ -27,10 +27,7 @@ import {PageTitleService} from 'services/page-title.service';
   selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
   styleUrls: ['./error-404-page.component.css'],
-  // We need ViewEncapsulation.None because the "home page" and "issue
-  // tracker" links are injected via [innerHTML] from a translation string,
-  // and Angular does not apply component-scoped style attributes to
-  // innerHTML-injected content, so scoped styles cannot reach them.
+  // We need ViewEncapsulation.None because the "home page" and "issue tracker" links are injected via [innerHTML] from a translation string,and Angular does not apply component-scoped style attributes to innerHTML-injected content, so scoped styles cannot reach them.
   encapsulation: ViewEncapsulation.None,
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
