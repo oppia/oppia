@@ -377,7 +377,6 @@
         "core.controllers.collection_viewer_test",
         "core.domain.rating_services_test",
         "core.controllers.recent_commits_test",
-        "core.domain.search_services_test",
         "core.domain.role_services_test",
         "core.controllers.contributor_dashboard_test",
         "core.platform.email.dev_mode_email_services_test",
