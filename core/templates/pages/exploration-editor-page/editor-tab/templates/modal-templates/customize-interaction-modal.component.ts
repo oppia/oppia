@@ -68,6 +68,7 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './customize-interaction-modal.component.css';
 
 export interface CustomizationArgSpecsInterface {
   name: string | number;
@@ -117,6 +118,7 @@ const isInteractionValidationServiceName = (
 @Component({
   selector: 'oppia-customize-interaction',
   templateUrl: './customize-interaction-modal.component.html',
+  styleUrls: ['./customize-interaction-modal.component.css'],
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal

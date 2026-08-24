@@ -114,7 +114,7 @@ export class CertificateAssessmentOfferingBackendApiService {
     classroomId: string
   ): string {
     return CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
-      '<classroom_id>',
+      '<classroom_url_fragment>',
       classroomId
     );
   }
