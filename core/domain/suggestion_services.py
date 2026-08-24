@@ -1007,6 +1007,12 @@ def accept_suggestion(
             suggestion.change_cmd.language_code,
             suggestion.target_type,
         )
+        if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # We import exp_services locally here to avoid a circular dependency
+            # with exp_services, which imports suggestion_services at the top level.
+            from core.domain import exp_services
+
+            exp_services.index_explorations_given_ids([suggestion.target_id])
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this
