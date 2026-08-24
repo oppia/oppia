@@ -287,11 +287,11 @@ export class CertificateAssessmentPlayerPageComponent
     this.refreshComputedFields();
   }
 
-  submitAssessment(): void {
+  private collectAnswers(): SubmitCertificateAssessmentAnswerBackendDict[] {
     const loadedQuestions = this.questions.filter(
       (question): question is AssessmentQuestion => question !== undefined
     );
-    const answers = loadedQuestions.map(question => {
+    return loadedQuestions.map(question => {
       const answer = this.answers[question.id] ?? null;
       let isCorrect = false;
       if (answer !== null) {
@@ -319,6 +319,10 @@ export class CertificateAssessmentPlayerPageComponent
           : {}),
       };
     });
+  }
+
+  submitAssessment(): void {
+    const answers = this.collectAnswers();
     const unansweredQuestionIndexes = this.questions
       .map((question, index) => ({question, index}))
       .filter(
@@ -350,7 +354,7 @@ export class CertificateAssessmentPlayerPageComponent
     }
     this.hasHandledTimeExpiry = true;
     this.openTimeExpiredModal();
-    this.submitAssessment();
+    this.assessmentSubmitted.emit(this.collectAnswers());
   }
 
   handleInteractionSubmit(answer: InteractionAnswer): void {
