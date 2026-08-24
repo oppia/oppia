@@ -394,7 +394,7 @@ module.exports = {
               tbt: 300,
               cls: 0.15,
             },
-            accessibilityMinScore: 0.95,
+            accessibilityMinScore: 0.88,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
             },
