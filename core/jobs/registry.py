@@ -55,6 +55,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     delete_duplicate_content_ids_jobs,
     dummy_jobs,
     email_deletion_jobs,
+    exp_end_state_normalization_jobs,
     exp_migration_jobs,
     exploration_voiceover_sync_jobs,
     firebase_server_sync_jobs,

@@ -104,7 +104,8 @@
                                             [ratings]="tile.ratings"
                                             [numViews]="tile.num_views"
                                             [thumbnailIconUrl]="tile.thumbnail_icon_url"
-                                            [thumbnailBgColor]="tile.thumbnail_bg_color">
+                                            [thumbnailBgColor]="tile.thumbnail_bg_color"
+                                            [translatedMetadataFields]="tile.translated_metadata_fields || []">
             </oppia-exploration-summary-tile>
           </div>
         </div>
@@ -196,7 +197,8 @@
                                                   [thumbnailBgColor]="tile.thumbnail_bg_color"
                                                   class="e2e-test-exp-summary-tile"
                                                   [isOwnedByCurrentUser]="activitiesOwned.explorations[tile.id]"
-                                                  [showLearnerDashboardIconsIfPossible]="true">
+                                                  [showLearnerDashboardIconsIfPossible]="true"
+                                                  [translatedMetadataFields]="tile.translated_metadata_fields || []">
                   </oppia-exploration-summary-tile>
                 </div>
               </div>
