@@ -17,7 +17,7 @@
  */
 
 import {Clipboard} from '@angular/cdk/clipboard';
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -55,7 +55,6 @@ const EXPLORATION_STATUS_PRIVATE = 'private';
   selector: 'oppia-lesson-information-card-modal',
   templateUrl: './lesson-information-card-modal.component.html',
   styleUrls: ['./lesson-information-card-modal.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
