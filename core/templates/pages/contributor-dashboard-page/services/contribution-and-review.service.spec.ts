@@ -815,10 +815,9 @@ describe('Contribution and review service', () => {
     });
 
     it('should review an exploration suggestion through the exploration endpoint', fakeAsync(() => {
-      const reviewExplorationSpy = spyOn(
-        cars,
-        'reviewExplorationSuggestion'
-      ).and.returnValue(Promise.resolve());
+      spyOn(carbas, 'reviewExplorationSuggestionAsync').and.returnValue(
+        Promise.resolve()
+      );
 
       cars.reviewTranslationSuggestion(
         AppConstants.ENTITY_TYPE.EXPLORATION,
@@ -832,15 +831,17 @@ describe('Contribution and review service', () => {
       );
       tick();
 
-      expect(reviewExplorationSpy).toHaveBeenCalledWith(
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
         'exp_1',
         'suggestion_1',
-        'accept',
-        'review message',
-        'commit message',
-        onSuccess,
-        onFailure
+        {
+          action: 'accept',
+          review_message: 'review message',
+          commit_message: 'commit message',
+        }
       );
+      expect(onSuccess).toHaveBeenCalledWith('suggestion_1');
+      expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should review a skill suggestion through the skill endpoint without a commit message', fakeAsync(() => {
@@ -900,7 +901,7 @@ describe('Contribution and review service', () => {
     }));
   });
 
-  describe('reviewExplorationSuggestion', () => {
+  describe('reviewTranslationSuggestion for an exploration', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
@@ -923,7 +924,8 @@ describe('Contribution and review service', () => {
           Promise.resolve()
         );
 
-        cars.reviewExplorationSuggestion(
+        cars.reviewTranslationSuggestion(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           'abc',
           'pqr',
           'accept',
@@ -954,7 +956,8 @@ describe('Contribution and review service', () => {
           })
         );
 
-        cars.reviewExplorationSuggestion(
+        cars.reviewTranslationSuggestion(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           'abc',
           'pqr',
           'accept',
@@ -976,7 +979,7 @@ describe('Contribution and review service', () => {
     );
   });
 
-  describe('reviewSkillSuggestion', () => {
+  describe('reviewQuestionSuggestion', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
@@ -999,7 +1002,7 @@ describe('Contribution and review service', () => {
           Promise.resolve()
         );
 
-        cars.reviewSkillSuggestion(
+        cars.reviewQuestionSuggestion(
           'abc',
           'pqr',
           'accept',
@@ -1020,34 +1023,6 @@ describe('Contribution and review service', () => {
       })
     );
 
-    it('should resolve suggestion to skill correctly when skillDifficulty is null', fakeAsync(() => {
-      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
-        Promise.resolve()
-      );
-
-      cars.reviewSkillSuggestion(
-        'abc',
-        'pqr',
-        'accept',
-        'review message',
-        null,
-        onSuccess,
-        onFailure
-      );
-      tick();
-
-      expect(carbas.reviewSkillSuggestionAsync).toHaveBeenCalledWith(
-        'abc',
-        'pqr',
-        {
-          action: 'accept',
-          review_message: 'review message',
-        }
-      );
-      expect(onSuccess).toHaveBeenCalledWith('pqr');
-      expect(onFailure).not.toHaveBeenCalled();
-    }));
-
     it(
       'should call onFailure function when' +
         'resolving suggestion to skill fails',
@@ -1056,7 +1031,7 @@ describe('Contribution and review service', () => {
           Promise.reject()
         );
 
-        cars.reviewSkillSuggestion(
+        cars.reviewQuestionSuggestion(
           'abc',
           'pqr',
           'accept',

@@ -90,6 +90,7 @@ export class LibraryPageComponent {
   // The following property will be assigned null when user
   // has not selected any active group index.
   activeGroupIndex!: number | null;
+  preferredLanguageCodesLoaded: boolean = false;
   activityList!: ActivityDict[];
   bannerImageFilename!: string;
   bannerImageFileUrl!: string;
@@ -417,9 +418,12 @@ export class LibraryPageComponent {
         .then(response => {
           this.activityList = response.activity_list;
           this.groupHeaderI18nId = response.header_i18n_id;
-          this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-            response.preferred_language_codes
-          );
+          if (!this.preferredLanguageCodesLoaded) {
+            this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+              response.preferred_language_codes
+            );
+            this.preferredLanguageCodesLoaded = true;
+          }
           this.loaderService.hideLoadingScreen();
           this.initCarousels();
         });
@@ -491,9 +495,12 @@ export class LibraryPageComponent {
             }
           });
 
-          this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-            response.preferred_language_codes
-          );
+          if (!this.preferredLanguageCodesLoaded) {
+            this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+              response.preferred_language_codes
+            );
+            this.preferredLanguageCodesLoaded = true;
+          }
 
           // The following initializes the tracker to have all
           // elements flush left.

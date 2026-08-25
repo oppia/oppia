@@ -422,14 +422,14 @@ export class ContributionAndReviewService {
   }
 
   /**
-   * Reviews a translation suggestion through the endpoint that matches its
-   * target type, so that callers do not have to branch on the entity type
-   * themselves.
+   * Reviews a translation suggestion of any entity type. The backend exposes
+   * one suggestion action endpoint per target type, so the endpoint is chosen
+   * from the suggestion's own target type and callers do not branch on it.
    *
    * A commit message is only sent for explorations. Accepting an exploration
-   * translation writes the translation into a new version of the exploration,
-   * which needs a commit message, while accepting a translation of any other
-   * entity type does not create a version.
+   * translation writes it into a new version of the exploration, which needs a
+   * commit message, while accepting a translation of any other entity type
+   * does not create a version.
    */
   reviewTranslationSuggestion(
     targetType: string,
@@ -441,86 +441,57 @@ export class ContributionAndReviewService {
     onSuccess: (suggestionId: string) => void,
     onFailure: (errorMessage: string) => void
   ): Promise<void> {
-    // The backend exposes one suggestion action endpoint per target type, and
-    // skills are the only non-exploration type with one so far. Any further
-    // type needs its own endpoint and a branch here.
     if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
-      return this.reviewSkillSuggestion(
-        targetId,
-        suggestionId,
-        action,
-        reviewMessage,
-        null,
-        onSuccess,
-        // The skill review endpoint reports failures without a message, so a
-        // generic one is supplied to keep the caller's handling uniform.
-        () =>
-          onFailure(
-            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
-          )
-      );
+      return this.contributionAndReviewBackendApiService
+        .reviewSkillSuggestionAsync(targetId, suggestionId, {
+          action: action,
+          review_message: reviewMessage,
+        })
+        .then(
+          () => {
+            onSuccess(suggestionId);
+          },
+          // The skill endpoint reports failures without a message, so a
+          // generic one is supplied to keep the caller's handling uniform.
+          () => {
+            onFailure(
+              ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+            );
+          }
+        );
     }
-    return this.reviewExplorationSuggestion(
-      targetId,
-      suggestionId,
-      action,
-      reviewMessage,
-      commitMessage,
-      onSuccess,
-      onFailure
-    );
-  }
-
-  reviewExplorationSuggestion(
-    targetId: string,
-    suggestionId: string,
-    action: string,
-    reviewMessage: string,
-    commitMessage: string | null,
-    onSuccess: (suggestionId: string) => void,
-    onFailure: (errorMessage: string) => void
-  ): Promise<void> {
-    const requestBody = {
-      action: action,
-      review_message: reviewMessage,
-      commit_message: commitMessage,
-    };
 
     return this.contributionAndReviewBackendApiService
-      .reviewExplorationSuggestionAsync(targetId, suggestionId, requestBody)
+      .reviewExplorationSuggestionAsync(targetId, suggestionId, {
+        action: action,
+        review_message: reviewMessage,
+        commit_message: commitMessage,
+      })
       .then(
         () => {
           onSuccess(suggestionId);
         },
         errorResponse => {
-          onFailure && onFailure(errorResponse.error.error);
+          onFailure(errorResponse.error.error);
         }
       );
   }
 
-  reviewSkillSuggestion(
+  reviewQuestionSuggestion(
     targetId: string,
     suggestionId: string,
     action: string,
     reviewMessage: string,
-    skillDifficulty: number | null,
+    skillDifficulty: number,
     onSuccess: (suggestionId: string) => void,
     onFailure: () => void
   ): Promise<void> {
-    const requestBody: {
-      action: string;
-      review_message: string;
-      skill_difficulty?: number;
-    } = {
-      action: action,
-      review_message: reviewMessage,
-    };
-    if (skillDifficulty !== null && skillDifficulty !== undefined) {
-      requestBody.skill_difficulty = skillDifficulty;
-    }
-
     return this.contributionAndReviewBackendApiService
-      .reviewSkillSuggestionAsync(targetId, suggestionId, requestBody)
+      .reviewSkillSuggestionAsync(targetId, suggestionId, {
+        action: action,
+        review_message: reviewMessage,
+        skill_difficulty: skillDifficulty,
+      })
       .then(
         () => {
           onSuccess(suggestionId);

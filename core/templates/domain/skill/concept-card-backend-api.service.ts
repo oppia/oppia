@@ -61,8 +61,8 @@ export class ConceptCardBackendApiService {
 
     const conceptCardObjects: ConceptCard[] = [];
     const params: Record<string, string> = {};
-    // English is the language the content is authored in, so there is nothing
-    // to look up for it.
+    // English is the language in which the content is authored, so there is
+    // nothing to look up for it.
     if (languageCode !== AppConstants.DEFAULT_LANGUAGE_CODE) {
       params.language_code = languageCode;
     }

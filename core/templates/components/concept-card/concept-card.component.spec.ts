@@ -31,12 +31,14 @@ import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-ap
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {ConceptCardComponent} from './concept-card.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 
 describe('Concept card component', () => {
   let fixture: ComponentFixture<ConceptCardComponent>;
   let componentInstance: ConceptCardComponent;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let contentTranslationLanguageService: ContentTranslationLanguageService;
   let conceptCard = new ConceptCard(
     new SubtitledHtml('', '1'),
     RecordedVoiceovers.createEmpty()
@@ -56,6 +58,9 @@ describe('Concept card component', () => {
     componentInstance = fixture.componentInstance;
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    contentTranslationLanguageService = TestBed.inject(
+      ContentTranslationLanguageService
+    );
   });
 
   it('should initialize and load concept cards successfully', fakeAsync(() => {
@@ -122,5 +127,27 @@ describe('Concept card component', () => {
     expect(componentInstance.skillDeletedMessage).toEqual(
       'Oops, it looks like this skill has been deleted.'
     );
+  }));
+
+  it("should prioritize the lesson's study language over the site language", fakeAsync(() => {
+    spyOn(
+      i18nLanguageCodeService,
+      'getCurrentI18nLanguageCode'
+    ).and.returnValue('es');
+    spyOn(
+      contentTranslationLanguageService,
+      'getCurrentContentLanguageCode'
+    ).and.returnValue('hi');
+    const loadConceptCardsSpy = spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve(conceptCardObjects));
+    componentInstance.index = 0;
+    componentInstance.skillIds = ['skill_1'];
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(loadConceptCardsSpy).toHaveBeenCalledWith(['skill_1'], 'hi');
   }));
 });

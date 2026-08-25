@@ -29,6 +29,7 @@ import {TranslationSuggestionReviewModalComponent} from './translation-suggestio
 import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -166,7 +167,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           status: 'status',
           suggestion_id: 'suggestion_1',
           target_id: '1',
-          target_type: 'target_type',
+          target_type: 'exploration',
           suggestion_type: 'translate_content',
           change_cmd: {
             content_id: 'hint_1',
@@ -199,7 +200,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -219,7 +220,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -239,7 +240,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_3',
       target_id: '3',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -379,7 +380,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -400,7 +401,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -813,7 +814,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -833,7 +834,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -878,7 +879,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -899,7 +900,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -1049,9 +1050,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.ngOnInit();
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1079,9 +1081,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.reviewMessage = 'Review message';
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1122,9 +1125,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1154,8 +1158,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1175,8 +1180,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '2',
           'suggestion_2',
           'accept',
@@ -1209,9 +1215,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1232,8 +1239,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1258,9 +1266,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1291,8 +1300,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1318,16 +1328,20 @@ describe('Translation Suggestion Review Modal Component', function () {
       }
     );
 
-    it('should call reviewSkillSuggestion when accepting a skill translation suggestion', fakeAsync(() => {
+    it('should review a skill translation suggestion when accepting', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1341,15 +1355,16 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
         '1',
         'suggestion_1',
         AppConstants.ACTION_ACCEPT_SUGGESTION,
         '',
-        // A skill translation is not applied as a new version, so it carries
-        // no skill difficulty and no commit message.
-        null,
+        // The caller passes the commit message for every accept, and the
+        // service drops it for a skill, which is not applied as a new version.
+        component.finalCommitMessage,
         jasmine.any(Function),
         jasmine.any(Function)
       );
@@ -1358,15 +1373,16 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     }));
 
-    it('should call reviewExplorationSuggestion with a commit message when accepting an exploration translation suggestion', fakeAsync(() => {
+    it('should send a commit message when accepting an exploration translation suggestion', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type =
         AppConstants.ENTITY_TYPE.EXPLORATION;
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1384,8 +1400,9 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewExplorationSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
         '1',
         'suggestion_1',
         AppConstants.ACTION_ACCEPT_SUGGESTION,
@@ -1399,17 +1416,23 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should warn when accepting a skill translation suggestion fails', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
-          errorCallback();
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
           return Promise.resolve();
         }
       );
@@ -1426,16 +1449,20 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     }));
 
-    it('should call reviewSkillSuggestion when rejecting a skill translation suggestion', fakeAsync(() => {
+    it('should review a skill translation suggestion when rejecting', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
@@ -1449,8 +1476,9 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
         '1',
         'suggestion_1',
         AppConstants.ACTION_REJECT_SUGGESTION,
@@ -1467,17 +1495,23 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should warn when rejecting a skill translation suggestion fails', fakeAsync(() => {
       component.ngOnInit();
       component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           message,
-          difficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
-          errorCallback();
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
           return Promise.resolve();
         }
       );
@@ -1530,9 +1564,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1557,8 +1592,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1582,8 +1618,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1791,7 +1828,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -1811,7 +1848,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -1856,9 +1893,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1884,8 +1922,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1924,7 +1963,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -1944,7 +1983,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
@@ -2153,7 +2192,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -2173,7 +2212,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
@@ -2363,7 +2402,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -2383,7 +2422,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2557,7 +2596,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -2577,7 +2616,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2752,7 +2791,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_1',
             target_id: '1',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_1',
@@ -2779,7 +2818,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_2',
             target_id: '2',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_2',
@@ -2806,7 +2845,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_3',
             target_id: '3',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_3',

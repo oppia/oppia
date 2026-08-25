@@ -606,7 +606,10 @@ describe('Contributions and review component', () => {
     it('should open call openQuestionSuggestionModal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewQuestionSuggestion'
+      ).and.callFake(
         (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
           callBackfunction();
           tick();
@@ -794,7 +797,7 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewQuestionSuggestion
       ).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
     }));
@@ -1012,7 +1015,10 @@ describe('Contributions and review component', () => {
     it('should open question suggestion modal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewQuestionSuggestion'
+      ).and.callFake(
         (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
           callBackfunction();
           tick();
@@ -1301,7 +1307,7 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewQuestionSuggestion
       ).toHaveBeenCalled();
       expect(component.openQuestionSuggestionModal).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
@@ -2703,7 +2709,7 @@ describe('Contributions and review component', () => {
         ' suggestion modal',
       () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-        spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
+        spyOn(contributionAndReviewService, 'reviewQuestionSuggestion');
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.reject({}),
         } as NgbModalRef);
@@ -3070,9 +3076,10 @@ describe('Contributions and review component', () => {
       };
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -3101,9 +3108,10 @@ describe('Contributions and review component', () => {
       component.queuedSuggestionSummary = null;
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -3125,7 +3133,7 @@ describe('Contributions and review component', () => {
 
       component.commitQueuedSuggestion();
       expect(
-        contributionAndReviewService.reviewExplorationSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).not.toHaveBeenCalled();
     });
 
@@ -3137,8 +3145,12 @@ describe('Contributions and review component', () => {
         action_status: 'accept',
         reviewer_message: 'test',
       };
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -3161,8 +3173,9 @@ describe('Contributions and review component', () => {
       component.commitQueuedSuggestion();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
         'skill_1',
         'suggestion_1',
         'accept',
@@ -3186,19 +3199,27 @@ describe('Contributions and review component', () => {
         action_status: 'reject',
         reviewer_message: 'test',
       };
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
           reviewMessage,
-          skillDifficulty,
+          commitMessage,
           successCallback,
           errorCallback
         ) => {
-          // The skill review service reports failures with no message, so the
-          // callback is invoked without arguments here as well.
-          return Promise.reject(errorCallback());
+          // The service supplies a generic message for a skill review
+          // failure, because that endpoint reports no reason of its own.
+          return Promise.reject(
+            errorCallback(
+              ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+            )
+          );
         }
       );
       component.contributions = {};
@@ -3228,9 +3249,10 @@ describe('Contributions and review component', () => {
       };
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
