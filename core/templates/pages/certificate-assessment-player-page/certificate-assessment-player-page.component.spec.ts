@@ -532,35 +532,28 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
-  it('should open the time-expired modal as a bottom sheet on mobile screens', () => {
-    const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(
-      WindowDimensionsService
-    ) as jasmine.SpyObj<WindowDimensionsService>;
-    windowDimensionsService.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = true;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
+  it('should open the time-expired modal as a bottom sheet on mobile screens', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    spyOn(component.assessmentSubmitted, 'emit');
+    triggerTimeExpiry();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
+  }));
 
-    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
-      TimeExpiredModalComponent
-    );
-  });
-
-  it('should open the unanswered-question modal as a bottom sheet on mobile screens', () => {
-    const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(
-      WindowDimensionsService
-    ) as jasmine.SpyObj<WindowDimensionsService>;
-    windowDimensionsService.getWidth.and.returnValue(400);
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = true;
-    fixture.detectChanges();
-
-    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
+  it('should open the unanswered-question modal as a bottom sheet on mobile screens', fakeAsync(() => {
+    load();
+    dimsSpy.getWidth.and.returnValue(400);
+    const ref = {
+      instance: {} as Record<string, unknown>,
+      afterDismissed: () => of(null),
+    };
+    bottomSheetSpy.open.and.returnValue(ref);
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
-  });
+  }));
 
   it('should report whether current question is last', fakeAsync(() => {
     load();

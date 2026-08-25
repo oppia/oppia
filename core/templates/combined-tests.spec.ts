@@ -70,19 +70,16 @@ getTestBed().initTestEnvironment(
 );
 
 // Load all spec files from core/templates and extensions.
-const testsContext = require.context(
-  '../../core/templates',
+// When Angular CLI's --include flag is used, the SingleTestTransformLoader
+// replaces this require.context with direct imports for only the specified
+// files. This MUST be a single-line require.context because the transform
+// loader's regex (require.context\(.*) uses .* which cannot cross newlines.
+const context = require.context(
+  '../../',
   true,
-  /\.spec\.ts$/
+  /(?:core\/templates|extensions)\/.*\.spec\.ts$/
 );
-testsContext.keys().forEach(testsContext);
-
-const extensionsContext = require.context(
-  '../../extensions',
-  true,
-  /\.spec\.ts$/
-);
-extensionsContext.keys().forEach(extensionsContext);
+context.keys().forEach(context);
 
 jasmine.getEnv().addReporter({
   specDone: function (result) {

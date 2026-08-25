@@ -187,7 +187,15 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if specs_to_run:
         print('Running the following specs:', specs_to_run)
         for spec in sorted(specs_to_run):
-            cmd.append('--include=%s' % spec)
+            # The Angular CLI's findTests() resolves --include patterns
+            # relative to dirname(main), which is core/templates/. Files
+            # under core/templates/ are found automatically (the prefix is
+            # stripped by findTests). Files outside that directory need a
+            # ../../ prefix to navigate back to the workspace root.
+            if spec.startswith('core/templates/'):
+                cmd.append('--include=%s' % spec)
+            else:
+                cmd.append('--include=../../%s' % spec)
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')

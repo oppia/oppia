@@ -222,9 +222,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             '--karma-config=core/tests/karma.conf.ts',
             '--watch=false',
             '--code-coverage',
-            '--include=about-page.component.spec.ts',
-            '--include=home-page.component.spec.ts',
-            '--include=test-module.spec.js',
+            '--include=../../about-page.component.spec.ts',
+            '--include=../../home-page.component.spec.ts',
+            '--include=../../test-module.spec.js',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
@@ -356,9 +356,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'test',
             '--karma-config=core/tests/karma.conf.ts',
             '--watch=false',
-            '--include=file1.spec.js',
-            '--include=file2.spec.ts',
-            '--include=file3.spec.ts',
+            '--include=../../file1.spec.js',
+            '--include=../../file2.spec.ts',
+            '--include=../../file3.spec.ts',
         ]
         self.assertIn(cmd, self.cmd_token_list)
 
