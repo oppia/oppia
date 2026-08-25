@@ -634,6 +634,44 @@ class FeaturedTranslationLanguagesModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'model id must be'):
             model.put()
 
+    def test_upsert_creates_singleton_when_absent(self) -> None:
+        self.assertIsNone(
+            translation_models.FeaturedTranslationLanguagesModel.get(
+                strict=False
+            )
+        )
+        translation_models.FeaturedTranslationLanguagesModel.upsert(
+            [{'language_code': 'hi', 'explanation': 'High demand'}]
+        )
+        model = translation_models.FeaturedTranslationLanguagesModel.get()
+        assert model is not None
+        self.assertEqual(
+            model.id, translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID
+        )
+        self.assertEqual(
+            model.featured_translation_languages,
+            [{'language_code': 'hi', 'explanation': 'High demand'}],
+        )
+
+    def test_upsert_updates_existing_singleton(self) -> None:
+        translation_models.FeaturedTranslationLanguagesModel.upsert(
+            [{'language_code': 'hi', 'explanation': 'a'}]
+        )
+        translation_models.FeaturedTranslationLanguagesModel.upsert(
+            [{'language_code': 'es', 'explanation': 'b'}]
+        )
+        model = translation_models.FeaturedTranslationLanguagesModel.get()
+        assert model is not None
+        self.assertEqual(
+            model.featured_translation_languages,
+            [{'language_code': 'es', 'explanation': 'b'}],
+        )
+        # Still exactly one instance under the fixed singleton id.
+        self.assertEqual(
+            translation_models.FeaturedTranslationLanguagesModel.query().count(),
+            1,
+        )
+
 
 class MachineTranslationPolicyModelTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslationPolicyModel."""

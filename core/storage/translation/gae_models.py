@@ -541,6 +541,29 @@ class FeaturedTranslationLanguagesModel(base_models.BaseModel):
         entity.put()
         return entity
 
+    @classmethod
+    def upsert(
+        cls, featured_translation_languages: List[Dict[str, str]]
+    ) -> FeaturedTranslationLanguagesModel:
+        """Creates the singleton instance if it does not yet exist, otherwise
+        updates the existing instance's featured translation languages.
+
+        Args:
+            featured_translation_languages: list(dict). The ordered list of
+                featured translation languages, each a dict with keys
+                'language_code' and 'explanation'.
+
+        Returns:
+            FeaturedTranslationLanguagesModel. The created or updated instance.
+        """
+        model = cls.get(strict=False)
+        if model is None:
+            model = cls(id=FEATURED_TRANSLATION_LANGUAGES_MODEL_ID)
+        model.featured_translation_languages = featured_translation_languages
+        model.update_timestamps()
+        model.put()
+        return model
+
     # Here we use MyPy ignore because we constrain the base put() to enforce
     # that this model can only ever be stored under the fixed singleton id.
     def put(self) -> None:  # type: ignore[override]
