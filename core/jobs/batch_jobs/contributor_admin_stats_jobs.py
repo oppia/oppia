@@ -1862,9 +1862,10 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             contrib_ids = [str(getattr(c, 'id', None)) for c in contribs]
             suggestion_ids = [str(getattr(s, 'id', None)) for s in suggestions]
 
-            err_logs = ''
-            err_logs += f'Missing {total_model_name} for key {key}:\n'
-            err_logs += '-> ' + f'{contrib_model_name}:\n'
+            err_logs = (
+                f'Missing {total_model_name} for key {key}:\n'
+                f'-> {contrib_model_name}:\n'
+            )
             if contrib_ids:
                 for cid in contrib_ids:
                     err_logs += f'--{cid}\n'

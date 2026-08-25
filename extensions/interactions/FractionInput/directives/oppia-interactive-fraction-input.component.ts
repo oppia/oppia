@@ -44,6 +44,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowNonzeroIntegerPartWithValue!: string;
   @Input() customPlaceholderWithValue!: string;
   @Input() labelForFocusTarget!: string;
+  @Input() lastAnswer!: FractionAnswer | null;
   @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
@@ -108,7 +109,9 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.allowImproperFraction = allowImproperFraction.value;
     this.allowNonzeroIntegerPart = allowNonzeroIntegerPart.value;
     this.customPlaceholder = customPlaceholder.value.unicode;
-    if (this.savedSolution !== undefined) {
+    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
+      this.answer = Fraction.fromDict(this.lastAnswer).toString();
+    } else if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
       savedSolution = Fraction.fromDict(
         savedSolution as FractionAnswer

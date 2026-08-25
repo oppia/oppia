@@ -152,6 +152,25 @@ describe('InteractiveFractionInputComponent', () => {
   );
 
   it(
+    'should restore the answer from lastAnswer when re-opening the' +
+      ' interaction',
+    () => {
+      component.lastAnswer = {
+        isNegative: false,
+        wholeNumber: 0,
+        numerator: 1,
+        denominator: 3,
+      };
+
+      expect(component.answer).toBe('');
+
+      component.ngOnInit();
+
+      expect(component.answer).toBe('1/3');
+    }
+  );
+
+  it(
     'should update the current answer with debounce' +
       'when user types valid input',
     fakeAsync(() => {
