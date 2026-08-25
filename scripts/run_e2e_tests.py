@@ -158,8 +158,8 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):
             print(
-                f'The {args.suite} suite should not be run '
-                + 'in the mobile viewport'
+                f'The {args.suite} suite should not be run in the mobile '
+                'viewport'
             )
             sys.exit(1)
 
