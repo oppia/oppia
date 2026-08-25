@@ -213,9 +213,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     ]
 
     def mock_get_exploration_by_id(self, exp_id: str) -> MockExploration:
+        mock_exp = None
         for exp in self.explorations:
             if exp.id == exp_id:
                 mock_exp = exp
+        assert mock_exp is not None
         return mock_exp
 
     def mock_pre_accept_validate_does_nothing(self) -> None:
@@ -2237,9 +2239,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ]
 
     def mock_get_exploration_by_id(self, exp_id: str) -> MockExploration:
+        mock_exp = None
         for exp in self.explorations:
             if exp.id == exp_id:
                 mock_exp = exp
+        assert mock_exp is not None
         return mock_exp
 
     def _create_question_suggestion_with_skill_id(

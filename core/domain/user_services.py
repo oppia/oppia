@@ -580,7 +580,7 @@ def _check_if_usernames_are_valid(
     if len(duplicates) > 0:
         raise Exception(
             f'Users list of user-group {name} contains '
-            + f'duplicates: {duplicates}.'
+            f'duplicates: {duplicates}.'
         )
 
     filters = [
@@ -604,7 +604,7 @@ def _check_if_usernames_are_valid(
     if len(invalid_usernames) > 0:
         raise Exception(
             f'Following users of user-group {name} '
-            + f'does not exist: {invalid_usernames}.'
+            f'does not exist: {invalid_usernames}.'
         )
 
 

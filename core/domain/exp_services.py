@@ -3499,6 +3499,7 @@ def get_exp_with_draft_applied(
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     draft_change_list = []
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (
@@ -3532,6 +3533,7 @@ def get_exp_with_draft_applied(
     if (
         exp_user_data
         and exp_user_data.draft_change_list
+        and draft_change_list_exp_version is not None
         and are_changes_mergeable(
             exp_id, draft_change_list_exp_version, draft_change_list
         )
