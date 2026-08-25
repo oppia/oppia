@@ -2245,6 +2245,10 @@ class BaseFeedbackModel(BaseModel):
 
         Returns:
             Query. The filtered query object.
+
+        Raises:
+            Exception. Raised when any of the given status filter values is
+                not present in feconf.STATUS_CHOICES.
         """
         query = cls.query()
         # Ignoring deleted threads as they are not relevant for operations.
@@ -2253,6 +2257,17 @@ class BaseFeedbackModel(BaseModel):
         if author_id is not None:
             query = query.filter(cls.author_id == author_id)
         if status_filter:
+            invalid_statuses = [
+                status
+                for status in status_filter
+                if status not in feconf.STATUS_CHOICES
+            ]
+            if invalid_statuses:
+                raise Exception(
+                    'Invalid status filter values: %s. Expected statuses to '
+                    'be chosen from feconf.STATUS_CHOICES: %s.'
+                    % (invalid_statuses, feconf.STATUS_CHOICES)
+                )
             query = query.filter(cls.status.IN(status_filter))
         if exploration_id is not None:
             query = query.filter(cls.exploration_id == exploration_id)

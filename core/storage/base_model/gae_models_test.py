@@ -1404,6 +1404,29 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         self.assertIsNone(final_cursor)
         self.assertFalse(more)
 
+    def test_fetch_page_with_invalid_status_filter_raises_error(self) -> None:
+        self._create_feedback_model('feedback_1')
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Invalid status filter values: \[\'invalid_status\'\]\. '
+            'Expected statuses to be chosen from feconf.STATUS_CHOICES',
+        ):
+            TestBaseFeedbackModel.fetch_page(
+                page_size=10,
+                status_filter=['open', 'invalid_status'],
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Invalid status filter values: \[\'not_a_real_status\'\]\. '
+            'Expected statuses to be chosen from feconf.STATUS_CHOICES',
+        ):
+            TestBaseFeedbackModel.fetch_page(
+                page_size=10,
+                status_filter=['not_a_real_status'],
+            )
+
     def test_fetch_page_with_multiple_statuses_treats_invalid_cursor_as_zero_offset(
         self,
     ) -> None:

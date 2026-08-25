@@ -114,6 +114,19 @@ class MyFeedbackListHandler(
         status_filter = req.get('status')
         status_filters = status_filter.split(',') if status_filter else None
 
+        if status_filters:
+            invalid_status_filters = [
+                status
+                for status in status_filters
+                if status not in feconf.STATUS_CHOICES
+            ]
+            if invalid_status_filters:
+                raise self.InvalidInputException(
+                    'Invalid status filter values: %s. Expected statuses '
+                    'to be chosen from feconf.STATUS_CHOICES: %s.'
+                    % (invalid_status_filters, feconf.STATUS_CHOICES)
+                )
+
         summaries, next_cursor, more = (
             general_feedback_services.get_learner_feedback_summaries(
                 author_id=self.user_id,

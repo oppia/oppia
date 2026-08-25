@@ -248,6 +248,23 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
             {feconf.STATUS_CHOICES_OPEN, feconf.STATUS_CHOICES_COMPLIMENT},
         )
 
+    def test_learner_cannot_list_feedback_with_invalid_status_filter(
+        self,
+    ) -> None:
+        self._create_feedback_with_mixed_statuses()
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(
+                '%s?status=%s,invalid_status'
+                % (feconf.MY_FEEDBACK_URL, feconf.STATUS_CHOICES_OPEN),
+                expected_status_int=400,
+            )
+
+        self.assertIn(
+            'Invalid status filter values',
+            response['error'],
+        )
+
     def test_learner_can_get_own_feedback_detail(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
             author_id=self.viewer_id,
