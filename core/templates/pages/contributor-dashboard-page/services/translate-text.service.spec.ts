@@ -52,6 +52,7 @@ describe('TranslateTextService', () => {
       content_type: 'content',
       interaction_id: null,
       rule_type: null,
+      status: 'new',
     };
   };
 
