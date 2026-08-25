@@ -37,7 +37,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import webapp2
-from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
+from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 

@@ -42,7 +42,6 @@ from core.constants import constants
 from core.controllers import base
 from core.domain import (
     auth_domain,
-    blog_services,
     caching_domain,
     classroom_config_domain,
     classroom_config_services,
@@ -102,7 +101,6 @@ from typing import (
     Set,
     Tuple,
     Type,
-    TypedDict,
     TypeVar,
     Union,
     cast,

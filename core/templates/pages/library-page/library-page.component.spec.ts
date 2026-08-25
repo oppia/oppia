@@ -440,6 +440,20 @@ describe('Library Page Component', () => {
     );
   });
 
+  it('should set browse mode page title when in group mode', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP;
+    componentInstance.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE'
+    );
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE'
+    );
+  });
+
   it('should not initiate carousels if in mobile view', () => {
     componentInstance.libraryWindowIsNarrow = true;
     componentInstance.initCarousels();
