@@ -286,6 +286,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: ['new'],
         },
         {
           id: '1',
@@ -298,6 +299,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: [],
         },
       ]);
     }
@@ -331,6 +333,7 @@ describe('Translation opportunities component', () => {
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        translationMissingReasons: [],
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -343,6 +346,7 @@ describe('Translation opportunities component', () => {
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        translationMissingReasons: ['new'],
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -362,6 +366,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: [],
         },
         {
           id: '2',
@@ -374,6 +379,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: ['new'],
         },
       ]);
     }

@@ -113,6 +113,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndAvailability2 = {
@@ -124,6 +125,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndAvailability1 = {
@@ -135,6 +137,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       const expectedTextAndPreviousAvailability1 = {
@@ -146,6 +149,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -179,6 +183,7 @@ describe('TranslateTextService', () => {
         contentType: 'content',
         interactionId: null,
         ruleType: null,
+        translationStatus: 'new',
       };
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getTranslatableItem('text1')},
@@ -210,6 +215,7 @@ describe('TranslateTextService', () => {
         contentType: undefined,
         interactionId: undefined,
         ruleType: undefined,
+        translationStatus: undefined,
       };
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getTranslatableItem('')},
