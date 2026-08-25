@@ -325,8 +325,10 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 },
             )
         )
-        self.assertTrue(res.is_ok())
-        model = res.unwrap()  # pylint: disable=assignment-from-no-return
+        # Err.unwrap() is typed NoReturn, so narrowing to Ok is what gives
+        # the model its type here instead of unwrapping the result.
+        assert isinstance(res, result.Ok)
+        model = res.ok_value
         self.assertNotIn('es', model.incomplete_translation_language_codes)
 
     def test_run_with_datastore_updates_disabled(self) -> None:
@@ -1301,8 +1303,10 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
                 },
             )
         )
-        self.assertTrue(res.is_ok())
-        model = res.unwrap()  # pylint: disable=assignment-from-no-return
+        # Err.unwrap() is typed NoReturn, so narrowing to Ok is what gives
+        # the model its type here instead of unwrapping the result.
+        assert isinstance(res, result.Ok)
+        model = res.ok_value
         self.assertEqual(model.translation_counts, {'es': 0})
         self.assertNotIn('es', model.incomplete_translation_language_codes)
 
