@@ -16,9 +16,11 @@
  * @fileoverview Component for the concept cards viewer.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 
 import './concept-card.component.css';
 
@@ -33,6 +35,10 @@ export class ConceptCardComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillIds!: string[];
   @Input() index!: number;
+  // The skill description is translated by the backend, so it is emitted for
+  // any surrounding UI (such as a modal heading) that displays it.
+  @Output() skillDescriptionLoaded: EventEmitter<string> =
+    new EventEmitter<string>();
   currentConceptCard!: ConceptCard;
   loadingMessage!: string;
   skillDeletedMessage!: string;
@@ -40,24 +46,39 @@ export class ConceptCardComponent implements OnInit {
   explanationIsShown: boolean = false;
 
   constructor(
-    private conceptCardBackendApiService: ConceptCardBackendApiService
+    private conceptCardBackendApiService: ConceptCardBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService
   ) {}
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
-    this.conceptCardBackendApiService.loadConceptCardsAsync(this.skillIds).then(
-      conceptCardObjects => {
-        conceptCardObjects.forEach(conceptCardObject => {
-          this.conceptsCards.push(conceptCardObject);
-        });
-        this.loadingMessage = '';
-        this.currentConceptCard = this.conceptsCards[this.index];
-      },
-      errorResponse => {
-        this.loadingMessage = '';
-        this.skillDeletedMessage =
-          'Oops, it looks like this skill has' + ' been deleted.';
-      }
-    );
+    let languageCode =
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+    if (
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+    ) {
+      languageCode =
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+    }
+    this.conceptCardBackendApiService
+      .loadConceptCardsAsync(this.skillIds, languageCode)
+      .then(
+        conceptCardObjects => {
+          conceptCardObjects.forEach(conceptCardObject => {
+            this.conceptsCards.push(conceptCardObject);
+          });
+          this.loadingMessage = '';
+          this.currentConceptCard = this.conceptsCards[this.index];
+          this.skillDescriptionLoaded.emit(
+            this.currentConceptCard.getSkillDescription()
+          );
+        },
+        errorResponse => {
+          this.loadingMessage = '';
+          this.skillDeletedMessage =
+            'Oops, it looks like this skill has' + ' been deleted.';
+        }
+      );
   }
 }

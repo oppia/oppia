@@ -270,7 +270,7 @@
             <div class="title-section-mask"></div>
           </div>
         </a>
-        <div section="right-section">
+        <div section="right-section" class="float-none h-auto w-100">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
@@ -283,8 +283,8 @@
                layout-wrap
                class="metrics"
                fxLayoutAlign="space-between center">
-            <ul class="row-one">
-              <li flex="50" class="e2e-test-exp-summary-tile-rating">
+            <ul class="row-one d-flex justify-content-start">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                         ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}"
@@ -296,7 +296,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback"
+              <li class="w-50 text-start e2e-test-exp-summary-tile-open-feedback"
                   tabindex="0"
                   [attr.aria-label]="'Feedbacks ' + exploration.numOpenThreads ">
                 <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
@@ -315,8 +315,8 @@
               </li>
             </ul>
 
-            <ul class="row-two">
-              <li flex="50" class="e2e-test-exp-summary-tile-num-views">
+            <ul class="row-two d-flex justify-content-start">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
                       placement="top">
@@ -328,7 +328,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-last-updated">
+              <li class="w-50 text-start e2e-test-exp-summary-tile-last-updated">
                 <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}"
                       placement="top">
@@ -340,13 +340,12 @@
                 </span>
               </li>
             </ul>
-            <div class="row-three" flex="100">
+            <div class="row-three w-100">
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
-                             flex="100"
-                             class="dashboard-hide-mobile oppia-dashboard-hide-mobile position-relative w-100"
+                             class="position-relative w-100 mt-2"
                              layoutType="row"
-                             layoutAlignType="space-around center"
+                             layoutAlignType="start center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
                              shareType="exploration"
                               [smallFont]="true"
@@ -461,6 +460,9 @@
   }
   .row-two {
     margin-bottom: 12px;
+  }
+  .row-three {
+    margin-left: -5px;
   }
   .oppia-mat-card {
     align-items: baseline;
@@ -635,9 +637,8 @@
     text-align: left;
   }
 
-  .oppia-dashboard-card-view-item .oppia-sharing-links {
+  .oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links {
     font-size: 24px;
-    margin: 10px;
   }
 
   .oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
@@ -862,10 +863,6 @@
       padding-right: 10px;
     }
 
-    sharing-links {
-      display: none;
-    }
-
     .oppia-dashboard-container .oppia-dashboard-tabs {
       justify-content: center;
     }
@@ -879,14 +876,14 @@
       width: 100%;
     }
 
-    .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
-    .oppia-dashboard-container .oppia-dashboard-card-view-item .oppia-sharing-links {
+    .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle {
       display: none;
     }
 
     .oppia-dashboard-card-view-item {
       display: block;
       height: auto;
+      margin-bottom: 20px;
       min-height: 125px;
       width: auto;
     }
