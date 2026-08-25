@@ -66,7 +66,7 @@ export class TranslationReviewer extends BaseUser {
         `Translate button for chapter ${chapterName} and story ${storyName} not found.`
       );
     }
-    await translateButton.click();
+    await translateButton.evaluate(el => (el as HTMLElement).click());
 
     // Verify that the translation editor is opened.
     const backToLessonButtonVisible = await this.isElementVisible(
@@ -96,29 +96,46 @@ export class TranslationReviewer extends BaseUser {
     heading: string,
     subheading: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(opportunityItemSelector);
-
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    const maxRetries = 3;
     let opportunityItem: ElementHandle<Element> | null = null;
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
-      );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
-        opportunityItem = opportunityItemElement;
-        break;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        await this.expectElementToBeVisible(opportunityItemSelector);
+        const opportunityItems = await this.page.$$(opportunityItemSelector);
+
+        for (const opportunityItemElement of opportunityItems) {
+          const opportunityItemHeading = await opportunityItemElement.evaluate(
+            (el: Element, sel: string) =>
+              el.querySelector(sel)?.textContent?.trim(),
+            opportunityItemHeadingSelector
+          );
+          const opportunityItemSubHeading =
+            await opportunityItemElement.evaluate(
+              (el: Element, sel: string) =>
+                el.querySelector(sel)?.textContent?.trim(),
+              opportunitySubHeadingSelector
+            );
+
+          if (
+            opportunityItemHeading === heading &&
+            opportunityItemSubHeading?.includes(subheading)
+          ) {
+            opportunityItem = opportunityItemElement;
+            break;
+          }
+        }
+        if (opportunityItem) {
+          break;
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('detached')) {
+          continue;
+        }
+        throw error;
       }
+      // Wait a moment before retrying if the element wasn't found (it might be rendering).
+      await this.page.waitForTimeout(1000);
     }
 
     if (!opportunityItem) {
@@ -143,20 +160,20 @@ export class TranslationReviewer extends BaseUser {
       subheading
     );
 
-    if (this.isViewportAtMobileWidth()) {
-      await opportunityItem.click();
-    } else {
-      // Click on translate button in the opportunity item.
-      const translateButton = await opportunityItem.waitForSelector(
-        opportunityTranslateButtonSelector
+    // Puppeteer scrolls a target back to the centre of the viewport before
+    // it dispatches a mouse event, which parks the button underneath the
+    // sticky header and delivers the click to the header instead.
+    // By evaluating the click, it is dispatched on the element itself where
+    // it cannot be intercepted.
+    const translateButton = await opportunityItem.waitForSelector(
+      opportunityTranslateButtonSelector
+    );
+    if (!translateButton) {
+      throw new Error(
+        `Translate button for chapter ${chapterName} and story ${subheading} not found.`
       );
-      if (!translateButton) {
-        throw new Error(
-          `Translate button for chapter ${chapterName} and story ${subheading} not found.`
-        );
-      }
-      await translateButton.click();
     }
+    await translateButton.evaluate(el => (el as HTMLElement).click());
 
     await this.expectModalTitleToBe('Review Translation Contributions');
   }

@@ -773,16 +773,12 @@ export class Contributor extends ExplorationEditor {
    * Clicks the control that opens and closes the "Content Type" dropdown.
    */
   private async clickContentTypeFilterToggle(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(selectedEntityTypeSelector);
-      return;
-    }
-
-    // At mobile width the filter row sits under the sticky navigation bar.
-    // Puppeteer scrolls a target back to the centre of the viewport before it
-    // dispatches a mouse event, which parks the control under that bar and
-    // delivers the click to the bar instead, so the click is dispatched on the
-    // control itself where it cannot be intercepted.
+    // The filter row can sit under the sticky navigation bar on mobile, and
+    // occasionally on desktop depending on scroll position. Puppeteer scrolls
+    // a target back to the centre of the viewport before it dispatches a
+    // mouse event, which parks the control under that bar and delivers the
+    // click to the bar instead. By evaluating the click, it is dispatched on
+    // the control itself where it cannot be intercepted.
     const toggle = await this.page.waitForSelector(selectedEntityTypeSelector);
     if (!toggle) {
       throw new Error('The content type filter was not found.');
