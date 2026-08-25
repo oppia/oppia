@@ -16,7 +16,7 @@
  * @fileoverview Mastery challenge card displayed at the end of a story section.
  */
 
-import {Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './mastery-challenge-card.component.css';
@@ -26,23 +26,20 @@ import './mastery-challenge-card.component.css';
   templateUrl: './mastery-challenge-card.component.html',
   styleUrls: ['./mastery-challenge-card.component.css'],
 })
-export class MasteryChallengeCardComponent implements OnDestroy {
+export class MasteryChallengeCardComponent {
   @Input() actionUrl: string = '#';
   @Input() isUnlocked: boolean = false;
   @Output() masteryClicked = new EventEmitter<void>();
 
-  showLockedTooltip: boolean = false;
-  private helperTooltipTimeoutId: number | null = null;
+  get displayTitle(): string {
+    return 'Mastery Challenge';
+  }
 
   constructor(private windowRef: WindowRef) {}
 
-  ngOnDestroy(): void {
-    this.clearHelperTooltipTimeout();
-  }
-
   onChallengeButtonClick(): void {
     if (!this.isUnlocked) {
-      this.showHelperTooltip();
+      this.masteryClicked.emit();
       return;
     }
 
@@ -61,21 +58,5 @@ export class MasteryChallengeCardComponent implements OnDestroy {
 
   isActionDisabled(): boolean {
     return this.isUnlocked && !this.hasActionUrl();
-  }
-
-  private showHelperTooltip(): void {
-    this.showLockedTooltip = true;
-    this.clearHelperTooltipTimeout();
-    this.helperTooltipTimeoutId = this.windowRef.nativeWindow.setTimeout(() => {
-      this.showLockedTooltip = false;
-      this.helperTooltipTimeoutId = null;
-    }, 5000);
-  }
-
-  private clearHelperTooltipTimeout(): void {
-    if (this.helperTooltipTimeoutId !== null) {
-      this.windowRef.nativeWindow.clearTimeout(this.helperTooltipTimeoutId);
-      this.helperTooltipTimeoutId = null;
-    }
   }
 }

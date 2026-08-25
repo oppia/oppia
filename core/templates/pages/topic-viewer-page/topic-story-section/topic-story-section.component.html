@@ -230,8 +230,8 @@
 
       <topic-mastery-challenge-card
         [actionUrl]="masteryChallengeUrl"
-        [isUnlocked]="isStoryCompleted()">
-      </topic-mastery-challenge-card>
+        [isUnlocked]="isStoryCompleted()"
+        (masteryClicked)="onMasteryChallengeClicked()">
       </topic-mastery-challenge-card>
     </div>
   </div>

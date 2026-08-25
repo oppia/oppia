@@ -23,22 +23,5 @@
       </span>
       <span>{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_BUTTON' | translate }}</span>
     </button>
-
-    <section *ngIf="showLockedTooltip"
-             class="mastery-challenge-helper-tooltip"
-             aria-live="polite"
-             [attr.aria-label]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_TITLE' | translate">
-      <div class="mastery-challenge-helper-icon" aria-hidden="true">
-        <i class="material-icons">lightbulb</i>
-      </div>
-      <div class="mastery-challenge-helper-content">
-        <h4 class="mastery-challenge-helper-title">
-          {{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_TITLE' | translate }}
-        </h4>
-        <p class="mastery-challenge-helper-description">
-          {{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_DESCRIPTION' | translate }}
-        </p>
-      </div>
-    </section>
   </div>
 </div>

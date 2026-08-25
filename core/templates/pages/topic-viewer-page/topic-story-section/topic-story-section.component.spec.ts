@@ -1932,6 +1932,8 @@ describe('TopicStorySectionComponent', () => {
         'getThumbnailFilename',
         'getExplorationId',
         'getId',
+        'getStatus',
+        'getAcquiredSkillIds',
         'getAvailableTextLanguageCodes',
         'getAvailableVoiceoverLanguageCodes',
         'getAvailableVoiceoverLanguageAccentDescriptions',
@@ -1941,6 +1943,8 @@ describe('TopicStorySectionComponent', () => {
       spy.getThumbnailFilename.and.returnValue(null);
       spy.getExplorationId.and.returnValue(`exp_${i}`);
       spy.getId.and.returnValue(`node_${i}`);
+      spy.getStatus.and.returnValue(null);
+      spy.getAcquiredSkillIds.and.returnValue([]);
       spy.getAvailableTextLanguageCodes.and.returnValue([]);
       spy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
       spy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue({});

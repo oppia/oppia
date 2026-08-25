@@ -73,7 +73,8 @@ export class TopicHeaderComponent implements OnInit {
   }
 
   private capitalize(value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1);
+    const trimmed = value.trim();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {

@@ -28,7 +28,8 @@ describe('MasteryChallengeLockedModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MasteryChallengeLockedModalComponent, MockTranslateModule],
+      declarations: [MasteryChallengeLockedModalComponent],
+      imports: [MockTranslateModule],
       providers: [NgbActiveModal],
     }).compileComponents();
 

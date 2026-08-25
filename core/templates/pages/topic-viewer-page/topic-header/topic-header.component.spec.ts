@@ -129,6 +129,12 @@ describe('TopicHeaderComponent', () => {
     expect(component.classroomName).toBeNull();
   });
 
+  it('should return empty string when capitalizedClassroomName is null', () => {
+    component.classroomName = null;
+    fixture.detectChanges();
+    expect(component.capitalizedClassroomName).toBe('');
+  });
+
   it('should initialize topic and classroom translation keys on init', () => {
     expect(i18nLanguageCodeService.getTopicTranslationKey).toHaveBeenCalledWith(
       'topic_id',

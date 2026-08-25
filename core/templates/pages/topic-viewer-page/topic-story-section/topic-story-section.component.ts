@@ -919,10 +919,7 @@ export class TopicStorySectionComponent
 
     return {
       practiceTitle: `${firstAdventureTitle} Review & Test`,
-      practiceDescription:
-        this.adventureGroups.length > 1
-          ? `Test what you have learned in ${firstAdventureTitle} to unlock the next adventure.`
-          : `Test what you have learned in ${firstAdventureTitle}.`,
+      practiceDescription: this.getPracticeDescription(0),
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
       practiceUrl: firstArcId
@@ -979,6 +976,11 @@ export class TopicStorySectionComponent
       group.hasPracticeQuestions = adventureAvailability[index];
     });
     this.practiceCard.hasPracticeQuestions = flatPracticeAvailability;
+
+    this.visibleAdventureGroups = this.visibleAdventureGroups.map(group => {
+      const updated = adventureGroups.find(g => g.arcId === group.arcId);
+      return updated ? {...updated, lessonCards: group.lessonCards} : group;
+    });
   }
 
   private getUniqueSkillIds(lessonCards: LessonCardData[]): string[] {
