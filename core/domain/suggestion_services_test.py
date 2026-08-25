@@ -219,9 +219,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     ]
 
     def mock_get_exploration_by_id(self, exp_id: str) -> MockExploration:
+        mock_exp = None
         for exp in self.explorations:
             if exp.id == exp_id:
                 mock_exp = exp
+        assert mock_exp is not None
         return mock_exp
 
     def mock_pre_accept_validate_does_nothing(self) -> None:
@@ -601,6 +603,38 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'test description',
             )
 
+    def test_create_suggestion_with_generic_state_name_fails_if_content_id_not_found(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'invalid_content_id',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>New.</p>',
+            'data_format': 'html',
+        }
+
+        with self.assertRaisesRegex(
+            Exception, 'State Generic Content does not exist'
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.target_id,
+                exp.version,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
     def test_create_suggestion_with_generic_state_name_succeeds(self) -> None:
         """Test that creating a translation suggestion with state_name='Content'
         successfully resolves the correct state name from the content_id.
@@ -900,6 +934,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertNotIn(
             'hi', updated_opportunity.incomplete_translation_language_codes
         )
+
+    def test_create_translation_suggestion_with_invalid_target_type(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>Hindi</p>',
+            'data_format': 'html',
+        }
+        # A classroom is a translatable entity type but has no fetcher in
+        # get_entity_by_type_and_id, so the lookup raises a ValueError and the
+        # entity is skipped. It is also not an allowed suggestion target type,
+        # so creating a suggestion for it must fail validation.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_CLASSROOM,
+                'classroom_1',
+                1,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
 
     def test_skill_translation_stats_use_topic_of_the_opportunity(
         self,
@@ -1236,6 +1300,156 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'review message')
+
+    def test_accept_exploration_translation_suggestion_reindexes_exploration(
+        self,
+    ) -> None:
+        """Test that accepting a translation suggestion for an exploration
+        triggers exploration reindexing.
+        """
+        # Create an exploration with the content.
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp.states['Introduction'].update_content(
+            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': exp.states['Introduction'].content.html,
+            'translation_html': '<p>Updated translation.</p>',
+            'data_format': 'html',
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            exp.version,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.target_id)]
+        )[0]
+
+        reindexed_ids = []
+
+        def mock_index_explorations(ids: List[str]) -> None:
+            reindexed_ids.extend(ids)
+
+        index_counter = test_utils.CallCounter(mock_index_explorations)
+
+        with (
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'pre_accept_validate',
+                lambda self: None,
+            ),
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'accept',
+                lambda self, unused_commit_message: None,
+            ),
+            self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda *args: None,
+            ),
+            self.swap(
+                exp_services,
+                'index_explorations_given_ids',
+                index_counter,
+            ),
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                self.COMMIT_MESSAGE,
+                'review message',
+            )
+
+        self.assertEqual(index_counter.times_called, 1)
+        self.assertEqual(reindexed_ids, [self.target_id])
+
+    def test_accept_skill_translation_suggestion_does_not_reindex(self) -> None:
+        """Test that accepting a translation suggestion for a skill does not
+        trigger exploration reindexing.
+        """
+        skill_id = skill_services.get_new_skill_id()
+        skill_description = 'Skill Description'
+        self.save_new_skill(
+            skill_id, self.author_id, description=skill_description
+        )
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': skill_description,
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)]
+        )[0]
+
+        reindexed_ids = []
+
+        def mock_index_explorations(ids: List[str]) -> None:
+            reindexed_ids.extend(ids)
+
+        index_counter = test_utils.CallCounter(mock_index_explorations)
+
+        with (
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'pre_accept_validate',
+                lambda self: None,
+            ),
+            self.swap(
+                suggestion_registry.SuggestionTranslateContent,
+                'accept',
+                lambda self, unused_commit_message: None,
+            ),
+            self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda *args: None,
+            ),
+            self.swap(
+                exp_services,
+                'index_explorations_given_ids',
+                index_counter,
+            ),
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                self.COMMIT_MESSAGE,
+                'review message',
+            )
+
+        self.assertEqual(index_counter.times_called, 0)
+        self.assertEqual(reindexed_ids, [])
 
     def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
         self,
@@ -2521,9 +2735,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ]
 
     def mock_get_exploration_by_id(self, exp_id: str) -> MockExploration:
+        mock_exp = None
         for exp in self.explorations:
             if exp.id == exp_id:
                 mock_exp = exp
+        assert mock_exp is not None
         return mock_exp
 
     def _create_question_suggestion_with_skill_id(
@@ -2695,13 +2911,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('author_id', self.author_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
-    def test_get_translation_suggestions_in_review_by_exp_ids(self) -> None:
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+    def test_get_translation_suggestions_in_review_by_entity_ids(self) -> None:
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1, self.target_id_2, self.target_id_3], 'en'
         )
         self.assertEqual(len(suggestions), 0)
         self._create_translation_suggestion_with_language_code('en')
-        suggestions = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
             [self.target_id_1], 'en'
         )
         # Ruling out the possibility of None for mypy type checking.
@@ -3102,7 +3318,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(  # pylint: disable=line-too-long
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(  # pylint: disable=line-too-long
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )
@@ -3125,7 +3341,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = (
-            suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
+            suggestion_services.get_reviewable_translation_suggestions_for_single_entity(
                 self.reviewer_id_1, opportunity_summary_id, 'hi'
             )
         )

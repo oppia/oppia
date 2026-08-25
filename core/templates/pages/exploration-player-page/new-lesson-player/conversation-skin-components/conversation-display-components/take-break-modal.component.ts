@@ -18,11 +18,12 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import './take-break-modal.component.css';
 
 @Component({
   selector: 'take-break-modal',
   templateUrl: './take-break-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./take-break-modal.component.css'],
 })
 export class TakeBreakModalComponent {
   constructor(private activeModal: NgbActiveModal) {}
