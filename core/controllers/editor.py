@@ -1782,6 +1782,7 @@ class LearnerAnswerInfoHandler(
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
+        state_reference = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
             if not state_name:
@@ -1795,6 +1796,11 @@ class LearnerAnswerInfoHandler(
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )
+        # NOTE: URL_PATH_ARGS_SCHEMAS handles entity_type validation via raising
+        # exceptions, so this assertion is purely for satisfying mypy; adding an
+        # else branch here would only introduce unreachable code.
+        assert state_reference is not None
+
         learner_answer_info_id = self.normalized_request[
             'learner_answer_info_id'
         ]

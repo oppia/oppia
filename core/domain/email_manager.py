@@ -3034,8 +3034,9 @@ def send_email_to_new_cd_user(
         category_description = category_data['description']
         rights_message = category_data['rights_message']
 
-    email_body_template = '%s %s %s %s'
-    recipient_username = user_services.get_username(recipient_id)
+        email_body = ''
+        email_body_template = '%s %s %s %s'
+        recipient_username = user_services.get_username(recipient_id)
     if category in [
         constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
