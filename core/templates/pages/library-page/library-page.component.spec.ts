@@ -50,6 +50,7 @@ import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
+import {LibraryPageConstants} from './library-page.constants';
 import {
   ActivityDict,
   LibraryIndexData,
@@ -725,14 +726,19 @@ describe('Library Page Component', () => {
   it('should unsubscribe on component destruction', () => {
     componentInstance.translateSubscription = new Subscription();
     componentInstance.resizeSubscription = new Subscription();
+    componentInstance.i18nLanguageCodeSubscription = new Subscription();
     spyOn(componentInstance.translateSubscription, 'unsubscribe');
     spyOn(componentInstance.resizeSubscription, 'unsubscribe');
+    spyOn(componentInstance.i18nLanguageCodeSubscription, 'unsubscribe');
     componentInstance.ngOnDestroy();
 
     expect(
       componentInstance.translateSubscription.unsubscribe
     ).toHaveBeenCalled();
     expect(componentInstance.resizeSubscription.unsubscribe).toHaveBeenCalled();
+    expect(
+      componentInstance.i18nLanguageCodeSubscription.unsubscribe
+    ).toHaveBeenCalled();
   });
 
   it('should get all classrooms data', fakeAsync(() => {
@@ -978,4 +984,32 @@ describe('Library Page Component', () => {
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
   });
+
+  it('should reload library data on site language change', fakeAsync(() => {
+    spyOn(componentInstance, 'loadLibraryData');
+    componentInstance.ngOnInit();
+    tick();
+    // The initial load in ngOnInit is discounted so that the assertion below
+    // only passes if the language change itself triggered a reload.
+    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+    tick();
+
+    expect(componentInstance.loadLibraryData).toHaveBeenCalled();
+  }));
+
+  it('should not reload library data on site language change in search mode', fakeAsync(() => {
+    spyOn(componentInstance, 'loadLibraryData');
+    componentInstance.ngOnInit();
+    tick();
+
+    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
+    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+    tick();
+
+    expect(componentInstance.loadLibraryData).not.toHaveBeenCalled();
+  }));
 });
