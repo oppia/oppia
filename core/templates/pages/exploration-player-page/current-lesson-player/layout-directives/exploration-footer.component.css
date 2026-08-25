@@ -272,37 +272,6 @@
   font-weight: normal;
 }
 
-.oppia-lesson-info-card {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  padding: 0 0 6px 0;
-  text-align: left;
-}
-
-.oppia-lesson-info-card .oppia-lesson-exploration-progress-info {
-  padding: 0 20px 20px 20px;
-}
-
-.oppia-lesson-info-card .oppia-story-title {
-  color: #3b3b3b;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 13px;
-  margin-bottom: -10px;
-  padding: 20px 20px 0;
-  text-align: left;
-}
-
-.oppia-lesson-info-card .oppia-lesson-info-content {
-  padding-bottom: 0;
-}
-
-.oppia-lesson-info-card .oppia-exploration-description {
-  color: #333;
-  font-size: 15px;
-  font-weight: normal;
-  padding-bottom: 10px;
-}
-
 .oppia-lesson-info .oppia-exploration-info-icon {
   cursor: pointer;
 }

@@ -168,6 +168,10 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
+    // The guard replaces the browser state with the requested URL after
+    // redirecting, so the call must be intercepted to prevent it from
+    // mutating the real window history and leaking the URL to other tests.
+    const replaceStateSpy = spyOn(location, 'replaceState');
 
     await guard.canActivate(
       {} as never,
@@ -178,6 +182,9 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
+    expect(replaceStateSpy).toHaveBeenCalledWith(
+      '/certificate-assessment/cert-1'
+    );
   });
 
   it('should still replace the state if redirect navigation fails', async () => {

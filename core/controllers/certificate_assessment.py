@@ -456,6 +456,21 @@ class StartCertificateAssessmentHandler(
                     self.normalized_payload['certificate_id'], self.user_id
                 )
             )
+        except (
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException
+        ) as e:
+            # Surface a structured error so the frontend can translate it via
+            # its translate pipes, instead of a hardcoded English string.
+            self.error(429)
+            self.render_json(
+                {
+                    'error': ('I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'),
+                    'error_type': 'cooldown',
+                    'remaining_minutes': e.remaining_minutes,
+                    'status_code': 429,
+                }
+            )
+            return
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
         except (

@@ -408,7 +408,18 @@ export class CertificateAssessmentOfferingBackendApiService {
         questions: response.questions,
       });
     } catch (errorResponse) {
-      throw errorResponse?.error?.error || errorResponse.message;
+      // Propagate a structured backend error (with error_type and
+      // remaining_minutes) so the caller can translate it; otherwise fall
+      // back to the usual error string.
+      const backendError = errorResponse?.error;
+      if (
+        backendError &&
+        typeof backendError === 'object' &&
+        (backendError as {error_type?: string}).error_type !== undefined
+      ) {
+        throw backendError;
+      }
+      throw errorResponse?.error?.error || errorResponse?.message;
     }
   }
 
