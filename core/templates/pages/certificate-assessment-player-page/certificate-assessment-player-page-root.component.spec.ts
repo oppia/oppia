@@ -18,6 +18,7 @@
 
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
+import {EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
@@ -28,6 +29,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
@@ -37,6 +39,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let playerStateService: CertificateAssessmentPlayerStateService;
+  let internetConnectivityService: InternetConnectivityService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
 
@@ -99,6 +102,13 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       'addWarning',
     ]);
 
+    const internetConnectivityServiceSpy = jasmine.createSpyObj(
+      'InternetConnectivityService',
+      ['startCheckingConnection']
+    );
+    internetConnectivityServiceSpy.onInternetStateChange =
+      new EventEmitter<boolean>();
+
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [{provide: ActivatedRoute, useValue: activatedRouteStubValue}],
@@ -117,6 +127,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiServiceSpy,
       playerStateServiceInstance,
       {} as ClassroomBackendApiService,
+      internetConnectivityServiceSpy,
       {} as PageHeadService,
       routerSpy,
       translateServiceSpy
@@ -125,6 +136,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     alertsService = alertsServiceSpy;
     certificateAssessmentOfferingBackendApiService =
       certificateAssessmentOfferingBackendApiServiceSpy;
+    internetConnectivityService = internetConnectivityServiceSpy;
     router = routerSpy;
     translateService = translateServiceSpy;
   };
@@ -669,6 +681,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
@@ -698,6 +711,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
@@ -742,4 +756,39 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       CertificateAssessmentPlayerPageConstants
     );
   });
+
+  it('should start checking the connection and react to network changes on init', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(
+      internetConnectivityService.startCheckingConnection
+    ).toHaveBeenCalled();
+  }));
+
+  it('should pause the countdown when the learner goes offline', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
+    spyOn(playerStateService, 'pauseForNetworkLoss');
+    (
+      internetConnectivityService.onInternetStateChange as EventEmitter<boolean>
+    ).emit(false);
+
+    expect(playerStateService.pauseForNetworkLoss).toHaveBeenCalled();
+    component.ngOnDestroy();
+  }));
+
+  it('should surface the interrupt card when the learner reconnects after a pause', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
+    spyOn(playerStateService, 'handleReconnect');
+    (
+      internetConnectivityService.onInternetStateChange as EventEmitter<boolean>
+    ).emit(true);
+
+    expect(playerStateService.handleReconnect).toHaveBeenCalled();
+    component.ngOnDestroy();
+  }));
 });
