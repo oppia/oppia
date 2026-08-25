@@ -53,6 +53,7 @@ describe('TranslateTextBackendApiService', () => {
       content_type: 'content',
       interaction_id: null,
       rule_type: null,
+      status: 'needs_update',
     };
   };
 
@@ -134,6 +135,7 @@ describe('TranslateTextBackendApiService', () => {
               content_type: 'content',
               content_format: 'html',
               content_value: 'text1',
+              status: 'needs_update',
             },
           ],
           version: '2',

@@ -66,6 +66,7 @@ describe('Contribution Opportunities Service', () => {
         translation_in_review_counts: {
           hi: 20,
         },
+        translation_missing_reasons: {},
         language_code: 'hi',
         is_pinned: false,
         reviewer_only_content_count: 0,
@@ -104,12 +105,14 @@ describe('Contribution Opportunities Service', () => {
   });
 
   it('should open login modal when user is not logged in', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: any, opt: any) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     contributionOpportunitiesService.showRequiresLoginModal();
 

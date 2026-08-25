@@ -176,6 +176,7 @@ describe('Translation opportunities component', () => {
         translation_in_review_counts: {
           en: 2,
         },
+        translation_missing_reasons: {},
         language_code: 'en',
         is_pinned: false,
         reviewer_only_content_count: 0,
@@ -192,6 +193,7 @@ describe('Translation opportunities component', () => {
         translation_in_review_counts: {
           en: 4,
         },
+        translation_missing_reasons: {},
         language_code: 'en',
         is_pinned: false,
         reviewer_only_content_count: 0,
@@ -400,6 +402,7 @@ describe('Translation opportunities component', () => {
           translation_in_review_counts: {
             en: 0,
           },
+          translation_missing_reasons: {},
           language_code: 'en',
           is_pinned: false,
           reviewer_only_content_count: 4,
@@ -442,6 +445,7 @@ describe('Translation opportunities component', () => {
           translation_in_review_counts: {
             en: 0,
           },
+          translation_missing_reasons: {},
           language_code: 'en',
           is_pinned: false,
           reviewer_only_content_count: 4,
