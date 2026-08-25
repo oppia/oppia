@@ -102,6 +102,7 @@
         "core.domain.feedback_services_test",
         "core.domain.visualization_registry_test",
         "core.jobs.batch_jobs.exp_migration_jobs_test",
+        "core.jobs.batch_jobs.exp_end_state_normalization_jobs_test",
         "core.domain.exp_services_test",
         "core.domain.app_feedback_report_services_test",
         "core.controllers.learner_goals_test",
@@ -218,7 +219,8 @@
         "core.domain.voiceover_cloud_task_services_test",
         "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
         "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test",
-        "core.jobs.batch_jobs.translation_opportunity_backfill_jobs_test"
+        "core.jobs.batch_jobs.translation_opportunity_backfill_jobs_test",
+        "core.jobs.batch_jobs.web_feedback_cleanup_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",

@@ -18,9 +18,10 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
-import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
 import './certificate-offering-available-page.component.css';
 
 export type CertificateAssessmentStatus = 'passed' | 'failed' | 'not_attempted';
@@ -48,7 +49,8 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
 
   constructor(
     private alertsService: AlertsService,
-    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private dateTimeFormatService: DateTimeFormatService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -78,6 +80,7 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
     switch (attemptStatus) {
       case 'Passed':
         return 'passed';
+      case 'Not Passed':
       case 'Failed':
         return 'failed';
       default:
@@ -93,8 +96,18 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
       assessmentRoute: this.getCertificateAssessmentRoute(
         offering.certificateId
       ),
-      passedOnDate: (offering as {passedOnDate?: string}).passedOnDate,
-      failedOnDate: (offering as {failedOnDate?: string}).failedOnDate,
+      passedOnDate:
+        offering.passedOnDate === null
+          ? undefined
+          : this.dateTimeFormatService.getLocaleDateString(
+              offering.passedOnDate
+            ),
+      failedOnDate:
+        offering.failedOnDate === null
+          ? undefined
+          : this.dateTimeFormatService.getLocaleDateString(
+              offering.failedOnDate
+            ),
     }));
   }
 

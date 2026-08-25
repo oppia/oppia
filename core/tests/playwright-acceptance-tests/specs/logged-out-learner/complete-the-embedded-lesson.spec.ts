@@ -110,7 +110,7 @@ test.describe('Logged-Out Learner in Embedded Lesson', function () {
     // Play until checkpoint.
     await loggedOutUser.submitAnswer('0');
     await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-    await loggedOutUser.continueToNextCard();
+    await loggedOutUser.continueToNextCardAsLoggedOutUser();
 
     // TODO(#24066): Verify checkpoint behavior. Currently, the expected behavior is not observed.
 

@@ -150,22 +150,22 @@ describe('UnansweredQuestionModalComponent', () => {
   });
 
   describe('submitAnyway', () => {
-    it('should close NgbActiveModal when available', () => {
+    it('should close NgbActiveModal with submit-anyway when available', () => {
       component.submitAnyway();
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith('submit-anyway');
     });
 
-    it('should close the modal when the submit button is clicked', () => {
+    it('should close the modal with submit-anyway when the submit button is clicked', () => {
       const submitButton = fixture.debugElement.query(
         By.css('.assessment-modal-action-button')
       );
 
       submitButton.triggerEventHandler('click', null);
 
-      expect(ngbActiveModal.close).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalledWith('submit-anyway');
     });
 
-    it('should dismiss MatBottomSheetRef when NgbActiveModal is not available', () => {
+    it('should dismiss MatBottomSheetRef with submit-anyway when NgbActiveModal is not available', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         declarations: [UnansweredQuestionModalComponent, MockTranslatePipe],
@@ -178,7 +178,7 @@ describe('UnansweredQuestionModalComponent', () => {
       const newComponentInstance = newFixture.componentInstance;
 
       newComponentInstance.submitAnyway();
-      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('submit-anyway');
     });
   });
 });
