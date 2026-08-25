@@ -72,12 +72,15 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd',
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,
@@ -115,12 +118,15 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd%s' % i,
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,
@@ -170,12 +176,15 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     [
                         {
                             'id': 'abcd',
-                            'language_code': 'lang',
+                            'language_code': ['lang'],
                             'title': 'title',
                             'category': 'category',
                             'tags': [],
                             'objective': 'objective',
                             'rank': 20,
+                            'translated_titles': [],
+                            'translated_objectives': [],
+                            'translated_tags': [],
                         }
                     ],
                     search_services.SEARCH_INDEX_EXPLORATIONS,

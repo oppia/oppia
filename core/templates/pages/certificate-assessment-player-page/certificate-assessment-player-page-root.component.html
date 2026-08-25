@@ -14,6 +14,9 @@
                                     (retryAssessment)="onRetryAssessment()"
                                     (resumeAssessment)="onResumeAssessment()">
         </oppia-assessment-interrupt>
+        <oppia-assessment-unavailable-modal *ngIf="showAssessmentUnavailableModal"
+                                            (goToAvailableCertificates)="onGoToAvailableCertificates()">
+        </oppia-assessment-unavailable-modal>
         <div *ngIf="isLoading" class="text-center py-3 text-muted">
           <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
         </div>
@@ -34,7 +37,10 @@
           <certificate-assessment-player-page *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
                                               [attempt]="attempt"
                                               [classroomUrlFragment]="classroomUrlFragment"
-                                              (assessmentSubmitted)="onAssessmentSubmitted($event)">
+                                              [isTimeExpired]="isTimeExpired"
+                                              (assessmentSubmitted)="onAssessmentSubmitted($event)"
+                                              (viewResults)="onViewResults()"
+                                              (assessmentEnded)="onAssessmentEnded()">
           </certificate-assessment-player-page>
         </div>
       </div>
