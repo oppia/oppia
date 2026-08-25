@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_migration_jobs
-from core.jobs.types import job_run_result
 
 
 class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
