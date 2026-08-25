@@ -234,20 +234,6 @@ ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
     'environment',
 )
 
-# Allowed formats of how HTML is present in rule specs.
-HTML_RULE_VARIABLE_FORMAT_SET = 'set'
-HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
-HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
-
-ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
-    HTML_RULE_VARIABLE_FORMAT_SET,
-    HTML_RULE_VARIABLE_FORMAT_STRING,
-    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS,
-]
-
-ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
-ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
-
 ENTITY_TYPE_BLOG_POST = 'blog_post'
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
@@ -717,25 +703,32 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
-    lambda recipient_username: 'Hi %s,' % recipient_username
-)
-DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = lambda sender_username: (
-    'Thanks!<br>%s (Oppia moderator)' % sender_username
-)
-DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = lambda exp_title: (
-    'Your Oppia exploration "%s" has been unpublished' % exp_title
-)
+
+
+def get_default_salutation_html(recipient_username: str) -> str:
+    """Returns the default HTML salutation for the given email recipient."""
+    return f'Hi {recipient_username},'
+
+
+def get_default_signoff_html(sender_username: str) -> str:
+    """Returns the default HTML signoff for the given email sender."""
+    return f'Thanks!<br>{sender_username} (Oppia moderator)'
+
+
+def get_default_email_subject(exp_title: str) -> str:
+    """Returns the default email subject for the given exploration title."""
+    return f'Your Oppia exploration "{exp_title}" has been unpublished'
+
 
 VALID_MODERATOR_ACTIONS: Dict[
     str, Dict[str, Union[str, Callable[[str], str]]]
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
+        'email_subject_fn': get_default_email_subject,
         'email_intent': 'unpublish_exploration',
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
+        'email_salutation_html_fn': get_default_salutation_html,
+        'email_signoff_html_fn': get_default_signoff_html,
     },
 }
 
