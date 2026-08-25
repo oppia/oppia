@@ -1120,8 +1120,12 @@ def update_translation_opportunity_with_accepted_suggestion(
             exp_opportunity_summary.translation_counts[language_code] = (
                 new_count
             )
+            # Here we use cast because mypy cannot infer that the entity is an
+            # Exploration after the entity_type check.
             exp_opportunity_summary.translation_missing_reasons = (
-                translation_services.get_translation_missing_reasons(entity)
+                translation_services.get_translation_missing_reasons(
+                    cast(exp_domain.Exploration, entity)
+                )
             )
 
             if (
