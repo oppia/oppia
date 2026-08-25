@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import apache_beam as beam
 from core import feconf
 from core.domain import exp_domain, exp_fetchers
 from core.jobs import base_jobs
@@ -26,16 +25,14 @@ from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
+
+import apache_beam as beam
 import result
 from typing import Dict, Iterable, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        exp_models,
-        opportunity_models,
-        translation_models,
-    )
+    from mypy_imports import exp_models, opportunity_models, translation_models
 
 (
     exp_models,
