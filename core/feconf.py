@@ -681,6 +681,9 @@ EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION = (
+    'web_user_feedback_message_notification'
+)
 EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
@@ -1171,9 +1174,7 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
 )
-CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = (
-    '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>'
-)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = '/certificate_assessment_offerings_for_classroom_handler/<classroom_url_fragment>'
 START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
 
 SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
@@ -1184,6 +1185,9 @@ CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
 )
 CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
     '/certificate_assessment_attempts_handler'
+)
+CERTIFICATE_QUESTION_HANDLER = (
+    '/certificate_question_handler/<attempt_id>/<question_id>'
 )
 
 # Event types.
@@ -1771,6 +1775,19 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_TOPIC,
 ]
 
+# Sentinel accepted as the target_type URL argument of the suggestion list
+# handlers, meaning "do not filter by target type". It is never stored on a
+# suggestion, so it is deliberately not part of
+# SUGGESTION_TARGET_TYPE_CHOICES.
+SUGGESTION_TARGET_TYPE_SENTINEL_ALL = 'all'
+
+# The target types accepted by the handlers that list suggestions. They also
+# accept the sentinel above, because a contributor can ask for translation
+# suggestions of every entity type at once.
+SUGGESTION_LIST_TARGET_TYPE_CHOICES = SUGGESTION_TARGET_TYPE_CHOICES + [
+    SUGGESTION_TARGET_TYPE_SENTINEL_ALL
+]
+
 TRANSLATABLE_ENTITY_TYPES = [
     ENTITY_TYPE_EXPLORATION,
     ENTITY_TYPE_TOPIC,
@@ -1999,3 +2016,5 @@ TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
 )
 
 DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM_EMAIL = 'web-leap-leads@oppia.org'
+DESTINATION_TECHNICAL_INTERNAL_TEAM_EMAIL = 'web-core-leads@oppia.org'
