@@ -510,7 +510,14 @@ export class TopicManager extends BaseUser {
     );
 
     await this.expectElementToBeVisible(assignSubtopicButton);
-    await this.clickOnElementWithText('Assign to Subtopic');
+    // Real click on the assign-option tag (not by text). Scrolling it into
+    // view first keeps the option box in the visible, unclipped area on narrow
+    // mobile viewports where long skill names otherwise push it out of view.
+    await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      el?.scrollIntoView({block: 'center'});
+    }, assignSubtopicButton);
+    await this.clickOnElementWithSelector(assignSubtopicButton);
 
     await this.clickOnElementWithSelectorAndText(
       subtopicNameSelector,
