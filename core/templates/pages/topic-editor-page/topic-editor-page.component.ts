@@ -30,6 +30,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TopicEditorRoutingService} from './services/topic-editor-routing.service';
 import {TopicEditorStateService} from './services/topic-editor-state.service';
 import './topic-editor-page.component.css';
@@ -52,6 +53,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     private pageContextService: PageContextService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
+    private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private ngbModal: NgbModal,
     private questionUndoRedoService: QuestionUndoRedoService,
