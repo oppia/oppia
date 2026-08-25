@@ -31,11 +31,22 @@ import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-cir
 import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
 import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
 import {MasteryChallengeLockedModalComponent} from './topic-story-section/mastery-challenge-locked-modal.component';
+import {ArcSkipConfirmationModalComponent} from './topic-story-section/arc-skip-confirmation-modal.component';
+import {AdventureMasteredModalComponent} from './topic-story-section/adventure-mastered-modal.component';
+import {TopicHeaderComponent} from './topic-header/topic-header.component';
+import {TopicViewerContentComponent} from './topic-viewer-content/topic-viewer-content.component';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, MatCardModule, SharedComponentsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatBottomSheetModule,
+    MatCardModule,
+    SharedComponentsModule,
+  ],
   declarations: [
     StoriesListComponent,
     SubtopicsListComponent,
@@ -47,6 +58,10 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
     MasteryChallengeLockedModalComponent,
+    ArcSkipConfirmationModalComponent,
+    AdventureMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
   entryComponents: [
     StoriesListComponent,
@@ -59,6 +74,10 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
     MasteryChallengeLockedModalComponent,
+    ArcSkipConfirmationModalComponent,
+    AdventureMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
   exports: [
     StoriesListComponent,
@@ -71,6 +90,10 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
     MasteryChallengeLockedModalComponent,
+    ArcSkipConfirmationModalComponent,
+    AdventureMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

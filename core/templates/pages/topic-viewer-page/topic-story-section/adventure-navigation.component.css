@@ -1,7 +1,22 @@
 .adventure-navigation-container {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0;
+  margin: 0 -24px;
+  opacity: 1;
+  padding: 0 24px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 56px;
+  z-index: 30;
+}
+
+@media (max-width: 800px) {
+  .adventure-navigation-container {
+    top: 56px;
+  }
 }
 
 .adventure-navigation-scroll-area {
@@ -21,8 +36,7 @@
   min-width: 0;
   overflow-x: auto;
   padding-bottom: 4px;
-  /* Hide native scrollbar — arrows replace it */
-  scrollbar-width: none;
+  position: relative;
 }
 
 .adventure-navigation-wrapper--centered {
@@ -31,6 +45,28 @@
 
 .adventure-navigation-wrapper::-webkit-scrollbar {
   display: none;
+}
+
+.adventure-navigation-wrapper--overflow::before,
+.adventure-navigation-wrapper--overflow::after {
+  bottom: 4px;
+  content: '';
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 22px;
+  z-index: 3;
+}
+
+.adventure-navigation-wrapper--overflow::before {
+  background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  left: 0;
+}
+
+.adventure-navigation-wrapper--overflow::after {
+  background: linear-gradient(to left, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  right: 0;
 }
 
 .adventure-navigation-arrow {
@@ -121,6 +157,18 @@
 }
 
 @media (max-width: 768px) {
+  .adventure-navigation-container {
+    margin: 0;
+    margin-top: 0;
+    padding: 0 14px;
+    padding-top: 0;
+  }
+
+  .adventure-navigation-wrapper--overflow::before,
+  .adventure-navigation-wrapper--overflow::after {
+    display: block;
+  }
+
   .adventure-navigation-wrapper {
     gap: 8px;
     margin: 6px 0 4px;
@@ -152,6 +200,18 @@
 }
 
 @media (max-width: 450px) {
+  .adventure-navigation-container {
+    margin: 0;
+    margin-top: 0;
+    padding: 0 12px;
+    padding-top: 0;
+  }
+
+  .adventure-navigation-wrapper--overflow::before,
+  .adventure-navigation-wrapper--overflow::after {
+    width: 18px;
+  }
+
   .adventure-navigation-wrapper {
     gap: 6px;
     margin: 4px 0 2px;

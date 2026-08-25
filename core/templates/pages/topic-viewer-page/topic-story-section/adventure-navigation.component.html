@@ -1,4 +1,6 @@
-<div class="adventure-navigation-container" *ngIf="adventureGroups.length > 0">
+<div class="adventure-navigation-container"
+     *ngIf="adventureGroups.length > 0"
+     [style.top]="isInTopicEditorPreview ? '126px' : '56px'">
   <div class="adventure-navigation-scroll-area">
     <button class="adventure-navigation-arrow adventure-navigation-arrow--left"
             *ngIf="showLeftArrow"
@@ -10,40 +12,42 @@
 
     <div class="adventure-navigation-wrapper"
          [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
+         [class.adventure-navigation-wrapper--overflow]="hasHorizontalOverflow"
          #scrollWrapper
          (scroll)="onScroll()">
       <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
            [ngStyle]="{'border-color': adventureGroup.accentColor}">
         <topic-adventure-circle-badge *ngFor="let lesson of adventureGroup.lessons"
                                       [label]="lesson.lessonNumber.toString()"
+                                      [iconName]="getLessonBadgeIconName(lesson.isCompleted)"
                                       [size]="'sm'"
-                            [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : '#fff'"
-                                      [borderColor]="adventureGroup.accentColor"
-                            [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : adventureGroup.accentColor"
+                                      [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : (lesson.isCompleted ? '#e7f6e9' : '#fff')"
+                                      [borderColor]="lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor"
+                            [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : (lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor)"
                                       class="adventure-navigation-clickable"
-                                      (click)="onLessonClick(lesson.lessonNumber)"
+                                      (click)="onLessonClick(lesson.lessonNumber, adventureIdx)"
                                       [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
-                                      [attr.title]="'Go to lesson ' + lesson.lessonNumber"
+                                      title="Go to lesson {{ lesson.lessonNumber }}"
                                       role="button"
                                       tabindex="0"
-                                      (keydown.enter)="onLessonClick(lesson.lessonNumber)"
-                                      (keydown.space)="onLessonClick(lesson.lessonNumber); $event.preventDefault()">
+                                      (keydown.enter)="onLessonClick(lesson.lessonNumber, adventureIdx)"
+                                      (keydown.space)="onLessonClick(lesson.lessonNumber, adventureIdx); $event.preventDefault()">
         </topic-adventure-circle-badge>
 
         <topic-adventure-circle-badge *ngIf="adventureGroup.showPractice"
-                            [iconName]="'edit'"
+                            [iconName]="getPracticeBadgeIconName(adventureGroup.isPracticeCompleted)"
                                       [size]="'sm'"
-                                      [backgroundColor]="'#fff'"
-                                      [borderColor]="adventureGroup.accentColor"
-                                      [textColor]="adventureGroup.accentColor"
+                                      [backgroundColor]="adventureGroup.isPracticeCompleted ? '#e7f6e9' : '#fff'"
+                                      [borderColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
+                                      [textColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
-                                      (click)="onPracticeClick(adventureIdx)"
-                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_PRACTICE_BADGE_ARIA_LABEL' | translate"
-                                      [attr.title]="'I18N_TOPIC_VIEWER_PRACTICE_BADGE_ARIA_LABEL' | translate"
+                                      (click)="onPracticeClick(adventureGroup.arcId)"
+                                      [attr.aria-label]="'Go to practice'"
+                                      title="Go to practice"
                                       role="button"
                                       tabindex="0"
-                                      (keydown.enter)="onPracticeClick(adventureIdx)"
-                                      (keydown.space)="onPracticeClick(adventureIdx); $event.preventDefault()">
+                                      (keydown.enter)="onPracticeClick(adventureGroup.arcId)"
+                                      (keydown.space)="onPracticeClick(adventureGroup.arcId); $event.preventDefault()">
         </topic-adventure-circle-badge>
       </div>
 
