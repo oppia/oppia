@@ -637,8 +637,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 proc.send_signal(signal.SIGINT)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
-                # can just return immediately.
-                return  # pylint: disable=lost-exception
+                # can just ignore and exit normally.
+                pass
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).

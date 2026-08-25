@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+import {StateBackendDict} from 'domain/state/state.model';
+
 // The shape of each attempt summary mirrors the response returned by the
 // CertificateAssessmentAttemptsHandler.
 export interface CertificateAttemptSummary {
@@ -35,7 +37,7 @@ export interface AssessmentResult {
   certificateName: string;
   scorePercentage: number;
   topicBreakdown: AssessmentResultTopicWiseBreakdown[];
-  timeTakenMinutes: number;
+  timeTakenMinutes: number | null;
 }
 
 // The shape of the topic-wise breakdown shown on the certificate assessment
@@ -45,37 +47,18 @@ export interface AssessmentResultTopicWiseBreakdown {
   scorePercentage: number;
 }
 
-// The shape of each certificate assessment question returned by the assessment
-// player.
-export type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input';
-
-export interface AssessmentQuestionOption {
-  id: string;
-  text: string;
-}
-
 export interface AssessmentQuestion {
   id: string;
-  type: AssessmentQuestionType;
   prompt: string;
-  hint: string;
-  options: AssessmentQuestionOption[];
-  placeholder?: string;
-  correctAnswerText: string;
 }
 
-// The shape of a recommended topic tile shown on the certificate assessment
-// introduction card.
-export interface RecommendedTopicStub {
-  name: string;
-  lessonCount: number;
-  // Placeholder swatch shown instead of a topic thumbnail image.
-  colorClass: string;
-}
+export const createAssessmentQuestionFromStateData = (
+  questionId: string,
+  stateData: StateBackendDict
+): AssessmentQuestion => ({
+  id: questionId,
+  prompt: stateData.content.html,
+});
 
 export interface CertificateAssessmentOfferingTopicData {
   [topicId: string]: number;
@@ -101,6 +84,53 @@ export interface AvailableCertificateAssessmentOfferingBackendDict {
   attempt_status: string;
   passed_on_date: number | null;
   failed_on_date: number | null;
+}
+
+export interface CertificateAssessmentAttemptQuestionBackendDict {
+  question_id: string;
+  question_version: number;
+}
+
+export interface CertificateAssessmentAttemptBackendDict {
+  attempt_id: string;
+  questions: CertificateAssessmentAttemptQuestionBackendDict[];
+}
+
+export interface CertificateAssessmentAttemptQuestion {
+  questionId: string;
+  questionVersion: number;
+}
+
+export interface CertificateAssessmentQuestionStateBackendDict {
+  question_id: string;
+  question_state_data: StateBackendDict;
+}
+
+export class CertificateAssessmentQuestionData {
+  _questionId: string;
+  _questionStateData: StateBackendDict;
+
+  constructor(questionId: string, questionStateData: StateBackendDict) {
+    this._questionId = questionId;
+    this._questionStateData = questionStateData;
+  }
+
+  get questionId(): string {
+    return this._questionId;
+  }
+
+  get questionStateData(): StateBackendDict {
+    return this._questionStateData;
+  }
+
+  static createFromBackendDict(
+    dict: CertificateAssessmentQuestionStateBackendDict
+  ): CertificateAssessmentQuestionData {
+    return new CertificateAssessmentQuestionData(
+      dict.question_id,
+      dict.question_state_data
+    );
+  }
 }
 
 export class AvailableCertificateAssessmentOfferingData {
@@ -290,6 +320,39 @@ export class CertificateAssessmentOfferingData {
       certificateAssessmentOfferingBackendDict.demonstrates,
       certificateAssessmentOfferingBackendDict.async_status,
       certificateAssessmentOfferingBackendDict.version
+    );
+  }
+}
+
+export class CertificateAssessmentAttemptData {
+  _attemptId: string;
+  _questions: CertificateAssessmentAttemptQuestion[];
+
+  constructor(
+    attemptId: string,
+    questions: CertificateAssessmentAttemptQuestion[]
+  ) {
+    this._attemptId = attemptId;
+    this._questions = questions;
+  }
+
+  get attemptId(): string {
+    return this._attemptId;
+  }
+
+  get questions(): CertificateAssessmentAttemptQuestion[] {
+    return this._questions;
+  }
+
+  static createFromBackendDict(
+    certificateAssessmentAttemptBackendDict: CertificateAssessmentAttemptBackendDict
+  ): CertificateAssessmentAttemptData {
+    return new CertificateAssessmentAttemptData(
+      certificateAssessmentAttemptBackendDict.attempt_id,
+      certificateAssessmentAttemptBackendDict.questions.map(question => ({
+        questionId: question.question_id,
+        questionVersion: question.question_version,
+      }))
     );
   }
 }

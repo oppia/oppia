@@ -1101,6 +1101,47 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         self.assertEqual(actual_outcome_list, [])
 
+    def test_convert_html_in_suggestion_change_with_none_old_value(
+        self,
+    ) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>new suggestion content</p>',
+            },
+            'old_value': None,
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        # Conversion_fn wraps html with div.
+        def conversion_fn(html: str) -> str:
+
+            return '<div>%s</div>' % html
+
+        suggestion.convert_html_in_suggestion_change(conversion_fn)
+
+        self.assertIsNone(suggestion.change_cmd.old_value)
+        self.assertEqual(
+            suggestion.change_cmd.new_value['html'],
+            '<div><p>new suggestion content</p></div>',
+        )
+
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
