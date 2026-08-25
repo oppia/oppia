@@ -109,6 +109,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'content_count': 5,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             },

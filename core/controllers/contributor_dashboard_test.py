@@ -156,6 +156,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -167,6 +168,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -178,6 +180,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -738,6 +741,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -749,6 +753,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -843,6 +848,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': True,
             }
@@ -854,6 +860,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -1122,6 +1129,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'translation_missing_reasons': {},
                     'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
@@ -1241,6 +1249,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'translation_missing_reasons': {},
                     'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
@@ -1526,31 +1535,40 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         mock_get_translatable_text_return_value = {
             'Introduction': {
-                'content_01': translation_domain.TranslatableContent(
-                    content_id='content_01',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                'content_01': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_01',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                        ),
+                        content_value=['string1', 'string2', 'string3'],
                     ),
-                    content_value=['string1', 'string2', 'string3'],
+                    translation_domain.TranslationStatus.NEW,
                 ),
-                'content_02': translation_domain.TranslatableContent(
-                    content_id='content_02',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                'content_02': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_02',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                        ),
+                        content_value=['string1', 'string2', 'string3'],
                     ),
-                    content_value=['string1', 'string2', 'string3'],
+                    translation_domain.TranslationStatus.NEW,
                 ),
             },
             'End State': {
-                'content_03': translation_domain.TranslatableContent(
-                    content_id='content_03',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.HTML
+                'content_03': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_03',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.HTML
+                        ),
+                        content_value='<p>Not a list content.</p>',
                     ),
-                    content_value='<p>Not a list content.</p>',
+                    translation_domain.TranslationStatus.NEW,
                 )
             },
         }
@@ -1581,6 +1599,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                             'content_type': 'content',
                             'interaction_id': None,
                             'rule_type': None,
+                            'status': 'new',
                         }
                     }
                 },
