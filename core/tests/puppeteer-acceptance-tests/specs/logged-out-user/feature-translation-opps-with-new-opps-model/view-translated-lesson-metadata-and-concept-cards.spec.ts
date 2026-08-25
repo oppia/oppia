@@ -165,18 +165,13 @@ describe('Logged-out User', function () {
       MAX_ITEMS_TO_SKIP
     );
     await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.saveTranslationAndMoveToNextItem();
     await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_OBJECTIVE,
       MAX_ITEMS_TO_SKIP
     );
     await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
-    await translationSubmitter.expectToastMessage(
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
       'Submitted translation for review.'
     );
     await translationSubmitter.closeTranslateTextModal();

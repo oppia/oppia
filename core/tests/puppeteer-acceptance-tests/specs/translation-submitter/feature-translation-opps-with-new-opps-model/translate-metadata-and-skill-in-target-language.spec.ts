@@ -210,11 +210,8 @@ describe('Translation Submitter', function () {
   });
 
   it('should not show the content type filter on tabs that cannot use it', async function () {
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Submit Question'
-    );
-    await translationSubmitter.expectContentTypeFilterToBeVisible(false);
-
+    // "Submit Question" is not checked here because that tab is only shown to
+    // a user who can suggest questions, which a translator cannot.
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
@@ -260,9 +257,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
     await translationSubmitter.expectNoTranslationErrors();
     await translationSubmitter.expectSaveTranslationButtonToBeEnabled();
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.saveTranslationAndMoveToNextItem();
 
     // The limit is the title's alone, so the same length is accepted for the
     // objective.
@@ -274,11 +269,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
     await translationSubmitter.expectNoTranslationErrors();
     await translationSubmitter.expectSaveTranslationButtonToBeEnabled();
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
-
-    await translationSubmitter.expectToastMessage(
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
       'Submitted translation for review.'
     );
     await translationSubmitter.closeTranslateTextModal();
@@ -306,9 +297,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextInTranslationInput(
       HINDI_SKILL_DESCRIPTION
     );
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.saveTranslationAndMoveToNextItem();
 
     await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_SKILL_EXPLANATION,

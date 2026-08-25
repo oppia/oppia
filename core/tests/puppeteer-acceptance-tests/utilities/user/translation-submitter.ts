@@ -615,9 +615,12 @@ export class TranslationSubmitter extends BaseUser {
   ): Promise<void> {
     const instructionsSeen: (string | undefined)[] = [];
     for (let skips = 0; skips <= maxSkips; skips++) {
-      // The modal renders its header before it has fetched the item, so the
-      // instruction line only appears once there is an item to name. Waiting
-      // for it here is what keeps the first read off an empty modal.
+      // The source block is removed while an item is loading and while a
+      // translation is uploading, so waiting for it back settles the modal
+      // before the instruction is read. Without this the read can land on the
+      // item that was just saved or skipped, and the skip below would then
+      // consume the item the caller was looking for.
+      await this.expectElementToBeVisible(textToTranslateContainerSelector);
       await this.expectElementToBeVisible(translationInstructionSelector);
       const instruction = await this.page.$eval(
         translationInstructionSelector,
@@ -645,14 +648,49 @@ export class TranslationSubmitter extends BaseUser {
         );
       }
       await this.clickOnSkipTranslationButton();
-      // The source text block is hidden while the next item is being fetched,
-      // so waiting for it back guarantees the instruction line read at the top
-      // of the next pass belongs to the new item and not the skipped one.
-      await this.expectElementToBeVisible(textToTranslateContainerSelector);
     }
     throw new Error(
       `No ${contentType} item was reached within ${maxSkips} skips. ` +
         `Items seen: ${instructionsSeen.join(' | ')}.`
+    );
+  }
+
+  /**
+   * Saves the current translation and waits for the modal to load the next
+   * item. Clicking save alone is not enough to move on, because the upload and
+   * the fetch that follows it are asynchronous, so a caller that read the
+   * modal straight afterwards would still see the item it had just saved.
+   * @param expectedToastMessage - The toast the save is expected to raise, if
+   *     it is being checked. The toast clears after a few seconds, so it is
+   *     checked before waiting for the next item rather than after.
+   */
+  async saveTranslationAndMoveToNextItem(
+    expectedToastMessage?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(textToTranslateContainerSelector);
+    const contentBeforeSave = await this.page.$eval(
+      textToTranslateContainerSelector,
+      el => el.textContent
+    );
+
+    await this.expectElementToBeVisible(saveTranslationButtonSelector);
+    await this.clickOnElementWithSelector(saveTranslationButtonSelector);
+
+    if (expectedToastMessage) {
+      await this.expectToastMessage(expectedToastMessage);
+    }
+
+    // The source block is taken out of the DOM while the translation uploads,
+    // so requiring it back with different text proves the next item has
+    // arrived rather than the saved one still being on screen.
+    await this.page.waitForFunction(
+      (selector: string, previousContent: string) => {
+        const element = document.querySelector(selector);
+        return element !== null && element.textContent !== previousContent;
+      },
+      {},
+      textToTranslateContainerSelector,
+      contentBeforeSave ?? ''
     );
   }
 
