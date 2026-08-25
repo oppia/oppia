@@ -29,6 +29,7 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     html_validation_service,
+    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -1100,6 +1101,47 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         self.assertEqual(actual_outcome_list, [])
 
+    def test_convert_html_in_suggestion_change_with_none_old_value(
+        self,
+    ) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>new suggestion content</p>',
+            },
+            'old_value': None,
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        # Conversion_fn wraps html with div.
+        def conversion_fn(html: str) -> str:
+
+            return '<div>%s</div>' % html
+
+        suggestion.convert_html_in_suggestion_change(conversion_fn)
+
+        self.assertIsNone(suggestion.change_cmd.old_value)
+        self.assertEqual(
+            suggestion.change_cmd.new_value['html'],
+            '<div><p>new suggestion content</p></div>',
+        )
+
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
@@ -1952,6 +1994,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
+    def test_pre_accept_validate_state_content_id(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        suggestion.change_cmd.state_name = 'Introduction'
+
+        # A valid state name must not be enough on its own: the content ID has
+        # to belong to the exploration as well.
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+
     def test_pre_accept_validate_metadata_content_id(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict.copy()
@@ -1992,6 +2062,62 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 utils.ValidationError,
                 'Expected invalid_metadata_content_id to be a valid metadata content ID',
+            ):
+                suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_skill_translation_suggestion(self) -> None:
+        self.save_new_skill('skill1', self.author_id, description='Skill 1')
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            'skill1',
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                'language_code': 'hi',
+                'content_html': 'original description',
+                'translation_html': 'translated description',
+                'data_format': 'unicode',
+            },
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+        )
+
+        suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'non_existent_skill_id'
+        with self.assertRaisesRegex(
+            Exception, 'No skill exists with ID: non_existent_skill_id'
+        ):
+            suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'skill1'
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+        suggestion.change_cmd.content_id = feconf.SKILL_DESCRIPTION_CONTENT_ID
+
+        suggestion.target_id = 'skill1'
+        with self.swap(
+            opportunity_services,
+            'get_entity_by_type_and_id',
+            lambda *args, **kwargs: object(),
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected entity to be a translatable object',
             ):
                 suggestion.pre_accept_validate()
 
