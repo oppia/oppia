@@ -212,6 +212,10 @@ describe('Logged-out User', function () {
       'accept',
       'Suggestion accepted.'
     );
+    await translationReviewer.startTranslationReview(
+      HINDI_OBJECTIVE,
+      `${TOPIC_NAME} / ${CHAPTER_NAME}`
+    );
     await translationReviewer.submitTranslationReviewAndExpectToast(
       'accept',
       'Suggestion accepted.'

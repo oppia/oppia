@@ -317,6 +317,11 @@ describe('Translation Submitter', function () {
   });
 
   it('should list the submitted metadata and skill translations', async function () {
+    // The contributions list is filtered by the Content Type selector, which
+    // the previous test left on "Skills". The selector is only shown on the
+    // "Translate Text" tab, so it is reset here before switching across,
+    // otherwise this test would only ever see one of the two contributions.
+    await translationSubmitter.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );

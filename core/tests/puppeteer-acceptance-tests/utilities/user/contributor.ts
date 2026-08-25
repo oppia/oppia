@@ -766,7 +766,29 @@ export class Contributor extends ExplorationEditor {
     if (dropdownIsOpen) {
       return;
     }
-    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+    await this.clickContentTypeFilterToggle();
+  }
+
+  /**
+   * Clicks the control that opens and closes the "Content Type" dropdown.
+   */
+  private async clickContentTypeFilterToggle(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+      return;
+    }
+
+    // At mobile width the filter row sits under the sticky navigation bar.
+    // Puppeteer scrolls a target back to the centre of the viewport before it
+    // dispatches a mouse event, which parks the control under that bar and
+    // delivers the click to the bar instead, so the click is dispatched on the
+    // control itself where it cannot be intercepted.
+    const toggle = await this.page.waitForSelector(selectedEntityTypeSelector);
+    if (!toggle) {
+      throw new Error('The content type filter was not found.');
+    }
+    await this.waitForElementToStabilize(toggle);
+    await toggle.evaluate(el => (el as HTMLElement).click());
   }
 
   /**
@@ -799,7 +821,7 @@ export class Contributor extends ExplorationEditor {
         );
       }
     }
-    await this.clickOnElementWithSelector(selectedEntityTypeSelector);
+    await this.clickContentTypeFilterToggle();
     await this.expectElementToBeVisible(entityTypeOptionSelector, false);
     showMessage(
       `Success: The content type filter offers exactly ${expectedOptions}.`

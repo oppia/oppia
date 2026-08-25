@@ -70,9 +70,8 @@ const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न के लिए �
 // each individual suggestion inside does.
 const OPPORTUNITY_ACTION_BUTTON_LABEL = 'Translations';
 
-// Accept and reject name the next suggestion while more remain, and drop that
-// mention on the last one.
-const ACCEPT_AND_REVIEW_NEXT_LABEL = 'Accept and review next';
+// Each suggestion on the review tab opens in its own modal, so accept and
+// reject never name a next suggestion here.
 const ACCEPT_LABEL = 'Accept';
 const REJECT_LABEL = 'Reject';
 
@@ -235,19 +234,23 @@ describe('Translation Reviewer', function () {
       SKILL_NAME
     );
 
-    // Two suggestions are pending for the skill, so the first review names the
-    // next one.
+    // Each suggestion is listed as its own row and opens in its own modal, so
+    // the review modal holds a single suggestion and the button reads "Accept"
+    // rather than naming a next one.
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
-      ACCEPT_AND_REVIEW_NEXT_LABEL
+      ACCEPT_LABEL
     );
     await translationReviewer.submitTranslationReviewAndExpectToast(
       'accept',
       'Suggestion accepted.'
     );
 
-    // The explanation is the last pending suggestion, so both buttons drop the
-    // mention of a next one.
+    // Open the second suggestion to test rejecting it.
+    await translationReviewer.startTranslationReview(
+      HINDI_SKILL_EXPLANATION,
+      SKILL_NAME
+    );
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
       ACCEPT_LABEL
