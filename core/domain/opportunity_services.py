@@ -48,10 +48,12 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models, user_models
+    from mypy_imports import opportunity_models, translation_models, user_models
 
-opportunity_models, user_models = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.USER]
+opportunity_models, translation_models, user_models = (
+    models.Registry.import_models(
+        [models.Names.OPPORTUNITY, models.Names.TRANSLATION, models.Names.USER]
+    )
 )
 
 # NOTE TO DEVELOPERS: The functions:
@@ -609,6 +611,11 @@ def _build_opportunity_for_non_exploration_entity(
         content_count=content_count,
         incomplete_translation_language_codes=incomplete_langs,
         translation_counts=translation_counts,
+        translation_missing_reasons=(
+            translation_services.get_translation_missing_reasons(entity)
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION
+            else {}
+        ),
         entity_type=entity_type,
     )
 
@@ -1671,6 +1678,7 @@ def _get_translation_opportunity_cards_from_models(
             content_count=model.content_count,
             incomplete_translation_language_codes=model.incomplete_translation_language_codes,
             translation_counts=model.translation_counts,
+            translation_missing_reasons=model.translation_missing_reasons,
             entity_type=model_entity_type,
             topic_name=topic_name_val,
             entity_description=entity_description,

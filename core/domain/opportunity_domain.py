@@ -108,12 +108,15 @@ class ExplorationOpportunitySummary:
             chapter_title: str. The title of the story chapter.
             content_count: int. The total number of content available in the
                 exploration.
-            incomplete_translation_language_codes: list(str). A list of language
-                code in which the exploration translation is incomplete.
-            translation_counts: dict. A dict with language code as a key and
-                number of translation available in that language as the value.
-            language_codes_needing_voice_artists: list(str). A list of language
-                code in which the exploration needs voice artist.
+            incomplete_translation_language_codes: list(str). The language codes
+                in which the translations are incomplete.
+            translation_counts: dict(str, int). A dictionary containing the
+                total number of translations available in a language.
+            translation_missing_reasons: dict(str, list(str)). A dict containing the
+                reasons for missing translations for a language.
+            language_codes_needing_voice_artists: list(str). The language codes
+                in which the voiceovers are incomplete and no voice artist is
+                assigned.
             language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
@@ -478,11 +481,13 @@ class TranslationOpportunity:
             entity_id: str. The ID of the related entity.
             content_count: int. The total number of contents available in the
                 entity.
-            incomplete_translation_language_codes: list(str). A list of
-                language codes in which the entity translation is incomplete.
-            translation_counts: dict. A dict mapping language codes to the
-                number of completed translations.
-            entity_type: str. The type of the entity. One of: "exploration",
+            incomplete_translation_language_codes: list(str). The language codes
+                in which the translations are incomplete.
+            translation_counts: dict(str, int). A dictionary containing the
+                total number of translations available in a language.
+            translation_missing_reasons: dict(str, list(str)). A dict containing the
+                reasons for missing translations for a language.
+            entity_type: str. The type of entity (e.g. exploration),
                 "skill", "topic", "story", "classroom".
         """
         self.topic_ids = topic_ids

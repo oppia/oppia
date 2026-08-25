@@ -21,7 +21,6 @@ from __future__ import annotations
 import apache_beam as beam
 from core import feconf
 from core.domain import exp_domain, exp_fetchers
-from core.domain import translation_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -100,12 +99,14 @@ class BackfillTranslationMissingReasonsJob(base_jobs.JobBase):
             if t.entity_version == exp.version
         ]
 
+        # Here we use cast because we are narrowing down the type of trans_opp_models.
         trans_opp_models = list(
             cast(
                 Iterable[opportunity_models.TranslationOpportunityModel],
                 grouped_data['trans_opp_models'],
             )
         )
+        # Here we use cast because we are narrowing down the type of exp_opp_summary_models.
         exp_opp_summary_models = list(
             cast(
                 Iterable[opportunity_models.ExplorationOpportunitySummaryModel],

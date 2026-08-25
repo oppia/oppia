@@ -698,6 +698,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 language_codes_needing_voice_artists=['en'],
                 language_codes_with_assigned_voice_artists=[],
                 translation_in_review_counts={},
+                translation_missing_reasons={},
             ),
             '1': None,
             '2': opportunity_domain.ExplorationOpportunitySummary(
@@ -713,6 +714,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 language_codes_needing_voice_artists=['en'],
                 language_codes_with_assigned_voice_artists=[],
                 translation_in_review_counts={},
+                translation_missing_reasons={},
             ),
         }
 
@@ -815,6 +817,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             language_codes_needing_voice_artists=['en'],
             language_codes_with_assigned_voice_artists=[],
             translation_in_review_counts={},
+            translation_missing_reasons={},
             is_pinned=True,
         )
 

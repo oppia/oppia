@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -507,6 +507,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 incomplete translation.
             translation_counts: dict(str, int). Map of language codes to
                 completed translation counts.
+            translation_missing_reasons: dict(str, list(str)). Map of language codes to
+                missing reasons for translation.
 
         Returns:
             TranslationOpportunityModel. A newly created model instance.

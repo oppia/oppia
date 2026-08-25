@@ -165,6 +165,24 @@
   color: red;
 }
 
+.oppia-update-needed-badge {
+  background-color: #f39c12;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.85em;
+  margin-left: 10px;
+  padding: 2px 6px;
+}
+
+.oppia-new-translation-badge {
+  background-color: #2ecc71;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.85em;
+  margin-left: 10px;
+  padding: 2px 6px;
+}
+
 @media screen and (max-width: 700px) {
   .oppia-container-expanded {
     height: fit-content;
