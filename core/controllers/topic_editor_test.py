@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import os
 
 from core import feature_flag_list, feconf, utils
@@ -262,6 +261,14 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         ]
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_4'
+        story.story_contents.add_arc(
+            story_domain.Arc(
+                'arc_1',
+                'Adventure 1',
+                'First adventure',
+                ['node_1', 'node_2', 'node_3'],
+            )
+        )
 
         self.assertEqual(response['canonical_story_summary_dicts'], [])
         self.assertEqual(response['additional_story_summary_dicts'], [])
@@ -314,8 +321,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             ],
             thumbnail_filename='img.svg',
             url_fragment='url',
-            story_model_created_on=datetime.datetime.today(),
-            story_model_last_updated=datetime.datetime.today(),
+            story_model_created_on=utils.get_current_local_datetime(),
+            story_model_last_updated=utils.get_current_local_datetime(),
         )
         story_services.save_story_summary(story_summary)
 
@@ -365,6 +372,17 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             )
             self.assertEqual(
                 canonical_story_summary_dict['overdue_chapters_count'], 1
+            )
+            self.assertEqual(
+                canonical_story_summary_dict['arcs'],
+                [
+                    {
+                        'id': 'arc_1',
+                        'title': 'Adventure 1',
+                        'description': 'First adventure',
+                        'node_ids': ['node_1', 'node_2', 'node_3'],
+                    }
+                ],
             )
 
             self.assertEqual(

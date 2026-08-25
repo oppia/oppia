@@ -29,10 +29,12 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AppConstants} from 'app.constants';
 import {ExplorationTitleService} from '../services/exploration-title.service';
+import './exploration-title-editor.component.css';
 
 @Component({
   selector: 'oppia-exploration-title-editor',
   templateUrl: './exploration-title-editor.component.html',
+  styleUrls: ['./exploration-title-editor.component.css'],
 })
 export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

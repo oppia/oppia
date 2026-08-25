@@ -798,16 +798,32 @@ export class BaseUser {
   }
 
   /**
-   * Returns text in nested element
-   * @param {string} selector - The selector of the element to get text from.
+   * Gets the trimmed text content of an element.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
    */
-  async getTextContent(selector: string): Promise<string> {
-    const element = await this.page.$(selector);
-    const text = await this.page.evaluate(
-      (el: Element) => el.textContent,
-      element as ElementHandle<Element>
-    );
-    return text?.trim() ?? '';
+  async getTextContent(
+    selector: string | ElementHandle<Element>
+  ): Promise<string> {
+    if (typeof selector === 'string') {
+      const element = await this.page.$(selector);
+      if (!element) {
+        throw new Error(`Element not found for selector: ${selector}`);
+      }
+      const text = await this.page.evaluate(el => el.textContent, element);
+      return text?.trim() ?? '';
+    }
+    const text = await selector.evaluate(el => el.textContent);
+    return (text ?? '').trim();
+  }
+
+  /**
+   * Checks if the application is in production mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**

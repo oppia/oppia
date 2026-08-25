@@ -29,7 +29,10 @@ import {
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {ExplorationRatings} from '../../../../domain/summary/learner-exploration-summary.model';
+import {
+  ExplorationRatings,
+  TranslatableExplorationMetadataField,
+} from '../../../../domain/summary/learner-exploration-summary.model';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {UserService} from '../../../../services/user.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
@@ -50,7 +53,7 @@ import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -165,7 +168,7 @@ describe('Lesson Information card modal component', () => {
       declarations: [
         LessonInformationCardModalComponent,
         MockTranslatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockLimitToPipe,
       ],
@@ -298,6 +301,15 @@ describe('Lesson Information card modal component', () => {
     let hackyExpDescTranslationIsDisplayed =
       componentInstance.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
+  });
+
+  it('should not display hacky translation when metadata field is translated by backend', () => {
+    componentInstance.expInfo.translated_metadata_fields = [
+      TranslatableExplorationMetadataField.TITLE,
+      TranslatableExplorationMetadataField.OBJECTIVE,
+    ];
+    expect(componentInstance.isHackyExpTitleTranslationDisplayed()).toBe(false);
+    expect(componentInstance.isHackyExpDescTranslationDisplayed()).toBe(false);
   });
 
   it("should determine if exploration isn't private upon initialization", () => {

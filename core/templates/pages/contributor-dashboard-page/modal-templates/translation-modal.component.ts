@@ -57,8 +57,19 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './translation-modal.component.css';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
+const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
+const EXPLORATION_TITLE_CHAR_LIMIT = 36;
+const CONTENT_TYPE_METADATA = 'metadata';
+const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
+const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
+const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
+const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill_description';
+const CONTENT_TYPE_SKILL_EXPLANATION = 'skill_explanation';
+const CONTENT_TYPE_MISCONCEPTION_FEEDBACK = 'misconception_feedback';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -83,6 +94,7 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
   reviewerOnlyContentCount: number;
+  entityType: string;
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -106,6 +118,7 @@ export interface ImageDetails {
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html',
+  styleUrls: ['./translation-modal.component.css'],
 })
 export class TranslationModalComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -147,6 +160,8 @@ export class TranslationModalComponent {
   hasImgCopyError: boolean = false;
   hasImgTextError: boolean = false;
   hasIncompleteTranslationError: boolean = false;
+  hasLengthValidationError: boolean = false;
+  lengthValidationErrorMessage: string = '';
   editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
@@ -224,7 +239,7 @@ export class TranslationModalComponent {
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
       this.pageContextService.setCustomEntityContext(
-        AppConstants.ENTITY_TYPE.EXPLORATION,
+        this.opportunity.entityType,
         this.opportunity.id
       );
 
@@ -239,7 +254,8 @@ export class TranslationModalComponent {
           this.hasDataFormatListContent =
             this.opportunity.reviewerOnlyContentCount > 0;
           this.loadingData = false;
-        }
+        },
+        this.opportunity.entityType
       );
     } else {
       // Initialize the translation modal with the "modify translation" opportunity
@@ -250,7 +266,8 @@ export class TranslationModalComponent {
         this.modifyTranslationOpportunity.contentId.split('_')[0];
       this.activeContentType = this.getFormattedContentType(
         contentType,
-        this.modifyTranslationOpportunity.interactionId
+        this.modifyTranslationOpportunity.interactionId,
+        this.modifyTranslationOpportunity.contentId
       );
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
@@ -408,7 +425,8 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId
+      interactionId,
+      this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
@@ -508,10 +526,25 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null
+    interactionId?: string | null,
+    contentId?: string | null
   ): string {
     if (!contentType) {
       return '';
+    }
+    if (contentType === CONTENT_TYPE_METADATA && contentId) {
+      if (contentId === EXPLORATION_TITLE_CONTENT_ID) {
+        return 'title';
+      }
+      if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
+        return 'objective';
+      }
+      if (contentId === EXPLORATION_CATEGORY_CONTENT_ID) {
+        return 'category';
+      }
+      if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
+        return 'tag';
+      }
     }
     switch (contentType) {
       case 'interaction':
@@ -522,6 +555,15 @@ export class TranslationModalComponent {
         return 'label';
       case 'rule':
         return 'input rule';
+      // A skill's content types are named after the field they come from, so
+      // they are spelled out here rather than shown to the contributor as
+      // their raw identifiers.
+      case CONTENT_TYPE_SKILL_DESCRIPTION:
+        return 'skill description';
+      case CONTENT_TYPE_SKILL_EXPLANATION:
+        return 'skill explanation';
+      case CONTENT_TYPE_MISCONCEPTION_FEEDBACK:
+        return 'misconception feedback';
     }
     return contentType;
   }
@@ -563,7 +605,11 @@ export class TranslationModalComponent {
   }
 
   hasSubmitValidationErrors(): boolean {
-    return this.hasImgTextError || this.hasIncompleteTranslationError;
+    return (
+      this.hasImgTextError ||
+      this.hasIncompleteTranslationError ||
+      this.hasLengthValidationError
+    );
   }
 
   suggestTranslatedText(): void {
@@ -626,6 +672,7 @@ export class TranslationModalComponent {
     ) {
       this.hasImgTextError = false;
       this.hasIncompleteTranslationError = false;
+      this.hasLengthValidationError = false;
       return;
     }
 
@@ -640,6 +687,18 @@ export class TranslationModalComponent {
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError =
       translationError.hasUntranslatedElements;
+
+    this.hasLengthValidationError = false;
+    this.lengthValidationErrorMessage = '';
+    const activeContentId = this.translateTextService.activeContentId;
+    if (activeContentId === EXPLORATION_TITLE_CONTENT_ID) {
+      if (this.activeWrittenTranslation.length > EXPLORATION_TITLE_CHAR_LIMIT) {
+        this.hasLengthValidationError = true;
+        this.lengthValidationErrorMessage =
+          'Translation exceeds the allowed character limit. The translation ' +
+          `for the above content must be ${EXPLORATION_TITLE_CHAR_LIMIT} characters or fewer.`;
+      }
+    }
   }
 
   private closeWithoutUnsavedCheck(): void {

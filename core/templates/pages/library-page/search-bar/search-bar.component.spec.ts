@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Search bar.
  */
 
-import {EventEmitter, Pipe} from '@angular/core';
+import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -35,7 +35,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {Subject} from 'rxjs/internal/Subject';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -114,7 +114,7 @@ describe('Search bar component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [SearchBarComponent, MockTranslatePipe, MockTrunctePipe],
+      declarations: [SearchBarComponent, MockTranslatePipe, MockTruncatePipe],
       providers: [
         {
           provide: WindowRef,
@@ -527,5 +527,23 @@ describe('Search bar component', () => {
     // need to test validations.
     // @ts-ignore
     component.openSubmenu(null, null);
+  });
+
+  it('should re-execute search on language change when on search find page', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    windowRef.nativeWindow.location.pathname = '/search/find';
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should not re-execute search on language change when not on search find page', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    windowRef.nativeWindow.location.pathname = '/community-library';
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
   });
 });

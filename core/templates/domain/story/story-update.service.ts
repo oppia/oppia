@@ -470,6 +470,15 @@ export class StoryUpdateService {
         this._storyEditorStateService.setExpIdsChanged();
       }
     );
+
+    if (this._platformFeatureService.status.StoryEditorArcs?.isEnabled) {
+      const arcs = story.getStoryContents().getArcs();
+      if (arcs.length === 0) {
+        this.createArc(story, 'arc_default', 'All Chapters', '', [nextNodeId]);
+      } else {
+        this.moveNodeToArc(story, nextNodeId, arcs[arcs.length - 1].getId());
+      }
+    }
   }
 
   /**

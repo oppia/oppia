@@ -356,15 +356,6 @@ describe('Translation status service', () => {
     tss.refresh();
   });
 
-  it('should initialize service properly', () => {
-    tss.ngOnInit();
-
-    expect(tss.explorationVoiceoverContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentRequiredCount).toEqual(0);
-    expect(tss.explorationVoiceoverContentRequiredCount).toEqual(0);
-  });
-
   it(
     'should return a correct list of state names for which audio needs ' +
       'update',
@@ -433,13 +424,13 @@ describe('Translation status service', () => {
       ttams.activateVoiceoverMode();
       var explorationAudioRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(8);
+      expect(explorationAudioRequiredCount).toBe(5);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       var explorationTranslationsRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationTranslationsRequiredCount).toBe(8);
+      expect(explorationTranslationsRequiredCount).toBe(5);
 
       // To test changes after adding a new state.
       ess.addState('Fourth', () => {});
@@ -451,14 +442,14 @@ describe('Translation status service', () => {
       tls.setActiveLanguageCode('en');
       var explorationAudioRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(9);
+      expect(explorationAudioRequiredCount).toBe(5);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
       var explorationTranslationsRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationTranslationsRequiredCount).toBe(9);
+      expect(explorationTranslationsRequiredCount).toBe(5);
     }
   );
 
@@ -502,12 +493,12 @@ describe('Translation status service', () => {
 
     ttams.activateVoiceoverMode();
 
-    expect(tss.getExplorationContentRequiredCount()).toBe(8);
+    expect(tss.getExplorationContentRequiredCount()).toBe(5);
 
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
 
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(7);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(4);
     let color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.NO_ASSETS_AVAILABLE_COLOR).toEqual(color);
 
@@ -518,7 +509,7 @@ describe('Translation status service', () => {
     } as FeatureStatusChecker);
 
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(3);
     color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.ALL_ASSETS_AVAILABLE_COLOR).toEqual(color);
 
@@ -527,7 +518,7 @@ describe('Translation status service', () => {
 
     entityVoiceoversService.setActiveLanguageAccentCode('en-IN');
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(8);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(5);
   });
 
   it('should return a correct count of audio not available in an exploration', () => {
@@ -543,7 +534,7 @@ describe('Translation status service', () => {
 
     explorationAudioNotAvailableCount =
       tss.getExplorationContentNotAvailableCount();
-    expect(explorationAudioNotAvailableCount).toBe(1);
+    expect(explorationAudioNotAvailableCount).toBe(0);
   });
 
   it(
@@ -555,7 +546,7 @@ describe('Translation status service', () => {
       tss.refresh();
       var explorationTranslationNotAvailableCount =
         tss.getExplorationContentNotAvailableCount();
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(4);
 
       ess.addState('Fourth', () => {});
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
@@ -565,7 +556,7 @@ describe('Translation status service', () => {
       tss.refresh();
       explorationTranslationNotAvailableCount =
         tss.getExplorationContentNotAvailableCount();
-      expect(explorationTranslationNotAvailableCount).toBe(8);
+      expect(explorationTranslationNotAvailableCount).toBe(4);
     }
   );
 
@@ -838,5 +829,50 @@ describe('Translation status service', () => {
     expect(tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()).toBe(
       true
     );
+  });
+});
+
+describe('Translation status service - initialization', () => {
+  let tss: TranslationStatusService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TranslationStatusService,
+        TranslationLanguageService,
+        TranslationTabActiveModeService,
+        ExplorationStatesService,
+        GenerateContentIdService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            },
+          },
+        },
+      ],
+    });
+
+    tss = TestBed.inject(TranslationStatusService);
+  });
+
+  it('should initialize properties correctly on construction', () => {
+    expect(tss.stateNeedsUpdateWarnings).toEqual({});
+    expect(tss.stateWiseStatusColor).toEqual({});
+    expect(tss.explorationTranslationContentRequiredCount).toBe(0);
+    expect(tss.explorationVoiceoverContentRequiredCount).toBe(0);
+    expect(tss.explorationTranslationContentNotAvailableCount).toBe(0);
+    expect(tss.explorationVoiceoverContentNotAvailableCount).toBe(0);
   });
 });

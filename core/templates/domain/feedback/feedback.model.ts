@@ -43,6 +43,37 @@ export interface LessonFeedbackBackendDict {
   lesson_metadata: LessonFeedbackMetadataBackendDict;
 }
 
+export interface LessonFeedbackSummary {
+  id: string;
+  feedback_text_preview: string;
+  status: FeedbackStatus;
+  source: string;
+  unread_response_count: number;
+}
+
+export interface LessonFeedbackBackendResponse {
+  summaries: LessonFeedbackSummary[];
+  next_cursor: string | null;
+  more: boolean;
+}
+
+export interface LessonFeedbackResponse {
+  response_text: string;
+  responded_by: string;
+  responded_on: number;
+}
+
+export interface LessonFeedbackDetailResponse {
+  id: string;
+  feedback_text: string;
+  status: FeedbackStatus;
+  lesson_metadata: LessonFeedbackMetadataBackendDict;
+  parent_feedback_id: string | null;
+  response_list: LessonFeedbackResponse[];
+  unread_response_count: number;
+  created_on_msecs: number;
+}
+
 export class LessonFeedbackModel {
   constructor(
     public readonly feedbackText: string,
@@ -82,11 +113,16 @@ export enum ReportType {
   APP = 'app',
 }
 
-export type DashboardType = 'creator' | 'technical';
+export type DashboardType = 'curriculum' | 'technical';
 
 export enum TechnicalTeamType {
   TECH_EXTERNAL = 'tech-external',
   TECH_INTERNAL = 'tech-internal',
+}
+
+export enum CreatorFeedbackType {
+  FEEDBACK = 'feedback',
+  REPORT = 'report',
 }
 
 export interface PlatformFeedbackBackendDict {
@@ -252,6 +288,7 @@ export interface FeedbackFilterState {
   searchText: string | null;
   status: FeedbackStatus | null;
   technicalTeam: TechnicalTeamType;
+  creatorFeedbackType: CreatorFeedbackType;
   dateRange: {
     start: Date | null;
     end: Date | null;
@@ -261,8 +298,10 @@ export interface FeedbackFilterState {
 /** Configuration passed to FeedbackFilterBar to hide/show filters. */
 export interface FeedbackFilterConfig {
   showTeamFilter: boolean;
+  showCreatorFeedbackTypeFilter: boolean;
   showDateRangeFilter: boolean;
   showSearchBar: boolean;
+  statusOptions: FeedbackStatus[];
 }
 
 /** Configuration passed to FeedbackCard to control visibility. */
@@ -276,8 +315,15 @@ export interface FeedbackCardConfig {
 
 export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
   showTeamFilter: true,
+  showCreatorFeedbackTypeFilter: false,
   showDateRangeFilter: true,
   showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.OPEN,
+    FeedbackStatus.FIXED,
+    FeedbackStatus.NOT_ACTIONABLE,
+    FeedbackStatus.TRANSFERRED_TO_GITHUB,
+  ],
 };
 
 export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
@@ -286,6 +332,19 @@ export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
   showLessonMetadata: true,
   showScreenshot: true,
   showSessionInfo: true,
+};
+
+export const CREATOR_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: false,
+  showCreatorFeedbackTypeFilter: true,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.OPEN,
+    FeedbackStatus.FIXED,
+    FeedbackStatus.COMPLIMENT,
+    FeedbackStatus.NOT_ACTIONABLE,
+  ],
 };
 
 // Human readable labels for enums.
@@ -301,6 +360,12 @@ export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {
   [TechnicalTeamType.TECH_EXTERNAL]: 'LEAP',
   [TechnicalTeamType.TECH_INTERNAL]: 'CORE',
 };
+
+export const CREATOR_FEEDBACK_TYPE_LABELS: Record<CreatorFeedbackType, string> =
+  {
+    [CreatorFeedbackType.REPORT]: 'Report',
+    [CreatorFeedbackType.FEEDBACK]: 'Feedback',
+  };
 
 export const CATEGORY_LABELS: Record<string, string> = {
   [ReportAnIssueCategory.TYPO]: 'Typo',
