@@ -126,6 +126,10 @@ describe('Translation Modal Component', () => {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
     gtag: jasmine.Spy;
+    location: {
+      pathname: string;
+      href: string;
+    };
   };
 
   const opportunity: TranslationOpportunity = {
@@ -157,6 +161,10 @@ describe('Translation Modal Component', () => {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
       gtag: jasmine.createSpy('gtag'),
+      location: {
+        pathname: '/signup',
+        href: '',
+      },
     };
 
     TestBed.configureTestingModule({

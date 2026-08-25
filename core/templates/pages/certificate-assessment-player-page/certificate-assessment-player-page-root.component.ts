@@ -60,6 +60,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   certificateOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   classroomUrlFragment = '';
+  showAssessmentUnavailableModal = false;
   isLoading = true;
   hasError = false;
   isSubmissionInProgress = false;
@@ -105,10 +106,10 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
-    if (currentRoute === 'session') {
+    await this.loadCertificateOffering();
+    if (currentRoute === 'session' && !this.hasError) {
       await this.startAssessment();
     }
-    await this.loadCertificateOffering();
   }
 
   private async loadCertificateOffering(): Promise<void> {
@@ -171,13 +172,39 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       this.certificateAssessmentPlayerStateService.beginNewAttempt(attempt);
-    } catch {
-      this.alertsService.addWarning(
-        this.translateService.instant(
-          'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-        )
-      );
+    } catch (error) {
+      // The backend returns a structured error for cooldowns (with an I18N
+      // key and remaining_minutes) and a generic error otherwise; both are
+      // translated client-side so the user sees a localized string.
+      const errorBody = (
+        typeof error === 'object' && error !== null ? error : {}
+      ) as {error_type?: string; remaining_minutes?: number};
+      if (errorBody.error_type === 'cooldown') {
+        this.alertsService.addWarning(
+          this.translateService.instant(
+            'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+            {remainingMinutes: errorBody.remaining_minutes}
+          )
+        );
+      } else {
+        this.alertsService.addWarning(
+          this.translateService.instant(
+            'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+          )
+        );
+        this.showAssessmentUnavailableModal = true;
+      }
     }
+  }
+
+  onGoToAvailableCertificates(): void {
+    this.showAssessmentUnavailableModal = false;
+    this.router.navigate([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        this.classroomUrlFragment
+      )}`,
+    ]);
   }
 
   /**
