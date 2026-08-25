@@ -3984,6 +3984,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             1,
             allowed_language_codes,
             {},
+            {},
             [],
             [],
             {},
@@ -4065,6 +4066,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             'Node',
             1,
             allowed_language_codes,
+            {},
             {},
             [],
             [],
@@ -4536,6 +4538,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         response = self.get_json(

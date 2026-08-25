@@ -372,6 +372,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['fr', 'de'],
             translation_counts={'fr': 5, 'de': 3},
+            translation_missing_reasons={},
         )
         model.put()
 
@@ -472,6 +473,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='exploration',
@@ -480,6 +482,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='skill',
@@ -488,6 +491,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
 
         # Test filter by entity_type, topic_id and language_code.
@@ -548,6 +552,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
                 content_count=10,
                 incomplete_translation_language_codes=['hi'],
                 translation_counts={'hi': 5},
+                translation_missing_reasons={},
             ).put()
 
         results, cursor, more = (
@@ -583,6 +588,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='exploration',
@@ -591,6 +597,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
 
         results = (
@@ -613,6 +620,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='exploration',
@@ -621,6 +629,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={},
         ).put()
 
         results = opportunity_models.TranslationOpportunityModel.get_by_topic(

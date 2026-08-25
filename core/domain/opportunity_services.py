@@ -44,7 +44,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -510,7 +510,8 @@ def compute_translation_opportunity_models_with_updated_entity(
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         translation_opportunity.translation_missing_reasons = (
             translation_services.get_translation_missing_reasons(
-                entity, new_translation_models=new_translation_models
+                cast(exp_domain.Exploration, entity),
+                new_translation_models=new_translation_models,
             )
         )
 
@@ -612,7 +613,9 @@ def _build_opportunity_for_non_exploration_entity(
         incomplete_translation_language_codes=incomplete_langs,
         translation_counts=translation_counts,
         translation_missing_reasons=(
-            translation_services.get_translation_missing_reasons(entity)
+            translation_services.get_translation_missing_reasons(
+                cast(exp_domain.Exploration, entity)
+            )
             if entity_type == feconf.ENTITY_TYPE_EXPLORATION
             else {}
         ),
@@ -1178,7 +1181,9 @@ def update_translation_opportunity_with_accepted_suggestion(
         )
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             translation_opportunity.translation_missing_reasons = (
-                translation_services.get_translation_missing_reasons(entity)
+                translation_services.get_translation_missing_reasons(
+                    cast(exp_domain.Exploration, entity)
+                )
             )
         translation_opportunity.update_translation_count(
             language_code, new_count

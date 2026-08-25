@@ -57,6 +57,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                         'language_codes_needing_voice_artists': ['en'],
                         'language_codes_with_assigned_voice_artists': ['hi'],
                         'translation_in_review_counts': {},
+                        'translation_missing_reasons': {},
                         'reviewer_only_content_count': 0,
                         'is_pinned': False,
                     }
@@ -83,8 +84,9 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'incomplete_translation_language_codes': ['hi-en', 'hi'],
             'translation_counts': {},
             'language_codes_needing_voice_artists': ['en'],
-            'language_codes_with_assigned_voice_artists': [],
+            'language_codes_with_assigned_voice_artists': ['hi'],
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -439,6 +441,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             'content_count': 5,
             'incomplete_translation_language_codes': ['en', 'hi'],
             'translation_counts': {'en': 2, 'hi': 1},
+            'translation_missing_reasons': {},
             'entity_type': 'exploration',
         }
 
@@ -601,6 +604,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
                 content_count=5,
                 incomplete_translation_language_codes=['en'],
                 translation_counts={'en': 3},
+                translation_missing_reasons={},
                 entity_type='exploration',
                 topic_name='Fractions',
                 entity_description='Introduction to Fractions',
@@ -616,6 +620,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             content_count=5,
             incomplete_translation_language_codes=['en'],
             translation_counts={'en': 3},
+            translation_missing_reasons={},
             entity_type='exploration',
             topic_name='Fractions',
             entity_description='Introduction to Fractions',
@@ -635,6 +640,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'is_pinned': True,
             'currently_available_to_learners': True,
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'story_title': None,
             'language_code': None,
             'reviewer_only_content_count': None,

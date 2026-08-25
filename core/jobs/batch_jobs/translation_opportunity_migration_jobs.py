@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, exp_fetchers
+from core.domain import exp_domain, exp_fetchers, translation_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -116,10 +116,15 @@ class BackfillTranslationMissingReasonsJob(base_jobs.JobBase):
             for translation_model in translations:
                 lang_code = translation_model.language_code
                 reasons = set()
+                entity_translation = (
+                    translation_fetchers.get_entity_translation_from_model(
+                        translation_model
+                    )
+                )
                 for state in exp.states.values():
                     pending_contents = (
                         state.get_all_contents_which_need_translations(
-                            translation_model
+                            entity_translation
                         ).values()
                     )
                     for content in pending_contents:

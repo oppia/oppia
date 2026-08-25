@@ -114,6 +114,28 @@ class PendingTranslationContent:
         self.translatable_content = translatable_content
         self.status = status
 
+    @property
+    def content_value(self) -> feconf.ContentValueType:
+        return self.translatable_content.content_value
+
+    @property
+    def content_id(self) -> str:
+        return self.translatable_content.content_id
+
+    @property
+    def content_type(self) -> ContentType:
+        return self.translatable_content.content_type
+
+    @property
+    def content_format(self) -> TranslatableContentFormat:
+        return self.translatable_content.content_format
+
+    def is_data_format_list(self) -> bool:
+        return self.translatable_content.is_data_format_list()
+
+    def is_reviewer_only(self) -> bool:
+        return self.translatable_content.is_reviewer_only()
+
     def to_dict(self) -> PendingTranslationDict:
         """Returns the dict representation of PendingTranslationContent object.
 

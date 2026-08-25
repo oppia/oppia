@@ -1165,10 +1165,10 @@ class MachineTranslationStateTextsHandler(
             # only handles str.
             # TODO(#16621): Fix get_and_cache_machine_translation to handle
             # translatable content of rule_spec [list(str)].
-            translated_texts[
-                content_id
-            ] = translation_services.get_and_cache_machine_translation(
-                exp.language_code, target_language_code, source_text  # type: ignore[arg-type]
+            translated_texts[content_id] = (
+                translation_services.get_and_cache_machine_translation(
+                    exp.language_code, target_language_code, source_text
+                )
             )
 
         self.values = {'translated_texts': translated_texts}
