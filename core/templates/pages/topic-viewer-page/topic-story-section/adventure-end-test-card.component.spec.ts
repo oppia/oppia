@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for AdventureEndTestCardComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
@@ -105,6 +105,51 @@ describe('AdventureEndTestCardComponent', () => {
 
     expect(urlInterpolationService.getStaticImageUrl).not.toHaveBeenCalled();
     expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
+  });
+
+  it('should fall back and hide the image when thumbnail loading fails', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/fallback-thumbnail.webp'
+    );
+    component.thumbnailUrl = '/assets/broken-thumbnail.png';
+    fixture.detectChanges();
+    const thumbnail = fixture.nativeElement.querySelector(
+      '.adventure-end-test-card-image'
+    );
+
+    thumbnail.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/fallback-thumbnail.webp'
+    );
+    expect(component.isThumbnailVisible).toBeTrue();
+
+    thumbnail.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    expect(component.isThumbnailVisible).toBeFalse();
+    expect(
+      thumbnail.classList.contains('adventure-end-test-card-image-hidden')
+    ).toBeTrue();
+  });
+
+  it('should show a new thumbnail when the input changes', () => {
+    component.thumbnailUrl = '/assets/updated-thumbnail.png';
+    component.isThumbnailVisible = false;
+
+    component.ngOnChanges({
+      thumbnailUrl: new SimpleChange(
+        '/assets/previous-thumbnail.png',
+        component.thumbnailUrl,
+        false
+      ),
+    });
+
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/updated-thumbnail.png'
+    );
+    expect(component.isThumbnailVisible).toBeTrue();
   });
 
   it('should execute navigateTo when url is provided', () => {

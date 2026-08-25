@@ -18,14 +18,11 @@
 
 import {
   Component,
-  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  QueryList,
   SimpleChanges,
-  ViewChildren,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Subscription} from 'rxjs';
@@ -66,6 +63,10 @@ const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';
 const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
 const ARC_ID_QUERY_PARAM = 'arc_id';
 const MOBILE_SCREEN_BREAKPOINT = 480;
+const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
+const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
+const DEFAULT_PRACTICE_ACCENT_COLOR = '#0b776d';
+const COMING_SOON_ACCENT_COLOR = '#6b7280';
 
 interface LessonCardData {
   lessonNumber: number;
@@ -164,6 +165,10 @@ export class TopicStorySectionComponent
   masteryChallengeUrl: string = '#';
   isMasteryUnlocked: boolean = false;
   isPracticeCardVisible: boolean = false;
+  readonly defaultFallbackAccentColor = DEFAULT_FALLBACK_ACCENT_COLOR;
+  readonly defaultPracticeBgColor = DEFAULT_PRACTICE_BG_COLOR;
+  readonly defaultPracticeAccentColor = DEFAULT_PRACTICE_ACCENT_COLOR;
+  readonly comingSoonAccentColor = COMING_SOON_ACCENT_COLOR;
   _expandedAdventureIndices: Set<number> = new Set();
   skippedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
@@ -178,11 +183,6 @@ export class TopicStorySectionComponent
   private hasHandledArcMasteredQueryParams: boolean = false;
   private arcSkipModalRef: NgbModalRef | null = null;
   private adventureMasteredModalRef: NgbModalRef | null = null;
-
-  @ViewChildren('lessonWrapper')
-  lessonWrappers!: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('practiceWrapper')
-  practiceWrappers!: QueryList<ElementRef<HTMLElement>>;
 
   private practiceAvailabilityRequestId: number = 0;
   private directiveSubscriptions: Subscription = new Subscription();
@@ -407,11 +407,19 @@ export class TopicStorySectionComponent
     if (numbers.length === 1) {
       return String(numbers[0]);
     }
+    const andConjunction = this.translateService.instant(
+      'I18N_TOPIC_VIEWER_LIST_AND'
+    );
     if (numbers.length === 2) {
-      return numbers.join(' and ');
+      return numbers.join(andConjunction);
     }
+    const commaAndConjunction = this.translateService.instant(
+      'I18N_TOPIC_VIEWER_LIST_COMMA_AND'
+    );
     return (
-      numbers.slice(0, -1).join(', ') + ', and ' + numbers[numbers.length - 1]
+      numbers.slice(0, -1).join(', ') +
+      commaAndConjunction +
+      numbers[numbers.length - 1]
     );
   }
 
@@ -488,33 +496,12 @@ export class TopicStorySectionComponent
     this.navigatedLessonNumber = lessonNumber;
 
     if (adventureIndex !== -1) {
-      this.markSkippedAdventuresBefore(adventureIndex);
       this._expandedAdventureIndices.add(adventureIndex);
     }
 
     setTimeout(() => {
-      const lessonEl = this.lessonWrappers?.find(ref => {
-        const elId = ref.nativeElement.id;
-        return (
-          elId === 'lesson-' + lessonNumber ||
-          elId === 'coming-soon-lesson-' + lessonNumber
-        );
-      });
-      if (lessonEl) {
-        const navbarHeight = 56;
-        const adventureNav = document.querySelector(
-          '.adventure-navigation-container'
-        );
-        const adventureNavHeight = adventureNav
-          ? adventureNav.getBoundingClientRect().height
-          : 0;
-        const offset = navbarHeight + adventureNavHeight + 16;
-        const top =
-          lessonEl.nativeElement.getBoundingClientRect().top +
-          window.scrollY -
-          offset;
-        window.scrollTo({top, behavior: 'smooth'});
-      }
+      this.scrollToElementById('lesson-' + lessonNumber);
+      this.scrollToElementById('coming-soon-lesson-' + lessonNumber);
     }, 300);
   }
 
@@ -550,12 +537,22 @@ export class TopicStorySectionComponent
     }
   }
 
-  onMasteryChallengeClicked(): void {
+  onNavigationMasteryChallengeClicked(): void {
+    this.openMasteryChallengeModal();
+  }
+
+  onMasteryChallengeCardClicked(): void {
     if (this.isMasteryUnlocked) {
-      this.scrollToMasteryChallenge();
+      if (this.masteryChallengeUrl !== '#') {
+        this.windowRef.nativeWindow.location.assign(this.masteryChallengeUrl);
+      }
       return;
     }
 
+    this.openMasteryChallengeModal();
+  }
+
+  private openMasteryChallengeModal(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
       MasteryChallengeLockedModalComponent,
       {
@@ -642,48 +639,38 @@ export class TopicStorySectionComponent
   }
 
   onNavigationPracticeSelected(arcId: string): void {
-    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const practiceEl = this.practiceWrappers?.find(
-        ref => ref.nativeElement.id === 'practice-card-' + arcId
-      );
-      if (practiceEl) {
-        const navbarHeight = 56;
-        const adventureNav = document.querySelector(
-          '.adventure-navigation-container'
-        );
-        const adventureNavHeight = adventureNav
-          ? adventureNav.getBoundingClientRect().height
-          : 0;
-        const offset = navbarHeight + adventureNavHeight + 16;
-        const top =
-          practiceEl.nativeElement.getBoundingClientRect().top +
-          window.scrollY -
-          offset;
-        window.scrollTo({top, behavior: 'smooth'});
-      }
+      this.scrollToElementById('practice-card-' + arcId);
     }, 300);
   }
 
   private scrollToMasteryChallenge(): void {
     setTimeout(() => {
-      const masteryElement = document.querySelector('.mastery-challenge-card');
-      if (!masteryElement) {
-        return;
+      const el = document.querySelector('.mastery-challenge-card');
+      if (el) {
+        this.scrollToElement(el);
       }
-
-      const navbarHeight = 56;
-      const adventureNav = document.querySelector(
-        '.adventure-navigation-container'
-      );
-      const adventureNavHeight = adventureNav
-        ? adventureNav.getBoundingClientRect().height
-        : 0;
-      const offset = navbarHeight + adventureNavHeight + 16;
-      const top =
-        masteryElement.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({top, behavior: 'smooth'});
     }, 50);
+  }
+
+  private scrollToElementById(id: string): void {
+    const el = document.getElementById(id);
+    if (el) {
+      this.scrollToElement(el);
+    }
+  }
+
+  private scrollToElement(el: Element): void {
+    const navbarHeight = 56;
+    const adventureNav = document.querySelector(
+      '.adventure-navigation-container'
+    );
+    const adventureNavHeight = adventureNav
+      ? adventureNav.getBoundingClientRect().height
+      : 0;
+    const offset = navbarHeight + adventureNavHeight + 16;
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({top, behavior: 'smooth'});
   }
 
   constructor(
@@ -756,7 +743,10 @@ export class TopicStorySectionComponent
       card => card.lessonProgressStatus === 'completed'
     ).length;
     const totalCount = adventureGroup.lessonCards.length;
-    return `${completedCount} of ${totalCount} completed`;
+    return this.translateService.instant(
+      'I18N_TOPIC_VIEWER_ADVENTURE_COMPLETION_TEXT',
+      {completedCount, totalCount}
+    );
   }
 
   isLanguageRTL(): boolean {
@@ -774,10 +764,7 @@ export class TopicStorySectionComponent
     }
 
     const visitedChapterTitles = this.storySummary.getVisitedChapterTitles();
-    if (
-      visitedChapterTitles &&
-      visitedChapterTitles.indexOf(nodeTitle) !== -1
-    ) {
+    if (visitedChapterTitles && visitedChapterTitles.includes(nodeTitle)) {
       return 'in_progress';
     }
 
@@ -951,13 +938,9 @@ export class TopicStorySectionComponent
   private getPracticeCardData(): PracticeCardData {
     const firstArcId =
       this.adventureGroups.length > 0 ? this.adventureGroups[0].arcId : '';
-    const firstAdventureTitle =
-      this.visibleAdventureGroups.length > 0
-        ? this.visibleAdventureGroups[0].adventureTitle
-        : 'Adventure 1';
 
     return {
-      practiceTitle: `${firstAdventureTitle} Review & Test`,
+      practiceTitle: this.getPracticeTitle(0),
       practiceDescription: this.getPracticeDescription(0),
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
@@ -1060,9 +1043,15 @@ export class TopicStorySectionComponent
         ? this.visibleAdventureGroups[adventureIndex].adventureTitle
         : `Adventure ${adventureIndex + 1}`;
     if (adventureIndex < this.visibleAdventureGroups.length - 1) {
-      return `Test what you have learned in ${adventureTitle} to unlock the next adventure.`;
+      return this.translateService.instant(
+        'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT',
+        {adventureTitle}
+      );
     }
-    return `Test what you have learned in ${adventureTitle}.`;
+    return this.translateService.instant(
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
+      {adventureTitle}
+    );
   }
 
   getLessonPracticeUrl(nodeId: string): string {

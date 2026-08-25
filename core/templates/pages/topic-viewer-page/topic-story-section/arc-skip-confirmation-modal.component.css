@@ -1,13 +1,14 @@
 .arc-skip-confirmation-modal {
   background: #fff;
   border-radius: 10px;
+  box-sizing: border-box;
   max-height: calc(100vh - 32px);
   max-width: 560px;
   min-height: 0;
   overflow-y: auto;
   padding: 20px 24px 16px;
   position: relative;
-  width: min(560px, calc(100vw - 32px));
+  width: 100%;
 }
 
 .arc-skip-confirmation-icon-wrap {
@@ -126,7 +127,7 @@
     border-radius: 10px;
     min-height: 0;
     padding: 16px 14px 14px;
-    width: min(560px, calc(100vw - 24px));
+    width: 100%;
   }
 
   .arc-skip-confirmation-icon-wrap {

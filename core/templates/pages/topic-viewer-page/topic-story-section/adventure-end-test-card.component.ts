@@ -16,7 +16,13 @@
  * @fileoverview Adventure end test card component used in the redesigned topic viewer story section.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -29,7 +35,7 @@ const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
   templateUrl: './adventure-end-test-card.component.html',
   styleUrls: ['./adventure-end-test-card.component.css'],
 })
-export class AdventureEndTestCardComponent implements OnInit {
+export class AdventureEndTestCardComponent implements OnInit, OnChanges {
   @Input() practiceTitle: string = '';
   @Input() practiceDescription: string = '';
   @Input() thumbnailUrl: string = '';
@@ -41,6 +47,8 @@ export class AdventureEndTestCardComponent implements OnInit {
   @Input() isPracticeCompleted: boolean = false;
 
   resolvedThumbnailUrl: string = '';
+  isThumbnailVisible: boolean = true;
+  private isUsingFallbackThumbnail: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -48,8 +56,22 @@ export class AdventureEndTestCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.resolvedThumbnailUrl =
-      this.thumbnailUrl || this.getFallbackThumbnailUrl();
+    this.resolveThumbnailUrl();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.thumbnailUrl && !changes.thumbnailUrl.firstChange) {
+      this.resolveThumbnailUrl();
+    }
+  }
+
+  onThumbnailError(): void {
+    if (!this.isUsingFallbackThumbnail) {
+      this.resolvedThumbnailUrl = this.getFallbackThumbnailUrl();
+      this.isUsingFallbackThumbnail = true;
+      return;
+    }
+    this.isThumbnailVisible = false;
   }
 
   navigateTo(url: string): void {
@@ -79,5 +101,12 @@ export class AdventureEndTestCardComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(
       FALLBACK_THUMBNAIL_IMAGE_PATH
     );
+  }
+
+  private resolveThumbnailUrl(): void {
+    this.isThumbnailVisible = true;
+    this.isUsingFallbackThumbnail = !this.thumbnailUrl;
+    this.resolvedThumbnailUrl =
+      this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 }

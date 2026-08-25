@@ -13,12 +13,6 @@
   z-index: 30;
 }
 
-@media (max-width: 800px) {
-  .adventure-navigation-container {
-    top: 56px;
-  }
-}
-
 .adventure-navigation-scroll-area {
   align-items: center;
   display: flex;
@@ -162,6 +156,7 @@
     margin-top: 0;
     padding: 0 14px;
     padding-top: 0;
+    position: static;
   }
 
   .adventure-navigation-wrapper--overflow::before,

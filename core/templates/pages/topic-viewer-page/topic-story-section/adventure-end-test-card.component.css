@@ -22,10 +22,15 @@
 }
 
 .adventure-end-test-card-image {
+  display: block;
   height: 100%;
   object-fit: cover;
   object-position: center;
   width: 100%;
+}
+
+.adventure-end-test-card-image-hidden {
+  visibility: hidden;
 }
 
 .adventure-end-test-card-content {

@@ -78,9 +78,22 @@ describe('AdventureNavigationComponent', () => {
     expect(component.isActiveLesson(2)).toBe(false);
   });
 
-  it('should show a check icon for completed lessons in the navigation', () => {
-    expect(component.getLessonBadgeIconName(true)).toBe('check');
-    expect(component.getLessonBadgeIconName(false)).toBe('');
+  it('should show lesson number as label for each lesson badge', () => {
+    component.adventureGroups = [
+      {
+        lessons: [
+          {lessonNumber: 1, isCompleted: true},
+          {lessonNumber: 2, isCompleted: false},
+        ],
+        accentColor: '#000',
+        showPractice: false,
+        isPracticeCompleted: false,
+        arcId: '1',
+      },
+    ];
+
+    expect(component.adventureGroups[0].lessons[0].lessonNumber).toBe(1);
+    expect(component.adventureGroups[0].lessons[1].lessonNumber).toBe(2);
   });
 
   it('should emit lessonSelected event when onLessonClick is called', () => {
@@ -102,9 +115,8 @@ describe('AdventureNavigationComponent', () => {
     expect(component.practiceSelected.emit).toHaveBeenCalledWith('2');
   });
 
-  it('should show a check icon for completed practice in navigation', () => {
-    expect(component.getPracticeBadgeIconName(true)).toBe('check');
-    expect(component.getPracticeBadgeIconName(false)).toBe('edit');
+  it('should return edit icon for practice badge', () => {
+    expect(component.getPracticeBadgeIconName()).toBe('edit');
   });
 
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {

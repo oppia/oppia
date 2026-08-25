@@ -29,7 +29,7 @@ import './mastery-challenge-card.component.css';
 export class MasteryChallengeCardComponent implements OnDestroy {
   @Input() actionUrl: string = '#';
   @Input() isUnlocked: boolean = false;
-  @Output() masteryClicked = new EventEmitter<void>();
+  @Output() buttonClicked = new EventEmitter<void>();
 
   showLockedTooltip: boolean = false;
   private helperTooltipTimeoutId: number | null = null;
@@ -45,7 +45,11 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   }
 
   onChallengeButtonClick(): void {
-    this.navigateToAction();
+    if (this.isUnlocked && this.hasActionUrl()) {
+      this.navigateToAction();
+      return;
+    }
+    this.buttonClicked.emit();
   }
 
   onButtonMouseEnter(): void {
@@ -70,7 +74,7 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   }
 
   isActionDisabled(): boolean {
-    return this.isUnlocked && !this.hasActionUrl();
+    return !this.isUnlocked || !this.hasActionUrl();
   }
 
   private showHelperTooltip(): void {

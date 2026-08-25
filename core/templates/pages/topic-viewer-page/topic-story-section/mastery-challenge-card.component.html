@@ -14,7 +14,6 @@
     <button class="mastery-challenge-button"
             type="button"
             [class.mastery-challenge-button-locked]="!isUnlocked"
-            [disabled]="isActionDisabled()"
             (click)="onChallengeButtonClick()"
             (mouseenter)="onButtonMouseEnter()"
             (mouseleave)="onButtonMouseLeave()">

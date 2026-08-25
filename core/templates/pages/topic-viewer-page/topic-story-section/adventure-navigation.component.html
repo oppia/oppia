@@ -5,7 +5,7 @@
     <button class="adventure-navigation-arrow adventure-navigation-arrow--left"
             *ngIf="showLeftArrow"
             (click)="scrollLeft()"
-            aria-label="Scroll left"
+            aria-label="{{ 'I18N_TOPIC_VIEWER_SCROLL_LEFT' | translate }}"
             type="button">
       <i class="material-icons">chevron_left</i>
     </button>
@@ -26,8 +26,8 @@
                                       [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onLessonClick(lesson.lessonNumber, adventureIdx)"
-                                      [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
-                                      title="Go to lesson {{ lesson.lessonNumber }}"
+                                       [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
+                                       [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onLessonClick(lesson.lessonNumber, adventureIdx)"
@@ -42,8 +42,8 @@
                                       [textColor]="adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onPracticeClick(adventureGroup.arcId)"
-                                      [attr.aria-label]="'Go to practice'"
-                                      title="Go to practice"
+                                       [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
+                                       [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onPracticeClick(adventureGroup.arcId)"
@@ -73,7 +73,7 @@
     <button class="adventure-navigation-arrow adventure-navigation-arrow--right"
             *ngIf="showRightArrow"
             (click)="scrollRight()"
-            aria-label="Scroll right"
+            aria-label="{{ 'I18N_TOPIC_VIEWER_SCROLL_RIGHT' | translate }}"
             type="button">
       <i class="material-icons">chevron_right</i>
     </button>

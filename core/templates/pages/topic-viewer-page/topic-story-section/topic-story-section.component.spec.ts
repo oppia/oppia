@@ -3459,8 +3459,12 @@ describe('TopicStorySectionComponent', () => {
     const navigationElement = fixture.nativeElement.querySelector(
       'topic-adventure-navigation'
     );
+    const stickyWrapper = fixture.nativeElement.querySelector(
+      '.adventure-navigation-sticky-wrapper'
+    );
     expect(navigationElement).not.toBeNull();
     expect(navigationElement.isInTopicEditorPreview).toBeTruthy();
+    expect(stickyWrapper.style.top).toBe('0px');
   });
 
   it('should not forward the topic editor preview flag by default', () => {
@@ -3470,8 +3474,12 @@ describe('TopicStorySectionComponent', () => {
     const navigationElement = fixture.nativeElement.querySelector(
       'topic-adventure-navigation'
     );
+    const stickyWrapper = fixture.nativeElement.querySelector(
+      '.adventure-navigation-sticky-wrapper'
+    );
     expect(navigationElement).not.toBeNull();
     expect(navigationElement.isInTopicEditorPreview).toBeFalsy();
+    expect(stickyWrapper.style.top).toBe('56px');
   });
 
   it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
@@ -4080,4 +4088,295 @@ describe('TopicStorySectionComponent', () => {
 
     expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
   }));
+
+  describe('onLessonStartClick', () => {
+    it('should set active lesson and navigate to startUrl when lesson is in the current adventure', fakeAsync(() => {
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1', 'node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      component.onLessonStartClick({
+        lessonNumber: 1,
+        startUrl: '/explore/exp_1',
+      });
+
+      expect(component.activeLessonNumber).toBe(1);
+      expect(component.navigatedLessonNumber).toBe(1);
+
+      tick(300);
+    }));
+
+    it('should expand adventure group when lesson belongs to an adventure', fakeAsync(() => {
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+
+      component.storySummary = createStorySummarySpy(
+        ['Node 1'],
+        [storyNodeSpy1],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      expect(component.isAdventureExpanded(0)).toBe(false);
+
+      component.onLessonStartClick({
+        lessonNumber: 1,
+        startUrl: '/explore/exp_1',
+      });
+
+      expect(component.isAdventureExpanded(0)).toBe(true);
+
+      tick(300);
+    }));
+
+    it('should open arc skip confirmation modal when lesson is in a later adventure and earlier ones are incomplete', fakeAsync(() => {
+      windowDimensionsService.getWidth.and.returnValue(1024);
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+          {
+            id: 'arc_2',
+            title: 'Adventure 2',
+            description: 'Second adventure',
+            node_ids: ['node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      component.onLessonStartClick({
+        lessonNumber: 2,
+        startUrl: '/explore/exp_2',
+      });
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should not navigate when startUrl is empty', fakeAsync(() => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+
+      component.storySummary = createStorySummarySpy(
+        ['Node 1'],
+        [storyNodeSpy],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      component.onLessonStartClick({
+        lessonNumber: 1,
+        startUrl: '',
+      });
+
+      expect(component.activeLessonNumber).toBe(1);
+
+      tick(300);
+    }));
+  });
+
+  describe('mastery challenge actions', () => {
+    it('should open the modal from navigation even when mastery is unlocked', () => {
+      component.isMasteryUnlocked = true;
+      const mockModalRef = {
+        result: new Promise<void>((resolve, reject) => {
+          reject('dismiss');
+        }),
+      };
+      ngbModal.open.and.returnValue(mockModalRef as NgbModalRef);
+
+      component.onNavigationMasteryChallengeClicked();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        MasteryChallengeLockedModalComponent,
+        {
+          backdrop: true,
+          windowClass: 'mastery-locked-modal',
+        }
+      );
+    });
+
+    it('should open the modal from the locked mastery card', () => {
+      component.isMasteryUnlocked = false;
+      const mockModalRef = {
+        result: new Promise<void>((resolve, reject) => {
+          reject('dismiss');
+        }),
+      };
+      ngbModal.open.and.returnValue(mockModalRef as NgbModalRef);
+
+      component.onMasteryChallengeCardClicked();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    });
+
+    it('should navigate from the unlocked mastery card', () => {
+      component.isMasteryUnlocked = true;
+      component.masteryChallengeUrl = '/practice/session/mastery-challenge';
+      spyOn(windowRef.nativeWindow.location, 'assign');
+
+      component.onMasteryChallengeCardClicked();
+
+      expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+        '/practice/session/mastery-challenge'
+      );
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    });
+
+    it('should set isMasteryUnlocked to true and scroll when modal resolves', fakeAsync(() => {
+      component.isMasteryUnlocked = false;
+      let resolveModal: () => void;
+      const mockModalRef = {
+        result: new Promise<void>(resolve => {
+          resolveModal = resolve;
+        }),
+      };
+      ngbModal.open.and.returnValue(mockModalRef as NgbModalRef);
+      spyOn(
+        component as unknown as {scrollToMasteryChallenge: jasmine.Spy},
+        'scrollToMasteryChallenge'
+      );
+
+      component.onNavigationMasteryChallengeClicked();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.isMasteryUnlocked).toBe(false);
+
+      resolveModal!();
+      tick();
+
+      expect(component.isMasteryUnlocked).toBe(true);
+      expect(
+        (component as unknown as {scrollToMasteryChallenge: jasmine.Spy})
+          .scrollToMasteryChallenge
+      ).toHaveBeenCalled();
+    }));
+  });
+
+  describe('isMasteryUnlocked on init', () => {
+    it('should set isMasteryUnlocked to true when story is completed on init', () => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+
+      const storySummary = createStorySummarySpy(['Node 1'], [storyNodeSpy]);
+      storySummary.isNodeCompleted.and.returnValue(true);
+      storySummary.getCompletedNodeTitles.and.returnValue(['Node 1']);
+
+      component.storySummary = storySummary;
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      expect(component.isMasteryUnlocked).toBe(true);
+    });
+
+    it('should set isMasteryUnlocked to false when story is not completed on init', () => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+
+      component.storySummary = createStorySummarySpy(
+        ['Node 1'],
+        [storyNodeSpy]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnInit();
+
+      expect(component.isMasteryUnlocked).toBe(false);
+    });
+  });
 });
