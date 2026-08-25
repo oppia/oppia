@@ -68,7 +68,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import List, Optional
+from typing import List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -86,13 +86,19 @@ datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-def establish_firebase_connection() -> None:
+def establish_firebase_connection(oppia_project_id: str | None = None) -> None:
     """Establishes the connection to Firebase needed by the rest of the SDK.
 
     All Firebase operations require an "app", the abstraction used for a
     Firebase server connection. The initialize_app() function raises an error
     when it's called more than once, however, so we make this function
     idempotent by trying to "get" the app first.
+
+    Args:
+        oppia_project_id: str|None. The project ID of the Oppia instance. This
+            is only needed when called from outside of the Google App Engine
+            environment, such as within an Apache Beam job. Otherwise, if None,
+            the value will be inferred from the App Engine environment.
 
     Raises:
         ValueError. The Firebase app has a genuine problem.
@@ -102,9 +108,13 @@ def establish_firebase_connection() -> None:
             firebase_admin.get_app()
         except ValueError as error:
             if 'initialize_app' in str(error):
-                oppia_project_id = app_identity_services.get_application_id()
                 firebase_admin.initialize_app(
-                    options={'projectId': oppia_project_id}
+                    options={
+                        'projectId': (
+                            oppia_project_id
+                            or app_identity_services.get_application_id()
+                        )
+                    }
                 )
             else:
                 raise
@@ -176,14 +186,6 @@ def get_auth_claims_from_request(
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
 
-def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
-    """Returns all accounts registered with Firebase."""
-    return [
-        auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
-        for user in firebase_auth.list_users().iterate_all()
-    ]
-
-
 def mark_user_for_deletion(user_id: str) -> None:
     """Marks the user, and all of their auth associations, as deleted.
 
@@ -209,11 +211,10 @@ def mark_user_for_deletion(user_id: str) -> None:
     assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
         if assoc_by_user_id_model is None
-        else
         # NOTE: We use get_multi(include_deleted=True) because get() returns
         # None for models with deleted=True, but we need to make changes to
         # those models when managing deletion.
-        auth_models.UserIdByFirebaseAuthIdModel.get_multi(
+        else auth_models.UserIdByFirebaseAuthIdModel.get_multi(
             [assoc_by_user_id_model.firebase_auth_id], include_deleted=True
         )[0]
     )
@@ -621,30 +622,57 @@ def _get_auth_claims_from_session_cookie(
             'session invalid: %s' % error
         ) from error
     else:
-        return _create_auth_claims(claims)
+        firebase_claims = _FirebaseAuthClaims(
+            sub=str(claims['sub']),
+            email=str(claims['email']) if 'email' in claims else None,
+            role=str(claims['role']) if 'role' in claims else None,
+        )
+        return _create_auth_claims(firebase_claims)
+
+
+class _FirebaseAuthClaims(TypedDict):
+    """Raw claims from Firebase that Oppia relies on.
+
+    To learn more about what "claims" are, see the "Terminology" section of this
+    module's documentation comments.
+
+    Attributes:
+        sub: str. The user's unique "Firebase Account ID". This is the
+            only claim that is GUARANTEED to exist.
+        email: str|None. The user's primary email address.
+        role: str|None. The user's administrator role. This value can
+            only be assigned to a user by Oppia's SERVER ADMINISTRATORS.
+            Users have ZERO CONTROL over what their assigned role is.
+    """
+
+    sub: str
+    email: str | None
+    role: str | None
 
 
 def _create_auth_claims(
-    firebase_claims: auth_domain.AuthClaimsDict,
+    firebase_claims: _FirebaseAuthClaims,
 ) -> auth_domain.AuthClaims:
-    """Returns a new AuthClaims domain object from Firebase claims.
+    """Returns a new AuthClaims domain object from the Firebase-provided dict.
 
     Args:
-        firebase_claims: dict(str: *). The raw claims returned by the Firebase
-            SDK.
+        firebase_claims: _FirebaseAuthClaims. The claims provided by Firebase.
 
     Returns:
-        AuthClaims. Oppia's representation of auth claims.
+        AuthClaims. Oppia's representation of the Firebase SDK claims.
     """
-    auth_id = firebase_claims['sub']
-    email = firebase_claims.get('email')
+    firebase_account_id = firebase_claims['sub']
+    primary_email = firebase_claims.get('email')
+    assigned_role = firebase_claims.get('role')
     role_is_super_admin = (
-        email
+        primary_email
         == platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
-        or firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN
+        or assigned_role == feconf.FIREBASE_ROLE_SUPER_ADMIN
     )
     return auth_domain.AuthClaims(
-        auth_id, email, role_is_super_admin=role_is_super_admin
+        firebase_account_id,
+        primary_email,
+        role_is_super_admin=role_is_super_admin,
     )

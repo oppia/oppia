@@ -16,8 +16,9 @@
  * @fileoverview Component for Number With Units Help Modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
@@ -25,7 +26,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
   templateUrl: './number-with-units-help-modal.component.html',
 })
 export class HelpModalNumberWithUnitsComponent extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() ngbActiveModal: NgbActiveModal,
+    @Optional()
+    numberWithUnitsHelpBottomSheetRef?: MatBottomSheetRef<HelpModalNumberWithUnitsComponent>
+  ) {
+    super(ngbActiveModal, numberWithUnitsHelpBottomSheetRef);
   }
 }
