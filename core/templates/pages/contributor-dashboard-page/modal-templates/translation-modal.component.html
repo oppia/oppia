@@ -42,7 +42,11 @@
   </div>
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
-      <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
+      <div class="oppia-translatable-text-section-header">
+        <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
+        <span *ngIf="activeTranslationStatus === 'update'" class="oppia-opportunities-label" style="background-color: #f39c12; color: white; margin-left: 10px; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">Update Needed</span>
+        <span *ngIf="activeTranslationStatus === 'new'" class="oppia-opportunities-label" style="background-color: #2ecc71; color: white; margin-left: 10px; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">New Translation</span>
+      </div>
       <a class="oppia-skip-button e2e-test-skip-translation-button" *ngIf="moreAvailable"
          (click)="skipActiveTranslation()">Skip
       </a>

@@ -110,6 +110,28 @@
   </div>
 </ng-template>
 
+<ng-template #TranslationContextBadges>
+  <div class="oppia-opportunities-label-container oppia-animate-fadein"
+       *ngIf="opportunity?.translationMissingReasons && opportunity?.translationMissingReasons.length > 0">
+    <div class="oppia-opportunities-label"
+         [ngStyle]="labelStyle"
+         *ngIf="opportunity.translationMissingReasons.includes('update')">
+      <span class="e2e-test-opportunity-list-item-label"
+            [hidden]="opportunityDataIsLoading">
+          Update Needed
+      </span>
+    </div>
+    <div class="oppia-opportunities-label"
+         [ngStyle]="labelStyle"
+         *ngIf="opportunity.translationMissingReasons.includes('new')">
+      <span class="e2e-test-opportunity-list-item-label"
+            [hidden]="opportunityDataIsLoading">
+          New Translation
+      </span>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #OpportunitiesButton>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <div class="oppia-opportunities-button-wrapper"
@@ -149,6 +171,7 @@
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationContextBadges"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -169,6 +192,7 @@
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationContextBadges"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -181,4 +205,5 @@
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationContextBadges"></ng-template>
 </button>

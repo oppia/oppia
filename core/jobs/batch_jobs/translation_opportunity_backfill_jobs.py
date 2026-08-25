@@ -110,6 +110,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             )
 
             translation_counts = {}
+            translation_missing_reasons = {}
             for translation_model in translations:
                 lang_code = translation_model.language_code
                 count = 0
@@ -119,6 +120,20 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                     if not translated_content['needs_update']:
                         count += 1
                 translation_counts[lang_code] = count
+
+                reasons = set()
+                for state in exp.states.values():
+                    pending_contents = (
+                        state.get_all_contents_which_need_translations(
+                            translation_model
+                        ).values()
+                    )
+                    for content in pending_contents:
+                        reasons.add(content.status.value)
+                if reasons:
+                    translation_missing_reasons[lang_code] = sorted(
+                        list(reasons)
+                    )
 
             audio_language_codes = set(
                 language['id']
@@ -145,6 +160,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                 content_count=content_count,
                 incomplete_translation_language_codes=incomplete_translation_language_codes,
                 translation_counts=translation_counts,
+                translation_missing_reasons=translation_missing_reasons,
             )
             model.update_timestamps()
         return result.Ok(model)

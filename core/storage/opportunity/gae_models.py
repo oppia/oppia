@@ -54,6 +54,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     translation_counts = datastore_services.JsonProperty(
         default={}, indexed=False
     )
+    translation_missing_reasons = datastore_services.JsonProperty(
+        default={}, indexed=False
+    )
     language_codes_with_assigned_voice_artists = (
         datastore_services.StringProperty(repeated=True, indexed=True)
     )
@@ -307,6 +310,10 @@ class TranslationOpportunityModel(base_models.BaseModel):
     translation_counts = datastore_services.JsonProperty(
         required=True, indexed=True
     )
+    # Dict mapping language codes to a list of translation missing reasons.
+    translation_missing_reasons = datastore_services.JsonProperty(
+        default={}, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -487,6 +494,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         content_count: int,
         incomplete_translation_language_codes: Sequence[str],
         translation_counts: Dict[str, int],
+        translation_missing_reasons: Dict[str, List[str]],
     ) -> TranslationOpportunityModel:
         """Creates and returns a new TranslationOpportunityModel instance.
 
@@ -513,6 +521,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 incomplete_translation_language_codes
             ),
             translation_counts=translation_counts,
+            translation_missing_reasons=translation_missing_reasons,
         )
 
 
