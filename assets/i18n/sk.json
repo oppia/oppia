@@ -1763,7 +1763,7 @@
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Celkový počet Vašich odberateľov <[totalSubscribers]>",
 	"I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON": "Zavrieť",
 	"I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT": "Späť na skúšku",
-	"I18N_UNANSWERED_QUESTION_MODAL_MESSAGE": "Máte {{unansweredQuestionCount}} nezodpovedaných otázok. Nezodpovedané otázky budú označené ako nesprávne.",
+	"I18N_UNANSWERED_QUESTION_MODAL_MESSAGE": "Máte <[unansweredQuestionCount]> nezodpovedaných otázok. Nezodpovedané otázky budú označené ako nesprávne.",
 	"I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER": "na návrat ku skúške alebo skúšku napriek tomu odošlite.",
 	"I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE": "Stlačte",
 	"I18N_UNANSWERED_QUESTION_MODAL_SUBMIT_BUTTON": "Odoslať skúšku",
