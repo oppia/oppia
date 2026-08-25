@@ -59,6 +59,26 @@ METHOD_NAME_REGEX: Final = r'async\s+(\w+)\s*\('
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
+APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
+    os.getcwd(),
+    'core',
+    'templates',
+    'pages',
+    'oppia-root',
+    'routing',
+    'app.routing.module.ts',
+)
+
+LIGHTHOUSE_PAGES_JSON_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'lighthouse-pages.json'
+)
+
+ROUTE_KEY_REGEX: Final = (
+    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\.ROUTE'
+)
+
+MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
+
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
@@ -93,6 +113,60 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
         'type_defs_filename_prefix': 'nerdamer-defs-',
     },
 ]
+
+# Routes that legitimately do not need Lighthouse coverage. Each entry
+# is a PAGES_REGISTERED_WITH_FRONTEND key name. Routes are excluded
+# when they are auth-gated, parameterized without test data, error/
+# utility pages, search/query-dependent, sub-pages of already-tested
+# modules, or special-purpose pages.
+LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
+    'ANDROID',
+    'BLOG_ADMIN',
+    'BLOG_AUTHOR_PROFILE_PAGE',
+    'BLOG_HOMEPAGE',
+    'BLOG_HOMEPAGE_SEARCH',
+    'BLOG_POST_PAGE',
+    'CERTIFICATE_ASSESSMENT_PLAYER',
+    'CERTIFICATE_ASSESSMENT_RESULT',
+    'CERTIFICATE_CREATOR_DASHBOARD',
+    'CERTIFICATE_OFFERING_AVAILABLE',
+    'CLASSROOMS',
+    'COLLECTION_EDITOR',
+    'COLLECTION_PLAYER',
+    'CONTRIBUTOR_DASHBOARD_ADMIN',
+    'CREATE_CERTIFICATE_OFFERING',
+    'CURRICULUM_ADMIN',
+    'DIAGNOSTIC_TEST_PLAYER',
+    'EDIT_CERTIFICATE_OFFERING',
+    'END_OF_ARC_TEST',
+    'ERROR',
+    'ERROR_IFRAMED',
+    'EXPLORATION_PLAYER_EMBED',
+    'FACILITATOR_DASHBOARD',
+    'FEEDBACK_UPDATES',
+    'LEARNER_GROUP_CREATOR',
+    'LEARNER_GROUP_EDITOR',
+    'LEARNER_GROUP_VIEWER',
+    'LESSON_PLAYER_EMBED',
+    'LIBRARY_RECENTLY_PUBLISHED',
+    'LIBRARY_SEARCH',
+    'LIBRARY_TOP_RATED',
+    'LOGIN',
+    'LOGOUT',
+    'MAINTENANCE',
+    'MASTERY_CHALLENGE',
+    'NEW_LESSON_PLAYER',
+    'NODE_PRACTICE_SESSION',
+    'PARTNERSHIPS',
+    'PENDING_ACCOUNT_DELETION',
+    'PRACTICE_SESSION',
+    'RELEASE_COORDINATOR_PAGE',
+    'REVIEW_TEST',
+    'SUBTOPIC_VIEWER',
+    'TECHNICAL_FEEDBACK_DASHBOARD',
+    'TECHNICAL_FEEDBACK_DETAIL',
+    'VOICEOVER_ADMIN',
+}
 
 
 class CustomLintChecksManager(linter_utils.BaseLinter):
@@ -354,6 +428,95 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             for job in jobs_with_unnamed_step
         ]
 
+    def check_lighthouse_page_coverage(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that every route in the routing module has a corresponding
+        Lighthouse page entry in lighthouse-pages.json, or is explicitly
+        listed in the exclusion set.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the
+            lint check.
+        """
+        name = 'Lighthouse page coverage'
+
+        error_messages: List[str] = []
+
+        routing_content = self.file_cache.read(APP_ROUTING_MODULE_FILEPATH)
+        lh_pages_content = self.file_cache.read(LIGHTHOUSE_PAGES_JSON_FILEPATH)
+
+        # Normalize routing content: remove single-line comments and
+        # join string-concatenated import paths so that the regex can
+        # match them reliably.
+        normalized = re.sub(r'//[^\n]*', '', routing_content)
+        normalized = re.sub(
+            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",
+            r"'\1\2'",
+            normalized,
+        )
+
+        # Parse lighthouse-pages.json and extract page_module paths,
+        # normalized to match the routing module import format.
+        lh_pages = json.loads(lh_pages_content)
+        lh_modules = set()
+        for page_entry in lh_pages.values():
+            page_module = page_entry.get('page_module', '')
+            if page_module.startswith('core/templates/'):
+                page_module = page_module[len('core/templates/') :]
+            if page_module.endswith('.ts'):
+                page_module = page_module[:-3]
+            lh_modules.add(os.path.normpath(page_module))
+
+        # Parse each route block to find the key and its associated
+        # module import path. Splitting on '{' captures each route
+        # object as a block.
+        key_to_modules: Dict[str, List[str]] = {}
+        route_blocks = re.split(r'\{', normalized)
+        for block in route_blocks:
+            key_match = re.search(ROUTE_KEY_REGEX, block)
+            if not key_match:
+                continue
+            key = key_match.group(1)
+            import_matches = re.findall(MODULE_IMPORT_REGEX, block)
+            if import_matches:
+                key_to_modules.setdefault(key, []).extend(import_matches)
+
+        # Also check routes pushed dynamically (via routes.push).
+        push_blocks = re.split(r'routes\.push\(', normalized)
+        for block in push_blocks:
+            key_match = re.search(ROUTE_KEY_REGEX, block)
+            if not key_match:
+                continue
+            key = key_match.group(1)
+            import_matches = re.findall(MODULE_IMPORT_REGEX, block)
+            if import_matches:
+                key_to_modules.setdefault(key, []).extend(import_matches)
+
+        # Find routes that have no corresponding Lighthouse page entry.
+        uncovered_keys = []
+        for key, modules in sorted(key_to_modules.items()):
+            if key in LIGHTHOUSE_ROUTE_EXCLUSIONS:
+                continue
+            covered = any(os.path.normpath(m) in lh_modules for m in modules)
+            if not covered:
+                uncovered_keys.append(key)
+
+        if uncovered_keys:
+            error_messages.append(
+                'The following routes in app.routing.module.ts do not '
+                'have a corresponding Lighthouse page entry in '
+                'core/tests/lighthouse-pages.json and are not in the '
+                'exclusion list (LIGHTHOUSE_ROUTE_EXCLUSIONS): %s. '
+                'Either add them to lighthouse-pages.json or add the '
+                'key to LIGHTHOUSE_ROUTE_EXCLUSIONS with a comment '
+                'explaining why.' % ', '.join(sorted(uncovered_keys))
+            )
+
+        return concurrent_task_utils.TaskResult(
+            name, bool(error_messages), error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -370,6 +533,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         linter_stdout.append(
             self.check_duplicate_method_names_in_user_utilities()
         )
+        linter_stdout.append(self.check_lighthouse_page_coverage())
 
         return linter_stdout
 
