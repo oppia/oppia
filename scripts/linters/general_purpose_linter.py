@@ -32,13 +32,28 @@ if MYPY:  # pragma: no cover
     from scripts.linters import run_lint_checks
 
 
-class BadPatternRegexpDict(TypedDict):
-    """Dictionary representation of bad pattern regular expressions."""
+class _BadPatternRegexpDictRequiredFields(TypedDict):
+    """Required fields for bad pattern regular expression dictionaries."""
 
     regexp: Pattern[str]
     message: str
     excluded_files: Tuple[str, ...]
     excluded_dirs: Tuple[str, ...]
+
+
+class BadPatternRegexpDict(_BadPatternRegexpDictRequiredFields, total=False):
+    """Dictionary representation of bad pattern regular expressions.
+
+    Optional fields:
+        strip_strings: bool. When True, quoted string literals are removed
+            from each line before the regex is applied. This prevents
+            false positives where the pattern text appears inside a string
+            value rather than as actual code or a comment. Should only be
+            enabled for patterns (e.g. the TODO rule) where matching inside
+            string literals would be a false positive.
+    """
+
+    strip_strings: bool
 
 
 class BadPatternsDict(TypedDict):
@@ -193,6 +208,10 @@ BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
         'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),
         'excluded_dirs': (),
+        # Strip quoted string literals before matching so that the word
+        # 'TODO' appearing inside a string value (e.g. as a UI message or
+        # test data) does not trigger a false-positive lint error.
+        'strip_strings': True,
     }
 ]
 
@@ -351,6 +370,30 @@ def is_filepath_excluded_for_bad_patterns_check(
     )
 
 
+# Regex that matches quoted string literals in a single source line. Used by
+# check_bad_pattern_in_file when a pattern has 'strip_strings': True. Handles:
+#   - Triple-double-quoted strings ("""..."""), including unclosed opening/
+#     closing lines that span multiple source lines.
+#   - Triple-single-quoted strings ('''...'''), same handling as above.
+#   - Double-quoted strings with escape sequences ("…").
+#   - Single-quoted strings with escape sequences ('…').
+#   - Backtick template literals with escape sequences (`…`).
+# The alternation order matters: triple-quote patterns must come before
+# single/double-quote patterns so that the simpler patterns do not partially
+# consume an opening or closing triple-quote.
+_QUOTED_STRING_REGEXP: Final = re.compile(
+    r'(""".*?"""'
+    r"|'''.*?'''"
+    r'|""".*'
+    r"|'''.*"
+    r'|.*"""'
+    r"|.*'''"
+    r'|"[^"\\]*(?:\\.[^"\\]*)*"'
+    r"|'[^'\\]*(?:\\.[^'\\]*)*'"
+    r'|`[^`\\]*(?:\\.[^`\\]*)*`)'
+)
+
+
 def check_bad_pattern_in_file(
     filepath: str, file_content: Tuple[str, ...], pattern: BadPatternRegexpDict
 ) -> Tuple[bool, List[str]]:
@@ -392,7 +435,21 @@ def check_bad_pattern_in_file(
                 stripped_line = line
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
-            if regexp.search(stripped_line):
+            if pattern.get('strip_strings'):
+                # For patterns that opt in to string stripping, remove quoted
+                # string literals before matching. This prevents the pattern
+                # from firing when the matched text appears inside a string
+                # value (e.g. a UI message) rather than as actual code or a
+                # comment. Only patterns that explicitly set
+                # 'strip_strings': True in their entry use this path; all
+                # other patterns (HTML, Python, etc.) receive the original
+                # line and are not affected.
+                line_to_check = re.sub(
+                    _QUOTED_STRING_REGEXP, '""', stripped_line
+                )
+            else:
+                line_to_check = stripped_line
+            if regexp.search(line_to_check):
                 error_message = '%s --> Line %s: %s' % (
                     filepath,
                     line_num,

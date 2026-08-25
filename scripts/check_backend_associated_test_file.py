@@ -43,6 +43,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/linters/test_files/invalid_request.py',
     'scripts/linters/test_files/invalid_tabs.py',
     'scripts/linters/test_files/invalid_todo.py',
+    'scripts/linters/test_files/valid_todo_in_string.py',
     'scripts/linters/test_files/invalid_urlopen.py',
     'scripts/linters/test_files/valid.py',
     'scripts/linters/test_files/valid_job_imports.py',
