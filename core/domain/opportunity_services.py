@@ -508,6 +508,8 @@ def compute_translation_opportunity_models_with_updated_entity(
     )
 
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        # Here we use cast because mypy cannot infer that the entity is an
+        # Exploration after the entity_type check.
         translation_opportunity.translation_missing_reasons = (
             translation_services.get_translation_missing_reasons(
                 cast(exp_domain.Exploration, entity),
@@ -612,6 +614,8 @@ def _build_opportunity_for_non_exploration_entity(
         content_count=content_count,
         incomplete_translation_language_codes=incomplete_langs,
         translation_counts=translation_counts,
+        # Here we use cast because mypy cannot infer that the entity is an
+        # Exploration after the entity_type check.
         translation_missing_reasons=(
             translation_services.get_translation_missing_reasons(
                 cast(exp_domain.Exploration, entity)
@@ -1180,6 +1184,8 @@ def update_translation_opportunity_with_accepted_suggestion(
             else 0
         )
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # Here we use cast because mypy cannot infer that the entity is an
+            # Exploration after the entity_type check.
             translation_opportunity.translation_missing_reasons = (
                 translation_services.get_translation_missing_reasons(
                     cast(exp_domain.Exploration, entity)

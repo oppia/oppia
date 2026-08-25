@@ -116,24 +116,54 @@ class PendingTranslationContent:
 
     @property
     def content_value(self) -> feconf.ContentValueType:
+        """Returns the content value of the translatable content.
+
+        Returns:
+            ContentValueType. The content value.
+        """
         return self.translatable_content.content_value
 
     @property
     def content_id(self) -> str:
+        """Returns the content id of the translatable content.
+
+        Returns:
+            str. The content id.
+        """
         return self.translatable_content.content_id
 
     @property
     def content_type(self) -> ContentType:
+        """Returns the content type of the translatable content.
+
+        Returns:
+            ContentType. The content type.
+        """
         return self.translatable_content.content_type
 
     @property
     def content_format(self) -> TranslatableContentFormat:
+        """Returns the content format of the translatable content.
+
+        Returns:
+            TranslatableContentFormat. The content format.
+        """
         return self.translatable_content.content_format
 
     def is_data_format_list(self) -> bool:
+        """Checks whether the content is of a list type.
+
+        Returns:
+            bool. Whether the content is a list.
+        """
         return self.translatable_content.is_data_format_list()
 
     def is_reviewer_only(self) -> bool:
+        """Checks whether the content is for reviewers only.
+
+        Returns:
+            bool. Whether the content is for reviewers only.
+        """
         return self.translatable_content.is_reviewer_only()
 
     def to_dict(self) -> PendingTranslationDict:
