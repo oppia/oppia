@@ -235,7 +235,15 @@ def _run_lighthouse_checks_for_config(config_filename: str) -> None:
     # so always print it.
     stderr_decoded = stderr.decode('utf-8')
     if stderr_decoded:
-        print(stderr_decoded)
+        # Filter out warn-level assertion results from CI output. Only
+        # error-level failures should be visible.
+        filtered = ''.join(
+            line
+            for line in stderr_decoded.splitlines(keepends=True)
+            if '\u26a0\ufe0f' not in line
+        )
+        if filtered:
+            print(filtered)
     if process.returncode != 0:
         print('Return code: %s' % process.returncode)
         print('Lighthouse checks failed. More details can be found above.')
