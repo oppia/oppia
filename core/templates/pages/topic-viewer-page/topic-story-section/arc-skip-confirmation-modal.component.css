@@ -5,40 +5,13 @@
   max-width: 560px;
   min-height: 0;
   overflow-y: auto;
-  padding: 24px 24px 20px;
+  padding: 20px 24px 16px;
   position: relative;
   width: min(560px, calc(100vw - 32px));
 }
 
-.arc-skip-confirmation-close {
-  align-items: center;
-  background: #fff;
-  border: 2px solid #e1e6ef;
-  border-radius: 50%;
-  color: #7f8a9b;
-  cursor: pointer;
-  display: inline-flex;
-  height: 48px;
-  justify-content: center;
-  padding: 0;
-  position: absolute;
-  right: 14px;
-  top: 12px;
-  width: 48px;
-}
-
-.arc-skip-confirmation-close .material-icons {
-  font-size: 30px;
-  line-height: 1;
-}
-
-.arc-skip-confirmation-close:focus-visible {
-  outline: 2px solid #00645c;
-  outline-offset: 2px;
-}
-
 .arc-skip-confirmation-icon-wrap {
-  margin: 0 auto 14px;
+  margin: 0 auto 12px;
   position: relative;
   width: fit-content;
 }
@@ -108,7 +81,7 @@
 .arc-skip-confirmation-divider {
   background: #e6e9ef;
   height: 1px;
-  margin: 20px auto 16px;
+  margin: 16px auto 14px;
   max-width: 100%;
   width: 100%;
 }
@@ -125,8 +98,8 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
   font-weight: 700;
-  min-height: 52px;
-  min-width: 240px;
+  min-height: 48px;
+  min-width: 220px;
   padding: 10px 16px;
 }
 
@@ -152,20 +125,8 @@
   .arc-skip-confirmation-modal {
     border-radius: 10px;
     min-height: 0;
-    padding: 18px 14px 14px;
+    padding: 16px 14px 14px;
     width: min(560px, calc(100vw - 24px));
-  }
-
-  .arc-skip-confirmation-close {
-    border-width: 1.5px;
-    height: 42px;
-    right: 8px;
-    top: 8px;
-    width: 42px;
-  }
-
-  .arc-skip-confirmation-close .material-icons {
-    font-size: 30px;
   }
 
   .arc-skip-confirmation-icon-wrap {

@@ -1658,6 +1658,8 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
+    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -2039,7 +2041,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isStoryCompleted()).toBe(false);
   });
 
-  it('should report adventure as completed only when all its lessons are completed', () => {
+  it('should not report an adventure as completed before its test is completed', () => {
     const baseLesson = {
       lessonTitle: 'Lesson',
       lessonDescription: '',
@@ -2102,9 +2104,72 @@ describe('TopicStorySectionComponent', () => {
     ];
 
     expect(component.isAdventureCompleted(0)).toBe(false);
-    expect(component.isAdventureCompleted(1)).toBe(true);
+    expect(component.isAdventureCompleted(1)).toBe(false);
     expect(component.isAdventureCompleted(2)).toBe(false);
     expect(component.isAdventureCompleted(99)).toBe(false);
+  });
+
+  it('should collapse an adventure only when its lessons and test are completed', () => {
+    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+    const storyNodeSpy = createStoryNodeSpy(
+      'Completed Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storySummary = createStorySummarySpy(
+      ['Completed Node'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    storySummary.isNodeCompleted.and.returnValue(true);
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.isAdventureCompleted(0)).toBe(true);
+    expect(component.isAdventureExpanded(0)).toBe(false);
+  });
+
+  it('should expand an adventure when only its lessons are completed', () => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Completed Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storySummary = createStorySummarySpy(
+      ['Completed Node'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    storySummary.isNodeCompleted.and.returnValue(true);
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.isAdventureCompleted(0)).toBe(false);
+    expect(component.isAdventureExpanded(0)).toBe(true);
   });
 
   it('should report that missing or empty adventures have incomplete lessons', () => {

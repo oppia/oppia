@@ -164,12 +164,8 @@ export class AdventureNavigationComponent
     this.practiceSelected.emit(arcId);
   }
 
-  getLessonBadgeIconName(isCompleted: boolean): string {
-    return isCompleted ? 'check' : '';
-  }
-
-  getPracticeBadgeIconName(isPracticeCompleted: boolean): string {
-    return isPracticeCompleted ? 'check' : 'edit';
+  getPracticeBadgeIconName(): string {
+    return 'edit';
   }
 
   onMasteryClick(): void {
