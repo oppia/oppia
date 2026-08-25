@@ -16,7 +16,14 @@
  * @fileoverview Component for the error page.
  */
 
-import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  Renderer2,
+} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -24,21 +31,22 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'error-page',
   templateUrl: './error-page.component.html',
-  styleUrls: ['./error-page.component.css'],
-  // We need ViewEncapsulation.None because the "home page" and "issue tracker" links are injected via [innerHTML] from a translation string,and Angular does not apply component-scoped style attributes to innerHTML-injected content, so scoped styles cannot reach them.
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: [],
 })
-export class ErrorPageComponent implements OnInit {
+export class ErrorPageComponent implements OnInit, AfterViewInit {
   // This property is initialized using Angular lifecycle hooks.
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() statusCode!: string;
 
   customErrorMessage: string | null = null;
+  private usingKeyboard = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -54,6 +62,57 @@ export class ErrorPageComponent implements OnInit {
       this.windowRef.nativeWindow.sessionStorage.removeItem(
         'oppia_401_error_message'
       );
+    }
+  }
+
+  private attachFocusListeners(links: NodeListOf<HTMLElement>): void {
+    this.renderer.listen('window', 'keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        this.usingKeyboard = true;
+      }
+    });
+    this.renderer.listen('window', 'mousedown', () => {
+      this.usingKeyboard = false;
+    });
+
+    links.forEach(link => {
+      this.renderer.listen(link, 'focus', () => {
+        if (this.usingKeyboard) {
+          this.renderer.setStyle(link, 'outline', '2px solid #0844aa');
+          this.renderer.setStyle(link, 'outline-offset', '2px');
+        }
+      });
+      this.renderer.listen(link, 'blur', () => {
+        this.renderer.removeStyle(link, 'outline');
+        this.renderer.removeStyle(link, 'outline-offset');
+      });
+    });
+  }
+
+  ngAfterViewInit(): void {
+    const container: HTMLElement | null =
+      this.elementRef.nativeElement.querySelector('.oppia-wide-panel-content');
+
+    if (!container) {
+      return;
+    }
+
+    const existingLinks: NodeListOf<HTMLElement> =
+      container.querySelectorAll('a');
+
+    if (existingLinks.length > 0) {
+      this.attachFocusListeners(existingLinks);
+    } else {
+      // The links are injected asynchronously via [innerHTML] once the
+      // translation resolves, so we observe the DOM until they appear.
+      const observer = new MutationObserver(() => {
+        const links: NodeListOf<HTMLElement> = container.querySelectorAll('a');
+        if (links.length > 0) {
+          this.attachFocusListeners(links);
+          observer.disconnect();
+        }
+      });
+      observer.observe(container, {childList: true, subtree: true});
     }
   }
 
