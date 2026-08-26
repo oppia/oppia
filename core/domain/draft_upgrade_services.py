@@ -29,7 +29,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Callable, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -333,6 +333,53 @@ class DraftUpgradeUtil:
                         'new_value': new_value,
                     }
                 )
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 57 to 58. State
+        version 58 removes refresher_exploration_id from outcome.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+
+            if (
+                change.property_name
+                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+            ):
+                edit_interaction_answer_groups_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
+                    change,
+                )
+                for (
+                    answer_group_dict
+                ) in edit_interaction_answer_groups_cmd.new_value:
+                    cast(Dict[str, Any], answer_group_dict['outcome']).pop(
+                        'refresher_exploration_id', None
+                    )
+            elif (
+                change.property_name
+                == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+            ):
+                edit_interaction_default_outcome_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
+                    change,
+                )
+                if edit_interaction_default_outcome_cmd.new_value is not None:
+                    cast(
+                        Dict[str, Any],
+                        edit_interaction_default_outcome_cmd.new_value,
+                    ).pop('refresher_exploration_id', None)
         return draft_change_list
 
     @classmethod
