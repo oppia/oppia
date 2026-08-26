@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that backfill TranslationOpportunityModel from existing ExplorationModels and StoryModels."""
+"""Jobs that backfill TranslationOpportunityModel from existing ExplorationModels, StoryModels and SkillModels."""
 
 from __future__ import annotations
 
@@ -23,6 +23,8 @@ from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
+    skill_domain,
+    skill_fetchers,
     topic_domain,
     topic_fetchers,
     translation_fetchers,
@@ -42,6 +44,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         exp_models,
         opportunity_models,
+        skill_models,
         story_models,
         topic_models,
         translation_models,
@@ -53,6 +56,7 @@ if MYPY:  # pragma: no cover
     translation_models,
     story_models,
     topic_models,
+    skill_models,
 ) = models.Registry.import_models(
     [
         models.Names.EXPLORATION,
@@ -60,34 +64,75 @@ if MYPY:  # pragma: no cover
         models.Names.TRANSLATION,
         models.Names.STORY,
         models.Names.TOPIC,
+        models.Names.SKILL,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
 
+# The domain objects a translation opportunity can be built from. Both extend
+# translation_domain.BaseTranslatableObject, and both expose the version,
+# language_code, get_content_count() and get_translation_count() members the
+# shared code below reads.
+TranslatableEntity = Union[exp_domain.Exploration, skill_domain.Skill]
 
-class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
-    """Backfills TranslationOpportunityModels from existing ExplorationModels and StoryModels."""
+# One element of the CoGroupByKey over an entity ID: the topic IDs the entity
+# belongs to, the entity's own domain object, and its translation models.
+GroupedEntityData = Tuple[
+    str,
+    Dict[
+        str,
+        Iterable[
+            Union[
+                str,
+                TranslatableEntity,
+                translation_models.EntityTranslationsModel,
+            ]
+        ],
+    ],
+]
+
+# One element of the CoGroupByKey over an opportunity model ID, holding the
+# recomputed model and the model already in the datastore.
+GroupedOpportunityModels = Tuple[
+    str,
+    Dict[str, Iterable[opportunity_models.TranslationOpportunityModel]],
+]
+
+
+class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
+    """Base class for jobs that backfill TranslationOpportunityModels for a
+    single entity type.
+
+    A subclass supplies the entity type and the pipeline that reads that
+    entity's models. Everything from the opportunity model's field values
+    onwards is shared, as is the audit variant of the run.
+    """
 
     DATASTORE_UPDATES_ALLOWED = True
 
-    @staticmethod
+    # The entity type this job backfills. It both tags the models the job
+    # writes and scopes the existing models it reads, so a job for one entity
+    # type never treats another type's opportunities as orphans.
+    ENTITY_TYPE: feconf.TranslatableEntityType
+
+    # Prefix of this job's result strings. 'TRANSLATION OPPORTUNITY MODEL'
+    # yields 'TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'.
+    RESULT_LABEL_PREFIX: str
+
+    # Reported when the grouped data has no domain object for the entity ID.
+    MISSING_ENTITY_ERROR: str
+
+    # Whether to count translatable metadata fields that are still behind a
+    # feature flag. Explorations must count them so that the backfill does not
+    # depend on the flag's state at run time; skills have no gated fields.
+    OVERRIDE_METADATA_FEATURE_FLAG = False
+
+    @classmethod
     def _create_translation_opportunity(
-        element: Tuple[
-            str,
-            Dict[
-                str,
-                Iterable[
-                    Union[
-                        str,
-                        exp_domain.Exploration,
-                        translation_models.EntityTranslationsModel,
-                    ]
-                ],
-            ],
-        ],
+        cls, element: GroupedEntityData
     ) -> result.Result[opportunity_models.TranslationOpportunityModel, str]:
         """Creates a TranslationOpportunityModel from the grouped data."""
-        exp_id = element[0]
+        entity_id = element[0]
         grouped_data = element[1]
 
         # Here we use cast because we are narrowing down the type of topic_ids.
@@ -95,11 +140,13 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         if not topic_ids:
             return result.Err('Missing topic_id')
 
-        # Here we use cast because we are narrowing down the type of exps.
-        exps = list(cast(Iterable[exp_domain.Exploration], grouped_data['exp']))
-        if not exps:
-            return result.Err('Missing ExplorationModel')
-        exp = exps[0]
+        # Here we use cast because we are narrowing down the type of entities.
+        entities = list(
+            cast(Iterable[TranslatableEntity], grouped_data['entity'])
+        )
+        if not entities:
+            return result.Err(cls.MISSING_ENTITY_ERROR)
+        entity = entities[0]
 
         # Here we use cast because we are narrowing down the type of translations.
         translations = [
@@ -108,24 +155,38 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                 Iterable[translation_models.EntityTranslationsModel],
                 grouped_data['translations'],
             )
-            if t.entity_version == exp.version
+            if t.entity_version == entity.version
         ]
         with datastore_services.get_ndb_context():
-            content_count = exp.get_content_count(
-                override_metadata_feature_flag=True
+            content_count = entity.get_content_count(
+                override_metadata_feature_flag=(
+                    cls.OVERRIDE_METADATA_FEATURE_FLAG
+                )
             )
 
+            # The count has to come from the entity, the same way
+            # translation_services.get_translation_counts computes it live.
+            # A translation model can hold entries for content the entity no
+            # longer has, or for content whose value is now empty, and neither
+            # is part of content_count. Counting the model's entries directly
+            # would let a stored count exceed content_count, which fails
+            # TranslationOpportunity validation when the opportunity is read.
             translation_counts = {}
             translation_missing_reasons = {}
             for translation_model in translations:
-                lang_code = translation_model.language_code
-                count = 0
-                for (
-                    translated_content
-                ) in translation_model.translations.values():
-                    if not translated_content['needs_update']:
-                        count += 1
-                translation_counts[lang_code] = count
+                entity_translation = (
+                    translation_fetchers.get_entity_translation_from_model(
+                        translation_model
+                    )
+                )
+                translation_counts[translation_model.language_code] = (
+                    entity.get_translation_count(
+                        entity_translation,
+                        override_metadata_feature_flag=(
+                            cls.OVERRIDE_METADATA_FEATURE_FLAG
+                        ),
+                    )
+                )
 
                 reasons = set()
                 entity_translation = (
@@ -155,18 +216,19 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             incomplete_translation_language_codes = sorted(
                 list(audio_language_codes - set(complete_languages))
             )
-            if exp.language_code in incomplete_translation_language_codes:
-                incomplete_translation_language_codes.remove(exp.language_code)
+            if entity.language_code in incomplete_translation_language_codes:
+                incomplete_translation_language_codes.remove(
+                    entity.language_code
+                )
 
-            model = opportunity_models.TranslationOpportunityModel(
-                id=opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
-                    feconf.TranslatableEntityType.EXPLORATION.value, exp_id
-                ),
-                entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
-                entity_id=exp_id,
+            model = opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type=cls.ENTITY_TYPE.value,
+                entity_id=entity_id,
                 topic_ids=topic_ids,
                 content_count=content_count,
-                incomplete_translation_language_codes=incomplete_translation_language_codes,
+                incomplete_translation_language_codes=(
+                    incomplete_translation_language_codes
+                ),
                 translation_counts=translation_counts,
                 translation_missing_reasons=translation_missing_reasons,
             )
@@ -178,93 +240,38 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
     ) -> beam.PCollection[
         result.Result[opportunity_models.TranslationOpportunityModel, str]
     ]:
-        """Computes the new translation opportunity models from datastore."""
+        """Computes the new translation opportunity models from datastore.
 
-        def get_published_story_ids(
-            topic: topic_domain.Topic,
-        ) -> Iterable[str]:
-            for reference in topic.canonical_story_references:
-                if reference.story_is_published:
-                    yield reference.story_id
-            for reference in topic.additional_story_references:
-                if reference.story_is_published:
-                    yield reference.story_id
-
-        def extract_topic_ids_from_story(
-            story_model: story_models.StoryModel,
-        ) -> Iterable[Tuple[str, str]]:
-            topic_id = story_model.corresponding_topic_id
-            nodes = story_model.story_contents.get('nodes', [])
-            for node in nodes:
-                node_exp_id = node.get('exploration_id')
-                if node_exp_id:
-                    yield (node_exp_id, topic_id)
-
-        published_story_ids_pcoll = (
-            self.pipeline
-            | 'Get all TopicModels'
-            >> ndb_io.GetModels(
-                topic_models.TopicModel.get_all(include_deleted=False)
-            )
-            | 'Get topic from model'
-            >> beam.Map(topic_fetchers.get_topic_from_model)
-            | 'Extract published story IDs'
-            >> beam.FlatMap(get_published_story_ids)
-            | 'Distinct story IDs'
-            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
+        Raises:
+            NotImplementedError. Needs to be overridden by a subclass.
+        """
+        raise NotImplementedError(
+            'Subclasses must implement the '
+            '_compute_translation_opportunities() method'
         )
 
-        story_topic_ids_pcoll = (
+    def _get_existing_opportunity_models(
+        self,
+    ) -> beam.PCollection[opportunity_models.TranslationOpportunityModel]:
+        """Returns the opportunity models already in the datastore for this
+        job's entity type.
+        """
+        return (
             self.pipeline
-            | 'Get all StoryModels'
+            | 'Get all TranslationOpportunityModels'
             >> ndb_io.GetModels(
-                story_models.StoryModel.get_all(include_deleted=False)
-            )
-            | 'Filter published StoryModels'
-            >> beam.Filter(
-                lambda story, published_ids: story.id in published_ids,
-                beam.pvalue.AsList(published_story_ids_pcoll),
-            )
-            | 'Extract exp_id and topic_id'
-            >> beam.FlatMap(extract_topic_ids_from_story)
-        )
-
-        exp_models_pcoll = (
-            self.pipeline
-            | 'Get all ExplorationModels'
-            >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False)
-            )
-            | 'Get exploration from model'
-            >> beam.Map(exp_fetchers.get_exploration_from_model)
-            | 'Map exp to exp_id' >> beam.Map(lambda exp: (exp.id, exp))
-        )
-
-        entity_translations_pcoll = (
-            self.pipeline
-            | 'Get all EntityTranslationsModels'
-            >> ndb_io.GetModels(
-                translation_models.EntityTranslationsModel.get_all(
+                opportunity_models.TranslationOpportunityModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Filter exploration translations'
+            # The entity type is passed as a side input rather than captured,
+            # because a closure over self would drag the pipeline into the
+            # pickled function.
+            | 'Filter models of this entity type'
             >> beam.Filter(
-                lambda model: model.entity_type
-                == feconf.TranslatableEntityType.EXPLORATION.value
+                lambda model, entity_type: model.entity_type == entity_type,
+                self.ENTITY_TYPE.value,
             )
-            | 'Map translation to exp_id'
-            >> beam.Map(lambda model: (model.entity_id, model))
-        )
-
-        grouped_data = {
-            'topic_ids': story_topic_ids_pcoll,
-            'exp': exp_models_pcoll,
-            'translations': entity_translations_pcoll,
-        } | 'Group by exp_id' >> beam.CoGroupByKey()
-
-        return grouped_data | 'Create TranslationOpportunityModels' >> beam.Map(
-            self._create_translation_opportunity
         )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -277,22 +284,12 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             | 'Unwrap models for cleanup' >> beam.Map(lambda res: res.unwrap())
         )
 
-        existing_opp_models_pcoll = (
-            self.pipeline
-            | 'Get all TranslationOpportunityModels for cleanup'
-            >> ndb_io.GetModels(
-                opportunity_models.TranslationOpportunityModel.get_all(
-                    include_deleted=False
-                )
-            )
-        )
-
         computed_by_id = (
             computed_opp_models_pcoll
             | 'Map computed by id' >> beam.Map(lambda model: (model.id, model))
         )
         existing_by_id = (
-            existing_opp_models_pcoll
+            self._get_existing_opportunity_models()
             | 'Map existing by id' >> beam.Map(lambda model: (model.id, model))
         )
 
@@ -302,13 +299,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         } | 'Group opp models for deletion' >> beam.CoGroupByKey()
 
         def get_orphans(
-            element: Tuple[
-                str,
-                Dict[
-                    str,
-                    Iterable[opportunity_models.TranslationOpportunityModel],
-                ],
-            ],
+            element: GroupedOpportunityModels,
         ) -> Iterable[opportunity_models.TranslationOpportunityModel]:
             _, grouped_data = element
             existing = list(grouped_data['existing'])
@@ -335,7 +326,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             created_models_results
             | 'Generate creation results'
             >> job_result_transforms.ResultsToJobRunResults(
-                'TRANSLATION OPPORTUNITY MODEL CREATION'
+                f'{self.RESULT_LABEL_PREFIX} CREATION'
             )
         )
 
@@ -343,7 +334,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             orphans_pcoll
             | 'Generate deletion results'
             >> job_result_transforms.CountObjectsToJobRunResult(
-                'TRANSLATION OPPORTUNITY MODEL DELETION'
+                f'{self.RESULT_LABEL_PREFIX} DELETION'
             )
         )
 
@@ -352,15 +343,10 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             deletion_results,
         ) | 'Flatten results' >> beam.Flatten()
 
-
-class AuditBackfillTranslationOpportunityModelJob(
-    BackfillTranslationOpportunityModelJob
-):
-    """Audit job for BackfillTranslationOpportunityModelJob."""
-
-    DATASTORE_UPDATES_ALLOWED = False
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+    def _run_audit(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Recomputes the opportunity models and reports how they differ from
+        the models already in the datastore, without writing anything.
+        """
         created_models_results = self._compute_translation_opportunities()
 
         computed_opp_models_pcoll = (
@@ -371,24 +357,12 @@ class AuditBackfillTranslationOpportunityModelJob(
         )
 
         existing_opp_models_pcoll = (
-            self.pipeline
-            | 'Get all TranslationOpportunityModels'
-            >> ndb_io.GetModels(
-                opportunity_models.TranslationOpportunityModel.get_all(
-                    include_deleted=False
-                )
-            )
+            self._get_existing_opportunity_models()
             | 'Map existing models' >> beam.Map(lambda model: (model.id, model))
         )
 
         def compare_models(
-            element: Tuple[
-                str,
-                Dict[
-                    str,
-                    Iterable[opportunity_models.TranslationOpportunityModel],
-                ],
-            ],
+            element: GroupedOpportunityModels,
         ) -> Iterable[Tuple[str, int]]:
             opp_id, grouped_data = element
             existing = list(grouped_data['existing'])
@@ -505,7 +479,7 @@ class AuditBackfillTranslationOpportunityModelJob(
             created_models_results
             | 'Generate results'
             >> job_result_transforms.ResultsToJobRunResults(
-                'TRANSLATION OPPORTUNITY MODEL CREATION'
+                f'{self.RESULT_LABEL_PREFIX} CREATION'
             )
         )
 
@@ -513,3 +487,204 @@ class AuditBackfillTranslationOpportunityModelJob(
             compare_results,
             summary_results,
         ) | 'Flatten results' >> beam.Flatten()
+
+
+class BackfillExplorationTranslationOpportunityModelJob(
+    BackfillTranslationOpportunityModelJobBase
+):
+    """Backfills TranslationOpportunityModels from existing ExplorationModels and StoryModels."""
+
+    ENTITY_TYPE = feconf.TranslatableEntityType.EXPLORATION
+    RESULT_LABEL_PREFIX = 'TRANSLATION OPPORTUNITY MODEL'
+    MISSING_ENTITY_ERROR = 'Missing ExplorationModel'
+    OVERRIDE_METADATA_FEATURE_FLAG = True
+
+    def _compute_translation_opportunities(
+        self,
+    ) -> beam.PCollection[
+        result.Result[opportunity_models.TranslationOpportunityModel, str]
+    ]:
+        """Computes the new translation opportunity models from datastore."""
+
+        def get_published_story_ids(
+            topic: topic_domain.Topic,
+        ) -> Iterable[str]:
+            for reference in topic.canonical_story_references:
+                if reference.story_is_published:
+                    yield reference.story_id
+            for reference in topic.additional_story_references:
+                if reference.story_is_published:
+                    yield reference.story_id
+
+        def extract_topic_ids_from_story(
+            story_model: story_models.StoryModel,
+        ) -> Iterable[Tuple[str, str]]:
+            topic_id = story_model.corresponding_topic_id
+            nodes = story_model.story_contents.get('nodes', [])
+            for node in nodes:
+                node_exp_id = node.get('exploration_id')
+                if node_exp_id:
+                    yield (node_exp_id, topic_id)
+
+        published_story_ids_pcoll = (
+            self.pipeline
+            | 'Get all TopicModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+            | 'Get topic from model'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
+            | 'Extract published story IDs'
+            >> beam.FlatMap(get_published_story_ids)
+            | 'Distinct story IDs'
+            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
+        )
+
+        story_topic_ids_pcoll = (
+            self.pipeline
+            | 'Get all StoryModels'
+            >> ndb_io.GetModels(
+                story_models.StoryModel.get_all(include_deleted=False)
+            )
+            | 'Filter published StoryModels'
+            >> beam.Filter(
+                lambda story, published_ids: story.id in published_ids,
+                beam.pvalue.AsList(published_story_ids_pcoll),
+            )
+            | 'Extract exp_id and topic_id'
+            >> beam.FlatMap(extract_topic_ids_from_story)
+        )
+
+        exp_models_pcoll = (
+            self.pipeline
+            | 'Get all ExplorationModels'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Get exploration from model'
+            >> beam.Map(exp_fetchers.get_exploration_from_model)
+            | 'Map exp to exp_id' >> beam.Map(lambda exp: (exp.id, exp))
+        )
+
+        entity_translations_pcoll = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter exploration translations'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.EXPLORATION.value
+            )
+            | 'Map translation to exp_id'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+
+        grouped_data = {
+            'topic_ids': story_topic_ids_pcoll,
+            'entity': exp_models_pcoll,
+            'translations': entity_translations_pcoll,
+        } | 'Group by exp_id' >> beam.CoGroupByKey()
+
+        return grouped_data | 'Create TranslationOpportunityModels' >> beam.Map(
+            self._create_translation_opportunity
+        )
+
+
+class AuditBackfillExplorationTranslationOpportunityModelJob(
+    BackfillExplorationTranslationOpportunityModelJob
+):
+    """Audit job for BackfillExplorationTranslationOpportunityModelJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return self._run_audit()
+
+
+class BackfillSkillOpportunityModelJob(
+    BackfillTranslationOpportunityModelJobBase
+):
+    """Backfills TranslationOpportunityModels from existing SkillModels and TopicModels."""
+
+    ENTITY_TYPE = feconf.TranslatableEntityType.SKILL
+    RESULT_LABEL_PREFIX = 'SKILL TRANSLATION OPPORTUNITY MODEL'
+    MISSING_ENTITY_ERROR = 'Missing SkillModel'
+
+    def _compute_translation_opportunities(
+        self,
+    ) -> beam.PCollection[
+        result.Result[opportunity_models.TranslationOpportunityModel, str]
+    ]:
+        """Computes the new skill translation opportunity models from datastore."""
+
+        def extract_skill_topic_ids(
+            topic: topic_domain.Topic,
+        ) -> Iterable[Tuple[str, str]]:
+            for skill_id in topic.get_all_skill_ids():
+                yield (skill_id, topic.id)
+
+        topic_skill_ids_pcoll = (
+            self.pipeline
+            | 'Get all TopicModels for skill opportunities'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+            | 'Get topic from model for skill opportunities'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
+            | 'Extract skill_id and topic_id'
+            >> beam.FlatMap(extract_skill_topic_ids)
+        )
+
+        skill_models_pcoll = (
+            self.pipeline
+            | 'Get all SkillModels'
+            >> ndb_io.GetModels(
+                skill_models.SkillModel.get_all(include_deleted=False)
+            )
+            | 'Get skill from model'
+            >> beam.Map(skill_fetchers.get_skill_from_model)
+            | 'Map skill to skill_id'
+            >> beam.Map(lambda skill: (skill.id, skill))
+        )
+
+        entity_translations_pcoll = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels for skills'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter skill translations'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.SKILL.value
+            )
+            | 'Map translation to skill_id'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+
+        grouped_data = {
+            'topic_ids': topic_skill_ids_pcoll,
+            'entity': skill_models_pcoll,
+            'translations': entity_translations_pcoll,
+        } | 'Group by skill_id' >> beam.CoGroupByKey()
+
+        return (
+            grouped_data
+            | 'Create Skill TranslationOpportunityModels'
+            >> beam.Map(self._create_translation_opportunity)
+        )
+
+
+class AuditBackfillSkillOpportunityModelJob(BackfillSkillOpportunityModelJob):
+    """Audit job for BackfillSkillOpportunityModelJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return self._run_audit()
