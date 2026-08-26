@@ -409,7 +409,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 True,
                 [],
                 'Not None',
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -433,7 +432,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [],

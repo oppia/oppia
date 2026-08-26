@@ -1673,7 +1673,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1732,7 +1731,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     {'list_of_values': ['3', '4'], 'parse_with_jinja': True},
                 )
             ],
-            None,
             None,
         )
         error_string = (
@@ -2861,7 +2859,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             False,
             [],
             None,
-            None,
         )
         state1.update_interaction_default_outcome(default_outcome1)
 
@@ -2912,7 +2909,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec('Equals', {'x': 0}),
@@ -2934,7 +2930,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [state_domain.RuleSpec('Equals', {'x': 0})],
                 [],
@@ -2954,7 +2949,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [

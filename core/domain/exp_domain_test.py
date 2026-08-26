@@ -873,7 +873,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -906,7 +905,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -944,7 +942,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -1009,7 +1006,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('feedback_0', '<p>Feedback</p>'),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -1134,7 +1130,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1158,7 +1153,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1181,7 +1175,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('feedback_2', '<p>Feedback</p>'),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -1210,7 +1203,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1237,7 +1229,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('feedback_0', '<p>Feedback</p>'),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -1306,7 +1297,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('feedback_0', '<p>Feedback</p>'),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -1383,7 +1373,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -1406,7 +1395,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -3538,7 +3526,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -3579,7 +3566,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('feedback_1', 'Feedback'),
                 False,
                 [],
-                None,
                 None,
             ),
             [
@@ -4358,7 +4344,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 param_changes,
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -4403,7 +4388,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ),
             False,
             [],
-            None,
             None,
         )
         init_state.update_interaction_default_outcome(state_default_outcome)
@@ -4796,7 +4780,6 @@ title: Title
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -4821,7 +4804,6 @@ title: Title
             ),
             False,
             [],
-            None,
             None,
         )
         state_hint_list = [
@@ -5822,11 +5804,21 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        v58_states_dict = exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
-            v57_states_dict  # type: ignore[arg-type]
+        v58_states_dict = (
+            exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
+                cast(Dict[str, state_domain.StateDict], v57_states_dict)
+            )
         )
-        outcome = v58_states_dict['State1']['interaction']['answer_groups'][0]['outcome']  # type: ignore[index]
-        default_outcome = v58_states_dict['State1']['interaction']['default_outcome']  # type: ignore[index]
+        outcome = cast(
+            Dict[str, Any],
+            v58_states_dict['State1']['interaction']['answer_groups'][0][
+                'outcome'
+            ],
+        )
+        default_outcome = cast(
+            Dict[str, Any],
+            v58_states_dict['State1']['interaction']['default_outcome'],
+        )
         self.assertNotIn('refresher_exploration_id', outcome)
         self.assertNotIn('refresher_exploration_id', default_outcome)
 
@@ -13568,7 +13560,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             False,
             [],
             None,
-            None,
         )
         state1.update_interaction_default_outcome(default_outcome)
 
@@ -13623,7 +13614,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec('Equals', {'x': 0}),
@@ -13645,7 +13635,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [state_domain.RuleSpec('Equals', {'x': 0})],
                 [],
@@ -13665,7 +13654,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [

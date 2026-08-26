@@ -2547,7 +2547,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -2584,7 +2583,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [

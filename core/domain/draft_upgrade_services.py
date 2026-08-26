@@ -603,11 +603,6 @@ class DraftUpgradeUtil:
                         'param_changes': (
                             answer_group_dict['outcome']['param_changes']
                         ),
-                        'refresher_exploration_id': (
-                            answer_group_dict['outcome'][
-                                'refresher_exploration_id'
-                            ]
-                        ),
                         'missing_prerequisite_skill_id': (
                             answer_group_dict['outcome'][
                                 'missing_prerequisite_skill_id'
@@ -655,9 +650,6 @@ class DraftUpgradeUtil:
                     ),
                     'param_changes': (
                         new_default_outcome_dict['param_changes']
-                    ),
-                    'refresher_exploration_id': (
-                        new_default_outcome_dict['refresher_exploration_id']
                     ),
                     'missing_prerequisite_skill_id': (
                         new_default_outcome_dict[

@@ -1693,7 +1693,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(

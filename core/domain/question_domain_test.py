@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 import datetime
 import re
+from typing import Any, Dict, cast
 
 from core import feconf, utils
 from core.domain import (
@@ -340,7 +341,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -661,11 +661,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         }
-        v58_state_dict = question_domain.Question._convert_state_v57_dict_to_v58_dict(
-            v57_state_dict  # type: ignore[arg-type]
+        v58_state_dict = (
+            question_domain.Question._convert_state_v57_dict_to_v58_dict(
+                cast(state_domain.StateDict, v57_state_dict)
+            )
         )
-        outcome = v58_state_dict['interaction']['answer_groups'][0]['outcome']  # type: ignore[index]
-        default_outcome = v58_state_dict['interaction']['default_outcome']  # type: ignore[index]
+        outcome = cast(
+            Dict[str, Any],
+            v58_state_dict['interaction']['answer_groups'][0]['outcome'],
+        )
+        default_outcome = cast(
+            Dict[str, Any], v58_state_dict['interaction']['default_outcome']
+        )
         self.assertNotIn('refresher_exploration_id', outcome)
         self.assertNotIn('refresher_exploration_id', default_outcome)
 

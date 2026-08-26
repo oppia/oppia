@@ -110,7 +110,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -300,7 +299,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -325,7 +323,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ),
             False,
             [],
-            None,
             None,
         )
         state_hint_list = [
@@ -445,7 +442,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ),
                 False,
                 [],
-                None,
                 None,
             ),
             [
@@ -597,7 +593,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -713,7 +708,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ),
                 False,
                 [],
-                None,
                 None,
             ),
             [
@@ -1084,7 +1078,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             False,
             [],
             None,
-            None,
         )
 
         init_state.update_interaction_default_outcome(default_outcome)
@@ -1110,7 +1103,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ),
                 False,
                 [],
-                None,
                 None,
             ),
             [
@@ -3139,7 +3131,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [state_domain.RuleSpec('Contains', {'x': 'Test'})],
             [],
@@ -3187,7 +3178,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [state_domain.RuleSpec('Contains', {})],
             [],
@@ -3215,7 +3205,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [],
@@ -3255,7 +3244,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [state_domain.RuleSpec('Contains', test_inputs)],
             [],
@@ -3290,7 +3278,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [
