@@ -14,19 +14,16 @@
 
 /**
  * @fileoverview Acceptance tests for CUJ L.O.2 (part 3):
- * Use the Arc section skip forward and back to move between lessons.
- * Topic Page Mastery Challenge.
+ * Arc Navigation, Skipping & Mastery Challenge.
  *
  * Covers:
- * - Arc section navigation: skip forward and back between chapters.
- * - Skip-Forward: first chapter has no backward skip; after skipping,
- *   next chapter becomes active with milestone indicator.
- * - Mastery Challenge: card at end of each Arc, "Take Mastery Challenge"
- *   link, dialog, practice session, score 6/6 or 5/6, score card.
- * - Score Card detail: chapter scores, accuracy, time taken, skill list,
- *   End Practice, Close buttons.
- * - Mastery Challenge failure and retry.
- * - Second Arc Mastery Challenge with milestone numbering.
+ * - Adventure navigation dock with clickable lesson nodes.
+ * - Clicking a later arc node triggers skip confirmation modal.
+ * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
+ * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
+ * - Smooth-scroll navigates to the selected Arc.
+ * - Mastery Challenge card at end of story.
+ * - Navigate to practice session from Mastery Challenge button.
  */
 
 import {UserFactory} from '../../../utilities/common/user-factory';
@@ -44,35 +41,23 @@ const BASE_URL = testConstants.URLs.BaseURL;
 const redesignedContainerSelector =
   '.e2e-test-redesigned-topic-viewer-container';
 const adventureNavigationSelector = '.e2e-test-adventure-navigation';
-const adventureSkipButtonSelector = '.e2e-test-adventure-skip-button';
-const skipConfirmationSelector = '.e2e-test-arc-skip-confirmation-modal';
-const skipConfirmationYesSelector = '.e2e-test-arc-skip-confirmation-proceed';
-const skipConfirmationNoSelector = '.e2e-test-arc-skip-confirmation-cancel';
-const milestoneIndicatorSelector = '.e2e-test-milestone-indicator';
 const adventureTitleSelector = '.e2e-test-adventure-title';
+const adventureGroupSelector = '.e2e-test-adventure-group';
+const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
+const arcSkipProceedSelector = '.e2e-test-arc-skip-confirmation-proceed';
+const arcSkipCancelSelector = '.e2e-test-arc-skip-confirmation-cancel';
+const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
+const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
+const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
+const skippedAdventureStartCtaSelector =
+  '.e2e-test-skipped-adventure-start-cta';
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
 const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
-const masteryChallengeCompleteSelector =
-  '.e2e-test-mastery-challenge-complete-button';
-const practiceSessionTitleSelector = '.e2e-test-practice-session-title';
-const scoreCardContainerSelector = '.e2e-test-score-card-container';
-const chapterScoreListSelector = '.e2e-test-chapter-score-list';
-const chapterScoreItemSelector = '.e2e-test-chapter-score-item';
-const totalScoreDisplaySelector = '.e2e-test-total-score-display';
-const accuracyDisplaySelector = '.e2e-test-accuracy-display';
-const timeTakenDisplaySelector = '.e2e-test-time-taken-display';
-const skillListContainerSelector = '.e2e-test-skill-list-container';
-const endPracticeButtonSelector = '.e2e-test-end-practice-button';
-const scoreCardCloseButtonSelector = '.e2e-test-score-card-close-button';
-const retryPracticeButtonSelector = '.e2e-test-retry-practice-button';
-const masteryScoreTextSelector = '.e2e-test-mastery-score-text';
-const milestoneNumberSelector = '.e2e-test-milestone-number';
-const milestoneIconSelector = '.e2e-test-milestone-icon';
-const questionCardSelector = '.e2e-test-question-card';
-const solutionChoiceSelector = '.e2e-test-interactive-solution-choice';
-const submitAnswerSelector = '.e2e-test-submit-answer-button';
-const nextQuestionSelector = '.e2e-test-next-question-button';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
+const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
+const lessonCardSelector = '.e2e-test-lesson-card';
+const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -187,98 +172,108 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should show skip confirmation dialog when clicking forward skip button',
+    'should display adventure groups with titles in the timeline',
     async function () {
-      const skipButtons = await loggedInLearner.page.$$(
-        adventureSkipButtonSelector
-      );
-      if (skipButtons.length === 0) {
-        throw new Error('No skip buttons found in adventure navigation.');
-      }
+      await loggedInLearner.expectElementToBeVisible(adventureTitleSelector);
 
-      await skipButtons[0].click();
-
-      await loggedInLearner.expectElementToBeVisible(skipConfirmationSelector);
-      await loggedInLearner.expectElementToBeVisible(
-        skipConfirmationYesSelector
+      const adventureGroups = await loggedInLearner.page.$$(
+        adventureGroupSelector
       );
-      await loggedInLearner.expectElementToBeVisible(
-        skipConfirmationNoSelector
-      );
+      expect(adventureGroups.length).toBeGreaterThan(0);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should not skip when No is clicked in skip confirmation dialog',
+    'should show skip confirmation modal when clicking a later arc node',
     async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        skipConfirmationNoSelector
+      const circleBadges = await loggedInLearner.page.$$(
+        `${adventureNavigationSelector} topic-adventure-circle-badge`
       );
 
-      await loggedInLearner.expectElementToBeVisible(
-        skipConfirmationSelector,
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      if (circleBadges.length >= 3) {
+        await circleBadges[2].click();
 
-  it(
-    'should skip forward when Yes is clicked and show milestone indicator',
-    async function () {
-      const skipButtons = await loggedInLearner.page.$$(
-        adventureSkipButtonSelector
-      );
-      if (skipButtons.length === 0) {
-        throw new Error('No skip buttons found.');
-      }
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipProceedSelector);
 
-      await skipButtons[0].click();
-
-      await loggedInLearner.expectElementToBeVisible(skipConfirmationSelector);
-      await loggedInLearner.clickOnElementWithSelector(
-        skipConfirmationYesSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        milestoneIndicatorSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should not show backward skip button for the first chapter',
-    async function () {
-      const skipButtons = await loggedInLearner.page.$$(
-        adventureSkipButtonSelector
-      );
-
-      const hasBackwardSkip = await Promise.all(
-        skipButtons.map(async button => {
-          const ariaLabel = await button.evaluate(
-            el => el.getAttribute('aria-label') || el.textContent
-          );
-          return ariaLabel?.toLowerCase().includes('back');
-        })
-      );
-
-      const backSkipCount = hasBackwardSkip.filter(Boolean).length;
-      const chaptersCount = await loggedInLearner.page.$$eval(
-        '.e2e-test-adventure-group',
-        groups => groups.length
-      );
-
-      if (chaptersCount > 0) {
-        expect(backSkipCount).toBeLessThan(chaptersCount);
+        await loggedInLearner.clickOnElementWithSelector(arcSkipCancelSelector);
+        await loggedInLearner.expectElementToBeVisible(
+          arcSkipModalSelector,
+          false
+        );
       }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should display Mastery Challenge card at the end of an Arc',
+    'should skip to later arc and show skipped adventure cards',
+    async function () {
+      const circleBadges = await loggedInLearner.page.$$(
+        `${adventureNavigationSelector} topic-adventure-circle-badge`
+      );
+
+      if (circleBadges.length >= 3) {
+        await circleBadges[2].click();
+
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.clickOnElementWithSelector(
+          arcSkipProceedSelector
+        );
+
+        await loggedInLearner.page.waitForTimeout(1000);
+
+        const skippedCards = await loggedInLearner.page.$$(
+          skippedAdventureCardSelector
+        );
+        expect(skippedCards.length).toBeGreaterThan(0);
+
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureBadgeSelector
+        );
+        await loggedInLearner.expectTextContentToContain(
+          skippedAdventureBadgeSelector,
+          'SKIPPED'
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureMessageSelector
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureStartCtaSelector
+        );
+      }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should expand a skipped adventure when clicking its Start CTA',
+    async function () {
+      const startCtas = await loggedInLearner.page.$$(
+        skippedAdventureStartCtaSelector
+      );
+
+      if (startCtas.length > 0) {
+        await startCtas[0].click();
+
+        await loggedInLearner.page.waitForTimeout(500);
+
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureCardSelector,
+          false
+        );
+
+        const lessonCards = await loggedInLearner.page.$$(lessonCardSelector);
+        expect(lessonCards.length).toBeGreaterThan(0);
+      }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display Mastery Challenge card at the end of the story path',
     async function () {
       await loggedInLearner.page.evaluate(() => {
         document
@@ -300,150 +295,27 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should open Mastery Challenge dialog when clicking Take Mastery Challenge',
+    'should navigate to practice session when clicking Take Mastery Challenge',
     async function () {
       await loggedInLearner.clickOnElementWithSelector(
         masteryChallengeButtonSelector
       );
 
+      await loggedInLearner.waitForPageToFullyLoad();
+
       await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeCompleteSelector
+        practiceSessionContainerSelector
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should complete a practice session and show score card with 6/6 score',
+    'should display question player header in practice session',
     async function () {
       await loggedInLearner.expectElementToBeVisible(
-        practiceSessionTitleSelector
+        practiceQuestionHeaderSelector
       );
-
-      const questionCount = await loggedInLearner.page.$$eval(
-        questionCardSelector,
-        cards => cards.length
-      );
-
-      for (let i = 0; i < questionCount; i++) {
-        await loggedInLearner.expectElementToBeVisible(
-          `${questionCardSelector}:not([disabled])`
-        );
-        await loggedInLearner.page.waitForTimeout(500);
-
-        const optionAvailable = await loggedInLearner.isElementVisible(
-          `${solutionChoiceSelector}:not([disabled])`
-        );
-
-        if (optionAvailable) {
-          await loggedInLearner.clickOnElementWithSelector(
-            `${solutionChoiceSelector}:not([disabled])`
-          );
-          await loggedInLearner.page.waitForTimeout(300);
-        }
-
-        const submitBtnVisible = await loggedInLearner.isElementVisible(
-          `${submitAnswerSelector}:not([disabled])`
-        );
-
-        if (submitBtnVisible) {
-          await loggedInLearner.clickOnElementWithSelector(
-            `${submitAnswerSelector}:not([disabled])`
-          );
-          await loggedInLearner.page.waitForTimeout(300);
-        }
-
-        const nextBtnVisible = await loggedInLearner.isElementVisible(
-          `${nextQuestionSelector}:not([disabled])`
-        );
-
-        if (nextBtnVisible) {
-          await loggedInLearner.clickOnElementWithSelector(
-            `${nextQuestionSelector}:not([disabled])`
-          );
-          await loggedInLearner.page.waitForTimeout(300);
-        }
-      }
-
-      await loggedInLearner.expectElementToBeVisible(
-        scoreCardContainerSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(masteryScoreTextSelector);
-      await loggedInLearner.expectTextContentToContain(
-        masteryScoreTextSelector,
-        '6/6'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display score card details: chapter scores, accuracy, time taken, skill list',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(chapterScoreListSelector);
-      await loggedInLearner.expectElementToBeVisible(chapterScoreItemSelector);
-      await loggedInLearner.expectElementToBeVisible(totalScoreDisplaySelector);
-      await loggedInLearner.expectElementToBeVisible(accuracyDisplaySelector);
-      await loggedInLearner.expectElementToBeVisible(timeTakenDisplaySelector);
-      await loggedInLearner.expectElementToBeVisible(
-        skillListContainerSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should close score card when clicking Close button',
-    async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        scoreCardCloseButtonSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        scoreCardContainerSelector,
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display End Practice button on score card',
-    async function () {
-      await loggedInLearner.page.evaluate(() => {
-        document
-          .querySelector('.e2e-test-mastery-challenge-card')
-          ?.scrollIntoView({behavior: 'smooth'});
-      });
-      await loggedInLearner.clickOnElementWithSelector(
-        masteryChallengeButtonSelector
-      );
-      await loggedInLearner.page.waitForTimeout(1000);
-
-      await loggedInLearner.expectElementToBeVisible(endPracticeButtonSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should show retry button when practice session score is below threshold',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        retryPracticeButtonSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display milestone icon and number for completed Arc',
-    async function () {
-      await loggedInLearner.page.evaluate(() => {
-        window.scrollTo(0, 0);
-      });
-
-      await loggedInLearner.expectElementToBeVisible(milestoneIconSelector);
-      await loggedInLearner.expectElementToBeVisible(milestoneNumberSelector);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

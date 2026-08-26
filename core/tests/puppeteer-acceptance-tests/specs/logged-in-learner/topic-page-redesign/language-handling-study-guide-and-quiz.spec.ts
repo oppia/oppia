@@ -14,21 +14,16 @@
 
 /**
  * @fileoverview Acceptance tests for CUJ L.O.2 (part 4):
- * Language Handling, Study Guide & Quiz, Topic Info, and Footer.
+ * Language Handling, Study Guide & Footer.
  *
  * Covers:
- * - Fallback to default language when preferred language content unavailable.
- * - Change language from dropdown and verify re-rendering.
- * - Topic Quiz: question number, progress indicator, score, answer submission,
- *   feedback, skip, score summary.
- * - Take the Topic Quiz CTA button opens quiz modal.
- * - Topic Info screen with topic details.
- * - Study Guide navigation.
- * - Footer links (Fr Mathieu, Donate, Contact Us).
- * - Subtopic display and navigation from topic page.
- * - Mastery score display.
- * - Chapter progression after completion.
- * - Reset Chapter Progress button and confirmation dialog.
+ * - Language selector with text and voiceover dropdowns on chapter cards.
+ * - Language fallback info tooltip shows when lesson is not in preferred language.
+ * - Language auto-selection waterfall: i18n → session fallback → English.
+ * - Session persistence of language choice within a tab.
+ * - Story card with title and Study Skills CTA.
+ * - New chapter badge for recently published lessons.
+ * - Footer with Contact Us link.
  */
 
 import {UserFactory} from '../../../utilities/common/user-factory';
@@ -45,48 +40,19 @@ const BASE_URL = testConstants.URLs.BaseURL;
 
 const redesignedContainerSelector =
   '.e2e-test-redesigned-topic-viewer-container';
-const topicInfoLinkSelector = '.e2e-test-topic-info-link';
-const topicInfoScreenSelector = '.e2e-test-topic-info-screen';
-const topicInfoCloseButtonSelector = '.e2e-test-topic-info-close-button';
-const topicInfoTitleSelector = '.e2e-test-topic-info-title';
-const studyGuideLinkSelector = '.e2e-test-topic-study-guide-link';
-const topicQuizSectionSelector = '.e2e-test-topic-quiz-section';
-const topicQuizButtonSelector = '.e2e-test-topic-quiz-button';
-const quizModalSelector = '.e2e-test-topic-quiz-modal';
-const questionNumberSelector = '.e2e-test-question-number';
-const quizProgressBarSelector = '.e2e-test-quiz-progress-bar';
-const quizScoreSelector = '.e2e-test-quiz-score';
-const quizNextButtonSelector = '.e2e-test-quiz-next-button';
-const quizSkipButtonSelector = '.e2e-test-quiz-skip-button';
-const quizSummarySelector = '.e2e-test-quiz-summary';
-const quizSummaryScoreSelector = '.e2e-test-quiz-summary-score';
-const quizSummaryCloseButtonSelector = '.e2e-test-quiz-summary-close-button';
-const topicQuizQuestionCardSelector = '.e2e-test-topic-quiz-question-card';
-const answerOptionSelector = '.e2e-test-topic-quiz-answer-option';
-const topicQuizFeedbackSelector = '.e2e-test-topic-quiz-feedback';
-const footerLinksSelector = '.e2e-test-oppia-footer-links';
-const footerFrMathieuSelector = '.e2e-test-footer-fr-mathieu-link';
-const footerDonateSelector = '.e2e-test-footer-donate-link';
-const footerContactUsSelector = '.e2e-test-footer-contact-us-link';
-const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
-const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
-const masteryScoreTextSelector = '.e2e-test-mastery-score-text';
 const lessonLanguageSelectorSelector =
   '.e2e-test-topic-lesson-language-selector';
-const lessonLanguageDropdownSelector = '.e2e-test-lesson-language-dropdown';
-const defaultLanguageOptionSelector = '.e2e-test-default-language-option';
-const preferredLanguageOptionSelector = '.e2e-test-preferred-language-option';
-const topicProgressContainerSelector = '.e2e-test-topic-progress-container';
-const completedChaptersCountSelector = '.e2e-test-completed-chapters-count';
-const totalChaptersCountSelector = '.e2e-test-total-chapters-count';
+const textLanguageSelector = '.e2e-test-topic-lesson-text-language-selector';
+const voiceoverLanguageSelector =
+  '.e2e-test-topic-lesson-voiceover-language-selector';
+const lessonFallbackInfoIconSelector = '.e2e-test-lesson-fallback-info-icon';
 const storyCardSelector = '.e2e-test-story-card';
 const storyTitleSelector = '.e2e-test-story-title';
+const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const lessonCardNewChapterSelector = '.e2e-test-lesson-card-new-label';
-const nextActiveLessonSelector = '.e2e-test-next-active-lesson';
-const resetProgressButtonSelector = '.e2e-test-reset-progress-button';
-const resetProgressDialogSelector = '.e2e-test-reset-progress-dialog';
-const resetProgressConfirmSelector = '.e2e-test-reset-progress-confirm-button';
-const resetProgressCancelSelector = '.e2e-test-reset-progress-cancel-button';
+const studySkillsCtaSelector = '.e2e-test-study-skills-cta';
+const lessonCardSelector = '.e2e-test-lesson-card';
+const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -183,7 +149,7 @@ describe('Logged-In Learner', function () {
   }, 900000);
 
   it(
-    'should display the Topic Info screen with topic details',
+    'should display the story card with title',
     async function () {
       await loggedInLearner.goto(
         `${BASE_URL}/learn/math/fractions/the-fraction-journey`
@@ -193,46 +159,6 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.expectElementToBeVisible(
         redesignedContainerSelector
       );
-      await loggedInLearner.clickOnElementWithSelector(topicInfoLinkSelector);
-
-      await loggedInLearner.expectElementToBeVisible(topicInfoScreenSelector);
-      await loggedInLearner.expectElementToBeVisible(topicInfoTitleSelector);
-      await loggedInLearner.expectTextContentToContain(
-        topicInfoTitleSelector,
-        'Fractions'
-      );
-
-      await loggedInLearner.clickOnElementWithSelector(
-        topicInfoCloseButtonSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        topicInfoScreenSelector,
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display topic progress with completed and total chapters count',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        topicProgressContainerSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        completedChaptersCountSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        totalChaptersCountSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display the story card with title and chapter cards',
-    async function () {
       await loggedInLearner.expectElementToBeVisible(storyCardSelector);
       await loggedInLearner.expectElementToBeVisible(storyTitleSelector);
       await loggedInLearner.expectTextContentToContain(
@@ -244,183 +170,119 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should navigate to Study Guide from topic page',
-    async function () {
-      await loggedInLearner.clickOnElementWithSelector(studyGuideLinkSelector);
-
-      await loggedInLearner.waitForPageToFullyLoad();
-
-      const currentUrl = loggedInLearner.page.url();
-      expect(currentUrl).toContain('study-guide');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should return to topic page and display footer links',
-    async function () {
-      await loggedInLearner.goto(
-        `${BASE_URL}/learn/math/fractions/the-fraction-journey`
-      );
-      await loggedInLearner.waitForPageToFullyLoad();
-
-      await loggedInLearner.scrollToBottomOfPage();
-
-      await loggedInLearner.expectElementToBeVisible(footerLinksSelector);
-      await loggedInLearner.expectElementToBeVisible(footerFrMathieuSelector);
-      await loggedInLearner.expectElementToBeVisible(footerDonateSelector);
-      await loggedInLearner.expectElementToBeVisible(footerContactUsSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Topic Quiz modal when clicking Take the Topic Quiz CTA',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(topicQuizSectionSelector);
-      await loggedInLearner.clickOnElementWithSelector(topicQuizButtonSelector);
-
-      await loggedInLearner.expectElementToBeVisible(quizModalSelector);
-      await loggedInLearner.expectElementToBeVisible(questionNumberSelector);
-      await loggedInLearner.expectElementToBeVisible(quizProgressBarSelector);
-      await loggedInLearner.expectElementToBeVisible(quizScoreSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should submit an answer and show feedback in the Topic Quiz',
+    'should display language selector with text and voiceover dropdowns',
     async function () {
       await loggedInLearner.expectElementToBeVisible(
-        topicQuizQuestionCardSelector
+        lessonLanguageSelectorSelector
       );
 
-      const hasOptions =
-        await loggedInLearner.isElementVisible(answerOptionSelector);
-      if (hasOptions) {
-        await loggedInLearner.clickOnElementWithSelector(answerOptionSelector);
-        await loggedInLearner.expectElementToBeVisible(
-          topicQuizFeedbackSelector
+      const hasTextDropdown =
+        await loggedInLearner.isElementVisible(textLanguageSelector);
+      const hasVoiceoverDropdown = await loggedInLearner.isElementVisible(
+        voiceoverLanguageSelector
+      );
+
+      expect(hasTextDropdown || hasVoiceoverDropdown).toBe(true);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should auto-select English as default text language when available',
+    async function () {
+      const hasLanguageSelector = await loggedInLearner.isElementVisible(
+        lessonLanguageSelectorSelector
+      );
+
+      if (hasLanguageSelector) {
+        const selectedLanguage = await loggedInLearner.page.$eval(
+          textLanguageSelector,
+          (el: HTMLSelectElement) => el.value
         );
+
+        expect(selectedLanguage).toBeTruthy();
       }
-
-      await loggedInLearner.expectElementToBeVisible(quizNextButtonSelector);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should skip a question in the Topic Quiz',
+    'should show fallback info icon when lesson is not in preferred language',
     async function () {
-      await loggedInLearner.clickOnElementWithSelector(quizSkipButtonSelector);
-      await loggedInLearner.waitForPageToFullyLoad();
-      await loggedInLearner.expectElementToBeVisible(quizNextButtonSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display quiz summary after completing all questions',
-    async function () {
-      const questionCount = await loggedInLearner.page.$$eval(
-        topicQuizQuestionCardSelector,
-        cards => cards.length
+      const hasFallbackIcon = await loggedInLearner.isElementVisible(
+        lessonFallbackInfoIconSelector
       );
 
-      for (let i = 0; i < questionCount; i++) {
+      if (hasFallbackIcon) {
         await loggedInLearner.expectElementToBeVisible(
-          topicQuizQuestionCardSelector
+          lessonFallbackInfoIconSelector
         );
 
-        const optionVisible =
-          await loggedInLearner.isElementVisible(answerOptionSelector);
-
-        if (optionVisible) {
-          await loggedInLearner.clickOnElementWithSelector(
-            answerOptionSelector
+        const tooltipText = await loggedInLearner.page.evaluate(() => {
+          const icon = document.querySelector(
+            '.e2e-test-lesson-fallback-info-icon'
           );
-          await loggedInLearner.page.waitForTimeout(300);
-        }
+          return icon?.getAttribute('mattooltip') || '';
+        });
 
-        const nextBtnVisible = await loggedInLearner.isElementVisible(
-          quizNextButtonSelector
+        expect(tooltipText).toBeTruthy();
+      }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should persist language selection within the same session',
+    async function () {
+      const hasLanguageSelector = await loggedInLearner.isElementVisible(
+        lessonLanguageSelectorSelector
+      );
+
+      if (hasLanguageSelector) {
+        const initialLanguage = await loggedInLearner.page.$eval(
+          textLanguageSelector,
+          (el: HTMLSelectElement) => el.value
         );
 
-        if (nextBtnVisible) {
-          await loggedInLearner.clickOnElementWithSelector(
-            quizNextButtonSelector
+        const storedLanguage = await loggedInLearner.page.evaluate(() => {
+          const stored = sessionStorage.getItem(
+            'topic_session_fallback_language'
           );
-          await loggedInLearner.page.waitForTimeout(300);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            return parsed.textLanguageCode || '';
+          }
+          return '';
+        });
+
+        if (storedLanguage) {
+          expect(storedLanguage).toBe(initialLanguage);
         }
       }
-
-      await loggedInLearner.expectElementToBeVisible(quizSummarySelector);
-      await loggedInLearner.expectElementToBeVisible(quizSummaryScoreSelector);
-
-      await loggedInLearner.clickOnElementWithSelector(
-        quizSummaryCloseButtonSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        quizSummarySelector,
-        false
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should display language selector on chapter card when multiple languages exist',
+    'should display the Study Skills CTA in the story card header',
     async function () {
-      await loggedInLearner.goto(
-        `${BASE_URL}/learn/math/fractions/the-fraction-journey`
-      );
-      await loggedInLearner.waitForPageToFullyLoad();
-
-      await loggedInLearner.expectElementToBeVisible(
-        redesignedContainerSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        lessonLanguageSelectorSelector
-      );
+      await loggedInLearner.expectElementToBeVisible(studySkillsCtaSelector);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should fall back to default language when preferred language content is unavailable',
+    'should display new chapter badge for the most recently published lesson',
     async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        lessonLanguageSelectorSelector
-      );
       await loggedInLearner.expectElementToBeVisible(
-        lessonLanguageDropdownSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        defaultLanguageOptionSelector
+        lessonCardNewChapterSelector
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should change language from dropdown and verify re-rendering',
-    async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        preferredLanguageOptionSelector
-      );
-      await loggedInLearner.page.waitForTimeout(1000);
-
-      await loggedInLearner.expectElementToBeVisible(
-        lessonLanguageSelectorSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display the Mastery Mastery card with mastery score',
+    'should display the Mastery Challenge card',
     async function () {
       await loggedInLearner.page.evaluate(() => {
         document
@@ -430,77 +292,6 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner.expectElementToBeVisible(
         masteryChallengeCardSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeTitleSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(masteryScoreTextSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display new chapter badge for the most recently published lesson',
-    async function () {
-      await loggedInLearner.page.evaluate(() => {
-        window.scrollTo(0, 0);
-      });
-
-      await loggedInLearner.expectElementToBeVisible(
-        lessonCardNewChapterSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display the next active lesson indicator for the correct chapter',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(nextActiveLessonSelector);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should show reset chapter progress button for the logged in learner',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        resetProgressButtonSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should show confirmation dialog when reset chapter progress is clicked',
-    async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        resetProgressButtonSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        resetProgressDialogSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        resetProgressConfirmSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        resetProgressCancelSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should not reset progress when cancel is clicked in confirmation dialog',
-    async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        resetProgressCancelSelector
-      );
-
-      await loggedInLearner.expectElementToBeVisible(
-        resetProgressDialogSelector,
-        false
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

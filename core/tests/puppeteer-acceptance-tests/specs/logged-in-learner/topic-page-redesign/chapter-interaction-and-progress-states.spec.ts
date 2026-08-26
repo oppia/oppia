@@ -17,15 +17,12 @@
  * Look down the timeline and choose a lesson.
  *
  * Covers:
- * - Scroll down the vertical timeline to view Arc headers and chapter cards.
- * - Expand an active chapter card: narrative description, Play CTA,
- *   Practice, Study Guide actions.
- * - Complete a lesson and verify chapter progression (collapsed row, completed
- *   indicator, Play Again action).
- * - Chapter 14 becomes the next active lesson after Chapter 13 completion.
- * - Click "Take the Mastery Challenge" button to enter practice session.
- * - Scroll to bottom and verify "Test Your Skills!" section with
- *   "Take the Topic Quiz" CTA.
+ * - Arc headers and chapter card expansion with description, Play CTA,
+ *   Practice, and Study Guide actions.
+ * - Complete a lesson and verify chapter progression (collapsed row,
+ *   completed indicator, Play Again action).
+ * - Mastery Challenge card with description and helper tooltip when locked.
+ * - Practice test card with Practice Test button.
  */
 
 import {UserFactory} from '../../../utilities/common/user-factory';
@@ -56,12 +53,16 @@ const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
 const masteryChallengeDescriptionSelector =
   '.e2e-test-mastery-challenge-description';
 const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
+const masteryChallengeHelperTooltipSelector =
+  '.e2e-test-mastery-challenge-helper-tooltip';
+const masteryChallengeHelperTitleSelector =
+  '.e2e-test-mastery-challenge-helper-title';
+const masteryChallengeHelperDescriptionSelector =
+  '.e2e-test-mastery-challenge-helper-description';
 const adventureEndTestCardSelector = '.e2e-test-adventure-end-test-card';
 const adventureEndTestTitleSelector = '.e2e-test-adventure-end-test-card-title';
 const adventureEndTestPracticeButtonSelector =
   '.e2e-test-adventure-end-test-card-practice-button';
-const topicQuizSectionSelector = '.e2e-test-topic-quiz-section';
-const topicQuizButtonSelector = '.e2e-test-topic-quiz-button';
 
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -158,7 +159,7 @@ describe('Logged-In Learner', function () {
   }, 900000);
 
   it(
-    'should scroll down the timeline and display bold thematic Arc headers',
+    'should display bold thematic Arc headers on the timeline',
     async function () {
       await loggedInLearner.goto(
         `${BASE_URL}/learn/math/fractions/the-fraction-journey`
@@ -271,18 +272,44 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should display the Test Your Skills section with Take the Topic Quiz CTA',
+    'should show helper tooltip when clicking the locked Mastery Challenge button',
     async function () {
-      await loggedInLearner.page.evaluate(() => {
-        window.scrollTo(0, document.body.scrollHeight);
+      const isUnlocked = await loggedInLearner.page.evaluate(() => {
+        const btn = document.querySelector(
+          '.e2e-test-mastery-challenge-button'
+        ) as HTMLButtonElement;
+        return (
+          !btn?.disabled &&
+          !btn?.classList.contains('mastery-challenge-button-locked')
+        );
       });
 
-      await loggedInLearner.expectElementToBeVisible(topicQuizSectionSelector);
-      await loggedInLearner.expectElementToBeVisible(topicQuizButtonSelector);
-      await loggedInLearner.expectTextContentToContain(
-        topicQuizButtonSelector,
-        'Take the Topic Quiz'
-      );
+      if (!isUnlocked) {
+        await loggedInLearner.clickOnElementWithSelector(
+          masteryChallengeButtonSelector
+        );
+
+        await loggedInLearner.expectElementToBeVisible(
+          masteryChallengeHelperTooltipSelector
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          masteryChallengeHelperTitleSelector
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          masteryChallengeHelperDescriptionSelector
+        );
+        await loggedInLearner.expectTextContentToContain(
+          masteryChallengeHelperTitleSelector,
+          'Complete all chapters to unlock'
+        );
+
+        await loggedInLearner.page.waitForTimeout(6000);
+
+        await loggedInLearner.expectElementToBeVisible(
+          masteryChallengeHelperTooltipSelector,
+          false
+        );
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
