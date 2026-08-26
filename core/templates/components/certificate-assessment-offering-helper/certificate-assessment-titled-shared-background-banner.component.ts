@@ -20,7 +20,7 @@
  * page rather than centered in the remaining space next to the button.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import './certificate-assessment-titled-shared-background-banner.component.css';
 
 @Component({
@@ -35,4 +35,8 @@ export class CertificateAssessmentTitledBackgroundBannerComponent {
   @Input() title: string = '';
   @Input() buttonText: string = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
   @Input() buttonRoute: string[] = [];
+  // Emitted when the banner's button is clicked. Consumers that need custom
+  // behavior (such as returning to a stage instead of navigating) can subscribe
+  // to this output and leave buttonRoute empty so no navigation is triggered.
+  @Output() bannerClick = new EventEmitter<void>();
 }

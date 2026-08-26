@@ -57,10 +57,12 @@ import {TranslationLanguageService} from '../services/translation-language.servi
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './state-translation.component.css';
 
 @Component({
   selector: 'oppia-state-translation',
   templateUrl: './state-translation.component.html',
+  styleUrls: ['./state-translation.component.css'],
 })
 export class StateTranslationComponent implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy!: boolean;

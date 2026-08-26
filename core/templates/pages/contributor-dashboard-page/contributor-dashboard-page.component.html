@@ -98,13 +98,22 @@
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 *ngIf="showTopicSelector()">
-              <div class="oppia-dashboard-topic-container">
-                <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
-                <translation-topic-selector class="oppia-topic-selector"
-                                            [activeTopicName]="topicName"
-                                            (setActiveTopicName)="onChangeTopic($event)">
-                </translation-topic-selector>
+                 *ngIf="showTopicSelector() || showEntityTypeSelector()">
+              <div class="oppia-dropdown-row">
+                <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
+                  <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
+                  <translation-topic-selector class="oppia-topic-selector"
+                                              [activeTopicName]="topicName"
+                                              (setActiveTopicName)="onChangeTopic($event)">
+                  </translation-topic-selector>
+                </div>
+                <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
+                  <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Content Type</div>
+                  <entity-type-selector class="oppia-entity-type-selector"
+                                        [activeEntityType]="activeEntityType"
+                                        (setActiveEntityType)="onChangeEntityType($event)">
+                  </entity-type-selector>
+                </div>
               </div>
             </div>
           </div>
@@ -128,21 +137,30 @@
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 *ngIf="showLanguageSelector() || showTopicSelector()">
-              <div class="oppia-dashboard-language-container"
-                   *ngIf="showLanguageSelector()">
-                <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
-                <translation-language-selector class="oppia-language-selector"
-                                               [activeLanguageCode]="languageCode"
-                                               (setActiveLanguageCode)="onChangeLanguage($event)">
-                </translation-language-selector>
-              </div>
-              <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
-                <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
-                <translation-topic-selector class="oppia-topic-selector"
-                                            [activeTopicName]="topicName"
-                                            (setActiveTopicName)="onChangeTopic($event)">
-                </translation-topic-selector>
+                 *ngIf="showLanguageSelector() || showTopicSelector() || showEntityTypeSelector()">
+              <div class="oppia-dropdown-row">
+                <div class="oppia-dashboard-language-container"
+                     *ngIf="showLanguageSelector()">
+                  <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
+                  <translation-language-selector class="oppia-language-selector"
+                                                 [activeLanguageCode]="languageCode"
+                                                 (setActiveLanguageCode)="onChangeLanguage($event)">
+                  </translation-language-selector>
+                </div>
+                <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
+                  <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
+                  <translation-topic-selector class="oppia-topic-selector"
+                                              [activeTopicName]="topicName"
+                                              (setActiveTopicName)="onChangeTopic($event)">
+                  </translation-topic-selector>
+                </div>
+                <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
+                  <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Content Type</div>
+                  <entity-type-selector class="oppia-entity-type-selector"
+                                        [activeEntityType]="activeEntityType"
+                                        (setActiveEntityType)="onChangeEntityType($event)">
+                  </entity-type-selector>
+                </div>
               </div>
             </div>
           </div>
@@ -151,7 +169,7 @@
     </div>
   </div>
   <div *ngIf="activeTabName === 'myContributionTab' || !activeTabName">
-    <oppia-contributions-and-review [activeTopicName]="topicName">
+    <oppia-contributions-and-review [activeTopicName]="topicName" [activeEntityType]="activeEntityType">
     </oppia-contributions-and-review>
   </div>
   <div *ngIf="activeTabName === 'submitQuestionTab'"
@@ -161,7 +179,7 @@
   </div>
   <div *ngIf="activeTabName === 'translateTextTab'"
        class="oppia-opportunities">
-    <oppia-translation-opportunities>
+    <oppia-translation-opportunities [activeEntityType]="activeEntityType">
     </oppia-translation-opportunities>
   </div>
 </div>
