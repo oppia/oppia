@@ -361,8 +361,6 @@ describe('Conversation flow service', () => {
     expect(conversationFlowService.onShowProgressModal).toBeDefined();
   });
 
-
-
   it('should move forward by one card when index is valid', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
@@ -1581,8 +1579,6 @@ describe('Conversation flow service', () => {
       conversationFlowService.moveBackByOneCard();
     }).toThrowError('Target card index out of bounds.');
   });
-
-
 
   it('should set and get nextCardIfStuck', () => {
     const mockCard = createCard('', 'TextInput');
