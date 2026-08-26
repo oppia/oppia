@@ -138,7 +138,12 @@ class BackfillTranslationMissingReasonsJobTests(
         self.summary_model.put()
 
     def test_empty_storage(self) -> None:
-        self.exp_model.delete()
+        self.exp_model.delete(
+            self.author_id, 'Delete exploration', force_deletion=True
+        )
+        self.translation_model.delete()
+        self.opp_model.delete()
+        self.summary_model.delete()
         self.assert_job_output_is([])
 
     def test_job_migrates_models(self) -> None:
