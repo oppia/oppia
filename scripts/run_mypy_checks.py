@@ -75,7 +75,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/jobs/batch_jobs/number_with_units_audit_jobs.py',
     'core/domain/app_feedback_report_services.py',
     'core/controllers/story_viewer.py',
-    'core/controllers/library.py',
     'core/controllers/reader.py',
     'core/jobs/transforms/validation/base_validation.py',
     'core/controllers/access_validators.py',
