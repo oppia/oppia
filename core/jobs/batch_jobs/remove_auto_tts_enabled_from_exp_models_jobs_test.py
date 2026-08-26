@@ -35,6 +35,10 @@ datastore_services = models.Registry.import_datastore_services()
 class MockExplorationModelWithAutoTts(exp_models.ExplorationModel):
     """Mock ExplorationModel so that it allows to set auto_tts_enabled."""
 
+    @classmethod
+    def _get_kind(cls) -> str:
+        return 'ExplorationModel'
+
     auto_tts_enabled = datastore_services.BooleanProperty(
         default=True, indexed=True
     )
@@ -45,7 +49,9 @@ class MockExplorationSnapshotContentModelWithAutoTts(
 ):
     """Mock ExplorationSnapshotContentModel."""
 
-    pass
+    @classmethod
+    def _get_kind(cls) -> str:
+        return 'ExplorationSnapshotContentModel'
 
 
 class RemoveAutoTtsEnabledFieldJobTests(job_test_utils.JobTestBase):
