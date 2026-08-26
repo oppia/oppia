@@ -5009,6 +5009,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'topic_name': 'topic',
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'translation_missing_reasons': {},
                 }
             },
         )
