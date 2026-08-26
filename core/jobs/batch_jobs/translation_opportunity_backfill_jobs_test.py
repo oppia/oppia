@@ -340,7 +340,9 @@ class BackfillTranslationOpportunityModelJobTests(
             )
         )
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
-        self.assertEqual(model.translation_missing_reasons, {'hi': ['new']})
+        self.assertEqual(
+            model.translation_missing_reasons, {'hi': ['new'], 'en': ['new']}
+        )
 
     def test_fails_if_missing_story_model(self) -> None:
         story_model = story_models.StoryModel.get_by_id('story_id')
@@ -824,6 +826,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
             content_count=10,
             incomplete_translation_language_codes=[],
             translation_counts={},
+            translation_missing_reasons={},
         )
         discrepant_model.update_timestamps()
         discrepant_model.put()
@@ -846,8 +849,8 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                 job_run_result.JobRunResult(
                     stderr=(
                         'Discrepancy for model exploration.exp_1: '
-                        'Existing (content_count=10, translation_counts={}), '
-                        'Computed (content_count=4, translation_counts={\'hi\': 1})'
+                        'Existing (content_count=10, translation_counts={}, translation_missing_reasons={}), '
+                        'Computed (content_count=4, translation_counts={\'hi\': 1}, translation_missing_reasons={\'hi\': [\'new\']})'
                     )
                 ),
                 job_run_result.JobRunResult(
