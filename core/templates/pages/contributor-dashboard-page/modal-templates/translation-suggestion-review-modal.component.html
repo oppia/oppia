@@ -64,6 +64,16 @@
       <div [attr.dir]="'auto'"
            class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
+        <span *ngIf="isAiGenerated && !isAiEdited"
+              class="oppia-ai-badge oppia-ai-generated-badge ms-2 e2e-test-ai-generated-badge"
+              aria-label="AI-generated translation">
+          AI-generated
+        </span>
+        <span *ngIf="isAiGenerated && isAiEdited"
+              class="oppia-ai-badge oppia-ai-edited-badge ms-2 e2e-test-ai-edited-badge"
+              aria-label="AI-generated translation edited by contributor">
+          AI-generated &bull; edited
+        </span>
         <button class="btn btn-sm btn-secondary float-end"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
                 (click)="editSuggestion()"

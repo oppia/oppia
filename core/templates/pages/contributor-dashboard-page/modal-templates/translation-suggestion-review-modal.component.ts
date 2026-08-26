@@ -75,6 +75,8 @@ export interface SuggestionChangeDict {
   language_code: string;
   state_name: string;
   translation_html: string;
+  was_auto_generated?: boolean;
+  was_edited?: boolean;
 }
 
 export interface ActiveSuggestionDict {
@@ -184,8 +186,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   @ViewChild('translationPanel')
   translationPanel!: RteOutputDisplayComponent;
 
-  @ViewChild('contentContainer')
-  contentContainer!: ElementRef;
+  get isAiGenerated(): boolean {
+    return !!this.activeSuggestion?.change_cmd?.was_auto_generated;
+  }
+
+  get isAiEdited(): boolean {
+    return !!this.activeSuggestion?.change_cmd?.was_edited;
+  }
+
+  @ViewChild('contentContainer') contentContainer!: ElementRef;
 
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
