@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
+from core.domain import exp_domain, rights_manager
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_migration_jobs
 from core.jobs.types import job_run_result
@@ -47,6 +47,12 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
+
+        rights_manager.create_new_exploration_rights(
+            self.EXP_1_ID, self.author_id
+        )
         self.exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
@@ -55,6 +61,10 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
             category='category',
             objective='objective',
             language_code='en',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     exp_domain.Exploration.create_default_exploration(
@@ -73,7 +83,7 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
             }
         )
         self.exp_model.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'commit_message', [commit_cmd.to_dict()]
+            self.author_id, 'commit_message', [commit_cmd.to_dict()]
         )
 
         self.translation_model = self.create_model(
