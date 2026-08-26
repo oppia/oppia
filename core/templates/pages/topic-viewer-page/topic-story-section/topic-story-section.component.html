@@ -14,16 +14,16 @@
     </p>
   </div>
 
-  <div class="story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
+  <div class="story-card e2e-test-story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h3 class="story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
+        <h3 class="story-title e2e-test-story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
         <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
           {{ getStoryMetaText() }}
         </p>
       </div>
       <div class="story-card-header-right">
-        <a class="study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL' | translate: {storyTitle: storyTitle || 'this story'}">
+        <a class="study-skills-cta e2e-test-study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL' | translate: {storyTitle: storyTitle || 'this story'}">
           <img class="study-skills-icon"
                src="/assets/images/icons/study-skills-icon.png"
                alt=""
@@ -70,7 +70,7 @@
             </div>
           </div>
 
-          <div class="adventure-group"
+          <div class="adventure-group e2e-test-adventure-group"
                *ngIf="!isAdventureSkipped(adventureIdx) || isAdventureExpanded(adventureIdx)"
                [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
             <div class="adventure-header" (click)="toggleAdventure(adventureIdx)" role="button" tabindex="0"
@@ -85,7 +85,7 @@
                   <i class="material-icons">{{ isAdventureCompleted(adventureIdx) ? 'check' : 'menu_book' }}</i>
                 </div>
                 <div class="adventure-header-text">
-                  <h4 class="adventure-title">{{ adventureGroup.adventureTitle }}</h4>
+                  <h4 class="adventure-title e2e-test-adventure-title">{{ adventureGroup.adventureTitle }}</h4>
                   <p class="adventure-completion-text">{{ getAdventureCompletionText(adventureIdx) }}</p>
                 </div>
               </div>
@@ -193,14 +193,14 @@
             <i class="material-icons">schedule</i>
           </div>
           <div class="coming-soon-chapters-heading-text">
-            <h4 class="coming-soon-chapters-title">{{ 'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS_HEADING' | translate }}</h4>
+            <h4 class="coming-soon-chapters-title e2e-test-coming-soon-chapters-title">{{ 'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS_HEADING' | translate }}</h4>
             <p class="coming-soon-chapters-count">
               {{ 'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count: comingSoonLessonCards.length, messageFormat: true} }}
             </p>
           </div>
         </div>
         <div
-             class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
+             class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper e2e-test-coming-soon-lesson-card-wrapper"
              #lessonWrapper
              [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
              *ngFor="let lessonCard of comingSoonLessonCards">

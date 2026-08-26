@@ -1,4 +1,4 @@
-<div class="topic-lesson-card"
+<div class="topic-lesson-card e2e-test-lesson-card"
      [attr.aria-label]="lessonTitle || 'Lesson card'"
      [class.collapsed]="!isExpanded"
      [class.completed-lesson]="isCompletedLesson"
@@ -30,30 +30,30 @@
         </topic-adventure-circle-badge>
         <div class="topic-lesson-card-header">
           <div class="topic-lesson-card-title-with-labels">
-            <h3 class="topic-lesson-card-title"
+            <h3 class="topic-lesson-card-title e2e-test-lesson-card-title"
                 [class.topic-lesson-card-title-completed-collapsed]="!isExpanded && isCompletedLesson">
               {{ lessonTitle }}
             </h3>
-            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">
+            <span class="topic-lesson-card-new-label e2e-test-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">
               {{ 'I18N_TOPIC_VIEWER_LESSON_NEW_LABEL' | translate }}
             </span>
-            <span class="topic-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
+            <span class="topic-lesson-card-coming-soon-label e2e-test-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
               {{ 'I18N_TOPIC_VIEWER_LESSON_COMING_SOON_LABEL' | translate }}
             </span>
-            <span class="topic-lesson-card-completed-label"
+            <span class="topic-lesson-card-completed-label e2e-test-lesson-card-completed-label"
                   [class.topic-lesson-card-completed-label-compact]="!isExpanded && isCompletedLesson"
                   *ngIf="isCompletedLesson">
               <i class="material-icons" aria-hidden="true">check_circle</i>
               {{ 'I18N_TOPIC_VIEWER_LESSON_COMPLETED_LABEL' | translate }}
             </span>
           </div>
-          <p class="topic-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
+          <p class="topic-lesson-card-description e2e-test-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
             {{ isComingSoonLesson ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : lessonDescription }}
           </p>
         </div>
         <button type="button"
                 *ngIf="!isExpanded && isCompletedLesson"
-                class="topic-lesson-card-play-again-button"
+                class="topic-lesson-card-play-again-button e2e-test-lesson-card-play-again-button"
                 [disabled]="isComingSoonLesson || !startUrl"
                 (click)="onPlayAgainClick()">
           <i class="material-icons" aria-hidden="true">replay</i>
@@ -103,14 +103,14 @@
         </div>
         <div class="topic-lesson-card-actions-right">
           <div class="topic-lesson-card-secondary-buttons">
-            <button class="topic-lesson-card-secondary-button"
+            <button class="topic-lesson-card-secondary-button e2e-test-lesson-card-secondary-button"
                     type="button"
                     [disabled]="isComingSoonLesson || (!practiceUrl && !startUrl)"
                     (click)="onPracticeButtonClick()">
               <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">edit</i>
               {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
             </button>
-            <button class="topic-lesson-card-secondary-button"
+            <button class="topic-lesson-card-secondary-button e2e-test-lesson-card-secondary-button"
                     type="button"
                     [disabled]="isComingSoonLesson || (!studyUrl && !startUrl)"
                     (click)="onStudyButtonClick()">
@@ -118,7 +118,7 @@
               {{ 'I18N_TOPIC_VIEWER_STUDY_BUTTON' | translate }}
             </button>
           </div>
-          <button class="topic-lesson-card-start-button"
+          <button class="topic-lesson-card-start-button e2e-test-lesson-card-start-button"
                   type="button"
                   [disabled]="isComingSoonLesson || !startUrl"
                   (click)="onStartButtonClick()">
