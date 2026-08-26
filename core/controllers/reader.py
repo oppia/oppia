@@ -943,9 +943,6 @@ class StateCompleteEventHandler(
         self.render_json({})
 
 
-
-
-
 class ReaderFeedbackHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of ReaderFeedbackHandler's
     normalized_payload dictionary.

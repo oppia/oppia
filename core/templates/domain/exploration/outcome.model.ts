@@ -93,10 +93,7 @@ export class Outcome extends BaseTranslatableObject {
    * Returns true iff an outcome has a self-loop and no feedback.
    */
   isConfusing(currentStateName: string): boolean {
-    return (
-      this.dest === currentStateName &&
-      !this.hasNonemptyFeedback()
-    );
+    return this.dest === currentStateName && !this.hasNonemptyFeedback();
   }
   static createNew(
     dest: string | null,

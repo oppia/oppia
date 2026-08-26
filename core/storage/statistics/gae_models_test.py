@@ -557,9 +557,6 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-
-
-
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
 

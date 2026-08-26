@@ -367,9 +367,6 @@ class StateCompleteEventHandler(BaseEventHandler):
         )
 
 
-
-
-
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 

@@ -306,9 +306,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
-
-
-
 class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
 
     def test_new_feedback_thread_creation_events(self) -> None:

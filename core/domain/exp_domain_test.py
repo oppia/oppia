@@ -4332,8 +4332,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.validate()
 
-
-
     def test_validate_exploration_answer_group_parameter(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id',
@@ -5798,7 +5796,10 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
                             'outcome': {
                                 'dest': 'State1',
                                 'dest_if_really_stuck': None,
-                                'feedback': {'content_id': 'feedback_1', 'html': ''},
+                                'feedback': {
+                                    'content_id': 'feedback_1',
+                                    'html': '',
+                                },
                                 'labelled_as_correct': False,
                                 'param_changes': [],
                                 'refresher_exploration_id': 'exp_refresher',
@@ -5809,7 +5810,10 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {
                         'dest': 'State1',
                         'dest_if_really_stuck': None,
-                        'feedback': {'content_id': 'default_outcome', 'html': ''},
+                        'feedback': {
+                            'content_id': 'default_outcome',
+                            'html': '',
+                        },
                         'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': 'exp_refresher_2',

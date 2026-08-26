@@ -1160,9 +1160,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         )
 
 
-
-
-
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
     statistics data aggregated from version 1 to the version given in the key.

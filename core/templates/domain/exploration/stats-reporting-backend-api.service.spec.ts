@@ -181,8 +181,6 @@ describe('Stats reporting backend API Service', () => {
     flushMicrotasks();
   }));
 
-
-
   it('should record state completion correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordStateCompletedAsync(
       expVersion,

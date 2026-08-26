@@ -209,8 +209,6 @@ describe('Outcome Destination Editor', () => {
     })
   );
 
-
-
   it('should update option names when state name is changed', fakeAsync(() => {
     let onStateNamesChangedEmitter = new EventEmitter();
     let computedLayout = stateGraphLayoutService.computeLayout(

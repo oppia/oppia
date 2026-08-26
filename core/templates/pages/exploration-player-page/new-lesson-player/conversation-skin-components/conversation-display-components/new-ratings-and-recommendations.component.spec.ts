@@ -556,8 +556,6 @@ describe('New Ratings and recommendations component', () => {
     })
   );
 
-
-
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');
 

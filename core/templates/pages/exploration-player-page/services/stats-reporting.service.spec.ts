@@ -272,8 +272,6 @@ describe('Stats reporting service ', () => {
     expect(recordSolutionHitSpy).toHaveBeenCalled();
   });
 
-
-
   it('should record stats for community exp when state is changed', () => {
     let recordStateHitSpy = spyOn(
       statsReportingBackendApiService,

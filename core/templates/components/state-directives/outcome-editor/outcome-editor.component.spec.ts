@@ -551,8 +551,6 @@ describe('Outcome Editor Component', () => {
     }).toThrowError('The active state name is null in the outcome editor.');
   });
 
-
-
   it(
     'should set labelled as correct to false on saving destination' +
       ' when state is in self loop',
