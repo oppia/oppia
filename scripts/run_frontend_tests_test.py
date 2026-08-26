@@ -240,6 +240,43 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             ],
         )
 
+    def test_frontend_tests_with_specs_to_run_core_templates_path(self) -> None:
+        original_os_path_exists = os.path.exists
+
+        def mock_os_path_exists(path: str) -> bool:
+            if (
+                path
+                == 'core/templates/pages/about-page/about-page.component.spec.ts'
+            ):
+                return True
+            return original_os_path_exists(path)
+
+        os_path_exists_swap = self.swap(os.path, 'exists', mock_os_path_exists)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, os_path_exists_swap:
+                    run_frontend_tests.main(
+                        args=[
+                            '--specs_to_run='
+                            'core/templates/pages/about-page/'
+                            'about-page.component.spec.ts',
+                        ]
+                    )
+        cmd = [
+            common.NODE_BIN_PATH,
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--include=core/templates/pages/about-page/'
+            'about-page.component.spec.ts',
+        ]
+        self.assertIn(cmd, self.cmd_token_list)
+
     def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
