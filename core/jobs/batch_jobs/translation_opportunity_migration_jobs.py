@@ -121,14 +121,11 @@ class BackfillTranslationMissingReasonsJob(base_jobs.JobBase):
                         translation_model
                     )
                 )
-                for state in exp.states.values():
-                    pending_contents = (
-                        state.get_all_contents_which_need_translations(
-                            entity_translation
-                        ).values()
-                    )
-                    for content in pending_contents:
-                        reasons.add(content.status.value)
+                pending_contents = exp.get_all_contents_which_need_translations(
+                    entity_translation, override_metadata_feature_flag=True
+                ).values()
+                for content in pending_contents:
+                    reasons.add(content.status.value)
                 if reasons:
                     translation_missing_reasons[lang_code] = sorted(
                         list(reasons)

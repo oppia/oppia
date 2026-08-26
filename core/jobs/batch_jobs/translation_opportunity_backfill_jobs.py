@@ -133,14 +133,11 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                         translation_model
                     )
                 )
-                for state in exp.states.values():
-                    pending_contents = (
-                        state.get_all_contents_which_need_translations(
-                            entity_translation
-                        ).values()
-                    )
-                    for content in pending_contents:
-                        reasons.add(content.status.value)
+                pending_contents = exp.get_all_contents_which_need_translations(
+                    entity_translation, override_metadata_feature_flag=True
+                ).values()
+                for content in pending_contents:
+                    reasons.add(content.status.value)
                 if reasons:
                     translation_missing_reasons[lang_code] = sorted(
                         list(reasons)
@@ -423,14 +420,20 @@ class AuditBackfillTranslationOpportunityModelJob(
                 exist_model.content_count != comp_model.content_count
                 or exist_model.translation_counts
                 != comp_model.translation_counts
+                or exist_model.translation_missing_reasons
+                != comp_model.translation_missing_reasons
             ):
                 yield ('discrepancy', 1)
                 yield (
                     f'error_details: Discrepancy for model {opp_id}: '
                     f'Existing (content_count={exist_model.content_count}, '
-                    f'translation_counts={exist_model.translation_counts}), '
+                    f'translation_counts={exist_model.translation_counts}, '
+                    f'translation_missing_reasons='
+                    f'{exist_model.translation_missing_reasons}), '
                     f'Computed (content_count={comp_model.content_count}, '
-                    f'translation_counts={comp_model.translation_counts})',
+                    f'translation_counts={comp_model.translation_counts}, '
+                    f'translation_missing_reasons='
+                    f'{comp_model.translation_missing_reasons})',
                     1,
                 )
             else:

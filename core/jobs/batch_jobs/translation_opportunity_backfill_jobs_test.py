@@ -221,6 +221,7 @@ class BackfillTranslationOpportunityModelJobTests(
         # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
         self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
+        self.assertEqual(model.translation_missing_reasons, {'hi': ['new']})
 
     def test_run_with_datastore_updates_disabled(self) -> None:
         orphaned_model = opportunity_models.TranslationOpportunityModel(
@@ -231,6 +232,7 @@ class BackfillTranslationOpportunityModelJobTests(
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 1},
+            translation_missing_reasons={'hi': ['new']},
         )
         orphaned_model.update_timestamps()
         orphaned_model.put()
@@ -311,6 +313,7 @@ class BackfillTranslationOpportunityModelJobTests(
         # Exploration has 4 metadata fields (title, objective, category, 1 tag).
         self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
+        self.assertEqual(model.translation_missing_reasons, {'hi': ['new']})
 
     def test_creates_translation_opportunity_model_with_complete_native_language(
         self,
@@ -337,6 +340,7 @@ class BackfillTranslationOpportunityModelJobTests(
             )
         )
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
+        self.assertEqual(model.translation_missing_reasons, {'hi': ['new']})
 
     def test_fails_if_missing_story_model(self) -> None:
         story_model = story_models.StoryModel.get_by_id('story_id')
@@ -763,6 +767,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                 if lang['id'] != 'en'
             ],
             translation_counts={'hi': 1},
+            translation_missing_reasons={'hi': ['new']},
         )
         matching_model.update_timestamps()
         matching_model.put()

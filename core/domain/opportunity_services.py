@@ -614,15 +614,10 @@ def _build_opportunity_for_non_exploration_entity(
         content_count=content_count,
         incomplete_translation_language_codes=incomplete_langs,
         translation_counts=translation_counts,
-        # Here we use cast because mypy cannot infer that the entity is an
-        # Exploration after the entity_type check.
-        translation_missing_reasons=(
-            translation_services.get_translation_missing_reasons(
-                cast(exp_domain.Exploration, entity)
-            )
-            if entity_type == feconf.ENTITY_TYPE_EXPLORATION
-            else {}
-        ),
+        # This helper only handles non-exploration entities (explorations
+        # are processed separately in `create_translation_opportunity`), so
+        # `translation_missing_reasons` is always empty here.
+        translation_missing_reasons={},
         entity_type=entity_type,
     )
 
@@ -740,6 +735,8 @@ def _save_multi_translation_opportunities(
                     existing_model.content_count != model.content_count
                     or existing_model.translation_counts
                     != model.translation_counts
+                    or existing_model.translation_missing_reasons
+                    != model.translation_missing_reasons
                     or set(existing_model.incomplete_translation_language_codes)
                     != set(model.incomplete_translation_language_codes)
                     or existing_model.topic_ids != merged_topic_ids

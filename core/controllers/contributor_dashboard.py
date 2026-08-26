@@ -971,9 +971,7 @@ class TranslatableTextHandler(
                 content_id,
                 translatable_item,
             ) in content_id_to_translatable_item.items():
-                if (
-                    not translatable_item.translatable_content.is_data_format_list()
-                ):
+                if not translatable_item.is_data_format_list():
                     content_id_to_not_set_translatable_item[content_id] = (
                         translatable_item
                     )

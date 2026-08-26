@@ -372,7 +372,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['fr', 'de'],
             translation_counts={'fr': 5, 'de': 3},
-            translation_missing_reasons={},
+            translation_missing_reasons={'fr': ['new']},
         )
         model.put()
 
@@ -388,6 +388,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             retrieved.incomplete_translation_language_codes, ['fr', 'de']
         )
         self.assertEqual(retrieved.translation_counts, {'fr': 5, 'de': 3})
+        self.assertEqual(retrieved.translation_missing_reasons, {'fr': ['new']})
 
     def test_validation_fails_for_invalid_entity_type(self) -> None:
         model = opportunity_models.TranslationOpportunityModel(

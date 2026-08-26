@@ -113,16 +113,14 @@
 <ng-template #TranslationContextBadges>
   <div class="oppia-opportunities-label-container oppia-animate-fadein"
        *ngIf="opportunity?.translationMissingReasons && opportunity?.translationMissingReasons.length > 0">
-    <div class="oppia-opportunities-label"
-         [ngStyle]="labelStyle"
+    <div class="oppia-opportunities-label oppia-update-needed-badge"
          *ngIf="opportunity.translationMissingReasons.includes('update')">
       <span class="e2e-test-opportunity-list-item-label"
             [hidden]="opportunityDataIsLoading">
           Update Needed
       </span>
     </div>
-    <div class="oppia-opportunities-label"
-         [ngStyle]="labelStyle"
+    <div class="oppia-opportunities-label oppia-new-translation-badge"
          *ngIf="opportunity.translationMissingReasons.includes('new')">
       <span class="e2e-test-opportunity-list-item-label"
             [hidden]="opportunityDataIsLoading">

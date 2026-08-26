@@ -158,7 +158,9 @@ describe('Exploration opportunity summary model', () => {
         translation_in_review_counts: {
           hi: 20,
         },
-        translation_missing_reasons: {},
+        translation_missing_reasons: {
+          hi: ['new'],
+        },
       };
 
       const summary =
@@ -173,6 +175,7 @@ describe('Exploration opportunity summary model', () => {
       expect(summary.getTranslationsCount('hi')).toEqual(15);
       expect(summary.getTranslationsInReviewCount('hi')).toEqual(20);
       expect(summary.getTranslationProgressPercentage('hi')).toEqual(15);
+      expect(summary.translationMissingReasons).toEqual({hi: ['new']});
     });
 
     it('should map optional V2 fields correctly if provided', () => {

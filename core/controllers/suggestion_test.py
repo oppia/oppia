@@ -4538,7 +4538,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
-            translation_missing_reasons={},
+            translation_missing_reasons={'hi': ['new']},
         ).put()
 
         response = self.get_json(
@@ -4572,6 +4572,12 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.EXP_ID]['entity_id'],
             self.EXP_ID,
+        )
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.EXP_ID][
+                'translation_missing_reasons'
+            ],
+            {'hi': ['new']},
         )
 
     def test_skill_opportunity_dict_with_none_opportunity(self) -> None:
