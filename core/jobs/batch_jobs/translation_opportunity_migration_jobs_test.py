@@ -24,6 +24,7 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.tests import test_utils
 
 (exp_models, opportunity_models, translation_models) = (
     models.Registry.import_models(
@@ -36,7 +37,9 @@ from core.platform import models
 )
 
 
-class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
+class BackfillTranslationMissingReasonsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     """Tests for BackfillTranslationMissingReasonsJob."""
 
     JOB_CLASS = (
