@@ -299,11 +299,7 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
     );
-    await curriculumAdmin.expectTextContentToBe(
-      '.toast-message',
-      'Certificate created.'
-    );
-    await curriculumAdmin.page.keyboard.press('Escape');
+    await curriculumAdmin.expectToastMessage('Certificate created.');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -373,11 +369,7 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
     );
-    await curriculumAdmin.expectTextContentToBe(
-      '.toast-message',
-      'Certificate updated.'
-    );
-    await curriculumAdmin.page.keyboard.press('Escape');
+    await curriculumAdmin.expectToastMessage('Certificate updated.');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -440,11 +432,7 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
     );
-    await curriculumAdmin.expectTextContentToBe(
-      '.toast-message',
-      'Certificate updated.'
-    );
-    await curriculumAdmin.page.keyboard.press('Escape');
+    await curriculumAdmin.expectToastMessage('Certificate updated.');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -515,10 +503,7 @@ describe('Certificate Assessment', function () {
     );
     expect(confirmUpdateButtonIsDisabled).toBe(true);
     await curriculumAdmin.clickOnElementWithSelector(saveAsNotReadyButton);
-    await curriculumAdmin.expectTextContentToBe(
-      '.toast-message',
-      'Certificate saved as not ready.'
-    );
+    await curriculumAdmin.expectToastMessage('Certificate saved as not ready.');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -547,8 +532,7 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.clickOnElementWithSelector(
       deleteCertificateConfirmButton
     );
-    await curriculumAdmin.expectTextContentToBe(
-      '.toast-message',
+    await curriculumAdmin.expectToastMessage(
       'Certificate deleted successfully.'
     );
     await curriculumAdmin.expectTextContentToBe(
