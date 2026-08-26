@@ -362,7 +362,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
       1
     );
-    expect(component.isLoadingQuestion).toBeTrue();
+    expect(component.isLoadingQuestion).toBe(true);
     (
       component as unknown as {loadQuestion: (index: number) => void}
     ).loadQuestion(0);
@@ -371,7 +371,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
     resolve(questionResponse('q1'));
     flushMicrotasks();
-    expect(component.isLoadingQuestion).toBeFalse();
+    expect(component.isLoadingQuestion).toBe(false);
   }));
 
   it('should store questions at correct index for sparse loading', fakeAsync(() => {
@@ -399,7 +399,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       Promise.reject(new Error('err'))
     );
     loadQ1();
-    expect(component.loadError).toBeTrue();
+    expect(component.loadError).toBe(true);
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       Promise.resolve(questionResponse('q1'))
     );
@@ -407,7 +407,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       component as unknown as {loadQuestion: (index: number) => void}
     ).loadQuestion(0);
     flushMicrotasks();
-    expect(component.loadError).toBeFalse();
+    expect(component.loadError).toBe(false);
   }));
 
   it('should retry loading the current question after a failure', fakeAsync(() => {
@@ -415,7 +415,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       Promise.reject(new Error('err'))
     );
     loadQ1();
-    expect(component.loadError).toBeTrue();
+    expect(component.loadError).toBe(true);
     apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
       Promise.resolve(questionResponse('q1'))
     );
@@ -423,7 +423,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.retryLoadQuestion();
     flushMicrotasks();
 
-    expect(component.loadError).toBeFalse();
+    expect(component.loadError).toBe(false);
     expect(component.currentQuestion).not.toBeNull();
     expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
       2
@@ -469,19 +469,19 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestion).toEqual(component.questions[0]);
     expect(component.totalQuestionCount).toBe(3);
     expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
-    expect(component.isLastQuestion).toBeFalse();
+    expect(component.isLastQuestion).toBe(false);
   }));
 
   it('should recompute derived fields when navigating', fakeAsync(() => {
     load();
     component.currentQuestionIndex = 0;
     component.nextQuestion();
-    expect(component.isLastQuestion).toBeFalse();
+    expect(component.isLastQuestion).toBe(false);
     component.nextQuestion();
-    expect(component.isLastQuestion).toBeTrue();
+    expect(component.isLastQuestion).toBe(true);
     expect(component.progressPercentage).toBe(100);
     component.previousQuestion();
-    expect(component.isLastQuestion).toBeFalse();
+    expect(component.isLastQuestion).toBe(false);
   }));
 
   it('should store answer via handleInteractionSubmit', fakeAsync(() => {
@@ -523,9 +523,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should report whether current question is last', fakeAsync(() => {
     load();
     component.currentQuestionIndex = 0;
-    expect(component.isCurrentQuestionLast()).toBeFalse();
+    expect(component.isCurrentQuestionLast()).toBe(false);
     component.currentQuestionIndex = 2;
-    expect(component.isCurrentQuestionLast()).toBeTrue();
+    expect(component.isCurrentQuestionLast()).toBe(true);
   }));
 
   it('should return 0 when no questions', async () => {
@@ -691,10 +691,35 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.assessmentEnded.emit).toHaveBeenCalled();
   }));
 
-  it('should open unanswered-question modal on desktop', fakeAsync(() => {
+  it('should not open any modal when the flag is false', fakeAsync(() => {
     loadQ1();
-    component.showUnansweredQuestionModal = true;
+    modalSpy.open.calls.reset();
     component.ngOnInit();
+    expect(modalSpy.open).not.toHaveBeenCalled();
+  }));
+
+  it('should emit answers directly when all questions are answered', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    component.answers.q1 = 1;
+    component.answers.q2 = ['a', 'b', 'd'];
+    component.answers.q3 = 'circle';
+    component.submitAssessment();
+    expect(modalSpy.open).not.toHaveBeenCalled();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'q1', is_correct: false, selected_answer: '1'},
+      {question_id: 'q2', is_correct: false, selected_answer: '["a","b","d"]'},
+      {question_id: 'q3', is_correct: false, selected_answer: 'circle'},
+    ]);
+  }));
+
+  it('should open unanswered-question modal with the unanswered count on desktop', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    const ref = modalRef();
+    modalSpy.open.and.returnValue(ref);
+    component.answers.q1 = 1;
+    component.submitAssessment();
     expect(modalSpy.open).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent,
       {
@@ -703,32 +728,100 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         windowClass: 'oppia-unanswered-question-modal',
       }
     );
+    expect(ref.componentInstance.unansweredQuestionCount).toBe(2);
+    expect(component.assessmentSubmitted.emit).not.toHaveBeenCalled();
+  }));
+
+  it('should return to the last unanswered question when the modal is dismissed', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    modalSpy.open.and.returnValue(modalRef(true));
+    component.currentQuestionIndex = 0;
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    flushMicrotasks();
+    expect(component.assessmentSubmitted.emit).not.toHaveBeenCalled();
+    expect(component.currentQuestionIndex).toBe(2);
+  }));
+
+  it('should return to the correct question when an intermediate question failed to load', fakeAsync(() => {
+    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
+      (_attemptId: string, questionId: string) => {
+        if (questionId === 'q2') {
+          return Promise.reject(new Error('load failed'));
+        }
+        return Promise.resolve(questionResponse(questionId));
+      }
+    );
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    const ref = modalRef();
+    modalSpy.open.and.returnValue(ref);
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    flushMicrotasks();
+    // Only q3 is loaded but unanswered, and its index within this.questions
+    // must be preserved even though it is first in the filtered list.
+    expect(ref.componentInstance.unansweredQuestionCount).toBe(1);
+    expect(component.currentQuestionIndex).toBe(2);
+  }));
+
+  it('should emit answers when submit anyway is confirmed', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    modalSpy.open.and.returnValue(modalRef(false, 'submit-anyway'));
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    flushMicrotasks();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
+      {question_id: 'q1', is_correct: false, selected_answer: '1'},
+      {question_id: 'q2', is_correct: false},
+      {question_id: 'q3', is_correct: false},
+    ]);
   }));
 
   it('should open unanswered-question modal as bottom sheet on mobile', fakeAsync(() => {
-    loadQ1();
+    load();
     dimsSpy.getWidth.and.returnValue(400);
-    component.showUnansweredQuestionModal = true;
-    component.ngOnInit();
+    const ref = {
+      instance: {} as Record<string, unknown>,
+      afterDismissed: () => of(null),
+    };
+    bottomSheetSpy.open.and.returnValue(ref);
+    component.answers.q1 = 1;
+    component.submitAssessment();
     expect(bottomSheetSpy.open).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
+    expect(ref.instance.unansweredQuestionCount).toBe(2);
   }));
 
-  it('should handle unanswered-question modal dismiss', fakeAsync(() => {
-    loadQ1();
-    modalSpy.open.and.returnValue(modalRef(true));
-    component.showUnansweredQuestionModal = true;
-    component.ngOnInit();
+  it('should emit answers when the bottom sheet is dismissed with submit-anyway', fakeAsync(() => {
+    load();
+    spyOn(component.assessmentSubmitted, 'emit');
+    dimsSpy.getWidth.and.returnValue(400);
+    bottomSheetSpy.open.and.returnValue({
+      instance: {} as Record<string, unknown>,
+      afterDismissed: () => of('submit-anyway'),
+    });
+    component.answers.q1 = 1;
+    component.submitAssessment();
     flushMicrotasks();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
   }));
 
-  it('should not open any modal when both flags are false', fakeAsync(() => {
-    loadQ1();
-    modalSpy.open.calls.reset();
-    component.showUnansweredQuestionModal = false;
-    component.ngOnInit();
-    expect(modalSpy.open).not.toHaveBeenCalled();
+  it('should return to the last unanswered question when the bottom sheet is dismissed', fakeAsync(() => {
+    load();
+    dimsSpy.getWidth.and.returnValue(400);
+    bottomSheetSpy.open.and.returnValue({
+      instance: {} as Record<string, unknown>,
+      afterDismissed: () => of(null),
+    });
+    component.currentQuestionIndex = 0;
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    flushMicrotasks();
+    expect(component.currentQuestionIndex).toBe(2);
   }));
 
   it('should emit correct answers on submit', fakeAsync(() => {
@@ -744,11 +837,12 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
     component.answers.q1 = 1;
     component.answers.q2 = ['a', 'b', 'd'];
+    component.answers.q3 = 'circle';
     component.submitAssessment();
     expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
       {question_id: 'q1', is_correct: true, selected_answer: '1'},
       {question_id: 'q2', is_correct: true, selected_answer: '["a","b","d"]'},
-      {question_id: 'q3', is_correct: false},
+      {question_id: 'q3', is_correct: true, selected_answer: 'circle'},
     ]);
   }));
 
@@ -802,7 +896,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should omit selected_answer when answer is null', fakeAsync(() => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
+    modalSpy.open.and.returnValue(modalRef(false, 'submit-anyway'));
     component.submitAssessment();
+    flushMicrotasks();
     const answers = (
       component.assessmentSubmitted.emit as jasmine.Spy
     ).calls.mostRecent().args[0];
