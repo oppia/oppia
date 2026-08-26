@@ -263,7 +263,6 @@
 
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
-/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
 /core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
@@ -620,6 +619,8 @@
 /core/templates/services/oppia-rte-parser.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-local-storage*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.css @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
 /core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
