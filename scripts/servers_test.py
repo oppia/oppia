@@ -541,9 +541,6 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
         self.assertEqual(list(popen_calls[0].kwargs.keys()), ['shell', 'env'])
 
-
-class PopenStub:
-
     def test_managed_redis_server(self) -> None:
         original_os_remove = os.remove
         original_os_path_exists = os.path.exists
