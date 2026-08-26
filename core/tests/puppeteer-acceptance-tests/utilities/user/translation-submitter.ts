@@ -187,12 +187,21 @@ export class TranslationSubmitter extends BaseUser {
           `Translate button for chapter ${chapterName} and story ${storyName} not found.`
         );
       }
-      // Puppeteer scrolls a target back to the centre of the viewport before
-      // it dispatches a mouse event, which parks the button underneath the
-      // sticky header again and delivers the click to the header instead.
-      // By evaluating the click, it is dispatched on the element itself where
-      // it cannot be intercepted.
-      await translateButton.evaluate(el => (el as HTMLElement).click());
+      if (this.isViewportAtMobileWidth()) {
+        // Aligning the button with the bottom of the viewport keeps it clear of
+        // the header so that the clickability check below can pass.
+        await translateButton.evaluate(el => el.scrollIntoView({block: 'end'}));
+        await this.waitForElementToStabilize(translateButton);
+        await this.waitForElementToBeClickable(translateButton);
+        // Puppeteer scrolls a target back to the centre of the viewport before
+        // it dispatches a mouse event, which parks the button underneath the
+        // sticky header again and delivers the click to the header instead.
+        // That scroll happens after the check above, so the click is dispatched
+        // on the element itself where it cannot be intercepted.
+        await translateButton.evaluate(el => (el as HTMLElement).click());
+      } else {
+        await this.clickOnElement(translateButton);
+      }
 
       // Verify that the translation editor is opened.
       try {

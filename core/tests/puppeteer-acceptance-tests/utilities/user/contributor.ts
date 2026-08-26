@@ -745,7 +745,12 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Content type option ${contentType} not found.`);
     }
 
-    await optionElement.click();
+    // The option is dispatched on the element for the same reason the toggle
+    // is. A native click re-centres the option first, which at mobile width
+    // puts it under the sticky navigation bar, and the click then lands on the
+    // bar instead. The dropdown closes on that outside click without the
+    // option ever being selected.
+    await optionElement.evaluate(el => (el as HTMLElement).click());
 
     // Verify the option is selected.
     await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
@@ -773,12 +778,11 @@ export class Contributor extends ExplorationEditor {
    * Clicks the control that opens and closes the "Content Type" dropdown.
    */
   private async clickContentTypeFilterToggle(): Promise<void> {
-    // The filter row can sit under the sticky navigation bar on mobile, and
-    // occasionally on desktop depending on scroll position. Puppeteer scrolls
-    // a target back to the centre of the viewport before it dispatches a
-    // mouse event, which parks the control under that bar and delivers the
-    // click to the bar instead. By evaluating the click, it is dispatched on
-    // the control itself where it cannot be intercepted.
+    // At mobile width the filter row sits under the sticky navigation bar.
+    // Puppeteer scrolls a target back to the centre of the viewport before it
+    // dispatches a mouse event, which parks the control under that bar and
+    // delivers the click to the bar instead, so the click is dispatched on the
+    // control itself where it cannot be intercepted.
     const toggle = await this.page.waitForSelector(selectedEntityTypeSelector);
     if (!toggle) {
       throw new Error('The content type filter was not found.');
