@@ -55,6 +55,13 @@ const reviewModalProbeTimeoutMsecs = 2000;
 // timeout is exactly thirty seconds and would race it.
 const reviewCommitTimeoutMsecs = 45000;
 
+// The suggestion list reloads itself shortly after it first renders, which
+// detaches the rows a search was holding. The search is therefore retried, and
+// three attempts spaced by the delay below comfortably outlast that reload
+// while still failing quickly when the row genuinely is not there.
+const opportunityCardSearchAttempts = 3;
+const opportunityCardSearchRetryDelayMsecs = 1000;
+
 export class TranslationReviewer extends BaseUser {
   /**
    * Clicks on the translate button in the translation modal.
@@ -112,10 +119,9 @@ export class TranslationReviewer extends BaseUser {
     heading: string,
     subheading: string
   ): Promise<ElementHandle<Element>> {
-    const maxRetries = 3;
     let opportunityItem: ElementHandle<Element> | null = null;
 
-    for (let i = 0; i < maxRetries; i++) {
+    for (let attempt = 1; attempt <= opportunityCardSearchAttempts; attempt++) {
       try {
         await this.expectElementToBeVisible(opportunityItemSelector);
         const opportunityItems = await this.page.$$(opportunityItemSelector);
@@ -145,13 +151,16 @@ export class TranslationReviewer extends BaseUser {
           break;
         }
       } catch (error) {
+        // A row that the reload detached mid-search is retried rather than
+        // reported, since the list is about to render the same row again.
+        // Puppeteer only signals this in the message of the error it throws.
         if (error instanceof Error && error.message.includes('detached')) {
           continue;
         }
         throw error;
       }
-      // Wait a moment before retrying if the element wasn't found (it might be rendering).
-      await this.page.waitForTimeout(1000);
+
+      await this.page.waitForTimeout(opportunityCardSearchRetryDelayMsecs);
     }
 
     if (!opportunityItem) {
@@ -246,7 +255,18 @@ export class TranslationReviewer extends BaseUser {
     await this.openFirstSuggestionForReview();
 
     for (let accepted = 1; accepted <= maxSuggestions; accepted++) {
-      await this.clickOnElementWithSelector(acceptTranslationButtonSelector);
+      const contentBeforeReview = await this.page.$eval(
+        reviewContentContainerSelector,
+        el => el.textContent
+      );
+      await this.pressReviewButton(acceptTranslationButtonSelector);
+
+      // Accepting one suggestion sends the one accepted before it, so from the
+      // second accept onwards a toast for the previous suggestion arrives here
+      // and is consumed before it clears.
+      if (accepted > 1) {
+        await this.expectReviewOutcomeToast(expectedToastMessage);
+      }
 
       const modalIsStillOpen = await this.isElementVisible(
         reviewModalContainerSelector,
@@ -254,13 +274,27 @@ export class TranslationReviewer extends BaseUser {
         reviewModalProbeTimeoutMsecs
       );
       if (!modalIsStillOpen) {
-        // Only the last accept is still held behind the undo window. Waiting
-        // for its toast is what proves every translation has reached the
-        // server, which is what a learner then has to be able to see.
+        // Nothing follows the last suggestion to send it, so it waits out its
+        // own undo window. Its toast is the one that proves every translation
+        // has reached the server, which is what a learner has to be able to
+        // see afterwards.
         await this.expectReviewOutcomeToast(expectedToastMessage);
         showMessage(`Accepted ${accepted} suggestions.`);
         return;
       }
+
+      // The modal is still on the suggestion just reviewed until the next one
+      // has loaded, and its accept button stays disabled for that whole time,
+      // so the next pass waits for the content to change before pressing it.
+      await this.page.waitForFunction(
+        (selector: string, previousContent: string) => {
+          const element = document.querySelector(selector);
+          return element !== null && element.textContent !== previousContent;
+        },
+        {},
+        reviewContentContainerSelector,
+        contentBeforeReview ?? ''
+      );
     }
 
     throw new Error(
@@ -300,7 +334,7 @@ export class TranslationReviewer extends BaseUser {
       el => el.textContent
     );
 
-    await this.clickOnElementWithSelector(buttonSelector);
+    await this.pressReviewButton(buttonSelector);
 
     await this.page.waitForFunction(
       (selector: string, initialContent: string) => {
@@ -415,8 +449,34 @@ export class TranslationReviewer extends BaseUser {
       await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
     }
 
-    await this.clickOnElementWithSelector(buttonSelector);
+    await this.pressReviewButton(buttonSelector);
     await this.expectReviewOutcomeToast(expectedToastMessage);
+  }
+
+  /**
+   * Presses an accept or reject button in the review modal. The button is
+   * disabled while the previous review is still resolving, so this waits for
+   * it to come back, and dispatches the click on the element so that neither
+   * the undo snackbar nor the navigation bar can intercept it.
+   * @param buttonSelector - The review button to press.
+   */
+  private async pressReviewButton(buttonSelector: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(
+          selector
+        ) as HTMLButtonElement | null;
+        return button !== null && !button.disabled;
+      },
+      {},
+      buttonSelector
+    );
+
+    const button = await this.page.waitForSelector(buttonSelector);
+    if (!button) {
+      throw new Error(`The review button ${buttonSelector} was not found.`);
+    }
+    await button.evaluate(el => (el as HTMLElement).click());
   }
 
   /**
@@ -440,6 +500,10 @@ export class TranslationReviewer extends BaseUser {
           `was "${toastMessage}".`
       );
     }
+
+    // The toast is left to clear so that a following assertion reads the next
+    // one rather than this one again.
+    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**

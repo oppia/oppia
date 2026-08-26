@@ -751,15 +751,6 @@ export class TranslationSubmitter extends BaseUser {
       enabled
     );
   }
-
-  /**
-   * Checks the label on the save button, which reads "Save and translate
-   * another" while items remain and "Save and close" on the last one.
-   * @param label - The expected button label.
-   */
-  async expectSaveTranslationButtonLabelToBe(label: string): Promise<void> {
-    await this.expectTextContentToBe(saveTranslationButtonSelector, label);
-  }
 }
 
 export let TranslationSubmitterFactory = (): TranslationSubmitter =>
