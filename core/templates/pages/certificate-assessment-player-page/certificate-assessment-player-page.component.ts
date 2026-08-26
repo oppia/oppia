@@ -362,7 +362,16 @@ export class CertificateAssessmentPlayerPageComponent
     if (question === null) {
       return;
     }
-    this.answers[question.id] = answer;
+    // Store the answer in its canonical dict form. Object-based answers (e.g.
+    // NumberWithUnits) are submitted as class instances, but interaction
+    // components reconstruct the value via `fromDict`, which expects a plain
+    // dict. Normalizing here guarantees pre-population works uniformly.
+    const normalizedAnswer =
+      answer !== null &&
+      typeof (answer as {toDict?: unknown}).toDict === 'function'
+        ? (answer as unknown as {toDict: () => InteractionAnswer}).toDict()
+        : answer;
+    this.answers[question.id] = normalizedAnswer;
     this.refreshComputedFields();
   }
 
@@ -372,6 +381,14 @@ export class CertificateAssessmentPlayerPageComponent
       return '';
     }
     return this.interactionHtmls[question.id] ?? '';
+  }
+
+  // The previously recorded answer for the current question, passed to the
+  // conversation skin so it can be restored into the interaction when the
+  // learner navigates back to a question they already answered.
+  get lastAnswerForCurrentQuestion(): InteractionAnswer | null {
+    const question = this.getCurrentQuestion();
+    return question ? this.answers[question.id] ?? null : null;
   }
 
   private formatAnswerForBackend(answer: InteractionAnswer): string {
