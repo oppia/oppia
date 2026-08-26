@@ -458,13 +458,13 @@ topic-mastery-challenge-card {
   display: block;
 }
 
-@media (max-width: 768px) {
-  .adventure-navigation-sticky-wrapper {
-    position: -webkit-sticky;
-    position: sticky;
-    z-index: 30;
-  }
+.adventure-navigation-sticky-wrapper {
+  position: -webkit-sticky;
+  position: sticky;
+  z-index: 30;
+}
 
+@media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
     gap: 16px;

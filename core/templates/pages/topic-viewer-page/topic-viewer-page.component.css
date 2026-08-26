@@ -51,6 +51,15 @@ topic-viewer-page-root .oppia-navbar {
   transform: translateY(0%);
 }
 
+.headroom--unpinned {
+  transform: translateY(0%);
+}
+
+.headroom {
+  transition: transform 200ms linear;
+  will-change: transform;
+}
+
 topic-viewer-page-root .oppia-topic-viewer-container .background-banner-position {
   position: inherit;
 }
