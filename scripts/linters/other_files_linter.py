@@ -450,9 +450,11 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         # join string-concatenated import paths so that the regex can
         # match them reliably.
         normalized = re.sub(r'//[^\n]*', '', routing_content)
+        # The regex and replacement contain literal single quotes from
+        # the TypeScript source, so double-quote delimiters are required.
         normalized = re.sub(
-            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",
-            r"'\1\2'",
+            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=C0042
+            r"'\1\2'",  # pylint: disable=C0042
             normalized,
         )
 

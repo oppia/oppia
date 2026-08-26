@@ -597,30 +597,32 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
-                        "const routes: Route[] = [",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND"
-                        ".SPLASH.ROUTE,",
-                        "    loadChildren: () =>",
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.SPLASH.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/splash-page/splash-page.module')",
-                        "  },",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND"
-                        ".ANDROID.ROUTE,",
-                        "    loadChildren: () =>",
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ANDROID.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/android-page/android-page.module')",
-                        "  },",
-                        "];",
+                        '  },',
+                        '];',
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
-                return '{'
-                '  "splash": {'
-                '    "url": "http://localhost:8181/",'
-                '    "page_module": '
-                '"core/templates/pages/splash-page/splash-page.module.ts"'
-                '  }'
-                '}'
+                return (
+                    '{'
+                    '  "splash": {'
+                    '    "url": "http://localhost:8181/",'
+                    '    "page_module": '
+                    '"core/templates/pages/splash-page/splash-page.module.ts"'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -638,20 +640,20 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
-                        "const routes: Route[] = [",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND"
-                        ".SPLASH.ROUTE,",
-                        "    loadChildren: () =>",
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.SPLASH.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/splash-page/splash-page.module')",
-                        "  },",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND"
-                        ".NEW_PAGE.ROUTE,",
-                        "    loadChildren: () =>",
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.NEW_PAGE.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/new-page/new-page.module')",
-                        "  },",
-                        "];",
+                        '  },',
+                        '];',
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
@@ -675,14 +677,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
-                        "const routes: Route[] = [",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND"
-                        ".ABOUT.ROUTE,",
-                        "    loadChildren: () =>",
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/about-page/about-page.module')",
-                        "  },",
-                        "];",
+                        '  },',
+                        '];',
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
@@ -706,20 +708,21 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_check_lighthouse_page_coverage_multiline_key(self) -> None:
         """Routes with multi-line PAGES_REGISTERED_WITH_FRONTEND keys
-        are handled correctly."""
+        are handled correctly.
+        """
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
-                        "const routes: Route[] = [",
-                        "  {",
-                        "    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND",
-                        "      .ADMIN.ROUTE,",
-                        "    loadChildren: () =>",
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND',
+                        '      .ADMIN.ROUTE,',
+                        '    loadChildren: () =>',
                         "      import('pages/admin-page/admin-page.module')",
-                        "  },",
-                        "];",
+                        '  },',
+                        '];',
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
