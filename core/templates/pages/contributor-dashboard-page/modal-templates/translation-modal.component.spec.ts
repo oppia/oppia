@@ -243,6 +243,12 @@ describe('Translation Modal Component', () => {
         can_review_questions: false,
       })
     );
+
+    const translateTextBackendApiService = TestBed.inject(TranslateTextBackendApiService);
+    spyOn(
+      translateTextBackendApiService,
+      'getMachineTranslationFeatureStatusAsync'
+    ).and.returnValue(Promise.resolve(true));
   });
 
   it('should wrap text with ellipsis when text is too long', () => {

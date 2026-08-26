@@ -523,6 +523,10 @@ URLS = [
         machine_translation.MachineTranslationGenerateHandler,
     ),
     get_redirect_route(
+        r'/machine-translation-feature-status',
+        machine_translation.MachineTranslationFeatureStatusHandler,
+    ),
+    get_redirect_route(
         r'/translation-provider-mapping',
         machine_translation.TranslationProviderMappingHandler,
     ),

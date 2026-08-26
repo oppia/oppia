@@ -242,8 +242,23 @@ export class TranslationModalComponent {
   }
 
   ngOnInit(): void {
-    this.isAutoTranslationFeatureEnabled =
+    const isFeatureFlagEnabled =
       this.platformFeatureService.status.EnableAutomaticTranslationSuggestions.isEnabled;
+
+    if (isFeatureFlagEnabled) {
+      this.translateTextBackendApiService
+        .getMachineTranslationFeatureStatusAsync()
+        .then(isEnabled => {
+          this.isAutoTranslationFeatureEnabled = isEnabled;
+          this.changeDetectorRef.detectChanges();
+        })
+        .catch(() => {
+          this.isAutoTranslationFeatureEnabled = false;
+          this.changeDetectorRef.detectChanges();
+        });
+    } else {
+      this.isAutoTranslationFeatureEnabled = false;
+    }
     this.activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
     this.subheading = this.opportunity

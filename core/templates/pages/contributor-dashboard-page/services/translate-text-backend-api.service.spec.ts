@@ -365,6 +365,21 @@ describe('TranslateTextBackendApiService', () => {
       })
     );
 
+    it('should successfully fetch the global automatic translation status', fakeAsync(() => {
+      translateTextBackendApiService
+        .getMachineTranslationFeatureStatusAsync()
+        .then(successHandler, failHandler);
+      flushMicrotasks();
+
+      const req = httpTestingController.expectOne('/machine-translation-feature-status');
+      expect(req.request.method).toEqual('GET');
+      req.flush({is_enabled: true});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
     it(
       'should include was_edited=true when contributor edited the ' +
         'AI suggestion before submission',
