@@ -231,3 +231,48 @@
     margin: 5px;
   }
 }
+
+/* Auto-translate button row ------------------------------------------------ */
+.oppia-auto-translate-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.oppia-auto-translate-btn {
+  background-color: #0d6efd;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  padding: 4px 10px;
+}
+
+.oppia-auto-translate-btn:disabled {
+  opacity: 0.6;
+}
+
+/* AI badge shared styles --------------------------------------------------- */
+.oppia-ai-badge {
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 2px 8px;
+}
+
+/* AI-generated badge (blue): the content was translated by AI and the
+   contributor has not yet made any edits. */
+.oppia-ai-generated-badge {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+/* AI-generated·edited badge (grey): the contributor modified the AI
+   suggestion before submitting. */
+.oppia-ai-edited-badge {
+  background-color: #e2e3e5;
+  color: #41464b;
+}

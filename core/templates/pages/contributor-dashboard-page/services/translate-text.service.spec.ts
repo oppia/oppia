@@ -337,6 +337,9 @@ describe('TranslateTextService', () => {
         'hi',
         [],
         'html',
+        false,
+        '',
+        false,
         successCallback,
         errorCallback
       );
@@ -361,6 +364,9 @@ describe('TranslateTextService', () => {
         'hi',
         [],
         'html',
+        false,
+        '',
+        false,
         successCallback,
         errorCallback
       );
@@ -397,6 +403,9 @@ describe('TranslateTextService', () => {
         'hi',
         [],
         'html',
+        false,
+        '',
+        false,
         successCallback,
         errorCallback
       );
@@ -442,6 +451,9 @@ describe('TranslateTextService', () => {
         'hi',
         [],
         'html',
+        false,
+        '',
+        false,
         successCallback,
         errorCallback
       );

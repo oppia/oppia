@@ -569,6 +569,188 @@ export class TranslationSubmitter extends BaseUser {
       skill
     );
   }
+
+  // ── Auto-translate helpers ───────────────────────────────────────────────
+
+  /**
+   * Intercepts all requests to the given URL path and returns a synthetic JSON
+   * response. This allows acceptance tests to exercise the auto-translate UI
+   * without a live AI provider.
+   *
+   * @param urlPath - Absolute or partial URL to intercept (e.g.
+   *   '/generate-translation').
+   * @param responseBody - Object that will be JSON-serialised and returned as
+   *   the response body.
+   */
+  async interceptTranslationRequests(
+    urlPath: string,
+    responseBody: object
+  ): Promise<void> {
+    await this.page.setRequestInterception(true);
+    this.page.on('request', request => {
+      if (request.url().includes(urlPath)) {
+        request.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(responseBody),
+        });
+      } else {
+        request.continue();
+      }
+    });
+  }
+
+  /**
+   * Clicks the translate button on the first available translation opportunity
+   * in the translate-text tab. Useful when the exact chapter/story name is not
+   * known in advance.
+   */
+  async clickButtonToStartTranslating(): Promise<void> {
+    await this.expectElementToBeVisible(opportunityTranslateButtonSelector);
+    const button = await this.page.$(opportunityTranslateButtonSelector);
+    if (!button) {
+      throw new Error('No translate button found on the page.');
+    }
+    await this.clickOnElement(button);
+    await this.page.waitForSelector(
+      translateTextModalHeaderContainerSelector,
+      {visible: true, timeout: 15000}
+    );
+  }
+
+  /**
+   * Selects the target language in the contributor dashboard language filter.
+   * @param language - The human-readable language label to select (e.g.
+   *   'español (Spanish)').
+   */
+  async selectLanguage(language: string): Promise<void> {
+    // The language selector element varies by page region; look for the
+    // first matching option that contains the given label.
+    const languageSelectorSelector = '.e2e-test-language-selector';
+    await this.clickOnElementWithSelector(languageSelectorSelector);
+    const optionElements = await this.page.$$(
+      '.e2e-test-language-selector-option'
+    );
+    for (const option of optionElements) {
+      const text = await option.evaluate(el => el.textContent ?? '');
+      if (text.trim().includes(language)) {
+        await option.click();
+        return;
+      }
+    }
+    // Language not found in dropdown; fall back to a direct filter update.
+    await this.page.select(languageSelectorSelector, language);
+  }
+
+  /**
+   * Returns true when the auto-translate button is present and visible in the
+   * translation modal editor section.
+   */
+  async isAutoTranslateButtonVisible(): Promise<boolean> {
+    const selector = '.e2e-test-auto-translate-button';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 5000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Clicks the auto-translate button in the translation modal and waits for
+   * the editor to be populated.
+   */
+  async clickAutoTranslateButton(): Promise<void> {
+    const selector = '.e2e-test-auto-translate-button';
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+    // Wait for the translating spinner to disappear (indicating the request
+    // completed and the editor was updated).
+    await this.page.waitForFunction(
+      (sel: string) => {
+        const btn = document.querySelector(sel);
+        return btn && !btn.textContent?.includes('Translating');
+      },
+      {timeout: 20000},
+      selector
+    );
+  }
+
+  /**
+   * Returns the inner text content of the translation editor area.
+   */
+  async getTranslationEditorContent(): Promise<string> {
+    const editorSelector = '.e2e-test-state-translation-editor';
+    await this.expectElementToBeVisible(editorSelector);
+    return this.page.$eval(
+      editorSelector,
+      (el: Element) => el.innerHTML ?? ''
+    );
+  }
+
+  /**
+   * Returns true when the "AI-generated" badge (without the edited variant)
+   * is visible in the translation modal.
+   */
+  async isAiGeneratedBadgeVisible(): Promise<boolean> {
+    const selector = '.e2e-test-ai-generated-badge';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true when the "AI-generated · edited" badge is visible in the
+   * translation modal.
+   */
+  async isAiEditedBadgeVisible(): Promise<boolean> {
+    const selector = '.e2e-test-ai-edited-badge';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true when the "Translation is incomplete" error message is shown
+   * in the translation modal.
+   */
+  async isTranslationIncompleteErrorVisible(): Promise<boolean> {
+    const selector = '.oppia-translation-error-section p';
+    try {
+      const el = await this.page.$(selector);
+      if (!el) {
+        return false;
+      }
+      const text = await el.evaluate((e: Element) => e.textContent ?? '');
+      return text.includes('incomplete');
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Types additional text at the end of the current translation editor
+   * content to simulate the contributor editing an AI-generated suggestion.
+   * @param text - The text to append inside the editor.
+   */
+  async editTranslationInEditor(text: string): Promise<void> {
+    const editorBodySelector = '.e2e-test-rte';
+    await this.expectElementToBeVisible(editorBodySelector);
+    await this.page.click(editorBodySelector);
+    // Move the cursor to the end of the existing content.
+    await this.page.keyboard.press('End');
+    await this.page.keyboard.type(text);
+    // Trigger Angular change detection by dispatching an input event.
+    await this.page.$eval(editorBodySelector, (el: Element) => {
+      el.dispatchEvent(new Event('input', {bubbles: true}));
+    });
+  }
 }
 
 export let TranslationSubmitterFactory = (): TranslationSubmitter =>
