@@ -218,6 +218,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      internetConnectivityService,
       {} as PageHeadService,
       router,
       translateService
@@ -237,7 +238,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     resolveClassroom({classroomDict: {urlFragment: 'math'}});
     flushMicrotasks();
 
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
 
     component.onGoToAvailableCertificates();
     flushMicrotasks();
@@ -259,7 +260,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.ngOnInit();
     flushMicrotasks();
 
-    expect(component.hasError).toBeTrue();
+    expect(component.hasError).toBe(true);
     expect(
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
     ).not.toHaveBeenCalled();
@@ -276,7 +277,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -341,12 +342,12 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.certificateId = 'cert-123';
     armCountdown();
     tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
+    expect(component.isTimeExpired).toBe(true);
 
     component.startAssessment();
     flushMicrotasks();
 
-    expect(component.isTimeExpired).toBeFalse();
+    expect(component.isTimeExpired).toBe(false);
     expect(component.remainingTimeInSeconds).toBe(3600);
     expect(window.clearInterval).toHaveBeenCalled();
     expect(window.setInterval).toHaveBeenCalledTimes(2);
@@ -367,7 +368,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     // A failed start request must neither wipe nor extend the current
     // window: resetting is reserved for successfully begun attempts.
-    expect(component.isTimeExpired).toBeFalse();
+    expect(component.isTimeExpired).toBe(false);
     expect(playerStateService.getAttempt()).toEqual(mockAttempt);
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
@@ -381,7 +382,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.certificateId = 'cert-123';
     armCountdown();
     tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
+    expect(component.isTimeExpired).toBe(true);
 
     component.onRetryAssessment();
 
@@ -390,14 +391,14 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe(
       CertificateAssessmentPlayerPageConstants.STAGE_INTRO
     );
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.isTimeExpired).toBeTrue();
+    expect(component.showAssessmentInterruptCard).toBe(false);
+    expect(component.isTimeExpired).toBe(true);
     expect(window.clearInterval).toHaveBeenCalledTimes(1);
 
     component.startAssessment();
     flushMicrotasks();
 
-    expect(component.isTimeExpired).toBeFalse();
+    expect(component.isTimeExpired).toBe(false);
     expect(component.remainingTimeInSeconds).toBe(3600);
     expect(window.setInterval).toHaveBeenCalledTimes(2);
     component.ngOnDestroy();
@@ -412,7 +413,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     tick(2000);
 
     expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(component.isTimeExpired).toBeFalse();
+    expect(component.isTimeExpired).toBe(false);
   }));
 
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
@@ -431,7 +432,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
   }));
 
   it('should show a localized cooldown warning when the attempt is within the cooldown', fakeAsync(() => {
@@ -450,7 +451,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(component.showAssessmentUnavailableModal).toBe(false);
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
       {remainingMinutes: 2}
@@ -467,7 +468,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.onGoToAvailableCertificates();
     flushMicrotasks();
 
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(component.showAssessmentUnavailableModal).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
         ':classroomUrlFragment',
@@ -508,7 +509,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     const answers = [{question_id: 'question_1', is_correct: true}];
     component.onAssessmentSubmitted(answers);
     tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
+    expect(component.isTimeExpired).toBe(true);
 
     component.onAssessmentSubmitted(answers);
     expect(
@@ -593,13 +594,13 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     });
     flushMicrotasks();
 
-    expect(viewResultsResolved).toBeFalse();
+    expect(viewResultsResolved).toBe(false);
     expect(router.navigate).not.toHaveBeenCalled();
 
     resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
     flushMicrotasks();
 
-    expect(viewResultsResolved).toBeTrue();
+    expect(viewResultsResolved).toBe(true);
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
       'attempt-1234',

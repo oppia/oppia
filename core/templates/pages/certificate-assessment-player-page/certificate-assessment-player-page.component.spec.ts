@@ -488,6 +488,34 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.answers.q1).toBe(1);
   }));
 
+  it('should normalize object answers with toDict into plain dicts', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    const dictForm = {
+      isNegative: false,
+      wholeNumber: 3,
+      numerator: 1,
+      denominator: 2,
+    };
+    const answerWithToDict = {
+      ...dictForm,
+      toDict: jasmine.createSpy('toDict').and.returnValue(dictForm),
+    };
+
+    component.handleInteractionSubmit(answerWithToDict);
+
+    expect(answerWithToDict.toDict).toHaveBeenCalled();
+    expect(component.answers.q1).toEqual(dictForm);
+  }));
+
+  it('should store plain answer as-is when it has no toDict method', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    const plainAnswer: InteractionAnswer = 'plain text answer';
+    component.handleInteractionSubmit(plainAnswer);
+    expect(component.answers.q1).toBe('plain text answer');
+  }));
+
   it('should not throw when no question loaded', () => {
     expect(() => component.handleInteractionSubmit(1)).not.toThrowError();
   });
@@ -499,6 +527,28 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should return html for loaded question', fakeAsync(() => {
     load();
     expect(component.getInteractionHtml()).toBe('<div>interaction</div>');
+  }));
+
+  it('should return null for lastAnswerForCurrentQuestion when no questions loaded', () => {
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
+  });
+
+  it('should return null for lastAnswerForCurrentQuestion when current question has no answer', fakeAsync(() => {
+    loadQ1();
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
+  }));
+
+  it('should return stored answer for lastAnswerForCurrentQuestion', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    component.handleInteractionSubmit('my answer');
+    expect(component.lastAnswerForCurrentQuestion).toBe('my answer');
+  }));
+
+  it('should return null for lastAnswerForCurrentQuestion when loaded question index is beyond array', fakeAsync(() => {
+    loadQ1();
+    component.currentQuestionIndex = 5;
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
   }));
 
   it('should return null when no questions loaded', () => {
