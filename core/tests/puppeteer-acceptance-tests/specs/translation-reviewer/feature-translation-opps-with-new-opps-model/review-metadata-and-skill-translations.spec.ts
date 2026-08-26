@@ -257,7 +257,10 @@ describe('Translation Reviewer', function () {
       'accept',
       ACCEPT_AND_REVIEW_NEXT_LABEL
     );
-    await translationReviewer.submitTranslationReview('accept');
+    await translationReviewer.submitTranslationReviewAndExpectToast(
+      'accept',
+      'Suggestion accepted.'
+    );
 
     // Accepting the first suggestion leaves the modal open on the second and
     // last one, where both buttons drop the mention of a next suggestion.
@@ -269,18 +272,11 @@ describe('Translation Reviewer', function () {
       'reject',
       REJECT_LABEL
     );
-    await translationReviewer.submitTranslationReview(
+    await translationReviewer.submitTranslationReviewAndExpectToast(
       'reject',
+      'Suggestion rejected.',
       'Please match the wording used in the lesson.'
     );
-
-    // A resolved suggestion is held so that it can be undone, and reviewing
-    // the next one commits the one before it. So rejecting the second
-    // suggestion is what sends the first, and the rejection itself is only
-    // sent once its own undo window closes. The toasts therefore arrive in
-    // that order rather than one after each click.
-    await translationReviewer.expectReviewOutcomeToast('Suggestion accepted.');
-    await translationReviewer.expectReviewOutcomeToast('Suggestion rejected.');
   });
 
   it('should be able to review a metadata translation', async function () {

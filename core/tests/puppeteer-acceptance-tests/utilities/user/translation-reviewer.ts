@@ -40,20 +40,10 @@ const translatedContentContainerSelector = '.e2e-test-translated-content';
 const reviewModalContainerSelector = '.e2e-test-translation-review-modal';
 const updateTranslationBtnSelector = '.e2e-test-update-translation-button';
 
-const toastMessageSelector = '.e2e-test-toast-message';
-
 // How long to wait when checking whether the review modal is still open after
 // a suggestion has been resolved. The modal closes without a request of its
 // own, so this only has to cover a render.
 const reviewModalProbeTimeoutMsecs = 2000;
-
-// A resolved suggestion is held for thirty seconds so that it can be undone,
-// and only reaches the server when that window closes, which is when the
-// outcome toast appears. Reviewing another suggestion flushes the held one
-// straight away, so only the last one waits the full window. The bound below
-// leaves margin over that thirty seconds, because the default selector
-// timeout is exactly thirty seconds and would race it.
-const reviewCommitTimeoutMsecs = 45000;
 
 // The suggestion list reloads itself shortly after it first renders, which
 // detaches the rows a search was holding. The search is therefore retried, and
@@ -241,9 +231,7 @@ export class TranslationReviewer extends BaseUser {
    * Opens the first suggestion in the list and accepts every suggestion the
    * modal then walks through. Opening the first row means the modal holds all
    * of the suggestions, so one pass resolves the whole list without reading it
-   * again. That matters because an accepted suggestion is queued for thirty
-   * seconds so it can be undone, and its row deliberately stays in the list
-   * until that window closes.
+   * again.
    * @param expectedToastMessage - The toast each accept raises.
    * @param maxSuggestions - Safety bound so a modal that stops closing fails
    *     instead of looping forever.
@@ -255,46 +243,15 @@ export class TranslationReviewer extends BaseUser {
     await this.openFirstSuggestionForReview();
 
     for (let accepted = 1; accepted <= maxSuggestions; accepted++) {
-      const contentBeforeReview = await this.page.$eval(
-        reviewContentContainerSelector,
-        el => el.textContent
-      );
-      await this.pressReviewButton(acceptTranslationButtonSelector);
-
-      // Accepting one suggestion sends the one accepted before it, so from the
-      // second accept onwards a toast for the previous suggestion arrives here
-      // and is consumed before it clears.
-      if (accepted > 1) {
-        await this.expectReviewOutcomeToast(expectedToastMessage);
-      }
-
-      const modalIsStillOpen = await this.isElementVisible(
-        reviewModalContainerSelector,
-        true,
-        reviewModalProbeTimeoutMsecs
+      const modalIsStillOpen = await this.reviewActiveSuggestion(
+        'accept',
+        undefined,
+        expectedToastMessage
       );
       if (!modalIsStillOpen) {
-        // Nothing follows the last suggestion to send it, so it waits out its
-        // own undo window. Its toast is the one that proves every translation
-        // has reached the server, which is what a learner has to be able to
-        // see afterwards.
-        await this.expectReviewOutcomeToast(expectedToastMessage);
         showMessage(`Accepted ${accepted} suggestions.`);
         return;
       }
-
-      // The modal is still on the suggestion just reviewed until the next one
-      // has loaded, and its accept button stays disabled for that whole time,
-      // so the next pass waits for the content to change before pressing it.
-      await this.page.waitForFunction(
-        (selector: string, previousContent: string) => {
-          const element = document.querySelector(selector);
-          return element !== null && element.textContent !== previousContent;
-        },
-        {},
-        reviewContentContainerSelector,
-        contentBeforeReview ?? ''
-      );
     }
 
     throw new Error(
@@ -319,32 +276,7 @@ export class TranslationReviewer extends BaseUser {
     reviewType: 'accept' | 'reject',
     reviewMessage?: string
   ): Promise<void> {
-    const buttonSelector =
-      reviewType === 'accept'
-        ? acceptTranslationButtonSelector
-        : rejectTranslationButtonSelector;
-    if (reviewMessage) {
-      await this.expectElementToBeVisible(reviewCommentInputSelector);
-      await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
-    }
-
-    await this.expectElementToBeVisible(reviewContentContainerSelector);
-    const initialReviewContent = await this.page.$eval(
-      reviewContentContainerSelector,
-      el => el.textContent
-    );
-
-    await this.pressReviewButton(buttonSelector);
-
-    await this.page.waitForFunction(
-      (selector: string, initialContent: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent !== initialContent;
-      },
-      {},
-      reviewContentContainerSelector,
-      initialReviewContent
-    );
+    await this.reviewActiveSuggestion(reviewType, reviewMessage);
   }
 
   /**
@@ -440,6 +372,28 @@ export class TranslationReviewer extends BaseUser {
     expectedToastMessage: string,
     reviewMessage?: string
   ): Promise<void> {
+    await this.reviewActiveSuggestion(
+      reviewType,
+      reviewMessage,
+      expectedToastMessage
+    );
+  }
+
+  /**
+   * Reviews the suggestion the modal is showing, then waits for the modal to
+   * either move on to the next suggestion or close.
+   * @param reviewType - The type of the review to submit.
+   * @param reviewMessage - The message to add to the review, if any.
+   * @param expectedToastMessage - The toast the review is expected to raise.
+   *     A review is sent as soon as its button is pressed and its toast clears
+   *     a few seconds later, so it is read here rather than by the caller.
+   * @returns Whether the modal is still open on a following suggestion.
+   */
+  private async reviewActiveSuggestion(
+    reviewType: 'accept' | 'reject',
+    reviewMessage?: string,
+    expectedToastMessage?: string
+  ): Promise<boolean> {
     const buttonSelector =
       reviewType === 'accept'
         ? acceptTranslationButtonSelector
@@ -449,15 +403,46 @@ export class TranslationReviewer extends BaseUser {
       await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
     }
 
+    await this.expectElementToBeVisible(reviewContentContainerSelector);
+    const contentBeforeReview = await this.page.$eval(
+      reviewContentContainerSelector,
+      el => el.textContent
+    );
+
     await this.pressReviewButton(buttonSelector);
-    await this.expectReviewOutcomeToast(expectedToastMessage);
+    if (expectedToastMessage) {
+      await this.expectToastMessage(expectedToastMessage);
+    }
+
+    const modalIsStillOpen = await this.isElementVisible(
+      reviewModalContainerSelector,
+      true,
+      reviewModalProbeTimeoutMsecs
+    );
+    if (!modalIsStillOpen) {
+      return false;
+    }
+
+    // The modal stays on the suggestion just reviewed until the next one has
+    // loaded, and its review buttons stay disabled for that whole time, so
+    // whatever follows waits for the content to change first.
+    await this.page.waitForFunction(
+      (selector: string, previousContent: string) => {
+        const element = document.querySelector(selector);
+        return element !== null && element.textContent !== previousContent;
+      },
+      {},
+      reviewContentContainerSelector,
+      contentBeforeReview ?? ''
+    );
+    return true;
   }
 
   /**
    * Presses an accept or reject button in the review modal. The button is
    * disabled while the previous review is still resolving, so this waits for
    * it to come back, and dispatches the click on the element so that neither
-   * the undo snackbar nor the navigation bar can intercept it.
+   * a toast nor the navigation bar can intercept it.
    * @param buttonSelector - The review button to press.
    */
   private async pressReviewButton(buttonSelector: string): Promise<void> {
@@ -477,33 +462,6 @@ export class TranslationReviewer extends BaseUser {
       throw new Error(`The review button ${buttonSelector} was not found.`);
     }
     await button.evaluate(el => (el as HTMLElement).click());
-  }
-
-  /**
-   * Waits for the toast that a review raises once it has been committed to the
-   * server. The commit is deferred behind the undo window, so this cannot use
-   * the shared toast helper, whose wait is exactly as long as that window.
-   * @param expectedToastMessage - The toast the review is expected to raise.
-   */
-  async expectReviewOutcomeToast(expectedToastMessage: string): Promise<void> {
-    const toast = await this.page.waitForSelector(toastMessageSelector, {
-      visible: true,
-      timeout: reviewCommitTimeoutMsecs,
-    });
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toast
-    );
-    if (toastMessage !== expectedToastMessage) {
-      throw new Error(
-        `Expected the review toast to be "${expectedToastMessage}", but it ` +
-          `was "${toastMessage}".`
-      );
-    }
-
-    // The toast is left to clear so that a following assertion reads the next
-    // one rather than this one again.
-    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**
