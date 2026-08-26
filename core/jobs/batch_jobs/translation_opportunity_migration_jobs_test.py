@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import state_domain
+from core.domain import exp_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_migration_jobs
 from core.platform import models
@@ -56,9 +56,11 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
             language_code='en',
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
-                    state_domain.State.create_default_state(
-                        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
-                    ).to_dict()
+                    exp_domain.Exploration.create_default_exploration(
+                        self.EXP_1_ID
+                    )
+                    .states[feconf.DEFAULT_INIT_STATE_NAME]
+                    .to_dict()
                 )
             },
         )
