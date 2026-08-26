@@ -18,7 +18,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   z-index: 16;
 }
 
-oppia-conversation-skin .supplemental-card-parent-container {
+.supplemental-card-parent-container {
   min-width: 50%;
 }
 
@@ -138,7 +138,7 @@ button.oppia-button-raised.e2e-test-next-lesson-button.mat-focus-indicator.mat-r
   width: 32px;
 }
 
-oppia-conversation-skin .oppia-button-icon {
+.oppia-button-icon {
   color: #fff;
   font-size: 42px;
 }
@@ -182,25 +182,5 @@ oppia-conversation-skin .oppia-button-icon {
     position: absolute;
     transform: translateX(-50%);
     width: 100%;
-  }
-
-  .conversation-skin-oppia-avatar.show-tutor-card {
-    border-radius: 50%;
-    box-shadow: 0 3px 3px grey, 0 5px 3px grey;
-    display: block;
-    height: 40px;
-    left: 100%;
-    position: absolute;
-    transform: translate(-100%, -100%);
-    width: 40px;
-    z-index: 16;
-  }
-
-  .conversation-skin-oppia-avatar.show-tutor-card:hover {
-    opacity: 0.8;
-  }
-
-  oppia-conversation-skin .conversation-skin-oppia-avatar {
-    display: none;
   }
 }

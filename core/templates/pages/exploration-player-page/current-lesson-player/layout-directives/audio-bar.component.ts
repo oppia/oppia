@@ -39,10 +39,12 @@ import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-ap
 import {LocalStorageService} from 'services/local-storage.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './audio-bar.component.css';
 
 @Component({
   selector: 'oppia-audio-bar',
   templateUrl: './audio-bar.component.html',
+  styleUrls: ['./audio-bar.component.css'],
 })
 export class AudioBarComponent {
   @ViewChild('audioControls', {static: false}) audioControlsRef!: ElementRef;
