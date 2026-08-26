@@ -161,7 +161,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
 
-  getDisplayedCard(): StateCard {
+  getDisplayedCard(): StateCard | undefined {
     const index = this.playerPositionService.getDisplayedCardIndex();
     return this.playerTranscriptService.getCard(index);
   }
@@ -171,7 +171,7 @@ export class CurrentInteractionService {
   }
 
   showNoResponseError(): boolean {
-    return this.getDisplayedCard().showNoResponseError();
+    return this.getDisplayedCard()?.showNoResponseError() ?? false;
   }
 
   submitAnswer(): void {
@@ -242,6 +242,6 @@ export class CurrentInteractionService {
     this.getDisplayedCard()?.updateAnswerIsValid(isAnswerValid);
   }
   showInvalidResponseError(): boolean {
-    return this.getDisplayedCard().showInvalidResponseError();
+    return this.getDisplayedCard()?.showInvalidResponseError() ?? false;
   }
 }
