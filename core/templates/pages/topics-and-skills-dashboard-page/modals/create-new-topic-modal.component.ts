@@ -29,10 +29,12 @@ import {
   ImageUploaderData,
   ImageUploaderParameters,
 } from 'components/forms/custom-forms-directives/image-uploader.component';
+import './create-new-topic-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-topic-modal',
   templateUrl: './create-new-topic-modal.component.html',
+  styleUrls: ['./create-new-topic-modal.component.css'],
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
