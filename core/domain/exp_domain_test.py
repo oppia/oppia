@@ -5788,6 +5788,44 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_convert_states_v57_dict_to_v58_dict(self) -> None:
+        """Test _convert_states_v57_dict_to_v58_dict removes refresher_exploration_id."""
+        v57_states_dict = {
+            'State1': {
+                'interaction': {
+                    'answer_groups': [
+                        {
+                            'outcome': {
+                                'dest': 'State1',
+                                'dest_if_really_stuck': None,
+                                'feedback': {'content_id': 'feedback_1', 'html': ''},
+                                'labelled_as_correct': False,
+                                'param_changes': [],
+                                'refresher_exploration_id': 'exp_refresher',
+                                'missing_prerequisite_skill_id': None,
+                            }
+                        }
+                    ],
+                    'default_outcome': {
+                        'dest': 'State1',
+                        'dest_if_really_stuck': None,
+                        'feedback': {'content_id': 'default_outcome', 'html': ''},
+                        'labelled_as_correct': False,
+                        'param_changes': [],
+                        'refresher_exploration_id': 'exp_refresher_2',
+                        'missing_prerequisite_skill_id': None,
+                    },
+                }
+            }
+        }
+        v58_states_dict = exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
+            v57_states_dict  # type: ignore[arg-type]
+        )
+        outcome = v58_states_dict['State1']['interaction']['answer_groups'][0]['outcome']  # type: ignore[index]
+        default_outcome = v58_states_dict['State1']['interaction']['default_outcome']  # type: ignore[index]
+        self.assertNotIn('refresher_exploration_id', outcome)
+        self.assertNotIn('refresher_exploration_id', default_outcome)
+
     def test_correct_exploration_schema_conversion_methods_exist(self) -> None:
         """Test that the right exploration schema conversion methods exist."""
         current_exp_schema_version = (

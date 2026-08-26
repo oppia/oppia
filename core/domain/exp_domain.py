@@ -5472,6 +5472,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v57 to v58. Version 58 removes the refresher_exploration_id
+        property from state outcomes.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted v58
+            state dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            interaction = state_dict.get('interaction', {})
+            for answer_group in interaction.get('answer_groups', []):
+                outcome = answer_group.get('outcome')
+                if outcome and 'refresher_exploration_id' in outcome:
+                    del outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
+            default_outcome = interaction.get('default_outcome')
+            if default_outcome and 'refresher_exploration_id' in default_outcome:
+                del default_outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5537,7 +5565,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 62
+    CURRENT_EXP_SCHEMA_VERSION = 63
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5948,6 +5976,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v62_dict_to_v63_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v62 exploration dict into a v63 exploration dict.
+        Removes refresher_exploration_id field from state outcomes.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v62.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v63.
+        """
+        exploration_dict['schema_version'] = 62
+
+        exploration_dict['states'] = cls._convert_states_v57_dict_to_v58_dict(
+            exploration_dict['states']
+        )
+        exploration_dict['states_schema_version'] = 58
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -6089,6 +6141,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict
             )
             exploration_schema_version = 62
+
+        if exploration_schema_version == 62:
+            exploration_dict = cls._convert_v62_dict_to_v63_dict(
+                exploration_dict
+            )
+            exploration_schema_version = 63
 
         return exploration_dict
 

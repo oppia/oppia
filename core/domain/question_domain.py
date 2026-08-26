@@ -1972,6 +1972,31 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v57_dict_to_v58_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from v57 to v58. Version 58 removes the refresher_exploration_id
+        property from state outcomes.
+
+        Args:
+            question_state_dict: dict. A dict representing a state dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        interaction = question_state_dict.get('interaction', {})
+        for answer_group in interaction.get('answer_groups', []):
+            outcome = answer_group.get('outcome')
+            if outcome and 'refresher_exploration_id' in outcome:
+                del outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
+        default_outcome = interaction.get('default_outcome')
+        if default_outcome and 'refresher_exploration_id' in default_outcome:
+            del default_outcome['refresher_exploration_id']  # type: ignore[typeddict-item]
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,
