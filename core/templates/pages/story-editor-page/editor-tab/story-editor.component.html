@@ -1,6 +1,6 @@
 <div class="e2e-test-story-editor">
   <div *ngIf="publishedChaptersDropErrorIsShown"
-       class="oppia-error-message-container">
+       class="oppia-error-message-container e2e-test-published-chapters-drop-error">
        The positions of published chapters cannot be changed.
   </div>
   <p class="oppia-mobile-back-to-parent e2e-test-mobile-back-to-topic" (click)="returnToTopicEditorPage()">
@@ -1378,5 +1378,42 @@
     .inline-arc-boundary-row { margin: 8px 0; }
     .inline-split-line-row { margin: 4px 0; }
     .inline-arc-boundary-row .arc-boundary-header { align-items: flex-start; display: flex; justify-content: space-between; }
+    @media screen and (max-width: 768px) {
+      .inline-arc-boundary-row .arc-boundary-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .arc-boundary-info {
+        min-width: 0;
+        width: 100%;
+      }
+      .arc-boundary-description,
+      .arc-boundary-chapter-count {
+        margin-left: 44px;
+      }
+      .arc-boundary-actions {
+        flex-wrap: wrap;
+        margin-left: 44px;
+      }
+      .arc-edit-button,
+      .arc-remove-button {
+        text-align: left;
+        white-space: normal;
+      }
+    }
+    @media screen and (max-width: 540px) {
+      .oppia-edit-arc-modal .modal-dialog {
+        margin: .5rem;
+        max-width: calc(100vw - 1rem);
+        width: auto;
+      }
+      .oppia-edit-arc-modal .modal-content {
+        min-width: 0;
+        width: 100%;
+      }
+      .oppia-edit-arc-modal .modal-footer {
+        flex-wrap: wrap;
+      }
+    }
   </style>
 </div>

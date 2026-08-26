@@ -98,11 +98,32 @@ export class UserFactory {
     TUser extends BaseUser,
     TRoles extends BaseUser[],
   >(user: TUser, roles: TRoles): TUser & UnionToIntersection<TRoles[number]> {
+    const userPrototype = Object.getPrototypeOf(user);
+
+    // Track which role (by constructor name) defined which method name
+    // within THIS composition call only. This lets us catch two different
+    // roles genuinely colliding on a name, without falsely flagging the
+    // same role being re-composed onto a prototype it already touched in
+    // an earlier, unrelated createNewUser() call.
+    const namesDefinedInThisCall = new Map<string, string>();
+
     for (const role of roles) {
-      const userPrototype = Object.getPrototypeOf(user);
       const rolePrototype = Object.getPrototypeOf(role);
+      const roleName = rolePrototype.constructor.name;
 
       Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        if (name === 'constructor') {
+          return;
+        }
+
+        const definedByRoleName = namesDefinedInThisCall.get(name);
+        if (definedByRoleName && definedByRoleName !== roleName) {
+          throw new Error(
+            `Method '${name}' is defined by both '${definedByRoleName}' and '${roleName}'. Function name collision detected.`
+          );
+        }
+        namesDefinedInThisCall.set(name, roleName);
+
         Object.defineProperty(
           userPrototype,
           name,
