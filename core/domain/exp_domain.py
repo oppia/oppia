@@ -5990,7 +5990,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v63.
         """
-        exploration_dict['schema_version'] = 62
+        exploration_dict['schema_version'] = 63
 
         exploration_dict['states'] = cls._convert_states_v57_dict_to_v58_dict(
             exploration_dict['states']
