@@ -37,6 +37,7 @@ class MockExplorationModelWithAutoTts(exp_models.ExplorationModel):
 
     @classmethod
     def _get_kind(cls) -> str:
+        """Return the model kind."""
         return 'ExplorationModel'
 
     auto_tts_enabled = datastore_services.BooleanProperty(
@@ -51,6 +52,7 @@ class MockExplorationSnapshotContentModelWithAutoTts(
 
     @classmethod
     def _get_kind(cls) -> str:
+        """Return the model kind."""
         return 'ExplorationSnapshotContentModel'
 
 
