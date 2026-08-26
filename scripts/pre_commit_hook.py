@@ -206,7 +206,10 @@ def check_changes_in_config() -> None:
 
 def run_formatters() -> None:
     """Runs prettier and black formatters."""
-    subprocess.run([NPX_CMD, 'lint-staged'], check=True)
+    env = os.environ.copy()
+    node_bin_path = os.path.dirname(NPX_CMD)
+    env['PATH'] = f'{node_bin_path}{os.pathsep}{env.get("PATH", "")}'
+    subprocess.run([NPX_CMD, 'lint-staged'], check=True, env=env)
 
 
 def main(args: Optional[List[str]] = None) -> None:

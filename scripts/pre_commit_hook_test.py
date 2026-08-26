@@ -25,7 +25,7 @@ import subprocess
 
 from core.tests import test_utils
 
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 from . import pre_commit_hook
 
@@ -419,7 +419,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             check_function_calls['check_changes_in_config_is_called'] = True
 
         def mock_npx_subprocess(  # pylint: disable=unused-argument
-            cmds: List[str], check: bool
+            cmds: List[str], check: bool, **kwargs: Any
         ) -> None:
             self.assertTrue(cmds[0].endswith('npx'))
             self.assertEqual(cmds[1], 'lint-staged')
