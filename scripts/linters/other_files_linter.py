@@ -74,7 +74,7 @@ LIGHTHOUSE_PAGES_JSON_FILEPATH: Final = os.path.join(
 )
 
 ROUTE_KEY_REGEX: Final = (
-    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\.ROUTE'
+    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 )
 
 MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
@@ -453,8 +453,8 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         # The regex and replacement contain literal single quotes from
         # the TypeScript source, so double-quote delimiters are required.
         normalized = re.sub(
-            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=C0042
-            r"'\1\2'",  # pylint: disable=C0042
+            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=invalid-string-quote
+            r"'\1\2'",  # pylint: disable=invalid-string-quote
             normalized,
         )
 
@@ -506,13 +506,12 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         if uncovered_keys:
             error_messages.append(
-                'The following routes in app.routing.module.ts do not '
-                'have a corresponding Lighthouse page entry in '
-                'core/tests/lighthouse-pages.json and are not in the '
-                'exclusion list (LIGHTHOUSE_ROUTE_EXCLUSIONS): %s. '
-                'Either add them to lighthouse-pages.json or add the '
-                'key to LIGHTHOUSE_ROUTE_EXCLUSIONS with a comment '
-                'explaining why.' % ', '.join(sorted(uncovered_keys))
+                'New routes found in app.routing.module.ts that are '
+                'missing from core/tests/lighthouse-pages.json:\n\n'
+                '  %s\n\n'
+                'Add a corresponding page_module entry to '
+                'lighthouse-pages.json for each route above.'
+                % '\n  '.join(sorted(uncovered_keys))
             )
 
         return concurrent_task_utils.TaskResult(

@@ -602,13 +602,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                         '.SPLASH.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/splash-page/splash-page.module')",
+                        '      import(\'pages/splash-page/splash-page.module\')',
                         '  },',
                         '  {',
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                         '.ANDROID.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/android-page/android-page.module')",
+                        '      import(\'pages/android-page/android-page.module\')',
                         '  },',
                         '];',
                     ]
@@ -645,13 +645,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                         '.SPLASH.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/splash-page/splash-page.module')",
+                        '      import(\'pages/splash-page/splash-page.module\')',
                         '  },',
                         '  {',
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                         '.NEW_PAGE.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/new-page/new-page.module')",
+                        '      import(\'pages/new-page/new-page.module\')',
                         '  },',
                         '];',
                     ]
@@ -682,7 +682,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                         '.ABOUT.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/about-page/about-page.module')",
+                        '      import(\'pages/about-page/about-page.module\')',
                         '  },',
                         '];',
                     ]
@@ -720,7 +720,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND',
                         '      .ADMIN.ROUTE,',
                         '    loadChildren: () =>',
-                        "      import('pages/admin-page/admin-page.module')",
+                        '      import(\'pages/admin-page/admin-page.module\')',
                         '  },',
                         '];',
                     ]
