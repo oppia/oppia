@@ -38,6 +38,7 @@ import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-oppo
 import {OpportunitiesListComponent} from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
 import {OpportunitiesListItemComponent} from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationOpportunitiesComponent} from './translation-opportunities.component';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -80,6 +81,7 @@ class MockPlatformFeatureService {
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
   let translationLanguageService: TranslationLanguageService;
+  let translationTopicService: TranslationTopicService;
   let userService: UserService;
   let modalService: NgbModal;
   let component: TranslationOpportunitiesComponent;
@@ -148,6 +150,7 @@ describe('Translation opportunities component', () => {
       ContributionOpportunitiesService
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
+    translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
     spyOn(modalService, 'open').and.returnValue(translationModal);
