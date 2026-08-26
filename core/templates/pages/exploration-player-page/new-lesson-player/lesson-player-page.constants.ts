@@ -112,7 +112,6 @@ export const NewLessonPlayerConstants = {
     EVENT_TYPE_STATE_COMPLETED: 'state_complete',
     EVENT_TYPE_ANSWER_SUBMITTED: 'answer_submitted',
     EVENT_TYPE_SOLUTION_HIT: 'solution_hit',
-    EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
   },
 
   STATS_REPORTING_URLS: {
@@ -128,8 +127,6 @@ export const NewLessonPlayerConstants = {
     EXPLORATION_ACTUALLY_STARTED:
       '/explorehandler/exploration_actual_start_event/<exploration_id>',
     SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>',
-    LEAVE_FOR_REFRESHER_EXP:
-      '/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
     STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>',
   },
 

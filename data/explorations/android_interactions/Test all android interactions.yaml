@@ -27,7 +27,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -58,7 +57,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
       - hint_content:
           content_id: hint_2
@@ -130,7 +128,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -164,7 +161,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -192,7 +188,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -230,7 +225,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -249,7 +243,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -285,7 +278,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -333,7 +325,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -366,7 +357,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -409,7 +399,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -428,7 +417,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_0
@@ -458,7 +446,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -528,7 +515,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: O
@@ -591,7 +577,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ImageClickInput
       solution: null
@@ -625,7 +610,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 121.0
@@ -640,7 +624,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 121.0
@@ -655,7 +638,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 121.0
@@ -672,7 +654,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -710,7 +691,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
@@ -739,7 +719,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -782,7 +761,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -807,7 +785,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: RatioExpressionInput
       solution: null

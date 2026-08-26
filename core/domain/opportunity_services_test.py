@@ -529,7 +529,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
-                'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
             },
             'rule_specs': [

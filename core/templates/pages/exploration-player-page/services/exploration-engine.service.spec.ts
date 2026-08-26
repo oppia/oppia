@@ -124,7 +124,6 @@ describe('Exploration engine service ', () => {
               {
                 outcome: {
                   missing_prerequisite_skill_id: null,
-                  refresher_exploration_id: null,
                   labelled_as_correct: false,
                   feedback: {
                     content_id: 'feedback_1',
@@ -151,7 +150,6 @@ describe('Exploration engine service ', () => {
             ],
             default_outcome: {
               missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
               labelled_as_correct: false,
               feedback: {
                 content_id: 'default_outcome',
@@ -222,7 +220,6 @@ describe('Exploration engine service ', () => {
               {
                 outcome: {
                   missing_prerequisite_skill_id: null,
-                  refresher_exploration_id: null,
                   labelled_as_correct: false,
                   feedback: {
                     content_id: 'feedback_1',
@@ -249,7 +246,6 @@ describe('Exploration engine service ', () => {
             ],
             default_outcome: {
               missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
               labelled_as_correct: false,
               feedback: {
                 content_id: 'default_outcome',
@@ -1270,7 +1266,6 @@ describe('Exploration engine service ', () => {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       };
       let answerClassificationResult = new AnswerClassificationResult(
@@ -1286,7 +1281,6 @@ describe('Exploration engine service ', () => {
           {
             outcome: {
               missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
               labelled_as_correct: true,
               feedback: {
                 content_id: 'feedback_1',

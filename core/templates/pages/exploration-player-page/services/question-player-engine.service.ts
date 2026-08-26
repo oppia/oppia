@@ -290,7 +290,6 @@ export class QuestionPlayerEngineService {
    *   @param {StateCard|null} successCallback.result.nextCard - The next card or null if staying.
    *   @param {boolean} successCallback.result.refreshInteraction - Whether interaction needs redraw.
    *   @param {string} successCallback.result.feedbackHtml - Feedback message to display.
-   *   @param {?string} successCallback.result.refresherExplorationId - Reserved.
    *   @param {?string} successCallback.result.missingPrerequisiteSkillId - Reserved.
    *   @param {boolean} successCallback.result.remainOnCurrentCard - Whether to stay on current question.
    *   @param {?string} successCallback.result.taggedSkillMisconceptionId - Known misconception link.
@@ -309,7 +308,6 @@ export class QuestionPlayerEngineService {
       nextCard: StateCard | null,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string | null,
       remainOnCurrentCard: boolean,
       taggedSkillMisconceptionId: string | null,
@@ -421,7 +419,6 @@ export class QuestionPlayerEngineService {
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      null,
       null,
       onSameCard,
       taggedSkillMisconceptionId,

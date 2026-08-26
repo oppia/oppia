@@ -37,7 +37,6 @@ describe('Stats reporting backend API Service', () => {
   let expVersion = 1;
   let expId = 'expId';
   let currentState = 'currentState';
-  let nextExpId = 'nextExpId';
   let previousState = 'previousState';
   let nextState = 'nextState';
   let sessionId = 'sessionId';
@@ -85,7 +84,6 @@ describe('Stats reporting backend API Service', () => {
       expVersion,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -107,7 +105,6 @@ describe('Stats reporting backend API Service', () => {
       expVersion,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -130,7 +127,6 @@ describe('Stats reporting backend API Service', () => {
       sessionId,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -151,7 +147,6 @@ describe('Stats reporting backend API Service', () => {
       sessionId,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -173,7 +168,6 @@ describe('Stats reporting backend API Service', () => {
       sessionId,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -187,28 +181,7 @@ describe('Stats reporting backend API Service', () => {
     flushMicrotasks();
   }));
 
-  it('should record leave for refresher exp correctly.', fakeAsync(() => {
-    statsReportingBackendApiService.recordLeaveForRefresherExpAsync(
-      expVersion,
-      expId,
-      currentState,
-      sessionId,
-      timeSpent,
-      expId,
-      currentState,
-      nextExpId,
-      previousState,
-      nextState
-    );
 
-    let req = httpTestingController.expectOne(
-      '/explorehandler/leave_for_refresher_exp_event/expId'
-    );
-    expect(req.request.method).toEqual('POST');
-    req.flush({});
-
-    flushMicrotasks();
-  }));
 
   it('should record state completion correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordStateCompletedAsync(
@@ -218,7 +191,6 @@ describe('Stats reporting backend API Service', () => {
       timeSpent,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -242,7 +214,6 @@ describe('Stats reporting backend API Service', () => {
       expVersion,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -269,7 +240,6 @@ describe('Stats reporting backend API Service', () => {
       'category',
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -293,7 +263,6 @@ describe('Stats reporting backend API Service', () => {
       expVersion,
       expId,
       currentState,
-      nextExpId,
       previousState,
       nextState
     );
@@ -332,7 +301,6 @@ describe('Stats reporting backend API Service', () => {
         expVersion,
         expId,
         currentState,
-        nextExpId,
         previousState,
         nextState
       )

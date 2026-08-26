@@ -127,7 +127,6 @@ describe('State Responses Component', () => {
         html: '',
       },
       param_changes: [],
-      refresher_exploration_id: null,
       labelled_as_correct: false,
       missing_prerequisite_skill_id: '',
     },
@@ -139,7 +138,6 @@ describe('State Responses Component', () => {
         html: "Let's go to state 5 ImageAndRegion",
       },
       param_changes: [],
-      refresher_exploration_id: null,
       labelled_as_correct: false,
       missing_prerequisite_skill_id: '',
     },
@@ -214,7 +212,6 @@ describe('State Responses Component', () => {
               html: '',
               content_id: 'This is a new feedback text',
             },
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
             labelled_as_correct: false,
             param_changes: [],
@@ -243,7 +240,6 @@ describe('State Responses Component', () => {
         },
         labelled_as_correct: true,
         param_changes: [],
-        refresher_exploration_id: 'test',
         missing_prerequisite_skill_id: 'test_skill_id',
       },
       confirmed_unclassified_answers: [],
@@ -292,7 +288,6 @@ describe('State Responses Component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
           },
           training_data: [],
@@ -310,7 +305,6 @@ describe('State Responses Component', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id',
     });
   });
@@ -660,7 +654,6 @@ describe('State Responses Component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
           },
           training_data: [],
@@ -868,7 +861,6 @@ describe('State Responses Component', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id',
     });
     spyOn(stateEditorService, 'getActiveStateName').and.returnValues(
@@ -894,7 +886,6 @@ describe('State Responses Component', () => {
         },
         labelled_as_correct: true,
         param_changes: [],
-        refresher_exploration_id: 'test',
         missing_prerequisite_skill_id: 'test_skill_id',
       });
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
@@ -962,7 +953,6 @@ describe('State Responses Component', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id',
     });
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
@@ -1018,7 +1008,6 @@ describe('State Responses Component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
           },
           training_data: [],

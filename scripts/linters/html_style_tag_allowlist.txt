@@ -39,7 +39,6 @@ core/templates/pages/exploration-player-page/current-lesson-player/modals/displa
 core/templates/pages/exploration-player-page/current-lesson-player/modals/display-solution-interstitial-modal.component.html
 core/templates/pages/exploration-player-page/current-lesson-player/modals/display-solution-modal.component.html
 core/templates/pages/exploration-player-page/current-lesson-player/modals/flag-exploration-modal.component.html
-core/templates/pages/exploration-player-page/current-lesson-player/modals/refresher-exploration-confirmation-modal.component.html
 core/templates/pages/exploration-player-page/current-lesson-player/modals/switch-content-language-refresh-required-modal.component.html
 core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component.html
 core/templates/pages/feedback-updates-page/feedback-updates-page.component.html

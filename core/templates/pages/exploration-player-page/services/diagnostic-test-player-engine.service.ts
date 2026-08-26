@@ -195,7 +195,6 @@ export class DiagnosticTestPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
       taggedSkillMisconceptionId: string,
@@ -219,7 +218,6 @@ export class DiagnosticTestPlayerEngineService {
     let stateCard: StateCard;
     let refreshInteraction: boolean = false;
     let feedbackHtml: string = '';
-    let refresherExplorationId: string = '';
     let missingPrerequisiteSkillId: string = '';
     let remainOnCurrentCard: boolean = false;
     let taggedSkillMisconceptionId: string = '';
@@ -249,7 +247,6 @@ export class DiagnosticTestPlayerEngineService {
           stateCard,
           refreshInteraction,
           feedbackHtml,
-          refresherExplorationId,
           missingPrerequisiteSkillId,
           remainOnCurrentCard,
           taggedSkillMisconceptionId,

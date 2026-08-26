@@ -59,7 +59,6 @@ const questionDict = {
             },
             labelled_as_correct: true,
             param_changes: [],
-            refresher_exploration_id: null,
           },
           rule_specs: [
             {

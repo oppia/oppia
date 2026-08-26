@@ -557,64 +557,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase
-):
-    """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self) -> None:
-        self.assertEqual(
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
-        )
-
-    def test_create_and_get_event_models(self) -> None:
-        event_id = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
-                'exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0
-            )
-        )
-
-        event_model = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get(
-                event_id
-            )
-        )
-
-        self.assertEqual(event_model.exp_id, 'exp_id1')
-        self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
-        self.assertEqual(event_model.exp_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
-        self.assertEqual(
-            event_model.event_schema_version,
-            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
-        )
-
-    def test_get_model_association_to_user(self) -> None:
-        self.assertEqual(
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
-        )
-
-    def test_get_export_policy(self) -> None:
-        expected_export_policy_dict = {
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_spent_in_state_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        }
-        self.assertEqual(
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_export_policy(),
-            expected_export_policy_dict,
-        )
 
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):

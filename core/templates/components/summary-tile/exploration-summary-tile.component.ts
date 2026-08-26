@@ -81,7 +81,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   explorationIsCurrentlyHoveredOver: boolean = false;
   isWindowLarge: boolean = false;
   userIsLoggedIn: boolean = false;
-  isRefresherExploration: boolean = false;
   contributors!: object;
   // A null value for 'lastUpdatedDateTime' and 'relativeLastUpdatedDateTime'
   // indicates that lastUpdatedMsecs received after component interactions
@@ -124,10 +123,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.isRefresherExploration = false;
-    if (this.parentExplorationIds) {
-      this.isRefresherExploration = this.parentExplorationIds.length > 0;
-    }
+
 
     if (!this.mobileCutoffPx) {
       this.mobileCutoffPx = 0;
@@ -176,10 +172,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   setHoverState(hoverState: boolean): void {
     this.explorationIsCurrentlyHoveredOver = hoverState;
-  }
-
-  loadParentExploration(): void {
-    this.windowRef.nativeWindow.location.href = this.getExplorationLink();
   }
 
   // Function will return null when Exploration Ratings are not present.

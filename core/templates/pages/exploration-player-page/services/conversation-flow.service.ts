@@ -35,7 +35,6 @@ import {ConceptCardManagerService} from './concept-card-manager.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
-import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {VoiceoverPlayerService} from './voiceover-player.service';
 import {AppConstants} from 'app.constants';
@@ -78,7 +77,6 @@ interface AnswerResponseData {
   nextCard: StateCard | null;
   refreshInteraction: boolean;
   feedbackHtml: string;
-  refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   remainOnCurrentCard: boolean;
   taggedSkillMisconceptionId: string | null;
@@ -122,11 +120,6 @@ export class ConversationFlowService {
   hasFullyLoaded: boolean = false;
   _nextFocusLabel!: string;
 
-  // TODO(#22780): Remove these variable and related code.
-  redirectToRefresherExplorationConfirmed!: boolean;
-  isRefresherExploration!: boolean;
-  parentExplorationIds: string[] = [];
-
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -151,7 +144,6 @@ export class ConversationFlowService {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private stateEditorService: StateEditorService,
     private fatigueDetectionService: FatigueDetectionService,
-    private refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService,
     private pageContextService: PageContextService,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private currentInteractionService: CurrentInteractionService,
@@ -412,7 +404,6 @@ export class ConversationFlowService {
         nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string | null,
         missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
         taggedSkillMisconceptionId: string | null,
@@ -428,7 +419,6 @@ export class ConversationFlowService {
           nextCard,
           refreshInteraction,
           feedbackHtml,
-          refresherExplorationId,
           missingPrerequisiteSkillId,
           remainOnCurrentCard,
           taggedSkillMisconceptionId,
@@ -739,26 +729,6 @@ export class ConversationFlowService {
   }
 
   /**
-   * Records that the learner is leaving the current exploration to view
-   * a refresher exploration, for analytics and progress tracking purposes.
-   *
-   * This event is only recorded when the learner is in the learner view,
-   * not in the exploration editor preview mode.
-   *
-   * @param {string} refresherExpId - The ID of the refresher exploration
-   *   the learner is navigating to.
-   */
-  private _recordLeaveForRefresherExp(refresherExpId: string): void {
-    let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
-    if (!editorPreviewMode) {
-      this.statsReportingService.recordLeaveForRefresherExp(
-        this.playerPositionService.getCurrentStateName(),
-        refresherExpId
-      );
-    }
-  }
-
-  /**
    * Handles the display of feedback to the learner while staying on the current card.
    * This method is called when an answer is submitted and the system decides to give feedback
    * instead of moving to the next state (e.g., due to an incorrect answer or missing prerequisite).
@@ -768,7 +738,6 @@ export class ConversationFlowService {
    * - Displays feedback and help cards if applicable
    * - Loads concept cards if a prerequisite skill is missing
    * - Optionally refreshes the interaction UI
-   * - Optionally prompts for redirection to a refresher exploration
    *
    * @param {string | null} feedbackHtml - HTML string containing feedback to show to the learner.
    *     If null, no feedback is shown.
@@ -776,14 +745,11 @@ export class ConversationFlowService {
    *     needs to revisit. If provided, triggers concept card loading.
    * @param {boolean} refreshInteraction - Whether the interaction should be visually refreshed
    *     (e.g., to give a new randomized version of the same interaction).
-   * @param {string | null} refresherExplorationId - If provided, prompts the learner to redirect to
-   *     a refresher exploration. Otherwise, no redirection is offered.
    */
   private _giveFeedbackAndStayOnCurrentCard(
     feedbackHtml: string,
     missingPrerequisiteSkillId: string | null,
-    refreshInteraction: boolean,
-    refresherExplorationId: string | null
+    refreshInteraction: boolean
   ): void {
     this._recordIncorrectAnswer();
     this.playerTranscriptService.addNewResponse(feedbackHtml);
@@ -811,27 +777,6 @@ export class ConversationFlowService {
         this.displayedCard.getInteractionHtml() +
           this.explorationEngineService.getRandomSuffix()
       );
-    }
-
-    this.redirectToRefresherExplorationConfirmed = false;
-
-    if (refresherExplorationId) {
-      // TODO(bhenning): Add tests to verify the event is
-      // properly recorded.
-      const confirmRedirection = () => {
-        this.redirectToRefresherExplorationConfirmed = true;
-        this._recordLeaveForRefresherExp(refresherExplorationId);
-      };
-      this.explorationSummaryBackendApiService
-        .loadPublicExplorationSummariesAsync([refresherExplorationId])
-        .then(response => {
-          if (response.summaries.length > 0) {
-            this.refresherExplorationConfirmationModalService.displayRedirectConfirmationModal(
-              refresherExplorationId,
-              confirmRedirection
-            );
-          }
-        });
     }
   }
 
@@ -1059,25 +1004,11 @@ export class ConversationFlowService {
    * @param displayedCard - The terminal card currently displayed to the user.
    */
   private _handleTerminalCard(displayedCard: StateCard): void {
-    this.setIsRefresherExploration(false);
-    const parentExplorationIds =
-      this.urlService.getQueryFieldValuesAsList('parent');
-    this.setParentExplorationIds(parentExplorationIds);
-    let recommendedExplorationIds = [];
-    let includeAutogeneratedRecommendations = false;
-
-    if (parentExplorationIds.length > 0) {
-      this.setIsRefresherExploration(true);
-      let parentExplorationId =
-        parentExplorationIds[parentExplorationIds.length - 1];
-      recommendedExplorationIds.push(parentExplorationId);
-    } else {
-      recommendedExplorationIds =
-        this.explorationEngineService.getAuthorRecommendedExpIdsByStateName(
-          displayedCard.getStateName()
-        );
-      includeAutogeneratedRecommendations = true;
-    }
+    let recommendedExplorationIds =
+      this.explorationEngineService.getAuthorRecommendedExpIdsByStateName(
+        displayedCard.getStateName()
+      );
+    let includeAutogeneratedRecommendations = true;
 
     if (this.explorationModeService.isInStoryChapterMode()) {
       recommendedExplorationIds = [];
@@ -1230,7 +1161,6 @@ export class ConversationFlowService {
    *   nextCard: StateCard,
    *   refreshInteraction: boolean,
    *   feedbackHtml: string,
-   *   refresherExplorationId: string | null,
    *   missingPrerequisiteSkillId: string,
    *   remainOnCurrentCard: boolean,
    *   taggedSkillMisconceptionId: string,
@@ -1251,7 +1181,6 @@ export class ConversationFlowService {
     nextCard,
     refreshInteraction,
     feedbackHtml,
-    refresherExplorationId,
     missingPrerequisiteSkillId,
     remainOnCurrentCard,
     taggedSkillMisconceptionId,
@@ -1281,8 +1210,7 @@ export class ConversationFlowService {
           this._giveFeedbackAndStayOnCurrentCard(
             feedbackHtml,
             missingPrerequisiteSkillId,
-            refreshInteraction,
-            refresherExplorationId
+            refreshInteraction
           );
         }
       }
@@ -1352,8 +1280,7 @@ export class ConversationFlowService {
         this._giveFeedbackAndStayOnCurrentCard(
           feedbackHtml,
           missingPrerequisiteSkillId,
-          refreshInteraction,
-          refresherExplorationId
+          refreshInteraction
         );
         if (refreshInteraction) {
           this._nextFocusLabel = this.focusManagerService.generateFocusLabel();
@@ -1600,60 +1527,6 @@ export class ConversationFlowService {
     } else {
       throw new Error('Target card index out of bounds.');
     }
-  }
-
-  /**
-   * Checks if the user has confirmed redirection to a refresher exploration.
-   *
-   * @returns {boolean} True if the user has confirmed redirection, false otherwise.
-   */
-  getRedirectToRefresherExplorationConfirmed(): boolean {
-    return this.redirectToRefresherExplorationConfirmed;
-  }
-
-  /**
-   * Sets whether the user has confirmed redirection to a refresher exploration.
-   *
-   * @param {boolean} confirmed - True if the user has confirmed redirection, false otherwise.
-   */
-  setRedirectToRefresherExplorationConfirmed(confirmed: boolean): void {
-    this.redirectToRefresherExplorationConfirmed = confirmed;
-  }
-
-  /**
-   * Checks if the current exploration is a refresher exploration.
-   *
-   * @returns {boolean} True if the current exploration is a refresher exploration, false otherwise.
-   */
-  getIsRefresherExploration(): boolean {
-    return this.isRefresherExploration;
-  }
-
-  /**
-   * Sets whether the current exploration is a refresher exploration.
-   *
-   * @param {boolean} isRefresher - True if the current exploration is a refresher exploration, false otherwise.
-   */
-  setIsRefresherExploration(isRefresher: boolean): void {
-    this.isRefresherExploration = isRefresher;
-  }
-
-  /**
-   * Sets the parent exploration IDs for the current exploration.
-   *
-   * @param {string[]} parentExplorationIds - An array of parent exploration IDs.
-   */
-  setParentExplorationIds(parentExplorationIds: string[]): void {
-    this.parentExplorationIds = [...parentExplorationIds];
-  }
-
-  /**
-   * Retrieves the parent exploration IDs for the current exploration.
-   *
-   * @returns {string[]} An array of parent exploration IDs.
-   */
-  getParentExplorationIds(): string[] {
-    return this.parentExplorationIds;
   }
 
   /**

@@ -209,7 +209,6 @@ describe('State Editor Component', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
         },
         hints: [],
       },

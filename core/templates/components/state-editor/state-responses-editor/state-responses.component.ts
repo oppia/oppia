@@ -391,7 +391,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.responsesService.updateActiveAnswerGroup(
       {
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId,
         missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId,
       },
       newAnswerGroups => {
@@ -453,7 +452,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.responsesService.updateDefaultOutcome(
       {
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId,
         missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId,
       } as Outcome,
       newDefaultOutcome => {

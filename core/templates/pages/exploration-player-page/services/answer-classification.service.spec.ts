@@ -119,7 +119,6 @@ describe('Answer Classification Service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [
@@ -146,7 +145,6 @@ describe('Answer Classification Service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [
@@ -191,7 +189,6 @@ describe('Answer Classification Service', () => {
                 },
                 labelled_as_correct: true,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [
@@ -236,7 +233,6 @@ describe('Answer Classification Service', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           hints: [],
@@ -381,7 +377,6 @@ describe('Answer Classification Service', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
             rule_specs: [
@@ -430,7 +425,6 @@ describe('Answer Classification Service', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           rule_specs: [
@@ -457,7 +451,6 @@ describe('Answer Classification Service', () => {
             },
             labelled_as_correct: true,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           rule_specs: [
@@ -586,7 +579,6 @@ describe('Answer Classification Service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               training_data: ['abc', 'input'],
@@ -613,7 +605,6 @@ describe('Answer Classification Service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               training_data: ['xyz'],
@@ -640,7 +631,6 @@ describe('Answer Classification Service', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           hints: [],

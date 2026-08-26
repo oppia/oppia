@@ -2760,7 +2760,6 @@ class OutcomeDict(TypedDict):
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
     param_changes: List[param_domain.ParamChangeDict]
-    refresher_exploration_id: Optional[str]
     missing_prerequisite_skill_id: Optional[str]
 
 
@@ -2777,7 +2776,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
         feedback: SubtitledHtml,
         labelled_as_correct: bool,
         param_changes: List[param_domain.ParamChange],
-        refresher_exploration_id: Optional[str],
         missing_prerequisite_skill_id: Optional[str],
     ) -> None:
         """Initializes a Outcome domain object.
@@ -2792,10 +2790,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
                 by the creator as corresponding to a "correct" answer.
             param_changes: list(ParamChange). List of exploration-level
                 parameter changes to make if this rule is triggered.
-            refresher_exploration_id: str or None. An optional exploration ID
-                to redirect the learner to if they seem to lack understanding
-                of a prerequisite concept. This should only exist if the
-                destination state for this outcome is a self-loop.
             missing_prerequisite_skill_id: str or None. The id of the skill that
                 this answer group tests. If this is not None, the exploration
                 player would redirect to this skill when a learner receives this
@@ -2814,10 +2808,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
         # Exploration-level parameter changes to make if this rule is
         # triggered.
         self.param_changes = param_changes or []
-        # An optional exploration ID to redirect the learner to if they lack
-        # understanding of a prerequisite concept. This should only exist if
-        # the destination state for this outcome is a self-loop.
-        self.refresher_exploration_id = refresher_exploration_id
         # An optional skill id whose concept card would be shown to the learner
         # when the learner receives this outcome.
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
@@ -2860,7 +2850,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
             'param_changes': [
                 param_change.to_dict() for param_change in self.param_changes
             ],
-            'refresher_exploration_id': self.refresher_exploration_id,
             'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id,
         }
 
@@ -2898,7 +2887,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
                 )
                 for param_change in outcome_dict['param_changes']
             ],
-            outcome_dict['refresher_exploration_id'],
             outcome_dict['missing_prerequisite_skill_id'],
         )
 
@@ -2930,13 +2918,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
             )
         for param_change in self.param_changes:
             param_change.validate()
-
-        if self.refresher_exploration_id is not None:
-            if not isinstance(self.refresher_exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected outcome refresher_exploration_id to be a string, '
-                    'received %s' % self.refresher_exploration_id
-                )
 
     @staticmethod
     def convert_html_in_outcome(

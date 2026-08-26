@@ -58,7 +58,6 @@ export class StatsReportingBackendApiService {
     urlIdentifier: string,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): string {
@@ -86,9 +85,6 @@ export class StatsReportingBackendApiService {
         if (currentStateName) {
           additionalInfo += '\nCurrent State name: ' + currentStateName;
         }
-        if (nextExpId) {
-          additionalInfo += '\nRefresher exp id: ' + nextExpId;
-        }
         if (previousStateName && nextStateName) {
           additionalInfo +=
             '\nOld State name: ' +
@@ -107,7 +103,6 @@ export class StatsReportingBackendApiService {
     expVersion: number,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -117,7 +112,6 @@ export class StatsReportingBackendApiService {
           'STATS_EVENTS',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -136,7 +130,6 @@ export class StatsReportingBackendApiService {
     expVersion: number,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -146,7 +139,6 @@ export class StatsReportingBackendApiService {
           'EXPLORATION_STARTED',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -168,7 +160,6 @@ export class StatsReportingBackendApiService {
     sessionId: string,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -178,7 +169,6 @@ export class StatsReportingBackendApiService {
           'STATE_HIT',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -199,7 +189,6 @@ export class StatsReportingBackendApiService {
     sessionId: string,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -209,7 +198,6 @@ export class StatsReportingBackendApiService {
           'EXPLORATION_ACTUALLY_STARTED',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -229,7 +217,6 @@ export class StatsReportingBackendApiService {
     sessionId: string,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -239,7 +226,6 @@ export class StatsReportingBackendApiService {
           'SOLUTION_HIT',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -248,40 +234,6 @@ export class StatsReportingBackendApiService {
           state_name: stateName,
           session_id: sessionId,
           time_spent_in_state_secs: timeSpentInStateSecs,
-        }
-      )
-      .toPromise();
-  }
-
-  async recordLeaveForRefresherExpAsync(
-    expVersion: number,
-    refresherExpId: string,
-    stateName: string,
-    sessionId: string,
-    timeSpentInStateSecs: number,
-    explorationId: string,
-    currentStateName: string,
-    nextExpId: string,
-    previousStateName: string,
-    nextStateName: string
-  ): Promise<Object> {
-    return this.http
-      .post(
-        this.getFullStatsUrl(
-          'LEAVE_FOR_REFRESHER_EXP',
-          explorationId,
-          currentStateName,
-          nextExpId,
-          previousStateName,
-          nextStateName
-        ),
-        {
-          exploration_version: expVersion,
-          refresher_exp_id: refresherExpId,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: timeSpentInStateSecs,
-        }
       )
       .toPromise();
   }
@@ -293,7 +245,6 @@ export class StatsReportingBackendApiService {
     timeSpentInStateSecs: number,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -303,7 +254,6 @@ export class StatsReportingBackendApiService {
           'STATE_COMPLETED',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -326,7 +276,6 @@ export class StatsReportingBackendApiService {
     version: number,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -336,7 +285,6 @@ export class StatsReportingBackendApiService {
           'EXPLORATION_COMPLETED',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -364,7 +312,6 @@ export class StatsReportingBackendApiService {
     classificationCategorization: string,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -374,7 +321,6 @@ export class StatsReportingBackendApiService {
           'ANSWER_SUBMITTED',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),
@@ -402,7 +348,6 @@ export class StatsReportingBackendApiService {
     version: number,
     explorationId: string,
     currentStateName: string,
-    nextExpId: string,
     previousStateName: string,
     nextStateName: string
   ): Promise<Object> {
@@ -412,7 +357,6 @@ export class StatsReportingBackendApiService {
           'EXPLORATION_MAYBE_LEFT',
           explorationId,
           currentStateName,
-          nextExpId,
           previousStateName,
           nextStateName
         ),

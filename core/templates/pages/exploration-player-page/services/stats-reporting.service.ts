@@ -59,7 +59,6 @@ export class StatsReportingService {
   stateStopwatch!: Stopwatch;
   optionalCollectionId!: string | null;
   currentStateName!: string;
-  nextExpId!: string;
   previousStateName!: string;
   nextStateName!: string;
   topicName!: string;
@@ -125,7 +124,6 @@ export class StatsReportingService {
         this.explorationVersion,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -182,7 +180,6 @@ export class StatsReportingService {
         this.explorationVersion,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -199,7 +196,6 @@ export class StatsReportingService {
         this.sessionId,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -237,7 +233,6 @@ export class StatsReportingService {
         this.sessionId,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -264,32 +259,9 @@ export class StatsReportingService {
         this.sessionId,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
-      )
-      .then(() => {
-        // Required for the post operation to deliver data to backend.
-      });
-  }
-
-  recordLeaveForRefresherExp(stateName: string, refresherExpId: string): void {
-    this.currentStateName = stateName;
-    this.nextExpId = refresherExpId;
-
-    this.statsReportingBackendApiService
-      .recordLeaveForRefresherExpAsync(
-        this.explorationVersion,
-        refresherExpId,
-        stateName,
-        this.sessionId,
-        this.stateStopwatch.getTimeInSecs(),
-        this.explorationId,
-        this.currentStateName,
-        this.nextExpId,
-        this.previousStateName,
-        this.nextStateName
-      )
+      })
       .then(() => {
         // Required for the post operation to deliver data to backend.
       });
@@ -327,7 +299,6 @@ export class StatsReportingService {
         this.sessionId,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -397,7 +368,6 @@ export class StatsReportingService {
         this.stateStopwatch.getTimeInSecs(),
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -428,7 +398,6 @@ export class StatsReportingService {
         this.explorationVersion,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -507,7 +476,6 @@ export class StatsReportingService {
         classificationCategorization,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )
@@ -536,7 +504,6 @@ export class StatsReportingService {
         this.explorationVersion,
         this.explorationId,
         this.currentStateName,
-        this.nextExpId,
         this.previousStateName,
         this.nextStateName
       )

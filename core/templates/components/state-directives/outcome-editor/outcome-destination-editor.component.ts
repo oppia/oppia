@@ -58,7 +58,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   currentStateName!: string;
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean = false;
-  canEditRefresherExplorationId: boolean = false;
   ENABLE_PREREQUISITE_SKILLS: boolean = AppConstants.ENABLE_PREREQUISITE_SKILLS;
 
   EXPLORATION_AND_SKILL_ID_PATTERN: RegExp =
@@ -215,14 +214,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.canAddPrerequisiteSkill =
       this.ENABLE_PREREQUISITE_SKILLS &&
       this.stateEditorService.isExplorationCurated();
-    this.canEditRefresherExplorationId = false;
-    this.userService.getUserInfoAsync().then(userInfo => {
-      // We restrict editing of refresher exploration IDs to
-      // admins/moderators for now, since the feature is still in
-      // development.
-      this.canEditRefresherExplorationId =
-        userInfo.isCurriculumAdmin() || userInfo.isModerator();
-    });
 
     this.explorationAndSkillIdPattern = this.EXPLORATION_AND_SKILL_ID_PATTERN;
     this.newStateNamePattern = /^[a-zA-Z0-9.\s\-]+$/;

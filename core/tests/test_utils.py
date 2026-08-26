@@ -2363,7 +2363,6 @@ class GenericTestBase(AppEngineTestBase):
                 },
                 'dest': None,
                 'dest_if_really_stuck': None,
-                'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
             },
@@ -2565,7 +2564,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -2592,7 +2590,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null

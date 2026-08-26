@@ -556,31 +556,7 @@ describe('New Ratings and recommendations component', () => {
     })
   );
 
-  it('should return the value from getIsRefresherExploration', () => {
-    const expectedValue = true;
-    spyOn(conversationFlowService, 'getIsRefresherExploration').and.returnValue(
-      expectedValue
-    );
 
-    const result = componentInstance.getIsRefresherExploration();
-
-    expect(
-      conversationFlowService.getIsRefresherExploration
-    ).toHaveBeenCalled();
-    expect(result).toBe(expectedValue);
-  });
-
-  it('should return the value from getParentExplorationIds', () => {
-    const expectedIds = ['exp1', 'exp2'];
-    spyOn(conversationFlowService, 'getParentExplorationIds').and.returnValue(
-      expectedIds
-    );
-
-    const result = componentInstance.getParentExplorationIds();
-
-    expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
-    expect(result).toBe(expectedIds);
-  });
 
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');

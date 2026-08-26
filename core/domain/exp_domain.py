@@ -2119,17 +2119,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         % default_outcome.dest_if_really_stuck
                     )
 
-                # Check that, if the outcome is a non-self-loop, then the
-                # refresher_exploration_id is None.
-                if (
-                    default_outcome.refresher_exploration_id is not None
-                    and default_outcome.dest != state_name
-                ):
-                    raise utils.ValidationError(
-                        'The default outcome for state %s has a refresher '
-                        'exploration ID, but is not a self-loop.' % state_name
-                    )
-
             for group in interaction.answer_groups:
                 # Check group destinations.
                 if group.outcome.dest not in all_state_names:
@@ -2148,18 +2137,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination for the stuck learner %s '
                         'is not a valid state.'
                         % group.outcome.dest_if_really_stuck
-                    )
-
-                # Check that, if the outcome is a non-self-loop, then the
-                # refresher_exploration_id is None.
-                if (
-                    group.outcome.refresher_exploration_id is not None
-                    and group.outcome.dest != state_name
-                ):
-                    raise utils.ValidationError(
-                        'The outcome for an answer group in state %s has a '
-                        'refresher exploration ID, but is not a self-loop.'
-                        % state_name
                     )
 
                 for param_change in group.outcome.param_changes:

@@ -347,7 +347,6 @@ describe('Contributions and review component', () => {
                             },
                             labelled_as_correct: true,
                             param_changes: [],
-                            refresher_exploration_id: null,
                           },
                           rule_specs: [],
                         },
@@ -449,7 +448,6 @@ describe('Contributions and review component', () => {
                             },
                             labelled_as_correct: true,
                             param_changes: [],
-                            refresher_exploration_id: null,
                           },
                           rule_specs: [],
                         },
@@ -670,7 +668,6 @@ describe('Contributions and review component', () => {
                   },
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 training_data: null,
                 rule_specs: [
@@ -693,7 +690,6 @@ describe('Contributions and review component', () => {
                   },
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 rule_specs: [
                   {
@@ -719,7 +715,6 @@ describe('Contributions and review component', () => {
             },
             default_outcome: {
               dest: null,
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
               feedback: {
@@ -965,7 +960,6 @@ describe('Contributions and review component', () => {
                   },
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 training_data: null,
                 rule_specs: [
@@ -988,7 +982,6 @@ describe('Contributions and review component', () => {
                   },
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 rule_specs: [
                   {
@@ -1014,7 +1007,6 @@ describe('Contributions and review component', () => {
             },
             default_outcome: {
               dest: null,
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
               feedback: {
@@ -1118,7 +1110,6 @@ describe('Contributions and review component', () => {
                           },
                           labelled_as_correct: true,
                           param_changes: [],
-                          refresher_exploration_id: null,
                         },
                         rule_specs: [],
                       },
@@ -1249,7 +1240,6 @@ describe('Contributions and review component', () => {
                   },
                   labelled_as_correct: true,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 training_data: null,
                 rule_specs: [
@@ -1276,7 +1266,6 @@ describe('Contributions and review component', () => {
             },
             default_outcome: {
               dest: null,
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
               feedback: {
@@ -1343,7 +1332,6 @@ describe('Contributions and review component', () => {
                     dest_if_really_stuck: null,
                     feedback: {content_id: '', html: ''},
                     param_changes: [],
-                    refresher_exploration_id: null,
                     missing_prerequisite_skill_id: null,
                     labelled_as_correct: false,
                   },
@@ -1570,7 +1558,6 @@ describe('Contributions and review component', () => {
                         },
                         labelled_as_correct: true,
                         param_changes: [],
-                        refresher_exploration_id: null,
                       },
                       rule_specs: [],
                     },

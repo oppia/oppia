@@ -262,7 +262,6 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(component.activityType).toBe('exploration');
-    expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
     expect(component.expTitleTranslationKey).toBe(
       'I18N_EXPLORATION_123ab_TITLE'

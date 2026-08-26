@@ -306,33 +306,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
-class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
-    def test_record_leave_for_refresher_exploration_events(self) -> None:
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
-        self.assertEqual(all_models.count(), 0)
-
-        event_services.LeaveForRefresherExpEventHandler.record(
-            'exp_id', 'refresher_exp_id', 1, 'state_name', 'session_id', 2.0
-        )
-
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
-        self.assertEqual(all_models.count(), 1)
-
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
-        self.assertEqual(model.exp_id, 'exp_id')
-        self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
-        self.assertEqual(model.state_name, 'state_name')
-        self.assertEqual(model.session_id, 'session_id')
-        self.assertEqual(model.exp_version, 1)
-        self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
 class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
@@ -586,7 +560,6 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
             'RateExplorationEventHandler',
             'StateHitEventHandler',
             'StateCompleteEventHandler',
-            'LeaveForRefresherExpEventHandler',
             'FeedbackThreadCreatedEventHandler',
             'FeedbackThreadStatusChangedEventHandler',
         ]

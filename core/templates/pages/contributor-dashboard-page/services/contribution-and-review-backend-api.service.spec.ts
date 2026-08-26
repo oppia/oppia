@@ -313,7 +313,6 @@ describe('Contribution and review backend API service', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         hints: [],

@@ -1995,7 +1995,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2193,7 +2192,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2363,7 +2361,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2413,7 +2410,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2489,7 +2485,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2685,7 +2680,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -2931,7 +2925,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest_if_really_stuck': None,
                     },
@@ -3135,7 +3128,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'rule_specs': [
@@ -3375,21 +3367,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration,
-            'Expected outcome refresher_exploration_id to be a string',
-        )
-
-        outcome.refresher_exploration_id = None
-        exploration.validate()
-
-        outcome.refresher_exploration_id = 'valid_string'
-        exploration.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
         outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -3401,21 +3378,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.missing_prerequisite_skill_id = 'valid_string'
         exploration.validate()
-
-        # Test that refresher_exploration_id must be None for non-self-loops.
-        new_state_name = 'New state'
-        exploration.add_states([new_state_name])
-
-        outcome.dest = new_state_name
-        outcome.refresher_exploration_id = 'another_string'
-        self._assert_validation_error(
-            exploration,
-            'has a refresher exploration ID, but is not a self-loop',
-        )
-
-        outcome.refresher_exploration_id = None
-        exploration.validate()
-        exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -4370,40 +4332,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.validate()
 
-    def test_validate_exploration_is_non_self_loop(self) -> None:
-        exploration = self.save_new_valid_exploration(
-            'exp_id',
-            'user@example.com',
-            title='',
-            category='',
-            objective='',
-            end_state_name='End',
-        )
-        exploration.validate()
 
-        exploration.add_states(['DEF'])
-
-        default_outcome = state_domain.Outcome(
-            'DEF',
-            None,
-            state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'
-            ),
-            False,
-            [],
-            'refresher_exploration_id',
-            None,
-        )
-        exploration.init_state.update_interaction_default_outcome(
-            default_outcome
-        )
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The default outcome for state Introduction has a refresher '
-            'exploration ID, but is not a self-loop.',
-        ):
-            exploration.validate()
 
     def test_validate_exploration_answer_group_parameter(self) -> None:
         exploration = self.save_new_valid_exploration(
@@ -4700,7 +4629,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -4731,7 +4659,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -5583,7 +5510,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -5610,7 +5536,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -5660,7 +5585,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -5686,7 +5610,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -5756,7 +5679,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -5923,7 +5845,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -5949,7 +5870,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6017,7 +5937,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6066,7 +5985,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6092,7 +6010,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6160,7 +6077,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6209,7 +6125,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6235,7 +6150,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6303,7 +6217,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6353,7 +6266,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6379,7 +6291,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6448,7 +6359,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6498,7 +6408,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6524,7 +6433,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6595,7 +6503,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6646,7 +6553,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6672,7 +6578,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6743,7 +6648,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6794,7 +6698,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6820,7 +6723,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6891,7 +6793,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -6942,7 +6843,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -6968,7 +6868,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7039,7 +6938,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7090,7 +6988,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7109,7 +7006,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7176,7 +7072,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7226,7 +7121,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7245,7 +7139,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7312,7 +7205,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7363,7 +7255,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7383,7 +7274,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7455,7 +7345,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7506,7 +7395,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7526,7 +7414,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7600,7 +7487,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7651,7 +7537,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7671,7 +7556,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7745,7 +7629,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7797,7 +7680,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6
@@ -7817,7 +7699,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -7886,7 +7767,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -7936,7 +7816,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -7967,7 +7846,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -8056,7 +7934,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -8087,7 +7964,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -8162,7 +8038,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -8201,7 +8076,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution:
@@ -8293,7 +8167,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -8333,7 +8206,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution:
@@ -8414,7 +8286,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -8507,7 +8378,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -8580,7 +8450,6 @@ states:
           labelled_as_correct: true
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 25.0
@@ -8603,7 +8472,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -8688,7 +8556,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 25.0
@@ -8708,7 +8575,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -8839,7 +8705,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -8981,7 +8846,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9075,7 +8939,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9183,7 +9046,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9264,7 +9126,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9356,7 +9217,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -9437,7 +9297,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 25.0
@@ -9463,7 +9322,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             a: 18.0
@@ -9495,7 +9353,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 25.0
@@ -9511,7 +9368,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 15.0
@@ -9541,7 +9397,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 40.0
@@ -9563,7 +9418,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: string
@@ -9599,7 +9453,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             tol: string
@@ -9624,7 +9477,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
         - hint_content:
             content_id: hint
@@ -9742,7 +9594,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 18.0
@@ -9773,7 +9624,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 25.0
@@ -9789,7 +9639,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 40.0
@@ -9809,7 +9658,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
       - hint_content:
           content_id: hint_5
@@ -9893,7 +9741,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -9920,7 +9767,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -9940,7 +9786,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -9967,7 +9812,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -9994,7 +9838,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3
@@ -10020,7 +9863,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10052,7 +9894,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: FractionInput
       solution: null
@@ -10145,7 +9986,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10165,7 +10005,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10185,7 +10024,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10205,7 +10043,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3
@@ -10233,7 +10070,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: FractionInput
       solution: null
@@ -10304,7 +10140,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10343,7 +10178,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: FractionInput
       solution: null
@@ -10432,7 +10266,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
@@ -10464,7 +10297,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: FractionInput
       solution: null
@@ -10543,7 +10375,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
@@ -10562,7 +10393,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
@@ -10581,7 +10411,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3
@@ -10613,7 +10442,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -10718,7 +10546,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
@@ -10734,7 +10561,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
@@ -10762,7 +10588,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -10843,7 +10668,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -10869,7 +10693,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -10909,7 +10732,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -11011,7 +10833,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11033,7 +10854,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11074,7 +10894,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -11152,7 +10971,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11173,7 +10991,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11198,7 +11015,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11215,7 +11031,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11248,7 +11063,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution:
@@ -11353,7 +11167,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11392,7 +11205,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -11464,7 +11276,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11481,7 +11292,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11515,7 +11325,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -11608,7 +11417,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11642,7 +11450,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -11714,7 +11521,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11743,7 +11549,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -11830,7 +11635,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11859,7 +11663,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -11938,7 +11741,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -11965,7 +11767,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_26
@@ -11982,7 +11783,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: []
@@ -11998,7 +11798,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_27
@@ -12036,7 +11835,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_27
@@ -12067,7 +11865,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -12163,7 +11960,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_5
@@ -12187,7 +11983,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ca_choices_5
@@ -12218,7 +12013,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -12289,7 +12083,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12348,7 +12141,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -12438,7 +12230,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12490,7 +12281,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution: null
@@ -12562,7 +12352,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12615,7 +12404,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution:
@@ -12717,7 +12505,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12750,7 +12537,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
       solution:
@@ -12832,7 +12618,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12858,7 +12643,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12883,7 +12667,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12908,7 +12691,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12933,7 +12715,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12964,7 +12745,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -12991,7 +12771,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -13107,7 +12886,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13127,7 +12905,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13146,7 +12923,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13165,7 +12941,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13184,7 +12959,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13219,7 +12993,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -13288,7 +13061,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13316,7 +13088,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -13400,7 +13171,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -13430,7 +13200,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -13519,7 +13288,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                     },
                     'hints': [],
@@ -14368,7 +14136,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'state_name': 'End',
                     'cmd': 'edit_state_property',
                     'new_value': {
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                         'dest': 'End',
                         'dest_if_really_stuck': None,
@@ -14392,7 +14159,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': [
                         {
                             'outcome': {
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
@@ -14779,7 +14545,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '<p>Next</p>',
                                 },
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'missing_prerequisite_skill_id': None,
@@ -14892,7 +14657,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'property_name': 'default_outcome',
                     'cmd': 'edit_state_property',
                     'new_value': {
-                        'refresher_exploration_id': None,
                         'dest': 'End',
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
@@ -14918,7 +14682,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'training_data': [],
                             'tagged_skill_misconception_id': None,
                             'outcome': {
-                                'refresher_exploration_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'missing_prerequisite_skill_id': None,
@@ -15067,7 +14830,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '<p>Next</p>',
                                 },
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'missing_prerequisite_skill_id': None,
@@ -15167,7 +14929,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                         }
@@ -15300,7 +15061,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'old_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
                             'html': '',
@@ -15314,7 +15074,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': self.content_id_generator.generate(
                                 translation_domain.ContentType.FEEDBACK
@@ -15353,7 +15112,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15388,7 +15146,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15452,7 +15209,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15485,7 +15241,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15519,7 +15274,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15686,7 +15440,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'property_name': 'default_outcome',
                     'cmd': 'edit_state_property',
                     'new_value': {
-                        'refresher_exploration_id': None,
                         'dest': 'End',
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
@@ -15712,7 +15465,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'training_data': [],
                             'tagged_skill_misconception_id': None,
                             'outcome': {
-                                'refresher_exploration_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'missing_prerequisite_skill_id': None,
@@ -15782,7 +15534,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                         }
@@ -15854,7 +15605,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15889,7 +15639,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15953,7 +15702,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -15986,7 +15734,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16020,7 +15767,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16096,7 +15842,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16131,7 +15876,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16199,7 +15943,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                         }
@@ -16358,7 +16101,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16393,7 +16135,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16459,7 +16200,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16492,7 +16232,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16526,7 +16265,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16657,7 +16395,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'html': '',
                             'content_id': self.content_id_generator.generate(
@@ -16681,7 +16418,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'missing_prerequisite_skill_id': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'feedback': {
                                     'html': '<p>Good</p>',
                                     'content_id': self.content_id_generator.generate(
@@ -16814,7 +16550,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                         }
@@ -16886,7 +16621,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16921,7 +16655,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -16985,7 +16718,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -17018,7 +16750,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -17052,7 +16783,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                             'rule_specs': [
@@ -17316,7 +17046,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'tagged_skill_misconception_id': None,
                             'outcome': {
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                                 'missing_prerequisite_skill_id': None,
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
@@ -17825,7 +17554,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': [
                         {
                             'outcome': {
-                                'refresher_exploration_id': None,
                                 'feedback': {
                                     'html': '<p>Good.</p>',
                                     'content_id': self.content_id_generator.generate(
@@ -17857,7 +17585,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'state_name': 'Introduction',
                     'new_value': {
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'html': '<p>Try Again.</p>',
                             'content_id': self.content_id_generator.generate(
@@ -17873,7 +17600,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',
                     'old_value': {
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'html': '',
                             'content_id': 'default_outcome',
@@ -17890,7 +17616,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'state_name': 'Introduction',
                     'new_value': {
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'html': '<p>Try Again.</p>',
                             'content_id': self.content_id_generator.generate(
@@ -17906,7 +17631,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',
                     'old_value': {
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'html': '<p>Try Again.</p>',
                             'content_id': 'default_outcome',
@@ -18316,7 +18040,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'old_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
                             'html': '',
@@ -18330,7 +18053,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
                             'html': '<p>Feedback 1.</p>',
@@ -18424,7 +18146,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                 'dest': 'End',
                                 'dest_if_really_stuck': None,
                                 'param_changes': [],
-                                'refresher_exploration_id': None,
                             },
                             'training_data': [],
                         }
@@ -18552,7 +18273,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'old_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
                             'html': 'Feedback 1.',
@@ -18566,7 +18286,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
                             'html': '<p>Feedback 2.</p>',
@@ -18657,7 +18376,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'old_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {'content_id': 'feedback_7', 'html': ''},
                         'param_changes': [],
                         'dest_if_really_stuck': None,
@@ -18668,7 +18386,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': {
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
-                        'refresher_exploration_id': None,
                         'feedback': {
                             'content_id': self.content_id_generator.generate(
                                 translation_domain.ContentType.DEFAULT_OUTCOME
@@ -18959,7 +18676,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19112,7 +18828,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19140,7 +18855,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19161,7 +18875,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',
@@ -19177,7 +18890,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'state_name': 'Introduction',
                 }
@@ -19233,7 +18945,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',
@@ -19336,7 +19047,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19501,7 +19211,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19622,7 +19331,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19650,7 +19358,6 @@ class ExplorationChangesMergeabilityUnitTests(
                                     'html': '',
                                 },
                                 'labelled_as_correct': False,
-                                'refresher_exploration_id': None,
                             },
                         }
                     ],
@@ -19671,7 +19378,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',
@@ -19687,7 +19393,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'state_name': 'Introduction',
                 }
@@ -19743,7 +19448,6 @@ class ExplorationChangesMergeabilityUnitTests(
                             'html': '',
                         },
                         'labelled_as_correct': False,
-                        'refresher_exploration_id': None,
                     },
                     'cmd': 'edit_state_property',
                     'property_name': 'default_outcome',

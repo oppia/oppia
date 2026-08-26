@@ -223,7 +223,6 @@ describe('Question Suggestion Editor Modal Component', () => {
                 },
                 labelled_as_correct: true,
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
@@ -253,7 +252,6 @@ describe('Question Suggestion Editor Modal Component', () => {
             },
             param_changes: [],
             labelled_as_correct: true,
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           hints: [
