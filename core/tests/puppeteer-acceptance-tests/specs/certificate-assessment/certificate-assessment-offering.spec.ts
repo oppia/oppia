@@ -296,6 +296,9 @@ describe('Certificate Assessment', function () {
       'publishCertificateModal',
       __dirname
     );
+    await curriculumAdmin.expectElementToBeVisible(
+      confirmSaveCertificateButton
+    );
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
     );
@@ -366,6 +369,9 @@ describe('Certificate Assessment', function () {
       '.e2e-test-modal-header',
       'Update Certificate'
     );
+    await curriculumAdmin.expectElementToBeVisible(
+      confirmSaveCertificateButton
+    );
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
     );
@@ -428,6 +434,9 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.expectTextContentToBe(
       '.e2e-test-modal-header',
       'Update Certificate'
+    );
+    await curriculumAdmin.expectElementToBeVisible(
+      confirmSaveCertificateButton
     );
     await curriculumAdmin.clickOnElementWithSelector(
       confirmSaveCertificateButton
@@ -502,6 +511,7 @@ describe('Certificate Assessment', function () {
       element => (element as HTMLButtonElement).disabled
     );
     expect(confirmUpdateButtonIsDisabled).toBe(true);
+    await curriculumAdmin.expectElementToBeVisible(saveAsNotReadyButton);
     await curriculumAdmin.clickOnElementWithSelector(saveAsNotReadyButton);
     await curriculumAdmin.expectToastMessage('Certificate saved as not ready.');
     await curriculumAdmin.expectTextContentToBe(
@@ -528,6 +538,9 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.expectScreenshotToMatch(
       'deleteCertificateModal',
       __dirname
+    );
+    await curriculumAdmin.expectElementToBeVisible(
+      deleteCertificateConfirmButton
     );
     await curriculumAdmin.clickOnElementWithSelector(
       deleteCertificateConfirmButton
