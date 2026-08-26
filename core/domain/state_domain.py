@@ -2222,7 +2222,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             False,
             [],
             None,
-            None,
         )
 
         return cls(

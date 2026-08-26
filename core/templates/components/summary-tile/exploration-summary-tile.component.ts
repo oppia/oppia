@@ -60,7 +60,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
-  @Input() parentExplorationIds!: string;
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the
@@ -122,8 +121,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
-
-
 
     if (!this.mobileCutoffPx) {
       this.mobileCutoffPx = 0;
@@ -208,12 +205,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     } else {
       let result = '/explore/' + this.explorationId;
       let urlParams = this.urlService.getUrlParams();
-      let parentExplorationIds = this.parentExplorationIds;
 
       let collectionIdToAdd = this.collectionId;
       // Replace the collection ID with the one in the URL if it exists
       // in urlParams.
-      if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
+      if (urlParams.hasOwnProperty('collection_id')) {
         collectionIdToAdd = urlParams.collection_id;
       }
 
@@ -223,15 +219,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
           'collection_id',
           collectionIdToAdd
         );
-      }
-      if (parentExplorationIds) {
-        for (let i = 0; i < parentExplorationIds.length - 1; i++) {
-          result = this.urlService.addField(
-            result,
-            'parent',
-            parentExplorationIds[i]
-          );
-        }
       }
       return result;
     }

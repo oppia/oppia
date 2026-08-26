@@ -234,6 +234,7 @@ export class StatsReportingBackendApiService {
           state_name: stateName,
           session_id: sessionId,
           time_spent_in_state_secs: timeSpentInStateSecs,
+        }
       )
       .toPromise();
   }

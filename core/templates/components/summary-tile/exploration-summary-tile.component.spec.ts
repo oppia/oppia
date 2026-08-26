@@ -398,34 +398,6 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.explorationIsCurrentlyHoveredOver).toBe(false);
   });
 
-  it('should navigate to parent exploration', fakeAsync(() => {
-    const explorationLinkSpy = spyOn(
-      component,
-      'getExplorationLink'
-    ).and.returnValue('/parent/id/1');
-
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        _hash: '',
-        _hashChange: null,
-        _href: '',
-        hash: '',
-        href: '/parent/id/1',
-        reload: (val: string) => '',
-      },
-      onhashchange: null,
-    });
-
-    component.loadParentExploration();
-    let location = component.getExplorationLink();
-
-    tick();
-    fixture.detectChanges();
-
-    expect(explorationLinkSpy).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.location.href).toBe(location);
-  }));
-
   it('should get the average ratings of the exploration', fakeAsync(() => {
     component.ratings = {
       1: 1,

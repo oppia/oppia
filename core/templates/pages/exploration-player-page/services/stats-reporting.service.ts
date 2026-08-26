@@ -261,7 +261,7 @@ export class StatsReportingService {
         this.currentStateName,
         this.previousStateName,
         this.nextStateName
-      })
+      )
       .then(() => {
         // Required for the post operation to deliver data to backend.
       });

@@ -2977,11 +2977,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-
-
-        self.logout()
-
-
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
