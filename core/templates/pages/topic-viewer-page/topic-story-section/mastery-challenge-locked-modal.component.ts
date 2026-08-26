@@ -17,7 +17,8 @@
  * trophy icon in the navigation bar before completing all story chapters.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -29,7 +30,28 @@ import './mastery-challenge-locked-modal.component.css';
   styleUrls: ['./mastery-challenge-locked-modal.component.css'],
 })
 export class MasteryChallengeLockedModalComponent extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
+  protected bottomSheetRef: MatBottomSheetRef | undefined;
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    @Optional() bottomSheetRef: MatBottomSheetRef | null
+  ) {
     super(ngbActiveModal);
+    this.bottomSheetRef = bottomSheetRef ?? undefined;
+  }
+
+  confirm(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('confirm');
+    } else {
+      super.confirm();
+    }
+  }
+
+  cancel(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('cancel');
+    } else {
+      super.cancel();
+    }
   }
 }

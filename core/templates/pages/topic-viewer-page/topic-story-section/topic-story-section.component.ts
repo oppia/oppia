@@ -185,6 +185,7 @@ export class TopicStorySectionComponent
   private adventureMasteredModalRef: NgbModalRef | null = null;
 
   private practiceAvailabilityRequestId: number = 0;
+  private practiceAvailabilityPending: Promise<void> | null = null;
   private directiveSubscriptions: Subscription = new Subscription();
 
   isAdventureExpanded(index: number): boolean {
@@ -207,6 +208,18 @@ export class TopicStorySectionComponent
   ): void {
     const lessonNumber = selection.lessonNumber;
     const adventureIndex = selection.adventureIndex;
+
+    if (adventureIndex !== -1 && this.shouldConfirmArcSkip(adventureIndex)) {
+      this.pendingNavigationLessonNumber = lessonNumber;
+      this.pendingNavigationAdventureIndex = adventureIndex;
+      this.pendingStartUrl = '';
+      this.pendingArcSkipTargetLabel = this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
+        {adventureNumber: adventureIndex + 1}
+      );
+      this.openArcSkipConfirmationModal();
+      return;
+    }
 
     this.selectLessonFromNavigation(lessonNumber, adventureIndex);
   }
@@ -239,7 +252,11 @@ export class TopicStorySectionComponent
     this.pendingArcSkipTargetLabel = '';
 
     if (adventureIndex !== -1) {
+      for (let i = 0; i < adventureIndex; i++) {
+        this.skippedAdventureIndices.add(i);
+      }
       this._expandedAdventureIndices.add(adventureIndex);
+      this.persistSkippedAdventures();
     }
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
@@ -384,7 +401,7 @@ export class TopicStorySectionComponent
 
     const skippedAdventureNumbers: number[] = [];
     for (let index = 0; index < this.pendingNavigationAdventureIndex; index++) {
-      if (!this.isAdventureCompleted(index)) {
+      if (!this.areAllLessonsCompleted(index)) {
         skippedAdventureNumbers.push(index + 1);
       }
     }
@@ -556,7 +573,7 @@ export class TopicStorySectionComponent
     const modalRef: NgbModalRef = this.ngbModal.open(
       MasteryChallengeLockedModalComponent,
       {
-        backdrop: true,
+        backdrop: 'static',
         windowClass: 'mastery-locked-modal',
       }
     );
@@ -575,7 +592,7 @@ export class TopicStorySectionComponent
     }
 
     for (let index = 0; index < adventureIndex; index++) {
-      if (!this.isAdventureCompleted(index)) {
+      if (!this.areAllLessonsCompleted(index)) {
         return true;
       }
     }
@@ -712,10 +729,12 @@ export class TopicStorySectionComponent
       changes.classroomUrlFragment ||
       changes.topicUrlFragment ||
       changes.lessonCount ||
-      changes.practiceCount ||
-      changes.practiceSubtopicIds
+      changes.practiceCount
     ) {
       this.populateFromInputs();
+    }
+    if (changes.practiceSubtopicIds) {
+      this.practiceCard = this.getPracticeCardData();
     }
     if (changes.storySummary && !changes.storySummary.firstChange) {
       void this.loadChapterProgress();
@@ -790,46 +809,60 @@ export class TopicStorySectionComponent
       return;
     }
 
-    this.lessonCards = this.storySummary
-      .getAllNodes()
-      .map((node: StoryNode, index: number) => {
-        const lessonProgressStatus = this.getLessonProgressStatus(node);
-
-        return {
-          lessonNumber: index + 1,
-          lessonTitle: node.getTitle(),
-          lessonDescription: node.getDescription(),
-          thumbnailUrl: this.getLessonThumbnailUrl(node),
-          startUrl:
-            lessonProgressStatus === 'coming_soon'
-              ? '#'
-              : this.getLessonStartUrl(node),
-          practiceUrl:
-            lessonProgressStatus === 'coming_soon'
-              ? '#'
-              : this.getLessonPracticeUrl(node.getId().split('_').pop() || ''),
-          skillIds: node.getAcquiredSkillIds(),
-          hasPracticeQuestions: false,
-          lessonProgressStatus,
-          nodeId: node.getId(),
-          isComingSoon: lessonProgressStatus === 'coming_soon',
-          isPublished: this.isChapterPublished(node),
-          isNewLabelVisible: this.isNewChapterLabelVisible(node),
-          availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-          availableVoiceoverLanguageCodes:
-            node.getAvailableVoiceoverLanguageCodes(),
-          availableVoiceoverLanguageAccentDescriptions:
-            node.getAvailableVoiceoverLanguageAccentDescriptions(),
-          totalCheckpointsCount: 0,
-          visitedCheckpointsCount: 0,
-        };
-      });
-
     const allNodes = this.storySummary.getAllNodes();
+    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
+      const lessonProgressStatus = this.getLessonProgressStatus(node);
+
+      return {
+        lessonNumber: index + 1,
+        lessonTitle: node.getTitle(),
+        lessonDescription: node.getDescription(),
+        thumbnailUrl: this.getLessonThumbnailUrl(node),
+        startUrl:
+          lessonProgressStatus === 'coming_soon'
+            ? '#'
+            : this.getLessonStartUrl(node),
+        practiceUrl:
+          lessonProgressStatus === 'coming_soon'
+            ? '#'
+            : this.getLessonPracticeUrl(node.getId().split('_').pop() || ''),
+        skillIds: node.getAcquiredSkillIds(),
+        hasPracticeQuestions: false,
+        lessonProgressStatus,
+        nodeId: node.getId(),
+        isComingSoon: lessonProgressStatus === 'coming_soon',
+        isPublished: this.isChapterPublished(node),
+        isNewLabelVisible: this.isNewChapterLabelVisible(node),
+        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
+        availableVoiceoverLanguageCodes:
+          node.getAvailableVoiceoverLanguageCodes(),
+        availableVoiceoverLanguageAccentDescriptions:
+          node.getAvailableVoiceoverLanguageAccentDescriptions(),
+        totalCheckpointsCount: 0,
+        visitedCheckpointsCount: 0,
+      };
+    });
+
+    allNodes.forEach((node, index) => {
+      const explorationId = node.getExplorationId();
+      if (explorationId) {
+        const summary =
+          this.chapterProgressLoaderService.getChapterProgressSummary(
+            explorationId
+          );
+        if (summary) {
+          this.lessonCards[index].totalCheckpointsCount =
+            summary.totalCheckpoints;
+          this.lessonCards[index].visitedCheckpointsCount =
+            summary.visitedCheckpoints;
+        }
+      }
+    });
+
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
     this.updateVisibleSections();
-    void this.loadPracticeQuestionAvailability();
+    this.practiceAvailabilityPending = this.loadPracticeQuestionAvailability();
     this.maybeShowAdventureMasteredModal();
   }
 
@@ -921,6 +954,22 @@ export class TopicStorySectionComponent
       };
     });
 
+    allNodes.forEach((node, index) => {
+      const explorationId = node.getExplorationId();
+      if (explorationId) {
+        const summary =
+          this.chapterProgressLoaderService.getChapterProgressSummary(
+            explorationId
+          );
+        if (summary) {
+          this.lessonCards[index].totalCheckpointsCount =
+            summary.totalCheckpoints;
+          this.lessonCards[index].visitedCheckpointsCount =
+            summary.visitedCheckpoints;
+        }
+      }
+    });
+
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
     this.restoreMasteredAdventures();
@@ -932,7 +981,7 @@ export class TopicStorySectionComponent
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getMasteryChallengeUrl();
     this.isMasteryUnlocked = this.isStoryCompleted();
-    void this.loadPracticeQuestionAvailability();
+    this.practiceAvailabilityPending = this.loadPracticeQuestionAvailability();
   }
 
   private getPracticeCardData(): PracticeCardData {
@@ -1014,7 +1063,7 @@ export class TopicStorySectionComponent
   }
 
   private async checkIfQuestionsExist(skillIds: string[]): Promise<boolean> {
-    if (skillIds.length === 0) {
+    if (!skillIds || skillIds.length === 0) {
       return false;
     }
 

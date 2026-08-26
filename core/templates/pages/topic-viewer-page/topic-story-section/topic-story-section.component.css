@@ -58,7 +58,7 @@
 
 .story-card {
   background: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   margin-top: 16px;
   max-width: 960px;
@@ -68,6 +68,7 @@
 .story-card-header {
   align-items: center;
   background: #00645c;
+  border-radius: 8px 8px 0 0;
   color: #fff;
   display: flex;
   justify-content: space-between;

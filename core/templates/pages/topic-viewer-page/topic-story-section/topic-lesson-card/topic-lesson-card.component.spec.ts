@@ -225,7 +225,7 @@ describe('TopicLessonCardComponent', () => {
   });
 
   it('should navigate to startUrl directly when no fallback is needed', () => {
-    spyOn(component, 'navigateTo');
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.selectedTextLanguageCode = null;
 

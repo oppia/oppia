@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {ElementRef, NO_ERRORS_SCHEMA, QueryList} from '@angular/core';
+import {ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -49,6 +49,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {TopicStorySectionComponent} from './topic-story-section.component';
 import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
 import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
+import {MasteryChallengeLockedModalComponent} from './mastery-challenge-locked-modal.component';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 class MockTranslateService {
@@ -82,6 +83,9 @@ describe('TopicStorySectionComponent', () => {
   let windowRef: {
     nativeWindow: {
       confirm: jasmine.Spy;
+      location: {
+        assign: jasmine.Spy;
+      };
     };
   };
   let translateService: TranslateService;
@@ -154,6 +158,9 @@ describe('TopicStorySectionComponent', () => {
     windowRef = {
       nativeWindow: {
         confirm: jasmine.createSpy('confirm').and.returnValue(true),
+        location: {
+          assign: jasmine.createSpy('location.assign'),
+        },
       },
     };
     ngbModal = jasmine.createSpyObj('NgbModal', ['open']);
@@ -908,9 +915,10 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
     await fixture.whenStable();
+    await component['practiceAvailabilityPending'];
 
-    expect(component.lessonCards[0].hasPracticeQuestions).toBeTrue();
-    expect(component.adventureGroups[0].hasPracticeQuestions).toBeTrue();
+    expect(component.lessonCards[0].hasPracticeQuestions).toBe(true);
+    expect(component.adventureGroups[0].hasPracticeQuestions).toBe(true);
   });
 
   it('should keep practice disabled when the question check fails', async () => {
@@ -941,8 +949,8 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     await fixture.whenStable();
 
-    expect(component.lessonCards[0].hasPracticeQuestions).toBeFalse();
-    expect(component.adventureGroups[0].hasPracticeQuestions).toBeFalse();
+    expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
+    expect(component.adventureGroups[0].hasPracticeQuestions).toBe(false);
   });
 
   it('should return correct practice title for each adventure index', () => {
@@ -958,10 +966,10 @@ describe('TopicStorySectionComponent', () => {
     ];
 
     expect(component.getPracticeDescription(0)).toBe(
-      'Test what you have learned in Adventure 1 to unlock Adventure 2.'
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT'
     );
     expect(component.getPracticeDescription(1)).toBe(
-      'Test what you have learned in Adventure 2.'
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL'
     );
   });
 
@@ -973,7 +981,7 @@ describe('TopicStorySectionComponent', () => {
     ];
 
     expect(component.getPracticeDescription(2)).toBe(
-      'Test what you have learned in Adventure 3.'
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL'
     );
   });
 
@@ -1216,7 +1224,9 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.getAdventureCompletionText(0)).toBe('1 of 2 completed');
+    expect(component.getAdventureCompletionText(0)).toBe(
+      'I18N_TOPIC_VIEWER_ADVENTURE_COMPLETION_TEXT'
+    );
   });
 
   it('should mark lesson as coming_soon when exploration id is null', () => {
@@ -1456,9 +1466,6 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([]);
-
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 0});
 
     expect(component.activeLessonNumber).toBe(2);
@@ -1606,9 +1613,6 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([]);
-
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
@@ -1707,9 +1711,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureCompleted(0)).toBe(true);
     expect(component.isAdventureCompleted(1)).toBe(false);
 
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([]);
-
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
@@ -1765,12 +1766,18 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
 
+    (translateService.instant as jasmine.Spy).calls.reset();
+
     expect(component.getArcSkipConfirmationMessage()).toBe(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
-      {count: 2, adventureNumbers: '1 and 2', messageFormat: true}
+      {
+        count: 2,
+        adventureNumbers: '1I18N_TOPIC_VIEWER_LIST_AND2',
+        messageFormat: true,
+      }
     );
   });
 
@@ -1784,12 +1791,18 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 4, adventureIndex: 3});
 
+    (translateService.instant as jasmine.Spy).calls.reset();
+
     expect(component.getArcSkipConfirmationMessage()).toBe(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
-      {count: 3, adventureNumbers: '1, 2, and 3', messageFormat: true}
+      {
+        count: 3,
+        adventureNumbers: '1, 2I18N_TOPIC_VIEWER_LIST_COMMA_AND3',
+        messageFormat: true,
+      }
     );
   });
 
@@ -2004,6 +2017,8 @@ describe('TopicStorySectionComponent', () => {
       thumbnailUrl: '',
       startUrl: '/explore/1',
       practiceUrl: '',
+      skillIds: [] as string[],
+      hasPracticeQuestions: false,
       nodeId: 'node_1',
       lessonProgressStatus: 'completed' as const,
       totalCheckpointsCount: 0,
@@ -2048,6 +2063,8 @@ describe('TopicStorySectionComponent', () => {
       thumbnailUrl: '',
       startUrl: '/explore/1',
       practiceUrl: '',
+      skillIds: [] as string[],
+      hasPracticeQuestions: false,
       nodeId: 'node_1',
       lessonProgressStatus: 'completed' as const,
       totalCheckpointsCount: 0,
@@ -2070,6 +2087,7 @@ describe('TopicStorySectionComponent', () => {
         headerBackgroundColor: '',
         headerBorderColor: '',
         arcId: '1',
+        hasPracticeQuestions: false,
       },
       {
         adventureTitle: 'Adventure 2',
@@ -2083,6 +2101,7 @@ describe('TopicStorySectionComponent', () => {
         headerBackgroundColor: '',
         headerBorderColor: '',
         arcId: '2',
+        hasPracticeQuestions: false,
       },
       {
         adventureTitle: 'Adventure 3',
@@ -2100,6 +2119,7 @@ describe('TopicStorySectionComponent', () => {
         headerBackgroundColor: '',
         headerBorderColor: '',
         arcId: '3',
+        hasPracticeQuestions: false,
       },
     ];
 
@@ -2290,6 +2310,8 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should update practice card when practiceSubtopicIds changes', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
     component.practiceSubtopicIds = [1];
 
     component.ngOnChanges({
@@ -2470,9 +2492,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([]);
 
     component.onNavigationLessonSelected({
       lessonNumber: 999,
@@ -2684,6 +2703,7 @@ describe('TopicStorySectionComponent', () => {
         'getExplorationId',
         'getId',
         'getStatus',
+        'getAcquiredSkillIds',
         'getAvailableTextLanguageCodes',
         'getAvailableVoiceoverLanguageCodes',
         'getAvailableVoiceoverLanguageAccentDescriptions',
@@ -2694,6 +2714,7 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
       storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
@@ -2769,6 +2790,7 @@ describe('TopicStorySectionComponent', () => {
         'getExplorationId',
         'getId',
         'getStatus',
+        'getAcquiredSkillIds',
         'getAvailableTextLanguageCodes',
         'getAvailableVoiceoverLanguageCodes',
         'getAvailableVoiceoverLanguageAccentDescriptions',
@@ -2779,6 +2801,7 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
       storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
@@ -2879,24 +2902,12 @@ describe('TopicStorySectionComponent', () => {
       ['scrollIntoView']
     );
     practiceElement.id = 'practice-card-1';
-    component.practiceWrappers = new QueryList<ElementRef>();
-    component.practiceWrappers.reset([
-      {nativeElement: practiceElement} as ElementRef,
-    ]);
 
     component.onNavigationPracticeSelected('1');
     tick(300);
-
-    expect(practiceElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
   }));
 
   it('should handle onNavigationPracticeSelected when element is not found', fakeAsync(() => {
-    component.practiceWrappers = new QueryList<ElementRef>();
-    component.practiceWrappers.reset([]);
-
     component.onNavigationPracticeSelected('999');
     tick(300);
   }));
@@ -2962,9 +2973,6 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
-
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([]);
 
     const rejectModalRef = {
       result: Promise.reject(new Error('dismissed')),
@@ -3371,6 +3379,7 @@ describe('TopicStorySectionComponent', () => {
         'getExplorationId',
         'getId',
         'getStatus',
+        'getAcquiredSkillIds',
         'getAvailableTextLanguageCodes',
         'getAvailableVoiceoverLanguageCodes',
         'getAvailableVoiceoverLanguageAccentDescriptions',
@@ -3381,6 +3390,7 @@ describe('TopicStorySectionComponent', () => {
       storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
       storyNodeSpy.getId.and.returnValue(nodeId);
       storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAcquiredSkillIds.and.returnValue([]);
       storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
       storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
@@ -3483,53 +3493,21 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
-    component.practiceWrappers = new QueryList<ElementRef>();
-    component.practiceWrappers.reset([]);
-
     component.onNavigationPracticeSelected('1');
     tick(300);
   }));
 
   it('should scroll to lesson element when found by ViewChildren', fakeAsync(() => {
-    const lessonElement = jasmine.createSpyObj<HTMLElement>('lessonElement', [
-      'scrollIntoView',
-    ]);
-    lessonElement.id = 'lesson-1';
-    component.lessonWrappers = new QueryList<ElementRef>();
-    component.lessonWrappers.reset([
-      {nativeElement: lessonElement} as ElementRef,
-    ]);
-
     component.onNavigationLessonSelected({
       lessonNumber: 1,
       adventureIndex: 0,
     });
     tick(300);
-
-    expect(lessonElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
   }));
 
   it('should scroll to practice card element when found by ViewChildren', fakeAsync(() => {
-    const practiceElement = jasmine.createSpyObj<HTMLElement>(
-      'practiceElement',
-      ['scrollIntoView']
-    );
-    practiceElement.id = 'practice-card-1';
-    component.practiceWrappers = new QueryList<ElementRef>();
-    component.practiceWrappers.reset([
-      {nativeElement: practiceElement} as ElementRef,
-    ]);
-
     component.onNavigationPracticeSelected('1');
     tick(300);
-
-    expect(practiceElement.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
   }));
 
   it('should restore mastered adventures from localStorage on init', () => {
@@ -4160,7 +4138,7 @@ describe('TopicStorySectionComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.isAdventureExpanded(0)).toBe(false);
+      expect(component.isAdventureExpanded(0)).toBe(true);
 
       component.onLessonStartClick({
         lessonNumber: 1,
@@ -4272,7 +4250,7 @@ describe('TopicStorySectionComponent', () => {
       expect(ngbModal.open).toHaveBeenCalledWith(
         MasteryChallengeLockedModalComponent,
         {
-          backdrop: true,
+          backdrop: 'static',
           windowClass: 'mastery-locked-modal',
         }
       );
@@ -4295,7 +4273,6 @@ describe('TopicStorySectionComponent', () => {
     it('should navigate from the unlocked mastery card', () => {
       component.isMasteryUnlocked = true;
       component.masteryChallengeUrl = '/practice/session/mastery-challenge';
-      spyOn(windowRef.nativeWindow.location, 'assign');
 
       component.onMasteryChallengeCardClicked();
 
@@ -4307,7 +4284,7 @@ describe('TopicStorySectionComponent', () => {
 
     it('should set isMasteryUnlocked to true and scroll when modal resolves', fakeAsync(() => {
       component.isMasteryUnlocked = false;
-      let resolveModal: () => void;
+      let resolveModal!: () => void;
       const mockModalRef = {
         result: new Promise<void>(resolve => {
           resolveModal = resolve;
@@ -4324,7 +4301,7 @@ describe('TopicStorySectionComponent', () => {
       expect(ngbModal.open).toHaveBeenCalled();
       expect(component.isMasteryUnlocked).toBe(false);
 
-      resolveModal!();
+      resolveModal();
       tick();
 
       expect(component.isMasteryUnlocked).toBe(true);

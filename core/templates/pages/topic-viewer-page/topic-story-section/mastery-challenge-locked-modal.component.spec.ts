@@ -17,6 +17,7 @@
  */
 
 import {TestBed, waitForAsync} from '@angular/core/testing';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
@@ -30,7 +31,7 @@ describe('MasteryChallengeLockedModalComponent', () => {
     TestBed.configureTestingModule({
       declarations: [MasteryChallengeLockedModalComponent],
       imports: [MockTranslateModule],
-      providers: [NgbActiveModal],
+      providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(

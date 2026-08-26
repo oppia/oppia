@@ -650,13 +650,6 @@
     width: 100%;
   }
 
-  .topic-lesson-card-chevron-badge {
-    flex: 0 0 38px;
-    height: 38px;
-    width: 38px;
-  }
-
-
   .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge {
     flex: 0 0 36px;
     height: 36px;
