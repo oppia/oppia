@@ -26,6 +26,7 @@ import {
   ConceptCard,
   ConceptCardBackendDict,
 } from 'domain/skill/concept-card.model';
+import {AppConstants} from 'app.constants';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -47,6 +48,7 @@ export class ConceptCardBackendApiService {
 
   private _fetchConceptCards(
     skillIds: string[],
+    languageCode: string,
     successCallback: (value: ConceptCard[]) => void,
     errorCallback: (reason: string) => void
   ): void {
@@ -58,9 +60,15 @@ export class ConceptCardBackendApiService {
     );
 
     const conceptCardObjects: ConceptCard[] = [];
+    const params: Record<string, string> = {};
+    // English is the language in which the content is authored, so there is
+    // nothing to look up for it.
+    if (languageCode !== AppConstants.DEFAULT_LANGUAGE_CODE) {
+      params.language_code = languageCode;
+    }
 
     this.http
-      .get<ConceptCardBackendDicts>(conceptCardDataUrl)
+      .get<ConceptCardBackendDicts>(conceptCardDataUrl, {params})
       .toPromise()
       .then(
         response => {
@@ -82,29 +90,44 @@ export class ConceptCardBackendApiService {
       );
   }
 
-  private _isCached(skillId: string): boolean {
-    return this._conceptCardCache.hasOwnProperty(skillId);
+  // Concept cards are cached per language, since the same skill renders
+  // different content depending on the language it is requested in.
+  private _getCacheKey(skillId: string, languageCode: string): string {
+    return `${languageCode}:${skillId}`;
   }
 
-  private _getUncachedSkillIds(skillIds: string[]): string[] {
+  private _isCached(skillId: string, languageCode: string): boolean {
+    return this._conceptCardCache.hasOwnProperty(
+      this._getCacheKey(skillId, languageCode)
+    );
+  }
+
+  private _getUncachedSkillIds(
+    skillIds: string[],
+    languageCode: string
+  ): string[] {
     const uncachedSkillIds: string[] = [];
     skillIds.forEach(skillId => {
-      if (!this._isCached(skillId)) {
+      if (!this._isCached(skillId, languageCode)) {
         uncachedSkillIds.push(skillId);
       }
     });
     return uncachedSkillIds;
   }
 
-  async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
+  async loadConceptCardsAsync(
+    skillIds: string[],
+    languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE
+  ): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
-      var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
+      var uncachedSkillIds = this._getUncachedSkillIds(skillIds, languageCode);
       const conceptCards: ConceptCard[] = [];
       if (uncachedSkillIds.length !== 0) {
         // Case where only part (or none) of the concept cards are cached
         // locally.
         this._fetchConceptCards(
           uncachedSkillIds,
+          languageCode,
           uncachedConceptCards => {
             skillIds.forEach(skillId => {
               if (uncachedSkillIds.includes(skillId)) {
@@ -112,11 +135,19 @@ export class ConceptCardBackendApiService {
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
                 );
                 // Save the fetched conceptCards to avoid future fetches.
-                this._conceptCardCache[skillId] = cloneDeep(
+                this._conceptCardCache[
+                  this._getCacheKey(skillId, languageCode)
+                ] = cloneDeep(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
                 );
               } else {
-                conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+                conceptCards.push(
+                  cloneDeep(
+                    this._conceptCardCache[
+                      this._getCacheKey(skillId, languageCode)
+                    ]
+                  )
+                );
               }
             });
             if (resolve) {
@@ -128,7 +159,11 @@ export class ConceptCardBackendApiService {
       } else {
         // Case where all of the concept cards are cached locally.
         skillIds.forEach(skillId => {
-          conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+          conceptCards.push(
+            cloneDeep(
+              this._conceptCardCache[this._getCacheKey(skillId, languageCode)]
+            )
+          );
         });
         if (resolve) {
           resolve(cloneDeep(conceptCards));

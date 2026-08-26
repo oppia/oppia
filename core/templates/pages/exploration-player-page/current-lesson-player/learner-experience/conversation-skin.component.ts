@@ -18,12 +18,7 @@
 
 import {Subscription} from 'rxjs';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {
-  ChangeDetectorRef,
-  Component,
-  Input,
-  ViewEncapsulation,
-} from '@angular/core';
+import {ChangeDetectorRef, Component, Input} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
@@ -75,7 +70,6 @@ import {InteractionAnswer} from 'interactions/answer-defs';
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
   styleUrls: ['./conversation-skin.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
@@ -566,10 +560,8 @@ export class ConversationSkinComponent {
   isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
     let recommendedExpTitleTranslationKey =
       this.getRecommendedExpTitleTranslationKey(explorationId);
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        recommendedExpTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      recommendedExpTitleTranslationKey
     );
   }
 
