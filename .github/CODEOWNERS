@@ -424,6 +424,9 @@
 /core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
+# Machine Translation project.
+/core/controllers/machine_translation*.py @oppia/lace-backend-reviewers
+/core/domain/machine_translation*.py @oppia/lace-backend-reviewers
 
 # Navigation bar project.
 /core/templates/components/button-directives/create-activity-button.component.ts @oppia/lace-frontend-reviewers
@@ -813,6 +816,7 @@
 /core/controllers/base*.py @oppia/core-reviewers
 /core/controllers/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
+/core/domain/html_translation_services*.py @oppia/contributor-experience-team
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers

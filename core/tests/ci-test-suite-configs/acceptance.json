@@ -734,6 +734,11 @@
       "name": "logged-in-learner/view-a-collection",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts",
       "framework": "puppeteer"
+    },
+    {
+      "name": "contributor-dashboard-admin/manage-auto-translation-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
+      "framework": "puppeteer"
     }
   ]
 }
