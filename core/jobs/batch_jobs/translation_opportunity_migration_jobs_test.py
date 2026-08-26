@@ -65,8 +65,16 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
                 )
             },
         )
-        self.exp_model.update_timestamps()
-        self.exp_model.put()
+        commit_cmd = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': 'title',
+                'category': 'category',
+            }
+        )
+        self.exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'commit_message', [commit_cmd.to_dict()]
+        )
 
         self.translation_model = self.create_model(
             translation_models.EntityTranslationsModel,
