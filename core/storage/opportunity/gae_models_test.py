@@ -602,6 +602,12 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                None, None, 'hi'
+            ),
+            3,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
                 'exploration', 'topic2', 'hi'
             ),
             1,

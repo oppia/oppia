@@ -3676,6 +3676,10 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/opportunitiescounthandler/translation', expected_status_int=400
         )
+        self.get_json(
+            '/opportunitiescounthandler/reviewable_translation',
+            expected_status_int=400,
+        )
 
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]

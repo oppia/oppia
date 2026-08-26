@@ -648,7 +648,8 @@ describe('Opportunities List Component', () => {
     }));
 
     it('should self-correct totalPages in fetchAndLoadOpportunities when backend is exhausted', fakeAsync(() => {
-      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 4 pages.
+      component.dropdownPaginationEnabled = true;
+      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 5 pages.
       component.loadOpportunities = () =>
         Promise.resolve({
           opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10), // Only 10 actual items.
@@ -659,11 +660,12 @@ describe('Opportunities List Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.totalPages).toBe(1); // Self-corrected from 4 to 1.
+      expect(component.totalPages).toBe(1); // Self-corrected from 5 to 1.
       expect(component.opportunities.length).toBe(10);
     }));
 
     it('should self-correct totalPages and clamp activePageNumber in gotoPage', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
       component.loadOpportunitiesCount = () => Promise.resolve(25); // Predict 3 pages.
       component.loadOpportunities = () =>
         Promise.resolve({

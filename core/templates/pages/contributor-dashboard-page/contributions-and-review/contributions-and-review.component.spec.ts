@@ -1818,6 +1818,22 @@ describe('Contributions and review component', () => {
         });
     });
 
+    it('should load reviewable translation opportunities count correctly', fakeAsync(() => {
+      const getReviewableTranslationOpportunitiesCountAsyncSpy = spyOn(
+        contributionOpportunitiesService,
+        'getReviewableTranslationOpportunitiesCountAsync'
+      ).and.returnValue(Promise.resolve(42));
+      let count = 0;
+      component.loadReviewableTranslationOpportunitiesCount().then(c => {
+        count = c;
+      });
+      tick();
+      expect(
+        getReviewableTranslationOpportunitiesCountAsyncSpy
+      ).toHaveBeenCalled();
+      expect(count).toEqual(42);
+    }));
+
     it('should open a snackbar if a pinned opportunity already exists', () => {
       const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
 

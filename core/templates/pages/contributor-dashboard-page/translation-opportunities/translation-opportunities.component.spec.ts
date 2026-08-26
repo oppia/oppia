@@ -251,6 +251,27 @@ describe('Translation opportunities component', () => {
       });
   });
 
+  it('should load translation opportunities count', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(translationTopicService, 'getActiveTopicName').and.returnValue(
+      'topic'
+    );
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(42));
+
+    let count = 0;
+    component.loadOpportunitiesCountAsync().then(c => {
+      count = c;
+    });
+    tick();
+
+    expect(count).toBe(42);
+  }));
+
   it(
     'should move opportunities with no translatable cards to the bottom ' +
       'of opportunity list',

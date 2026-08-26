@@ -270,6 +270,36 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should use the reject handler if fetching opportunities count fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error fetching count.',
+      },
+      {
+        status: 500,
+        statusText: 'Error fetching count.',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Error fetching count.')
+    );
+  }));
+
   it('should fetch skill opportunities with a search query', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
