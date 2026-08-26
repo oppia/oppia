@@ -69,11 +69,19 @@ const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 // createSkillForTopic, so the English text the fallback shows is known.
 const SKILL_EXPLANATION = `Review material text content for ${SKILL_NAME}.`;
 
+// A suggestion row truncates its heading at 30 characters, and the heading is
+// the translation itself, so any translation looked up by heading below is
+// kept under that limit.
 const HINDI_TITLE = 'पाई काटना';
-const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
-const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न के लिए समीक्षा सामग्री।';
+const HINDI_OBJECTIVE = 'केक को बराबर बाँटना सीखें';
+const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
 
 const MAX_ITEMS_TO_SKIP = 15;
+
+// The lesson contributes a title and an objective and the skill contributes an
+// explanation, so no list here holds more than a handful of suggestions. The
+// bound only exists so a modal that stops closing fails instead of looping.
+const MAX_SUGGESTIONS_TO_ACCEPT = 6;
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
@@ -204,33 +212,17 @@ describe('Logged-out User', function () {
       CHAPTER_NAME,
       LESSON_SUBHEADING
     );
-    await translationReviewer.startTranslationReview(
-      HINDI_TITLE,
-      `${TOPIC_NAME} / ${CHAPTER_NAME}`
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'accept',
-      'Suggestion accepted.'
-    );
-    await translationReviewer.startTranslationReview(
-      HINDI_OBJECTIVE,
-      `${TOPIC_NAME} / ${CHAPTER_NAME}`
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'accept',
-      'Suggestion accepted.'
+    await translationReviewer.acceptAllSuggestionsInReviewModal(
+      'Suggestion accepted.',
+      MAX_SUGGESTIONS_TO_ACCEPT
     );
 
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
-    await translationReviewer.startTranslationReview(
-      HINDI_SKILL_EXPLANATION,
-      SKILL_NAME
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'accept',
-      'Suggestion accepted.'
+    await translationReviewer.acceptAllSuggestionsInReviewModal(
+      'Suggestion accepted.',
+      MAX_SUGGESTIONS_TO_ACCEPT
     );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();

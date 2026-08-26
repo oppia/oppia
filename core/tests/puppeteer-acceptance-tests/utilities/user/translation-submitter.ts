@@ -166,6 +166,14 @@ export class TranslationSubmitter extends BaseUser {
     // the opportunity is re-queried and clicked again if the modal does not
     // open within the timeout.
     for (let attempt = 1; attempt <= translateButtonClickAttempts; attempt++) {
+      // The top navigation's menus open on mouseover and close only on
+      // mouseleave. Puppeteer's pointer is virtual and stays wherever the last
+      // native click left it, so one of those menus can still be hanging open
+      // over the opportunity list, which puts its own markup at the centre of
+      // the translate button and fails the clickability check below. Parking
+      // the pointer at the page origin fires the mouseleave that closes it.
+      await this.page.mouse.move(0, 0);
+
       const opportunityItem =
         await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
           chapterName,

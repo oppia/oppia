@@ -18,6 +18,7 @@
 
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
+import {showMessage} from '../common/show-message';
 
 const opportunityItemSelector = '.e2e-test-opportunity-list-item';
 const opportunityItemHeadingSelector =
@@ -38,6 +39,21 @@ const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const translatedContentContainerSelector = '.e2e-test-translated-content';
 const reviewModalContainerSelector = '.e2e-test-translation-review-modal';
 const updateTranslationBtnSelector = '.e2e-test-update-translation-button';
+
+const toastMessageSelector = '.e2e-test-toast-message';
+
+// How long to wait when checking whether the review modal is still open after
+// a suggestion has been resolved. The modal closes without a request of its
+// own, so this only has to cover a render.
+const reviewModalProbeTimeoutMsecs = 2000;
+
+// A resolved suggestion is held for thirty seconds so that it can be undone,
+// and only reaches the server when that window closes, which is when the
+// outcome toast appears. Reviewing another suggestion flushes the held one
+// straight away, so only the last one waits the full window. The bound below
+// leaves margin over that thirty seconds, because the default selector
+// timeout is exactly thirty seconds and would race it.
+const reviewCommitTimeoutMsecs = 45000;
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -180,6 +196,77 @@ export class TranslationReviewer extends BaseUser {
     }
 
     await this.expectModalTitleToBe('Review Translation Contributions');
+  }
+
+  /**
+   * Opens the first suggestion in the list for review. The modal decides its
+   * button labels, and whether it closes or walks to the next suggestion, from
+   * the position of the row that was opened, so opening the first row keeps
+   * that behaviour the same no matter how the list happens to be sorted.
+   */
+  async openFirstSuggestionForReview(): Promise<void> {
+    await this.expectElementToBeVisible(opportunityItemSelector);
+    const [firstSuggestion] = await this.page.$$(opportunityItemSelector);
+    if (!firstSuggestion) {
+      throw new Error('There are no suggestions to review.');
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      // At mobile width the whole row is the button, and the click is
+      // dispatched on it so the sticky navigation bar cannot intercept it.
+      await firstSuggestion.evaluate(el => (el as HTMLElement).click());
+    } else {
+      const reviewButton = await firstSuggestion.waitForSelector(
+        opportunityTranslateButtonSelector
+      );
+      if (!reviewButton) {
+        throw new Error('The review button on the first suggestion is absent.');
+      }
+      await reviewButton.evaluate(el => (el as HTMLElement).click());
+    }
+
+    await this.expectModalTitleToBe('Review Translation Contributions');
+  }
+
+  /**
+   * Opens the first suggestion in the list and accepts every suggestion the
+   * modal then walks through. Opening the first row means the modal holds all
+   * of the suggestions, so one pass resolves the whole list without reading it
+   * again. That matters because an accepted suggestion is queued for thirty
+   * seconds so it can be undone, and its row deliberately stays in the list
+   * until that window closes.
+   * @param expectedToastMessage - The toast each accept raises.
+   * @param maxSuggestions - Safety bound so a modal that stops closing fails
+   *     instead of looping forever.
+   */
+  async acceptAllSuggestionsInReviewModal(
+    expectedToastMessage: string,
+    maxSuggestions: number
+  ): Promise<void> {
+    await this.openFirstSuggestionForReview();
+
+    for (let accepted = 1; accepted <= maxSuggestions; accepted++) {
+      await this.clickOnElementWithSelector(acceptTranslationButtonSelector);
+
+      const modalIsStillOpen = await this.isElementVisible(
+        reviewModalContainerSelector,
+        true,
+        reviewModalProbeTimeoutMsecs
+      );
+      if (!modalIsStillOpen) {
+        // Only the last accept is still held behind the undo window. Waiting
+        // for its toast is what proves every translation has reached the
+        // server, which is what a learner then has to be able to see.
+        await this.expectReviewOutcomeToast(expectedToastMessage);
+        showMessage(`Accepted ${accepted} suggestions.`);
+        return;
+      }
+    }
+
+    throw new Error(
+      `The review modal was still open after accepting ${maxSuggestions} ` +
+        'suggestions.'
+    );
   }
 
   /**
@@ -329,7 +416,30 @@ export class TranslationReviewer extends BaseUser {
     }
 
     await this.clickOnElementWithSelector(buttonSelector);
-    await this.expectToastMessage(expectedToastMessage);
+    await this.expectReviewOutcomeToast(expectedToastMessage);
+  }
+
+  /**
+   * Waits for the toast that a review raises once it has been committed to the
+   * server. The commit is deferred behind the undo window, so this cannot use
+   * the shared toast helper, whose wait is exactly as long as that window.
+   * @param expectedToastMessage - The toast the review is expected to raise.
+   */
+  async expectReviewOutcomeToast(expectedToastMessage: string): Promise<void> {
+    const toast = await this.page.waitForSelector(toastMessageSelector, {
+      visible: true,
+      timeout: reviewCommitTimeoutMsecs,
+    });
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toast
+    );
+    if (toastMessage !== expectedToastMessage) {
+      throw new Error(
+        `Expected the review toast to be "${expectedToastMessage}", but it ` +
+          `was "${toastMessage}".`
+      );
+    }
   }
 
   /**

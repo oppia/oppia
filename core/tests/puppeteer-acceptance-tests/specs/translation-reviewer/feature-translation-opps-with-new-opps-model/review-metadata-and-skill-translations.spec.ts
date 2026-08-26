@@ -60,18 +60,22 @@ const CONTENT_TYPE_OBJECTIVE = 'objective';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
+// A suggestion row truncates its heading at 30 characters, and the heading is
+// the translation itself, so any translation looked up by heading below is
+// kept under that limit.
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
 const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
-const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न के लिए समीक्षा सामग्री।';
+const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
 
 // The action button an opportunity card carries on the review tab. It opens
 // the card's own suggestions rather than a review, which is what "Review" on
 // each individual suggestion inside does.
 const OPPORTUNITY_ACTION_BUTTON_LABEL = 'Translations';
 
-// Each suggestion on the review tab opens in its own modal, so accept and
-// reject never name a next suggestion here.
+// The review modal walks through the suggestions that follow the row that was
+// opened, so it names the next one until the last is reached.
+const ACCEPT_AND_REVIEW_NEXT_LABEL = 'Accept and review next';
 const ACCEPT_LABEL = 'Accept';
 const REJECT_LABEL = 'Reject';
 
@@ -228,44 +232,6 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to accept and reject a skill translation', async function () {
-    await translationReviewer.startTranslationReview(
-      HINDI_SKILL_DESCRIPTION,
-      SKILL_NAME
-    );
-
-    // Each suggestion is listed as its own row and opens in its own modal, so
-    // the review modal holds a single suggestion and the button reads "Accept"
-    // rather than naming a next one.
-    await translationReviewer.expectReviewButtonLabelToBe(
-      'accept',
-      ACCEPT_LABEL
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'accept',
-      'Suggestion accepted.'
-    );
-
-    // Open the second suggestion to test rejecting it.
-    await translationReviewer.startTranslationReview(
-      HINDI_SKILL_EXPLANATION,
-      SKILL_NAME
-    );
-    await translationReviewer.expectReviewButtonLabelToBe(
-      'accept',
-      ACCEPT_LABEL
-    );
-    await translationReviewer.expectReviewButtonLabelToBe(
-      'reject',
-      REJECT_LABEL
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'reject',
-      'Suggestion rejected.',
-      'Please match the wording used in the lesson.'
-    );
-  });
-
   it('should be able to open a skill from the mixed list', async function () {
     // Reaching a skill's suggestions through its opportunity card is a
     // different path from the skills filter above, which skips the card, so
@@ -278,6 +244,38 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectOpportunityToBePresent(
       HINDI_SKILL_EXPLANATION,
       SKILL_NAME
+    );
+  });
+
+  it('should be able to accept and reject a skill translation', async function () {
+    // The skill has two pending suggestions. Opening the first row means one
+    // suggestion still follows it, which is what makes the labels below
+    // deterministic rather than dependent on how the list is sorted.
+    await translationReviewer.openFirstSuggestionForReview();
+
+    await translationReviewer.expectReviewButtonLabelToBe(
+      'accept',
+      ACCEPT_AND_REVIEW_NEXT_LABEL
+    );
+    await translationReviewer.submitTranslationReviewAndExpectToast(
+      'accept',
+      'Suggestion accepted.'
+    );
+
+    // Accepting the first suggestion leaves the modal open on the second and
+    // last one, where both buttons drop the mention of a next suggestion.
+    await translationReviewer.expectReviewButtonLabelToBe(
+      'accept',
+      ACCEPT_LABEL
+    );
+    await translationReviewer.expectReviewButtonLabelToBe(
+      'reject',
+      REJECT_LABEL
+    );
+    await translationReviewer.submitTranslationReviewAndExpectToast(
+      'reject',
+      'Suggestion rejected.',
+      'Please match the wording used in the lesson.'
     );
   });
 
