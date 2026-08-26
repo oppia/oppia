@@ -22,6 +22,7 @@ from core import feconf
 from core.domain import exp_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_migration_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
 
 (exp_models, opportunity_models, translation_models) = (
@@ -122,8 +123,8 @@ class BackfillTranslationMissingReasonsJobTests(job_test_utils.JobTestBase):
     def test_job_migrates_models(self) -> None:
         self.assert_job_output_is(
             [
-                job_test_utils.ResultEntry(
-                    'SUCCESS', ('exploration.exp_1', 'exp_1')
+                job_run_result.JobRunResult(
+                    stdout='BACKFILL_TRANSLATION_MISSING_REASONS SUCCESS: 1'
                 )
             ]
         )
