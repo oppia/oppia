@@ -165,15 +165,19 @@ export class TranslationReviewer extends BaseUser {
     // sticky header and delivers the click to the header instead.
     // By evaluating the click, it is dispatched on the element itself where
     // it cannot be intercepted.
-    const translateButton = await opportunityItem.waitForSelector(
-      opportunityTranslateButtonSelector
-    );
-    if (!translateButton) {
-      throw new Error(
-        `Translate button for chapter ${chapterName} and story ${subheading} not found.`
+    if (this.isViewportAtMobileWidth()) {
+      await opportunityItem.evaluate(el => (el as HTMLElement).click());
+    } else {
+      const translateButton = await opportunityItem.waitForSelector(
+        opportunityTranslateButtonSelector
       );
+      if (!translateButton) {
+        throw new Error(
+          `Translate button for chapter ${chapterName} and story ${subheading} not found.`
+        );
+      }
+      await translateButton.evaluate(el => (el as HTMLElement).click());
     }
-    await translateButton.evaluate(el => (el as HTMLElement).click());
 
     await this.expectModalTitleToBe('Review Translation Contributions');
   }
