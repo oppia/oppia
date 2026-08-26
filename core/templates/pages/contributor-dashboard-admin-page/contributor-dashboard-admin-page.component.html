@@ -5,7 +5,7 @@
 </div>
 <br>
 
-<div *ngIf="isAutoTranslationEnabled" class="oppia-contributor-dashboard-admin-page-tabs-container">
+<div *ngIf="isAutoTranslationEnabled && UserIsTranslationAdmin" class="oppia-contributor-dashboard-admin-page-tabs-container">
   <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
 </div>
 
@@ -254,6 +254,5 @@
       </table>
     </div>
   </mat-card>
-  <oppia-translation-configuration-tab *ngIf="UserIsTranslationAdmin"></oppia-translation-configuration-tab>
 </div>
 
