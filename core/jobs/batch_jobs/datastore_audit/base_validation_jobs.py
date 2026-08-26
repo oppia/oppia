@@ -188,4 +188,5 @@ class ApplyAllValidations(beam.DoFn):  # type: ignore[misc]
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         for validation_fn in self._validation_functions:
-            yield from validation_fn(model)
+            for error in validation_fn(model):
+                yield error

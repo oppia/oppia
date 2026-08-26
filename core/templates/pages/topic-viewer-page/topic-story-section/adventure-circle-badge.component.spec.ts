@@ -16,19 +16,20 @@
  * @fileoverview Unit tests for AdventureCircleBadgeComponent.
  */
 
-import {TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
 
 describe('AdventureCircleBadgeComponent', () => {
   let component: AdventureCircleBadgeComponent;
+  let fixture: ComponentFixture<AdventureCircleBadgeComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AdventureCircleBadgeComponent],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
+    fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
     component = fixture.componentInstance;
   }));
 
@@ -43,9 +44,36 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.borderColor).toBe('#7f8c8d');
     expect(component.textColor).toBe('#334155');
     expect(component.size).toBe('md');
-    expect(component.title).toBe('');
-    expect(component.getAriaLabel()).toBe('');
-    expect(component.getTooltipText()).toBe('');
+  });
+
+  it('should return default class when size is md', () => {
+    component.size = 'md';
+
+    expect(component.circleClass).toBe('adventure-circle-badge');
+  });
+
+  it('should return small class when size is sm', () => {
+    component.size = 'sm';
+
+    expect(component.circleClass).toBe(
+      'adventure-circle-badge adventure-circle-badge--sm'
+    );
+  });
+
+  it('should update input properties', () => {
+    component.label = '1';
+    component.iconName = 'done';
+    component.backgroundColor = '#000000';
+    component.borderColor = '#111111';
+    component.textColor = '#ffffff';
+    component.size = 'sm';
+
+    expect(component.label).toBe('1');
+    expect(component.iconName).toBe('done');
+    expect(component.backgroundColor).toBe('#000000');
+    expect(component.borderColor).toBe('#111111');
+    expect(component.textColor).toBe('#ffffff');
+    expect(component.size).toBe('sm');
   });
 
   it('should update circleClass when size changes', () => {
@@ -56,59 +84,5 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.circleClass).toBe(
       'adventure-circle-badge adventure-circle-badge--sm'
     );
-  });
-
-  it('should use the label for the aria label when present', () => {
-    component.label = '1';
-    component.iconName = 'check';
-
-    expect(component.getAriaLabel()).toBe('1');
-  });
-
-  it('should fall back to the icon name for the aria label when no label is present', () => {
-    component.label = '';
-    component.iconName = 'done';
-
-    expect(component.getAriaLabel()).toBe('done');
-  });
-
-  it('should use the explicit title for the tooltip', () => {
-    component.title = 'Go to lesson 1';
-    component.label = '1';
-    component.iconName = 'check';
-
-    expect(component.getTooltipText()).toBe('Go to lesson 1');
-  });
-
-  it('should fall back to the label for the tooltip when no title is provided', () => {
-    component.title = '';
-    component.label = '1';
-    component.iconName = 'check';
-
-    expect(component.getTooltipText()).toBe('1');
-  });
-
-  it('should fall back to the icon name for the tooltip when no title or label is provided', () => {
-    component.title = '';
-    component.label = '';
-    component.iconName = 'done';
-
-    expect(component.getTooltipText()).toBe('done');
-  });
-
-  it('should report the icon as shown when an icon name is provided', () => {
-    component.iconName = 'check';
-    component.label = '1';
-
-    expect(component.hasIcon).toBeTrue();
-    expect(component.getAriaLabel()).toBe('1');
-  });
-
-  it('should report the label as shown when no icon name is provided', () => {
-    component.iconName = '';
-    component.label = '1';
-
-    expect(component.hasIcon).toBeFalse();
-    expect(component.getAriaLabel()).toBe('1');
   });
 });

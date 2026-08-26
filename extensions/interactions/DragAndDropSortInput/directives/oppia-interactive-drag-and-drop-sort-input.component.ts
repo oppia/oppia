@@ -54,7 +54,6 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   @Input() allowMultipleItemsInSamePositionWithValue!: string;
   @Input() choicesWithValue!: string;
   // Save solution is null until the solution is set.
-  @Input() lastAnswer!: InteractionAnswer | null;
   @Input() savedSolution!: InteractionAnswer | null;
   choices!: string[];
   choicesValue!: SubtitledHtml[];
@@ -468,11 +467,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.maxGroups = this.choices.length;
 
     let savedSolution = (
-      this.lastAnswer !== null && this.lastAnswer !== undefined
-        ? this.lastAnswer
-        : this.savedSolution !== null && this.savedSolution !== undefined
-          ? this.savedSolution
-          : []
+      this.savedSolution !== null ? this.savedSolution : []
     ) as DragAndDropAnswer;
 
     if (this.allowMultipleItemsInSamePosition) {

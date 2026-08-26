@@ -375,21 +375,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         this.refreshSearchBarLabels()
       )
     );
-
-    // Result titles and objectives are rendered in the site language, so the
-    // results are re-fetched when it changes. This listens to the language
-    // code service rather than to onLangChange, because for a logged-in user
-    // the code is only updated after their preference has been saved, and
-    // re-fetching any earlier would send the previous language. Pages other
-    // than the search results page load their own tiles, so they are left to
-    // refresh themselves.
-    this.directiveSubscriptions.add(
-      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
-        if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
-          this.onSearchQueryChangeExec();
-        }
-      })
-    );
   }
 
   ngOnDestroy(): void {

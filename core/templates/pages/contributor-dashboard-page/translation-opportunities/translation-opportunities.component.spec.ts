@@ -33,7 +33,6 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
-import {AppConstants} from 'app.constants';
 import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {OpportunitiesListComponent} from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
@@ -283,7 +282,6 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
           id: '1',
@@ -295,7 +293,6 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
     }
@@ -328,7 +325,6 @@ describe('Translation opportunities component', () => {
         totalCount: 4,
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
-        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -340,7 +336,6 @@ describe('Translation opportunities component', () => {
         totalCount: 10,
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
-        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -359,7 +354,6 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
           id: '2',
@@ -371,7 +365,6 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
     }
@@ -536,23 +529,4 @@ describe('Translation opportunities component', () => {
 
     expect(component.languageSelected).toBe(true);
   }));
-
-  it('should emit reloadOpportunitiesEventEmitter when activeEntityType changes', () => {
-    spyOn(
-      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
-      'emit'
-    );
-    component.ngOnChanges({
-      activeEntityType: {
-        currentValue: 'skill',
-        previousValue: 'exploration',
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    });
-
-    expect(
-      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
-    ).toHaveBeenCalled();
-  });
 });

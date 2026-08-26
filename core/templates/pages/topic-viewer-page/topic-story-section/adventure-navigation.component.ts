@@ -35,17 +35,9 @@ import './adventure-navigation.component.css';
 interface AdventureNavigationGroup {
   lessons: {
     lessonNumber: number;
-    isCompleted: boolean;
   }[];
   accentColor: string;
   showPractice: boolean;
-  isPracticeCompleted: boolean;
-  arcId: string;
-}
-
-export interface AdventureNavigationLessonSelection {
-  lessonNumber: number;
-  adventureIndex: number;
 }
 
 @Component({
@@ -58,12 +50,8 @@ export class AdventureNavigationComponent
 {
   @Input() adventureGroups: AdventureNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
-  // True when this component is rendered inside the topic editor's preview
-  // tab, where the fixed editor header bar adds height to the header stack.
-  @Input() isInTopicEditorPreview: boolean = false;
-  @Output() lessonSelected =
-    new EventEmitter<AdventureNavigationLessonSelection>();
-  @Output() practiceSelected = new EventEmitter<string>();
+  @Output() lessonSelected = new EventEmitter<number>();
+  @Output() practiceSelected = new EventEmitter<number>();
 
   @ViewChild('scrollWrapper') scrollWrapper!: ElementRef<HTMLElement>;
 
@@ -150,22 +138,11 @@ export class AdventureNavigationComponent
     return lessonNumber === this.activeLessonNumber;
   }
 
-  onLessonClick(lessonNumber: number, adventureIndex: number): void {
-    this.lessonSelected.emit({
-      lessonNumber,
-      adventureIndex,
-    });
+  onLessonClick(lessonNumber: number): void {
+    this.lessonSelected.emit(lessonNumber);
   }
 
-  onPracticeClick(arcId: string): void {
-    this.practiceSelected.emit(arcId);
-  }
-
-  getLessonBadgeIconName(isCompleted: boolean): string {
-    return isCompleted ? 'check' : '';
-  }
-
-  getPracticeBadgeIconName(isPracticeCompleted: boolean): string {
-    return isPracticeCompleted ? 'check' : 'edit';
+  onPracticeClick(adventureIndex: number): void {
+    this.practiceSelected.emit(adventureIndex);
   }
 }

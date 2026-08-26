@@ -19,6 +19,7 @@
  * TS.CD.02 Check their accomplishment.
  */
 
+import path from 'path';
 import testConstants from '../../../utilities/common/test-constants';
 import {UserFactory} from '../../../utilities/common/user-factory';
 import {Contributor} from '../../../utilities/user/contributor';
@@ -137,7 +138,7 @@ describe('Translation Submitter V2', function () {
     );
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterAccomplishment',
-      __dirname
+      path.join(__dirname, '..')
     );
     await translationSubmitter.expectContributionTableToContainRow([
       null, // Date can't be compared as it will be different every time.
@@ -155,7 +156,7 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.navigateToTabInMyContributions('Badges');
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterBadges',
-      __dirname
+      path.join(__dirname, '..')
     );
     await translationSubmitter.expectBadgesToContain(
       '1',

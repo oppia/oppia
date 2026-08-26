@@ -22,6 +22,7 @@ import {
   SimpleChanges,
   ViewChild,
   Renderer2,
+  ViewEncapsulation,
 } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
@@ -74,6 +75,7 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
   styleUrls: ['./tutor-card.component.css'],
+  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('expandInOut', [
       state(

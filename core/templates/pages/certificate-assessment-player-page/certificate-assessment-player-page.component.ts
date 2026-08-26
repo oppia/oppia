@@ -16,44 +16,16 @@
  * @fileoverview Certificate assessment player page component.
  */
 
-import {
-  Component,
-  EventEmitter,
-  OnChanges,
-  Input,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, OnInit, Optional} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import type {CertificateAssessmentStage} from './certificate-assessment-player-page.constants';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {
-  AssessmentQuestion,
-  CertificateAssessmentAttemptData,
-  createAssessmentQuestionFromStateData,
-} from 'domain/certificate-assessment/certificate-assessment.model';
-import {StateBackendDict} from 'domain/state/state.model';
-import {Interaction} from 'domain/exploration/interaction.model';
-import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {
-  CurrentInteractionService,
-  OnSubmitFn,
-} from 'pages/exploration-player-page/services/current-interaction.service';
-import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
-import {InteractionAnswer} from 'interactions/answer-defs';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
-import {
-  UnansweredQuestionModalComponent,
-  SUBMIT_ANYWAY_RESULT,
-} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -63,136 +35,92 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   templateUrl: './certificate-assessment-player-page.component.html',
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
-export class CertificateAssessmentPlayerPageComponent
-  implements OnInit, OnChanges, OnDestroy
-{
-  @Input() attempt: CertificateAssessmentAttemptData | null = null;
-  @Input() classroomUrlFragment = '';
-  @Input() isTimeExpired = false;
-  @Output() assessmentSubmitted = new EventEmitter<
-    SubmitCertificateAssessmentAnswerBackendDict[]
-  >();
-  @Output() viewResults = new EventEmitter<void>();
-  @Output() assessmentEnded = new EventEmitter<void>();
-
-  bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
-  bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
+export class CertificateAssessmentPlayerPageComponent implements OnInit {
+  readonly certificateAssessmentPlayerPageConstants =
+    CertificateAssessmentPlayerPageConstants;
+  certificateId = '';
+  currentStage: CertificateAssessmentStage =
+    CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+  // TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
+  showAssessmentInterruptCard = false;
+  // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal and
+  // showUnansweredQuestionModal flags are currently initialized with default
+  // values. Update these flags based on the appropriate conditions once the
+  // logic for determining when the modals should be shown or hidden is
+  // implemented.
+  showUnansweredQuestionModal = false;
+  showTimeExpiredModal = false;
 
   currentQuestionIndex = 0;
-  questions: AssessmentQuestion[] = [];
-  isLoadingQuestion = false;
-  loadError = false;
-  private inflightIndexes = new Set<number>();
-  answers: {[questionId: string]: InteractionAnswer | null} = {};
-  interactions: {[questionId: string]: Interaction} = {};
-  interactionHtmls: {[questionId: string]: string} = {};
-  focusLabel = '';
-  currentQuestion: AssessmentQuestion | null = null;
-  totalQuestionCount = 0;
-  progressPercentage = 0;
-  isLastQuestion = false;
-  hasHandledTimeExpiry = false;
-  private handleSubmitFn: OnSubmitFn;
+  readonly mockQuestions: AssessmentQuestion[] = [
+    {
+      id: 'q1',
+      type: 'multiple_choice',
+      prompt: 'Which number completes the sequence: 2, 4, 6, ?',
+      hint: 'Choose one option.',
+      options: [
+        {id: 'a', text: '7'},
+        {id: 'b', text: '8'},
+        {id: 'c', text: '9'},
+      ],
+      correctAnswerText: '8',
+    },
+    {
+      id: 'q2',
+      type: 'multiple_select',
+      prompt: 'Select all prime numbers.',
+      hint: 'More than one option may be correct.',
+      options: [
+        {id: 'a', text: '2'},
+        {id: 'b', text: '3'},
+        {id: 'c', text: '4'},
+        {id: 'd', text: '5'},
+      ],
+      correctAnswerText: '2, 3, 5',
+    },
+    {
+      id: 'q3',
+      type: 'text_input',
+      prompt: 'Type the name of the shape with three sides.',
+      hint: 'Use plain text.',
+      options: [],
+      placeholder: 'Enter your answer',
+      correctAnswerText: 'Triangle',
+    },
+    {
+      id: 'q4',
+      type: 'numeric_input',
+      prompt: 'What is 12 divided by 3?',
+      hint: 'Enter a number.',
+      options: [],
+      placeholder: '0',
+      correctAnswerText: '4',
+    },
+  ];
+  submittedResponses: string[] = [];
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     @Optional() private bottomSheet: MatBottomSheet,
     @Optional() private ngbModal: NgbModal,
-    private windowDimensionsService: WindowDimensionsService,
-    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
-    private answerClassificationService: AnswerClassificationService,
-    private currentInteractionService: CurrentInteractionService,
-    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private focusManagerService: FocusManagerService,
-    private interactionRulesRegistryService: InteractionRulesRegistryService
-  ) {
-    this.handleSubmitFn = this.handleInteractionSubmit.bind(this);
-  }
+    private router: Router,
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
 
   ngOnInit(): void {
-    this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
-    this.loadQuestion(0);
-    this.refreshComputedFields();
-    if (this.isTimeExpired) {
-      this.handleTimeExpiry();
+    this.certificateId =
+      this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
+    const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
+    if (currentRoute === 'session') {
+      this.currentStage =
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
     }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.isTimeExpired?.currentValue === true &&
-      !changes.isTimeExpired?.previousValue
-    ) {
-      this.handleTimeExpiry();
+    if (this.showTimeExpiredModal) {
+      this.openTimeExpiredModal();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.currentInteractionService.clearOnSubmitFn(this.handleSubmitFn);
-  }
-
-  private loadQuestion(index: number): void {
-    if (
-      this.attempt === null ||
-      this.questions[index] !== undefined ||
-      this.inflightIndexes.has(index)
-    ) {
-      return;
+    if (this.showUnansweredQuestionModal) {
+      this.openUnansweredQuestionModal();
     }
-    const attemptQuestion = this.attempt.questions[index];
-    if (attemptQuestion === undefined) {
-      return;
-    }
-    this.inflightIndexes.add(index);
-    this.isLoadingQuestion = true;
-    this.loadError = false;
-    this.certificateAssessmentOfferingBackendApiService
-      .getCertificateAssessmentQuestionAsync(
-        this.attempt.attemptId,
-        attemptQuestion.questionId
-      )
-      .then(response => {
-        this.buildQuestionFromStateData(
-          index,
-          response.questionId,
-          response.questionStateData
-        );
-        this.loadError = false;
-        this.refreshComputedFields();
-      })
-      .catch(() => {
-        this.loadError = true;
-      })
-      .finally(() => {
-        this.isLoadingQuestion = false;
-        this.inflightIndexes.delete(index);
-      });
-  }
-
-  private buildQuestionFromStateData(
-    index: number,
-    questionId: string,
-    stateData: StateBackendDict
-  ): void {
-    const interaction = Interaction.createFromBackendDict(
-      stateData.interaction
-    );
-    this.interactions[questionId] = interaction;
-
-    this.focusLabel = this.focusManagerService.generateFocusLabel();
-    const interactionId = interaction.id as string;
-    this.interactionHtmls[questionId] =
-      this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
-        interaction.customizationArgs,
-        true,
-        this.focusLabel,
-        null
-      );
-
-    this.questions[index] = createAssessmentQuestionFromStateData(
-      questionId,
-      stateData
-    );
   }
 
   private isMobileScreenSize(): boolean {
@@ -201,17 +129,7 @@ export class CertificateAssessmentPlayerPageComponent
 
   openTimeExpiredModal(): void {
     if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        } else {
-          this.assessmentEnded.emit();
-        }
-      });
+      this.bottomSheet.open(TimeExpiredModalComponent);
       return;
     }
     const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
@@ -219,37 +137,14 @@ export class CertificateAssessmentPlayerPageComponent
       centered: true,
       windowClass: 'oppia-time-expired-modal',
     });
-    modalRef.result
-      .then(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        }
-      })
-      .catch(() => {
-        this.assessmentEnded.emit();
-      });
+    // TODO(#24717-m2.19): Wire the viewResult and dismiss actions once the
+    // backend is integrated.
+    modalRef.result.catch(() => null);
   }
 
-  openUnansweredQuestionModal(
-    unansweredQuestionCount: number,
-    onGoBack: () => void,
-    onSubmitAnyway: () => void
-  ): void {
+  openUnansweredQuestionModal(): void {
     if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(
-        UnansweredQuestionModalComponent
-      );
-      bottomSheetRef.instance.unansweredQuestionCount = unansweredQuestionCount;
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result === SUBMIT_ANYWAY_RESULT) {
-          onSubmitAnyway();
-        } else {
-          onGoBack();
-        }
-      });
+      this.bottomSheet.open(UnansweredQuestionModalComponent);
       return;
     }
     const modalRef = this.ngbModal.open(UnansweredQuestionModalComponent, {
@@ -257,26 +152,39 @@ export class CertificateAssessmentPlayerPageComponent
       centered: true,
       windowClass: 'oppia-unanswered-question-modal',
     });
-    modalRef.componentInstance.unansweredQuestionCount =
-      unansweredQuestionCount;
-    modalRef.result
-      .then(result => {
-        if (result === SUBMIT_ANYWAY_RESULT) {
-          onSubmitAnyway();
-        }
-      })
-      .catch(() => {
-        onGoBack();
-      });
+    // The unanswered-question count is mocked until the backend is integrated.
+    modalRef.componentInstance.unansweredQuestionCount = 3;
+    // TODO(#24717-m2.19): Wire the submitAnyway and goBackToAssessment actions
+    // once the backend is integrated.
+    modalRef.result.catch(() => null);
+  }
+
+  showInstructions(): void {
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS;
+  }
+
+  startAssessment(): void {
+    this.router.navigate(['session'], {relativeTo: this.activatedRoute});
+  }
+
+  onRetryAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+    this.currentQuestionIndex = 0;
+  }
+
+  onResumeAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
   }
 
   nextQuestion(): void {
-    if (this.currentQuestionIndex >= this.getTotalQuestionCount() - 1) {
+    if (this.currentQuestionIndex < this.mockQuestions.length - 1) {
+      this.currentQuestionIndex += 1;
       return;
     }
-    this.currentQuestionIndex += 1;
-    this.loadQuestion(this.currentQuestionIndex);
-    this.refreshComputedFields();
   }
 
   previousQuestion(): void {
@@ -284,138 +192,37 @@ export class CertificateAssessmentPlayerPageComponent
       return;
     }
     this.currentQuestionIndex -= 1;
-    this.refreshComputedFields();
-  }
-
-  private collectAnswers(): SubmitCertificateAssessmentAnswerBackendDict[] {
-    const loadedQuestions = this.questions.filter(
-      (question): question is AssessmentQuestion => question !== undefined
-    );
-    return loadedQuestions.map(question => {
-      const answer = this.answers[question.id] ?? null;
-      let isCorrect = false;
-      if (answer !== null) {
-        const interaction = this.interactions[question.id];
-        const rulesService =
-          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-            interaction.id as string
-          );
-        const result =
-          this.answerClassificationService.getMatchingClassificationResult(
-            question.id,
-            interaction,
-            answer,
-            rulesService
-          );
-        isCorrect = result.outcome.labelledAsCorrect;
-      }
-      const selectedAnswer =
-        answer !== null ? this.formatAnswerForBackend(answer) : undefined;
-      return {
-        question_id: question.id,
-        is_correct: isCorrect,
-        ...(selectedAnswer !== undefined
-          ? {selected_answer: selectedAnswer}
-          : {}),
-      };
-    });
   }
 
   submitAssessment(): void {
-    const answers = this.collectAnswers();
-    const unansweredQuestionIndexes = this.questions
-      .map((question, index) => ({question, index}))
-      .filter(
-        ({question}) =>
-          question !== undefined && (this.answers[question.id] ?? null) === null
-      )
-      .map(({index}) => index);
-    if (unansweredQuestionIndexes.length === 0) {
-      this.assessmentSubmitted.emit(answers);
-      return;
-    }
-    const lastUnansweredQuestionIndex =
-      unansweredQuestionIndexes[unansweredQuestionIndexes.length - 1];
-    this.openUnansweredQuestionModal(
-      unansweredQuestionIndexes.length,
-      () => {
-        this.currentQuestionIndex = lastUnansweredQuestionIndex;
-        this.refreshComputedFields();
-      },
-      () => {
-        this.assessmentSubmitted.emit(answers);
-      }
-    );
-  }
-
-  private handleTimeExpiry(): void {
-    if (this.hasHandledTimeExpiry) {
-      return;
-    }
-    this.hasHandledTimeExpiry = true;
-    this.openTimeExpiredModal();
-    this.assessmentSubmitted.emit(this.collectAnswers());
-  }
-
-  handleInteractionSubmit(answer: InteractionAnswer): void {
-    const question = this.getCurrentQuestion();
-    if (question === null) {
-      return;
-    }
-    this.answers[question.id] = answer;
-    this.refreshComputedFields();
-  }
-
-  getInteractionHtml(): string {
-    const question = this.getCurrentQuestion();
-    if (question === null) {
-      return '';
-    }
-    return this.interactionHtmls[question.id] ?? '';
-  }
-
-  private formatAnswerForBackend(answer: InteractionAnswer): string {
-    if (typeof answer === 'string') {
-      return answer;
-    }
-    return JSON.stringify(answer);
+    const attemptId = `attempt-${Date.now()}`;
+    this.router.navigate([
+      '/certificate-assessment',
+      this.certificateId,
+      'result',
+      attemptId,
+    ]);
   }
 
   getProgressPercentage(): number {
-    if (this.getTotalQuestionCount() === 0) {
-      return 0;
-    }
     return Math.round(
-      ((this.currentQuestionIndex + 1) / this.getTotalQuestionCount()) * 100
+      ((this.currentQuestionIndex + 1) / this.mockQuestions.length) * 100
     );
   }
 
-  getCurrentQuestion(): AssessmentQuestion | null {
-    if (this.questions.length === 0) {
-      return null;
-    }
-    return this.questions[this.currentQuestionIndex] ?? null;
+  getCurrentQuestion(): AssessmentQuestion {
+    return this.mockQuestions[this.currentQuestionIndex];
   }
 
   isCurrentQuestionLast(): boolean {
-    return (
-      this.getTotalQuestionCount() > 0 &&
-      this.currentQuestionIndex === this.getTotalQuestionCount() - 1
-    );
+    return this.currentQuestionIndex === this.mockQuestions.length - 1;
   }
 
-  private getTotalQuestionCount(): number {
-    return this.attempt?.questions.length ?? this.questions.length;
+  getSavedResponse(): string {
+    return this.submittedResponses[this.currentQuestionIndex] || '';
   }
 
-  retryLoadQuestion(): void {
-    this.loadQuestion(this.currentQuestionIndex);
-  }
-
-  private refreshComputedFields(): void {
-    this.currentQuestion = this.getCurrentQuestion();
-    this.totalQuestionCount = this.getTotalQuestionCount();
-    this.progressPercentage = this.getProgressPercentage();
-    this.isLastQuestion = this.isCurrentQuestionLast();
+  updateResponse(response: string): void {
+    this.submittedResponses[this.currentQuestionIndex] = response;
   }
 }

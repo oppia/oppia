@@ -1,4 +1,4 @@
-.inner-container {
+oppia-checkpoint-celebration-footer .inner-container {
   -webkit-animation-delay: 0.5s;
   -ms-animation-delay: 0.5s;
   -webkit-animation-direction: normal;
@@ -37,7 +37,7 @@
   text-align: center;
 }
 
-.inner-container-alignment {
+oppia-checkpoint-celebration-footer .inner-container-alignment {
   bottom: 60px;
   left: 50%;
   padding-left: 30px;
@@ -45,16 +45,16 @@
   position: fixed;
   transform: translateX(-50%);
 }
-.tick-symbol {
+oppia-checkpoint-celebration-footer .tick-symbol {
   font-size: 42px;
   vertical-align: middle;
 }
 
-.inner-content {
+oppia-checkpoint-celebration-footer .inner-content {
   padding-left: 8px;
 }
 
-.inner-container-fade-out {
+oppia-checkpoint-celebration-footer .inner-container-fade-out {
   animation: fadeout 5s 1;
 }
 
@@ -398,17 +398,17 @@ oppia-checkpoint-celebration-footer .dot18 {
 }
 
 @media(max-width: 959px) {
-  .inner-container {
+  oppia-checkpoint-celebration-footer .inner-container {
     max-width: 650px;
   }
 }
 
 @media(max-width: 480px) {
-  .inner-container {
+  oppia-checkpoint-celebration-footer .inner-container {
     min-width: 250px;
   }
 
-  .inner-content {
+  oppia-checkpoint-celebration-footer .inner-content {
     font-size: 16px;
   }
 

@@ -241,7 +241,7 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
-      expect(component.dragStarted).toBe(false);
+      expect(component.dragStarted).toBeFalse();
     });
 
     it('should throw error if story url fragment is not present', () => {
@@ -356,7 +356,7 @@ describe('Drag and drop sort input interactive component', () => {
       ]);
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
-      expect(component.dragStarted).toBe(false);
+      expect(component.dragStarted).toBeFalse();
       expect(component.highlightedGroup).toBe(-1);
     });
 
@@ -450,7 +450,7 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.noShow).toBe(1);
       expect(component.hide).toEqual([1, 2]);
-      expect(component.dragStarted).toBe(true);
+      expect(component.dragStarted).toBeTrue();
     });
 
     it('should set focus on list items change', () => {
@@ -525,13 +525,13 @@ describe('Drag and drop sort input interactive component', () => {
     it('should return true if child element have border', () => {
       component.noShow = -1;
 
-      expect(component.isChildElementHaveBorder(1)).toBe(true);
+      expect(component.isChildElementHaveBorder(1)).toBeTrue();
     });
 
     it('should return true if child element have zero height', () => {
       component.hide = [1, 2];
 
-      expect(component.isChildElementHaveZeroHeight(1)).toBe(true);
+      expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
     });
 
     describe('getFlatIndex', () => {

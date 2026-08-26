@@ -36,14 +36,8 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
 
   it('should render topic breakdown rows', () => {
     component.topicBreakdown = [
-      {
-        topicName: 'Place Values',
-        scorePercentage: 88.4,
-      },
-      {
-        topicName: 'Addition',
-        scorePercentage: 95,
-      },
+      {topicName: 'Place Values', scorePercentage: 88},
+      {topicName: 'Addition', scorePercentage: 95},
     ];
     fixture.detectChanges();
 
@@ -58,5 +52,8 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
     expect(
       rows[0].querySelector('.topic-row-bar').getAttribute('aria-valuenow')
     ).toBe('88');
+    expect(rows[0].querySelector('.topic-row-bar-fill').style.width).toBe(
+      '88%'
+    );
   });
 });

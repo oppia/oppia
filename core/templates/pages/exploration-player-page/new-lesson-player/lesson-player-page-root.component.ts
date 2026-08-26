@@ -16,10 +16,11 @@
  * @fileoverview New lesson player page root component.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 
 @Component({
   selector: 'oppia-new-lesson-player-page-root',
   templateUrl: './lesson-player-page-root.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class NewLessonPlayerPageRootComponent {}

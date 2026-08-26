@@ -28,15 +28,13 @@ import {AssessmentIntroductionCardComponent} from './assessment-introduction-car
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
-import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
+import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 import {TranslateModule} from '@ngx-translate/core';
-import {InteractionExtensionsModule} from 'interactions/interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     MatBottomSheetModule,
-    InteractionExtensionsModule,
     SharedComponentsModule,
     CertificateOfferingSharedModule,
     RouterModule.forChild([
@@ -52,7 +50,6 @@ import {InteractionExtensionsModule} from 'interactions/interactions.module';
       },
     ]),
     TranslateModule,
-    CertificateAssessmentTitledBackgroundBannerModule,
   ],
   declarations: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -60,6 +57,7 @@ import {InteractionExtensionsModule} from 'interactions/interactions.module';
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
+    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
   entryComponents: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -67,6 +65,7 @@ import {InteractionExtensionsModule} from 'interactions/interactions.module';
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
+    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
 export class CertificateAssessmentPlayerPageModule {}

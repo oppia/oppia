@@ -53,9 +53,7 @@ describe('Search Backend Api Service', () => {
           expect(response.activity_list).toEqual([]);
           expect(response.search_cursor).toBe('notempty');
         });
-      const req = httpTestingController.expectOne(
-        '/searchhandler/data?display_in_language_code=en'
-      );
+      const req = httpTestingController.expectOne('/searchhandler/data');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleSearchResponse);
       flushMicrotasks();

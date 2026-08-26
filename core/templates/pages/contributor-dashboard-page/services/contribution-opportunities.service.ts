@@ -82,16 +82,10 @@ export class ContributionOpportunitiesService {
   private async _getTranslationOpportunitiesAsync(
     languageCode: string,
     topicName: string,
-    cursor: string,
-    entityType?: string
+    cursor: string
   ) {
     return this.contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync(
-        languageCode,
-        topicName,
-        cursor,
-        entityType
-      )
+      .fetchTranslationOpportunitiesAsync(languageCode, topicName, cursor)
       .then(({opportunities, nextCursor, more}) => {
         this._translationOpportunitiesCursor = nextCursor;
         this._moreTranslationOpportunitiesAvailable = more;
@@ -119,15 +113,9 @@ export class ContributionOpportunitiesService {
 
   async getTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
-    entityType?: string
+    topicName: string
   ): Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunitiesAsync(
-      languageCode,
-      topicName,
-      '',
-      entityType
-    );
+    return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
   }
 
   async getMoreSkillOpportunitiesAsync(
@@ -145,15 +133,13 @@ export class ContributionOpportunitiesService {
 
   async getMoreTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
-    entityType?: string
+    topicName: string
   ): Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
         languageCode,
         topicName,
-        this._translationOpportunitiesCursor,
-        entityType
+        this._translationOpportunitiesCursor
       );
     }
     throw new Error('No more translation opportunities available.');
@@ -161,15 +147,10 @@ export class ContributionOpportunitiesService {
 
   async getReviewableTranslationOpportunitiesAsync(
     topicName: string,
-    languageCode?: string,
-    entityType?: string
+    languageCode?: string
   ): Promise<ExplorationOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(
-        topicName,
-        languageCode,
-        entityType
-      )
+      .fetchReviewableTranslationOpportunitiesAsync(topicName, languageCode)
       .then(({opportunities}) => {
         return {
           opportunities: opportunities,

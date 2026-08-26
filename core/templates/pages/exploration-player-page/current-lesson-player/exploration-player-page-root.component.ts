@@ -16,12 +16,11 @@
  * @fileoverview Exploration player page root component.
  */
 
-import {Component} from '@angular/core';
-import './exploration-player-page-root.component.css';
+import {Component, ViewEncapsulation} from '@angular/core';
 
 @Component({
   selector: 'oppia-exploration-player-page-root',
   templateUrl: './exploration-player-page-root.component.html',
-  styleUrls: ['./exploration-player-page-root.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationPlayerPageRootComponent {}

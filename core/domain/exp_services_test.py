@@ -7243,109 +7243,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_translated_metadata_is_added_correctly_to_index(self) -> None:
-        exp_id = 'id0'
-        self.save_new_valid_exploration(
-            exp_id,
-            self.owner_id,
-            title='Fractions',
-            category='Mathematics',
-            objective='Learn about fractions',
-        )
-        exp_services.update_exploration(
-            self.owner_id,
-            exp_id,
-            [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'tags',
-                        'new_value': ['numbers'],
-                    }
-                )
-            ],
-            'Add a tag.',
-        )
-        rights_manager.publish_exploration(self.owner, exp_id)
-        exp = exp_fetchers.get_exploration_by_id(exp_id)
-
-        # Hindi translates the title, the objective and the tag. Bengali
-        # translates only the title, and its objective translation is stale.
-        translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            exp_id,
-            exp.version,
-            'hi',
-            {
-                feconf.EXPLORATION_TITLE_CONTENT_ID: {
-                    'content_value': 'भिन्न',
-                    'needs_update': False,
-                    'content_format': 'unicode',
-                },
-                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
-                    'content_value': 'भिन्न के बारे में जानें',
-                    'needs_update': False,
-                    'content_format': 'unicode',
-                },
-                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
-                    'content_value': 'संख्याएँ',
-                    'needs_update': False,
-                    'content_format': 'unicode',
-                },
-            },
-        ).put()
-        translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            exp_id,
-            exp.version,
-            'bn',
-            {
-                feconf.EXPLORATION_TITLE_CONTENT_ID: {
-                    'content_value': 'ভগ্নাংশ',
-                    'needs_update': False,
-                    'content_format': 'unicode',
-                },
-                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
-                    'content_value': 'পুরানো উদ্দেশ্য',
-                    'needs_update': True,
-                    'content_format': 'unicode',
-                },
-            },
-        ).put()
-
-        actual_docs = []
-
-        def mock_add_documents_to_index(
-            docs: List[Dict[str, str]], index: str
-        ) -> None:
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            actual_docs.extend(docs)
-
-        add_docs_swap = self.swap(
-            search_services,
-            'add_documents_to_index',
-            mock_add_documents_to_index,
-        )
-
-        with add_docs_swap:
-            exp_services.index_explorations_given_ids([exp_id])
-
-        self.assertEqual(len(actual_docs), 1)
-        indexed_doc = actual_docs[0]
-        # The English metadata is indexed unchanged.
-        self.assertEqual(indexed_doc['title'], 'Fractions')
-        self.assertEqual(indexed_doc['objective'], 'Learn about fractions')
-        self.assertEqual(indexed_doc['tags'], ['numbers'])
-        # Both title translations are indexed, sorted. Sorting is by Unicode
-        # code point, so the Devanagari title precedes the Bengali one.
-        self.assertEqual(indexed_doc['translated_titles'], ['भिन्न', 'ভগ্নাংশ'])
-        # The Bengali objective is stale, so only the Hindi one is indexed.
-        self.assertEqual(
-            indexed_doc['translated_objectives'], ['भिन्न के बारे में जानें']
-        )
-        # Only Hindi translated the tag.
-        self.assertEqual(indexed_doc['translated_tags'], ['संख्याएँ'])
-
     def test_updated_exploration_is_added_correctly_to_index(self) -> None:
         exp_id = 'id0'
         exp_title = 'title 0'
@@ -7354,26 +7251,20 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         initial_exp_doc = {
             'category': 'cat0',
             'id': 'id0',
-            'language_code': ['en'],
+            'language_code': 'en',
             'objective': 'An objective',
             'rank': 20,
             'tags': [],
             'title': 'title 0',
-            'translated_titles': [],
-            'translated_objectives': [],
-            'translated_tags': [],
         }
         updated_exp_doc = {
             'category': 'cat1',
             'id': 'id0',
-            'language_code': ['en'],
+            'language_code': 'en',
             'objective': 'An objective',
             'rank': 20,
             'tags': [],
             'title': 'title 0',
-            'translated_titles': [],
-            'translated_objectives': [],
-            'translated_tags': [],
         }
 
         def mock_add_documents_to_index(

@@ -22,8 +22,6 @@ import {Injectable} from '@angular/core';
 
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-exploration-summary.model';
-import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 interface LibraryGroupDataBackendDict {
   activity_list: ActivityDict[];
@@ -44,7 +42,6 @@ export interface ActivityDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
-  translated_metadata_fields?: TranslatableExplorationMetadataField[];
 }
 export interface SummaryDict {
   activity_summary_dicts: ActivityDict[];
@@ -84,25 +81,11 @@ export class LibraryPageBackendApiService {
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
   LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
-  constructor(
-    private http: HttpClient,
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
-
-  // The cards are displayed in the learner's site language, so that the
-  // exploration metadata matches the rest of the page.
-  private getDisplayLanguageParams(): {display_in_language_code: string} {
-    return {
-      display_in_language_code:
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode(),
-    };
-  }
+  constructor(private http: HttpClient) {}
 
   async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
     return this.http
-      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER, {
-        params: this.getDisplayLanguageParams(),
-      })
+      .get<LibraryIndexData>(this.LIBRARY_INDEX_HANDLER)
       .toPromise();
   }
 
@@ -119,7 +102,6 @@ export class LibraryPageBackendApiService {
       .get<LibraryGroupDataBackendDict>(this.LIBRARY_GROUP_HANDLER, {
         params: {
           group_name: groupName,
-          ...this.getDisplayLanguageParams(),
         },
       })
       .toPromise();

@@ -17,7 +17,12 @@
  * in exploration player.
  */
 
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
@@ -53,6 +58,7 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
   selector: 'oppia-exploration-footer',
   templateUrl: './exploration-footer.component.html',
   styleUrls: ['./exploration-footer.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationFooterComponent {
   directiveSubscriptions = new Subscription();

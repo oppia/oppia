@@ -52,7 +52,7 @@ describe('Learner View Info Backend Api Service', () => {
 
     let req = httpTestingController.expectOne(
       '/explorationsummarieshandler/' +
-        'data?stringified_exp_ids=&include_private_explorations=&display_in_language_code=en'
+        'data?stringified_exp_ids=&include_private_explorations='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(jobOutput);

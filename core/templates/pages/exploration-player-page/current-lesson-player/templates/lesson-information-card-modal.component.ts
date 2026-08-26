@@ -17,14 +17,11 @@
  */
 
 import {Clipboard} from '@angular/cdk/clipboard';
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {
-  LearnerExplorationSummaryBackendDict,
-  TranslatableExplorationMetadataField,
-} from 'domain/summary/learner-exploration-summary.model';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -58,6 +55,7 @@ const EXPLORATION_STATUS_PRIVATE = 'private';
   selector: 'oppia-lesson-information-card-modal',
   templateUrl: './lesson-information-card-modal.component.html',
   styleUrls: ['./lesson-information-card-modal.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
@@ -239,27 +237,19 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
-  private isMetadataFieldTranslatedByBackend(
-    field: TranslatableExplorationMetadataField
-  ): boolean {
-    return (this.expInfo.translated_metadata_fields || []).includes(field);
-  }
-
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
-      this.expTitleTranslationKey,
-      this.isMetadataFieldTranslatedByBackend(
-        TranslatableExplorationMetadataField.TITLE
-      )
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
-    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
-      this.expDescTranslationKey,
-      this.isMetadataFieldTranslatedByBackend(
-        TranslatableExplorationMetadataField.OBJECTIVE
-      )
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 

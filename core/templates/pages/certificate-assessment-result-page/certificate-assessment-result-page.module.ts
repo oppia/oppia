@@ -25,7 +25,6 @@ import {CertificateAssessmentResultPageComponent} from './certificate-assessment
 import {CertificateAssessmentResultPageRoutingModule} from './certificate-assessment-result-page-routing.module';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
-import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
 
 @NgModule({
   imports: [
@@ -33,7 +32,6 @@ import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/cert
     SharedComponentsModule,
     RouterModule,
     CertificateAssessmentResultPageRoutingModule,
-    CertificateAssessmentTitledBackgroundBannerModule,
   ],
   declarations: [
     CertificateAssessmentResultPageRootComponent,

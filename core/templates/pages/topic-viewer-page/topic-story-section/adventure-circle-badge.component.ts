@@ -17,6 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
+
 import './adventure-circle-badge.component.css';
 
 @Component({
@@ -31,23 +32,10 @@ export class AdventureCircleBadgeComponent {
   @Input() borderColor: string = '#7f8c8d';
   @Input() textColor: string = '#334155';
   @Input() size: 'sm' | 'md' = 'md';
-  @Input() title: string = '';
 
   get circleClass(): string {
     return this.size === 'sm'
       ? 'adventure-circle-badge adventure-circle-badge--sm'
       : 'adventure-circle-badge';
-  }
-
-  get hasIcon(): boolean {
-    return this.iconName !== '';
-  }
-
-  getAriaLabel(): string {
-    return this.label || this.iconName;
-  }
-
-  getTooltipText(): string {
-    return this.title || this.label || this.iconName;
   }
 }

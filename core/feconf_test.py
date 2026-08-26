@@ -60,19 +60,19 @@ class FeconfTests(test_utils.GenericTestBase):
     def test_callable_variables_return_correctly(self) -> None:
         recipient_username = 'Anshuman'
         self.assertEqual(
-            feconf.get_default_salutation_html(recipient_username),
+            feconf.DEFAULT_SALUTATION_HTML_FN(recipient_username),
             'Hi %s,' % recipient_username,
         )
 
         sender_username = 'Ezio'
         self.assertEqual(
-            feconf.get_default_signoff_html(sender_username),
+            feconf.DEFAULT_SIGNOFF_HTML_FN(sender_username),
             'Thanks!<br>%s (Oppia moderator)' % sender_username,
         )
 
         exploration_title = 'Test'
         self.assertEqual(
-            feconf.get_default_email_subject(exploration_title),
+            feconf.DEFAULT_EMAIL_SUBJECT_FN(exploration_title),
             'Your Oppia exploration "Test" has been unpublished',
         )
 

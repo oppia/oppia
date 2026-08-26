@@ -16,18 +16,9 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-import {
-  Component,
-  Injector,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, Injector} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AppConstants} from 'app.constants';
-import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {PageContextService} from 'services/page-context.service';
@@ -47,12 +38,10 @@ import {TranslateTextService} from '../services/translate-text.service';
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
-export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
+export class TranslationOpportunitiesComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() activeEntityType: string =
-    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
@@ -120,12 +109,6 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
-        // An opportunity's entity type comes from the opportunity itself, not
-        // from the dashboard filter, since the filter can be set to "all".
-        // Legacy opportunities carry no entity type and are always
-        // explorations.
-        entityType:
-          opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
@@ -201,12 +184,6 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
-      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
-    }
-  }
-
   async loadMoreOpportunitiesAsync(): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
@@ -214,8 +191,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName(),
-        this.activeEntityType
+        this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
@@ -227,8 +203,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName(),
-        this.activeEntityType
+        this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }

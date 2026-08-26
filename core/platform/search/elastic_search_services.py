@@ -328,14 +328,7 @@ def search(
                 'multi_match': {
                     'query': query_string,
                     'type': 'bool_prefix',
-                    'fields': [
-                        'title^3',
-                        'objective^2',
-                        'tags',
-                        'translated_titles^3',
-                        'translated_objectives^2',
-                        'translated_tags',
-                    ],
+                    'fields': ['title^3', 'objective^2'],
                 }
             }
         ]

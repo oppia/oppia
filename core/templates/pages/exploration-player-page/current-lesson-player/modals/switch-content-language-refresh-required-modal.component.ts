@@ -20,7 +20,6 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './switch-content-language-refresh-required-modal.component.css';
 
 export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
   'initialContentLanguageCode';
@@ -29,7 +28,7 @@ export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
   selector: 'switch-content-language-refresh-required-modal',
   templateUrl:
     './switch-content-language-refresh-required-modal.component.html',
-  styleUrls: ['./switch-content-language-refresh-required-modal.component.css'],
+  styleUrls: [],
 })
 export class SwitchContentLanguageRefreshRequiredModalComponent {
   @Input() languageCode!: string;

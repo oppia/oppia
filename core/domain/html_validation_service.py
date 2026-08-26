@@ -622,7 +622,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                 for component_tag in soup_for_collapsible.findAll(
                     name=component_name
                 ):
-                    yield from validate_customization_args_in_tag(component_tag)
+                    for err_msg in validate_customization_args_in_tag(
+                        component_tag
+                    ):
+                        yield err_msg
 
         elif tag_name == 'oppia-noninteractive-tabs':
             tab_content_list = value_dict['tab_contents-with-value']
@@ -633,9 +636,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                     for component_tag in soup_for_tabs.findAll(
                         name=component_name
                     ):
-                        yield from validate_customization_args_in_tag(
+                        for err_msg in validate_customization_args_in_tag(
                             component_tag
-                        )
+                        ):
+                            yield err_msg
 
         elif tag_name == 'oppia-noninteractive-workedexample':
             question_html = value_dict['question-with-value']
@@ -646,7 +650,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                 for component_tag in soup_for_workedexample.findAll(
                     name=component_name
                 ):
-                    yield from validate_customization_args_in_tag(component_tag)
+                    for err_msg in validate_customization_args_in_tag(
+                        component_tag
+                    ):
+                        yield err_msg
             answer_html = value_dict['answer-with-value']
             soup_for_workedexample = bs4.BeautifulSoup(
                 answer_html, 'html.parser'
@@ -655,7 +662,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                 for component_tag in soup_for_workedexample.findAll(
                     name=component_name
                 ):
-                    yield from validate_customization_args_in_tag(component_tag)
+                    for err_msg in validate_customization_args_in_tag(
+                        component_tag
+                    ):
+                        yield err_msg
     except Exception as e:
         yield str(e)
 

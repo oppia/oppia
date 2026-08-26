@@ -27,11 +27,11 @@ from core.platform import models
 
 from typing import Final, Type
 
-MYPY = False
+MYPY = True
 if MYPY:
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
+(topic_model,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class MigrateTopicJobTests(job_test_utils.JobTestBase):

@@ -38,7 +38,6 @@ class CloudTaskRunDict(TypedDict):
     last_updated: str
     current_retry_attempt: int
     created_on: str
-    additional_contextual_information: Dict[str, str]
 
 
 class CloudTaskRun:
@@ -56,7 +55,6 @@ class CloudTaskRun:
         current_retry_attempt: int,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
-        additional_contextual_information: Dict[str, str],
     ) -> None:
         self.task_run_id = task_run_id
         self.cloud_task_name = cloud_task_name
@@ -70,9 +68,6 @@ class CloudTaskRun:
         self.current_retry_attempt = current_retry_attempt
         self.last_updated = last_updated
         self.created_on = created_on
-        self.additional_contextual_information = (
-            additional_contextual_information
-        )
 
     def to_dict(self) -> CloudTaskRunDict:
         """Returns a dictionary representation of this domain object.
@@ -94,7 +89,6 @@ class CloudTaskRun:
             'current_retry_attempt': self.current_retry_attempt,
             'last_updated': self.last_updated.isoformat(),
             'created_on': self.created_on.isoformat(),
-            'additional_contextual_information': self.additional_contextual_information,
         }
 
     def to_dict_with_timezone_info(self) -> CloudTaskRunDict:
@@ -123,7 +117,6 @@ class CloudTaskRun:
             'created_on': self.created_on.replace(
                 tzinfo=datetime.timezone.utc
             ).isoformat(),
-            'additional_contextual_information': self.additional_contextual_information,
         }
 
     @classmethod
@@ -155,33 +148,7 @@ class CloudTaskRun:
             created_on=datetime.datetime.fromisoformat(
                 cloud_task_run_dict['created_on']
             ),
-            additional_contextual_information=cloud_task_run_dict.get(
-                'additional_contextual_information', {}
-            ),
         )
-
-    def is_voiceover_regeneration_parent_task(self) -> bool:
-        """Checks whether the cloud task run is related to a parent task for
-        voiceover regeneration.
-
-        Returns:
-            bool. True if the cloud task run is related to a parent task for
-            voiceover regeneration, False otherwise.
-        """
-        return self.function_id in {
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
-            ],
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
-            ],
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
-            ],
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
-            ],
-        }
 
 
 class VoiceoverRegenerationJobDict(TypedDict):

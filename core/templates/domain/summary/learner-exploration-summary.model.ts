@@ -26,16 +26,6 @@ export interface ExplorationRatings {
   '5': number;
 }
 
-// The metadata fields of an exploration summary that contributors can
-// translate. The backend reports which of them it returned translated, so that
-// clients only fall back to their hardcoded translation bundles for the rest.
-export enum TranslatableExplorationMetadataField {
-  TITLE = 'title',
-  OBJECTIVE = 'objective',
-  CATEGORY = 'category',
-  TAGS = 'tags',
-}
-
 export interface LearnerExplorationSummaryBackendDict {
   category: string;
   community_owned: boolean;
@@ -55,7 +45,6 @@ export interface LearnerExplorationSummaryBackendDict {
   title: string;
   visited_checkpoints_count?: number;
   total_checkpoints_count?: number;
-  translated_metadata_fields?: TranslatableExplorationMetadataField[];
 }
 
 export class LearnerExplorationSummary {

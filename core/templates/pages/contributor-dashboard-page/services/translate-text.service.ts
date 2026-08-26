@@ -72,7 +72,6 @@ export class TranslateTextService {
   activeIndex = this.STARTING_INDEX;
   activeExpId: string | null = null;
   activeExpVersion: string | null = null;
-  activeEntityType: string = AppConstants.ENTITY_TYPE.EXPLORATION;
   activeContentId: string | null = null;
   activeStateName: string | null = null;
   activeContentText: string | string[] | null = null;
@@ -166,7 +165,6 @@ export class TranslateTextService {
     this.activeContentText = '';
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
-    this.activeEntityType = entityType;
     this.translateTextBackendApiService
       .getTranslatableTextsAsync(expId, languageCode, entityType)
       .then((translatableTexts: TranslatableTexts) => {
@@ -277,8 +275,7 @@ export class TranslateTextService {
         contentToTranslateAtSubmission,
         translation,
         imagesData,
-        dataFormat,
-        this.activeEntityType
+        dataFormat
       )
       .then(
         () => {

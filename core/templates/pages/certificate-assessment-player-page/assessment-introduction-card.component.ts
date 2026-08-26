@@ -16,12 +16,8 @@
  * @fileoverview Component for the assessment introduction card.
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AppConstants} from 'app.constants';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {RecommendedTopicStub} from 'domain/certificate-assessment/certificate-assessment.model';
 import './assessment-introduction-card.component.css';
 
 @Component({
@@ -29,13 +25,9 @@ import './assessment-introduction-card.component.css';
   templateUrl: './assessment-introduction-card.component.html',
   styleUrls: ['./assessment-introduction-card.component.css'],
 })
-export class AssessmentIntroductionCardComponent implements OnInit {
-  @Input() certificateOffering!: CertificateAssessmentOfferingData;
+export class AssessmentIntroductionCardComponent {
+  @Input() certificateId = '';
   @Output() continue = new EventEmitter<void>();
-
-  classroomUrlFragment = '';
-  recommendedTopicSummaries: CreatorTopicSummary[] = [];
-  isLoadingTopics = true;
 
   // Static UI chrome text, translated via i18n keys.
   readonly demonstratesHeadingI18nKey =
@@ -44,49 +36,35 @@ export class AssessmentIntroductionCardComponent implements OnInit {
   readonly topicsSubtextI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_TOPICS_SUBTEXT';
   readonly continueButtonI18nKey =
     'I18N_CERTIFICATE_ASSESSMENT_CONTINUE_BUTTON';
-  readonly lessonsCountI18nKey = 'I18N_COUNT_OF_LESSONS';
 
-  constructor(
-    private classroomBackendApiService: ClassroomBackendApiService,
-    private assetsBackendApiService: AssetsBackendApiService
-  ) {}
+  // TODO(##24717-M2.15): Everything below will eventually be populated from
+  // the CertificateAssessmentOfferingModel record identified by
+  // this.certificateId, once the corresponding backend handler and
+  // domain object/frontend service are available. For now this is
+  // hardcoded so the UI can be built and reviewed independently.
+  certificateTitle = 'Everyday Arithmetic & Number Confidence';
 
-  async ngOnInit(): Promise<void> {
-    await this.loadRecommendedTopics();
-  }
+  certificateDescription =
+    'This certificate recognizes your ability to work confidently with ' +
+    'numbers in everyday situations, including basic operations and ' +
+    'number reasoning.';
 
-  private async loadRecommendedTopics(): Promise<void> {
-    try {
-      const classroomDataResponse =
-        await this.classroomBackendApiService.getClassroomDataAsync(
-          this.certificateOffering.classroomId
-        );
-      this.classroomUrlFragment =
-        classroomDataResponse.classroomDict.urlFragment;
-      const classroomData =
-        await this.classroomBackendApiService.fetchClassroomDataAsync(
-          this.classroomUrlFragment
-        );
-      const offeringTopicIds = Object.keys(this.certificateOffering.topicData);
-      this.recommendedTopicSummaries = classroomData
-        .getTopicSummaries()
-        .filter(topicSummary =>
-          offeringTopicIds.includes(topicSummary.getId())
-        );
-    } catch {
-      this.recommendedTopicSummaries = [];
-    } finally {
-      this.isLoadingTopics = false;
-    }
-  }
+  demonstratesList: string[] = [
+    'Understanding of numbers and their relationships',
+    'Ability to perform basic arithmetic accurately',
+    'Confidence solving everyday numerical problems',
+  ];
 
-  getTopicThumbnailUrl(topicSummary: CreatorTopicSummary): string {
-    return this.assetsBackendApiService.getThumbnailUrlForPreview(
-      AppConstants.ENTITY_TYPE.TOPIC,
-      topicSummary.getId(),
-      topicSummary.getThumbnailFilename()
-    );
-  }
+  recommendedTopics: RecommendedTopicStub[] = [
+    {name: 'Place Values', lessonCount: 5, colorClass: 'topic-color-1'},
+    {
+      name: 'Addition and Subtraction',
+      lessonCount: 7,
+      colorClass: 'topic-color-2',
+    },
+    {name: 'Multiplication', lessonCount: 7, colorClass: 'topic-color-3'},
+    {name: 'Fractions', lessonCount: 12, colorClass: 'topic-color-4'},
+  ];
 
   onContinue(): void {
     this.continue.emit();

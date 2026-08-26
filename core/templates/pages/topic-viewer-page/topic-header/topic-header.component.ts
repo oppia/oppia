@@ -17,7 +17,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -35,14 +35,17 @@ export class TopicHeaderComponent implements OnInit {
   @Input() topicId!: string;
   @Input() classroomName!: string | null;
   @Input() showStudySkillsBreadcrumb: boolean = false;
-  @Input() classroomUrlFragment: string = '';
-  @Input() topicUrlFragment: string = '';
+  classroomUrlFragment!: string;
+  topicUrlFragment!: string;
 
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
   classroomNameTranslationKey!: string;
 
-  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private urlService: UrlService
+  ) {}
 
   ngOnInit(): void {
     this.topicNameTranslationKey =
@@ -55,6 +58,10 @@ export class TopicHeaderComponent implements OnInit {
         this.topicId,
         TranslationKeyType.DESCRIPTION
       );
+
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
 
     if (this.classroomName) {
       this.classroomNameTranslationKey =
@@ -94,20 +101,10 @@ export class TopicHeaderComponent implements OnInit {
   }
 
   getClassroomUrl(): string {
-    return this.classroomUrlFragment
-      ? `/learn/${this.classroomUrlFragment}`
-      : '/learn';
+    return this.urlService.getLearnerClassroomUrl();
   }
 
   getTopicStoryUrl(): string {
-    return this.classroomUrlFragment && this.topicUrlFragment
-      ? ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE.replace(
-          '<classroom_url_fragment>',
-          encodeURIComponent(this.classroomUrlFragment)
-        ).replace(
-          '<topic_url_fragment>',
-          encodeURIComponent(this.topicUrlFragment)
-        )
-      : '/learn';
+    return this.urlService.getLearnerTopicStoryUrl();
   }
 }

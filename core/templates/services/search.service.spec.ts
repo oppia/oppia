@@ -251,7 +251,7 @@ describe('Search Service', () => {
     };
     const SAMPLE_QUERY =
       '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")&display_in_language_code=en';
+      '("exploration")&language_code=("en" OR "hi")';
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
       errorHandler = jasmine.createSpy('error');
@@ -318,7 +318,7 @@ describe('Search Service', () => {
     describe('loadMoreData', () => {
       const MORE_DATA_REQUEST =
         '/searchhandler/data?q=example&category=' +
-        '("exploration")&language_code=("en" OR "hi")&offset=notempty&display_in_language_code=en';
+        '("exploration")&language_code=("en" OR "hi")&offset=notempty';
       const MORE_DATA_RESPONSE = {
         search_cursor: 'newcursor',
       };
@@ -385,8 +385,7 @@ describe('Search Service', () => {
           () => {}
         );
         const moreDataReq = httpTestingController.expectOne(
-          '/searchhandler/data?q=example&category=' +
-            '("exploration")&language_code=("en" OR "hi")&offset=notempty&display_in_language_code=en'
+          SAMPLE_QUERY + '&offset=notempty'
         );
         moreDataReq.flush({search_cursor: null});
         flushMicrotasks();

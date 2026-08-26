@@ -13,10 +13,10 @@
 
   <div class="data-container">
     <div class="data-type-title">
-      <span>Event: </span>
+      <span>Function ID:</span>
     </div>
     <div class="messages-container">
-      {{cloudTaskRun.getEventName()}}
+      {{getFunctionIdText(cloudTaskRun.functionId)}}
     </div>
   </div>
 
@@ -47,11 +47,14 @@
     </div>
   </div>
 
-  <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
+  <div>
     <div class="data-type-title">
       <span>Error messages:</span>
     </div>
-    <div class="content-container">
+    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="error-messages-container">
+      <i>No error messages.</i>
+    </div>
+    <div class="content-container" *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
       <mat-tab-group>
         <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
           <div class="error-messages-container">
@@ -92,8 +95,8 @@
   .error-messages-container {
     background-color: rgba(0, 0, 0, 0.06);
     font-family: monospace;
-    max-height: 250px;
-    overflow: auto;
+    height: 250px;
+    overflow: scroll;
     padding: 2%;
     white-space: pre-wrap;
   }

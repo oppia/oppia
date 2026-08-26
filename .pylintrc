@@ -6,11 +6,11 @@
 init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
+load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
 
-[STRING]
-
-check-quote-consistency=yes
+string-quote=single
+triple-quote=double
+docstring-quote=double
 
 [BASIC]
 
@@ -124,7 +124,6 @@ disable=abstract-method,
         no-else-return,
         no-member,
         too-many-arguments,
-        too-many-positional-arguments,
         too-many-boolean-expressions,
         too-many-branches,
         too-many-instance-attributes,

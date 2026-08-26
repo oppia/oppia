@@ -40,15 +40,6 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-
-class MockPlatformFeatureService {
-  status = {
-    RedesignedTopicViewerPage: {
-      isEnabled: false,
-    },
-  };
-}
 
 class MockPageContextService {
   getExplorationId() {
@@ -96,8 +87,8 @@ describe('Topic editor page', () => {
         TopicEditorStateService,
         UrlService,
         {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -322,6 +313,18 @@ describe('Topic editor page', () => {
     const topicPreviewSpy = spyOn(
       topicEditorRoutingService,
       'navigateToTopicPreviewTab'
+    );
+    component.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'subtopic_editor'
+    );
+    const topicPreviewSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicPreviewTab'
     );
     component.openTopicViewer();
     expect(topicPreviewSpy).toHaveBeenCalled();

@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './audio-slider.component.css';
 
 @Component({
   selector: 'oppia-audio-slider',
@@ -33,7 +32,15 @@ import './audio-slider.component.css';
     aria-label="audio-slider"
   >
   </mat-slider>`,
-  styleUrls: ['./audio-slider.component.css'],
+  styles: [
+    `
+      .mat-accent /deep/ .mat-slider-track-fill,
+      .mat-accent /deep/ .mat-slider-thumb,
+      .mat-accent /deep/ .mat-slider-thumb-label {
+        background: #ff4081;
+      }
+    `,
+  ],
 })
 export class AudioSliderComponent {
   // These properties are initialized using component interactions

@@ -376,7 +376,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
     @classmethod
     def get_by_entity_type_and_topic(
         cls,
-        entity_type: Optional[str],
+        entity_type: str,
         topic_id: Optional[str],
         language_code: str,
         page_size: int,
@@ -386,8 +386,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         topic and language code.
 
         Args:
-            entity_type: str or None. The type of the entity. If None, all
-                entity types are included.
+            entity_type: str. The type of the entity.
             topic_id: str or None. The ID of the topic to filter by. If None,
                 all topics are included.
             language_code: str. The language code to filter by.
@@ -405,15 +404,10 @@ class TranslationOpportunityModel(base_models.BaseModel):
         else:
             start_cursor = datastore_services.make_cursor()
 
-        if entity_type:
-            query = cls.query(
-                cls.entity_type == entity_type,
-                cls.incomplete_translation_language_codes == language_code,
-            )
-        else:
-            query = cls.query(
-                cls.incomplete_translation_language_codes == language_code,
-            )
+        query = cls.query(
+            cls.entity_type == entity_type,
+            cls.incomplete_translation_language_codes == language_code,
+        )
 
         if topic_id:
             query = query.filter(cls.topic_ids == topic_id)

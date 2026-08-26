@@ -43,7 +43,6 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() labelForFocusTarget!: string;
-  @Input() lastAnswer!: NumberWithUnitsAnswer | null;
   @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
@@ -82,9 +81,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
-      this.answer = NumberWithUnits.fromDict(this.lastAnswer).toString();
-    } else if (this.savedSolution !== undefined) {
+    if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
       savedSolution = NumberWithUnits.fromDict(
         savedSolution as NumberWithUnitsAnswer

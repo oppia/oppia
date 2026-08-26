@@ -20,7 +20,6 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ServicesConstants} from './services.constants';
 
 export class SearchResponseBackendDict {
@@ -32,22 +31,14 @@ export class SearchResponseBackendDict {
   providedIn: 'root',
 })
 export class SearchBackendApiService {
-  constructor(
-    private http: HttpClient,
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async fetchExplorationSearchResultAsync(
     searchQuery: string
   ): Promise<SearchResponseBackendDict> {
-    // The results are displayed in the learner's site language, which is
-    // separate from the language filter inside the search query.
-    const displayInLanguageCode =
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
     return this.http
       .get<SearchResponseBackendDict>(
-        ServicesConstants.SEARCH_DATA_URL + searchQuery,
-        {params: {display_in_language_code: displayInLanguageCode}}
+        ServicesConstants.SEARCH_DATA_URL + searchQuery
       )
       .toPromise();
   }

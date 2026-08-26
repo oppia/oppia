@@ -29,45 +29,25 @@ import {
 export interface ConceptCardBackendDict {
   explanation: SubtitledHtmlBackendDict;
   recorded_voiceovers: RecordedVoiceOverBackendDict;
-  // Only the concept card handler supplies this. The same dict shape is reused
-  // for a skill's contents in the editor, where the description lives on the
-  // skill itself rather than on its contents.
-  skill_description?: string;
 }
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
   _recordedVoiceovers: RecordedVoiceovers;
-  _skillDescription: string;
 
   constructor(
     explanation: SubtitledHtml,
-    recordedVoiceovers: RecordedVoiceovers,
-    skillDescription: string = ''
+    recordedVoiceovers: RecordedVoiceovers
   ) {
     this._explanation = explanation;
     this._recordedVoiceovers = recordedVoiceovers;
-    this._skillDescription = skillDescription;
   }
 
   toBackendDict(): ConceptCardBackendDict {
-    const conceptCardBackendDict: ConceptCardBackendDict = {
+    return {
       explanation: this._explanation.toBackendDict(),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict(),
     };
-    // A skill's contents carry no description, so the key is only added back
-    // when it came from the concept card handler. This keeps the dict a skill
-    // sends to the backend unchanged.
-    if (this._skillDescription) {
-      conceptCardBackendDict.skill_description = this._skillDescription;
-    }
-    return conceptCardBackendDict;
-  }
-
-  // The skill description is shown as the concept card's heading, and is
-  // translated alongside the explanation.
-  getSkillDescription(): string {
-    return this._skillDescription;
   }
 
   getExplanation(): SubtitledHtml {
@@ -89,8 +69,7 @@ export class ConceptCard {
       SubtitledHtml.createFromBackendDict(conceptCardBackendDict.explanation),
       RecordedVoiceovers.createFromBackendDict(
         conceptCardBackendDict.recorded_voiceovers
-      ),
-      conceptCardBackendDict.skill_description
+      )
     );
   }
 }

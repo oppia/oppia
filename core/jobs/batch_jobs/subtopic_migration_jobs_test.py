@@ -27,11 +27,11 @@ from core.platform import models
 
 from typing import Final, Type
 
-MYPY = False
+MYPY = True
 if MYPY:
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
+(topic_model,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
