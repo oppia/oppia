@@ -158,14 +158,6 @@ class PendingTranslationContent:
         """
         return self.translatable_content.is_data_format_list()
 
-    def is_reviewer_only(self) -> bool:
-        """Checks whether the content is for reviewers only.
-
-        Returns:
-            bool. Whether the content is for reviewers only.
-        """
-        return self.translatable_content.is_reviewer_only()
-
     def to_dict(self) -> PendingTranslationDict:
         """Returns the dict representation of PendingTranslationContent object.
 
