@@ -38,6 +38,7 @@ import {
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
 import {TranslationValidationService} from 'services/translation-validation.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AppConstants} from 'app.constants';
 import {
   ListSchema,
@@ -193,6 +194,8 @@ export class TranslationModalComponent {
   // submission.
   wasEdited: boolean = false;
 
+  isAutoTranslationFeatureEnabled: boolean = false;
+
   @ViewChild('contentPanel')
   contentPanel!: RteOutputDisplayComponent;
 
@@ -220,6 +223,7 @@ export class TranslationModalComponent {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService,
     private readonly translationValidationService: TranslationValidationService,
+    private readonly platformFeatureService: PlatformFeatureService,
     private readonly windowRef: WindowRef
   ) {}
 
@@ -238,6 +242,8 @@ export class TranslationModalComponent {
   }
 
   ngOnInit(): void {
+    this.isAutoTranslationFeatureEnabled =
+      this.platformFeatureService.status.EnableAutomaticTranslationSuggestions.isEnabled;
     this.activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
     this.subheading = this.opportunity
@@ -713,8 +719,7 @@ export class TranslationModalComponent {
       this.resetEditor();
       this.updateTranslationErrors();
     } catch (error: unknown) {
-      const msg =
-        error instanceof Error ? error.message : String(error);
+      const msg = error instanceof Error ? error.message : String(error);
       this.alertsService.addWarning(
         'Auto-translation failed. Please try again or translate manually. ' +
           msg
