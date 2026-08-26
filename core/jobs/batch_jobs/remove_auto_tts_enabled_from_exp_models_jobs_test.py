@@ -95,8 +95,13 @@ class RemoveAutoTtsEnabledFieldJobTests(job_test_utils.JobTestBase):
             correctness_feedback_enabled=False,
             edits_allowed=True,
         )
-        if 'auto_tts_enabled' in self.exp_2._properties:
-            del self.exp_2._properties['auto_tts_enabled']
+        if (
+            'auto_tts_enabled'
+            in self.exp_2._properties  # pylint: disable=protected-access
+        ):
+            del self.exp_2._properties[  # pylint: disable=protected-access
+                'auto_tts_enabled'
+            ]
 
         self.snapshot_1 = self.create_model(
             MockExplorationSnapshotContentModelWithAutoTts,
@@ -127,10 +132,16 @@ class RemoveAutoTtsEnabledFieldJobTests(job_test_utils.JobTestBase):
         )
 
         exp_1_model = exp_models.ExplorationModel.get('exp_1')
-        self.assertFalse('auto_tts_enabled' in exp_1_model._properties)
+        self.assertFalse(
+            'auto_tts_enabled'
+            in exp_1_model._properties  # pylint: disable=protected-access
+        )
 
         exp_2_model = exp_models.ExplorationModel.get('exp_2')
-        self.assertFalse('auto_tts_enabled' in exp_2_model._properties)
+        self.assertFalse(
+            'auto_tts_enabled'
+            in exp_2_model._properties  # pylint: disable=protected-access
+        )
 
         snapshot_1_model = exp_models.ExplorationSnapshotContentModel.get(
             'exp_1-1'
