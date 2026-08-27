@@ -663,6 +663,7 @@ const reportIssueBrokenLayoutChipSelector =
   '.e2e-test-report-issue-broken-layout-chip';
 const reportIssueOtherChipSelector = '.e2e-test-report-issue-other-chip';
 const technicalLogsSelector = '.e2e-test-technical-logs';
+const technicalLogsLabelSelector = '.e2e-test-technical-logs-label';
 const imageRecieverFeedbackComponentSelector = '.e2e-test-photo-upload-input';
 const reportWebsiteIssueLink = '.e2e-test-report-website-issue-link';
 const feedbackCaptchaContainer = '.e2e-test-feedback-captcha-container';
@@ -6434,10 +6435,11 @@ export class LoggedOutUser extends BaseUser {
   async expectIncludeTechnicalLogToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {
+    await this.expectElementToBeVisible(technicalLogsSelector, shouldBePresent);
     if (shouldBePresent) {
-      await this.expectElementToBeVisible(
-        technicalLogsSelector,
-        shouldBePresent
+      await this.expectTextContentInElementWithSelectorToBe(
+        technicalLogsLabelSelector,
+        'Include technical error logs to help the team fix this faster (highly recommended).'
       );
     }
   }
@@ -6685,12 +6687,10 @@ export class LoggedOutUser extends BaseUser {
   async expectLessonSpecificCategoryChipsToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {
-    if (shouldBePresent) {
-      await this.expectElementToBeVisible(
-        lessonSpecificCategoryChips,
-        shouldBePresent
-      );
-    }
+    await this.expectElementToBeVisible(
+      lessonSpecificCategoryChips,
+      shouldBePresent
+    );
   }
 
   async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
@@ -6704,11 +6704,11 @@ export class LoggedOutUser extends BaseUser {
   async expectFeedbackScreenshotPreviewToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {
+    await this.expectElementToBeVisible(
+      feedbackScreenshotPreviewSelector,
+      shouldBePresent
+    );
     if (shouldBePresent) {
-      await this.expectElementToBeVisible(
-        feedbackScreenshotPreviewSelector,
-        shouldBePresent
-      );
       await this.expectElementToBeVisible(
         cancelFeedbackUploadButtonSelector,
         shouldBePresent
