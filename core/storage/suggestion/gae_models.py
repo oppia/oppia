@@ -42,7 +42,7 @@ if MYPY:  # pragma: no cover
     from core.domain import change_domain  # pylint: disable=invalid-import
     from mypy_imports import base_models, datastore_services
 
-(base_models, user_models) = models.Registry.import_models(
+base_models, user_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.USER]
 )
 
@@ -681,6 +681,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         user_id: str,
         sort_key: Optional[str],
         language_codes: List[str],
+        target_type: Optional[str] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches translation suggestions that are in-review where the
         author_id != user_id and language_code matches one of the supplied
@@ -697,6 +698,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sort_key: str|None. The key to sort the suggestions by.
             language_codes: list(str). List of language codes that the
                 suggestions should match.
+            target_type: str|None. Optional target type to filter suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -710,16 +712,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
+            filters = [
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.language_code.IN(language_codes),
+            ]
+            if target_type is not None:
+                filters.append(cls.target_type == target_type)
+
             suggestion_query = (
                 cls.get_all()
-                .filter(
-                    datastore_services.all_of(
-                        cls.status == STATUS_IN_REVIEW,
-                        cls.suggestion_type
-                        == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        cls.language_code.IN(language_codes),
-                    )
-                )
+                .filter(datastore_services.all_of(*filters))
                 .order(-cls.created_on)
             )
 
@@ -751,13 +754,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
             return (sorted_results, offset)
 
+        filters = [
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            datastore_services.not_equal(cls.author_id, user_id),
+            cls.language_code.IN(language_codes),
+        ]
+        if target_type is not None:
+            filters.append(cls.target_type == target_type)
+
         suggestion_query = cls.get_all().filter(
-            datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                datastore_services.not_equal(cls.author_id, user_id),
-                cls.language_code.IN(language_codes),
-            )
+            datastore_services.all_of(*filters)
         )
 
         results: Sequence[GeneralSuggestionModel] = (
@@ -771,7 +778,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_translation_suggestion_target_ids(
-        cls, user_id: str, language_codes: List[str]
+        cls,
+        user_id: str,
+        language_codes: List[str],
+        target_type: Optional[str] = None,
     ) -> List[str]:
         """Fetches all target ids of translation suggestion that are in-review
         where the author_id != user_id and language_code matches one of the
@@ -783,21 +793,23 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 by the user will be excluded.
             language_codes: list(str). List of language codes that the
                 suggestions should match.
+            target_type: str|None. Optional entity type to filter suggestions by.
 
         Returns:
             list(str). A list of target ids of the matching suggestions.
         """
+        filters = [
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            datastore_services.not_equal(cls.author_id, user_id),
+            cls.language_code.IN(language_codes),
+        ]
+        if target_type is not None:
+            filters.append(cls.target_type == target_type)
+
         fetched_models: Sequence[GeneralSuggestionModel] = (
             cls.get_all()
-            .filter(
-                datastore_services.all_of(
-                    cls.status == STATUS_IN_REVIEW,
-                    cls.suggestion_type
-                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    datastore_services.not_equal(cls.author_id, user_id),
-                    cls.language_code.IN(language_codes),
-                )
-            )
+            .filter(datastore_services.all_of(*filters))
             .fetch(projection=[cls.target_id])
         )
 
@@ -871,6 +883,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         sort_key: Optional[str],
         language_codes: List[str],
         exp_ids: List[str],
+        target_type: Optional[str] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Gets all translation suggestions for the given language
         codes which are in review and correspond to the
@@ -888,6 +901,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             language_codes: list(str). The list of language codes.
             exp_ids: list(str). Exploration IDs matching the target ID of the
                 translation suggestions.
+            target_type: str|None. Optional target type to filter suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -902,17 +916,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
+            filters = [
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.language_code.IN(language_codes),
+                cls.target_id.IN(exp_ids),
+            ]
+            if target_type is not None:
+                filters.append(cls.target_type == target_type)
+
             suggestion_query = (
                 cls.get_all()
-                .filter(
-                    datastore_services.all_of(
-                        cls.status == STATUS_IN_REVIEW,
-                        cls.suggestion_type
-                        == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        cls.language_code.IN(language_codes),
-                        cls.target_id.IN(exp_ids),
-                    )
-                )
+                .filter(datastore_services.all_of(*filters))
                 .order(-cls.created_on)
             )
 
@@ -944,14 +959,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
             return (sorted_results, offset)
 
+        filters = [
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            datastore_services.not_equal(cls.author_id, user_id),
+            cls.language_code.IN(language_codes),
+            cls.target_id.IN(exp_ids),
+        ]
+        if target_type is not None:
+            filters.append(cls.target_type == target_type)
+
         suggestion_query = cls.get_all().filter(
-            datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                datastore_services.not_equal(cls.author_id, user_id),
-                cls.language_code.IN(language_codes),
-                cls.target_id.IN(exp_ids),
-            )
+            datastore_services.all_of(*filters)
         )
 
         results: Sequence[GeneralSuggestionModel] = (
@@ -992,21 +1011,22 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_in_review_translation_suggestions_by_exp_ids(
-        cls, exp_ids: List[str], language_code: str
+    def get_in_review_translation_suggestions_by_entity_ids(
+        cls, entity_ids: List[str], language_code: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Gets all in-review translation suggestions matching the supplied
-        exp_ids and language_code.
+        entity_ids and language_code. The query matches on target_id alone, so
+        the ids may belong to any translatable entity type.
 
         Args:
-            exp_ids: list(str). Exploration IDs matching the target ID of the
+            entity_ids: list(str). Entity IDs matching the target ID of the
                 translation suggestions.
             language_code: str. The ISO 639-1 language code of the translation
                 suggestions.
 
         Returns:
             list(SuggestionModel). A list of suggestions matching the supplied
-            exp_ids and language_code.
+            entity_ids and language_code.
         """
         return (
             cls.get_all()
@@ -1015,7 +1035,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     cls.status == STATUS_IN_REVIEW,
                     cls.suggestion_type
                     == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    cls.target_id.IN(exp_ids),
+                    cls.target_id.IN(entity_ids),
                     cls.language_code == language_code,
                 )
             )
@@ -1205,6 +1225,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_type: str,
         user_id: str,
         sort_key: Optional[str],
+        target_type: Optional[str] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches suggestions of suggestion_type which the supplied user has
         created.
@@ -1216,6 +1237,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             suggestion_type: str. The type of suggestion to query for.
             user_id: str. The id of the user trying to make this query.
             sort_key: str|None. The key to sort the suggestions by.
+            target_type: str|None. Optional target type to filter suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -1224,10 +1246,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
+        filters = [
+            cls.suggestion_type == suggestion_type,
+            cls.author_id == user_id,
+        ]
+        if target_type is not None:
+            filters.append(cls.target_type == target_type)
+
         suggestion_query = cls.get_all().filter(
-            datastore_services.all_of(
-                cls.suggestion_type == suggestion_type, cls.author_id == user_id
-            )
+            datastore_services.all_of(*filters)
         )
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
