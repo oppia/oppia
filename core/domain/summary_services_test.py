@@ -26,12 +26,15 @@ from core.domain import (
     collection_domain,
     collection_services,
     exp_domain,
+    exp_fetchers,
     exp_services,
     exp_services_test,
     rating_services,
     rights_domain,
     rights_manager,
     summary_services,
+    translation_domain,
+    translation_services,
     user_services,
 )
 from core.tests import test_utils
@@ -266,6 +269,7 @@ class ExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#cc4b00',
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'title': 'Exploration 2 Albert title',
+            'translated_metadata_fields': [],
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(
@@ -281,6 +285,153 @@ class ExplorationDisplayableSummariesTest(
             )
         )
         self.assertEqual(displayable_summaries, [])
+
+    def test_get_displayable_exp_summary_dicts_with_translated_metadata(
+        self,
+    ) -> None:
+        exp_summary_1 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_1
+        )
+        exp_summary_2 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_2
+        )
+        exp_summary_2.tags = ['tag', 'math']
+
+        translated_title = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_objective = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Objective',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_category = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Category',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_0 = translation_domain.TranslatedContent(
+            'Hindi Tag 1',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_1_outdated = translation_domain.TranslatedContent(
+            'Outdated Tag 2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=True,
+        )
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
+            translated_objective,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_CATEGORY_CONTENT_ID,
+            translated_category,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0',
+            translated_tag_0,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_1',
+            translated_tag_1_outdated,
+        )
+
+        # Querying with exp_summary_1 (no translations) and exp_summary_2 (has translations).
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts(
+                [exp_summary_1, exp_summary_2], display_in_language_code='hi'
+            )
+        )
+        self.assertEqual(len(displayable_summaries), 2)
+
+        # exp_summary_1 keeps untranslated default metadata.
+        exp1_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_1
+        )
+        self.assertEqual(exp1_summary['title'], 'Exploration 1 title')
+        self.assertEqual(exp1_summary['translated_metadata_fields'], [])
+
+        # exp_summary_2 receives translated title, objective, category, and tag 0.
+        exp2_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_2
+        )
+        self.assertEqual(exp2_summary['title'], 'Exploration 2 Hindi Title')
+        self.assertEqual(
+            exp2_summary['objective'], 'Exploration 2 Hindi Objective'
+        )
+        self.assertEqual(
+            exp2_summary['category'], 'Exploration 2 Hindi Category'
+        )
+        self.assertEqual(exp2_summary['tags'], ['Hindi Tag 1', 'math'])
+        self.assertEqual(
+            exp2_summary['translated_metadata_fields'],
+            ['title', 'objective', 'category', 'tags'],
+        )
+
+    def test_get_displayable_exp_summary_dicts_with_partially_translated_metadata(
+        self,
+    ) -> None:
+        exp_summary_2 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_2
+        )
+        exp_summary_2.tags = ['tag1']
+
+        translated_title = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Title Only',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts(
+                [exp_summary_2], display_in_language_code='hi'
+            )
+        )
+        self.assertEqual(len(displayable_summaries), 1)
+        self.assertEqual(
+            displayable_summaries[0]['translated_metadata_fields'], ['title']
+        )
+        self.assertEqual(
+            displayable_summaries[0]['title'], 'Exploration 2 Hindi Title Only'
+        )
+        self.assertEqual(displayable_summaries[0]['tags'], ['tag1'])
 
     def test_get_public_and_filtered_private_summary_dicts_for_creator(
         self,
@@ -1077,6 +1228,40 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             test_summary_3, recently_published_exploration_summaries[0]
         )
+
+    def test_get_recently_published_exp_summary_dicts_with_display_in_language_code(
+        self,
+    ) -> None:
+        exp_summary_1 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_1
+        )
+        translated_title = translation_domain.TranslatedContent(
+            'Recently Published Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_1,
+            exp_summary_1.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        recently_published_summaries = (
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE,
+                display_in_language_code='hi',
+            )
+        )
+        exp1_summary = next(
+            s for s in recently_published_summaries if s['id'] == self.EXP_ID_1
+        )
+        self.assertEqual(
+            exp1_summary['title'], 'Recently Published Hindi Title'
+        )
+        self.assertEqual(exp1_summary['translated_metadata_fields'], ['title'])
 
 
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
