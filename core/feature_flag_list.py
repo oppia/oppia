@@ -135,7 +135,6 @@ class FeatureNames(enum.Enum):
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
@@ -156,6 +155,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.STORY_EDITOR_ARCS,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -283,7 +283,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
