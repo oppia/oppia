@@ -1731,7 +1731,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             suggestion.suggestion_id,
             self.admin_id,
             'Accepting suggestion',
-            None,
+            '',
         )
 
         exp_services.update_exploration(
