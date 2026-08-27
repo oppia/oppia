@@ -75,6 +75,7 @@ describe('Logged-In Learner', function () {
     );
 
     await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -136,6 +137,11 @@ describe('Logged-In Learner', function () {
       'Multiplying Fractions',
       fourthExplorationId as string
     );
+
+    // Split the story into two Adventures so that the Adventure (arc) features
+    // (navigation dock, skip confirmation modal, skipped-adventure cards)
+    // render for the learner on the redesigned topic page.
+    await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();

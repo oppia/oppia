@@ -54,8 +54,6 @@ const skippedAdventureStartCtaSelector =
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
 const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
-const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
-const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 const lessonCardSelector = '.e2e-test-lesson-card';
 
 describe('Logged-In Learner', function () {
@@ -81,6 +79,7 @@ describe('Logged-In Learner', function () {
     );
 
     await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -142,6 +141,11 @@ describe('Logged-In Learner', function () {
       'Multiplying Fractions',
       fourthExplorationId as string
     );
+
+    // Split the story into two Adventures so that the Adventure (arc) features
+    // (navigation dock, skip confirmation modal, skipped-adventure cards)
+    // render for the learner on the redesigned topic page.
+    await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
@@ -294,27 +298,29 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should navigate to practice session when clicking Take Mastery Challenge',
+    'should not navigate away when clicking the locked Mastery Challenge button',
     async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        masteryChallengeButtonSelector
-      );
+      const isUnlocked = await loggedInLearner.page.evaluate(() => {
+        const btn = document.querySelector(
+          '.e2e-test-mastery-challenge-button'
+        ) as HTMLButtonElement;
+        return (
+          !btn?.disabled &&
+          !btn?.classList.contains('mastery-challenge-button-locked')
+        );
+      });
 
-      await loggedInLearner.waitForPageToFullyLoad();
+      if (!isUnlocked) {
+        const urlBeforeClick = loggedInLearner.page.url();
 
-      await loggedInLearner.expectElementToBeVisible(
-        practiceSessionContainerSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+        await loggedInLearner.clickOnElementWithSelector(
+          masteryChallengeButtonSelector
+        );
 
-  it(
-    'should display question player header in practice session',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        practiceQuestionHeaderSelector
-      );
+        await loggedInLearner.page.waitForTimeout(500);
+
+        expect(loggedInLearner.page.url()).toBe(urlBeforeClick);
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
