@@ -50,6 +50,7 @@
 .oppia-dropdown-row {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   width: 100%;
 }
 button.oppia-autofocus:focus {
@@ -68,7 +69,7 @@ button.oppia-autofocus:focus {
   display: flex;
   flex-direction: column;
   margin-left: 2%;
-  width: 100%;
+  width: 250px;
 }
 .oppia-opportunity-language-selector {
   background: white;
@@ -254,7 +255,7 @@ button.oppia-autofocus:focus {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
-  width: 100%;
+  width: 250px;
 }
 @media (max-width:700px) {
   .oppia-opportunities-tabs-explanation h1,
