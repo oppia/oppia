@@ -114,11 +114,9 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     },
 ]
 
-# Routes that legitimately do not need Lighthouse coverage. Each entry
-# is a PAGES_REGISTERED_WITH_FRONTEND key name. Routes are excluded
-# when they are auth-gated, parameterized without test data, error/
-# utility pages, search/query-dependent, sub-pages of already-tested
-# modules, or special-purpose pages.
+# Routes that are not covered by Lighthouse tests. Each entry is a
+# PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
+# this list without asking @Hardikgoyal2003.
 LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
     'ANDROID',
     'BLOG_ADMIN',
