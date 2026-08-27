@@ -76,14 +76,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             lhci_path,
             'autorun',
             '--config=%s' % LIGHTHOUSE_CONFIG_FILENAME,
-            '--max-old-space-size=4096',
         ]
         self.lighthouse_desktop_check_bash_command = [
             common.LIGHTHOUSE_NODE_BIN_PATH,
             lhci_path,
             'autorun',
             '--config=%s' % LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
-            '--max-old-space-size=4096',
         ]
         # Arguments to record in lighthouse_setup.js.
         self.extra_args = [
@@ -436,6 +434,76 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             captured_kwargs['env']['PATH'].split(os.pathsep)[0],
             os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH),
         )
+        self.assertEqual(
+            captured_kwargs['env']['NODE_OPTIONS'],
+            '--max-old-space-size=4096',
+        )
+
+    def test_patch_lighthouse_target_manager_success(self) -> None:
+        file_contents = (
+            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;"
+        )
+        temp_file_path: str
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.js', delete=False
+        ) as f:
+            f.write(file_contents)
+            temp_file_path = f.name
+
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
+
+        def mock_open(
+            path: str, mode: str = 'r', **unused_kwargs: object
+        ) -> object:
+            return open(temp_file_path, mode)
+
+        swap_open = self.swap(builtins, 'open', mock_open)
+        with self.print_swap, swap_isfile, swap_join, swap_open:
+            run_lighthouse_tests._patch_lighthouse_target_manager()
+
+        with open(temp_file_path, 'r', encoding='utf-8') as read_file:
+            patched = read_file.read()
+        self.assertIn('/Not allowed/.test(err.message)', patched)
+        self.assertIn(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.',
+            self.print_arr,
+        )
+        os.remove(temp_file_path)
+
+    def test_patch_lighthouse_target_manager_missing_file(self) -> None:
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: False)
+        with self.print_swap, swap_isfile:
+            with self.assertRaisesRegex(
+                RuntimeError, 'Could not find Lighthouse target-manager.js'
+            ):
+                run_lighthouse_tests._patch_lighthouse_target_manager()
+
+    def test_patch_lighthouse_target_manager_substitution_not_found(
+        self,
+    ) -> None:
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.js', delete=False
+        ) as f:
+            f.write('unrelated source content')
+            temp_file_path = f.name
+
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
+
+        def mock_open(
+            path: str, mode: str = 'r', **unused_kwargs: object
+        ) -> object:
+            return open(temp_file_path, mode)
+
+        swap_open = self.swap(builtins, 'open', mock_open)
+        with self.print_swap, swap_isfile, swap_join, swap_open:
+            with self.assertRaisesRegex(
+                RuntimeError,
+                'the expected upstream source line was not found',
+            ):
+                run_lighthouse_tests._patch_lighthouse_target_manager()
+        os.remove(temp_file_path)
 
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
