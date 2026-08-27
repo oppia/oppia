@@ -63,7 +63,7 @@ PLAYWRIGHT_NODE_VERSION = '20.11.1'
 # used to run the repo-wide `yarn install` (see install_third_party_libs.py),
 # so that the engines requirement of Lighthouse is satisfied at install time
 # without an --ignore-engines flag.
-LIGHTHOUSE_NODE_VERSION = '20.11.1'
+LIGHTHOUSE_NODE_VERSION = PLAYWRIGHT_NODE_VERSION
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
