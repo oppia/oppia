@@ -31,6 +31,17 @@ import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-l
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {OpportunitiesListComponent} from './opportunities-list.component';
 import {MatIconModule} from '@angular/material/icon';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableDropdownPagination: {
+        isEnabled: true,
+      },
+    };
+  }
+}
 
 describe('Opportunities List Component', () => {
   let component: OpportunitiesListComponent;
@@ -48,6 +59,10 @@ describe('Opportunities List Component', () => {
         ContributionOpportunitiesService,
         TranslationLanguageService,
         TranslationTopicService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -613,6 +628,69 @@ describe('Opportunities List Component', () => {
       expect(component.searchQuery).toEqual('math');
       expect(component.activePageNumber).toBe(1);
       expect(component.fetchAndLoadOpportunities).toHaveBeenCalled();
+    }));
+
+    it('should initialize totalPages to 1 if loadOpportunitiesCount is undefined', fakeAsync(() => {
+      component.loadOpportunitiesCount = undefined;
+      component.init();
+      component.ngOnInit();
+      tick();
+      expect(component.totalPages).toBe(1);
+    }));
+
+    it('should calculate totalPages on init using loadOpportunitiesCount', fakeAsync(() => {
+      component.loadOpportunitiesCount = () => Promise.resolve(20); // E.g. 20 total items.
+      // 20 items / 16 items per page = 2 pages.
+      component.init();
+      component.ngOnInit();
+      tick();
+      expect(component.totalPages).toBe(2);
+    }));
+
+    it('should self-correct totalPages in fetchAndLoadOpportunities when backend is exhausted', fakeAsync(() => {
+      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 4 pages.
+      component.loadOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10), // Only 10 actual items.
+          more: false, // End of actual dataset.
+        });
+
+      component.init();
+      component.ngOnInit();
+      tick();
+
+      expect(component.totalPages).toBe(1); // Self-corrected from 4 to 1.
+      expect(component.opportunities.length).toBe(10);
+    }));
+
+    it('should self-correct totalPages and clamp activePageNumber in gotoPage', fakeAsync(() => {
+      component.loadOpportunitiesCount = () => Promise.resolve(25); // Predict 3 pages.
+      component.loadOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10), // Only 10 items initially.
+          more: true,
+        });
+      component.loadMoreOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 5), // Only 5 items on page 2.
+          more: false, // End of actual dataset.
+        });
+
+      component.init();
+      component.ngOnInit();
+      tick();
+
+      expect(component.totalPages).toBe(3); // Initial prediction.
+
+      // Navigate to a page that will trigger loadMoreOpportunities and hit the end of the dataset.
+      component.gotoPage(3);
+      tick();
+
+      // Total opportunities loaded is 10 + 5 = 15.
+      // 15 / 10 (page size) = 1.5 -> 2 pages total.
+      // Since we tried to go to page 3, it should clamp to page 2.
+      expect(component.totalPages).toBe(2); // Self-corrected from 3 to 2.
+      expect(component.activePageNumber).toBe(2); // Clamped from 3 to 2.
     }));
   });
 

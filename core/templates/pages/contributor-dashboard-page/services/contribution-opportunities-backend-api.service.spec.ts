@@ -250,6 +250,26 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch the opportunities count data', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 42});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(42);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should fetch skill opportunities with a search query', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
