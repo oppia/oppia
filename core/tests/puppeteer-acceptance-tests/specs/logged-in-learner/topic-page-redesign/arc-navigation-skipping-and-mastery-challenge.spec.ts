@@ -57,7 +57,6 @@ const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
 const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 const lessonCardSelector = '.e2e-test-lesson-card';
-const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;

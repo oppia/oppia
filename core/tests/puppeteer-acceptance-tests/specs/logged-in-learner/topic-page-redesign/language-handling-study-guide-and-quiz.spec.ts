@@ -51,8 +51,6 @@ const storyTitleSelector = '.e2e-test-story-title';
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const lessonCardNewChapterSelector = '.e2e-test-lesson-card-new-label';
 const studySkillsCtaSelector = '.e2e-test-study-skills-cta';
-const lessonCardSelector = '.e2e-test-lesson-card';
-const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -197,7 +195,7 @@ describe('Logged-In Learner', function () {
       if (hasLanguageSelector) {
         const selectedLanguage = await loggedInLearner.page.$eval(
           textLanguageSelector,
-          (el: HTMLSelectElement) => el.value
+          (el: Element) => (el as HTMLSelectElement).value
         );
 
         expect(selectedLanguage).toBeTruthy();
@@ -241,15 +239,15 @@ describe('Logged-In Learner', function () {
       if (hasLanguageSelector) {
         const initialLanguage = await loggedInLearner.page.$eval(
           textLanguageSelector,
-          (el: HTMLSelectElement) => el.value
+          (el: Element) => (el as HTMLSelectElement).value
         );
 
         const storedLanguage = await loggedInLearner.page.evaluate(() => {
-          const stored = sessionStorage.getItem(
+          const stored = window.sessionStorage.getItem(
             'topic_session_fallback_language'
           );
           if (stored) {
-            const parsed = JSON.parse(stored);
+            const parsed = JSON.parse(stored) as {textLanguageCode?: string};
             return parsed.textLanguageCode || '';
           }
           return '';

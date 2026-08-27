@@ -736,22 +736,22 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/topic-page-layout-and-timeline-navigation",
+      "name": "logged-in-learner/topic-page-redesign/topic-page-layout-and-timeline-navigation",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/topic-page-redesign/topic-page-layout-and-timeline-navigation.spec.ts",
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/chapter-interaction-and-progress-states",
+      "name": "logged-in-learner/topic-page-redesign/chapter-interaction-and-progress-states",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/topic-page-redesign/chapter-interaction-and-progress-states.spec.ts",
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/arc-navigation-skipping-and-mastery-challenge",
+      "name": "logged-in-learner/topic-page-redesign/arc-navigation-skipping-and-mastery-challenge",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/topic-page-redesign/arc-navigation-skipping-and-mastery-challenge.spec.ts",
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/language-handling-study-guide-and-quiz",
+      "name": "logged-in-learner/topic-page-redesign/language-handling-study-guide-and-quiz",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/topic-page-redesign/language-handling-study-guide-and-quiz.spec.ts",
       "framework": "puppeteer"
     }
