@@ -46,6 +46,7 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 import {VoiceoverBackendApiService} from '../../../../domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
@@ -81,6 +82,20 @@ class MockContentTranslationLanguageService {
 class MockI18nLanguageCodeService {
   getCurrentI18nLanguageCode() {
     return 'fr';
+  }
+}
+
+class MockEntityTranslationsService {
+  getEntityTranslationsAsync(languageCode: string) {
+    return Promise.resolve({
+      entityId: 'exp_1',
+      entityType: 'exploration',
+      entityVersion: 1,
+      languageCode: 'fr',
+      translationMapping: {},
+      getWrittenTranslation: () => null,
+      hasWrittenTranslation: () => false,
+    });
   }
 }
 
@@ -131,6 +146,10 @@ describe('Content language selector component', () => {
         {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
+        },
+        {
+          provide: EntityTranslationsService,
+          useClass: MockEntityTranslationsService,
         },
       ],
     })

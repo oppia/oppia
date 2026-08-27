@@ -106,8 +106,10 @@ export class ContentTranslationManagerService {
       this.entityTranslationsService
         .getEntityTranslationsAsync(languageCode)
         .then(entityTranslations => {
-          // Image preloading is disabled in the exploration editor preview mode.
-          if (!this.pageContextService.isInExplorationEditorPage()) {
+          if (
+            !this.pageContextService.isInExplorationEditorPage() &&
+            this.playerTranscriptService.getCard(0)
+          ) {
             this.imagePreloaderService.restartImagePreloader(
               this.playerTranscriptService.getCard(0).getStateName()
             );
