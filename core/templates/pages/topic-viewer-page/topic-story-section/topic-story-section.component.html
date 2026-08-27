@@ -83,7 +83,11 @@
                 <div class="adventure-flag-icon"
                      [class.adventure-flag-icon-completed]="isAdventureCompleted(adventureIdx)"
                      [ngStyle]="{'background-color': isAdventureCompleted(adventureIdx) ? '#27a844' : adventureGroup.iconBg}">
-                  <i class="material-icons">{{ isAdventureCompleted(adventureIdx) ? 'check' : 'menu_book' }}</i>
+                  <img *ngIf="!isAdventureCompleted(adventureIdx)"
+                       src="/assets/images/icons/menu-book.svg"
+                       alt="Menu book"
+                       class="adventure-flag-icon-img">
+                  <i *ngIf="isAdventureCompleted(adventureIdx)" class="material-icons">check</i>
                 </div>
                 <div class="adventure-header-text">
                   <h4 class="adventure-title">{{ adventureGroup.adventureTitle }}</h4>

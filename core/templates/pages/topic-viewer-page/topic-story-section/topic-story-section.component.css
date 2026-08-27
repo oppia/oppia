@@ -302,9 +302,12 @@
   width: 52px;
 }
 
-.adventure-flag-icon .material-icons {
-  font-size: 24px;
+.adventure-flag-icon .material-icons,
+.adventure-flag-icon-img {
+  font-size: 32px;
+  height: 32px;
   line-height: 1;
+  width: 32px;
 }
 
 .adventure-flag-icon-completed .material-icons {
@@ -641,8 +644,11 @@ topic-mastery-challenge-card {
     width: 38px;
   }
 
-  .adventure-flag-icon .material-icons {
-    font-size: 18px;
+  .adventure-flag-icon .material-icons,
+  .adventure-flag-icon-img {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
   }
 
   .adventure-title {
