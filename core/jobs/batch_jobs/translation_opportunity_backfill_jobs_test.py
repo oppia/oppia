@@ -271,10 +271,13 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 'needs_update': False,
             }
 
-        translations_es = {
-            content_id: dict(content)
-            for content_id, content in translations.items()
-        }
+        translations_es = cast(
+            Dict[str, translation_models.TranslatedContentDict],
+            {
+                content_id: dict(content)
+                for content_id, content in translations.items()
+            },
+        )
 
         # Set a non-empty content to needs_update.
         translations[feconf.EXPLORATION_TITLE_CONTENT_ID]['needs_update'] = True
@@ -290,7 +293,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
 
         translation_model_es = (
             translation_models.EntityTranslationsModel.create_new(
-                feconf.TranslatableEntityType.EXPLORATION,
+                feconf.TranslatableEntityType.EXPLORATION.value,
                 self.exp_id,
                 1,
                 'es',
