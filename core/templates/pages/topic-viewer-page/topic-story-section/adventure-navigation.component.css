@@ -22,10 +22,10 @@
   flex: 1 1 0;
   flex-wrap: nowrap;
   gap: 10px;
-  margin: 8px 0 4px;
+  margin: 24px 0 12px;
   min-width: 0;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 0;
   position: relative;
 }
 
@@ -128,6 +128,7 @@
 
 .adventure-navigation-mastery-group {
   align-items: center;
+  border: 2.5px solid #f5a623;
   border-radius: 36px;
   cursor: pointer;
   display: inline-flex;

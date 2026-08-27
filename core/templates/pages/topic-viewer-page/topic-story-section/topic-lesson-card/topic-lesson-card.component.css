@@ -129,12 +129,6 @@
   gap: 8px;
 }
 
-.topic-lesson-card.completed-collapsed .topic-lesson-card-title-with-labels {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .topic-lesson-card-new-label {
   background: #1f7a42;
   border-radius: 999px;
