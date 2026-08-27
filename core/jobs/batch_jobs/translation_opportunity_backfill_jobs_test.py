@@ -271,17 +271,34 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 'needs_update': False,
             }
 
+        translations_es = {
+            content_id: dict(content)
+            for content_id, content in translations.items()
+        }
+
         # Set a non-empty content to needs_update.
         translations[feconf.EXPLORATION_TITLE_CONTENT_ID]['needs_update'] = True
 
-        translation_model = (
+        translation_model_hi = (
             translation_models.EntityTranslationsModel.get_model(
                 feconf.TranslatableEntityType.EXPLORATION, self.exp_id, 1, 'hi'
             )
         )
-        translation_model.translations = translations
-        translation_model.update_timestamps()
-        translation_model.put()
+        translation_model_hi.translations = translations
+        translation_model_hi.update_timestamps()
+        translation_model_hi.put()
+
+        translation_model_es = (
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION,
+                self.exp_id,
+                1,
+                'es',
+                translations_es,
+            )
+        )
+        translation_model_es.update_timestamps()
+        translation_model_es.put()
 
         self.assert_job_output_is(
             [
@@ -295,7 +312,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
             feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
         self.assertIsNotNone(model)
-        self.assertEqual(model.translation_counts, {'hi': 3})
+        self.assertEqual(model.translation_counts, {'hi': 3, 'es': 4})
         self.assertEqual(model.translation_missing_reasons, {'hi': ['update']})
 
     def test_translation_count_ignores_content_the_exploration_does_not_have(

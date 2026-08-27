@@ -286,6 +286,7 @@ describe('TranslateTextService', () => {
             content_format: 'html',
             content_value: 'text1',
             state_name: 'stateName1',
+            status: 'new',
           },
         ],
         version: '2',
@@ -300,6 +301,9 @@ describe('TranslateTextService', () => {
       flushMicrotasks();
 
       expect(translateTextService.stateAndContent[0].contentText).toBe('text1');
+      expect(translateTextService.stateAndContent[0].translationStatus).toBe(
+        'new'
+      );
     }));
   });
 
