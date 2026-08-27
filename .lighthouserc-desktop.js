@@ -386,7 +386,7 @@ module.exports = {
           },
           {
             matchingUrlPattern:
-              '^http://localhost:8181/learn/staging/dummy-topic-one/story$', // pylint: disable=line-too-long
+              '^http://localhost:8181/learn/staging/dummy-topic-one/story$',
             pagePerfThresholds: {
               fcp: 2775,
               speedIndex: 4815,
@@ -401,7 +401,7 @@ module.exports = {
           },
           {
             matchingUrlPattern:
-              '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$', // pylint: disable=line-too-long
+              '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$',
             pagePerfThresholds: {
               fcp: 2775,
               speedIndex: 5370,
