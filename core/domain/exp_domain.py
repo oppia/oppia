@@ -1611,13 +1611,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     translation_domain.TranslatableContentFormat.UNICODE_STRING,
                     self.objective,
                 )
-            if self.category:
-                translatable_contents_collection.add_translatable_field(
-                    feconf.EXPLORATION_CATEGORY_CONTENT_ID,
-                    translation_domain.ContentType.METADATA,
-                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
-                    self.category,
-                )
             for idx, tag in enumerate(self.tags):
                 translatable_contents_collection.add_translatable_field(
                     f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{idx}',

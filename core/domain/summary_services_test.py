@@ -387,13 +387,11 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual(
             exp2_summary['objective'], 'Exploration 2 Hindi Objective'
         )
-        self.assertEqual(
-            exp2_summary['category'], 'Exploration 2 Hindi Category'
-        )
+        self.assertEqual(exp2_summary['category'], 'Algebra')
         self.assertEqual(exp2_summary['tags'], ['Hindi Tag 1', 'math'])
         self.assertEqual(
             exp2_summary['translated_metadata_fields'],
-            ['title', 'objective', 'category', 'tags'],
+            ['title', 'objective', 'tags'],
         )
 
     def test_get_displayable_exp_summary_dicts_with_partially_translated_metadata(
