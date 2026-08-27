@@ -60,4 +60,42 @@ describe('MasteryChallengeLockedModalComponent', () => {
 
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
+
+  it('should dismiss bottom sheet when confirm is called and bottomSheetRef exists', () => {
+    const mockBottomSheetRef = {dismiss: jasmine.createSpy('dismiss')};
+    const componentWithBottomSheet = new MasteryChallengeLockedModalComponent(
+      ngbActiveModal,
+      mockBottomSheetRef as unknown as MatBottomSheetRef
+    );
+
+    componentWithBottomSheet.confirm();
+
+    expect(mockBottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
+  });
+
+  it('should dismiss bottom sheet when cancel is called and bottomSheetRef exists', () => {
+    const mockBottomSheetRef = {dismiss: jasmine.createSpy('dismiss')};
+    const componentWithBottomSheet = new MasteryChallengeLockedModalComponent(
+      ngbActiveModal,
+      mockBottomSheetRef as unknown as MatBottomSheetRef
+    );
+
+    componentWithBottomSheet.cancel();
+
+    expect(mockBottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
+  it('should store undefined when bottomSheetRef is null', () => {
+    expect(component.bottomSheetRef).toBeUndefined();
+  });
+
+  it('should store the provided bottomSheetRef when it is passed', () => {
+    const mockBottomSheetRef = {dismiss: jasmine.createSpy('dismiss')};
+    const componentWithBottomSheet = new MasteryChallengeLockedModalComponent(
+      ngbActiveModal,
+      mockBottomSheetRef as unknown as MatBottomSheetRef
+    );
+
+    expect(componentWithBottomSheet.bottomSheetRef).toBe(mockBottomSheetRef);
+  });
 });

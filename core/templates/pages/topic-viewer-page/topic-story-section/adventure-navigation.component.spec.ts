@@ -271,6 +271,14 @@ describe('AdventureNavigationComponent', () => {
     expect(component.showRightArrow).toBe(true);
   });
 
+  it('should emit masteryChallengeClicked event when onMasteryClick is called', () => {
+    spyOn(component.masteryChallengeClicked, 'emit');
+
+    component.onMasteryClick();
+
+    expect(component.masteryChallengeClicked.emit).toHaveBeenCalled();
+  });
+
   it('should not update arrows when scrollWrapper nativeElement is null', () => {
     component.scrollWrapper = createScrollWrapper(500, 200, 0);
     Object.defineProperty(component.scrollWrapper, 'nativeElement', {

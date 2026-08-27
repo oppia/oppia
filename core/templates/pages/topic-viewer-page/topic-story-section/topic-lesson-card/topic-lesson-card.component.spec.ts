@@ -1008,4 +1008,95 @@ describe('TopicLessonCardComponent', () => {
 
     expect(componentRef.getLanguageDescription('xx')).toBe('xx');
   });
+
+  it('should return true for showCheckpointBar when not coming_soon and checkpoints exist', () => {
+    component.lessonProgressStatus = 'not_started';
+    component.totalCheckpointsCount = 5;
+
+    expect(component.showCheckpointBar).toBeTrue();
+  });
+
+  it('should return false for showCheckpointBar when coming_soon', () => {
+    component.lessonProgressStatus = 'coming_soon';
+    component.totalCheckpointsCount = 5;
+
+    expect(component.showCheckpointBar).toBeFalse();
+  });
+
+  it('should return false for showCheckpointBar when no checkpoints', () => {
+    component.lessonProgressStatus = 'not_started';
+    component.totalCheckpointsCount = 0;
+
+    expect(component.showCheckpointBar).toBeFalse();
+  });
+
+  it('should emit startLessonClick with voiceover language query param when voiceover is selected', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.selectedTextLanguageCode = 'fr';
+    component.selectedVoiceoverLanguageCode = 'fr-CA';
+
+    component.onStartButtonClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl:
+        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA',
+    });
+  });
+
+  it('should create URL with only content language code when voiceover is null', () => {
+    component.startUrl = '/explore/123';
+
+    const result = componentRef.getLessonStartUrlWithLanguageSelection(
+      'es',
+      null
+    );
+
+    expect(result).toBe(
+      'https://www.oppia.org/explore/123?initialContentLanguageCode=es'
+    );
+  });
+
+  it('should use session fallback voiceover only when it is in available list', () => {
+    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
+
+    expect(componentRef.getInitialVoiceoverLanguageCode('fr', 'en')).toBe('fr');
+  });
+
+  it('should use compatible voiceover from related codes when session fallback is not available', () => {
+    component.availableVoiceoverLanguageCodes = ['es', 'de'];
+    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
+      .withArgs('es')
+      .and.returnValue(['fr']);
+
+    expect(componentRef.getInitialVoiceoverLanguageCode('pt', 'fr')).toBe('es');
+  });
+
+  it('should return first available voiceover when no compatible found and no English', () => {
+    component.availableVoiceoverLanguageCodes = ['fr', 'de'];
+
+    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'zh')).toBe('fr');
+  });
+
+  it('should return English text language code as fallback when available', () => {
+    component.availableTextLanguageCodes = ['en', 'fr'];
+
+    expect(componentRef.getFallbackTextLanguageCode()).toBe('en');
+  });
+
+  it('should return first text language when English is not available', () => {
+    component.availableTextLanguageCodes = ['fr', 'es'];
+
+    expect(componentRef.getFallbackTextLanguageCode()).toBe('fr');
+  });
+
+  it('should handle onSelectedTextLanguageCodeChange with null value', () => {
+    component.onSelectedTextLanguageCodeChange(null);
+
+    expect(component.selectedTextLanguageCode).toBeNull();
+    expect(
+      topicSessionFallbackLanguageService.saveFallbackSelection
+    ).not.toHaveBeenCalled();
+  });
 });

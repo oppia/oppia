@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -915,7 +915,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
     await fixture.whenStable();
-    await component['practiceAvailabilityPending'];
+    await component.practiceAvailabilityPending;
 
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(true);
     expect(component.adventureGroups[0].hasPracticeQuestions).toBe(true);
@@ -4354,6 +4354,101 @@ describe('TopicStorySectionComponent', () => {
       component.ngOnInit();
 
       expect(component.isMasteryUnlocked).toBe(false);
+    });
+
+    it('should not navigate when mastery is unlocked but masteryChallengeUrl is #', () => {
+      component.isMasteryUnlocked = true;
+      component.masteryChallengeUrl = '#';
+
+      component.onMasteryChallengeCardClicked();
+
+      expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    });
+
+    it('should return empty string for getAdventureCompletionText with invalid index', () => {
+      expect(component.getAdventureCompletionText(999)).toBe('');
+    });
+
+    it('should not include practice questions for lessons with no skill ids', async () => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node title 1',
+        'Node description 1',
+        'exp_1',
+        'node_1',
+        'thumb.png',
+        {acquiredSkillIds: []}
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node title 1'],
+        [storyNodeSpy],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+
+      component.ngOnInit();
+      await fixture.whenStable();
+
+      expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
+      expect(component.adventureGroups[0].hasPracticeQuestions).toBe(false);
+    });
+
+    it('should handle practice availability with stale request id', async () => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node title 1',
+        'Node description 1',
+        'exp_1',
+        'node_1',
+        'thumb.png',
+        {acquiredSkillIds: ['skill_1']}
+      );
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync.and.resolveTo(
+        2
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node title 1'],
+        [storyNodeSpy],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+
+      component.ngOnInit();
+      Reflect.set(component, 'practiceAvailabilityRequestId', 999);
+      await fixture.whenStable();
+
+      expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
+    });
+
+    it('should show practice card when practice count is 1 or more', () => {
+      component.storySummary = createStorySummarySpy([], []);
+      component.lessonCount = 0;
+      component.practiceCount = 2;
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.practiceSubtopicIds = [1];
+
+      component.ngOnInit();
+
+      expect(component.isPracticeCardVisible).toBe(true);
+    });
+
+    it('should return default accent colors for adventure groups', () => {
+      expect(component.defaultFallbackAccentColor).toBe('#00645c');
+      expect(component.defaultPracticeBgColor).toBe('#ecf7f6');
+      expect(component.defaultPracticeAccentColor).toBe('#0b776d');
+      expect(component.comingSoonAccentColor).toBe('#6b7280');
     });
   });
 });
