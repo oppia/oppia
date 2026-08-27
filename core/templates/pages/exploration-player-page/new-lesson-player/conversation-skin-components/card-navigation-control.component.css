@@ -12,7 +12,6 @@ oppia-progress-tracker {
   width: 375px;
 }
 
-<<<<<<< HEAD
 .card-navigation-control .oppia-learner-confirm-button {
   border-radius: 2px;
   font-size: 16px;
@@ -68,8 +67,6 @@ oppia-progress-tracker {
   cursor: default;
 }
 
-=======
->>>>>>> f53d1283c8 (moved sidebar to right side and changed the question card structure back to old lesson player)
 .card-navigation-control {
   background-color: white;
   height: 60px;
@@ -113,8 +110,8 @@ oppia-progress-tracker {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  margin: 0 auto;
   max-width: 850px;
-  transform: translateX(3%);
   width: 100%;
 }
 
@@ -169,7 +166,6 @@ oppia-progress-tracker {
 @media (max-width: 1024px) {
   .card-navigation-control .control-container {
     max-width: 790px;
-    transform: translateX(0);
   }
 }
 
