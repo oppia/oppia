@@ -726,7 +726,15 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "admin": {'
+                    '    "url": "http://localhost:8181/admin",'
+                    '    "page_module": '
+                    '"core/templates/pages/admin-page/admin-page.module.ts"'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
