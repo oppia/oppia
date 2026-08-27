@@ -272,13 +272,15 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         yarn_install_command = ['yarn', 'install', '--pure-lockfile']
         self.assertIn(yarn_install_command, self.all_cmd_tokens)
-        self.assertNotIn('--ignore-engines', yarn_install_command)
         yarn_install_index = self.all_cmd_tokens.index(yarn_install_command)
+        self.assertNotIn(
+            '--ignore-engines', self.all_cmd_tokens[yarn_install_index]
+        )
         yarn_install_env = self.all_envs[yarn_install_index]
         self.assertIsNotNone(yarn_install_env)
         assert yarn_install_env is not None
         expected_node_20_bin_path = os.path.join(
-            common.PLAYWRIGHT_NODE_PATH, 'bin'
+            common.LIGHTHOUSE_NODE_PATH, 'bin'
         )
         self.assertTrue(
             yarn_install_env['PATH'].startswith(
