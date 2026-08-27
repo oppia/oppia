@@ -648,7 +648,8 @@ describe('Opportunities List Component', () => {
     }));
 
     it('should self-correct totalPages in fetchAndLoadOpportunities when backend is exhausted', fakeAsync(() => {
-      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 4 pages.
+      component.dropdownPaginationEnabled = true;
+      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 5 pages.
       component.loadOpportunities = () =>
         Promise.resolve({
           opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10), // Only 10 actual items.
@@ -659,11 +660,12 @@ describe('Opportunities List Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.totalPages).toBe(1); // Self-corrected from 4 to 1.
+      expect(component.totalPages).toBe(1); // Self-corrected from 5 to 1.
       expect(component.opportunities.length).toBe(10);
     }));
 
     it('should self-correct totalPages and clamp activePageNumber in gotoPage', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
       component.loadOpportunitiesCount = () => Promise.resolve(25); // Predict 3 pages.
       component.loadOpportunities = () =>
         Promise.resolve({
@@ -691,6 +693,79 @@ describe('Opportunities List Component', () => {
       // Since we tried to go to page 3, it should clamp to page 2.
       expect(component.totalPages).toBe(2); // Self-corrected from 3 to 2.
       expect(component.activePageNumber).toBe(2); // Clamped from 3 to 2.
+    }));
+
+    it('should return correct page numbers', () => {
+      component.totalPages = 5;
+      expect(component.pageNumbers).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it('should clamp activePageNumber when self-correcting totalPages in fetchAndLoadOpportunities', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
+      component.activePageNumber = 5; // Start at page 5.
+      component.loadOpportunitiesCount = () => Promise.resolve(50); // Predict 5 pages.
+      component.loadOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10), // Only 10 items.
+          more: false, // End of dataset.
+        });
+
+      component.loadOpportunities = component.loadOpportunities.bind(component);
+      component.fetchAndLoadOpportunities();
+      tick();
+
+      expect(component.totalPages).toBe(1);
+      expect(component.activePageNumber).toBe(1); // Clamped from 5 to 1.
+    }));
+
+    it('should clamp activePageNumber in gotoPage when more is false and navigating out of bounds', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
+      component.opportunities = explorationOpportunitiesLoad1.slice(0, 10);
+      component.more = false;
+      component.totalPages = 1;
+
+      component.gotoPage(3);
+      tick();
+
+      expect(component.totalPages).toBe(1);
+      expect(component.activePageNumber).toBe(1); // Clamped to 1.
+    }));
+
+    it('should not clamp activePageNumber in gotoPage if dropdownPaginationEnabled is false', fakeAsync(() => {
+      component.dropdownPaginationEnabled = false;
+      component.opportunities = explorationOpportunitiesLoad1.slice(0, 10);
+      component.more = true;
+      component.loadMoreOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10),
+          more: false,
+        });
+
+      component.gotoPage(2);
+      tick();
+
+      expect(component.activePageNumber).toBe(2);
+      expect(component.opportunities.length).toBe(20);
+    }));
+
+    it('should hit the else branch in unpinOpportunity when indexInVisible is -1', fakeAsync(() => {
+      component.opportunities = explorationOpportunitiesLoad1
+        .slice(0, 10)
+        .map(opp => ({...opp}));
+      component.visibleOpportunities = []; // Force indexInVisible to be -1.
+
+      // Set it up as pinned.
+      component.opportunities[0].isPinned = true;
+
+      component.unpinOpportunity({
+        explorationId: component.opportunities[0].id as string,
+        topicName: component.opportunities[0].topicName,
+      });
+      tick();
+
+      expect(
+        component.opportunities[component.opportunities.length - 1].isPinned
+      ).toBe(false);
     }));
   });
 
@@ -1030,6 +1105,13 @@ describe('Opportunities List Component', () => {
       expect(component.opportunities[0].topicName).toBe('Topic 1');
 
       component.pinOpportunity({explorationId: 'id2', topicName: 'Topic 1'});
+
+      // Pin an opportunity that is not visible (to hit indexInVisible === -1).
+      component.visibleOpportunities = [];
+      component.pinOpportunity({explorationId: 'id3', topicName: 'Topic 1'});
+
+      // Pin an opportunity with same id but different topic name (to cover the || branch).
+      component.pinOpportunity({explorationId: 'id3', topicName: 'Topic 2'});
     }));
 
     it('should unpin an opportunity', fakeAsync(() => {
