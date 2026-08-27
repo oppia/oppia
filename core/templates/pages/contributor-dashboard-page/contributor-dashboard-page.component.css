@@ -45,7 +45,7 @@
 .oppia-dropdown-container {
   display: flex;
   margin-bottom: 20px;
-  width: 50%;
+  width: 75%;
 }
 .oppia-dropdown-row {
   display: flex;
@@ -67,7 +67,7 @@ button.oppia-autofocus:focus {
   align-items: flex-start;
   display: flex;
   flex-direction: column;
-  margin-left: 10%;
+  margin-left: 2%;
   width: 100%;
 }
 .oppia-opportunity-language-selector {
@@ -98,6 +98,8 @@ button.oppia-autofocus:focus {
   color: #009688;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 24px;
+  flex-shrink: 0;
+  white-space: nowrap;
   height: 30%;
   min-width: 0;
   padding-top: 10px;
