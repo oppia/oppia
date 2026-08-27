@@ -100,7 +100,7 @@ jobs:
     needs: [check_test_suites_to_run, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
+            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
@@ -337,52 +337,18 @@ jobs:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
 
-  lighthouse_accessibility_test:
-    needs: [check_test_suites_to_run]
-    if: ${{
-        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0
-        && github.event_name != 'merge_group'
-      }}
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: ${{ github.event_name == 'merge_group' }}
-      matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.suites }}
-    name: Lighthouse a11y (shard ${{ matrix.suite.name }})
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-        with:
-          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-      - name: Install Chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: ./.github/actions/install-chrome
-      - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
-        shell: bash
-        timeout-minutes: 45
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "A Lighthouse test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  lighthouse_performance_test:
+  lighthouse_test:
     needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{
-        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0
         && github.event_name != 'merge_group'
       }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.suites }}
-    name: Lighthouse perf (shard ${{ matrix.suite.name }})
+        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.suites }}
+    name: Lighthouse tests (shard ${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -401,9 +367,9 @@ jobs:
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
+      - name: Run Lighthouse checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        run: python -m scripts.run_lighthouse_tests --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
         timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
@@ -415,7 +381,7 @@ jobs:
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "A Lighthouse performance test failed on the upstream develop branch."
+          message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_workflow_statuses:
     # This job is needed because we cannot make each e2e/acceptance/lighthouse
@@ -426,8 +392,7 @@ jobs:
       - check_test_suites_to_run
       - e2e_test
       - acceptance_test
-      - lighthouse_accessibility_test
-      - lighthouse_performance_test
+      - lighthouse_test
       - setup_merge_sha
     if: always()
     runs-on: ubuntu-22.04
