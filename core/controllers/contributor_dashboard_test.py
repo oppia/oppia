@@ -1775,7 +1775,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None,
-                        'status': 'update_needed',
+                        'status': 'update',
                     }
                 },
                 'End State': {
