@@ -39,7 +39,6 @@ import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voic
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AlertsService} from 'services/alerts.service';
-import './voiceover-admin-page.component.css';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -52,7 +51,6 @@ export interface LanguageAccentDescriptionToCode {
 @Component({
   selector: 'oppia-voiceover-admin-page',
   templateUrl: './voiceover-admin-page.component.html',
-  styleUrls: ['./voiceover-admin-page.component.css'],
   providers: [NativeDateAdapter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

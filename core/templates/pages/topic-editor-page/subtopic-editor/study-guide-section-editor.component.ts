@@ -25,7 +25,6 @@ import {
   HtmlLengthService,
 } from 'services/html-length.service';
 import {AppConstants} from 'app.constants';
-import './study-guide-section-editor.component.css';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -40,7 +39,6 @@ interface Container {
 @Component({
   selector: 'oppia-study-guide-section-editor',
   templateUrl: './study-guide-section-editor.component.html',
-  styleUrls: ['./study-guide-section-editor.component.css'],
 })
 export class StudyGuideSectionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

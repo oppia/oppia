@@ -29,12 +29,11 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {FractionInputRulesService} from './fraction-input-rules.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
-import './fraction-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-fraction-input',
   templateUrl: './fraction-input-interaction.component.html',
-  styleUrls: ['./fraction-input-interaction.component.css'],
+  styleUrls: [],
 })
 export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

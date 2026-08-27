@@ -33,13 +33,11 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
-import {AppConstants} from 'app.constants';
 import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {OpportunitiesListComponent} from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
 import {OpportunitiesListItemComponent} from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationOpportunitiesComponent} from './translation-opportunities.component';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -82,7 +80,6 @@ class MockPlatformFeatureService {
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
   let translationLanguageService: TranslationLanguageService;
-  let translationTopicService: TranslationTopicService;
   let userService: UserService;
   let modalService: NgbModal;
   let component: TranslationOpportunitiesComponent;
@@ -151,7 +148,6 @@ describe('Translation opportunities component', () => {
       ContributionOpportunitiesService
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
-    translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
     spyOn(modalService, 'open').and.returnValue(translationModal);
@@ -255,27 +251,6 @@ describe('Translation opportunities component', () => {
       });
   });
 
-  it('should load translation opportunities count', fakeAsync(() => {
-    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      'en'
-    );
-    spyOn(translationTopicService, 'getActiveTopicName').and.returnValue(
-      'topic'
-    );
-    spyOn(
-      contributionOpportunitiesService,
-      'getTranslationOpportunitiesCountAsync'
-    ).and.returnValue(Promise.resolve(42));
-
-    let count = 0;
-    component.loadOpportunitiesCountAsync().then(c => {
-      count = c;
-    });
-    tick();
-
-    expect(count).toBe(42);
-  }));
-
   it(
     'should move opportunities with no translatable cards to the bottom ' +
       'of opportunity list',
@@ -307,7 +282,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          entityType: 'exploration',
         },
         {
           id: '1',
@@ -319,7 +294,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          entityType: 'exploration',
         },
       ]);
     }
@@ -352,7 +327,7 @@ describe('Translation opportunities component', () => {
         totalCount: 4,
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
-        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        entityType: 'exploration',
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -364,7 +339,7 @@ describe('Translation opportunities component', () => {
         totalCount: 10,
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
-        entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        entityType: 'exploration',
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -383,7 +358,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          entityType: 'exploration',
         },
         {
           id: '2',
@@ -395,7 +370,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
-          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          entityType: 'exploration',
         },
       ]);
     }
@@ -560,23 +535,4 @@ describe('Translation opportunities component', () => {
 
     expect(component.languageSelected).toBe(true);
   }));
-
-  it('should emit reloadOpportunitiesEventEmitter when activeEntityType changes', () => {
-    spyOn(
-      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
-      'emit'
-    );
-    component.ngOnChanges({
-      activeEntityType: {
-        currentValue: 'skill',
-        previousValue: 'exploration',
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    });
-
-    expect(
-      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
-    ).toHaveBeenCalled();
-  });
 });

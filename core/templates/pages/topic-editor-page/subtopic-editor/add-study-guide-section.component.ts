@@ -20,7 +20,6 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './add-study-guide-section.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -34,7 +33,6 @@ interface HtmlFormSchema {
 @Component({
   selector: 'oppia-add-study-guide-section-modal',
   templateUrl: './add-study-guide-section.component.html',
-  styleUrls: ['./add-study-guide-section.component.css'],
 })
 export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

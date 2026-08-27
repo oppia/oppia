@@ -19,12 +19,11 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {DragAndDropAnswer} from 'interactions/answer-defs';
-import './drag-and-drop-sort-input-short-response.component.css';
 
 @Component({
   selector: 'oppia-short-response-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-short-response.component.html',
-  styleUrls: ['./drag-and-drop-sort-input-short-response.component.css'],
+  styleUrls: [],
 })
 export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

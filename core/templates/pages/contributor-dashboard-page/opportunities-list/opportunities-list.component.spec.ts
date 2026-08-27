@@ -695,6 +695,11 @@ describe('Opportunities List Component', () => {
       expect(component.activePageNumber).toBe(2); // Clamped from 3 to 2.
     }));
 
+    it('should return correct page numbers', () => {
+      component.totalPages = 5;
+      expect(component.pageNumbers).toEqual([1, 2, 3, 4, 5]);
+    });
+
     it('should clamp activePageNumber when self-correcting totalPages in fetchAndLoadOpportunities', fakeAsync(() => {
       component.dropdownPaginationEnabled = true;
       component.activePageNumber = 5; // Start at page 5.

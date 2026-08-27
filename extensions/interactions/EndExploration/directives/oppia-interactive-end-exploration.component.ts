@@ -28,12 +28,11 @@ import {EndExplorationBackendApiService} from './end-exploration-backend-api.ser
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 
 import {ServicesConstants} from 'services/services.constants';
-import './end-exploration-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-end-exploration',
   templateUrl: './end-exploration-interaction.component.html',
-  styleUrls: ['./end-exploration-interaction.component.css'],
+  styleUrls: [],
 })
 export class InteractiveEndExplorationComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
