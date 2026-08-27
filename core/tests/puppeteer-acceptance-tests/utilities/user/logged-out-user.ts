@@ -6561,8 +6561,9 @@ export class LoggedOutUser extends BaseUser {
       ? await this.expectModalTitleToBe('Send Feedback to the Lessons Team')
       : await this.expectModalTitleToBe('Want to chat with our Lessons Team?');
     await this.expectElementToBeVisible(commonModalBodySelector);
-    if (isUserLoggedIn)
+    if (isUserLoggedIn) {
       await this.expectElementToBeVisible(feedbackModaltextarea);
+    }
   }
 
   /**
