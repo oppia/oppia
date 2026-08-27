@@ -303,6 +303,7 @@ describe('Certificate Assessment', function () {
       confirmSaveCertificateButton
     );
     await curriculumAdmin.expectToastMessage('Certificate created.');
+    await curriculumAdmin.page.keyboard.press('Escape');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -376,6 +377,7 @@ describe('Certificate Assessment', function () {
       confirmSaveCertificateButton
     );
     await curriculumAdmin.expectToastMessage('Certificate updated.');
+    await curriculumAdmin.page.keyboard.press('Escape');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
@@ -442,6 +444,7 @@ describe('Certificate Assessment', function () {
       confirmSaveCertificateButton
     );
     await curriculumAdmin.expectToastMessage('Certificate updated.');
+    await curriculumAdmin.page.keyboard.press('Escape');
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
       'Certificate Creator Dashboard'
