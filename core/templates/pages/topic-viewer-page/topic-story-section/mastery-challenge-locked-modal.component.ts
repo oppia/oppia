@@ -30,7 +30,7 @@ import './mastery-challenge-locked-modal.component.css';
   styleUrls: ['./mastery-challenge-locked-modal.component.css'],
 })
 export class MasteryChallengeLockedModalComponent extends ConfirmOrCancelModal {
-  protected bottomSheetRef: MatBottomSheetRef | undefined;
+  bottomSheetRef: MatBottomSheetRef | undefined;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     @Optional() bottomSheetRef: MatBottomSheetRef | null

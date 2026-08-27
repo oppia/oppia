@@ -185,7 +185,7 @@ export class TopicStorySectionComponent
   private adventureMasteredModalRef: NgbModalRef | null = null;
 
   private practiceAvailabilityRequestId: number = 0;
-  private practiceAvailabilityPending: Promise<void> | null = null;
+  practiceAvailabilityPending: Promise<void> | null = null;
   private directiveSubscriptions: Subscription = new Subscription();
 
   isAdventureExpanded(index: number): boolean {

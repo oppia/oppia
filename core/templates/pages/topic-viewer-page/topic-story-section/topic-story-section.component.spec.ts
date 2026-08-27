@@ -4451,4 +4451,449 @@ describe('TopicStorySectionComponent', () => {
       expect(component.comingSoonAccentColor).toBe('#6b7280');
     });
   });
+
+  describe('onArcSkipConfirmationProceed with startUrl', () => {
+    it('should navigate via location.assign when startUrl is set', fakeAsync(() => {
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+          {
+            id: 'arc_2',
+            title: 'Adventure 2',
+            description: 'Second adventure',
+            node_ids: ['node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.ngOnInit();
+
+      component.onNavigationLessonSelected({
+        lessonNumber: 2,
+        adventureIndex: 1,
+      });
+      Reflect.set(component, 'pendingStartUrl', '/explore/exp_2');
+
+      component.onArcSkipConfirmationProceed();
+
+      expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+        '/explore/exp_2'
+      );
+      tick(300);
+    }));
+
+    it('should not navigate when startUrl is empty', fakeAsync(() => {
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+          {
+            id: 'arc_2',
+            title: 'Adventure 2',
+            description: 'Second adventure',
+            node_ids: ['node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.ngOnInit();
+
+      component.onNavigationLessonSelected({
+        lessonNumber: 2,
+        adventureIndex: 1,
+      });
+
+      component.onArcSkipConfirmationProceed();
+
+      expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalledWith(
+        '/explore/exp_2'
+      );
+      tick(300);
+    }));
+
+    it('should expand the target adventure and mark earlier ones skipped', fakeAsync(() => {
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+          {
+            id: 'arc_2',
+            title: 'Adventure 2',
+            description: 'Second adventure',
+            node_ids: ['node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.ngOnInit();
+
+      component.onNavigationLessonSelected({
+        lessonNumber: 2,
+        adventureIndex: 1,
+      });
+
+      component.onArcSkipConfirmationProceed();
+
+      expect(component.isAdventureSkipped(0)).toBe(true);
+      expect(component.isAdventureExpanded(1)).toBe(true);
+      expect(component.activeLessonNumber).toBe(2);
+      expect(component.navigatedLessonNumber).toBe(2);
+      tick(300);
+    }));
+  });
+
+  describe('onLessonStartClick end-to-end with skip confirm', () => {
+    it('should open skip modal and navigate on proceed', fakeAsync(() => {
+      windowDimensionsService.getWidth.and.returnValue(1024);
+      const storyNodeSpy1 = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      const storyNodeSpy2 = createStoryNodeSpy(
+        'Node 2',
+        'Desc 2',
+        'exp_2',
+        'node_2',
+        null
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node 1', 'Node 2'],
+        [storyNodeSpy1, storyNodeSpy2],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+          {
+            id: 'arc_2',
+            title: 'Adventure 2',
+            description: 'Second adventure',
+            node_ids: ['node_2'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.ngOnInit();
+
+      let resolveModal!: () => void;
+      const mockModalRef = {
+        result: new Promise<void>(resolve => {
+          resolveModal = resolve;
+        }),
+        componentInstance: {},
+      };
+      ngbModal.open.and.returnValue(mockModalRef as NgbModalRef);
+
+      component.onLessonStartClick({
+        lessonNumber: 2,
+        startUrl: '/explore/exp_2',
+      });
+
+      expect(ngbModal.open).toHaveBeenCalled();
+
+      resolveModal();
+      tick();
+
+      expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+        '/explore/exp_2'
+      );
+      expect(component.activeLessonNumber).toBe(2);
+      expect(component.navigatedLessonNumber).toBe(2);
+      tick(300);
+    }));
+
+    it('should navigate directly when lesson is in current adventure', fakeAsync(() => {
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node 1',
+        'Desc 1',
+        'exp_1',
+        'node_1',
+        null
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node 1'],
+        [storyNodeSpy],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+      component.ngOnInit();
+
+      component.onLessonStartClick({
+        lessonNumber: 1,
+        startUrl: '/explore/exp_1',
+      });
+
+      expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+        '/explore/exp_1'
+      );
+      expect(component.activeLessonNumber).toBe(1);
+      expect(component.navigatedLessonNumber).toBe(1);
+      tick(300);
+    }));
+  });
+
+  describe('onAdventureMasteredContinue edge cases', () => {
+    it('should not change lesson numbers when next adventure has empty lessonCards', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+        createAdventureGroup('Adventure 2', []),
+      ];
+      component.masteredAdventureIndex = 0;
+
+      component.onAdventureMasteredContinue();
+
+      expect(component.isAdventureExpanded(0)).toBe(false);
+      expect(component.isAdventureExpanded(1)).toBe(true);
+      expect(component.activeLessonNumber).toBeNull();
+      expect(component.navigatedLessonNumber).toBeNull();
+      expect(component.masteredAdventureIndex).toBeNull();
+    });
+
+    it('should set hasHandledArcMasteredQueryParams to true', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+      ];
+      component.masteredAdventureIndex = 0;
+
+      component.onAdventureMasteredContinue();
+
+      expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+        true
+      );
+    });
+
+    it('should set navigatedLessonNumber on continue', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+        createAdventureGroup('Adventure 2', [
+          createLessonCard(2, 'not_started'),
+          createLessonCard(3, 'not_started'),
+        ]),
+      ];
+      component.masteredAdventureIndex = 0;
+
+      component.onAdventureMasteredContinue();
+
+      expect(component.navigatedLessonNumber).toBe(2);
+    });
+  });
+
+  describe('getAdventureMasteredSubtitle edge cases', () => {
+    it('should return all complete subtitle when no more adventures exist', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+      ];
+      component.masteredAdventureIndex = 0;
+
+      expect(component.getAdventureMasteredSubtitle()).toBe(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+      );
+    });
+
+    it('should return unlocked subtitle when next adventure exists', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+        createAdventureGroup('Adventure 2', [
+          createLessonCard(2, 'not_started'),
+        ]),
+      ];
+      component.masteredAdventureIndex = 0;
+
+      expect(component.getAdventureMasteredSubtitle()).toBe(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE'
+      );
+    });
+
+    it('should return momentum subtitle when masteredAdventureIndex is null', () => {
+      component.masteredAdventureIndex = null;
+
+      expect(component.getAdventureMasteredSubtitle()).toBe(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+      );
+    });
+  });
+
+  describe('getArcSkipConfirmationMessage edge cases', () => {
+    it('should return empty string when pendingAdventureIndex is null', () => {
+      Reflect.set(component, 'pendingNavigationAdventureIndex', null);
+
+      expect(component.getArcSkipConfirmationMessage()).toBe('');
+    });
+
+    it('should return empty string when all earlier adventures are completed', () => {
+      component.visibleAdventureGroups = [
+        createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+        createAdventureGroup('Adventure 2', [
+          createLessonCard(2, 'not_started'),
+        ]),
+      ];
+      Reflect.set(component, 'pendingNavigationAdventureIndex', 1);
+
+      expect(component.getArcSkipConfirmationMessage()).toBe('');
+    });
+  });
+
+  describe('checkIfQuestionsExist error handling', () => {
+    it('should handle fetchTotalQuestionCount failure gracefully', async () => {
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync.and.rejectWith(
+        new Error('Network error')
+      );
+      const storyNodeSpy = createStoryNodeSpy(
+        'Node title 1',
+        'Node description 1',
+        'exp_1',
+        'node_1',
+        'thumb.png',
+        {acquiredSkillIds: ['skill_1']}
+      );
+      component.storySummary = createStorySummarySpy(
+        ['Node title 1'],
+        [storyNodeSpy],
+        [
+          {
+            id: 'arc_1',
+            title: 'Adventure 1',
+            description: 'First adventure',
+            node_ids: ['node_1'],
+          },
+        ]
+      );
+
+      component.ngOnInit();
+      await fixture.whenStable();
+
+      expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
+    });
+  });
+
+  describe('selectLessonFromNavigation with adventureIndex -1', () => {
+    it('should not expand any adventure when adventureIndex is -1', fakeAsync(() => {
+      component.onNavigationLessonSelected({
+        lessonNumber: 1,
+        adventureIndex: -1,
+      });
+
+      expect(component.activeLessonNumber).toBe(1);
+      expect(component.navigatedLessonNumber).toBe(1);
+      tick(300);
+    }));
+  });
+
+  describe('ngOnChanges for practiceSubtopicIds', () => {
+    it('should update practiceCard when practiceSubtopicIds changes', () => {
+      component.practiceSubtopicIds = [1];
+      component.classroomUrlFragment = 'math';
+      component.topicUrlFragment = 'topic';
+
+      component.ngOnChanges({
+        practiceSubtopicIds: new SimpleChange([1], [2], false),
+      });
+
+      expect(component.practiceCard).toBeDefined();
+    });
+  });
+
+  describe('joinAdventureNumbers', () => {
+    it('should return single number as string', () => {
+      const result = (
+        component as unknown as {joinAdventureNumbers: (n: number[]) => string}
+      ).joinAdventureNumbers([1]);
+      expect(result).toBe('1');
+    });
+
+    it('should join two numbers with AND conjunction', () => {
+      const result = (
+        component as unknown as {joinAdventureNumbers: (n: number[]) => string}
+      ).joinAdventureNumbers([1, 2]);
+      expect(result).toContain('1');
+      expect(result).toContain('2');
+    });
+
+    it('should join three numbers with comma AND conjunction', () => {
+      const result = (
+        component as unknown as {joinAdventureNumbers: (n: number[]) => string}
+      ).joinAdventureNumbers([1, 2, 3]);
+      expect(result).toContain('1');
+      expect(result).toContain('2');
+      expect(result).toContain('3');
+    });
+  });
 });
