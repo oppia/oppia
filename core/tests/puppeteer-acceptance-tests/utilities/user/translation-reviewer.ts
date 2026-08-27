@@ -429,7 +429,7 @@ export class TranslationReviewer extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, previousContent: string) => {
         const element = document.querySelector(selector);
-        return element !== null && element.textContent !== previousContent;
+        return element === null || element.textContent !== previousContent;
       },
       {},
       reviewContentContainerSelector,

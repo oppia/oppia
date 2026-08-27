@@ -8410,7 +8410,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     throw new Error(
-      `No lesson tile titled "${title}" was found. Titles found: ${titlesFound}.`
+      `The lesson tile titled "${title}" was not found. Tiles found: ${titlesFound.join(', ')}`
     );
   }
 }

@@ -231,6 +231,7 @@ describe('Logged-out User', function () {
   it('should show the translated lesson title and objective in the community library', async function () {
     await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
     await loggedOutUser.navigateToCommunityLibraryPage();
+    await loggedOutUser.searchForLessonInSearchBar(EXPLORATION_TITLE);
 
     await loggedOutUser.expectLessonTileToShow(HINDI_TITLE, HINDI_OBJECTIVE);
   });
