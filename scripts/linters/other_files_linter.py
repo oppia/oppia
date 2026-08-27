@@ -79,6 +79,39 @@ ROUTE_KEY_REGEX: Final = (
 
 MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
 
+
+def _extract_top_level_route_objects(content: str) -> List[str]:
+    """Returns each top-level (outermost) balanced curly-brace group.
+
+    Route objects in app.routing.module.ts are object literals that follow a
+    `PAGES_REGISTERED_WITH_FRONTEND.<KEY>.ROUTE` path. Scanning for balanced
+    braces keeps each route object's key and its lazy import together even
+    when the object contains nested object literals (such as a data block) or
+    a block-bodied loadChildren.
+
+    Args:
+        content: str. The normalized routing module source.
+
+    Returns:
+        list(str). The text of each outermost balanced {...} group, in
+        source order.
+    """
+    route_objects = []
+    start_index = -1
+    depth = 0
+    for index, char in enumerate(content):
+        if char == '{':
+            if depth == 0:
+                start_index = index
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0 and start_index != -1:
+                route_objects.append(content[start_index : index + 1])
+                start_index = -1
+    return route_objects
+
+
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
@@ -468,28 +501,20 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 page_module = page_module[:-3]
             lh_modules.add(os.path.normpath(page_module))
 
-        # Parse each route block to find the key and its associated
-        # module import path. Splitting on '{' captures each route
-        # object as a block.
+        # Parse each route object to find its key and associated module
+        # import path. Splitting on every '{' would break routes that
+        # contain nested object literals (e.g. a data object) or a
+        # block-bodied loadChildren, because the key and its import could
+        # be placed in separate fragments. Instead, extract each top-level
+        # route object as a whole so the key and its import always stay
+        # together.
         key_to_modules: Dict[str, List[str]] = {}
-        route_blocks = re.split(r'\{', normalized)
-        for block in route_blocks:
-            key_match = re.search(ROUTE_KEY_REGEX, block)
+        for route_object in _extract_top_level_route_objects(normalized):
+            key_match = re.search(ROUTE_KEY_REGEX, route_object)
             if not key_match:
                 continue
             key = key_match.group(1)
-            import_matches = re.findall(MODULE_IMPORT_REGEX, block)
-            if import_matches:
-                key_to_modules.setdefault(key, []).extend(import_matches)
-
-        # Also check routes pushed dynamically (via routes.push).
-        push_blocks = re.split(r'routes\.push\(', normalized)
-        for block in push_blocks:
-            key_match = re.search(ROUTE_KEY_REGEX, block)
-            if not key_match:
-                continue
-            key = key_match.group(1)
-            import_matches = re.findall(MODULE_IMPORT_REGEX, block)
+            import_matches = re.findall(MODULE_IMPORT_REGEX, route_object)
             if import_matches:
                 key_to_modules.setdefault(key, []).extend(import_matches)
 
