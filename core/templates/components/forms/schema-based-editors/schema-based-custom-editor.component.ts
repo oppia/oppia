@@ -38,10 +38,12 @@ import {
   CustomSchema,
   SchemaDefaultValue,
 } from 'services/schema-default-value.service';
+import './schema-based-custom-editor.component.css';
 
 @Component({
   selector: 'schema-based-custom-editor',
   templateUrl: './schema-based-custom-editor.component.html',
+  styleUrls: ['./schema-based-custom-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

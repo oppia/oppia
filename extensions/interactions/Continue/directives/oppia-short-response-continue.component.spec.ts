@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Continue button response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {OppiaShortResponseContinueComponent} from './oppia-short-response-continue.component';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -30,7 +30,7 @@ describe('OppiaShortResponseContinueComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [OppiaShortResponseContinueComponent],
       providers: [

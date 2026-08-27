@@ -19,6 +19,7 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {SuperAdmin} from '../../utilities/user/super-admin';
+import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import testConstants from '../../utilities/common/test-constants';
 import {showMessage} from '../../utilities/common/show-message';
 
@@ -28,15 +29,32 @@ const NUM_OF_DUMMY_BLOGS = 30;
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
   let superAdmin: SuperAdmin;
+  let blogPostEditor: BlogPostEditor;
 
   beforeAll(async function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
+    await loggedOutUser.page.setDefaultNavigationTimeout(60000);
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    blogPostEditor = await UserFactory.createNewUser(
+      'blogPostEditor',
+      'blog_post_editor@example.com',
+      [testConstants.Roles.BLOG_POST_EDITOR]
+    );
 
     const isInProdMode = await superAdmin.isInProdMode();
     if (!isInProdMode) {
       await superAdmin.navigateToAdminPageActivitiesTab();
       await superAdmin.generateDummyBlogPosts(NUM_OF_DUMMY_BLOGS);
+
+      await blogPostEditor.openBlogEditorPage();
+      await blogPostEditor.uploadBlogPostThumbnailImage();
+      await blogPostEditor.updateBlogPostTitle('Recipe Post');
+      await blogPostEditor.updateBodyTextTo(
+        'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.'
+      );
+      await blogPostEditor.selectTag('News');
+      await blogPostEditor.saveBlogBodyChanges();
+      await blogPostEditor.publishTheBlogPost();
     } else {
       showMessage(
         'The application is currently running in production mode. Skipping dummy blog post generation.'
@@ -45,6 +63,9 @@ describe('Logged-out User', function () {
       // tests for Blog Admin and Blog Post Editor.
       process.exit(0);
     }
+
+    await UserFactory.closeBrowserForUser(superAdmin);
+    await UserFactory.closeBrowserForUser(blogPostEditor);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
@@ -84,6 +105,15 @@ describe('Logged-out User', function () {
     async function () {
       await loggedOutUser.filterBlogPostsByKeyword('Education');
       await loggedOutUser.expectBlogSearchResultsToContain('Education');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should be able to search blog posts by body content',
+    async function () {
+      await loggedOutUser.filterBlogPostsByKeyword('Pineapple');
+      await loggedOutUser.expectBlogSearchResultsToContain('Recipe Post');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

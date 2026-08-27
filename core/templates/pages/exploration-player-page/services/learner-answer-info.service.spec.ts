@@ -35,7 +35,7 @@ describe('Learner answer info service', () => {
   let firstState: State;
   let secondState: State;
   let thirdState: State;
-  let tirs: InteractionRulesService;
+  let tirs: TextInputRulesService;
   let mockAnswer: string;
   let ladbas: LearnerAnswerDetailsBackendApiService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
@@ -160,18 +160,20 @@ describe('Learner answer info service', () => {
       solicit_answer_details: true,
       card_is_checkpoint: false,
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
       classifier_model_id: '',
     };
 
-    learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
-    answerClassificationService = TestBed.get(AnswerClassificationService);
-    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
+    learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
+    ladbas = TestBed.inject(LearnerAnswerDetailsBackendApiService);
     DEFAULT_OUTCOME_CLASSIFICATION =
       ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
     firstState = State.createFromBackendDict('new state', stateDict);
     secondState = State.createFromBackendDict('fake state', stateDict);
     thirdState = State.createFromBackendDict('demo state', stateDict);
-    tirs = TestBed.get(TextInputRulesService);
+    tirs = TestBed.inject(TextInputRulesService) as InteractionRulesService &
+      TextInputRulesService;
 
     spyOn(
       answerClassificationService,
@@ -200,8 +202,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
     });
 
@@ -230,8 +231,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
     });
 
@@ -247,8 +247,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false
@@ -263,8 +262,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
     });
 
@@ -282,8 +280,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
     });
     it('should return can ask learner for answer info false', () => {
@@ -299,8 +296,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
     });
 
@@ -323,16 +319,14 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10',
         secondState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
@@ -342,8 +336,7 @@ describe('Learner answer info service', () => {
         '10',
         thirdState,
         mockAnswer,
-        tirs,
-        false
+        tirs as InteractionRulesService & TextInputRulesService
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false

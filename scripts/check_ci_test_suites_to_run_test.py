@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import subprocess
@@ -211,17 +212,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'name': 'blog-admin/assign-roles',
                                 'module': 'blog-admin/assign-roles.spec.ts',
+                                'framework': 'puppeteer',
                             },
                             {
                                 'name': 'blog-editor/publish',
                                 'module': 'blog-editor/publish.spec.ts',
+                                'framework': 'puppeteer',
                             },
-                        ],
-                        'docker_suites': [
                             {
                                 'name': 'exploration-player/view-exploration',
                                 'module': 'exploration-player/view-exploration.spec.ts',
-                            }
+                                'framework': 'playwright',
+                            },
                         ],
                     }
                 )
@@ -358,31 +360,37 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
         self.all_test_suites = {
             'acceptance': {
-                'docker': {
-                    'count': 1,
-                    'suites': [
-                        {
-                            'name': 'exploration-player/view-exploration',
-                            'module': 'exploration-player/view-exploration.spec.ts',
-                            'environment': 'docker',
-                        }
-                    ],
-                },
-                'python': {
-                    'count': 2,
-                    'suites': [
-                        {
-                            'name': 'blog-admin/assign-roles',
-                            'module': 'blog-admin/assign-roles.spec.ts',
-                        },
-                        {
-                            'name': 'blog-editor/publish',
-                            'module': 'blog-editor/publish.spec.ts',
-                        },
-                    ],
-                },
+                'count': 3,
+                'suites': [
+                    {
+                        'name': 'blog-admin/assign-roles',
+                        'module': 'blog-admin/assign-roles.spec.ts',
+                        'framework': 'puppeteer',
+                    },
+                    {
+                        'name': 'blog-editor/publish',
+                        'module': 'blog-editor/publish.spec.ts',
+                        'framework': 'puppeteer',
+                    },
+                    {
+                        'name': 'exploration-player/view-exploration',
+                        'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
+                    },
+                ],
+            },
+            'acceptance_playwright': {
+                'count': 1,
+                'suites': [
+                    {
+                        'name': 'exploration-player/view-exploration',
+                        'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
+                    },
+                ],
             },
             'e2e': {
+                'count': 3,
                 'suites': [
                     {'name': 'accessibility', 'module': 'accessibility.js'},
                     {
@@ -394,9 +402,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'module': 'additionalEditorFeaturesModals.js',
                     },
                 ],
-                'count': 3,
             },
             'lighthouse_accessibility': {
+                'count': 2,
                 'suites': [
                     {
                         'name': '1',
@@ -411,9 +419,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                     },
                 ],
-                'count': 2,
             },
             'lighthouse_performance': {
+                'count': 2,
                 'suites': [
                     {
                         'name': '1',
@@ -428,7 +436,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                     },
                 ],
-                'count': 2,
             },
         }
 
@@ -574,59 +581,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     'core/templates/pages/Base.ts',
                 ]
             )
-        )
-
-    def test_split_tests_by_docker(self) -> None:
-        suites_to_split: check_ci_test_suites_to_run.CITestSuitesDict = {
-            'count': 3,
-            'suites': [
-                {
-                    'name': 'suite1',
-                    'module': 'module1',
-                    'environment': 'python',
-                },
-                {
-                    'name': 'suite2',
-                    'module': 'module2',
-                    'environment': 'python',
-                },
-                {
-                    'name': 'suite3',
-                    'module': 'module3',
-                    'environment': 'docker',
-                },
-            ],
-        }
-
-        self.assertEqual(
-            check_ci_test_suites_to_run.split_tests_by_docker(suites_to_split),
-            {
-                'docker': {
-                    'count': 1,
-                    'suites': [
-                        {
-                            'name': 'suite3',
-                            'module': 'module3',
-                            'environment': 'docker',
-                        }
-                    ],
-                },
-                'python': {
-                    'count': 2,
-                    'suites': [
-                        {
-                            'name': 'suite1',
-                            'module': 'module1',
-                            'environment': 'python',
-                        },
-                        {
-                            'name': 'suite2',
-                            'module': 'module2',
-                            'environment': 'python',
-                        },
-                    ],
-                },
-            },
         )
 
     def test_get_lighthouse_pages_from_config(self) -> None:
@@ -804,16 +758,20 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'count': 0, 'suites': []},
-                                    'python': {'count': 0, 'suites': []},
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_accessibility': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_performance': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                             },
                         )
@@ -872,19 +830,27 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {
-                                        'count': 1,
-                                        'suites': [
-                                            {
-                                                'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
-                                                'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
-                                                'environment': 'docker',
-                                            }
-                                        ],
-                                    },
-                                    'python': {'count': 0, 'suites': []},
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
+                                            'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
+                                        }
+                                    ],
                                 },
                                 'lighthouse_performance': {
+                                    'count': 1,
                                     'suites': [
                                         {
                                             'name': '1',
@@ -898,9 +864,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             ],
                                         }
                                     ],
-                                    'count': 1,
                                 },
                                 'lighthouse_accessibility': {
+                                    'count': 1,
                                     'suites': [
                                         {
                                             'name': '1',
@@ -914,7 +880,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             ],
                                         }
                                     ],
-                                    'count': 1,
                                 },
                             },
                         )
@@ -945,25 +910,32 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {
-                                        'suites': [
-                                            {
-                                                'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
-                                                'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
-                                                'environment': 'docker',
-                                            }
-                                        ],
-                                        'count': 1,
-                                    },
-                                    'python': {'count': 0, 'suites': []},
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
+                                            'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
+                                        }
+                                    ],
                                 },
                                 'lighthouse_accessibility': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_performance': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                             },
                         )
@@ -992,14 +964,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'suites': [], 'count': 0},
-                                    'python': {'suites': [], 'count': 0},
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_accessibility': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_performance': {
+                                    'count': 2,
                                     'suites': [
                                         {
                                             'name': '1',
@@ -1018,7 +995,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             ],
                                         },
                                     ],
-                                    'count': 2,
                                 },
                             },
                         )
@@ -1035,6 +1011,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 {
                     'name': 'blog-admin/create-blog-post',
                     'module': 'blog-admin/create-blog-post.spec.ts',
+                    'framework': 'puppeteer',
                 }
             )
 
@@ -1062,24 +1039,48 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'count': 0, 'suites': []},
-                                    'python': {
-                                        'suites': [
-                                            {
-                                                'name': 'blog-admin/create-blog-post',  # pylint: disable=line-too-long
-                                                'module': 'blog-admin/create-blog-post.spec.ts',  # pylint: disable=line-too-long
-                                            }
-                                        ],
-                                        'count': 1,
-                                    },
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'blog-admin/create-blog-post',  # pylint: disable=line-too-long
+                                            'module': 'blog-admin/create-blog-post.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'puppeteer',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_accessibility': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_performance': {
-                                    'suites': [],
                                     'count': 0,
+                                    'suites': [],
                                 },
                             },
                         )
+
+    def test_output_variable_to_github_workflow_without_github_output(
+        self,
+    ) -> None:
+        """Test output_variable_to_github_workflow when GITHUB_OUTPUT is missing."""
+        output: List[str] = []
+
+        def mock_print(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(os, 'environ', {}):
+            with self.swap(builtins, 'print', mock_print):
+                check_ci_test_suites_to_run.output_variable_to_github_workflow(
+                    'variable', 'value'
+                )
+
+        self.assertEqual(len(output), 2)
+        self.assertEqual(
+            output[0],
+            'Cannot find GITHUB_OUTPUT in os.environ. Outputting to stdout instead:',
+        )
+        self.assertEqual(output[1], 'variable=value')

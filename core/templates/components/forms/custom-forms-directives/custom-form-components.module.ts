@@ -16,7 +16,6 @@
  * @fileoverview Module for the Custom Form components.
  */
 
-import 'core-js/es7/reflect';
 import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
@@ -25,9 +24,9 @@ import {NgbTooltipModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
 import {MaterialModule} from 'modules/material.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
-import {ImageReceiverComponent} from './image-receiver.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
+import {ImageReceiverModule} from './image-receiver.module';
 
 @NgModule({
   imports: [
@@ -38,11 +37,10 @@ import {RouterModule} from '@angular/router';
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ImageReceiverModule,
     SharedPipesModule,
     TranslateModule,
   ],
-  declarations: [ImageReceiverComponent],
-  entryComponents: [ImageReceiverComponent],
-  exports: [ImageReceiverComponent],
+  exports: [ImageReceiverModule],
 })
 export class CustomFormsComponentsModule {}

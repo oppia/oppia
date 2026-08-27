@@ -16,7 +16,12 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -60,7 +65,7 @@ class MockRouterService {
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }

@@ -18,16 +18,23 @@
 
 from __future__ import annotations
 
-import datetime
 import json
 import os
+import uuid
+from types import SimpleNamespace
 
-from core import feconf, schema_utils, utils
-from core.constants import constants
-from core.domain import exp_domain, exp_services
+from core import constants, feconf, schema_utils
+from core.domain import exp_domain, exp_fetchers, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
+    story_domain,
+    story_services,
+    suggestion_services,
+    taskqueue_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
     translation_domain,
     translation_fetchers,
     voiceover_domain,
@@ -42,21 +49,30 @@ from typing import Dict, List, Sequence, Tuple
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        cloud_task_models,
         email_models,
         exp_models,
+        opportunity_models,
         translation_models,
         voiceover_models,
     )
 
-(exp_models, email_models, voiceover_models, translation_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.EMAIL,
-            models.Names.VOICEOVER,
-            models.Names.TRANSLATION,
-        ]
-    )
+(
+    cloud_task_models,
+    exp_models,
+    opportunity_models,
+    email_models,
+    voiceover_models,
+    translation_models,
+) = models.Registry.import_models(
+    [
+        models.Names.CLOUD_TASK,
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.EMAIL,
+        models.Names.VOICEOVER,
+        models.Names.TRANSLATION,
+    ]
 )
 
 
@@ -316,7 +332,6 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                 'exp_id_1', 'exploration', 1, 'en'
             )
         )
-
         self.assertEqual(len(retrieved_entity_voiceovers), 2)
 
     def test_should_compute_entity_voiceovers_model_successfully(self) -> None:
@@ -483,7 +498,14 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'content_id': 'content_0',
                 }
-            )
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'mark_voiceovers_needs_update',
+                    'language_code': 'hi',
+                    'content_id': 'content_0',
+                }
+            ),
         ]
 
         entity_voiceovers_models = (
@@ -519,7 +541,7 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         assert auto_voiceover is not None
 
         self.assertTrue(manual_voiceover.needs_update)
-        self.assertFalse(auto_voiceover.needs_update)
+        self.assertTrue(auto_voiceover.needs_update)
 
     def test_should_remove_entity_voiceovers(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -571,7 +593,14 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'content_id': 'content_0',
                 }
-            )
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'remove_voiceovers',
+                    'language_code': 'hi',
+                    'content_id': 'content_0',
+                }
+            ),
         ]
 
         entity_voiceovers_models = (
@@ -593,11 +622,8 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                 'exploration', 'exp_id_1', 2, 'en-US'
             )
         )
-
-        self.assertIsNone(
-            retrieved_entity_voiceovers.voiceovers_mapping['content_0'][
-                'manual'
-            ]
+        self.assertNotIn(
+            'content_0', retrieved_entity_voiceovers.voiceovers_mapping
         )
 
     def test_should_get_entity_voiceovers_for_reverted_version(self) -> None:
@@ -764,6 +790,67 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(autogeneratable_accents_for_hindi, [])
 
+    def test_get_new_auto_voiceover_accent_returns_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': True},
+            'hi': {'hi-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertEqual(new_accent_code, 'en-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_enabled_existing_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertEqual(new_accent_code, 'hi-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_none_when_no_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertIsNone(new_accent_code)
+
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """Unit tests to validate the language-accent information saved as
@@ -771,10 +858,9 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """
 
     def test_get_language_accent_master_list_works_correctly(self) -> None:
-        file_path = os.path.join(
-            feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
-        )
-        with utils.open_file(file_path, 'r') as f:
+        file_path = os.path.join('assets', 'language_accent_master_list.json')
+
+        with open(file_path, 'r', encoding='utf-8') as f:
             language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
                 f.read()
             )
@@ -791,10 +877,10 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         file_path = os.path.join(
-            feconf.VOICEOVERS_DATA_DIR,
+            'assets',
             'autogeneratable_language_accent_list.json',
         )
-        with utils.open_file(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
                 json.loads(f.read())
             )
@@ -885,13 +971,13 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         ) in voiceover_services.get_language_accent_master_list().values():
             for lang_accent_code in accent_code_to_description.keys():
                 language_accent_master_list.append(lang_accent_code)
-        autogeneratable_langauge_accent_codes = list(
+        autogeneratable_language_accent_codes = list(
             voiceover_services.get_autogeneratable_language_accent_list().keys()
         )
 
         self.assertTrue(
             set(language_accent_master_list).issuperset(
-                set(autogeneratable_langauge_accent_codes)
+                set(autogeneratable_language_accent_codes)
             )
         )
 
@@ -916,6 +1002,31 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             expected_language_code,
         )
 
+    def test_validate_language_accent_code_for_autogeneration(self) -> None:
+        invalid_accent_code = 'en-XX'
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        # Here we use MyPy ignore because here we assign type int to
+        # type str. This is done to test the validation of the
+        # is_accent_code_valid_for_autogeneration method.
+        invalid_accent_code = 5  # type: ignore[assignment]
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        valid_accent_code = 'en-US'
+        self.assertTrue(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                valid_accent_code
+            )
+        )
+
 
 class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     """Test class to verify voiceover regeneration across various scenarios,
@@ -925,7 +1036,13 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.committer_1_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.old_content_html = '<p>old content html</p>'
         self.new_content_html = '<p>new content html</p>'
@@ -970,12 +1087,8 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         exploration_id = 'exp_id_1'
-        exploration_title = 'Test Exploration'
         exploration_version = 2
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-
-        date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
@@ -998,7 +1111,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1013,18 +1126,34 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
-            voiceover_services,
-            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
-            self.mock_send_email_to_voiceover_admins_and_tech_leads,
-        ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
-                exploration_id=exploration_id,
-                exploration_title=exploration_title,
-                exploration_version=exploration_version,
-                author_id=author_id,
-                date_time=date_time,
-            )
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                voiceover_services.regenerate_voiceovers_for_batch_contents(
+                    exploration_id,
+                    parent_cloud_task_model_id,
+                    cloud_run.task_run_id,
+                )
 
         entity_voiceovers_models = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1042,11 +1171,8 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
 
     def test_should_regenerate_voiceover_for_translation_update(self) -> None:
         exploration_id = 'exp_id_1'
-        exploration_title = 'Test Exploration'
         exploration_version = 2
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
@@ -1066,7 +1192,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     ).to_dict(),
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1081,18 +1207,34 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
-            voiceover_services,
-            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
-            self.mock_send_email_to_voiceover_admins_and_tech_leads,
-        ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
-                exploration_id=exploration_id,
-                exploration_title=exploration_title,
-                exploration_version=exploration_version,
-                author_id=author_id,
-                date_time=date_time,
-            )
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                voiceover_services.regenerate_voiceovers_for_batch_contents(
+                    exploration_id,
+                    parent_cloud_task_model_id,
+                    cloud_run.task_run_id,
+                )
 
         entity_voiceovers_models = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1108,10 +1250,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         exploration_id = 'exp_id_1'
-        exploration_title = 'Test Exploration'
         exploration_version = 2
-        author_id = 'nik'
-        date_time = datetime.datetime.utcnow().isoformat()
 
         error = (
             'Could not fetch change diff for exploration %s, version %s during '
@@ -1119,24 +1258,29 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             % (exploration_id, str(exploration_version))
         )
 
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+
         with self.assertRaisesRegex(Exception, error):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
-                exploration_id=exploration_id,
-                exploration_title=exploration_title,
-                exploration_version=exploration_version,
-                author_id=author_id,
-                date_time=date_time,
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
+                exploration_id, exploration_version, parent_cloud_task_model_id
             )
 
     def test_should_not_regenerate_voiceover_for_non_supported_accents(
         self,
     ) -> None:
         exploration_id = 'exp_id_1'
-        exploration_title = 'Test Exploration'
         exploration_version = 2
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
@@ -1159,7 +1303,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1178,18 +1322,34 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
-            voiceover_services,
-            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
-            self.mock_send_email_to_voiceover_admins_and_tech_leads,
-        ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
-                exploration_id=exploration_id,
-                exploration_title=exploration_title,
-                exploration_version=exploration_version,
-                author_id=author_id,
-                date_time=date_time,
-            )
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                voiceover_services.regenerate_voiceovers_for_batch_contents(
+                    exploration_id,
+                    parent_cloud_task_model_id,
+                    cloud_run.task_run_id,
+                )
 
         entity_voiceovers_models = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1280,12 +1440,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     )
     def test_should_raise_error_while_regenerating_voiceover(self) -> None:
         exploration_id = 'exp_id_1'
-        exploration_title = 'Test Exploration'
         exploration_version = 2
-        self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = '2025-08-01T08:35:05.864077'
-
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
             2,
@@ -1307,7 +1462,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1333,27 +1488,52 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             _language_accent_code: str,
         ) -> List[Tuple[str, str]]:
             errors_while_voiceover_regeneration = [
-                ('content5', 'Error 1 occurred'),
+                ('content_5', 'Error 1 occurred'),
             ]
             return errors_while_voiceover_regeneration
+
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
 
         with self.swap(
             voiceover_regeneration_services,
             'regenerate_voiceovers_of_exploration',
             mock_regenerate_voiceovers_of_exploration,
         ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
-                exploration_id=exploration_id,
-                exploration_title=exploration_title,
-                exploration_version=exploration_version,
-                author_id=author_id,
-                date_time=date_time,
-            )
+            for cloud_run in updated_cloud_task_runs:
+                if (
+                    cloud_run.function_id
+                    == 'regenerate_voiceovers_for_batch_contents'
+                ):
+                    voiceover_services.regenerate_voiceovers_for_batch_contents(
+                        exploration_id,
+                        parent_cloud_task_model_id,
+                        cloud_run.task_run_id,
+                    )
 
         all_models: Sequence[email_models.SentEmailModel] = (
             email_models.SentEmailModel.get_all().fetch()
         )
-        self.assertEqual(len(all_models), 3)
+
+        self.assertEqual(len(all_models), 2)
 
         expected_html_body = (
             'Hi Voiceover Admins,<br><br>tester has initiated the generation '
@@ -1375,6 +1555,105 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             ):
                 self.assertEqual(email_model.html_body, expected_html_body)
 
+        updated_cloud_task_run_model = cloud_task_models.CloudTaskRunModel.get(
+            parent_cloud_task_model_id
+        )
+        assert updated_cloud_task_run_model is not None
+        self.assertEqual(
+            updated_cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED'
+        )
+
+    def test_should_raise_exception_while_regenerating_voiceovers_in_batch(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id_1'
+        exploration_version = 2
+        commit1 = exp_models.ExplorationCommitLogEntryModel.create(
+            exploration_id,
+            2,
+            self.committer_1_id,
+            'msg',
+            'create',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 1',
+                    'old_value': {
+                        'content_id': 'content_5',
+                        'html': self.old_content_html,
+                    },
+                    'new_value': {
+                        'content_id': 'content_5',
+                        'html': self.new_content_html,
+                    },
+                }
+            ],
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            False,
+        )
+
+        commit1.exploration_id = exploration_id
+        commit1.update_timestamps()
+        commit1.put()
+
+        self.voiceover_autogeneration_policy_model.language_codes_mapping = {
+            'en': {'en-US': True}
+        }
+
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(len(entity_voiceovers_models), 0)
+
+        def mock_regenerate_voiceovers_of_exploration(
+            _exploration_id: str,
+            _exploration_version: int,
+            _content_id_to_content_html: Dict[str, str],
+            _language_accent_code: str,
+        ) -> List[Tuple[str, str]]:
+            raise Exception(
+                'Expected error raised during voiceover regeneration!'
+            )
+
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        with self.swap(
+            voiceover_regeneration_services,
+            'regenerate_voiceovers_of_exploration',
+            mock_regenerate_voiceovers_of_exploration,
+        ):
+            for cloud_run in updated_cloud_task_runs:
+                if (
+                    cloud_run.function_id
+                    == 'regenerate_voiceovers_for_batch_contents'
+                ):
+                    voiceover_services.regenerate_voiceovers_for_batch_contents(
+                        exploration_id,
+                        parent_cloud_task_model_id,
+                        cloud_run.task_run_id,
+                    )
+
     def _create_exploration_and_arabic_translation(
         self, exploration_id: str, language_code: str
     ) -> None:
@@ -1384,10 +1663,12 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             exploration_id: str. The ID of the exploration to create.
             language_code: str. The language code for the translation.
         """
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id,
             title='A Title',
-            category='A Category',
+            category=constants.constants.ALL_CATEGORIES[0],
             objective='An Objective',
         )
         exploration.states['Introduction'].content.html = 'First Card!'
@@ -1431,7 +1712,9 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         ]
         exploration.add_state('Second', 'content_2', 'content-3')
 
-        exp_services.save_new_exploration(exploration_id, exploration)
+        exp_services.save_new_exploration(owner_id, exploration)
+
+        self.publish_exploration(self.owner_id, exploration_id)
 
         arabic_translation = 'المحتوى المترجم'
         translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
@@ -1464,6 +1747,67 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             language_code,
             translations_mapping,
         ).put()
+        topic_id_1 = 'topic_id_1'
+        story_id_1 = 'story_id_1'
+        curated_exploration_1 = exploration_id
+
+        topic_1 = topic_domain.Topic.create_default_topic(
+            topic_id_1, 'topic1', 'abbrev', 'description', 'fragm'
+        )
+        topic_1.thumbnail_filename = 'thumbnail.svg'
+        topic_1.thumbnail_bg_color = '#C6DCDA'
+        topic_1.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url',
+            )
+        ]
+        topic_1.next_subtopic_id = 2
+        topic_1.skill_ids_for_diagnostic_test = ['skill_id_1']
+
+        topic_services.save_new_topic(owner_id, topic_1)
+        topic_services.publish_topic(topic_id_1, self.admin_id)
+
+        story_1 = story_domain.Story.create_default_story(
+            story_id_1,
+            'A story',
+            'Description',
+            topic_id_1,
+            'story-two',
+        )
+        story_services.save_new_story(owner_id, story_1)
+        topic_services.add_canonical_story(owner_id, topic_id_1, story_id_1)
+
+        topic_services.publish_story(topic_id_1, story_id_1, self.admin_id)
+
+        story_services.update_story(
+            owner_id,
+            story_id_1,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_1',
+                        'title': 'Node1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': curated_exploration_1,
+                    }
+                ),
+            ],
+            'Changes.',
+        )
 
     def test_should_regenerate_voiceover_for_arabic_language(self) -> None:
         language_accent_code = 'ar-AE'
@@ -1471,8 +1815,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id_1'
         exploration_version = 1
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         self._create_exploration_and_arabic_translation(
             exploration_id, language_code
@@ -1496,16 +1838,34 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(entity_translation.language_code, language_code)
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
-        with self.swap(
-            voiceover_services,
-            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
-            self.mock_send_email_to_voiceover_admins_and_tech_leads,
-        ):
-            (
-                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
-                    exploration_id, language_accent_code, author_id, date_time
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+        voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+            exploration_id, language_accent_code, parent_cloud_task_model_id
+        )
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                voiceover_services.regenerate_voiceovers_for_batch_contents(
+                    exploration_id,
+                    parent_cloud_task_model_id,
+                    cloud_run.task_run_id,
                 )
-            )
 
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -1546,17 +1906,325 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         language_accent_code = 'ar-non-existent'
         exploration_id = 'exp_id_1'
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         with self.assertRaisesRegex(
             Exception, 'Invalid language accent code: %s' % language_accent_code
         ):
             (
                 voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
-                    exploration_id, language_accent_code, author_id, date_time
+                    exploration_id, language_accent_code, 'cloud_task_run_id'
                 )
             )
+
+    def test_should_return_none_when_language_description_has_non_string_value(
+        self,
+    ) -> None:
+        self.swap(
+            constants.constants,
+            'SUPPORTED_CONTENT_LANGUAGES',
+            [{'code': 'en', 'description': 123}],
+        )
+
+        self.assertIsNone(
+            voiceover_services.get_language_description_from_code('error')
+        )
+
+    def test_should_use_empty_context_when_title_lookup_fails_for_language_accent_regeneration(
+        self,
+    ) -> None:
+        class ExploitationWithBrokenTitle:
+            """A mock exploration class that raises an exception when the
+            title is accessed.
+            """
+
+            version = 1
+
+            @property
+            def title(self) -> str:
+                """A mock exploration class method that raises an exception
+                when the title is accessed.
+
+                Raises:
+                    Exception. Always raises an exception to simulate a title lookup failure.
+                """
+                raise Exception('title lookup failed')
+
+        exploration = ExploitationWithBrokenTitle()
+        captured_additional_contextual_information = {}
+
+        def mock_regenerate_voiceovers_for_given_contents(
+            _exploration_id: str,
+            _exploration_version: int,
+            _language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+            _task_run_id: str,
+            additional_contextual_information: Dict[str, str],
+            specific_language_accent_code: str | None = None,
+        ) -> None:
+            _ = specific_language_accent_code
+            captured_additional_contextual_information.update(
+                additional_contextual_information
+            )
+
+        with self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            lambda _exploration_id: exploration,
+        ):
+            with self.swap(
+                voiceover_services,
+                'extract_english_voiceover_texts_from_exploration',
+                lambda _exploration: {},
+            ):
+                with self.swap(
+                    voiceover_services,
+                    'regenerate_voiceovers_for_given_contents',
+                    mock_regenerate_voiceovers_for_given_contents,
+                ):
+                    voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                        'exp_id_1', 'en-US', 'task_run_id'
+                    )
+
+        self.assertDictEqual(captured_additional_contextual_information, {})
+
+    def test_should_use_exploration_title_context_when_summary_lookup_succeeds(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id_1'
+        exploration_version = 2
+        captured_additional_contextual_information = {}
+
+        commit_log_entry = exp_models.ExplorationCommitLogEntryModel.create(
+            exploration_id,
+            exploration_version,
+            self.committer_1_id,
+            'msg',
+            'create',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 1',
+                    'old_value': {
+                        'content_id': 'content_5',
+                        'html': self.old_content_html,
+                    },
+                    'new_value': {
+                        'content_id': 'content_5',
+                        'html': self.new_content_html,
+                    },
+                }
+            ],
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            False,
+        )
+        commit_log_entry.exploration_id = exploration_id
+        commit_log_entry.update_timestamps()
+        commit_log_entry.put()
+
+        def mock_regenerate_voiceovers_for_given_contents(
+            _exploration_id: str,
+            _exploration_version: int,
+            _language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+            _task_run_id: str,
+            additional_contextual_information: Dict[str, str],
+            specific_language_accent_code: str | None = None,
+        ) -> None:
+            _ = specific_language_accent_code
+            captured_additional_contextual_information.update(
+                additional_contextual_information
+            )
+
+        with self.swap(
+            exp_fetchers,
+            'get_exploration_summary_by_id',
+            lambda _exploration_id: SimpleNamespace(title='Test Exploration'),
+        ):
+            with self.swap(
+                voiceover_services,
+                'regenerate_voiceovers_for_given_contents',
+                mock_regenerate_voiceovers_for_given_contents,
+            ):
+                voiceover_services.regenerate_voiceovers_on_exploration_update(
+                    exploration_id, exploration_version, 'task_run_id'
+                )
+
+        self.assertDictEqual(
+            captured_additional_contextual_information,
+            {'exploration_title': 'Test Exploration'},
+        )
+
+    def test_should_use_topic_and_exploration_context_when_topic_lookup_succeeds(
+        self,
+    ) -> None:
+        captured_additional_contextual_information = {}
+
+        def mock_regenerate_voiceovers_for_given_contents(
+            _exploration_id: str,
+            _exploration_version: int,
+            _language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+            _task_run_id: str,
+            additional_contextual_information: Dict[str, str],
+            specific_language_accent_code: str | None = None,
+        ) -> None:
+            _ = specific_language_accent_code
+            captured_additional_contextual_information.update(
+                additional_contextual_information
+            )
+
+        with self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            lambda _exploration_id: SimpleNamespace(
+                version=1, title='Curated Exploration'
+            ),
+        ):
+            with self.swap(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                'get_by_id',
+                lambda _exploration_id: SimpleNamespace(topic_id='topic_1'),
+            ):
+                with self.swap(
+                    topic_fetchers,
+                    'get_topic_by_id',
+                    lambda _topic_id: SimpleNamespace(name='Sample Topic'),
+                ):
+                    with self.swap(
+                        voiceover_services,
+                        'extract_english_voiceover_texts_from_exploration',
+                        lambda _exploration: {},
+                    ):
+                        with self.swap(
+                            translation_fetchers,
+                            'get_all_entity_translations_for_entity',
+                            lambda *_args, **_kwargs: [],
+                        ):
+                            with self.swap(
+                                voiceover_services,
+                                'extract_translated_voiceover_texts_from_entity_translations',
+                                lambda _entity_translations: {},
+                            ):
+                                with self.swap(
+                                    voiceover_services,
+                                    'regenerate_voiceovers_for_given_contents',
+                                    mock_regenerate_voiceovers_for_given_contents,
+                                ):
+                                    voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+                                        'exp_id_1', 'task_run_id'
+                                    )
+
+        self.assertDictEqual(
+            captured_additional_contextual_information,
+            {
+                'exploration_title': 'Curated Exploration',
+                'topic_name': 'Sample Topic',
+            },
+        )
+
+    def test_should_use_empty_context_when_topic_lookup_fails_for_curated_regeneration(
+        self,
+    ) -> None:
+        captured_additional_contextual_information = {}
+
+        def mock_regenerate_voiceovers_for_given_contents(
+            _exploration_id: str,
+            _exploration_version: int,
+            _language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+            _task_run_id: str,
+            additional_contextual_information: Dict[str, str],
+            specific_language_accent_code: str | None = None,
+        ) -> None:
+            _ = specific_language_accent_code
+            captured_additional_contextual_information.update(
+                additional_contextual_information
+            )
+
+        with self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            lambda _exploration_id: SimpleNamespace(
+                version=1, title='Curated Exploration'
+            ),
+        ):
+            with self.swap(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                'get_by_id',
+                lambda _exploration_id: (_ for _ in ()).throw(
+                    Exception('topic lookup failed')
+                ),
+            ):
+                with self.swap(
+                    voiceover_services,
+                    'extract_english_voiceover_texts_from_exploration',
+                    lambda _exploration: {},
+                ):
+                    with self.swap(
+                        translation_fetchers,
+                        'get_all_entity_translations_for_entity',
+                        lambda *_args, **_kwargs: [],
+                    ):
+                        with self.swap(
+                            voiceover_services,
+                            'extract_translated_voiceover_texts_from_entity_translations',
+                            lambda _entity_translations: {},
+                        ):
+                            with self.swap(
+                                voiceover_services,
+                                'regenerate_voiceovers_for_given_contents',
+                                mock_regenerate_voiceovers_for_given_contents,
+                            ):
+                                voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+                                    'exp_id_1', 'task_run_id'
+                                )
+
+        self.assertDictEqual(captured_additional_contextual_information, {})
+
+    def test_should_use_empty_context_when_exploration_summary_lookup_fails_after_accepting_suggestion(
+        self,
+    ) -> None:
+        captured_additional_contextual_information = {}
+
+        suggestion = SimpleNamespace(
+            change_cmd=SimpleNamespace(
+                translation_html='<p>translated</p>', content_id='content_0'
+            ),
+            language_code='en',
+            target_id='exp_id_1',
+            target_version_at_submission=1,
+        )
+
+        def mock_regenerate_voiceovers_for_given_contents(
+            _exploration_id: str,
+            _exploration_version: int,
+            _language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+            _task_run_id: str,
+            additional_contextual_information: Dict[str, str],
+        ) -> None:
+            captured_additional_contextual_information.update(
+                additional_contextual_information
+            )
+
+        with self.swap(
+            suggestion_services,
+            'get_suggestion_by_id',
+            lambda _suggestion_id: suggestion,
+        ):
+            with self.swap(
+                exp_fetchers,
+                'get_exploration_summary_by_id',
+                lambda _exploration_id: (_ for _ in ()).throw(
+                    Exception('summary lookup failed')
+                ),
+            ):
+                with self.swap(
+                    voiceover_services,
+                    'regenerate_voiceovers_for_given_contents',
+                    mock_regenerate_voiceovers_for_given_contents,
+                ):
+                    voiceover_services.regenerate_voiceovers_after_accepting_suggestion(
+                        'suggestion_id', 'task_run_id'
+                    )
+
+        self.assertDictEqual(captured_additional_contextual_information, {})
 
     def test_should_regenerate_voiceover_for_english_language(self) -> None:
         language_accent_code = 'en-US'
@@ -1564,8 +2232,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id_1'
         exploration_version = 1
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         self._create_exploration_and_arabic_translation(
             exploration_id, language_code
@@ -1581,16 +2247,34 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
-        with self.swap(
-            voiceover_services,
-            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
-            self.mock_send_email_to_voiceover_admins_and_tech_leads,
-        ):
-            (
-                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
-                    exploration_id, language_accent_code, author_id, date_time
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+        voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+            exploration_id, language_accent_code, parent_cloud_task_model_id
+        )
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                voiceover_services.regenerate_voiceovers_for_batch_contents(
+                    exploration_id,
+                    parent_cloud_task_model_id,
+                    cloud_run.task_run_id,
                 )
-            )
 
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -1605,23 +2289,22 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             entity_voiceovers.language_accent_code, language_accent_code
         )
         self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
-        self.assertEqual(
+        default_audio_offset = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+        self.assertDictEqual(
             entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
             {
-                'content_0': [
-                    {'token': 'This', 'audio_offset_msecs': 0.0},
-                    {'token': 'is', 'audio_offset_msecs': 100.0},
-                    {'token': 'a', 'audio_offset_msecs': 200.0},
-                    {'token': 'test', 'audio_offset_msecs': 300.0},
-                    {'token': 'text', 'audio_offset_msecs': 400.0},
-                ],
-                'feedback_1': [
-                    {'token': 'This', 'audio_offset_msecs': 0.0},
-                    {'token': 'is', 'audio_offset_msecs': 100.0},
-                    {'token': 'a', 'audio_offset_msecs': 200.0},
-                    {'token': 'test', 'audio_offset_msecs': 300.0},
-                    {'token': 'text', 'audio_offset_msecs': 400.0},
-                ],
+                'content_0': default_audio_offset,
+                'feedback_1': default_audio_offset,
+                'content_2': default_audio_offset,
+                'default_outcome_1': default_audio_offset,
+                'content-3': default_audio_offset,
+                'ca_placeholder_2': default_audio_offset,
             },
         )
 
@@ -1632,8 +2315,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id_1'
         exploration_version = 1
         self.signup('tester@org.com', 'tester')
-        author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.utcnow().isoformat()
 
         self._create_exploration_and_arabic_translation(
             exploration_id, language_code
@@ -1647,6 +2328,31 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(len(entity_voiceovers_list), 0)
+        parent_cloud_task_run_model_id = (
+            cloud_task_models.CloudTaskRunModel.get_new_id()
+        )
+        cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=parent_cloud_task_run_model_id,
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/'
+                'voiceover-regeneration/tasks/task1'
+            ),
+            latest_job_state='RUNNING',
+            function_id='update_stats',
+            current_retry_attempt=1,
+        )
+
+        voiceover_regeneration_task_mapping_model_id = '%s:%s' % (
+            exploration_id,
+            parent_cloud_task_run_model_id,
+        )
+        voiceover_regeneration_task_mapping_model = (
+            cloud_task_models.VoiceoverRegenerationJobModel.get(
+                voiceover_regeneration_task_mapping_model_id, strict=False
+            )
+        )
+
+        self.assertIsNone(voiceover_regeneration_task_mapping_model)
 
         with self.swap(
             voiceover_services,
@@ -1654,10 +2360,25 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
             (
-                voiceover_services.regenerate_voiceovers_on_exploration_curation(
-                    exploration_id, date_time, author_id
+                voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+                    exploration_id,
+                    parent_cloud_task_run_model_id,
                 )
             )
+            updated_cloud_task_runs = sorted(
+                taskqueue_services.get_all_cloud_task_runs(),
+                key=lambda task_run: task_run.created_on,
+            )
+            for cloud_run in updated_cloud_task_runs:
+                if (
+                    cloud_run.function_id
+                    == 'regenerate_voiceovers_for_batch_contents'
+                ):
+                    voiceover_services.regenerate_voiceovers_for_batch_contents(
+                        exploration_id,
+                        parent_cloud_task_run_model_id,
+                        cloud_run.task_run_id,
+                    )
 
         entity_voiceovers_list = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1671,22 +2392,92 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         # autogeneration: 'en-US', 'en-IN', and 'ar-AE'.
         self.assertEqual(len(entity_voiceovers_list), 3)
 
+        voiceover_regeneration_task_mapping_model = (
+            cloud_task_models.VoiceoverRegenerationJobModel.get(
+                voiceover_regeneration_task_mapping_model_id, strict=False
+            )
+        )
+        expected_language_accent_to_content_status_map = {
+            'en-US': {
+                'ca_placeholder_2': 'SUCCEEDED',
+                'content-3': 'SUCCEEDED',
+                'content_0': 'SUCCEEDED',
+                'content_2': 'SUCCEEDED',
+                'default_outcome_1': 'SUCCEEDED',
+                'feedback_1': 'SUCCEEDED',
+            },
+            'en-IN': {
+                'ca_placeholder_2': 'SUCCEEDED',
+                'content-3': 'SUCCEEDED',
+                'content_0': 'SUCCEEDED',
+                'content_2': 'SUCCEEDED',
+                'default_outcome_1': 'SUCCEEDED',
+                'feedback_1': 'SUCCEEDED',
+            },
+            'ar-AE': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
+        }
+
+        self.assertIsNotNone(voiceover_regeneration_task_mapping_model)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover_regeneration_task_mapping_model is not None
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.exploration_id,
+            exploration_id,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.cloud_task_run_id,
+            parent_cloud_task_run_model_id,
+        )
+
     def test_should_generate_voiceover_for_translated_content(self) -> None:
-        language_code = 'ar'
+        language_code = 'hi'
         exploration_id = 'exp_id_1'
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
         exploration_version = 1
-        language_accent_code = 'ar-AE'
-        translation_content = 'المحتوى المترجم'
-        content_id = 'content_id_0'
+        language_accent_code = 'hi-IN'
+
+        owner_id = self.owner_id
 
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id,
             title='A Title',
-            category='A Category',
+            category=constants.constants.ALL_CATEGORIES[0],
             objective='An Objective',
         )
         exploration.states['Introduction'].content.html = 'First Card!'
-        exp_services.save_new_exploration(exploration_id, exploration)
+        exp_services.save_new_exploration(owner_id, exploration)
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': language_code,
+            'content_html': 'First Card!',
+            'translation_html': 'पहला कार्ड',
+            'data_format': 'html',
+        }
+
+        translation_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exploration_id,
+            exploration.version,
+            owner_id,
+            add_translation_change_dict,
+            'test description',
+        )
 
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -1698,20 +2489,44 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+
         with self.swap(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
             (
-                voiceover_services.generate_voiceover_from_translated_content(
-                    exploration_id,
-                    exploration_version,
-                    translation_content,
-                    content_id,
-                    language_code,
+                voiceover_services.regenerate_voiceovers_after_accepting_suggestion(
+                    translation_suggestion.suggestion_id,
+                    parent_cloud_task_model_id,
                 )
             )
+
+            updated_cloud_task_runs = sorted(
+                taskqueue_services.get_all_cloud_task_runs(),
+                key=lambda task_run: task_run.created_on,
+            )
+            for cloud_run in updated_cloud_task_runs:
+                if (
+                    cloud_run.function_id
+                    == 'regenerate_voiceovers_for_batch_contents'
+                ):
+                    voiceover_services.regenerate_voiceovers_for_batch_contents(
+                        exploration_id,
+                        parent_cloud_task_model_id,
+                        cloud_run.task_run_id,
+                    )
 
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -1721,4 +2536,3 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 language_accent_code,
             )
         )
-        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})

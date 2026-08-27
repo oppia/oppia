@@ -15,13 +15,20 @@
 /**
  * @fileoverview Unit tests for EditorFirstTimeEventsService.
  */
-import {TestBed} from '@angular/core/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 describe('Editor First Time Events Service', () => {
   let eftes: EditorFirstTimeEventsService;
   let sas: SiteAnalyticsService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     eftes = TestBed.inject(EditorFirstTimeEventsService);

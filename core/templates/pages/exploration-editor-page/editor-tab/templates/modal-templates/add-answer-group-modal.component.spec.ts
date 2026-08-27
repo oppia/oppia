@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for AddAnswerGroupModalController.
  */
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
   fakeAsync,
@@ -27,12 +28,12 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {Outcome} from 'domain/exploration/outcome.model';
+import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {AddAnswerGroupModalComponent} from './add-answer-group-modal.component';
 import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -61,11 +62,11 @@ describe('Add Answer Group Modal Component', () => {
   var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [AddAnswerGroupModalComponent],
       providers: [
         EditorFirstTimeEventsService,
@@ -133,13 +134,21 @@ describe('Add Answer Group Modal Component', () => {
     expect(component.validation).toBe(false);
   }));
 
+  it('should initialize null outcome destination in question mode', () => {
+    expect(component.questionModeEnabled).toBe(true);
+    expect(component.tmpOutcome.dest).toBe(null);
+  });
+
   it('should update answer group feedback', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);
 
-    var feedback = new SubtitledHtml('New feedback', null);
     component.updateAnswerGroupFeedback({
-      feedback: feedback,
-    } as Outcome);
+      feedback: {
+        html: 'New feedback',
+        content_id: null,
+      },
+      labelledAsCorrect: false,
+    });
     component.modalId = Symbol();
     const eventBusGroup = new EventBusGroup(TestBed.inject(EventBusService));
     eventBusGroup.emit(
@@ -149,7 +158,7 @@ describe('Add Answer Group Modal Component', () => {
       })
     );
     expect(component.feedbackEditorIsOpen).toBe(true);
-    expect(component.tmpOutcome.feedback).toBe(feedback);
+    expect(component.tmpOutcome.feedback.html).toBe('New feedback');
   });
 
   it('should update tagged misconception', () => {
@@ -205,5 +214,39 @@ describe('Add Answer Group Modal Component', () => {
     component.updateState('update');
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
+  });
+
+  describe('isRuleValid', () => {
+    it('should return true when interaction is not NumericInput', () => {
+      component.currentInteractionId = 'TextInput';
+      component.tmpRule = new Rule('Equals', {}, {});
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return true when interaction is NumericInput but rule is not IsWithinTolerance', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule('Equals', {x: 5}, {});
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return true when interaction is NumericInput, rule is IsWithinTolerance, and tol is >= 0', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule(
+        'IsWithinTolerance',
+        {tol: 0, x: 5},
+        {tol: 'Real', x: 'Real'}
+      );
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return false when interaction is NumericInput, rule is IsWithinTolerance, and tol is < 0', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule(
+        'IsWithinTolerance',
+        {tol: -2, x: 5},
+        {tol: 'Real', x: 'Real'}
+      );
+      expect(component.isRuleValid()).toBe(false);
+    });
   });
 });

@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './opportunities-list-item.component.css';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -42,7 +43,7 @@ export interface ExplorationOpportunity {
 @Component({
   selector: 'oppia-opportunities-list-item',
   templateUrl: './opportunities-list-item.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list-item.component.css'],
 })
 export class OpportunitiesListItemComponent {
   constructor(private windowDimensionsService: WindowDimensionsService) {}
@@ -55,10 +56,12 @@ export class OpportunitiesListItemComponent {
   @Input() opportunityType!: string;
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
+  @Input() disableButtonOnComplete: boolean = true;
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
 
   labelText!: string;
+  progressBarLabel!: string;
   labelStyle!: {'background-color': string};
   progressPercentage!: string;
   progressBarStyle!: {width: string};
@@ -124,8 +127,16 @@ export class OpportunitiesListItemComponent {
       this.opportunityHeadingTruncationLength = 40;
     }
     if (this.opportunity) {
-      if (this.opportunity.progressPercentage) {
-        this.progressPercentage = `${Math.floor(this.opportunity.progressPercentage)}%`;
+      // We explicitly check for undefined and null instead of using a simple
+      // truthiness check (i.e., `if (this.opportunity.progressPercentage)`).
+      // This is because a progress percentage of 0 is falsy, which previously
+      // caused the progress bar to incorrectly fail to initialize or update
+      // for opportunities with 0% progress.
+      if (
+        this.opportunity.progressPercentage !== undefined &&
+        this.opportunity.progressPercentage !== null
+      ) {
+        this.progressPercentage = `${Math.floor(Number(this.opportunity.progressPercentage))}%`;
         if (
           this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
@@ -152,9 +163,10 @@ export class OpportunitiesListItemComponent {
             width: inReviewTranslationsPercentage + '%',
           };
           this.opportunityButtonDisabled =
+            this.disableButtonOnComplete &&
             this.opportunity.translationsCount +
               this.opportunity.inReviewCount ===
-            this.opportunity.totalCount;
+              this.opportunity.totalCount;
         } else {
           this.progressBarStyle = {width: this.progressPercentage};
         }

@@ -16,7 +16,6 @@
  * @fileoverview Module for the common code between admin pages.
  */
 
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 import {CommonModule} from '@angular/common';
@@ -27,7 +26,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
   imports: [CommonModule, MatProgressSpinnerModule],
   declarations: [RolesAndActionsVisualizerComponent],
-  entryComponents: [RolesAndActionsVisualizerComponent],
   exports: [RolesAndActionsVisualizerComponent],
 })
 export class AdminBlogAdminCommonModule {}

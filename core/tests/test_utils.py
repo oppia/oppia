@@ -167,6 +167,7 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES: Final = (
     'BaseSnapshotContentModel',
     'BaseSnapshotMetadataModel',
     'VersionedModel',
+    'BaseFeedbackModel',
 )
 
 _GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
@@ -296,7 +297,7 @@ def mock_load_template(
         filepath = get_filepath_from_filename(filename, 'src')
     if filepath is None:
         raise Exception('No file exists for the given file name.')
-    with utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
 
@@ -320,8 +321,7 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
     """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.Names:
-        yield name
+    yield from models.Names
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
@@ -344,7 +344,7 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
                     yield clazz
 
 
-def generate_random_hexa_str() -> str:  # docker: no cover
+def generate_random_hexa_str() -> str:
     """Generate 32 character random string that looks like hex number.
 
     Returns:
@@ -584,48 +584,46 @@ class ElasticSearchStub:
         """Helper method that clears the mock database."""
         self._DB.clear()
 
-    def _generate_index_not_found_error(self, index_name: str) -> None:
+    def _generate_index_not_found_error(self, index: str) -> None:
         """Helper method that generates an elasticsearch 'index not found' 404
         error.
 
         Args:
-            index_name: str. The index that was not found.
+            index: str. The index that was not found.
 
         Raises:
             elasticsearch.NotFoundError. A manually-constructed error
                 indicating that the index was not found.
         """
-        raise elasticsearch.NotFoundError(
-            404,
-            'index_not_found_exception',
-            {
-                'status': 404,
-                'error': {
-                    'reason': 'no such index [%s]' % index_name,
-                    'root_cause': [
-                        {
-                            'reason': 'no such index [%s]' % index_name,
-                            'index': index_name,
-                            'index_uuid': '_na_',
-                            'type': 'index_not_found_exception',
-                            'resource.type': 'index_or_alias',
-                            'resource.id': index_name,
-                        }
-                    ],
-                    'index': index_name,
+        error_data = {
+            'reasoon': 'no such  index[%s]' % index,
+            'root_cause': [
+                {
+                    'reason': 'no such index [%s]' % index,
+                    'index': index,
                     'index_uuid': '_na_',
                     'type': 'index_not_found_exception',
                     'resource.type': 'index_or_alias',
-                    'resource.id': index_name,
-                },
-            },
+                    'resource.id': index,
+                }
+            ],
+            'index': index,
+            'index_uuid': '_na_',
+            'type': 'index_not_found_exception',
+            'resource.type': 'index_or_alias',
+            'resource.id': index,
+        }
+        meta = type('Meta', (), {'status': 404})()
+        body = {'status': 404, 'error': error_data}
+        raise elasticsearch.NotFoundError(
+            'index_not_found_exception: no such index [%s]' % index, meta, body
         )
 
-    def mock_create_index(self, index_name: str) -> NewIndexDict:
+    def mock_create_index(self, index: str) -> NewIndexDict:
         """Creates an index with the given name.
 
         Args:
-            index_name: str. The name of the index to create.
+            index: str. The name of the index to create.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -634,22 +632,30 @@ class ElasticSearchStub:
             elasticsearch.RequestError. An index with the given name already
                 exists.
         """
-        if index_name in self._DB:
+        if index in self._DB:
+            error_data = {
+                'type': 'resource_already_exists_exception',
+                'reason': f'index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+                'index': index,
+                'index_uuid': 'RaNdOmStRiNgOfAlPhAs',
+            }
+            meta = type('Meta', (), {'status': 400})()
+            body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
-                400,
-                'resource_already_exists_exception',
-                'index [%s/RaNdOmStRiNgOfAlPhAs] already exists' % index_name,
+                f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+                meta,
+                body,
             )
-        self._DB[index_name] = []
+        self._DB[index] = []
         return {
-            'index': index_name,
+            'index': index,
             'acknowledged': True,
             'shards_acknowledged': True,
         }
 
     def mock_index(
         self,
-        index_name: str,
+        index: str,
         document: Dict[str, str],
         id: Optional[str] = None,  # pylint: disable=redefined-builtin
     ) -> ExistingIndexDict:
@@ -661,7 +667,7 @@ class ElasticSearchStub:
         https://elasticsearch-py.readthedocs.io/en/v7.10.1/api.html
 
         Args:
-            index_name: str. The name of the index to create.
+            index: str. The name of the index to create.
             document: dict. The document to store.
             id: str. The unique identifier of the document.
 
@@ -672,14 +678,12 @@ class ElasticSearchStub:
             elasticsearch.RequestError. An index with the given name already
                 exists.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        self._DB[index_name] = [
-            d for d in self._DB[index_name] if d['id'] != id
-        ]
-        self._DB[index_name].append(document)
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        self._DB[index] = [d for d in self._DB[index] if d['id'] != id]
+        self._DB[index].append(document)
         return {
-            '_index': index_name,
+            '_index': index,
             '_shards': {
                 'total': 2,
                 'successful': 1,
@@ -693,13 +697,15 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index_name: str, doc_id: str) -> bool:
+    def mock_exists(
+        self, index: str, id: str  # pylint: disable=redefined-builtin
+    ) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
         Args:
-            index_name: str. The name of the index to check.
-            doc_id: str. The document id to check.
+            index: str. The name of the index to check.
+            id: str. The document id to check.
 
         Returns:
             bool. Whether the document exists in the index.
@@ -707,17 +713,19 @@ class ElasticSearchStub:
         Raises:
             elasticsearch.NotFoundError: The given index name was not found.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        return any(d['id'] == doc_id for d in self._DB[index_name])
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        return any(d['id'] == id for d in self._DB[index])
 
-    def mock_delete(self, index_name: str, doc_id: str) -> ExistingIndexDict:
+    def mock_delete(
+        self, index: str, id: str  # pylint: disable=redefined-builtin
+    ) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
         Args:
-            index_name: str. The name of the index to delete the document from.
-            doc_id: str. The document id to be deleted from the index.
+            index: str. The name of the index to delete the document from.
+            id: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -725,40 +733,41 @@ class ElasticSearchStub:
         Raises:
             Exception. The document does not exist in the index.
             elasticsearch.NotFoundError. The given index name was not found, or
-                the given doc_id was not found in the given index.
+                the given id was not found in the given index.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
-        if len(self._DB[index_name]) != len(docs):
-            self._DB[index_name] = docs
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        docs = [d for d in self._DB[index] if d['id'] != id]
+        if len(self._DB[index]) != len(docs):
+            self._DB[index] = docs
             return {
                 '_type': '_doc',
                 '_seq_no': 99,
                 '_shards': {'total': 2, 'successful': 1, 'failed': 0},
                 'result': 'deleted',
                 '_primary_term': 1,
-                '_index': index_name,
+                '_index': index,
                 '_version': 4,
                 '_id': '0',
             }
 
+        body = {
+            '_index': index,
+            '_type': '_doc',
+            '_id': id,
+            '_version': 1,
+            'result': 'not_found',
+            '_shards': {'total': 2, 'successful': 1, 'failed': 0},
+            '_seq_no': 103,
+            '_primary_term': 1,
+        }
+        meta = type('Meta', (), {'status': 404})()
         raise elasticsearch.NotFoundError(
-            404,
-            {
-                '_index': index_name,
-                '_type': '_doc',
-                '_id': doc_id,
-                '_version': 1,
-                'result': 'not_found',
-                '_shards': {'total': 2, 'successful': 1, 'failed': 0},
-                '_seq_no': 103,
-                '_primary_term': 1,
-            },
+            f'document not found: [{index}][{id}]', meta, body
         )
 
     def mock_delete_by_query(
-        self, index_name: str, query: Dict[str, Dict[str, Dict[str, str]]]
+        self, index: str, body: Dict[str, Dict[str, Dict[str, str]]]
     ) -> DeletedDocumentDict:
         """Deletes documents from an index based on the given query.
 
@@ -767,8 +776,8 @@ class ElasticSearchStub:
         function use that query format.
 
         Args:
-            index_name: str. The name of the index to delete the documents from.
-            query: dict. The query that defines which documents to delete.
+            index: str. The name of the index to delete the documents from.
+            body: dict. The query that defines which documents to delete.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
@@ -777,12 +786,12 @@ class ElasticSearchStub:
             AssertionError. The query is not in the correct form.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert list(query.keys()) == ['query']
-        assert query['query'] == {'match_all': {}}
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        index_size = len(self._DB[index_name])
-        del self._DB[index_name][:]
+        assert list(body.keys()) == ['query']
+        assert body['query'] == {'match_all': {}}
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        index_size = len(self._DB[index])
+        del self._DB[index][:]
         return {
             'took': 72,
             'version_conflicts': 0,
@@ -805,17 +814,16 @@ class ElasticSearchStub:
         self,
         body: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
         index: Optional[str] = None,
-        params: Optional[Dict[str, int]] = None,
+        size: Optional[int] = None,
+        from_: Optional[int] = None,
     ) -> SearchDocumentDict:
         """Searches and returns documents that match the given query.
 
         Args:
             body: dict|None. A dictionary search definition that uses Query DSL.
             index: str|None. The name of the index to search.
-            params: dict|None. A dict with two keys: `size` and `from`. The
-                corresponding values are ints which represent the number of
-                results to fetch, and the offset from which to fetch them,
-                respectively.
+            size: int|None. The number of results to fetch.
+            from_: int|None. The offset from which the results are to be fetched.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
@@ -829,8 +837,8 @@ class ElasticSearchStub:
         # all indexes. We do not allow their use.
         assert index not in ['_all', '']
         assert index is not None
-        assert params is not None
-        assert sorted(params.keys()) == ['from', 'size']
+        assert size is not None
+        assert from_ is not None
 
         if index not in self._DB:
             self._generate_index_not_found_error(index)
@@ -858,13 +866,24 @@ class ElasticSearchStub:
                     result_docs = [doc for doc in result_docs if v in doc[k]]
             else:
                 for k, v in f['match'].items():
-                    # In explorations and collections, 'doc[k]' is a single
-                    # language or category to which the exploration or
-                    # collection belongs, 'v' is a string of all the languages
-                    # or categories (separated by space eg. 'en hi') in which if
-                    # doc[k] is present, the 'doc' should be returned.
-                    # Therefore, we check using 'doc[k] in v'.
-                    result_docs = [doc for doc in result_docs if doc[k] in v]
+                    # 'v' is a string of all the requested languages or
+                    # categories, separated by spaces (eg. '"en" "hi"'). A
+                    # collection's value is a single string, while an
+                    # exploration's language_code is a list, because an
+                    # exploration is indexed under its own language and every
+                    # language it has an up-to-date translation in. The doc
+                    # matches if any of its values appears in 'v', which is how
+                    # Elasticsearch treats an array field in a match query.
+                    result_docs = [
+                        doc
+                        for doc in result_docs
+                        if any(
+                            value in v
+                            for value in (
+                                doc[k] if isinstance(doc[k], list) else [doc[k]]
+                            )
+                        )
+                    ]
 
         if terms:
             filtered_docs = []
@@ -890,9 +909,7 @@ class ElasticSearchStub:
                 '_index': index,
                 '_source': doc,
             }
-            for doc in result_docs[
-                params['from'] : params['from'] + params['size']
-            ]
+            for doc in result_docs[from_ : from_ + size]
         ]
 
         return {
@@ -2127,7 +2144,7 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
-        # Mock set_constans_to_default method to throw an exception.
+        # Mock set_constants_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.
         self.contextManager = self.swap(
@@ -2219,63 +2236,16 @@ class AppEngineTestBase(TestBase):
         )
 
     def mock_set_constants_to_default(self) -> None:
-        """Change constants file in the test could lead to other
-        tests fail. Mock set_constants_to_default method in your test
-        will suppress this exception.
+        """Mock implementation of set_constants_to_default for tests.
+
+        Directly changing the shared constants file in your test can cause
+        problems. Mocking common.set_constants_to_default() in your test will
+        suppress this exception.
         """
-        raise Exception('Please mock this method in the test.')
-
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
-        """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
-
-        Example:
-            import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
-
-        Args:
-            mocked_now: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-
-        Raises:
-            Exception. Given argument is not a datetime.
-        """
-        if not isinstance(mocked_now, datetime.datetime):
-            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
-
-        old_datetime = datetime.datetime
-
-        class MockDatetimeType(type):
-            """Overrides isinstance() behavior."""
-
-            @classmethod
-            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
-                return isinstance(instance, old_datetime)
-
-        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
-            """Always returns mocked_now as the current UTC time."""
-
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
-            @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
-                """Returns the mocked datetime."""
-                return mocked_now
-
-        setattr(datetime, 'datetime', MockDatetime)
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', old_datetime)
+        raise Exception(
+            'Tests should mock common.set_constants_to_default() to avoid '
+            'modifying the constants file during tests.'
+        )
 
 
 class GenericTestBase(AppEngineTestBase):
@@ -2312,6 +2282,8 @@ class GenericTestBase(AppEngineTestBase):
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
     RELEASE_COORDINATOR_USERNAME: Final = 'releasecoordinator'
+    TECH_LEAD_EMAIL: Final = 'techlead@example.com'
+    TECH_LEAD_USERNAME: Final = 'techlead'
     OWNER_EMAIL: Final = 'owner@example.com'
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
@@ -2881,6 +2853,15 @@ version: 1
                     csrf_token=self.get_new_csrf_token(),
                 )
 
+    def set_question_admins(self, question_admin_usernames: List[str]) -> None:
+        """Sets role of given users as QUESTION_ADMIN.
+
+        Args:
+            question_admin_usernames: list(str). List of usernames.
+        """
+        for name in question_admin_usernames:
+            self.add_user_role(name, feconf.ROLE_ID_QUESTION_ADMIN)
+
     def set_translation_coordinators(
         self, translation_coordinator_usernames: List[str], language_id: str
     ) -> None:
@@ -3170,6 +3151,8 @@ version: 1
                 msg='Expected params to be a dict, received %s' % params,
             )
 
+        response = None
+
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
@@ -3191,7 +3174,7 @@ version: 1
             )
         elif http_method != 'GET':
             raise Exception('Invalid http method %s' % http_method)
-
+        assert response is not None
         self.assertIn(response.status_int, expected_status_int_list)
 
         return response
@@ -3425,21 +3408,20 @@ version: 1
             webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
-        if upload_files is not None:
-            encoded_upload_files = tuple(
-                tuple(
-                    f.encode('utf-8') if isinstance(f, str) else f
-                    for f in upload_file
-                )
-                for upload_file in upload_files
+        encoded_upload_files = tuple(
+            tuple(
+                f.encode('utf-8') if isinstance(f, str) else f
+                for f in upload_file
             )
+            for upload_file in (upload_files or ())
+        )
 
         return app.post(
             url,
             params=data,
             headers=headers,
             status=expected_status_int,
-            upload_files=(encoded_upload_files if upload_files else None),
+            upload_files=encoded_upload_files or None,
             expect_errors=expect_errors,
         )
 
@@ -4568,6 +4550,7 @@ version: 1
         classroom_id: str = 'math_classroom_id',
         name: str = 'math',
         url_fragment: str = 'math',
+        feedback_recipient_email: str = 'user@email.com',
         course_details: str = 'Course Details',
         teaser_text: str = 'Teaser Text',
         topic_list_intro: str = 'Topic list intro',
@@ -4585,6 +4568,7 @@ version: 1
             classroom_id: str. Classroom ID of the newly-created classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. A text to provide course details present in
                 the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
@@ -4612,6 +4596,7 @@ version: 1
             classroom_id=classroom_id,
             name=name,
             url_fragment=url_fragment,
+            feedback_recipient_email=feedback_recipient_email,
             teaser_text=teaser_text,
             course_details=course_details,
             topic_list_intro=topic_list_intro,

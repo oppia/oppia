@@ -28,7 +28,7 @@ describe('expression interpolation service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    expressionInterpolationService = TestBed.get(
+    expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
   });

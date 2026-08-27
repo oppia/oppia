@@ -21,7 +21,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {
-  async,
+  waitForAsync,
   fakeAsync,
   flush,
   flushMicrotasks,
@@ -52,14 +52,14 @@ describe('Story Creation Backend Api Service', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [StoryCreationBackendApiService],
     });
   }));
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     let sampleTopicBackendObject = {
       topicDict: {
         id: 'sample_topic_id',

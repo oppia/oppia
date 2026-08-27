@@ -18,14 +18,14 @@
 
 import {ChangeDetectorRef} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {SetOfUnicodeStringEditorComponent} from './set-of-unicode-string-editor.component';
 
 describe('SetOfUnicodeStringEditorComponent', () => {
   let component: SetOfUnicodeStringEditorComponent;
   let fixture: ComponentFixture<SetOfUnicodeStringEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SetOfUnicodeStringEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

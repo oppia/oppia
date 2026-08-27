@@ -20,6 +20,7 @@
            [ngClass]="getContentAudioHighlightClass()">
         <div tabindex="0">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
+                                    [rteStringContext]="'content'"
                                     class="e2e-test-conversation-content">
           </oppia-rte-output-display>
         </div>

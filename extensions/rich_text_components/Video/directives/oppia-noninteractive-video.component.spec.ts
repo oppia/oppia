@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Video rich-text component.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NoninteractiveVideo} from './oppia-noninteractive-video.component';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {PageContextService} from 'services/page-context.service';
@@ -49,7 +49,7 @@ describe('NoninteractiveVideo', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [NoninteractiveVideo],
       providers: [
@@ -64,7 +64,7 @@ describe('NoninteractiveVideo', () => {
   beforeEach(() => {
     autoplayedVideosService = TestBed.inject(AutoplayedVideosService);
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
-    pageContextService = TestBed.get(PageContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     fixture = TestBed.createComponent(NoninteractiveVideo);
     component = fixture.componentInstance;

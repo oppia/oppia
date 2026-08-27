@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import os
 
 from core import feature_flag_list, feconf, utils
@@ -46,17 +45,24 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL
         )
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.question_admin_id = self.get_user_id_from_email(
+            self.QUESTION_ADMIN_EMAIL
+        )
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id
+        )
+        self.question_admin = user_services.get_user_actions_info(
+            self.question_admin_id
         )
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
@@ -136,6 +142,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         )
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={self.topic_id: []}
@@ -254,6 +261,14 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         ]
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_4'
+        story.story_contents.add_arc(
+            story_domain.Arc(
+                'arc_1',
+                'Adventure 1',
+                'First adventure',
+                ['node_1', 'node_2', 'node_3'],
+            )
+        )
 
         self.assertEqual(response['canonical_story_summary_dicts'], [])
         self.assertEqual(response['additional_story_summary_dicts'], [])
@@ -306,8 +321,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             ],
             thumbnail_filename='img.svg',
             url_fragment='url',
-            story_model_created_on=datetime.datetime.today(),
-            story_model_last_updated=datetime.datetime.today(),
+            story_model_created_on=utils.get_current_local_datetime(),
+            story_model_last_updated=utils.get_current_local_datetime(),
         )
         story_services.save_story_summary(story_summary)
 
@@ -358,6 +373,17 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             self.assertEqual(
                 canonical_story_summary_dict['overdue_chapters_count'], 1
             )
+            self.assertEqual(
+                canonical_story_summary_dict['arcs'],
+                [
+                    {
+                        'id': 'arc_1',
+                        'title': 'Adventure 1',
+                        'description': 'First adventure',
+                        'node_ids': ['node_1', 'node_2', 'node_3'],
+                    }
+                ],
+            )
 
             self.assertEqual(
                 additional_story_summary_dict['description'],
@@ -386,7 +412,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -418,7 +444,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -455,7 +481,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-two',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb',
             encoding=None,
@@ -496,7 +522,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             url_fragment='original',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -560,7 +586,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -578,7 +604,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -596,7 +622,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -722,7 +748,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -745,7 +771,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -768,7 +794,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -1061,7 +1087,7 @@ class TopicEditorTests(
         self.assertEqual(
             {
                 'subtitled_html': {
-                    'html': '<p>New Data</p>',
+                    'html': '<p><strong>new heading</strong></p>\n\n<p>New Data</p>',
                     'content_id': 'content',
                 },
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
@@ -1069,7 +1095,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         json_response = self.get_json(
             '%s/%s/%s'
@@ -1097,7 +1123,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
 
         # Test if the corresponding study guides were created.
@@ -1118,7 +1144,7 @@ class TopicEditorTests(
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -1436,6 +1462,19 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         )
         self.assertEqual(json_response['published'], False)
         self.assertEqual(json_response['can_publish_topic'], True)
+        self.assertEqual(json_response['can_edit_question'], True)
+        self.assertEqual(json_response['can_edit_topic'], True)
+        self.logout()
+
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        # Test whether question admins can access topic rights.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id)
+        )
+        self.assertEqual(json_response['published'], False)
+        self.assertEqual(json_response['can_edit_topic'], False)
+        self.assertEqual(json_response['can_edit_question'], True)
+        self.assertEqual(json_response['can_publish_topic'], False)
         self.logout()
 
         self.login(self.NEW_USER_EMAIL)
@@ -1612,6 +1651,27 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
+
+    def test_normal_user_cannot_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'test'),
+            expected_status_int=401,
+        )
+
+        self.logout()
+
+    def test_topic_manager_can_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.TOPIC_MANAGER_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'unique-fragment')
+        )
+
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        self.logout()
 
     def test_topic_url_fragment_handler_when_unique(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)

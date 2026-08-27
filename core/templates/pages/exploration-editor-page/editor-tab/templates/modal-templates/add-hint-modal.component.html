@@ -10,7 +10,7 @@
 </div>
 
 <div class="modal-body">
-  <form class="form-inline">
+  <form class="d-flex align-items-center">
     <div class="oppia-rule-details-header">
       <strong tabindex="0">Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="e2e-test-hint-text"
@@ -29,27 +29,3 @@
   <button class="btn btn-secondary e2e-test-cancel-hint" (click)="cancel()">Cancel</button>
   <button class="btn btn-success e2e-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
 </div>
-
-<style>
-  @media screen and (max-width: 768px) {
-    .add-hint-modal .modal-dialog,
-    .add-hint-modal .modal-content {
-      border: 0;
-      border-radius: 0;
-      margin: 0;
-    }
-    .add-hint-modal .modal-content {
-      height: 100vh;
-    }
-    .add-hint-modal .modal-header {
-      background-color: #00609c;
-    }
-    .add-hint-modal .modal-header i {
-      color: #fff;
-      font-size: 20px;
-    }
-    .add-hint-modal .modal-header h3 {
-      color: #fff;
-    }
-  }
-</style>

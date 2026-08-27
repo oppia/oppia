@@ -196,6 +196,7 @@ export const AppConstants = {
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
     CLASSROOM: 'classroom',
+    FEEDBACK: 'feedback',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
@@ -324,8 +325,8 @@ export const AppConstants = {
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
     SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
   },
-  VOLUNTEER_FORM_LINK:
-    'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+  VOLUNTEER_IDEALIST_LINK:
+    'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
   IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
   IMPACT_REPORT_LINK_2023:
@@ -423,6 +424,20 @@ export const AppConstants = {
   },
   ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
   ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
+
+  FINANCIAL_LITERACY_CAMPAIGN_CONFIG_TEST: {
+    bannerImageRelativePath: '/donate/financial-literacy-campaign.webp',
+    startDate: new Date('2026-03-01'),
+    endDate: new Date('2026-04-30'),
+    bannerReRenderIntervalMs: 30 * 1000,
+  },
+
+  FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD: {
+    bannerImageRelativePath: '/donate/financial-literacy-campaign.webp',
+    startDate: new Date('2026-04-07'),
+    endDate: new Date('2026-04-30'),
+    bannerReRenderIntervalMs: 7 * 24 * 60 * 60 * 1000,
+  },
 } as const;
 
 export enum NavbarAndFooterGATrackingPages {

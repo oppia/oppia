@@ -22,7 +22,10 @@ import {ChangeDetectorRef, Component, Input} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
-import {CurrentInteractionService} from '../../services/current-interaction.service';
+import {
+  CurrentInteractionService,
+  OnSubmitFn,
+} from '../../services/current-interaction.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
 import {
@@ -51,14 +54,17 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
-import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
+import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -66,24 +72,24 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
   styleUrls: ['./conversation-skin.component.css'],
 })
 export class ConversationSkinComponent {
-  @Input() questionPlayerConfig;
-  @Input() diagnosticTestTopicTrackerModel;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
+  @Input() diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _editorPreviewMode;
+  _editorPreviewMode!: boolean;
 
-  isLoggedIn: boolean;
+  isLoggedIn: boolean = false;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle: string;
-  explorationId: string;
-  isIframed: boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
+  collectionTitle: string | null = null;
+  explorationId!: string;
+  isIframed!: boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary;
-  moveToExploration: boolean;
+  collectionSummary: LearnerExplorationSummary | string | null = null;
+  moveToExploration: boolean = false;
 
-  pidInUrl: string;
+  pidInUrl: string | null = null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -125,7 +131,8 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
-    private chapterProgressService: ChapterProgressService
+    private chapterProgressService: ChapterProgressService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
@@ -191,6 +198,8 @@ export class ConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          // Reset showInteraction when a new card opens after stuck state redirect.
+          this.showInteraction = true;
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });
@@ -269,11 +278,11 @@ export class ConversationSkinComponent {
       this.isLoggedIn = userInfo.isLoggedIn();
       this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
-      this.windowRef.nativeWindow.addEventListener('beforeunload', e => {
+      this.preventPageUnloadEventService.addListener(() => {
         let redirectToRefresherExplorationConfirmed =
           this.conversationFlowService.getRedirectToRefresherExplorationConfirmed();
         if (redirectToRefresherExplorationConfirmed) {
-          return;
+          return false;
         }
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
@@ -286,13 +295,9 @@ export class ConversationSkinComponent {
             this.learnerParamsService.getAllParams()
           );
 
-          let confirmationMessage =
-            'Please save your progress before navigating away from the' +
-            ' page; else, you will lose your exploration progress.';
-          (e || this.windowRef.nativeWindow.event).returnValue =
-            confirmationMessage;
-          return confirmationMessage;
+          return true;
         }
+        return false;
       });
 
       let pid =
@@ -308,9 +313,17 @@ export class ConversationSkinComponent {
       this.cardAnimationService.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
-        this.conversationFlowService.submitAnswer.bind(
-          this.conversationFlowService
-        )
+        (
+          answer: InteractionAnswer,
+          interactionRulesService: Parameters<OnSubmitFn>[1]
+        ) => {
+          const submitFn: Function = this.conversationFlowService.submitAnswer;
+          submitFn.call(
+            this.conversationFlowService,
+            answer,
+            interactionRulesService
+          );
+        }
       );
       this.initializePage();
 
@@ -399,6 +412,7 @@ export class ConversationSkinComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.preventPageUnloadEventService.removeListener();
   }
 
   getAnswerIsBeingProcessed(): boolean {
@@ -457,9 +471,13 @@ export class ConversationSkinComponent {
       return false;
     }
     let interaction = displayedCard.getInteraction();
+    if (!interaction.id) {
+      return false;
+    }
     return (
-      Boolean(interaction.id) &&
-      INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
+      interaction.id in INTERACTION_SPECS &&
+      INTERACTION_SPECS[interaction.id as keyof typeof INTERACTION_SPECS]
+        .show_generic_submit_button &&
       this.isCurrentCardAtEndOfTranscript()
     );
   }
@@ -469,10 +487,17 @@ export class ConversationSkinComponent {
   }
 
   triggerRedirectionToStuckState(): void {
+    // Save the current state name before redirecting so that after
+    // completing the revision, the learner can navigate back to it.
+    const currentStateName = this.conversationFlowService
+      .getDisplayedCard()
+      .getStateName();
+    this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
-    this.conversationFlowService.setNextStateCard(
-      this.conversationFlowService.getNextCardIfStuck()
-    );
+    const nextStateCard = this.conversationFlowService.getNextCardIfStuck();
+    if (nextStateCard) {
+      this.conversationFlowService.setNextStateCard(nextStateCard);
+    }
     this.showInteraction = false;
     this.conversationFlowService.showPendingCard();
   }
@@ -540,10 +565,8 @@ export class ConversationSkinComponent {
   isHackyExpTitleTranslationDisplayed(explorationId: string): boolean {
     let recommendedExpTitleTranslationKey =
       this.getRecommendedExpTitleTranslationKey(explorationId);
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        recommendedExpTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      recommendedExpTitleTranslationKey
     );
   }
 

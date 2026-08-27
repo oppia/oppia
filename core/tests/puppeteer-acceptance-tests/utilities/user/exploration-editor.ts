@@ -27,14 +27,16 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
+import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor, RTE_BUTTON_TITLES} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
+const emptyCreatorDashboardMessageSelector = '.oppia-dashboard-empty-text p';
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -42,6 +44,11 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
+
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalMathJaxSvgSelector = '.modal-dialog .MathJax_SVG svg';
+const activeModalMathJaxTextSelector = '.modal-dialog .MathJax_SVG text';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -59,9 +66,15 @@ const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
 const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const creationModalSelector = '.e2e-test-creation-modal';
+const createExplorationFromModalSelector = '.e2e-test-create-exploration';
+const rolesHeaderSelector = '.e2e-test-roles-header';
+const rolesContentSelector = '.e2e-test-roles-content';
+const usernameSelector = '.e2e-test-role-username';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -74,7 +87,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -118,6 +131,11 @@ const modifyTranslationModalSelector =
   '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
+const stateNodeGroupSelector = '.e2e-test-node';
+
+// To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts.
+const MAX_NODE_LABEL_LENGTH = 15;
+
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -196,12 +214,7 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 const settingsContainerSelector =
@@ -235,6 +248,13 @@ const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
+const explorationGridCardTitleSelector =
+  '.e2e-test-exploration-dashboard-card .e2e-test-exp-summary-tile-title';
+const explorationListRowTitleSelector = '.e2e-test-exp-summary-row-title';
+const explorationListItemSelector = '.exploration-list-item';
+const averageRatingsCardSelector = '.average-ratings';
+const totalPlaysCardSelector = '.total-plays';
+const openFeedbackCardSelector = '.total-open-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
@@ -242,9 +262,6 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
-const totalPlaysSelector = '.e2e-test-oppia-total-plays';
-const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
-const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
@@ -269,6 +286,7 @@ const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const ownersListSelector = '.e2e-test-owner-role-names';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
@@ -372,13 +390,18 @@ const helpPageLinkSelector = '.e2e-test-help-page-link';
 const takeATourButtonSelector = '.e2e-test-tour-button';
 const translationTourButtonSelector = '.e2e-test-translation-tour-button';
 
-// Joyride (Exploration Editor Tour).
-const joyrideBodySelector = '.joyride-step__body';
-const joyrideTitleSelector = '.e2e-test-joyride-title';
-const nextButtonSelector = '.joyride-step__next-container .joyride-button';
-const previousButtonSelector = '.joyride-step__prev-container .joyride-button';
-const joyrideDoneButtonSelector = '.joyride-step__done-button .joyride-button';
-const joyrideStepSelector = '.joyride-step__counter';
+// Shepherd (Exploration Editor Tour).
+const shepherdBodySelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdTitleSelector = '.shepherd-element:not([hidden]) .shepherd-title';
+const nextButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const previousButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-secondary';
+const shepherdDoneButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const shepherdStepSelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdFooterSelector =
+  '.shepherd-element:not([hidden]) .shepherd-footer';
 
 // Save Exploration Modal.
 const saveExplorationModalContainerSelector =
@@ -403,6 +426,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -433,6 +457,49 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
+const feedbackTimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+const numberOfPassers = '.e2e-test-num-passersby';
+
+const explorationGraphSelector = 'oppia-exploration-graph';
+const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
+const explorationGraphNodeDeleteButtonSelector =
+  'g.e2e-test-delete-node rect.oppia-node-delete';
+const explorationGraphNodeSelector = 'g.e2e-test-node';
+const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
+
+const lostChangesModalSelector = '.e2e-test-lost-changes-modal';
+const discardAndExportLostChangesButtonSelector =
+  'button.e2e-test-discard-and-export-lost-changes-button';
+const stateNameSubmitButtonSelector = 'button.e2e-test-state-name-submit';
+const stateNameInputSelector = '.e2e-test-state-name-input';
+const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
+
+const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
+const saveRecommendationModalSaveButtonSelector =
+  'button.e2e-test-recommendation-prompt-save-button';
+
+const nextCardButtonSelector = '.e2e-test-next-card-button';
+const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
+
+const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
+
+const explorationListSelector = '.oppia-dashboard-table';
+
+const explorationGridRatingSelector = '.e2e-test-exp-summary-tile-rating';
+
+const explorationGridFeedbackSelector =
+  '.e2e-test-exp-summary-tile-open-feedback';
+
+const explorationGridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -487,6 +554,22 @@ const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
+   * Truncates a card name the same way the frontend graph visualization does.
+   * Matches the behavior of TruncatePipe with MAX_NODE_LABEL_LENGTH.
+   * @param cardName The card name to potentially truncate.
+   * @returns The truncated card name if it exceeds MAX_NODE_LABEL_LENGTH, otherwise the original name.
+   */
+  private truncateCardName(cardName: string): string {
+    if (!cardName || cardName.length <= MAX_NODE_LABEL_LENGTH) {
+      return cardName;
+    }
+    const suffix = '...';
+    return (
+      cardName.substring(0, MAX_NODE_LABEL_LENGTH - suffix.length) + suffix
+    );
+  }
+
+  /**
    * Checks if the interaction name is as expected.
    * @param name The name of the interaction.
    */
@@ -502,7 +585,9 @@ export class ExplorationEditor extends BaseUser {
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(feedbackResponseRemoveSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
@@ -610,10 +695,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Selects multiple options from the item selection input.
+   * This function will uncheck any currently checked options that are not in
+   * the provided list, and check any options that should be selected.
    * @param options The options to select.
    */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
     const optionElementSelector = '.e2e-test-item-selection-input-item';
+    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
 
     await this.expectElementToBeVisible(optionElementSelector);
     const optionElements = await this.page.$$(optionElementSelector);
@@ -625,16 +713,41 @@ export class ExplorationEditor extends BaseUser {
       if (!optionText) {
         continue;
       }
-      if (options.includes(optionText)) {
-        await optionElement.click();
 
-        const inputElement = await optionElement.$('input');
+      // Click on the mat-checkbox element inside the label.
+      const checkboxElement = await optionElement.$(checkboxSelector);
+      if (!checkboxElement) {
+        throw new Error(`Checkbox not found for option: ${optionText}`);
+      }
+
+      // Check if the checkbox is currently checked.
+      const checkboxIsCurrentlyChecked = await checkboxElement.evaluate(el =>
+        el.classList.contains('mat-checkbox-checked')
+      );
+
+      const shouldBeChecked = options.includes(optionText);
+
+      if (shouldBeChecked && !checkboxIsCurrentlyChecked) {
+        // Need to check this checkbox. Use clickOnElement to ensure the element
+        // is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
         await this.page.waitForFunction(
-          (element: HTMLInputElement) => {
-            return element.checked;
+          (element: Element) => {
+            return element.classList.contains('mat-checkbox-checked');
           },
           {},
-          inputElement
+          checkboxElement
+        );
+      } else if (!shouldBeChecked && checkboxIsCurrentlyChecked) {
+        // Need to uncheck this checkbox. Use clickOnElement to ensure the
+        // element is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return !element.classList.contains('mat-checkbox-checked');
+          },
+          {},
+          checkboxElement
         );
       }
     }
@@ -692,6 +805,14 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
+
+    // ClearAllTextFrom clears the field programmatically, so the input is not
+    // marked as user-edited and Enter alone does not fire a change event. Since
+    // the filter only re-applies on change, dispatch it explicitly so that the
+    // filter reflects the current input value.
+    await this.page.$eval(historyUserFilterSelector, el => {
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+    });
   }
 
   /**
@@ -1683,6 +1804,10 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1738,6 +1863,10 @@ export class ExplorationEditor extends BaseUser {
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
 
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1792,6 +1921,9 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          visible: true,
+        });
         await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
@@ -1936,9 +2068,19 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates graph theory learner answer in response modal to be a simple star network.
+   * * @param {string} centerVertex - The text to be entered for the center vertex.
    */
-  async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
+  async updateGraphTheoryLearnerAnswerInResponseModal(
+    centerVertex?: string
+  ): Promise<void> {
     const responseBox = await this.getRuleEditorModal();
+
+    if (centerVertex) {
+      const inputElement = await responseBox.$('input');
+      if (inputElement) {
+        await inputElement.type(centerVertex);
+      }
+    }
 
     await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
@@ -2018,6 +2160,10 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2420,7 +2566,20 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
+    await this.waitForCreatorDashboardToLoad();
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Waits for the creator dashboard content to finish loading.
+   */
+  async waitForCreatorDashboardToLoad(): Promise<void> {
+    await this.expectElementToBeVisible(
+      creatorDashboardContainerSelector,
+      true
+    );
+    await this.waitForPageToFullyLoad();
+    await this.waitForNetworkIdle({idleTime: 1000});
   }
 
   /**
@@ -2428,7 +2587,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+    await this.clickOnElementWithSelector(createExplorationButtonSelector);
+
+    // If the create activity modal appears (user has collection editor role),
+    // click the exploration option.
+    const isCreationModalVisible = await this.isElementVisible(
+      creationModalSelector,
+      true,
+      5000
+    );
+
+    if (isCreationModalVisible) {
+      await this.clickAndWaitForNavigation(
+        createExplorationFromModalSelector,
+        true
+      );
+    }
 
     await this.page.waitForFunction(
       (targetURL: string) => {
@@ -2467,6 +2641,9 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    // Ensure the editor is fully loaded before attempting to navigate.
+    await this.waitForPageToFullyLoad();
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2478,19 +2655,23 @@ export class ExplorationEditor extends BaseUser {
         });
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
+      // Wait until the expanded mobile navbar is visible before clicking it.
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
+      // Open the navbar dropdown, then navigate to Settings.
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(advanceSettingsDropdown);
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-      await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
+      // Use expandSettingsTabSection which checks if already expanded.
+      await this.expectElementToBeVisible(basicSettingsDropdown);
+      await this.expandSettingsTabSection('Basic Settings');
+      await this.expandSettingsTabSection('Advanced Features');
+      await this.expandSettingsTabSection('Roles');
+      await this.expandSettingsTabSection('Voice Artists');
+      await this.expandSettingsTabSection('Permissions');
+      await this.expandSettingsTabSection('Feedback');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2506,7 +2687,9 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Expands the specified settings tab section.
-   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
+   * Permissions, Feedback, and Controls sections.
+   * Note: Roles and Voice Artists sections are only available for exploration creators.
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
@@ -2515,6 +2698,8 @@ export class ExplorationEditor extends BaseUser {
       | 'Advanced Features'
       | 'Roles'
       | 'Voice Artists'
+      | 'Permissions'
+      | 'Feedback'
       | 'Controls'
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
@@ -2530,6 +2715,17 @@ export class ExplorationEditor extends BaseUser {
     const sectionContentSelector = `.e2e-test-${identifier}-content`;
     const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
+    // Check if the section header exists (some sections like Roles and Voice Artists
+    // are only available for exploration creators).
+    const sectionHeaderExists = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeaderExists) {
+      showMessage(
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is not available (only available for exploration creators).'
+      );
+      return;
+    }
+
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
@@ -2541,7 +2737,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Expand the section.
     await this.expectElementToBeVisible(sectionHeaderSelector);
-    await this.page.click(sectionHeaderSelector);
+    await this.clickOnElementWithSelector(sectionHeaderSelector);
     await this.expectElementToBeVisible(sectionContentSelector);
   }
 
@@ -2599,8 +2795,9 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.,
+   * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
+   * @returns {string} The exploration id of the published exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -2611,13 +2808,8 @@ export class ExplorationEditor extends BaseUser {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
-        await this.page.waitForSelector(mobileNavbarDropdown, {
-          visible: true,
-        });
+        await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
         const element = await this.page.$(mobileNavbarOptions);
-        // If the element is not present, it means the mobile navigation bar is not expanded.
-        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-        // which expands the mobile navigation bar.
         if (!element) {
           await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
         }
@@ -2630,7 +2822,6 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(publishExplorationButtonSelector);
       }
     };
-
     const fillExplorationMetadataDetails = async () => {
       await this.clickOnElementWithSelector(explorationTitleInput);
       await this.typeInInputField(explorationTitleInput, title);
@@ -2650,6 +2841,17 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -2693,21 +2895,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      const mobileNavbarElement = await this.getElementInParent(
+        mobileNavbarOptions
+      ).catch(() => null);
       if (!mobileNavbarElement) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
       }
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.expectElementToBeVisible(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
 
-    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
   /**
@@ -2728,22 +2931,23 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`Welcome Modal not found, but test can be continued.
-        Error: ${error.message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
+  }
+
+  /**
+   * Function to dismiss welcome modal if it is present. This is useful when
+   * the modal may or may not appear due to race conditions or when it has
+   * already been dismissed earlier in the test flow.
+   */
+  async dismissWelcomeModalIfPresent(): Promise<void> {
+    // The existing dismissWelcomeModal() in this class already handles the
+    // case where the modal is not present (via try/catch), so we just
+    // delegate to it.
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -2794,8 +2998,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
+      timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
@@ -2818,13 +3031,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
-        INTERACTION_TYPES.GRAPH_THEORY,
         INTERACTION_TYPES.NUMBER_INPUT,
         INTERACTION_TYPES.SET_INPUT,
         INTERACTION_TYPES.NUMERIC_EXPRESSION,
@@ -2833,8 +3041,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.NUMBER_WITH_UNITS,
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
-      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {
@@ -2843,6 +3049,17 @@ export class ExplorationEditor extends BaseUser {
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOnElementWithSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
+        // Wait until the tab gains the 'active' class before looking for tiles.
+        // Without this, Puppeteer may query tiles while the modal is still
+        // animating to the new tab, causing spurious 'not found' errors.
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const el = document.querySelector(selector);
+            return el && el.classList.contains('active');
+          },
+          {timeout: 30000},
           INTERACTION_TABS_SELECTORS[interaction]
         );
         showMessage(`Switched to ${interaction} tab.`);
@@ -2864,6 +3081,10 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
+      hidden: true,
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -2874,7 +3095,24 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    // Scope the XPath search to the modal body. Searching the whole page
+    // (e.g. `//*[contains(text(), tileText)]`) can accidentally match
+    // unrelated elements outside the modal whose text happens to contain
+    // the interaction name as a substring — e.g. a state named
+    // "Text Input - 3" will match a search for "Text Input", causing us
+    // to click the state name header instead of the interaction tile
+    // while the modal is still open (and blocking the click).
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(@class, "modal-body")]//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
+    }
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -3349,6 +3587,96 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Opens the Roles form.
+   * Uses existing helpers and resilient fallbacks for mobile/constrained
+   * viewports.
+   */
+  async openRolesForm(): Promise<void> {
+    // Precondition: The caller must navigate to the Settings tab first.
+    // This helper intentionally avoids navigation so expectation methods do
+    // not perform extra interactions as side effects.
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+
+    await this.expectElementToBeVisible(rolesHeaderSelector);
+
+    // The edit button opens the roles form via Angular handler. Try a normal
+    // click first, then fallback to dispatching low-level mouse events if the
+    // add-user input does not appear.
+    await this.page.waitForSelector(editRolesButtonSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOnElementWithSelector(editRoleButton);
+
+    try {
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 3000,
+      });
+      return;
+    } catch (e) {
+      showMessage(
+        'Edit roles click did not open the form; performing in-page click fallback.'
+      );
+      await this.page.evaluate((editRoleButtonSelector: string) => {
+        const el = document.querySelector(
+          editRoleButtonSelector
+        ) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, editRoleButton);
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+
+    // Verify the roles form is open by checking the add-user input is visible.
+    await this.expectElementToBeVisible(addUsernameInputBox);
+  }
+
+  /**
+   * Expects the exploration to be community owned in the Settings tab.
+   * @param expectedCommunityOwnedMessage The expected community-owned text.
+   */
+  async expectExplorationToBeCommunityOwned(
+    expectedCommunityOwnedMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityOwnedMessageSelector);
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          const messageText = element?.textContent?.trim() || '';
+          return messageText.includes(expectedText);
+        },
+        {timeout: 5000},
+        communityOwnedMessageSelector,
+        expectedCommunityOwnedMessage
+      );
+    } catch {
+      const messageText = await this.page.$eval(
+        communityOwnedMessageSelector,
+        el => el.textContent?.trim() || ''
+      );
+      throw new Error(
+        `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${messageText}"`
+      );
+    }
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3359,16 +3687,60 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    const [managerOption] = await this.page.$x(
-      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
     );
-    await managerOption.click();
-    await this.page.waitForSelector(tagFilterDropdownSelector, {
-      hidden: true,
-    });
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
     showMessage(`${username} has been added as manager role.`);
+  }
+
+  /**
+   * Assigns a role of manager to any guest user assuming the Roles form is
+   * already open and the username input is visible. This avoids re-clicking the
+   * edit button when it may be unreliable in constrained viewports.
+   * @param {string} username - The username to assign the manager role to.
+   */
+  async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameSelector);
+    await this.expectElementToBeClickable(addUsernameInputBox);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `${username} has been added as manager role (after form open).`
+    );
   }
 
   /**
@@ -3385,7 +3757,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as collaboratorRole.`);
   }
 
@@ -3405,7 +3777,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addRoleDropdown);
     await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as playtester.`);
   }
 
@@ -3550,6 +3922,9 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.page.waitForSelector(
+        `${mobileDiscardButtonSelector}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.page.waitForSelector(discardDraftDropdownSelector, {
@@ -3559,6 +3934,9 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(desktopDiscardDraftButton, {
         visible: true,
       });
+      await this.page.waitForSelector(
+        `${desktopDiscardDraftButton}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.page.waitForSelector(confirmDiscardButton, {
@@ -3580,6 +3958,112 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(stateResponsesSelector);
+
+    // Ensure the default response tab actually becomes active.
+    await this.page
+      .waitForSelector(`${stateResponsesSelector}.oppia-rule-tab-active`, {
+        visible: true,
+        timeout: 4000,
+      })
+      .catch(async () => {
+        // Retry using a DOM click in case layered UI blocks pointer events.
+        await this.page.evaluate((selector: string) => {
+          const tabs = Array.from(document.querySelectorAll(selector));
+          const visibleTab = tabs.find(tab => {
+            const rect = (tab as HTMLElement).getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          }) as HTMLElement | undefined;
+          visibleTab?.click();
+        }, stateResponsesSelector);
+
+        await this.page.waitForSelector(
+          `${stateResponsesSelector}.oppia-rule-tab-active`,
+          {
+            visible: true,
+            timeout: 4000,
+          }
+        );
+      });
+
+    // For some interactions, the default response panel can take longer to
+    // render or only expose the destination editor first.
+    try {
+      await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
+        visible: true,
+        timeout: 7000,
+      });
+    } catch {
+      await this.page.waitForSelector(
+        `${openOutcomeDestButton}, ${destinationCardSelector}`,
+        {
+          visible: true,
+        }
+      );
+    }
+  }
+
+  /**
+   * Returns whether the destination selector is already visible.
+   */
+  async isOutcomeDestinationSelectorVisible(): Promise<boolean> {
+    return await this.isElementVisible(destinationCardSelector, true, 1200);
+  }
+
+  /**
+   * Opens destination editor if needed.
+   */
+  async openOutcomeDestinationEditorIfNeeded(): Promise<void> {
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (isDestinationSelectorVisible) {
+      return;
+    }
+
+    await this.page.waitForSelector(openOutcomeDestButton, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
+    await this.page.waitForSelector(destinationCardSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Function to select destination for default response.
+   * @param cardName - The name of the card to which learners will be directed.
+   */
+  async selectDestinationAndSave(cardName: string): Promise<void> {
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.page.waitForSelector(addStateInput, {
+      visible: true,
+    });
+    await this.typeInInputField(addStateInput, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Function to select existing destination and save.
+   * @param cardName - The name of the card to which learners will be directed.
+   */
+  async selectExistingDestinationAndSave(cardName: string): Promise<void> {
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Function to display the Oppia responses section.
+   */
+  async viewOppiaResponsesLegacyKeptForCompatibility(): Promise<void> {
+    await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
       visible: true,
     });
@@ -3590,35 +4074,62 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to which learners will be directed.
    */
   async directLearnersToNewCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
-    await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.typeInInputField(addStateInput, cardName);
-    await this.clickOnElementWithSelector(saveOutcomeDestButton);
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      hidden: true,
-    });
+    const isOutcomeDestinationEditorVisible = await this.isElementVisible(
+      openOutcomeDestButton,
+      true,
+      2500
+    );
+
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (!isOutcomeDestinationEditorVisible && !isDestinationSelectorVisible) {
+      await this.viewOppiaResponses();
+    }
+
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectDestinationAndSave(cardName);
+    await this.waitForNetworkIdle();
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForSelector(stateNodeGroupSelector);
+
+    const truncatedCardName = this.truncateCardName(cardName);
+    await this.page.waitForFunction(
+      (selector: string, fullName: string, truncatedName: string) => {
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
+      },
+      {timeout: 10000},
+      stateNodeSelector,
+      cardName,
+      truncatedCardName
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
   }
 
   /**
    * Updates direct learners option when changing cards.
-   * @param cardName - The ard name where learners should be directed.
+   * @param cardName - Card name where learners should be directed
    */
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
-    await this.waitForElementToBeClickable(destinationCardSelector);
-    await this.select(destinationCardSelector, cardName);
-    await this.clickOnElementWithSelector(saveOutcomeDestButton);
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      hidden: true,
-    });
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectExistingDestinationAndSave(cardName);
   }
 
   /**
@@ -3637,38 +4148,75 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileStateGraphResizeButton, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      // Check if the state graph modal is already open before clicking the
+      // resize button.
+      const stateGraphModalIsOpen = await this.page.$(
+        explorationStateGraphModalSelector
+      );
+      if (!stateGraphModalIsOpen) {
+        // Wait for any blocking modal to close first before clicking the
+        // resize button.
+        const blockingModal = await this.page.$('div.modal-content');
+        if (blockingModal) {
+          await this.page.waitForSelector('div.modal-content', {hidden: true});
+        }
+        await this.page.waitForSelector(mobileStateGraphResizeButton, {
+          visible: true,
+        });
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
     }
 
-    await this.page.waitForSelector(stateNodeSelector);
-    elements = await this.page.$$(stateNodeSelector);
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect which has the click handler.
+    const stateNodeGroupSelector = '.e2e-test-node';
+    const scopedStateNodeGroupSelector = this.isViewportAtMobileWidth()
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        visible: true,
+      });
+    }
+    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
-        element.$eval('tspan', node => node.textContent?.trim() || '')
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() || ''
+        )
       )
     );
-    const cardIndex = cardNames.indexOf(cardName);
+
+    const truncatedCardName = this.truncateCardName(cardName);
+    let cardIndex = cardNames.indexOf(cardName);
+
+    if (cardIndex === -1) {
+      cardIndex = cardNames.indexOf(truncatedCardName);
+    }
 
     if (cardIndex === -1) {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let cardButton: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      cardButton = elements[cardIndex + elements.length / 2];
-    } else {
-      cardButton = elements[cardIndex];
-    }
-
-    if (!cardButton) {
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
+    if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    await cardButton.click();
+    // Click on the node background rect which has the click handler.
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    await nodeBackground.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
@@ -3693,6 +4241,16 @@ export class ExplorationEditor extends BaseUser {
           `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
+    }
+
+    // On mobile the state-graph modal uses an NgBootstrap CSS fade-out animation.
+    // Wait for it to fully disappear before returning, otherwise the modal
+    // backdrop can obstruct the editor content (e.g., stateEditSelector)
+    // in the next call.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+      });
     }
   }
 
@@ -3746,7 +4304,18 @@ export class ExplorationEditor extends BaseUser {
 
     if (directToCard) {
       await this.clickOnElementWithSelector(openOutcomeDestButton);
-      await this.page.select(destinationSelectorDropdown, directToCard);
+
+      // '(try again)' is represented in the UI summary, but destination
+      // selection expects the current card name for a self-loop.
+      let destinationValue = directToCard;
+      if (directToCard === '(try again)') {
+        destinationValue = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
+      }
+
+      await this.page.select(destinationSelectorDropdown, destinationValue);
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
@@ -4216,8 +4785,11 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(previewTabButton);
     }
 
-    await this.expectElementToBeVisible(previewTabContainer);
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(previewTabContainer, {visible: true});
   }
 
   /**
@@ -4443,7 +5015,10 @@ export class ExplorationEditor extends BaseUser {
     try {
       await this.page.waitForFunction(
         (element: HTMLElement, value: string, matchCase: boolean) => {
-          return (element.innerText.trim() === value.trim()) === matchCase;
+          const normalize = (s: string) => s.trim().replace(/\n+/g, '\n');
+          return (
+            (normalize(element.innerText) === normalize(value)) === matchCase
+          );
         },
         {},
         element,
@@ -4473,13 +5048,22 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
-
     if (skipVerification) {
       return;
     }
     await this.page.waitForSelector(previousCardButton, {
       visible: true,
     });
+  }
+
+  /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
   }
 
   /**
@@ -4604,13 +5188,11 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = true
+    flag: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal(flag);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -4624,27 +5206,31 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
+    await this.expectElementToBeVisible(addStateInput);
     await this.typeInInputField(addStateInput, lastInteraction);
     await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.expectElementToBeVisible(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -4658,9 +5244,9 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
-      'Algebra'
+      'Mathematics'
     );
 
     // Check if publish button is disabled (post-check)
@@ -4691,11 +5277,12 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics',
-    numberOfCards: number = 2
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
       await this.updateCardContent(`Content ${i}`);
@@ -4805,6 +5392,37 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
     }
+  }
+
+  /**
+   * Checks whether the specified user is a manager of the exploration.
+   * Verifies by checking that the username appears explicitly in the Managers section.
+   */
+  async expectUserToBeExplorationManager(username: string): Promise<void> {
+    // Verify the username is listed in the Managers section (the definitive check per CUJ).
+    await this.expectElementToBeVisible(rolesContentSelector);
+    const owners = await this.page.$$(ownersListSelector);
+    if (owners.length === 0) {
+      throw new Error('Managers list is empty or not found.');
+    }
+
+    const ownerUsernames = await this.page.$$eval(
+      ownersListSelector,
+      elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(Boolean)
+    );
+
+    if (!ownerUsernames.includes(username)) {
+      throw new Error(
+        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
+          ', '
+        )}`
+      );
+    }
+
+    showMessage(`User ${username} is listed as a manager of this exploration.`);
   }
 
   /**
@@ -5342,6 +5960,8 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < answerItems.length - 1; i++) {
       const option = answerItems[i];
 
+      // Re-query the list fresh after each drag so stale handles from
+      // Angular re-renders do not cause incorrect source/destination picks.
       const optionElements = await this.page.$$(dragAndDropItemSelector);
       const destinationElement = optionElements[i];
 
@@ -5361,6 +5981,14 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Option "${option}" not found.`);
       }
 
+      if (sourceElement === destinationElement) {
+        continue;
+      }
+
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
@@ -5376,6 +6004,9 @@ export class ExplorationEditor extends BaseUser {
         destBox.x + destBox.width / 2,
         destBox.y + destBox.height / 2
       );
+
+      // Wait for the list to settle after the drag before the next iteration.
+      await this.page.waitForTimeout(500);
     }
 
     await this.clickOnSubmitAnswerButton();
@@ -5387,21 +6018,51 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
    */
   async expectAverageRatingAndUsersToBe(
-    expectedRating: number,
+    expectedRating: number | string,
     expectedUsers: number
   ): Promise<void> {
-    await this.page.waitForSelector(avarageRatingSelector, {
-      visible: true,
-    });
-    const avarageRating = await this.page.$eval(
-      avarageRatingSelector,
-      element => parseFloat((element as HTMLElement).innerText.trim())
+    await this.expectElementToBeVisible(averageRatingsCardSelector, true);
+
+    const ratingElements = await this.page.$$(
+      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
+        `${averageRatingsCardSelector} .stat-value-without-rating`
     );
-    if (avarageRating !== expectedRating) {
-      throw new Error(
-        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+    let ratingText = '';
+
+    for (const element of ratingElements) {
+      const rect = await element.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      ratingText = await this.page.evaluate(
+        el => (el as HTMLElement).innerText.trim() || '',
+        element
       );
+      break;
     }
+
+    // Handle "N/A" case.
+    if (expectedRating === 'N/A') {
+      if (ratingText !== 'N/A') {
+        throw new Error(
+          'Expected average rating to be "N/A", but found "' + ratingText + '".'
+        );
+      }
+    } else {
+      const ratingValue = parseFloat(ratingText);
+
+      if (ratingValue !== expectedRating) {
+        throw new Error(
+          'Expected average rating to be ' +
+            expectedRating +
+            ', but found ' +
+            ratingValue +
+            '.'
+        );
+      }
+    }
+
     const totalUsersText = await this.page.$eval(
       usersCountInRatingSelector,
       el => (el as HTMLElement).innerText.trim() || ''
@@ -5421,12 +6082,28 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(openFeedbackCardSelector, true);
     const numberOfOpenFeedbacks = await this.page.$eval(
-      numberOfOpenFeedbacksSelector,
-      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+      openFeedbackCardSelector,
+      card => {
+        const statValue = Array.from(
+          (card as HTMLElement).querySelectorAll(
+            '.stat-value-with-rating, .stat-value-without-rating'
+          )
+        ).find(element => {
+          const htmlElement = element as HTMLElement;
+          const style = window.getComputedStyle(htmlElement);
+          const rect = htmlElement.getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        }) as HTMLElement | undefined;
+
+        return parseInt(statValue?.innerText.trim() || '0', 10);
+      }
     );
     if (numberOfOpenFeedbacks !== number) {
       throw new Error(
@@ -5440,12 +6117,26 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(totalPlaysSelector, {
-      visible: true,
-    });
-    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
-      parseInt((el as HTMLElement).innerText.trim(), 10)
+    await this.expectElementToBeVisible(totalPlaysCardSelector, true);
+    const totalPlaysElements = await this.page.$$(
+      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
+        `${totalPlaysCardSelector} .stat-value-without-rating`
     );
+    let numberOfTotalPlays = 0;
+
+    for (const el of totalPlaysElements) {
+      const rect = await el.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        element => (element as HTMLElement).innerText.trim() || '0',
+        el
+      );
+      numberOfTotalPlays = parseInt(text, 10) || 0;
+      break;
+    }
     if (numberOfTotalPlays !== number) {
       throw new Error(
         `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
@@ -5791,14 +6482,14 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(takeATourButtonSelector);
     await this.clickOnElementWithSelector(takeATourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
     await this.expectElementToBeVisible(translationTourButtonSelector);
     await this.clickOnElementWithSelector(translationTourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   /**
@@ -5875,45 +6566,45 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the next step in the joyride.
+   * Navigates to the next step in the shepherd tour.
    */
-  async continueToNextJoyrideStep(): Promise<void> {
+  async continueToNextShepherdStep(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.expectJoyrideNextButtonToBeVisible();
+    await this.expectShepherdNextButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(nextButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForTimeout(1000);
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
   /**
-   * Navigates to the previous step in the joyride.
+   * Navigates to the previous step in the shepherd tour.
    */
-  async continueToPreviousJoyrideStep(): Promise<void> {
-    await this.expectJoyridePreviousButtonToBeVisible();
+  async continueToPreviousShepherdStep(): Promise<void> {
+    await this.expectShepherdPreviousButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(previousButtonSelector);
 
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
@@ -5958,12 +6649,66 @@ export class ExplorationEditor extends BaseUser {
   async expectCurrentOutcomeDestinationToBe(
     expectedDestination: string
   ): Promise<void> {
+    if (expectedDestination === '(try again)') {
+      const isCurrentDestinationSummaryVisible = await this.isElementVisible(
+        currentOutcomeDestinationSelector,
+        true,
+        3000
+      );
+
+      if (isCurrentDestinationSummaryVisible) {
+        const currentDestination = await this.page.$eval(
+          currentOutcomeDestinationSelector,
+          el => el.textContent?.trim() || ''
+        );
+        expect(['(try again)', '']).toContain(currentDestination);
+        return;
+      }
+
+      // Self-loop destinations sometimes render without current-outcome text.
+      // In that case, verify by opening the destination editor and checking
+      // that the selected destination is the current card.
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+      await this.page.waitForSelector(destinationSelectorDropdown, {
+        visible: true,
+      });
+
+      try {
+        const selectedDestinationText = await this.page.$eval(
+          `${destinationSelectorDropdown} option:checked`,
+          option => option.textContent?.trim() || ''
+        );
+        const currentCardName = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
+
+        const normalizedDestination = selectedDestinationText.toLowerCase();
+        const normalizedCurrentCardName = currentCardName.toLowerCase();
+        const isSelfLoopDestination =
+          normalizedDestination === '(try again)' ||
+          normalizedDestination === '' ||
+          normalizedDestination.includes(normalizedCurrentCardName);
+        expect(isSelfLoopDestination).toBe(true);
+      } finally {
+        const cancelDestinationButton = await this.page.$(
+          '.e2e-test-cancel-outcome-dest'
+        );
+        if (cancelDestinationButton) {
+          await this.clickOnElementWithSelector(
+            '.e2e-test-cancel-outcome-dest'
+          );
+        }
+      }
+      return;
+    }
+
     await this.page.waitForSelector(currentOutcomeDestinationSelector, {
       visible: true,
     });
     const currentDestination = await this.page.$eval(
       currentOutcomeDestinationSelector,
-      el => el.textContent?.trim()
+      el => el.textContent?.trim() || ''
     );
 
     expect(currentDestination).toBe(expectedDestination);
@@ -5981,11 +6726,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Verifies that the edit card content pencil button is visible.
+   * @param {boolean} isVisible - Whether the button is expected to be visible.
    */
-  async expectEditCardContentPencilButtonToBeVisible(): Promise<void> {
+  async expectEditCardContentPencilButtonToBeVisible(
+    isVisible: boolean = true
+  ): Promise<void> {
     const visible = await this.isElementVisible(editCardContentButtonSelector);
-
-    expect(visible).toBe(true);
+    expect(visible).toBe(isVisible);
   }
 
   /**
@@ -6008,17 +6755,23 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationStateGraphInMobileView();
     }
 
+    await this.page.waitForSelector(stateNodeGroupSelector);
+
+    const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
-      (selector: string, value: string) => {
+      (selector: string, fullName: string, truncatedName: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.includes(value);
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
       },
-      {},
+      {timeout: 60000},
       stateNodeSelector,
-      cardName
+      cardName,
+      truncatedCardName
     );
 
     if (this.isViewportAtMobileWidth()) {
@@ -6077,40 +6830,77 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Verifies that the joyride content is as expected.
+   * Verifies that the shepherd tour content is as expected.
    * @param expectedContent - The expected content.
    */
-  async expectJoyrideContentToContain(expectedContent: string): Promise<void> {
-    await this.expectTextContentToContain(joyrideBodySelector, expectedContent);
+  async expectShepherdContentToContain(expectedContent: string): Promise<void> {
+    await this.expectTextContentToContain(
+      shepherdBodySelector,
+      expectedContent
+    );
   }
 
   /**
-   * Verifies that the joyride title is as expected.
+   * Verifies that the shepherd tour title is as expected.
    * @param expectedTitle - The expected title.
    */
-  async expectJoyrideTitleToBe(expectedTitle: string): Promise<void> {
-    await this.expectTextContentToBe(joyrideTitleSelector, expectedTitle);
+  async expectShepherdTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(shepherdTitleSelector, expectedTitle);
   }
 
-  async expectJoyrideDoneButtonToBeVisible(
+  async expectShepherdDoneButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const doneButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Done')
+        );
+        if (shouldBeVisible) {
+          return (
+            doneButton && (doneButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !doneButton || (doneButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**
-   * Verifies that the joyride next button is visible.
+   * Verifies that the shepherd next button is visible.
    */
-  async expectJoyrideNextButtonToBeVisible(
+  async expectShepherdNextButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(nextButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const nextButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Next')
+        );
+        if (shouldBeVisible) {
+          return (
+            nextButton && (nextButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !nextButton || (nextButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**
-   * Verifies that the joyride previous button is visible.
+   * Verifies that the shepherd previous button is visible.
    */
-  async expectJoyridePreviousButtonToBeVisible(
+  async expectShepherdPreviousButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(previousButtonSelector, visible);
@@ -6140,19 +6930,26 @@ export class ExplorationEditor extends BaseUser {
    * Verifies that the outcome feedback is visible.
    */
   async expectOutcomeFeedbackToBe(expectedFeedback: string): Promise<void> {
-    await this.page.waitForSelector(outcomeFeedbackSelector);
-    const feedbackText = await this.page.evaluate(
-      element => element.textContent,
-      outcomeFeedbackSelector
+    await this.page.waitForSelector(outcomeFeedbackSelector, {
+      visible: true,
+    });
+    const feedbackText = await this.page.$eval(
+      outcomeFeedbackSelector,
+      element => element.textContent?.trim() || ''
     );
 
     // Remove "Oppia tells the learner..." prefix.
-    const feedbackTextWithoutPrefix = feedbackText.replace(
-      'Oppia tells the learner...',
-      ''
-    );
+    const feedbackTextWithoutPrefix = feedbackText
+      .replace('Oppia tells the learner...', '')
+      .trim();
 
-    expect(feedbackTextWithoutPrefix).toBe(expectedFeedback);
+    // Strip icon glyphs (for example material-icon private-use characters)
+    // that can appear before feedback text in mobile layouts.
+    const normalizedFeedbackText = feedbackTextWithoutPrefix
+      .replace(/[\uE000-\uF8FF]/g, '')
+      .trim();
+
+    expect(normalizedFeedbackText).toBe(expectedFeedback);
   }
 
   /**
@@ -6277,13 +7074,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to finish the joyride.
+   * Function to finish the shepherd.
    */
-  async finishJoyride(): Promise<void> {
-    await this.expectJoyrideDoneButtonToBeVisible();
+  async finishShepherd(): Promise<void> {
+    await this.expectShepherdDoneButtonToBeVisible();
 
-    await this.page.click(joyrideDoneButtonSelector);
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, false);
+    await this.page.click(shepherdDoneButtonSelector);
+    await this.expectElementToBeVisible(shepherdDoneButtonSelector, false);
   }
 
   /**
@@ -7058,6 +7855,900 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(
       confirmDeleteInteractionButtonSelector,
       false
+    );
+  }
+
+  /**
+   * Clicks on a node element in the exploration graph
+   * @param stateName The name of the state to be clicked
+   * @param selectorToClick The selector of the element to be clicked within the node
+   * @returns A boolean indicating if the click was successful
+   */
+  async clickOnGraphNodeElement(
+    stateName: string,
+    selectorToClick: string
+  ): Promise<boolean> {
+    await this.page.waitForFunction(
+      (nodeSelector: string) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {timeout: 60000},
+      explorationGraphNodeSelector
+    );
+    return await this.page.evaluate(
+      (name: string, selectorToClick: string, nodeSelector: string) => {
+        const nodes = Array.from(document.querySelectorAll(nodeSelector));
+
+        const targetNode = nodes.find(node => {
+          const title = node.querySelector('title')?.textContent || '';
+          const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+          const normalizedName = name.replace(/\s+/g, ' ').trim();
+          return normalizedTitle.includes(normalizedName);
+        });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const element = targetNode.querySelector(
+          selectorToClick
+        ) as HTMLElement | null;
+
+        if (!element) {
+          return false;
+        }
+
+        element.scrollIntoView({block: 'center', inline: 'center'});
+        element.dispatchEvent(new Event('click', {bubbles: true}));
+        return true;
+      },
+      stateName,
+      selectorToClick,
+      explorationGraphNodeSelector
+    );
+  }
+
+  /**
+   * Deletes a state from the exploration
+   * @param stateName The name of the state to be deleted
+   */
+
+  async deleteState(stateName: string): Promise<void> {
+    await this.expectExplorationGraphToContainCard(stateName);
+    const isMobile = this.isViewportAtMobileWidth();
+
+    if (isMobile) {
+      await this.openExplorationStateGraphInMobileView();
+    } else {
+      await this.navigateToCard(stateName);
+    }
+
+    await this.expectElementToBeVisible(explorationGraphSelector);
+
+    await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeBackgroundSelector
+    );
+
+    const deleteClicked = await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeDeleteButtonSelector
+    );
+
+    if (!deleteClicked) {
+      throw new Error(
+        `Delete button not found in graph for card: ${stateName}`
+      );
+    }
+
+    await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
+    await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      stateName
+    );
+
+    if (isMobile) {
+      const closeBtn = await this.page.$(closeModalButtonSelector);
+      if (closeBtn) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      }
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Expects the lost changes modal to be visible or not and matches the heading if visible
+   * @param isVisible - Whether the modal should be visible or not
+   */
+  async expectLostChangesModalToBeVisible(isVisible: boolean): Promise<void> {
+    await this.expectElementToBeVisible(lostChangesModalSelector, isVisible);
+
+    if (isVisible) {
+      await this.expectModalTitleToBe('Error Saving Exploration');
+    }
+  }
+
+  /**
+   * Exports and discards lost changes from the lost changes modal
+   */
+  async exportAndDiscardLostChanges(): Promise<void> {
+    await this.expectLostChangesModalToBeVisible(true);
+
+    await this.expectElementToBeVisible(
+      discardAndExportLostChangesButtonSelector,
+      true
+    );
+
+    await this.clickOnElementWithSelector(
+      discardAndExportLostChangesButtonSelector
+    );
+
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects a file to be downloaded with given file name
+   */
+  async expectLostChangesFileToBeDownloaded(): Promise<void> {
+    const downloadedFile =
+      await this.waitForExplorationDownload('lostChanges.txt');
+    expect(downloadedFile).toBe('lostChanges.txt');
+    await this.waitForPageToFullyLoad();
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Updates the name of a state in the exploration editor
+   * @param newStateName - The new name for the state
+   */
+  async updateStateName(newStateName: string): Promise<void> {
+    await this.expectElementToBeVisible(currentCardNameContainerSelector, true);
+    await this.clickOnElementWithSelector(currentCardNameContainerSelector);
+
+    await this.page.evaluate(selector => {
+      const input = document.querySelector(selector) as HTMLInputElement;
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }, stateNameInputSelector);
+
+    await this.page.keyboard.type(newStateName);
+    await this.clickOnElementWithSelector(stateNameSubmitButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      newStateName
+    );
+  }
+
+  /**
+   * Expects the state name to be a specific value
+   * @param expectedStateName The expected state name
+   */
+  async expectStateNameToBe(expectedStateName: string): Promise<void> {
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      expectedStateName
+    );
+  }
+
+  /**
+   * Expects the exploration graph to not contain a specific card
+   * @param cardName The name of the card to check
+   */
+  async expectExplorationGraphToNotContainCard(
+    cardName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      cardName
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Clicks on the discard lost changes button
+   */
+  async discardLostChanges(): Promise<void> {
+    await this.expectElementToBeVisible(errorSavingExplorationModal);
+    await this.clickOnElementWithSelector(errorSavingExplorationModal);
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects the card height limit warning to be visible
+   */
+  async expectCardHeightLimitWarningToBeVisible(): Promise<void> {
+    await this.expectTextContentToContain(
+      cardHeightLimitWarningSelector,
+      'This card is quite long'
+    );
+  }
+
+  /**
+   * Expects the save recommendation modal to be visible
+   */
+  async expectSaveRecommendationModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, true);
+
+    await this.expectModalTitleToBe('Save Changes');
+
+    await this.expectModalContentToContain(
+      'It is recommended to save if the exploration has more than 50 changes.'
+    );
+  }
+
+  /**
+   * Clicks on the save draft button in the save recommendation modal
+   * * @param commitMessage - The commit message text to be saved.
+   */
+  async saveExplorationDraftFromSaveRecommendationModal(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
+    await this.expectSaveRecommendationModalToBeVisible();
+    await this.clickOnElementWithSelector(
+      saveRecommendationModalSaveButtonSelector
+    );
+
+    if (commitMessage) {
+      await this.clickOnElementWithSelector(commitMessageSelector);
+      await this.typeInInputField(commitMessageSelector, commitMessage);
+    }
+
+    await this.clickOnElementWithSelector(saveDraftButton);
+    await this.expectElementToBeVisible(saveDraftButton, false);
+
+    await this.expectElementToBeVisible(toastMessage, true);
+    await this.expectElementToBeVisible(toastMessage, false);
+    showMessage('Exploration is saved successfully.');
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, false);
+  }
+
+  /**
+   * Navigates to creator dashboard using profile dropdown.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(creatorDashboardMenuLink);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+    await this.waitForCreatorDashboardToLoad();
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.navigateToCard(cardName);
+    await this.expectElementToBeVisible(explorationStateStatsModalSelector);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    await this.expectElementToBeVisible(
+      explorationStateStatsModalSelector,
+      false
+    );
+  }
+
+  /**
+   * Expects the number of passers to be a specific value.
+   * @param expected the expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await this.expectElementToBeVisible(numberOfPassers);
+
+    const text = await this.page.$eval(
+      numberOfPassers,
+      el => el.textContent?.trim() || ''
+    );
+
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
+  }
+
+  /**
+   * Expects the feedback reply details to be visible.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(feedbackTimeElement);
+  }
+
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Expects the interaction preview element to be absent from the DOM.
+   * Use this immediately after removeInteraction() to confirm the preview
+   * has been cleared.
+   */
+  async expectInteractionPreviewToBeAbsent(): Promise<void> {
+    const preview = await this.page.$(interactionPreviewSelector);
+    expect(preview).toBeNull();
+  }
+
+  /**
+   * Expects the "Customize Interaction" modal to have closed. Call this
+   * after clicking "Save Interaction" to confirm the modal disappears.
+   * Uses commonModalTitleSelector which is already defined in this file.
+   */
+  async expectCustomizeInteractionModalToBeClosed(): Promise<void> {
+    await this.page.waitForSelector(commonModalTitleSelector, {
+      hidden: true,
+      timeout: 10000,
+    });
+  }
+
+  /**
+   * Waits for the next-card button to be visible in the preview tab and
+   * asserts that its label matches the expected text (e.g. 'Continue').
+   * @param {string} expectedText - The expected text of the next-card button.
+   */
+  async expectNextCardButtonTextToBe(expectedText: string): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+    const buttonText = await this.page.$eval(
+      nextCardButtonSelector,
+      el => el.textContent?.trim() || ''
+    );
+    expect(buttonText).toBe(expectedText);
+  }
+
+  /**
+   * Waits until the next-card button is visible in the preview tab.
+   * Use this before asserting preview card content when the card has a
+   * Continue Button interaction.
+   */
+  async expectNextCardButtonToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+  }
+
+  /**
+   * Asserts that the multiple-choice options rendered in the preview tab
+   * match the expected set exactly (order-independent, ignoring empty strings).
+   * Uses multipleChoiceOptionSelector which is already defined in this file.
+   * @param {string[]} expectedOptions - The expected set of multiple-choice options.
+   */
+  async expectPreviewMultipleChoiceOptionsToEqual(
+    expectedOptions: string[]
+  ): Promise<void> {
+    const choices = await this.page.$$eval(
+      multipleChoiceOptionSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const nonEmptyChoices = choices.filter(choice => choice);
+    expect(nonEmptyChoices.length).toBe(expectedOptions.length);
+    expect(nonEmptyChoices).toEqual(expect.arrayContaining(expectedOptions));
+  }
+
+  /**
+   * Waits for the solution modal body to be visible and asserts that it
+   * contains every string in expectedTexts.
+   * Uses commonModalBodySelector which is already defined in this file.
+   * @param {string[]} expectedTexts - The strings expected to appear in the solution modal body.
+   */
+  async expectSolutionModalToContain(expectedTexts: string[]): Promise<void> {
+    await this.page.waitForSelector('ngb-modal-window.modal.show .modal-body', {
+      visible: true,
+    });
+    const modalText = await this.page.$eval(
+      'ngb-modal-window.modal.show .modal-body',
+      el => el.textContent || ''
+    );
+    for (const text of expectedTexts) {
+      expect(modalText).toContain(text);
+    }
+  }
+
+  /**
+   * Asserts that the preview is showing the end-exploration card:
+   * no submit-answer button is present and the restart button is visible.
+   */
+  async expectEndExplorationPreviewToBeVisible(): Promise<void> {
+    const submitButton = await this.page.$(submitAnswerButton);
+    expect(submitButton).toBeNull();
+    await this.page.waitForSelector(previewRestartButton, {
+      visible: true,
+    });
+  }
+  /*
+   * Adds a math formula to the current card's content using the RTE toolbar.
+   * This opens the state content editor, inserts a math formula via the
+   * CKEditor math button, and saves the content.
+   * @param {string} latex - The LaTeX expression to insert.
+   * @param {string} [expectedText] - The text expected to be rendered inside the MathJax SVG text node.
+   */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedText?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
+
+    // Insert mathematical formula via the RTE toolbar.
+    const rteEditor = new RTEEditor(this.page, this.page);
+    await rteEditor.clickOnRTEOptionWithTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.EN
+    );
+    await this.waitForNetworkIdle();
+    await rteEditor.typeMathExpression(latex);
+
+    if (expectedText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Math formula added to card content successfully.');
+  }
+
+  /**
+   * Asserts that Arabic text in a MathJax-rendered formula is preserved as a
+   * single contiguous string inside a text element, rather than being
+   * split into disconnected SVG text nodes. This verifies that the
+   * mtextFontInherit configuration is working correctly (Fixes #26148).
+   * @param {string} expectedText - The Arabic text expected inside the
+   *   text node.
+   */
+  async expectMathJaxToRenderArabicTextInSvgTextNode(
+    expectedText: string
+  ): Promise<void> {
+    // Math interactions require heavy MathJax rendering and take significantly
+    // longer to load than other interactions.
+    await this.page.waitForSelector(activeModalMathJaxSvgSelector, {
+      timeout: 15000,
+    });
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
+      (svgSelector, textSelector) => {
+        const svgElement = document.querySelector(svgSelector);
+        const textNodes = document.querySelectorAll(textSelector);
+        return {
+          arabicTextContent:
+            Array.from(textNodes)
+              .map(node => node.textContent?.trim() || '')
+              .filter(text => text !== '')
+              .join(' | ') || null,
+          rawSvgHtml: svgElement ? svgElement.textContent : null,
+        };
+      },
+      activeModalMathJaxSvgSelector,
+      activeModalMathJaxTextSelector
+    );
+
+    if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
+      throw new Error(
+        `Expected MathJax to render Arabic text "${expectedText}" inside an ` +
+          `SVG <text> element, but found: "${arabicTextContent}". ` +
+          `Raw SVG HTML for debugging: \n${rawSvgHtml}\n ` +
+          'This indicates that mtextFontInherit is not working correctly.'
+      );
+    }
+    showMessage(
+      'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
+  }
+
+  /**
+   * Expects explorations displayed in the grid to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInGridInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationGridSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationGridCardTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects explorations displayed in the list to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInListInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationListSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationListRowTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the grid to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenFeedback - The expected open feedback text.
+   * @param {string} expectedViews - The expected views text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenFeedback: string,
+    expectedViews: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationGridCardTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationGridCardTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    const cardHandle = await titleElement.evaluateHandle(
+      (element, cardSelector) => element.closest(cardSelector),
+      explorationGridSelector
+    );
+    const card = cardHandle.asElement();
+
+    if (!card) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        expectedRatingText: string,
+        expectedFeedbackText: string,
+        expectedViewsText: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getStatisticText(ratingSelector) === expectedRatingText &&
+          getStatisticText(feedbackSelector) === expectedFeedbackText &&
+          getStatisticText(viewsSelector) === expectedViewsText
+        );
+      },
+      {},
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
+    const cardDetails = await this.page.evaluate(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return {
+          rating: getStatisticText(ratingSelector),
+          feedback: getStatisticText(feedbackSelector),
+          views: getStatisticText(viewsSelector),
+        };
+      },
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector
+    );
+
+    if (cardDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${cardDetails.rating}".`
+      );
+    }
+
+    if (cardDetails.feedback !== expectedOpenFeedback) {
+      throw new Error(
+        `Expected open feedback "${expectedOpenFeedback}" but found "${cardDetails.feedback}".`
+      );
+    }
+
+    if (cardDetails.views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${cardDetails.views}".`
+      );
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the list to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenThreads - The expected open threads text.
+   * @param {string} expectedPlays - The expected plays text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenThreads: string,
+    expectedPlays: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationListRowTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationListRowTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+    const rowHandle = await titleElement.evaluateHandle(
+      (element, rowSelector) => element.closest(rowSelector),
+      explorationListItemSelector
+    );
+    const row = rowHandle.asElement();
+
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        rowElement: Element,
+        expectedRatingText: string,
+        expectedOpenThreadsText: string,
+        expectedPlaysText: string
+      ) => {
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              rowElement.querySelector(cellSelector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === expectedRatingText &&
+          getCellText('td:nth-child(3)') === expectedPlaysText &&
+          getCellText('td:nth-child(4)') === expectedOpenThreadsText
+        );
+      },
+      {},
+      row,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
+
+    const rowDetails = await this.page.evaluate((rowElement: Element) => {
+      const getCellText = (cellSelector: string): string => {
+        return (
+          (
+            rowElement.querySelector(cellSelector) as HTMLElement | null
+          )?.textContent?.trim() || ''
+        );
+      };
+
+      return {
+        rating: getCellText('td:nth-child(2)'),
+        plays: getCellText('td:nth-child(3)'),
+        openThreads: getCellText('td:nth-child(4)'),
+      };
+    }, row);
+
+    if (rowDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rowDetails.rating}".`
+      );
+    }
+
+    if (rowDetails.openThreads !== expectedOpenThreads) {
+      throw new Error(
+        `Expected open threads "${expectedOpenThreads}" but found "${rowDetails.openThreads}".`
+      );
+    }
+
+    if (rowDetails.plays !== expectedPlays) {
+      throw new Error(
+        `Expected plays "${expectedPlays}" but found "${rowDetails.plays}".`
+      );
+    }
+  }
+
+  /**
+   * Switches the exploration editor to list view.
+   */
+  async switchToListView(): Promise<void> {
+    await this.expectElementToBeVisible(listViewButtonSelector, true);
+
+    // If list is already visible and grid is hidden, we can pass.
+    const listVisibleInitially = await this.isElementVisible(
+      explorationListSelector,
+      true,
+      500
+    );
+    const gridVisibleInitially = await this.isElementVisible(
+      explorationGridSelector,
+      true,
+      500
+    );
+
+    if (listVisibleInitially && !gridVisibleInitially) {
+      await this.waitForCreatorDashboardToLoad();
+      return;
+    }
+
+    await this.clickOnElementWithSelector(listViewButtonSelector);
+
+    // Wait until the list container is visible and the grid container is hidden.
+    await this.page.waitForFunction(
+      (listSel: string, gridSel: string) => {
+        const list = document.querySelector(listSel);
+        const grid = document.querySelector(gridSel);
+
+        const isVisible = (el: Element | null) => {
+          if (!el) {
+            return false;
+          }
+          const style = window.getComputedStyle(el as Element);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        };
+
+        return isVisible(list) && !isVisible(grid);
+      },
+      {},
+      explorationListSelector,
+      explorationGridSelector
+    );
+
+    await this.waitForCreatorDashboardToLoad();
+  }
+
+  /**
+   * Utility to verify the empty-dashboard message on the Creator Dashboard.
+   * @param expectedText - The expected message text.
+   */
+  async expectCreatorDashboardMessageToBe(expectedText: string): Promise<void> {
+    await this.expectTextContentToBe(
+      emptyCreatorDashboardMessageSelector,
+      expectedText
     );
   }
 }

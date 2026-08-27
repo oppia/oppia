@@ -29,11 +29,13 @@ import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {ExternalSaveService} from 'services/external-save.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
+import './state-content-editor.component.css';
 
 interface HTMLSchema {
   type: string;
@@ -46,6 +48,7 @@ interface HTMLSchema {
 @Component({
   selector: 'oppia-state-content-editor',
   templateUrl: './state-content-editor.component.html',
+  styleUrls: ['./state-content-editor.component.css'],
 })
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
@@ -67,6 +70,7 @@ export class StateContentEditorComponent implements OnInit {
     private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
+    private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
     private editabilityService: EditabilityService
@@ -139,6 +143,7 @@ export class StateContentEditorComponent implements OnInit {
 
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
+    this.externalRteSaveService.onExternalRteSave.emit();
     this.saveContent();
   }
 

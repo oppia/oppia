@@ -28,7 +28,6 @@ import urllib
 from core import feconf, utils
 from core.constants import constants
 from core.tests import test_utils
-from core.tests.data import unicode_and_str_handler
 
 from typing import Dict, List, Tuple, Union
 
@@ -47,29 +46,6 @@ class UtilsTests(test_utils.GenericTestBase):
 
         for test_case in test_cases:
             self.assertEqual(utils.get_url_scheme(test_case[0]), test_case[1])
-
-    def test_open_file(self) -> None:
-        with utils.open_file(os.path.join('core', 'utils.py'), 'r') as f:
-            file_content = f.readlines()
-            self.assertIsNotNone(file_content)
-
-    def test_can_not_open_file(self) -> None:
-        with self.assertRaisesRegex(
-            FileNotFoundError, 'No such file or directory: \'invalid_file.py\''
-        ):
-            with utils.open_file('invalid_file.py', 'r') as f:
-                f.readlines()
-
-    def test_unicode_and_str_chars_in_file(self) -> None:
-        self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
-        self.assertIsInstance(unicode_and_str_handler.SOME_UNICODE_TEXT, str)
-        self.assertIsInstance(unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
-
-        with utils.open_file(
-            'core/tests/data/unicode_and_str_handler.py', 'r'
-        ) as f:
-            file_content = f.read()
-            self.assertIsInstance(file_content, str)
 
     def test_get_comma_sep_string_from_list(self) -> None:
         """Test get_comma_sep_string_from_list method."""
@@ -269,11 +245,81 @@ class UtilsTests(test_utils.GenericTestBase):
                 )
             )
 
+    def test_are_datetimes_close_with_aware_utc_datetimes(self) -> None:
+        initial_time = datetime.datetime(
+            2016, 12, 1, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 1, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 3, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+
+    def test_are_datetimes_close_with_naive_and_aware_datetimes(self) -> None:
+        initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 1, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 3, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+
+    def test_are_datetimes_close_with_non_utc_aware_datetime(self) -> None:
+        ist_timezone = datetime.timezone(
+            datetime.timedelta(hours=5, minutes=30)
+        )
+        initial_time = datetime.datetime(
+            2016, 12, 1, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 5, 30, 1, tzinfo=ist_timezone
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 5, 30, 3, tzinfo=ist_timezone
+                    ),
+                    initial_time,
+                )
+            )
+
     def test_conversion_between_string_and_naive_datetime_object(self) -> None:
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_utc_datetime()
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
                 utils.convert_naive_datetime_to_string(now)
@@ -794,12 +840,48 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_time_in_millisecs(self) -> None:
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
-        self.assertEqual(dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ).replace(tzinfo=None),
+        )
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
-        self.assertEqual(dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ).replace(tzinfo=None),
+        )
+
+    def test_get_time_in_millisecs_with_utc_aware_datetime(self) -> None:
+        dt = datetime.datetime(2020, 6, 15, tzinfo=datetime.timezone.utc)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ),
+        )
+
+    def test_get_time_in_millisecs_with_non_utc_aware_datetime(self) -> None:
+        # A non-UTC aware datetime should be normalized to UTC correctly,
+        # not have tzinfo blindly stripped, which would corrupt the time.
+        ist = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
+        dt_ist = datetime.datetime(2020, 6, 15, 5, 30, 0, tzinfo=ist)
+        dt_utc = datetime.datetime(
+            2020, 6, 15, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+        msecs = utils.get_time_in_millisecs(dt_ist)
+        self.assertEqual(
+            dt_utc,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ),
+        )
 
     def test_convert_millisecs_time_to_datetime_object(self) -> None:
         msecs = 1690761600000
@@ -902,12 +984,17 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_human_readable_time_string(-1.42)
 
     def test_get_number_of_days_since_date(self) -> None:
-        self.assertEqual(
-            90,
-            utils.get_number_of_days_since_date(
-                datetime.date.today() - datetime.timedelta(days=90)
-            ),
-        )
+        mock_current_date = datetime.date(2025, 1, 1)
+
+        with self.swap(
+            utils, 'get_current_utc_date', lambda: mock_current_date
+        ):
+            self.assertEqual(
+                90,
+                utils.get_number_of_days_since_date(
+                    mock_current_date - datetime.timedelta(days=90)
+                ),
+            )
 
     def test_generate_new_session_id(self) -> None:
         test_string = utils.generate_new_session_id()
@@ -1052,6 +1139,12 @@ class UtilsTests(test_utils.GenericTestBase):
             ),
         )
 
+    def test_get_current_utc_datetime_returns_naive_utc_datetime(self) -> None:
+        # TODO(#26624): This will be updated to assertIsNotNone after
+        # AwareDateTimeProperty is implemented in PR 3.
+        current_time = utils.get_current_utc_datetime()
+        self.assertIsNone(current_time.tzinfo)
+
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()
         time.sleep(2)
@@ -1092,3 +1185,111 @@ class UtilsTests(test_utils.GenericTestBase):
             'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
         )
         self.assertEqual(utils.unescape_html(html_data), expected_html_data)
+
+
+class SingletonMetaTests(test_utils.GenericTestBase):
+    """Tests for SingletonMeta metaclass."""
+
+    def test_singleton_returns_same_instance(self) -> None:
+        """Test that SingletonMeta returns the same instance."""
+
+        # Create a test class using SingletonMeta.
+        class TestSingleton(metaclass=utils.SingletonMeta):
+            """Test singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize test singleton."""
+                self.value = 42
+
+        # Create two instances.
+        instance1 = TestSingleton()
+        instance2 = TestSingleton()
+
+        # They should be the exact same object.
+        self.assertIs(instance1, instance2)
+        self.assertEqual(instance1.value, 42)
+        self.assertEqual(instance2.value, 42)
+
+        # Modifying one affects the other since they're the same object.
+        instance1.value = 100
+        self.assertEqual(instance2.value, 100)
+
+    def test_singleton_works_with_different_classes(self) -> None:
+        """Test that different classes get different singleton instances."""
+
+        class SingletonA(metaclass=utils.SingletonMeta):
+            """First singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize singleton A."""
+                self.name = 'A'
+
+        class SingletonB(metaclass=utils.SingletonMeta):
+            """Second singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize singleton B."""
+                self.name = 'B'
+
+        # Each class should have its own singleton instance.
+        instance_a1 = SingletonA()
+        instance_a2 = SingletonA()
+        instance_b1 = SingletonB()
+        instance_b2 = SingletonB()
+
+        # Same class instances should be identical.
+        self.assertIs(instance_a1, instance_a2)
+        self.assertIs(instance_b1, instance_b2)
+
+        # Different class instances should be different.
+        self.assertIsNot(instance_a1, instance_b1)
+
+        # Each should maintain its own value.
+        self.assertEqual(instance_a1.name, 'A')
+        self.assertEqual(instance_b1.name, 'B')
+
+    def test_singleton_respects_init_arguments_on_first_call(self) -> None:
+        """Test that singleton uses arguments from first instantiation."""
+
+        class ConfigurableSingleton(metaclass=utils.SingletonMeta):
+            """Singleton with configurable initialization."""
+
+            def __init__(self, value: int = 0) -> None:
+                """Initialize with a value."""
+                self.value = value
+
+        # First call with value=10.
+        instance1 = ConfigurableSingleton(10)
+        self.assertEqual(instance1.value, 10)
+
+        # Second call without arguments should return the same instance.
+        instance2 = ConfigurableSingleton()
+        self.assertIs(instance1, instance2)
+        self.assertEqual(instance2.value, 10)
+
+        # Second call with different arguments should raise an error.
+        with self.assertRaisesRegex(
+            ValueError,
+            'Singleton instance of ConfigurableSingleton already exists',
+        ):
+            ConfigurableSingleton(20)
+
+    def test_singleton_raises_error_on_reinit_with_kwargs(self) -> None:
+        """Test that singleton raises error when reinitialized with kwargs."""
+
+        class KeywordSingleton(metaclass=utils.SingletonMeta):
+            """Singleton with keyword arguments."""
+
+            def __init__(self, name: str = 'default') -> None:
+                """Initialize with a name."""
+                self.name = name
+
+        # First call.
+        instance1 = KeywordSingleton(name='first')
+        self.assertEqual(instance1.name, 'first')
+
+        # Second call with different kwargs should raise an error.
+        with self.assertRaisesRegex(
+            ValueError, 'Singleton instance of KeywordSingleton already exists'
+        ):
+            KeywordSingleton(name='second')

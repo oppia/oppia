@@ -146,7 +146,9 @@ export class UserService {
     return this.getUserInfoAsync().then(userInfo => {
       return (
         userInfo.isLoggedIn() &&
-        (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+        (userInfo.isCurriculumAdmin() ||
+          userInfo.isTopicManager() ||
+          userInfo.isQuestionAdmin())
       );
     });
   }
@@ -155,5 +157,9 @@ export class UserService {
     return this.getUserInfoAsync().then(info => {
       return info.isBlogAdmin() || info.isBlogPostEditor();
     });
+  }
+
+  isLoggedIn(): boolean {
+    return this.userInfo !== null && this.userInfo.isLoggedIn();
   }
 }

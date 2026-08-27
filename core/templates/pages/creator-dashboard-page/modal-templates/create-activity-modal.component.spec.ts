@@ -75,10 +75,10 @@ describe('Create Activity Modal Component', () => {
         fixture = TestBed.createComponent(CreateActivityModalComponent);
         component = fixture.componentInstance;
       });
-    ngbActiveModal = TestBed.get(NgbActiveModal);
-    explorationCreationService = TestBed.get(ExplorationCreationService);
-    collectionCreationService = TestBed.get(CollectionCreationService);
-    userService = TestBed.get(UserService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    explorationCreationService = TestBed.inject(ExplorationCreationService);
+    collectionCreationService = TestBed.inject(CollectionCreationService);
+    userService = TestBed.inject(UserService);
   }));
 
   afterEach(() => {

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillMasteryViewerComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {SkillMasteryViewerComponent} from './skill-mastery.component';
@@ -33,13 +33,15 @@ describe('SkillMasteryViewerComponent', () => {
     skillId1: 1.0,
   });
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SkillMasteryViewerComponent],
       providers: [SkillMasteryBackendApiService],
       imports: [HttpClientTestingModule],
     }).compileComponents();
-    skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
+    skillMasteryBackendApiService = TestBed.inject(
+      SkillMasteryBackendApiService
+    );
   }));
 
   beforeEach(() => {

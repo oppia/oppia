@@ -17,13 +17,13 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {Component, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -41,26 +41,24 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {UserInfo} from 'domain/user/user-info.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
-@Component({selector: 'learner-dashboard-icons', template: ''})
-class LearnerDashboardIconsComponentStub {}
+import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'summarizeNonnegativeNumber'})
-class MockSummarizeNonnegativeNumberPipe {
+class MockSummarizeNonnegativeNumberPipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -159,7 +157,7 @@ describe('Exploration Summary Tile Component', () => {
     true
   );
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
@@ -171,10 +169,9 @@ describe('Exploration Summary Tile Component', () => {
       declarations: [
         ExplorationSummaryTileComponent,
         MockTruncatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockTranslatePipe,
-        LearnerDashboardIconsComponentStub,
       ],
       providers: [
         DateTimeFormatService,
@@ -215,7 +212,7 @@ describe('Exploration Summary Tile Component', () => {
     component.collectionId = '1';
     component.explorationId = '1';
     component.explorationTitle = 'Title';
-    component.numViews = '100';
+    component.numViews = 100;
     component.objective = 'objective';
     component.category = 'category';
     component.contributorsSummary = {
@@ -317,6 +314,23 @@ describe('Exploration Summary Tile Component', () => {
     expect(hackyTranslationIsDisplayed).toBe(true);
   }));
 
+  it('should not display hacky translation when backend translated the field', () => {
+    component.translatedMetadataFields = [
+      TranslatableExplorationMetadataField.TITLE,
+      TranslatableExplorationMetadataField.OBJECTIVE,
+    ];
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+
+    expect(component.isHackyExpTitleTranslationDisplayed()).toBe(false);
+    expect(component.isHackyExpObjectiveTranslationDisplayed()).toBe(false);
+  });
+
   it(
     'should intialize the component and set mobileCutoffPx to 0' +
       ' if it is undefined',
@@ -369,7 +383,20 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlPathSpy).toHaveBeenCalled();
     expect(component.mobileCardToBeShown).toBe(true);
 
+    urlPathSpy.and.returnValue('/create');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(true);
+
     urlPathSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
+
+    component.isWindowLarge = true;
+    urlPathSpy.and.returnValue('/create');
 
     component.checkIfMobileCardToBeShown();
 

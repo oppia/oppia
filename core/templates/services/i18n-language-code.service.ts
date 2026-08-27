@@ -16,7 +16,7 @@
  * @fileoverview Service for informing of the i18n language code changes.
  */
 
-import {Injectable, EventEmitter} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {ClassroomTranslationKeys} from 'pages/classroom-page/classroom-page.component';
 
@@ -39,24 +39,9 @@ export interface LanguageInfo {
   providedIn: 'root',
 })
 export class I18nLanguageCodeService {
-  // TODO(#9154): Remove static when migration is complete.
-  /**
-   * The static keyword is used here because this service is used in both
-   * angular and angularjs. Since we are using upgradedServices.ts, where a new
-   * instance is created for angularjs and angular will creates a new instance
-   * for the angular part, we end up having two instances of the service.
-   * In order to keep the variables same, static is used until migration is
-   * complete.
-   */
-  static prevLangCode: string = 'en';
-  static languageCodeChangeEventEmitter = new EventEmitter<string>();
-  static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
-  // TODO(#9154): Remove this variable when translation service is extended.
-  /**
-   * It stores all classroom metadata translation keys, like topic/story
-   * title, description keys which currently cannot be translated from the
-   * translations dashboard.
-   */
+  prevLangCode: string = 'en';
+  languageCodeChangeEventEmitter = new EventEmitter<string>();
+  languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   private _HACKY_TRANSLATION_KEYS: readonly string[] =
     AppConstants.HACKY_TRANSLATION_KEYS;
 
@@ -76,8 +61,7 @@ export class I18nLanguageCodeService {
   constructor() {}
 
   getCurrentI18nLanguageCode(): string {
-    // TODO(#9154): Change I18nLanguageCodeService to "this".
-    return I18nLanguageCodeService.languageCode;
+    return this.languageCode;
   }
 
   isLanguageRTL(langCode: string): boolean {
@@ -188,16 +172,36 @@ export class I18nLanguageCodeService {
     return this._HACKY_TRANSLATION_KEYS.indexOf(translationKey) !== -1;
   }
 
+  // TODO(#14645): Remove this method when translation service is extended.
+  /**
+   * Decides whether the hardcoded translation bundle should be displayed for
+   * a piece of content. A contributor translation supersedes the bundle,
+   * because it covers every exploration rather than the fixed set the bundle
+   * was built for, and it is the value reviewers accepted most recently.
+   * @param {string} translationKey - The bundle key for the content.
+   * @param {boolean} isTranslatedByBackend - Whether the backend already
+   * returned a contributor translation for this content.
+   * @returns {boolean} - Whether the bundle translation should be displayed.
+   */
+  isHackyTranslationDisplayed(
+    translationKey: string,
+    isTranslatedByBackend: boolean = false
+  ): boolean {
+    return (
+      !isTranslatedByBackend &&
+      this.isHackyTranslationAvailable(translationKey) &&
+      !this.isCurrentLanguageEnglish()
+    );
+  }
+
   get onI18nLanguageCodeChange(): EventEmitter<string> {
-    // TODO(#9154): Change I18nLanguageCodeService to "this".
-    return I18nLanguageCodeService.languageCodeChangeEventEmitter;
+    return this.languageCodeChangeEventEmitter;
   }
 
   setI18nLanguageCode(code: string): void {
-    // TODO(#9154): Change I18nLanguageCodeService to "this".
-    I18nLanguageCodeService.prevLangCode = I18nLanguageCodeService.languageCode;
-    I18nLanguageCodeService.languageCode = code;
-    I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
+    this.prevLangCode = this.languageCode;
+    this.languageCode = code;
+    this.languageCodeChangeEventEmitter.emit(code);
   }
 
   get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {

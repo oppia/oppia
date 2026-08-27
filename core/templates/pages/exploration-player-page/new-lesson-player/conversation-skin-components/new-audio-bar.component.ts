@@ -22,7 +22,6 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import './new-audio-bar.component.css';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';

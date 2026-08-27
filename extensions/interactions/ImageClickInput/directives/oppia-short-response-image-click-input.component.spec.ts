@@ -16,7 +16,7 @@
  * @fileoverview Directive for the ImageClickInput response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseImageClickInput} from './oppia-short-response-image-click-input.component';
 
@@ -29,7 +29,7 @@ describe('ShortResponseImageClickInput', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseImageClickInput],
       providers: [

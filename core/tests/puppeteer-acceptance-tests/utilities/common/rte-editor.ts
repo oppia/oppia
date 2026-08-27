@@ -191,6 +191,28 @@ export class RTEEditor {
       hidden: true,
     });
   }
+  /**
+   * Types a LaTeX expression into the Math RTE modal.
+   * @param {string} latex - The LaTeX expression to type.
+   */
+  async typeMathExpression(latex: string): Promise<void> {
+    const textareaElement = await this.parentPage.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    if (!textareaElement) {
+      throw new Error('Math formula textarea not found.');
+    }
+    await textareaElement.type(latex);
+    // Press Tab to blur the textarea. This triggers Angular's ngModel change
+    // detection, which validates the LaTeX input and enables the "Done" button.
+    await this.parentPage.keyboard.press('Tab');
+
+    // Use the custom waitForNetworkIdle defined in BaseUser if possible,
+    // otherwise just wait for network idle using Puppeteer's native methods.
+    // wait for network idle is usually handled by the test utilities, but we
+    // will just use standard waitForNetworkIdle since this is a page object.
+    await this.parentPage.waitForNetworkIdle();
+  }
 }
 
 export const RTE_BUTTON_TITLES = {

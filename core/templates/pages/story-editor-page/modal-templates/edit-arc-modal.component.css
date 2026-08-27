@@ -1,0 +1,13 @@
+.arc-input {
+  margin-bottom: 14px;
+}
+
+.arc-input-label {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.arc-error-message {
+  color: #d93900;
+  font-size: 13px;
+}

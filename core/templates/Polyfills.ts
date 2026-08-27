@@ -16,9 +16,11 @@
  * @fileoverview Polyfills for Oppia.
  */
 
+import 'reflect-metadata';
 import 'globalthis/auto';
 import 'proxy-polyfill';
 import '@webcomponents/custom-elements';
+import '@angular/localize/init';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
@@ -184,3 +186,9 @@ if (!Object.entries) {
     return objectEntriesArray;
   };
 }
+
+(window as unknown as Window & {global: Window}).global = window;
+
+(window as unknown as Window & {process: {env: {DEBUG: undefined}}}).process = {
+  env: {DEBUG: undefined},
+};

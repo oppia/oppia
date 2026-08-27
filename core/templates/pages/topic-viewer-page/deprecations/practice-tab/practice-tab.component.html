@@ -1,0 +1,68 @@
+<div class="practice-tab">
+  <div class="oppia-practice-tab-container e2e-test-practice-tab-container"
+       [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <h1 class="tab-title e2e-test-topic-page-tab-title"
+          tabindex="0"
+          *ngIf="displayArea === 'topicViewer'">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"
+              class="beta-label"
+              matTooltip="This feature is only available in English for now"
+              matTooltipClass="oppia-mat-tooltip-list">
+        </span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: translatedTopicName}"></span>
+        <span>&nbsp;</span>
+      </h1>
+      <div class="practice-content"
+           tabindex="0"
+           *ngIf="displayArea === 'topicViewer'">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate: {topicName: topicName}"></span>
+      </div>
+      <mat-card-content>
+        <div *ngFor="let subtopic of availableSubtopics; let i = index"
+             class="practice-tab-subtopic-item e2e-test-subtopic-item">
+          <mat-checkbox color="primary"
+                        tabindex="0"
+                        class="practice-tab-mat-checkbox e2e-test-skill-checkbox"
+                        [(ngModel)]="selectedSubtopicIndices[i]"
+                        (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
+            <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}" class="e2e-test-skill-checkbox-title">
+              {{ subtopic.getTitle() }}
+            </span>
+          </mat-checkbox>
+          <div class="capsule-progress"
+               *ngIf="displayArea === 'progressTab'"
+               [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
+            <span class="subtopic-mastery"
+                  [ngStyle]="{'color': masteryTextColor(i)}">
+              {{subtopicMasteryArray[i]}}%
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions class="card-actions">
+        <div class="fx-row fx-main-center fx-cross-center w-100">
+          <button mat-raised-button
+                  [disabled]="startButtonIsDisabled && questionsStatusCallIsComplete"
+                  [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
+                  (click)="checkSiteLanguageBeforeBeginningPracticeSession()"
+                  class="practice-session-button e2e-test-practice-start-button" >
+            <span *ngIf="questionsStatusCallIsComplete"
+                  class="font-heavy"
+                  [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate">
+            </span>
+            <mat-spinner [diameter]="20"
+                         class="question-status-spinner"
+                         *ngIf="!questionsStatusCallIsComplete">
+            </mat-spinner>
+          </button>
+        </div>
+        <div class="mt-3"
+             *ngIf="questionsStatusCallIsComplete && !questionsAreAvailable && isAtLeastOneSubtopicSelected()">
+          <em class="text-danger" [innerHTML]="'I18N_TOPIC_VIEWER_NO_QUESTION_WARNING' | translate">
+          </em>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

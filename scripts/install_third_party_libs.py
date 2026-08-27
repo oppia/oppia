@@ -36,34 +36,14 @@ import subprocess
 import sys
 import tarfile
 
-from core import feconf
-from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
-    install_python_dev_dependencies,
+from scripts import (
+    install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
+from scripts import install_python_prod_dependencies
 
 from typing import Final
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    install_python_dev_dependencies.main(['--assert_compiled'])
-    from . import (
-        pre_commit_hook,
-    )  # pylint: disable=wrong-import-position, wrong-import-order
-    from . import (
-        pre_push_hook,
-    )  # pylint: disable=wrong-import-position, wrong-import-order
-
-from core import (  # pylint: disable=wrong-import-position, wrong-import-order
-    utils,
-)
-from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
-    install_dependencies_json_packages,
-    install_python_prod_dependencies,
-)
-
-from . import (  # pylint: disable=wrong-import-position, wrong-import-order
-    clean,
-    common,
-)
+from . import clean, common
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
@@ -90,7 +70,9 @@ def make_google_module_importable_by_python(google_module_path: str) -> None:
     for path_list in os.walk(google_module_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with utils.open_file(os.path.join(root_path, '__init__.py'), 'a'):
+            with open(
+                os.path.join(root_path, '__init__.py'), 'a', encoding='utf-8'
+            ):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass
@@ -182,6 +164,52 @@ def install_node() -> None:
                 subprocess.check_call(['make'])
 
     print('Node is installed.')
+
+
+def install_playwright_node() -> None:
+    """Download and install Node.js for Playwright (Node 20)."""
+
+    if not os.path.exists(common.PLAYWRIGHT_NODE_PATH):
+        print(
+            'Playwright Node not found. Installing Node.js %s...'
+            % common.PLAYWRIGHT_NODE_VERSION
+        )
+
+        outfile_name = 'node-playwright-download'
+
+        if common.is_x64_architecture():
+            if common.is_mac_os():
+                node_file_name = (
+                    'node-v%s-darwin-x64' % common.PLAYWRIGHT_NODE_VERSION
+                )
+            elif common.is_linux_os():
+                node_file_name = (
+                    'node-v%s-linux-x64' % common.PLAYWRIGHT_NODE_VERSION
+                )
+            else:
+                raise Exception('Unsupported OS')
+        else:
+            node_file_name = 'node-v%s' % common.PLAYWRIGHT_NODE_VERSION
+
+        # Download.
+        download_and_install_package(
+            'https://nodejs.org/dist/v%s/%s.tar.gz'
+            % (common.PLAYWRIGHT_NODE_VERSION, node_file_name),
+            outfile_name,
+        )
+
+        # Rename.
+        os.rename(
+            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+            common.PLAYWRIGHT_NODE_PATH,
+        )
+
+        if node_file_name == 'node-v%s' % common.PLAYWRIGHT_NODE_VERSION:
+            with common.CD(common.PLAYWRIGHT_NODE_PATH):
+                subprocess.check_call(['./configure'])
+                subprocess.check_call(['make'])
+
+    print('Playwright Node is installed.')
 
 
 def install_yarn() -> None:
@@ -348,12 +376,6 @@ def install_redis_cli() -> None:
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
     cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
-    redis package installed in dependencies.json (redis-3.5.3). The redis-3.5.3
-    package detailed in dependencies.json is the Python library that allows
-    users to communicate with any Redis cache using Python. The redis-cli-6.0.6
-    package installed in this function contains C++ scripts for the redis-cli
-    and redis-server programs detailed below.
-
     The redis-cli program is the command line interface that serves up an
     interpreter that allows users to connect to a redis database cache and
     query the cache using the Redis CLI API. It also contains functionality to
@@ -446,11 +468,13 @@ def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
 
-    if feconf.OPPIA_IS_DOCKERIZED:
-        make_google_module_importable_by_python(
-            google_module_path='/app/oppia/third_party/python_libs/google'
-        )
-        return
+    # This ensures dev dependencies are present and compiled before we
+    # proceed to other setup tasks that require them.
+    install_python_dev_dependencies.main(['--assert_compiled'])
+    # Import the hook scripts here (after dev deps are installed) so that
+    # they are only loaded when running the installer.
+    from . import pre_commit_hook  # pylint: disable=wrong-import-position
+    from . import pre_push_hook  # pylint: disable=wrong-import-position
 
     if common.is_windows_os():
         raise Exception(
@@ -467,6 +491,7 @@ def main() -> None:
     pathlib.Path(common.THIRD_PARTY_DIR).mkdir(exist_ok=True)
 
     install_node()
+    install_playwright_node()
     install_yarn()
     install_redis_cli()
     install_elasticsearch_dev_server()
@@ -491,7 +516,6 @@ def main() -> None:
         'the start.py script.\n',
     )
     install_python_prod_dependencies.main()
-    install_dependencies_json_packages.main()
 
     # The install_gcloud_sdk() function needs the Python third-party libs
     # "google" folder to exist first, so we only do the installation here after

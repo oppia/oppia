@@ -2,7 +2,8 @@ name: Oppiabot
 
 on:
   merge_group:
-    types: [checks_requested]
+    types:
+      - checks_requested
   issues:
     types:
       - labeled
@@ -17,10 +18,10 @@ jobs:
     name: Verify CLA
     runs-on: ubuntu-22.04
     permissions:
-      issues: write          
-      pull-requests: write   
-      checks: write 
-      statuses: write        
+      issues: write
+      pull-requests: write
+      checks: write
+      statuses: write
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4

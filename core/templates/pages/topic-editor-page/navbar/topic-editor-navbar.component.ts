@@ -19,7 +19,13 @@
 import {Subscription} from 'rxjs';
 import {TopicEditorSendMailComponent} from '../modal-templates/topic-editor-send-mail-modal.component';
 import {TopicEditorSaveModalComponent} from '../modal-templates/topic-editor-save-modal.component';
-import {AfterContentChecked, Component, OnDestroy, OnInit} from '@angular/core';
+import {
+  AfterContentChecked,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
@@ -43,22 +49,22 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 export class TopicEditorNavbarComponent
   implements OnInit, OnDestroy, AfterContentChecked
 {
-  validationIssues: string[];
-  topic: Topic;
-  prepublishValidationIssues: string[];
-  topicRights: TopicRights;
-  topicId: string;
-  topicName: string;
-  discardChangesButtonIsShown: boolean;
-  showTopicEditOptions: boolean;
-  topicSkillIds: string[];
-  showNavigationOptions: boolean;
-  warningsAreShown: boolean;
-  navigationChoices: string[];
-  activeTab: string;
-  changeListLength: number;
-  topicIsSaveable: boolean;
-  totalWarningsCount: number;
+  validationIssues!: string[];
+  topic!: Topic;
+  prepublishValidationIssues!: string[];
+  topicRights!: TopicRights;
+  topicId!: string;
+  topicName!: string;
+  discardChangesButtonIsShown!: boolean;
+  showTopicEditOptions!: boolean;
+  topicSkillIds!: string[];
+  showNavigationOptions!: boolean;
+  warningsAreShown!: boolean;
+  navigationChoices!: string[];
+  activeTab!: string;
+  changeListLength!: number;
+  topicIsSaveable!: boolean;
+  totalWarningsCount!: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -71,7 +77,8 @@ export class TopicEditorNavbarComponent
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private topicEditorRoutingService: TopicEditorRoutingService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -89,13 +96,22 @@ export class TopicEditorNavbarComponent
       this.validationIssues.push('Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
-    let subtopicPrepublishValidationIssues = [].concat.apply(
-      [],
-      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
-    );
+    let subtopicPrepublishValidationIssues: string[] = [];
+    this.topic.getSubtopics().forEach(subtopic => {
+      subtopicPrepublishValidationIssues =
+        subtopicPrepublishValidationIssues.concat(
+          subtopic.prepublishValidate()
+        );
+    });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );
+    this.validationIssues = this.validationIssues.concat(
+      this.topicEditorStateService.getSupersedingSkillIssues(
+        this.topic.getSkillIds()
+      )
+    );
+    this.changeDetectorRef.detectChanges();
   }
 
   publishTopic(): void {
@@ -130,14 +146,12 @@ export class TopicEditorNavbarComponent
         }
         this.topicRights.markTopicAsPublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
-      })
-      .then(() => {
         let successToast = 'Topic published.';
+        this.alertsService.addSuccessMessage(successToast, 1000);
         if (redirectToDashboard) {
           this.windowRef.nativeWindow.location.href =
             '/topics-and-skills-dashboard';
         }
-        this.alertsService.addSuccessMessage(successToast, 1000);
       });
   }
 
@@ -161,7 +175,8 @@ export class TopicEditorNavbarComponent
   }
 
   isWarningTooltipDisabled(): boolean {
-    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+    const result = this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+    return result;
   }
 
   getAllTopicWarnings(): string {
@@ -215,6 +230,7 @@ export class TopicEditorNavbarComponent
         this.topicRights.markTopicAsUnpublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
       });
+    return true;
   }
 
   toggleNavigationOptions(): void {
@@ -253,6 +269,7 @@ export class TopicEditorNavbarComponent
     } else if (activeTab === 'topic_preview') {
       return 'Preview';
     }
+    return 'Editor';
   }
 
   openTopicViewer(): void {
@@ -295,6 +312,9 @@ export class TopicEditorNavbarComponent
       const topicUrlFragment = this.topic.getUrlFragment();
       const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
+      if (!classroomUrlFragment) {
+        return;
+      }
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
           ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
@@ -357,13 +377,17 @@ export class TopicEditorNavbarComponent
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        this._validateTopic();
+        this.topicEditorStateService
+          .prefetchSkills(this.topic.getSkillIds())
+          .then(() => this._validateTopic());
       })
     );
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        this._validateTopic();
+        this.topicEditorStateService
+          .prefetchSkills(this.topic.getSkillIds())
+          .then(() => this._validateTopic());
       })
     );
     this.preventPageUnloadEventService.addListener(() => {
@@ -383,10 +407,33 @@ export class TopicEditorNavbarComponent
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
+    if (this.topicEditorStateService.hasLoadedTopic()) {
+      this.topicEditorStateService
+        .prefetchSkills(this.topic.getSkillIds())
+        .then(() => this._validateTopic());
+    }
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        this._validateTopic();
+        const changeList = this.undoRedoService.getChangeList();
+        if (changeList.length === 0) {
+          this._validateTopic();
+          return;
+        }
+        const lastChange =
+          changeList[changeList.length - 1].getBackendChangeObject();
+        const isSkillChange =
+          lastChange.cmd === 'add_uncategorized_skill_id' ||
+          lastChange.cmd === 'remove_uncategorized_skill_id' ||
+          lastChange.cmd === 'move_skill_id_to_subtopic' ||
+          lastChange.cmd === 'remove_skill_id_from_subtopic';
+        if (isSkillChange) {
+          this.topicEditorStateService
+            .updateSkillCache(this.topic.getSkillIds())
+            .then(() => this._validateTopic());
+        } else {
+          this._validateTopic();
+        }
       })
     );
   }

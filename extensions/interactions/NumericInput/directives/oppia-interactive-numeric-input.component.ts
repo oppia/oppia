@@ -27,7 +27,7 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {NumericInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {NumericInputRulesService} from './numeric-input-rules.service';
 import {NumericInputValidationService} from './numeric-input-validation.service';
-import {NumericInputAnswer} from 'interactions/answer-defs';
+import type {NumericInputAnswer} from 'interactions/answer-defs';
 
 interface NumericInputFormSchema {
   type: string;
@@ -43,6 +43,7 @@ export class InteractiveNumericInput implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() requireNonnegativeInputWithValue: string = '';
+  @Input() lastAnswer!: NumericInputAnswer | null;
   @Input() savedSolution!: NumericInputAnswer;
   @Input() labelForFocusTarget!: string;
   // Answer is empty string if the user has not yet entered an answer. This is
@@ -126,7 +127,12 @@ export class InteractiveNumericInput implements OnInit {
         this.getAttributesObject()
       ) as NumericInputCustomizationArgs;
     this.requireNonnegativeInput = requireNonnegativeInput.value;
-    this.answer = this.savedSolution !== undefined ? this.savedSolution : '';
+    this.answer =
+      this.lastAnswer !== null && this.lastAnswer !== undefined
+        ? this.lastAnswer
+        : this.savedSolution !== undefined
+          ? this.savedSolution
+          : '';
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',

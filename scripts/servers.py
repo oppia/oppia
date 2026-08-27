@@ -24,6 +24,7 @@ import re
 import shutil
 import signal
 import subprocess
+import sys
 import threading
 
 from core import feconf
@@ -162,7 +163,7 @@ def managed_dev_appserver(
     host: str = '0.0.0.0',
     port: int = 8080,
     admin_host: str = '0.0.0.0',
-    admin_port: int = 8000,
+    admin_port: int = feconf.GAE_ADMIN_SERVER_PORT,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False,
@@ -268,7 +269,12 @@ def managed_firebase_auth_emulator(
         emulator_args, human_readable_name='Firebase Emulator', shell=True
     )
     with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.FIREBASE_EMULATOR_PORT)
+        # Verify that the emulator is actually responding to HTTP requests, not
+        # just that the port is open. This prevents race conditions where the
+        # emulator binds the port but crashes during initialization.
+        common.wait_for_firebase_emulator_to_be_ready(
+            feconf.FIREBASE_EMULATOR_PORT
+        )
         yield proc
 
 
@@ -289,6 +295,13 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
         '-q',
+        '-E',
+        # Disable security for the local ElasticSearch server.
+        'xpack.security.enabled=false',
+        # Disable the disk threshold checks. These checks can cause issues on
+        # machines with low disk space.
+        '-E',
+        'cluster.routing.allocation.disk.threshold_enabled=false',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
@@ -458,7 +471,10 @@ def create_managed_web_browser(port: int) -> ContextManager[psutil.Process]:
 
 @contextlib.contextmanager
 def managed_ng_build(
-    *, use_prod_env: bool = False, watch_mode: bool = False
+    *,
+    use_prod_env: bool = False,
+    watch_mode: bool = False,
+    source_maps: bool = False,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
 
@@ -466,6 +482,8 @@ def managed_ng_build(
         use_prod_env: bool. Whether to compile for use in production.
         watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
             change.
+        source_maps: bool. Whether to generate source maps for the compiled
+            files. This is useful for debugging the compiled code.
 
     Yields:
         psutil.Process. The ng compiler process.
@@ -478,6 +496,9 @@ def managed_ng_build(
         compiler_args.append('--prod')
     if watch_mode:
         compiler_args.append('--watch')
+    if source_maps:
+        compiler_args.append('--source-map')
+
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
@@ -500,104 +521,6 @@ def managed_ng_build(
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
                 if b'Build at: ' in line:
-                    break
-            else:
-                # If none of the lines contained the string 'Built at',
-                # raise an error because a build hasn't finished successfully.
-                raise IOError('First build never completed')
-
-        def print_proc_output() -> None:
-            """Prints the proc's output until it is exhausted."""
-            for line in iter(read_line_func, None):
-                common.write_stdout_safe(line)
-
-        # Start a thread to print the rest of the compiler's output to stdout.
-        printer_thread = threading.Thread(target=print_proc_output)
-        printer_thread.start()
-        exit_stack.callback(printer_thread.join)
-
-        yield proc
-
-
-@contextlib.contextmanager
-def managed_webpack_compiler(
-    config_path: Optional[str] = None,
-    use_prod_env: bool = False,
-    use_source_maps: bool = False,
-    watch_mode: bool = False,
-    max_old_space_size: Optional[int] = None,
-) -> Iterator[psutil.Process]:
-    """Returns context manager to start/stop the webpack compiler gracefully.
-
-    Args:
-        config_path: str|None. Path to an explicit webpack config, or None to
-            determine it from the other args.
-        use_prod_env: bool. Whether to compile for use in production. Only
-            respected if config_path is None.
-        use_source_maps: bool. Whether to compile with source maps. Only
-            respected if config_path is None.
-        watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
-            change.
-        max_old_space_size: int|None. Sets the max memory size of the compiler's
-            "old memory" section. As memory consumption approaches the limit,
-            the compiler will spend more time on garbage collection in an effort
-            to free unused memory.
-
-    Yields:
-        psutil.Process. The Webpack compiler process.
-
-    Raises:
-        OSError. First build never completed.
-    """
-    if config_path is not None:
-        pass
-    elif use_prod_env:
-        config_path = (
-            common.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-            if use_source_maps
-            else common.WEBPACK_PROD_CONFIG
-        )
-    else:
-        config_path = (
-            common.WEBPACK_DEV_SOURCE_MAPS_CONFIG
-            if use_source_maps
-            else common.WEBPACK_DEV_CONFIG
-        )
-
-    compiler_args = [
-        common.NODE_BIN_PATH,
-        common.WEBPACK_BIN_PATH,
-        '--config',
-        config_path,
-    ]
-    if max_old_space_size:
-        # NOTE: --max-old-space-size is a flag for Node.js, not the Webpack
-        # compiler, so we insert it immediately after NODE_BIN_PATH.
-        compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
-    if watch_mode:
-        compiler_args.extend(['--color', '--watch', '--progress'])
-    with contextlib.ExitStack() as exit_stack:
-        # OK to use shell=True here because we are passing string literals and
-        # constants, so there is no risk of a shell-injection attack.
-        proc = exit_stack.enter_context(
-            managed_process(
-                compiler_args,
-                human_readable_name='Webpack Compiler',
-                shell=True,
-                # Capture compiler's output to detect when builds have completed.
-                stdout=subprocess.PIPE,
-            )
-        )
-
-        read_line_func: Callable[[], Optional[bytes]] = (
-            lambda: proc.stdout.readline() or None
-        )
-        if watch_mode:
-            for line in iter(read_line_func, None):
-                common.write_stdout_safe(line)
-                # Message printed when a compilation has succeeded. We break
-                # after the first one to ensure the site is ready to be visited.
-                if b'Built at: ' in line:
                     break
             else:
                 # If none of the lines contained the string 'Built at',
@@ -714,8 +637,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 proc.send_signal(signal.SIGINT)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
-                # can just return immediately.
-                return  # pylint: disable=lost-exception
+                # can just ignore and exit normally.
+                pass
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
@@ -823,6 +746,7 @@ def managed_acceptance_tests_server(
     headless: bool = False,
     mobile: bool = False,
     prod_env: bool = False,
+    update_snapshots: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -834,6 +758,9 @@ def managed_acceptance_tests_server(
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
         prod_env: bool. Whether to run the acceptance tests in production mode.
+        update_snapshots: bool. Whether to update Playwright screenshot
+            baselines instead of comparing against them. Ignored for
+            Puppeteer suites.
         stdout: int. The file descriptor where the standard output of the
             subprocess is sent.
 
@@ -851,35 +778,118 @@ def managed_acceptance_tests_server(
         filedata = json.load(f)
         for suites in filedata.values():
             for suite in suites:
-                available_suites[suite['name']] = suite['module']
+                available_suites[suite['name']] = {
+                    'module': suite['module'],
+                    'framework': suite['framework'],
+                }
+
     if suite_name not in available_suites:
         raise Exception('Invalid suite name: %s' % suite_name)
 
-    os.environ['HEADLESS'] = 'true' if headless else 'false'
-    os.environ['MOBILE'] = 'true' if mobile else 'false'
-    os.environ['SPEC_NAME'] = suite_name
-    os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
+    suite_config = available_suites[suite_name]
+    module = suite_config['module']
+    framework = suite_config['framework']
 
-    nodemodules_jest_bin_path = os.path.join(
-        common.NODE_MODULES_PATH, '.bin', 'jest'
-    )
+    # TODO(#24715): Remove the puppeteer framework once the
+    # migration from Puppeteer to Playwright is complete.
+    if framework == 'puppeteer':
+        os.environ['HEADLESS'] = 'true' if headless else 'false'
+        os.environ['MOBILE'] = 'true' if mobile else 'false'
+        os.environ['SPEC_NAME'] = suite_name
+        os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
-    acceptance_tests_args = [
-        nodemodules_jest_bin_path,
-        '%s' % os.path.join(available_suites[suite_name]),
-        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js',
-    ]
+        nodemodules_jest_bin_path = os.path.join(
+            common.NODE_MODULES_PATH, '.bin', 'jest'
+        )
 
-    # OK to use shell=True here because we are passing string literals,
-    # and verifying that the passed suite-name are within the list of
-    # the suites we have, so there is no risk of a shell-injection attack.
-    managed_acceptance_tests_proc = managed_process(
-        acceptance_tests_args,
-        human_readable_name='Acceptance Tests Server',
-        shell=True,
-        raise_on_nonzero_exit=False,
-        stdout=stdout,
-    )
+        acceptance_tests_args = [
+            nodemodules_jest_bin_path,
+            '%s' % os.path.join(module),
+            '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js',
+        ]
 
-    with managed_acceptance_tests_proc as proc:
-        yield proc
+        # OK to use shell=True here because we are passing string literals,
+        # and verifying that the passed suite-name are within the list of
+        # the suites we have, so there is no risk of a shell-injection attack.
+        managed_acceptance_tests_proc = managed_process(
+            acceptance_tests_args,
+            human_readable_name='Acceptance Tests Server',
+            shell=True,
+            raise_on_nonzero_exit=False,
+            stdout=stdout,
+        )
+
+        with managed_acceptance_tests_proc as proc:
+            yield proc
+
+    elif framework == 'playwright':
+        playwright_dir = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+        )
+        # Use the local Playwright binary directly instead of npx
+        # to avoid version resolution or download attempts.
+        playwright_bin = os.path.join(
+            playwright_dir, 'node_modules', '.bin', 'playwright'
+        )
+        playwright_env = {
+            **os.environ,
+            # Prepend Node 20 bin so npx uses the correct runtime.
+            'PATH': os.pathsep.join(
+                [
+                    os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
+                    os.environ['PATH'],
+                ]
+            ),
+            'NODE': os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin', 'node'),
+            'HEADLESS': 'true' if headless else 'false',
+            'MOBILE': 'true' if mobile else 'false',
+            'PROD_ENV': 'true' if prod_env else 'false',
+            'SPEC_NAME': suite_name,
+            'UPDATE_SNAPSHOTS': 'true' if update_snapshots else 'false',
+        }
+        playwright_args = [
+            playwright_bin,
+            'test',
+            module,
+            '--config=./core/tests/playwright-acceptance-tests/'
+            'playwright.config.ts',
+        ]
+        if headless is False:
+            playwright_args.append('--headed')
+        if update_snapshots:
+            playwright_args.append('--update-snapshots')
+
+        managed_proc = managed_process(
+            playwright_args,
+            human_readable_name='Acceptance Tests Server',
+            shell=False,
+            raise_on_nonzero_exit=False,
+            stdout=stdout,
+            env=playwright_env,
+        )
+        with managed_proc as proc:
+            yield proc
+
+    else:
+        raise Exception(
+            'Suite "%s" has invalid framework: "%s". '
+            'Must be "puppeteer" or "playwright".' % (suite_name, framework)
+        )
+
+
+def run_ng_compilation() -> None:
+    """Runs angular compilation."""
+    max_tries = 2
+    ng_bundles_dir_name = 'dist/oppia-angular'
+    for _ in range(max_tries):
+        try:
+            with managed_ng_build() as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+        if os.path.isdir(ng_bundles_dir_name):
+            break
+    if not os.path.isdir(ng_bundles_dir_name):
+        print('Failed to complete ng build compilation, exiting...')
+        sys.exit(1)

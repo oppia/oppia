@@ -21,6 +21,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {MusicNotesAnswer} from 'interactions/answer-defs';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -28,15 +29,17 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   templateUrl: './music-notes-input-short-response.component.html',
 })
 export class ShortResponseMusicNotesInput implements OnInit {
-  @Input() answer;
-  displayedAnswer: string;
+  @Input() answer!: string;
+  displayedAnswer!: string;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    let _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as MusicNotesAnswer[];
     let _notes = [];
-    for (let i = 0; i < Object.keys(_answer).length; i++) {
+    for (let i = 0; i < _answer.length; i++) {
       if (_answer[i].readableNoteName) {
         _notes.push(_answer[i].readableNoteName);
       }

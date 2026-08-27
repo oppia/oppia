@@ -26,6 +26,16 @@ export interface ExplorationRatings {
   '5': number;
 }
 
+// The metadata fields of an exploration summary that contributors can
+// translate. The backend reports which of them it returned translated, so that
+// clients only fall back to their hardcoded translation bundles for the rest.
+export enum TranslatableExplorationMetadataField {
+  TITLE = 'title',
+  OBJECTIVE = 'objective',
+  CATEGORY = 'category',
+  TAGS = 'tags',
+}
+
 export interface LearnerExplorationSummaryBackendDict {
   category: string;
   community_owned: boolean;
@@ -43,6 +53,9 @@ export interface LearnerExplorationSummaryBackendDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
+  visited_checkpoints_count?: number;
+  total_checkpoints_count?: number;
+  translated_metadata_fields?: TranslatableExplorationMetadataField[];
 }
 
 export class LearnerExplorationSummary {
@@ -62,12 +75,19 @@ export class LearnerExplorationSummary {
     public lastUpdatedMsec: number,
     public createdOnMsec: number,
     public ratings: ExplorationRatings,
-    public humanReadableContributorsSummary: HumanReadableContributorsSummary
+    public humanReadableContributorsSummary: HumanReadableContributorsSummary,
+    public visitedCheckpointsCount: number = 0,
+    public totalCheckpointsCount: number = 0
   ) {}
 
   static createFromBackendDict(
     expSummaryBacknedDict: LearnerExplorationSummaryBackendDict
   ): LearnerExplorationSummary {
+    const visitedCheckpointsCount =
+      expSummaryBacknedDict.visited_checkpoints_count ?? 0;
+    const totalCheckpointsCount =
+      expSummaryBacknedDict.total_checkpoints_count ?? 0;
+
     return new LearnerExplorationSummary(
       expSummaryBacknedDict.category,
       expSummaryBacknedDict.community_owned,
@@ -84,7 +104,9 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.last_updated_msec,
       expSummaryBacknedDict.created_on_msec,
       expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary
+      expSummaryBacknedDict.human_readable_contributors_summary,
+      visitedCheckpointsCount,
+      totalCheckpointsCount
     );
   }
 }

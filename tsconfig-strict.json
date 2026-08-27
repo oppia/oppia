@@ -10,6 +10,7 @@
     "lib": [
       "es2017",
       "dom",
+      "dom.iterable",
       "webworker"
     ],
     "module": "es2020",
@@ -24,6 +25,9 @@
       ],
       "app.constants": [
         "core/templates/app.constants"
+      ],
+      "base-components/*": [
+        "core/templates/base-components/*"
       ],
       "components/*": [
         "core/templates/components/*"
@@ -52,6 +56,9 @@
       "modules/*": [
         "core/templates/modules/*"
       ],
+      "objects/*": [
+        "extensions/objects/*"
+      ],
       "pages/*": [
         "core/templates/pages/*"
       ],
@@ -78,6 +85,9 @@
       "./node_modules/@types"
     ]
   },
+  "exclude": [
+    "core/tests/playwright-acceptance-tests"
+  ],
   "include": [
     "core",
     "extensions",

@@ -63,7 +63,7 @@ import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 /**
- * These dtslint type tests check that for each interaction, its frontend
+ * These type tests check that for each interaction, its frontend
  * and backend customization argument interfaces are exactly the same, excluding
  * specific properties that are replaced. We do this because some customization
  * arguments values contain different frontend/backend types in their values.

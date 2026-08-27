@@ -63,10 +63,12 @@ export class ContributionOpportunitiesService {
   private _moreVoiceoverOpportunitiesAvailable: boolean = true;
 
   private async _getSkillOpportunitiesAsync(
-    cursor: string
+    cursor: string,
+    searchQuery?: string
   ): Promise<SkillOpportunitiesDict> {
+    const query = searchQuery || '';
     return this.contributionOpportunitiesBackendApiService
-      .fetchSkillOpportunitiesAsync(cursor)
+      .fetchSkillOpportunitiesAsync(cursor, query)
       .then(({opportunities, nextCursor, more}) => {
         this._skillOpportunitiesCursor = nextCursor;
         this._moreSkillOpportunitiesAvailable = more;
@@ -80,10 +82,16 @@ export class ContributionOpportunitiesService {
   private async _getTranslationOpportunitiesAsync(
     languageCode: string,
     topicName: string,
-    cursor: string
+    cursor: string,
+    entityType?: string
   ) {
     return this.contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync(languageCode, topicName, cursor)
+      .fetchTranslationOpportunitiesAsync(
+        languageCode,
+        topicName,
+        cursor,
+        entityType
+      )
       .then(({opportunities, nextCursor, more}) => {
         this._translationOpportunitiesCursor = nextCursor;
         this._moreTranslationOpportunitiesAvailable = more;
@@ -102,33 +110,50 @@ export class ContributionOpportunitiesService {
     this.modalService.open(LoginRequiredModalContent);
   }
 
-  async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
-    return this._getSkillOpportunitiesAsync('');
+  async getSkillOpportunitiesAsync(
+    searchQuery?: string
+  ): Promise<SkillOpportunitiesDict> {
+    const query = searchQuery || '';
+    return this._getSkillOpportunitiesAsync('', query);
   }
 
   async getTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string
+    topicName: string,
+    entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
+    return this._getTranslationOpportunitiesAsync(
+      languageCode,
+      topicName,
+      '',
+      entityType
+    );
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync(
+    searchQuery?: string
+  ): Promise<SkillOpportunitiesDict> {
+    const query = searchQuery || '';
     if (this._moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
+      return this._getSkillOpportunitiesAsync(
+        this._skillOpportunitiesCursor,
+        query
+      );
     }
     throw new Error('No more skill opportunities available.');
   }
 
   async getMoreTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string
+    topicName: string,
+    entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
         languageCode,
         topicName,
-        this._translationOpportunitiesCursor
+        this._translationOpportunitiesCursor,
+        entityType
       );
     }
     throw new Error('No more translation opportunities available.');
@@ -136,10 +161,15 @@ export class ContributionOpportunitiesService {
 
   async getReviewableTranslationOpportunitiesAsync(
     topicName: string,
-    languageCode?: string
+    languageCode?: string,
+    entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(topicName, languageCode)
+      .fetchReviewableTranslationOpportunitiesAsync(
+        topicName,
+        languageCode,
+        entityType
+      )
       .then(({opportunities}) => {
         return {
           opportunities: opportunities,

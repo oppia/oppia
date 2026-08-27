@@ -44,7 +44,6 @@ describe('datetimeformatter', () => {
     // suppress this error because the actual 'Date' has more properties than
     // 'MockDateContructor'. We have only defined the properties we need in
     // 'MockDateContructor'.
-    // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 
@@ -87,6 +86,12 @@ describe('datetimeformatter', () => {
     let dateFromPreviousYear = NOW_MILLIS - 365 * 24 * 60 * 60 * 1000;
     expect(df.getLocaleDateTimeHourString(dateFromPreviousYear)).toBe(
       dayjs(new Date(dateFromPreviousYear)).format('MMM D, YYYY')
+    );
+  });
+
+  it('should provide date time in words format', () => {
+    expect(df.getDateTimeInWords(NOW_MILLIS)).toBe(
+      dayjs(new Date(NOW_MILLIS)).format('dddd, MMMM D, YYYY [at] h:mm A')
     );
   });
 

@@ -20,11 +20,11 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './add-study-guide-section.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -34,6 +34,7 @@ interface HtmlFormSchema {
 @Component({
   selector: 'oppia-add-study-guide-section-modal',
   templateUrl: './add-study-guide-section.component.html',
+  styleUrls: ['./add-study-guide-section.component.css'],
 })
 export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -56,22 +57,12 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private htmlLengthService: HtmlLengthService,
-    private platformFeatureService: PlatformFeatureService
+    private htmlLengthService: HtmlLengthService
   ) {
     super(ngbActiveModal);
   }
 
   getContentSchema(): HtmlFormSchema {
-    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
-      this.SECTION_FORM_CONTENT_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_component_config_id: 'ALL_COMPONENTS',
-          rows: 100,
-        },
-      };
-    }
     return this.SECTION_FORM_CONTENT_SCHEMA;
   }
 
@@ -89,11 +80,6 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
     if (this.tempSectionContentHtml !== $event) {
       this.tempSectionContentHtml = $event;
     }
-  }
-
-  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
-      .isEnabled;
   }
 
   isSectionContentLengthExceeded(): boolean {

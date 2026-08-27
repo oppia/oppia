@@ -73,7 +73,7 @@ describe('Language util service', function () {
   ];
 
   beforeEach(() => {
-    lus = TestBed.get(LanguageUtilService);
+    lus = TestBed.inject(LanguageUtilService);
   });
 
   // The spies were moved to individual functions from the beforeEach block.

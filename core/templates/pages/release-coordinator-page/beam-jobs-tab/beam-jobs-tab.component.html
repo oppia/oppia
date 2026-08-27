@@ -80,13 +80,24 @@
                   color="warn">
             Cancel
           </button>
-          <button mat-raised-button
-                  *ngIf="jobRun.inTerminalState()"
-                  color="accent"
-                  [disabled]="!jobRun.hasOutput()"
-                  (click)="onViewOutputClick(jobRun)">
-            View Output
-          </button>
+          <div *ngIf="jobRun.inTerminalState()" class="job-run-terminal-actions">
+            <button mat-raised-button
+                    color="accent"
+                    [disabled]="!jobRun.hasOutput()"
+                    (click)="onViewOutputClick(jobRun)">
+              View Output
+            </button>
+            <a *ngIf="jobRun.isFailed()"
+               mat-raised-button
+               color="primary"
+               [disabled]="!jobRun.dataflowJobId"
+               [attr.href]="jobRun.dataflowJobId ? jobRun.getDataflowUrl() : null"
+               target="_blank"
+               rel="noopener"
+               [matTooltip]="!jobRun.dataflowJobId ? 'Dataflow view not available for synchronous jobs.' : ''">
+              View on Dataflow
+            </a>
+          </div>
         </td>
       </ng-container>
 
@@ -145,5 +156,15 @@
     font-size: 30px;
     height: 30px;
     width: 30px;
+  }
+  .oppia-beam-jobs-tab-page .job-run-terminal-actions {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .oppia-beam-jobs-tab-page .job-run-terminal-actions a {
+    width: 100%;
   }
 </style>

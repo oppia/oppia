@@ -32,6 +32,7 @@ import {FractionInputRulesService} from 'interactions/FractionInput/directives/f
 import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
@@ -41,9 +42,9 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {StateCard} from 'domain/state_card/state-card.model';
 
-type SubmitAnswerFn = () => void;
+export type SubmitAnswerFn = () => void;
 
-type InteractionRulesService =
+export type InteractionRulesService =
   | AlgebraicExpressionInputRulesService
   | CodeReplRulesService
   | ContinueRulesService
@@ -51,6 +52,7 @@ type InteractionRulesService =
   | ImageClickInputRulesService
   | InteractiveMapRulesService
   | MathEquationInputRulesService
+  | MultipleChoiceInputRulesService
   | NumericExpressionInputRulesService
   | NumericInputRulesService
   | PencilCodeEditorRulesService
@@ -87,7 +89,7 @@ export class CurrentInteractionService {
   // in 'null', the submit button will remain enabled (for the entire duration
   // of the current interaction).
   private static validityCheckFn: ValidityCheckFn | null = null;
-  private static onSubmitFn: OnSubmitFn;
+  private static onSubmitFn: OnSubmitFn | null = null;
   private static presubmitHooks: PresubmitHookFn[] = [];
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
@@ -99,6 +101,15 @@ export class CurrentInteractionService {
      * @param {function(answer, interactionRulesService)} onSubmit
      */
     CurrentInteractionService.onSubmitFn = onSubmit;
+  }
+
+  clearOnSubmitFn(onSubmit: OnSubmitFn): void {
+    // Only clears the registered onSubmit callback if it is the exact
+    // callback passed in. This prevents a component being destroyed from
+    // removing a callback registered by a different component.
+    if (CurrentInteractionService.onSubmitFn === onSubmit) {
+      CurrentInteractionService.onSubmitFn = null;
+    }
   }
 
   registerCurrentInteraction(
@@ -144,10 +155,13 @@ export class CurrentInteractionService {
     for (let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
       CurrentInteractionService.presubmitHooks[i]();
     }
+    if (CurrentInteractionService.onSubmitFn === null) {
+      throw new Error('No onSubmit function has been registered.');
+    }
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
 
-  getDisplayedCard(): StateCard {
+  getDisplayedCard(): StateCard | undefined {
     const index = this.playerPositionService.getDisplayedCardIndex();
     return this.playerTranscriptService.getCard(index);
   }
@@ -157,7 +171,7 @@ export class CurrentInteractionService {
   }
 
   showNoResponseError(): boolean {
-    return this.getDisplayedCard().showNoResponseError();
+    return this.getDisplayedCard()?.showNoResponseError() ?? false;
   }
 
   submitAnswer(): void {
@@ -210,6 +224,13 @@ export class CurrentInteractionService {
     return !CurrentInteractionService.validityCheckFn();
   }
 
+  isSubmitAnswerFnRegistered(): boolean {
+    // True if the current interaction registered a submit answer function.
+    // Interactions such as ImageClickInput register null because they submit
+    // answers via their own interaction handlers instead.
+    return CurrentInteractionService.submitAnswerFn !== null;
+  }
+
   updateViewWithNewAnswer(): void {
     CurrentInteractionService.answerChangedSubject.next();
   }
@@ -221,6 +242,6 @@ export class CurrentInteractionService {
     this.getDisplayedCard()?.updateAnswerIsValid(isAnswerValid);
   }
   showInvalidResponseError(): boolean {
-    return this.getDisplayedCard().showInvalidResponseError();
+    return this.getDisplayedCard()?.showInvalidResponseError() ?? false;
   }
 }

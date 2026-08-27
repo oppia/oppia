@@ -36,6 +36,7 @@ import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {MockI18nService, MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopNavigationBarComponent} from './top-navigation-bar.component';
 import {SidebarStatusService} from 'services/sidebar-status.service';
@@ -52,13 +53,31 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {FeedbackModalComponent} from '../../../base-components/feedback-modal.component';
 
 class MockPlatformFeatureService {
   status = {
     ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false,
     },
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+    TechnicalFeedbackDashboardEnabled: {
+      isEnabled: false,
+    },
+    EnableCertificateAssessment: {
+      isEnabled: false,
+    },
   };
+}
+
+class MockNgbModal {
+  open = jasmine.createSpy('open').and.returnValue({
+    componentInstance: {},
+    result: Promise.resolve(),
+  });
 }
 
 class MockWindowRef {
@@ -93,12 +112,17 @@ class MockWindowRef {
   };
 }
 
+class MockSignInEventService {
+  onUserSignIn = new EventEmitter<void>();
+}
+
 describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
   let searchService: SearchService;
   let wds: WindowDimensionsService;
+  let ngbModal: NgbModal;
   let userService: UserService;
   let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -168,6 +192,10 @@ describe('TopNavigationBarComponent', () => {
           useClass: MockI18nService,
         },
         {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
@@ -183,6 +211,10 @@ describe('TopNavigationBarComponent', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: SignInEventService,
+          useClass: MockSignInEventService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -193,6 +225,7 @@ describe('TopNavigationBarComponent', () => {
     component = fixture.componentInstance;
     searchService = TestBed.inject(SearchService);
     wds = TestBed.inject(WindowDimensionsService);
+    ngbModal = TestBed.inject(NgbModal);
     userService = TestBed.inject(UserService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
@@ -473,21 +506,8 @@ describe('TopNavigationBarComponent', () => {
     spyOn(document, 'querySelectorAll')
       .withArgs('.oppia-navbar-tab-content')
       .and.returnValues(
-        [
-          {
-            // This throws "Type '{ innerText: string; }' is not assignable to
-            // type 'Element'.". We need to suppress this error because if i18n
-            // has not run, then the tabs will not have text content and so
-            // their innerText.length value will be 0.
-            // @ts-expect-error
-            innerText: '',
-          },
-        ],
-        [
-          {
-            innerText: 'About',
-          },
-        ]
+        [{innerText: ''}] as unknown as NodeListOf<Element>,
+        [{innerText: 'About'}] as unknown as NodeListOf<Element>
       );
 
     expect(component.checkIfI18NCompleted()).toBe(false);
@@ -545,18 +565,11 @@ describe('TopNavigationBarComponent', () => {
 
   it("should hide navbar if it's height more than 60px", fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
+    const mockElement = document.createElement('div');
+    Object.defineProperty(mockElement, 'clientHeight', {value: 61});
     spyOn(document, 'querySelector')
       .withArgs('div.collapse.navbar-collapse')
-      // This throws "Type '{ clientWidth: number; }' is missing the following
-      // properties from type 'Element': assignedSlot, attributes, classList,
-      // className, and 122 more.". We need to suppress this error because
-      // typescript expects around 120 more properties than just one
-      // (clientWidth). We need only one 'clientWidth' for
-      // testing purposes.
-      // @ts-expect-error
-      .and.returnValue({
-        clientHeight: 61,
-      });
+      .and.returnValue(mockElement);
 
     component.navElementsVisibilityStatus = {
       I18N_TOPNAV_DONATE: true,
@@ -659,6 +672,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isModerator).toBe(false);
     expect(component.isCurriculumAdmin).toBe(false);
     expect(component.isTopicManager).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(false);
     expect(component.username).toBe(undefined);
@@ -670,6 +684,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isModerator).toBe(true);
     expect(component.isCurriculumAdmin).toBe(false);
     expect(component.isTopicManager).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(true);
     expect(component.username).toBe('username1');
@@ -680,15 +695,55 @@ describe('TopNavigationBarComponent', () => {
     );
   }));
 
+  it('should set isQuestionAdmin to true when user is a question admin', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE', 'QUESTION_ADMIN'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isModerator).toBe(true);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(true);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     let userInfo = {
       isModerator: () => false,
       isCurriculumAdmin: () => false,
       isTopicManager: () => false,
+      isQuestionAdmin: () => false,
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTechTeamLead: () => false,
+      isTranslationAdmin: () => false,
+      isTranslationCoordinator: () => false,
+      isQuestionCoordinator: () => false,
+      isReleaseCoordinator: () => false,
       isLoggedIn: () => true,
       getUsername: () => null,
     };
@@ -899,16 +954,58 @@ describe('TopNavigationBarComponent', () => {
     () => {
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeFalse();
+      ).toBe(false);
 
       mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
         true;
 
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeTrue();
+      ).toBe(true);
     }
   );
+
+  it(
+    'should return correct value for show technical feedback dashboard page' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.TechnicalFeedbackDashboardEnabled.isEnabled =
+        true;
+
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(true);
+    }
+  );
+
+  it(
+    'should return correct value for WebFeedbackModalEnabled' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.WebFeedbackModalEnabled.isEnabled =
+        true;
+
+      expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+    }
+  );
+
+  it('should return correct value for certificate assessment feature flag', () => {
+    expect(component.isCertificateAssessmentEnabled()).toBe(false);
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
+
+    expect(component.isCertificateAssessmentEnabled()).toBe(true);
+  });
+
+  it('should open site feedback modal', () => {
+    component.openSiteFeedbackModal();
+    expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+  });
 
   it('should not check learner groups feature on signup page', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
@@ -922,21 +1019,21 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(learnerGroupSpy).not.toHaveBeenCalled();
-    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(false);
   }));
 
   it('should hide menu icon when page contains a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeFalse();
+    expect(component.menuIconIsShown).toBe(false);
   });
 
   it('should show menu icon when page does not contain a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeTrue();
+    expect(component.menuIconIsShown).toBe(true);
   });
 
   it('should set classroomSummariesLength from DOM data attribute', () => {
@@ -974,4 +1071,97 @@ describe('TopNavigationBarComponent', () => {
     expect(component.classroomSummariesLength).toBe(0);
     document.body.removeChild(mockElement);
   });
+
+  it('should not show Sign In button while auth status is not resolved', () => {
+    component.authStatusResolved = false;
+    component.userIsLoggedIn = false;
+    component.username = 'testuser';
+    component.pageIsIframed = false;
+    fixture.detectChanges();
+
+    const signInButton = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-login')
+    );
+
+    expect(signInButton).toBeFalsy();
+  });
+
+  it('should show Sign In button after auth status is resolved for logged out user', () => {
+    component.authStatusResolved = true;
+    component.userIsLoggedIn = false;
+    component.username = 'testuser';
+    component.pageIsIframed = false;
+    component.userMenuIsShown = true;
+    fixture.detectChanges();
+
+    const signInButton = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-login')
+    );
+
+    expect(signInButton).toBeTruthy();
+  });
+
+  it('should not show profile dropdown while auth status is not resolved', () => {
+    component.authStatusResolved = false;
+    component.userIsLoggedIn = true;
+    component.pageIsIframed = false;
+    fixture.detectChanges();
+
+    const profileDropdown = fixture.debugElement.query(
+      By.css('.e2e-test-profile-dropdown')
+    );
+
+    expect(profileDropdown).toBeFalsy();
+  });
+
+  it('should show profile dropdown after auth status is resolved for logged in user', () => {
+    component.authStatusResolved = true;
+    component.userIsLoggedIn = true;
+    component.pageIsIframed = false;
+    component.userMenuIsShown = true;
+    component.profilePicturePngDataUrl = 'test-image-url';
+    fixture.detectChanges();
+
+    const profileDropdown = fixture.debugElement.query(
+      By.css('.e2e-test-profile-dropdown')
+    );
+
+    expect(profileDropdown).toBeTruthy();
+  });
+
+  it('should set authStatusResolved to true after getUserInfoAsync resolves', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'],
+      false,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.authStatusResolved).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.authStatusResolved).toBe(true);
+  }));
+
+  it('should set authStatusResolved to true even if getUserInfoAsync fails', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.rejectWith('Auth error');
+
+    expect(component.authStatusResolved).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.authStatusResolved).toBe(true);
+  }));
 });

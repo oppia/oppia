@@ -13,7 +13,7 @@
   color: #c55f45;
 }
 
-.oppia-learner-group-details .form-group {
+.oppia-learner-group-details .mb-3 {
   display: grid;
   grid-gap: 10px;
 }

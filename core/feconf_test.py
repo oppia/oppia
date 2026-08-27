@@ -19,9 +19,11 @@
 from __future__ import annotations
 
 import datetime
+import importlib
 import os
 
 from core import feconf
+from core.constants import constants
 from core.tests import test_utils
 
 import bs4
@@ -58,19 +60,19 @@ class FeconfTests(test_utils.GenericTestBase):
     def test_callable_variables_return_correctly(self) -> None:
         recipient_username = 'Anshuman'
         self.assertEqual(
-            feconf.DEFAULT_SALUTATION_HTML_FN(recipient_username),
+            feconf.get_default_salutation_html(recipient_username),
             'Hi %s,' % recipient_username,
         )
 
         sender_username = 'Ezio'
         self.assertEqual(
-            feconf.DEFAULT_SIGNOFF_HTML_FN(sender_username),
+            feconf.get_default_signoff_html(sender_username),
             'Thanks!<br>%s (Oppia moderator)' % sender_username,
         )
 
         exploration_title = 'Test'
         self.assertEqual(
-            feconf.DEFAULT_EMAIL_SUBJECT_FN(exploration_title),
+            feconf.get_default_email_subject(exploration_title),
             'Your Oppia exploration "Test" has been unpublished',
         )
 
@@ -106,3 +108,13 @@ class FeconfTests(test_utils.GenericTestBase):
                 ).find_all('li')
             )
         self.assertEqual(feconf.TERMS_PAGE_LAST_UPDATED_UTC, max_date)
+
+    def test_prod_mode_frontend_dirs_match_angular_build_output(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            importlib.reload(feconf)
+            self.assertEqual(
+                feconf.FRONTEND_TEMPLATES_DIR, os.path.join('build')
+            )
+            self.assertEqual(feconf.FRONTEND_AOT_DIR, os.path.join('build'))
+
+        importlib.reload(feconf)

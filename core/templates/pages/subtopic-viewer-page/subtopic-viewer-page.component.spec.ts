@@ -45,6 +45,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -108,7 +109,8 @@ describe('Subtopic viewer page', function () {
     {},
     true,
     '',
-    ''
+    '',
+    null
   );
 
   let subtopicTitle = 'Subtopic Title';
@@ -118,6 +120,7 @@ describe('Subtopic viewer page', function () {
       topic_id: topicId,
       topic_name: topicName,
       subtopic_title: subtopicTitle,
+      current_subtopic_id: 1,
       page_contents: {
         subtitled_html: {
           content_id: '',
@@ -135,7 +138,7 @@ describe('Subtopic viewer page', function () {
           },
           content: {
             content_id: 'sections_content_1',
-            unicode_str: 'Test content',
+            html: 'Test content',
           },
         },
       ],
@@ -155,6 +158,7 @@ describe('Subtopic viewer page', function () {
       topic_id: topicId,
       topic_name: topicName,
       subtopic_title: subtopicTitle,
+      current_subtopic_id: 1,
       page_contents: {
         subtitled_html: {
           content_id: '',
@@ -313,7 +317,7 @@ describe('Subtopic viewer page', function () {
         subtopicDataObject.getNextSubtopic()
       );
       expect(component.prevSubtopic).toBeUndefined();
-      expect(component.subtopicSummaryIsShown).toBeTrue();
+      expect(component.subtopicSummaryIsShown).toBe(true);
 
       expect(component.subtopicTitleTranslationKey).toEqual(
         'I18N_SUBTOPIC_123abcd_test_TITLE'
@@ -378,7 +382,7 @@ describe('Subtopic viewer page', function () {
     () => {
       component.subscribeToOnLangChange();
       spyOn(component, 'setPageTitle');
-      translateService.onLangChange.emit();
+      translateService.onLangChange.next();
 
       expect(component.setPageTitle).toHaveBeenCalled();
     }
@@ -448,7 +452,7 @@ describe('Subtopic viewer page', function () {
       subtopicDataObjectWithPrevSubtopic.getPrevSubtopic()
     );
     expect(component.nextSubtopic).toBeUndefined();
-    expect(component.subtopicSummaryIsShown).toBeTrue();
+    expect(component.subtopicSummaryIsShown).toBe(true);
 
     component.ngOnDestroy();
   }));
@@ -499,9 +503,11 @@ describe('Subtopic viewer page', function () {
   it('should open study guide when openStudyGuide is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    };
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+    component.nextSubtopic = mockSubtopic;
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/test-url'
@@ -518,9 +524,12 @@ describe('Subtopic viewer page', function () {
   it('should open study guide when openStudyGuide is called with Ctrl+click event', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    };
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+
+    component.nextSubtopic = mockSubtopic;
     const mockEvent = new MouseEvent('click', {ctrlKey: true});
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -538,9 +547,11 @@ describe('Subtopic viewer page', function () {
   it('should not open study guide when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    };
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+    component.nextSubtopic = mockSubtopic;
 
     component.openStudyGuide();
 
@@ -696,10 +707,13 @@ describe('Subtopic viewer page', function () {
 
     // Test desktop view (default behavior).
     spyOn(component, 'checkMobileView').and.returnValue(false);
-    component.nextSubtopic = {
-      getTitle: () => longTitle,
-      getUrlFragment: () => 'test-fragment',
-    };
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getTitle',
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getTitle.and.returnValue(longTitle);
+    mockSubtopic.getUrlFragment.and.returnValue('test-fragment');
+    component.nextSubtopic = mockSubtopic;
 
     const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
     // 20 chars + '...'.
@@ -717,10 +731,8 @@ describe('Subtopic viewer page', function () {
 
     // Test short title (should not be truncated).
     const shortTitle = 'Short title';
-    component.nextSubtopic = {
-      getTitle: () => shortTitle,
-      getUrlFragment: () => 'test-fragment',
-    };
+    mockSubtopic.getTitle.and.returnValue(shortTitle);
+    component.nextSubtopic = mockSubtopic;
 
     const shortResult = component.checkNextSubtopicTitleLengthAndModify();
     expect(shortResult).toBe(shortTitle);

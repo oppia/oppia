@@ -43,20 +43,22 @@ import {UtilsService} from 'services/utils.service';
 import {EdgeCentre, GraphDetailService} from './graph-detail.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-const debounce = (delay: number = 5): MethodDecorator => {
-  return function (
-    target: string,
-    propertyKey: string,
+const debounce = (delay = 5): MethodDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol,
     descriptor: PropertyDescriptor
-  ) {
-    const original = descriptor.value;
-    const key = `__timeout__${propertyKey}`;
+  ): void => {
+    const original = descriptor.value as (...args: unknown[]) => unknown;
+    const key = `__timeout__${String(propertyKey)}`;
 
-    descriptor.value = function (...args) {
-      clearTimeout(this[key]);
+    descriptor.value = function (
+      this: Record<string, unknown>,
+      ...args: unknown[]
+    ) {
+      clearTimeout(this[key] as number);
       this[key] = setTimeout(() => original.apply(this, args), delay);
     };
-    return descriptor;
   };
 };
 
@@ -77,16 +79,16 @@ interface GraphOption {
   styleUrls: [],
 })
 export class GraphVizComponent implements OnInit, AfterViewInit {
-  @Input() graph: GraphAnswer;
-  @Input() canAddVertex: boolean;
-  @Input() canDeleteVertex: boolean;
-  @Input() canMoveVertex: boolean;
-  @Input() canEditVertexLabel: boolean;
-  @Input() canAddEdge: boolean;
-  @Input() canDeleteEdge: boolean;
-  @Input() canEditEdgeWeight: boolean;
-  @Input() interactionIsActive: boolean;
-  @Input() canEditOptions: boolean;
+  @Input() graph!: GraphAnswer;
+  @Input() canAddVertex!: boolean;
+  @Input() canDeleteVertex!: boolean;
+  @Input() canMoveVertex!: boolean;
+  @Input() canEditVertexLabel!: boolean;
+  @Input() canAddEdge!: boolean;
+  @Input() canDeleteEdge!: boolean;
+  @Input() canEditEdgeWeight!: boolean;
+  @Input() interactionIsActive!: boolean;
+  @Input() canEditOptions!: boolean;
   @ViewChild('dotCursor') dotCursor!: ElementRef<HTMLDivElement>;
   @ViewChild('graphArea') graphArea!: ElementRef<HTMLElement>;
   dotCursorCoordinateX: number = 0;
@@ -94,7 +96,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
   usingMobileDevice: boolean = false;
-  helpText: string = '';
+  helpText: string | null = '';
   _MODES = {
     MOVE: 0,
     ADD_EDGE: 1,
@@ -108,20 +110,20 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   SELECT_COLOR = 'orange';
   DEFAULT_COLOR = 'black';
   state = {
-    currentMode: this._MODES.MOVE,
+    currentMode: this._MODES.MOVE as number | null,
     // Vertex, edge, mode button, label currently being hovered over.
-    hoveredVertex: null,
-    hoveredEdge: null,
+    hoveredVertex: null as number | null,
+    hoveredEdge: null as number | null,
     hoveredModeButton: null,
     // If in ADD_EDGE mode, source vertex of the new edge, if it
     // exists.
-    addEdgeVertex: null,
+    addEdgeVertex: null as number | null,
     // Currently dragged vertex.
-    currentlyDraggedVertex: null,
+    currentlyDraggedVertex: null as number | null,
     // Selected vertex for editing label.
-    selectedVertex: null,
+    selectedVertex: null as number | null,
     // Selected edge for editing weight.
-    selectedEdge: null,
+    selectedEdge: null as number | null,
     // Mouse position in SVG coordinates.
     mouseX: 0,
     mouseY: 0,
@@ -133,15 +135,15 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartY: 0,
   };
 
-  selectedEdgeWeightValue: number | string;
+  selectedEdgeWeightValue!: string | number;
   buttons: GraphButton[] = [];
-  private vizContainer: SVGSVGElement[];
+  private vizContainer!: SVGSVGElement[];
   componentSubscriptions: Subscription = new Subscription();
-  shouldShowWrongWeightWarning: boolean;
-  VERTEX_RADIUS_PX: number;
-  EDGE_WIDTH_PX: number;
-  graphOptions: GraphOption[];
-  svgViewBox: string;
+  shouldShowWrongWeightWarning!: boolean;
+  VERTEX_RADIUS_PX!: number;
+  EDGE_WIDTH_PX!: number;
+  graphOptions!: GraphOption[];
+  svgViewBox!: string;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private deviceInfoService: DeviceInfoService,
@@ -299,9 +301,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     const pt = this.vizContainer[0].createSVGPoint();
     pt.x = event.clientX;
     pt.y = event.clientY;
-    const svgp = pt.matrixTransform(
-      this.vizContainer[0].getScreenCTM().inverse()
-    );
+    const ctm = this.vizContainer[0].getScreenCTM();
+    if (!ctm) {
+      return;
+    }
+    const svgp = pt.matrixTransform(ctm.inverse());
     this.state.mouseX = svgp.x;
     this.state.mouseY = svgp.y;
     // The condition `currentMode === 2` signifies that
@@ -444,7 +448,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  toggleGraphOption(option: string): void {
+  toggleGraphOption(option: 'isDirected' | 'isWeighted' | 'isLabeled'): void {
     // Handle the case when we have two edges s -> d and d -> s.
     if (option === 'isDirected' && this.graph[option]) {
       this._deleteRepeatedUndirectedEdges();
@@ -545,7 +549,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onTouchFinalVertex(index: number): void {
-    if (this.state.currentMode === this._MODES.ADD_EDGE) {
+    if (
+      this.state.currentMode === this._MODES.ADD_EDGE &&
+      this.state.addEdgeVertex !== null
+    ) {
       this.tryAddEdge(this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
@@ -621,7 +628,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.usingMobileDevice) {
       return;
     }
-    if (this.state.currentMode === this._MODES.ADD_EDGE) {
+    if (
+      this.state.currentMode === this._MODES.ADD_EDGE &&
+      this.state.addEdgeVertex !== null
+    ) {
       if (this.state.hoveredVertex !== null) {
         this.tryAddEdge(this.state.addEdgeVertex, this.state.hoveredVertex);
       }
@@ -731,19 +741,18 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   deleteVertex(index: number): void {
-    this.graph.edges = this.graph.edges.map(edge => {
-      if (edge.src === index || edge.dst === index) {
-        return null;
-      }
-      if (edge.src > index) {
-        edge.src--;
-      }
-      if (edge.dst > index) {
-        edge.dst--;
-      }
-      return edge;
-    });
-    this.graph.edges = this.graph.edges.filter(edge => edge !== null);
+    this.graph.edges = this.graph.edges
+      .filter(edge => edge.src !== index && edge.dst !== index)
+      .map(edge => {
+        if (edge.src > index) {
+          edge.src--;
+        }
+        if (edge.dst > index) {
+          edge.dst--;
+        }
+        return edge;
+      });
+
     this.graph.vertices.splice(index, 1);
     this.graphChange.emit(this.graph);
     this.state.hoveredVertex = null;
@@ -757,12 +766,15 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   set selectedVertexLabel(label: string) {
-    if (this.utilsService.isDefined(label)) {
+    if (
+      this.utilsService.isDefined(label) &&
+      this.state.selectedVertex !== null
+    ) {
       this.graph.vertices[this.state.selectedVertex].label = label;
     }
   }
 
-  get selectedEdgeWeight(): string | number {
+  get selectedEdgeWeight(): string | number | null {
     if (this.state.selectedEdge === null) {
       return '';
     }
@@ -783,7 +795,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onUpdateEdgeWeight(): void {
-    if (isNumber(this.selectedEdgeWeightValue)) {
+    if (
+      this.state.selectedEdge !== null &&
+      isNumber(this.selectedEdgeWeightValue)
+    ) {
       this.graph.edges[this.state.selectedEdge].weight =
         this.selectedEdgeWeightValue;
       this.graphChange.emit(this.graph);

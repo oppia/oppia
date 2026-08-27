@@ -40,6 +40,15 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    RedesignedTopicViewerPage: {
+      isEnabled: false,
+    },
+  };
+}
 
 class MockPageContextService {
   getExplorationId() {
@@ -65,9 +74,9 @@ describe('Topic editor page', () => {
   let undoRedoService: UndoRedoService;
   let topicEditorStateService: TopicEditorStateService;
   let urlService: UrlService;
-  let topic;
-  let ngbModal;
-  let runSpy;
+  let topic: Topic;
+  let ngbModal: NgbModal;
+  let runSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -87,8 +96,8 @@ describe('Topic editor page', () => {
         TopicEditorStateService,
         UrlService,
         {
-          provide: PageContextService,
-          useClass: MockPageContextService,
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -223,7 +232,7 @@ describe('Topic editor page', () => {
       {backdrop: true}
     );
     expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
-    expect(component.cancelNavigationOnce).toBeFalse();
+    expect(component.cancelNavigationOnce).toBe(false);
     expect(runSpy).toHaveBeenCalled();
   }));
 
@@ -242,7 +251,7 @@ describe('Topic editor page', () => {
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
-    expect(component.cancelNavigationOnce).toBeTrue();
+    expect(component.cancelNavigationOnce).toBe(true);
     expect(runSpy).not.toHaveBeenCalled();
   }));
 
@@ -253,7 +262,7 @@ describe('Topic editor page', () => {
 
     component.confirmBeforeLeavingQuestions(runSpy);
 
-    expect(component.cancelNavigationOnce).toBeFalse();
+    expect(component.cancelNavigationOnce).toBe(false);
     expect(runSpy).not.toHaveBeenCalled();
   });
 
@@ -274,7 +283,7 @@ describe('Topic editor page', () => {
       spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
       spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
-        callback => callback()
+        (callback: () => boolean) => callback()
       );
 
       component.ngOnInit();
@@ -318,18 +327,6 @@ describe('Topic editor page', () => {
     expect(topicPreviewSpy).toHaveBeenCalled();
   });
 
-  it('should open subtopic preview tab if active tab is subtopic editor', () => {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'subtopic_editor'
-    );
-    const topicPreviewSpy = spyOn(
-      topicEditorRoutingService,
-      'navigateToSubtopicPreviewTab'
-    );
-    component.openTopicViewer();
-    expect(topicPreviewSpy).toHaveBeenCalled();
-  });
-
   it('should navigate to topic editor tab in topic editor', () => {
     spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_preview'
@@ -352,6 +349,71 @@ describe('Topic editor page', () => {
     );
     component.selectMainTab();
     expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should not set document title when topic is not loaded', () => {
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      undefined
+    );
+    const setDocumentTitleSpy = spyOn(pageTitleService, 'setDocumentTitle');
+    const setNavbarSubtitleSpy = spyOn(
+      pageTitleService,
+      'setNavbarSubtitleForMobileView'
+    );
+
+    component.setDocumentTitle();
+
+    expect(setDocumentTitleSpy).not.toHaveBeenCalled();
+    expect(setNavbarSubtitleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not set document title when topic has no name', () => {
+    let topicWithoutName = new Topic(
+      'id',
+      '',
+      'Abbrev.',
+      'url-frag',
+      'Description',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    topicWithoutName.setName('');
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      topicWithoutName
+    );
+    const setDocumentTitleSpy = spyOn(pageTitleService, 'setDocumentTitle');
+    const setNavbarSubtitleSpy = spyOn(
+      pageTitleService,
+      'setNavbarSubtitleForMobileView'
+    );
+
+    component.setDocumentTitle();
+
+    expect(setDocumentTitleSpy).not.toHaveBeenCalled();
+    expect(setNavbarSubtitleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not validate when topic is not set', () => {
+    component.topic = null;
+    component.validationIssues = ['existing'];
+    component.prepublishValidationIssues = ['pre-existing'];
+
+    component._validateTopic();
+
+    expect(component.validationIssues).toEqual(['existing']);
+    expect(component.prepublishValidationIssues).toEqual(['pre-existing']);
   });
 
   it('should validate the topic and return validation issues', () => {
@@ -413,4 +475,56 @@ describe('Topic editor page', () => {
       component.ngOnDestroy();
     }
   );
+
+  it('should return "Topic Editor" when topic has not loaded', () => {
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
+    expect(component.getNavbarText()).toBe('Topic Editor');
+  });
+
+  it('should navigate to subtopic preview when lastSubtopicIdVisited is set', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(
+      topicEditorRoutingService,
+      'getLastSubtopicIdVisited'
+    ).and.returnValue(2);
+    const subtopicPreviewSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicPreviewTab'
+    );
+    component.openTopicViewer();
+    expect(subtopicPreviewSpy).toHaveBeenCalledWith(2);
+  });
+
+  it('should navigate to subtopic editor when lastTabVisited is subtopic', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
+      'subtopic'
+    );
+    spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and.returnValue(
+      null
+    );
+    spyOn(
+      topicEditorRoutingService,
+      'getLastSubtopicIdVisited'
+    ).and.returnValue(3);
+    const subtopicEditorSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicEditorWithId'
+    );
+    component.selectMainTab();
+    expect(subtopicEditorSpy).toHaveBeenCalledWith(3);
+  });
+
+  it('should directly run callback when no changes in questions tab', () => {
+    spyOn(component, 'getActiveTabName').and.returnValue('questions');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(runSpy).toHaveBeenCalled();
+  });
 });

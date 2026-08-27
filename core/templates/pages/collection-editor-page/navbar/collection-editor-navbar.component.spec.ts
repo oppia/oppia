@@ -160,6 +160,24 @@ describe('Collection editor navbar component', () => {
     expect(collectionEditorStateService.getCollectionRights).toHaveBeenCalled();
   }));
 
+  it('should unpublish the collection', fakeAsync(() => {
+    const unpublishSpy = spyOn(
+      collectionRightsBackendApiService,
+      'setCollectionPrivateAsync'
+    ).and.returnValue(Promise.resolve());
+    const setRightsSpy = spyOn(
+      collectionEditorStateService,
+      'setCollectionRights'
+    );
+    componentInstance.collectionId = collectionId;
+    componentInstance.collection = mockCollection;
+    componentInstance.collectionRights = mockPrivateCollectionRights;
+    componentInstance.unpublishCollection();
+    tick();
+    expect(unpublishSpy).toHaveBeenCalled();
+    expect(setRightsSpy).toHaveBeenCalled();
+  }));
+
   it('should validate public collection', fakeAsync(() => {
     let mockPublicCollectionRights = new CollectionRights({
       collection_id: collectionId,

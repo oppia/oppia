@@ -25,7 +25,6 @@ import subprocess
 
 from core.tests import test_utils
 
-import psutil
 from typing import List, Tuple
 
 from . import pre_commit_hook
@@ -236,14 +235,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
             stderr: int = subprocess.PIPE,
-        ) -> psutil.Popen:
+        ) -> subprocess.Popen[bytes]:
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen):
-            self.assertEqual(
-                pre_commit_hook.start_subprocess_for_result(['cmd']),
-                (b'test\n', b''),
-            )
+            result = pre_commit_hook.start_subprocess_for_result(['cmd'])
+            self.assertEqual(result[0], b'test\n')
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
         self,

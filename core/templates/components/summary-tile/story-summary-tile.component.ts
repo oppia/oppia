@@ -33,7 +33,6 @@ import {
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import './story-summary-tile.component.css';
 import constants from 'assets/constants';
 
 @Component({

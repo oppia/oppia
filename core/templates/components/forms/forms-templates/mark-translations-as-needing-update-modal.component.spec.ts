@@ -55,21 +55,13 @@ class MockPlatformFeatureService {
   };
 }
 
-export class MockNgbModalRef {
-  componentInstance = {
-    contentId: null,
-    contentValue: null,
-  };
-  result: null;
-}
-
 describe('Mark Translations As Needing Update Modal Component', () => {
   let component: MarkTranslationsAsNeedingUpdateModalComponent;
   let fixture: ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
+  let ngbModalRef: NgbModalRef;
   let entityTranslationsService: EntityTranslationsService;
 
   beforeEach(waitForAsync(() => {
@@ -123,11 +115,11 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   it('should check feature flag when initialized', () => {
     mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
       true;
-    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeFalse();
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBe(false);
 
     component.ngOnInit();
 
-    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeTrue();
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBe(true);
   });
 
   it('should call markNeedingUpdateHandler', () => {
@@ -137,16 +129,18 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
     component.markNeedsUpdate();
 
-    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
+    expect(handlerWithSpy).toHaveBeenCalledTimes(1);
+    expect(handlerWithSpy).toHaveBeenCalledWith('contentId_1');
   });
 
   it('should open the ModifyTranslations modal', fakeAsync(() => {
     component.contentId = 'content1';
     component.contentValue = 'Content value';
-    ngbModalRef.result = Promise.resolve();
-    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as NgbModalRef
-    );
+    ngbModalRef = {
+      componentInstance: {contentId: null, contentValue: null},
+      result: Promise.resolve(),
+    } as NgbModalRef;
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
     );
@@ -166,10 +160,12 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
   it('should cancel ModifyTranslations modal', () => {
     component.contentId = 'content1';
-    ngbModalRef.result = Promise.reject();
-    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as NgbModalRef
-    );
+    ngbModalRef = {
+      componentInstance: {},
+      result: undefined,
+    } as unknown as NgbModalRef;
+    ngbModalRef.result = Promise.reject().catch(() => {});
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
     );
@@ -203,7 +199,8 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
     component.removeTranslations();
 
-    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
+    expect(handlerWithSpy).toHaveBeenCalledTimes(1);
+    expect(handlerWithSpy).toHaveBeenCalledWith('contentId_1');
   });
 
   it('should dismiss the modal when cancel is called', () => {

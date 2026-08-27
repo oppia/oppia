@@ -22,9 +22,15 @@ import {ContactPageComponent} from './contact-page.component';
 import {ContactPageRootComponent} from './contact-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ContactPageRoutingModule} from './contact-page-routing.module';
+import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, ContactPageRoutingModule],
+  imports: [
+    CommonModule,
+    SharedComponentsModule,
+    ContactPageRoutingModule,
+    CampaignBannerModule,
+  ],
   declarations: [ContactPageComponent, ContactPageRootComponent],
   entryComponents: [ContactPageComponent, ContactPageRootComponent],
 })

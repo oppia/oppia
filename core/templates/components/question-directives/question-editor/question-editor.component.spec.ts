@@ -35,6 +35,7 @@ import {Question} from 'domain/question/question.model';
 import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {QuestionEditorComponent} from './question-editor.component';
+import {InteractionData} from 'interactions/customization-args-defs';
 
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
@@ -146,6 +147,7 @@ describe('Question Editor Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
       },
       next_content_id_index: 1,
       inapplicable_skill_misconception_ids: [],
@@ -158,7 +160,7 @@ describe('Question Editor Component', () => {
     component.questionStateData = question.getStateData();
 
     spyOn(questionUpdateService, 'setQuestionStateData').and.callFake(
-      (question, update) => {
+      (question: Question, update: () => void) => {
         update();
       }
     );
@@ -306,8 +308,8 @@ describe('Question Editor Component', () => {
     spyOn(stateEditorService, 'setInteractionId');
     spyOn(stateEditorService, 'setInteractionCustomizationArgs');
 
-    let newInteractionData = {
-      interactionId: 'Text Input',
+    let newInteractionData: InteractionData = {
+      interactionId: 'TextInput',
       customizationArgs: 'Customization Args',
     };
     component.saveInteractionData(newInteractionData);

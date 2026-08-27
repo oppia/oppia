@@ -22,16 +22,31 @@ import {
   ComponentFactoryResolver,
   Input,
   SimpleChange,
+  Type,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
+import './interaction-display.component.css';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
+type ScopedValue =
+  | string
+  | number
+  | boolean
+  // The 'unknown' type is used here because 'ScopedValue' can represent various
+  // data types passed to interaction components (e.g., placeholder, lastAnswer,
+  // etc.). Since these properties can be complex objects whose internal
+  // structure is specific to the interaction being rendered (and thus only
+  // known at runtime), a more specific type cannot be defined here.
+  | Record<string, unknown>
+  | null
+  | undefined;
 
 @Component({
   selector: 'oppia-interaction-display',
   templateUrl: './interaction-display.component.html',
+  styleUrls: ['./interaction-display.component.css'],
 })
 export class InteractionDisplayComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -41,9 +56,7 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
-  // TODO(#13015): Remove use of unknown as a type.
-  // The passed htmlData sometimes accesses property from parent scope.
-  @Input() parentScope!: unknown;
+  @Input() parentScope?: Object;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -64,24 +77,31 @@ export class InteractionDisplayComponent {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
 
-      if (
-        dom.body.firstElementChild &&
-        TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName]
-      ) {
-        let interaction =
-          TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName];
+      // The 'unknown' type is used here because the Record represents a
+      // generic interaction component's properties. Since this mapping
+      // includes all possible interactions, each with its own unique set
+      // of properties and types, we use 'unknown' for the property values
+      // to allow generic assignment at runtime.
+      const interactionMapping =
+        TAG_TO_INTERACTION_MAPPING as unknown as Record<
+          string,
+          Type<Record<string, unknown>>
+        >;
+      const firstChild = dom.body.firstElementChild;
+      if (firstChild && interactionMapping[firstChild.tagName]) {
+        let interaction = interactionMapping[firstChild.tagName];
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
         const componentRef =
           this.viewContainerRef.createComponent(componentFactory);
 
-        let attributes = dom.body.firstElementChild.attributes;
+        let attributes = firstChild.attributes;
 
         Array.from(attributes).forEach(attribute => {
           let attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
-          let attributeValue = attribute.value;
+          let attributeValue: ScopedValue = attribute.value;
 
           // Properties enclosed with [] needs to be resolved from parent scope.
           // NOTE TO DEVELOPERS: The variables in this case are keyed by the
@@ -92,7 +112,9 @@ export class InteractionDisplayComponent {
           // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
-              attributeValue = this.parentScope[attributeNameInCamelCase];
+              attributeValue = (
+                this.parentScope as Record<string, ScopedValue>
+              )[attributeNameInCamelCase];
             } else {
               attributeValue = null;
             }
@@ -103,7 +125,9 @@ export class InteractionDisplayComponent {
             );
           }
 
-          componentRef.instance[attributeNameInCamelCase] = attributeValue;
+          (componentRef.instance as Record<string, ScopedValue>)[
+            attributeNameInCamelCase
+          ] = attributeValue;
         });
 
         componentRef.changeDetectorRef.detectChanges();

@@ -25,7 +25,12 @@ import {
   discardPeriodicTasks,
   waitForAsync,
 } from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
+import {
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  EventEmitter,
+  PipeTransform,
+} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {PageContextService} from 'services/page-context.service';
@@ -47,9 +52,11 @@ import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.m
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import {StateBackendDict} from 'domain/state/state.model';
 
 @Pipe({name: 'formatTime'})
-class MockFormatTimePipe {
+class MockFormatTimePipe implements PipeTransform {
   transform(value: number): string {
     return String(value);
   }
@@ -87,6 +94,7 @@ describe('Voiceover card component', () => {
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
   let adminBackendApiService: AdminBackendApiService;
+  let voiceoverRegenerationJobService: VoiceoverRegenerationJobService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -131,6 +139,9 @@ describe('Voiceover card component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
+    voiceoverRegenerationJobService = TestBed.inject(
+      VoiceoverRegenerationJobService
+    );
 
     spyOn(
       translationLanguageService,
@@ -143,6 +154,10 @@ describe('Voiceover card component', () => {
     spyOn(
       translationLanguageService,
       'onActiveLanguageAccentChanged'
+    ).and.returnValue(new EventEmitter<void>());
+    spyOn(
+      voiceoverRegenerationJobService,
+      'onNewRegenerationRequest'
     ).and.returnValue(new EventEmitter<void>());
     spyOn(entityVoiceoversService, 'onVoiceoverLoad').and.returnValue(
       new EventEmitter<void>()
@@ -162,6 +177,10 @@ describe('Voiceover card component', () => {
       translationLanguageService,
       'onActiveLanguageChanged'
     ).and.returnValue(questionSummariesInitializedEmitter);
+    spyOn(
+      voiceoverLanguageManagementService,
+      'getAutogeneratableLanguageAccents'
+    );
 
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
@@ -184,6 +203,7 @@ describe('Voiceover card component', () => {
     translationLanguageService.onActiveLanguageChanged.emit();
     translationTabActiveContentIdService.onActiveContentIdChanged.emit();
     entityVoiceoversService.onVoiceoverLoad.emit();
+    voiceoverRegenerationJobService.onNewRegenerationRequest.emit();
 
     flush();
     tick(5000);
@@ -343,6 +363,7 @@ describe('Voiceover card component', () => {
       entity_version: entityVersion,
       language_accent_code: languageAccentCode,
       voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -362,7 +383,7 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect(component.manualVoiceover.filename).toEqual('a.mp3');
+    expect(component.manualVoiceover?.filename).toEqual('a.mp3');
   }));
 
   it('should be able to set active automatic voiceover', fakeAsync(() => {
@@ -374,7 +395,6 @@ describe('Voiceover card component', () => {
     };
     let contentIdToVoiceoversMappingBackendDict = {
       content0: {
-        manual: undefined,
         auto: automaticVoiceoverBackendDict,
       },
     };
@@ -389,6 +409,7 @@ describe('Voiceover card component', () => {
       entity_version: entityVersion,
       language_accent_code: languageAccentCode,
       voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -408,7 +429,7 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect(component.automaticVoiceover.filename).toEqual('a.mp3');
+    expect(component.automaticVoiceover?.filename).toEqual('a.mp3');
   }));
 
   it('should be able to update language accent code', fakeAsync(() => {
@@ -436,13 +457,13 @@ describe('Voiceover card component', () => {
     discardPeriodicTasks();
 
     expect(component.languageAccentCode).toEqual('en-IN');
-    expect(component.unsupportedLanguageCode).toBeFalse();
+    expect(component.unsupportedLanguageCode).toBeFalsy();
 
     component.updateLanguageAccentCode('');
     flush();
     discardPeriodicTasks();
 
-    expect(component.unsupportedLanguageCode).toBeTrue();
+    expect(component.unsupportedLanguageCode).toBeTruthy();
     expect(component.languageAccentCode).toEqual('');
   }));
 
@@ -484,7 +505,7 @@ describe('Voiceover card component', () => {
     );
     flush();
     discardPeriodicTasks();
-    expect(audioPlayerService.isPlaying()).toBeTrue();
+    expect(audioPlayerService.isPlaying()).toBeTruthy();
   }));
 
   it('should be able to play manual voiceover by pausing automatic voiceover', fakeAsync(() => {
@@ -502,8 +523,8 @@ describe('Voiceover card component', () => {
     );
 
     expect(audioPlayerService.play).toHaveBeenCalled();
-    expect(component.isAutomaticVoiceoverPlaying).toBeFalse();
-    expect(component.isManualVoiceoverPlaying).toBeTrue();
+    expect(component.isAutomaticVoiceoverPlaying).toBeFalsy();
+    expect(component.isManualVoiceoverPlaying).toBeTruthy();
   }));
 
   it('should be able to play automatic voiceover by pausing manual voiceover', fakeAsync(() => {
@@ -518,8 +539,8 @@ describe('Voiceover card component', () => {
     component.playAndPauseVoiceover('a.mp3', AppConstants.VOICEOVER_TYPE_AUTO);
 
     expect(audioPlayerService.play).toHaveBeenCalled();
-    expect(component.isAutomaticVoiceoverPlaying).toBeTrue();
-    expect(component.isManualVoiceoverPlaying).toBeFalse();
+    expect(component.isAutomaticVoiceoverPlaying).toBeTruthy();
+    expect(component.isManualVoiceoverPlaying).toBeFalsy();
   }));
 
   it('should be able to play and pause loaded automatic voiceover', fakeAsync(() => {
@@ -528,7 +549,7 @@ describe('Voiceover card component', () => {
     component.playAndPauseVoiceover('a.mp3', AppConstants.VOICEOVER_TYPE_AUTO);
     flush();
     discardPeriodicTasks();
-    expect(audioPlayerService.isPlaying()).toBeTrue();
+    expect(audioPlayerService.isPlaying()).toBeTruthy();
   }));
 
   it('should be able to delete manual voiceover', fakeAsync(() => {
@@ -543,8 +564,17 @@ describe('Voiceover card component', () => {
       needs_update: false,
       duration_secs: 10.0,
     };
+    let automaticVoiceoverBackendDict: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
     component.manualVoiceover = Voiceover.createFromBackendDict(
       manualVoiceoverBackendDict
+    );
+    component.automaticVoiceover = Voiceover.createFromBackendDict(
+      automaticVoiceoverBackendDict
     );
 
     let entityId = 'exploration_1';
@@ -554,7 +584,6 @@ describe('Voiceover card component', () => {
     let contentIdToVoiceoversMappingBackendDict = {
       content0: {
         manual: manualVoiceoverBackendDict,
-        auto: undefined,
       },
     };
     let contentIdToVoiceoversAudioOffsetsMsecsBackendDict = {};
@@ -626,6 +655,7 @@ describe('Voiceover card component', () => {
       entity_version: entityVersion,
       language_accent_code: languageAccentCode,
       voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -637,12 +667,12 @@ describe('Voiceover card component', () => {
     entityVoiceoversService.init(entityId, entityType, entityVersion, 'en');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
 
-    expect(component.manualVoiceover.needsUpdate).toBeFalse();
+    expect(component.manualVoiceover?.needsUpdate).toBeFalsy();
     component.toggleAudioNeedsUpdate();
     flush();
     discardPeriodicTasks();
 
-    expect(component.manualVoiceover.needsUpdate).toBeTrue();
+    expect(component.manualVoiceover?.needsUpdate).toBeTruthy();
   }));
 
   it('should be able to add manual voiceovers', fakeAsync(() => {
@@ -666,8 +696,8 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect(component.manualVoiceover.filename).toEqual('a.mp3');
-    expect(component.manualVoiceover.durationSecs).toEqual(10.0);
+    expect(component.manualVoiceover?.filename).toEqual('a.mp3');
+    expect(component.manualVoiceover?.durationSecs).toEqual(10.0);
   }));
 
   it('should not add manual voiceovers for reject handler', fakeAsync(() => {
@@ -788,14 +818,14 @@ describe('Voiceover card component', () => {
 
     component.ngAfterViewChecked();
 
-    expect(component.isGenerateAutomaticVoiceoverOptionEnabled).toBeTrue();
+    expect(component.isGenerateAutomaticVoiceoverOptionEnabled).toBeTruthy();
 
     changeListService.explorationChangeList = [];
     isOnlyVoiceoverChangeListPresentSpy.and.returnValue(false);
 
     component.ngAfterViewChecked();
 
-    expect(component.isGenerateAutomaticVoiceoverOptionEnabled).toBeFalse();
+    expect(component.isGenerateAutomaticVoiceoverOptionEnabled).toBeFalsy();
   }));
 
   it('should be able to update content availability status', fakeAsync(() => {
@@ -807,26 +837,20 @@ describe('Voiceover card component', () => {
     isContentAvaiableForVoiceoverSpy.and.returnValue(true);
     component.contentAvailableForVoiceovers = false;
     component.updateContentAvailabilityStatusForVoiceovers();
-    expect(component.contentAvailableForVoiceovers).toBeTrue();
+    expect(component.contentAvailableForVoiceovers).toBeTruthy();
 
     isContentAvaiableForVoiceoverSpy.and.returnValue(false);
     component.contentAvailableForVoiceovers = true;
     component.updateContentAvailabilityStatusForVoiceovers();
-    expect(component.contentAvailableForVoiceovers).toBeFalse();
+    expect(component.contentAvailableForVoiceovers).toBeFalsy();
   }));
 
   it('should return correct content availability status', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content_0',
         html: 'Hello world!',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -873,9 +897,9 @@ describe('Voiceover card component', () => {
 
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
-    expect(component.isContentAvaiableForVoiceover()).toBeTrue();
+    expect(component.isContentAvaiableForVoiceover()).toBeTruthy();
     component.activeContentId = 'feedback_1';
-    expect(component.isContentAvaiableForVoiceover()).toBeFalse();
+    expect(component.isContentAvaiableForVoiceover()).toBeFalsy();
   });
 
   it('should disable voiceover regeneration feature flag', () => {
@@ -887,7 +911,7 @@ describe('Voiceover card component', () => {
 
     expect(
       component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeFalse();
+    ).toBeFalsy();
   });
 
   it('should enable voiceover regeneration feature flag', () => {
@@ -899,7 +923,7 @@ describe('Voiceover card component', () => {
 
     expect(
       component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeTrue();
+    ).toBeTruthy();
   });
 
   it('should show voiceover regeneration section', () => {
@@ -915,24 +939,24 @@ describe('Voiceover card component', () => {
     ).and.returnValue(true);
 
     explorationLinkedToStorySpy.and.returnValue(true);
-    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeTrue();
+    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeTruthy();
 
     explorationLinkedToStorySpy.and.returnValue(false);
-    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeFalse();
+    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeFalsy();
   });
 
   it('should be able to enable and disable voiceovers loading correctly', () => {
-    expect(component.manualVoiceoverIsLoading).toBeFalse();
+    expect(component.manualVoiceoverIsLoading).toBeFalsy();
     component.enableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_MANUAL);
-    expect(component.manualVoiceoverIsLoading).toBeTrue();
+    expect(component.manualVoiceoverIsLoading).toBeTruthy();
     component.disableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_MANUAL);
-    expect(component.manualVoiceoverIsLoading).toBeFalse();
+    expect(component.manualVoiceoverIsLoading).toBeFalsy();
 
-    expect(component.automaticVoiceoverIsLoading).toBeFalse();
+    expect(component.automaticVoiceoverIsLoading).toBeFalsy();
     component.enableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_AUTO);
-    expect(component.automaticVoiceoverIsLoading).toBeTrue();
+    expect(component.automaticVoiceoverIsLoading).toBeTruthy();
     component.disableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_AUTO);
-    expect(component.automaticVoiceoverIsLoading).toBeFalse();
+    expect(component.automaticVoiceoverIsLoading).toBeFalsy();
   });
 
   it('should be able to get automatic voiceover disable reason', () => {
@@ -967,4 +991,77 @@ describe('Voiceover card component', () => {
 
     expect(component.getAutomaticVoiceoverDisableReason()).toEqual('');
   });
+
+  it('should update automatic voiceover status when generation status is SUCCEEDED', fakeAsync(() => {
+    spyOn(
+      voiceoverRegenerationJobService,
+      'getContentRegenerationStatus'
+    ).and.returnValue('SUCCEEDED');
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+      Promise.resolve()
+    );
+
+    component.updateAutomaticVoiceoverWithRegenerationStatus();
+
+    tick();
+
+    expect(entityVoiceoversService.fetchEntityVoiceovers).toHaveBeenCalled();
+    expect(component.automaticVoiceoverGenerationStatus).toEqual('SUCCEEDED');
+  }));
+
+  it('should update automatic voiceover status when generation status is FAILED', fakeAsync(() => {
+    spyOn(
+      voiceoverRegenerationJobService,
+      'getContentRegenerationStatus'
+    ).and.returnValue('FAILED');
+
+    component.updateAutomaticVoiceoverWithRegenerationStatus();
+
+    expect(component.automaticVoiceoverGenerationStatus).toEqual('FAILED');
+  }));
+
+  it('should update automatic voiceover status when generation status is GENERATING', fakeAsync(() => {
+    spyOn(
+      voiceoverRegenerationJobService,
+      'getContentRegenerationStatus'
+    ).and.returnValue('GENERATING');
+    component.automaticVoiceover = Voiceover.createFromBackendDict({
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    });
+
+    component.updateAutomaticVoiceoverWithRegenerationStatus();
+
+    expect(component.automaticVoiceoverGenerationStatus).toEqual('GENERATING');
+  }));
+
+  it('should correctly update language accent code from translationLanguageService when active accent changes', fakeAsync(() => {
+    // 1. Simulate the bug's race condition where localStorage returns null.
+    spyOn(
+      localStorageService,
+      'getLastSelectedLanguageAccentCode'
+    ).and.returnValue(null);
+
+    // 2. Provide the single source of truth from the correct service.
+    spyOn(
+      translationLanguageService,
+      'getActiveLanguageAccentCode'
+    ).and.returnValue('en-US');
+
+    spyOn(component, 'updateLanguageAccentCode');
+
+    // 3. Initialize the component to start the subscription.
+    component.ngOnInit();
+
+    // 4. Trigger the translation event.
+    translationLanguageService.onActiveLanguageAccentChanged.emit();
+    flush();
+
+    // 5. The component should update with the service's value ('en-US'), NOT localStorage (null).
+    expect(component.updateLanguageAccentCode).toHaveBeenCalledWith('en-US');
+
+    discardPeriodicTasks();
+  }));
 });

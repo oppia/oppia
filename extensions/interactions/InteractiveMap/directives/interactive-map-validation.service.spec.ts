@@ -39,7 +39,7 @@ describe('InteractiveMapValidationService', () => {
       providers: [InteractiveMapValidationService],
     });
 
-    validatorService = TestBed.get(InteractiveMapValidationService);
+    validatorService = TestBed.inject(InteractiveMapValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({

@@ -16,17 +16,24 @@
  * @fileoverview Unit tests for the Skill question tab Component.
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Skill} from 'domain/skill/skill.model';
 import {SkillQuestionsTabComponent} from './skill-questions-tab.component';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 describe('Skill question tab component', () => {
   let component: SkillQuestionsTabComponent;
   let fixture: ComponentFixture<SkillQuestionsTabComponent>;
   let skillEditorStateService: SkillEditorStateService;
+  let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let initEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
 
@@ -34,7 +41,10 @@ describe('Skill question tab component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillQuestionsTabComponent],
-      providers: [SkillEditorStateService],
+      providers: [
+        SkillEditorStateService,
+        TopicsAndSkillsDashboardBackendApiService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
@@ -43,6 +53,9 @@ describe('Skill question tab component', () => {
     fixture = TestBed.createComponent(SkillQuestionsTabComponent);
     component = fixture.componentInstance;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService
+    );
 
     let misconceptionDict1 = {
       id: 2,
@@ -90,18 +103,34 @@ describe('Skill question tab component', () => {
     component.ngOnDestroy();
   });
 
-  it('should fetch skill when initialized', () => {
+  it('should fetch skill when initialized', fakeAsync(() => {
     const fetchSkillSpy = spyOn(
       skillEditorStateService,
       'getSkill'
     ).and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        categorizedSkillsDict: {},
+        untriagedSkillSummaries: [],
+        topicSummaries: [],
+        totalSkillCount: 0,
+        canDeleteTopic: false,
+        canCreateTopic: false,
+        canDeleteSkill: false,
+        canCreateSkill: false,
+      })
+    );
     component.ngOnInit();
     initEventEmitter.emit();
+    tick();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
-  });
+  }));
 
   it('should not initialize when skill is not available', () => {
     const fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill');
@@ -115,16 +144,77 @@ describe('Skill question tab component', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('should initialize when skill is available', () => {
+  it('should initialize when skill is available', fakeAsync(() => {
     const fetchSkillSpy = spyOn(
       skillEditorStateService,
       'getSkill'
     ).and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        categorizedSkillsDict: {},
+        untriagedSkillSummaries: [],
+        topicSummaries: [],
+        totalSkillCount: 0,
+        canDeleteTopic: false,
+        canCreateTopic: false,
+        canDeleteSkill: false,
+        canCreateSkill: false,
+      })
+    );
 
     component.ngOnInit();
+    tick();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
-  });
+  }));
+
+  it('should load skills categorized by topics', fakeAsync(() => {
+    const mockCategorizedSkills = {
+      'Test Topic': {
+        'Test Subtopic': [{id: 'skill1', description: 'Test Skill 1'}],
+      },
+    };
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        categorizedSkillsDict: mockCategorizedSkills,
+        untriagedSkillSummaries: [],
+        topicSummaries: [],
+        totalSkillCount: 0,
+        canDeleteTopic: false,
+        canCreateTopic: false,
+        canDeleteSkill: false,
+        canCreateSkill: false,
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.skillsCategorizedByTopics).toEqual(mockCategorizedSkills);
+  }));
+
+  it('should handle error when fetching dashboard data fails', fakeAsync(() => {
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.returnValue(Promise.reject());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.skillsCategorizedByTopics).toEqual({});
+    expect(component.untriagedSkillSummaries).toEqual([]);
+  }));
 });

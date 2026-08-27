@@ -131,6 +131,22 @@ describe('Opportunities List Item Component', () => {
         });
       }
     );
+
+    describe('when progress percentage is zero', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.progressPercentage = 0;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should initialize progressPercentage to 0%', () => {
+        expect(component.progressPercentage).toBe('0%');
+        expect(component.progressBarStyle).toEqual({
+          width: '0%',
+        });
+      });
+    });
   });
 
   describe('when a translation opportunity is provided', () => {
@@ -182,6 +198,46 @@ describe('Opportunities List Item Component', () => {
         it('should initialize correspondingOpportunityDeleted to true', () => {
           expect(component.correspondingOpportunityDeleted).toBe(true);
         });
+      }
+    );
+  });
+
+  describe('when a translation opportunity has no cards left to translate', () => {
+    beforeEach(() => {
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 100,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 30,
+        topicName: 'Topic 1',
+      };
+      component.opportunityType = 'translation';
+      component.progressBarRequired = true;
+      fixture.detectChanges();
+    });
+
+    it(
+      'should disable the opportunity button when disableButtonOnComplete ' +
+        'is true',
+      () => {
+        component.disableButtonOnComplete = true;
+        component.ngOnInit();
+
+        expect(component.opportunityButtonDisabled).toBe(true);
+      }
+    );
+
+    it(
+      'should not disable the opportunity button when ' +
+        'disableButtonOnComplete is false',
+      () => {
+        component.disableButtonOnComplete = false;
+        component.ngOnInit();
+
+        expect(component.opportunityButtonDisabled).toBe(false);
       }
     );
   });

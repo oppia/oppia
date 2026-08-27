@@ -31,7 +31,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslateService} from '@ngx-translate/core';
-import './search-bar.component.css';
 
 interface SearchDropDownCategories {
   id: string;
@@ -185,11 +184,20 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
   }
-
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
+  }
+
+  /**
+   * Triggers a search query when the dropdown menu is closed.
+   * @param {boolean} isOpen - The new open state of the dropdown.
+   */
+  triggerSearchOnDropdownClose(isOpen: boolean): void {
+    if (!isOpen) {
+      this.onSearchQueryChangeExec();
+    }
   }
 
   onSearchQueryChangeExec(): void {
@@ -366,6 +374,21 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.classroomBackendApiService.onInitializeTranslation.subscribe(() =>
         this.refreshSearchBarLabels()
       )
+    );
+
+    // Result titles and objectives are rendered in the site language, so the
+    // results are re-fetched when it changes. This listens to the language
+    // code service rather than to onLangChange, because for a logged-in user
+    // the code is only updated after their preference has been saved, and
+    // re-fetching any earlier would send the previous language. Pages other
+    // than the search results page load their own tiles, so they are left to
+    // refresh themselves.
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
+          this.onSearchQueryChangeExec();
+        }
+      })
     );
   }
 

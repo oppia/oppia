@@ -24,9 +24,12 @@ from core.constants import constants
 from core.domain import (
     change_domain,
     exp_domain,
+    exp_fetchers,
     exp_services,
+    feature_flag_services,
     fs_services,
     html_validation_service,
+    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -49,7 +52,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, suggestion_models
 
-(suggestion_models, opportunity_models) = models.Registry.import_models(
+suggestion_models, opportunity_models = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
 )
 
@@ -131,6 +134,22 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             self.base_suggestion.convert_html_in_suggestion_change(
                 conversion_fn
             )
+
+    def test_get_author_name_with_deleted_user(self) -> None:
+        self.base_suggestion.author_id = 'deleted_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: [None]
+        ):
+            self.assertEqual(
+                self.base_suggestion.get_author_name(), '[Deleted User]'
+            )
+
+    def test_get_author_name_with_valid_user(self) -> None:
+        self.base_suggestion.author_id = 'valid_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: ['username']
+        ):
+            self.assertEqual(self.base_suggestion.get_author_name(), 'username')
 
 
 class SuggestionEditStateContentDict(TypedDict):
@@ -1082,6 +1101,47 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_target_entity_html_strings()
         self.assertEqual(actual_outcome_list, [])
 
+    def test_convert_html_in_suggestion_change_with_none_old_value(
+        self,
+    ) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>new suggestion content</p>',
+            },
+            'old_value': None,
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        # Conversion_fn wraps html with div.
+        def conversion_fn(html: str) -> str:
+
+            return '<div>%s</div>' % html
+
+        suggestion.convert_html_in_suggestion_change(conversion_fn)
+
+        self.assertIsNone(suggestion.change_cmd.old_value)
+        self.assertEqual(
+            suggestion.change_cmd.new_value['html'],
+            '<div><p>new suggestion content</p></div>',
+        )
+
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
@@ -1301,6 +1361,39 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
 
         suggestion.validate()
+
+    def test_validate_suggestion_with_too_long_exploration_title_fails(
+        self,
+    ) -> None:
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['content_id'] = 'exploration_title'
+        change_cmd['translation_html'] = (
+            'This exploration title is way longer than thirty six characters limit'
+        )
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Translation exceeds the allowed character limit. The translation '
+            'for the above content must be 36 characters or fewer.',
+        ):
+            suggestion.validate()
 
     def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -1901,6 +1994,133 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
+    def test_pre_accept_validate_state_content_id(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        suggestion.change_cmd.state_name = 'Introduction'
+
+        # A valid state name must not be enough on its own: the content ID has
+        # to belong to the exploration as well.
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_metadata_content_id(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        expected_suggestion_dict['language_code'] = 'ak'
+        expected_suggestion_dict['change_cmd'] = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'exploration_title',
+            'language_code': 'ak',
+            'content_html': 'original title',
+            'translation_html': 'translated title',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.swap(
+            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+        ):
+            suggestion.pre_accept_validate()
+
+        suggestion.change_cmd.content_id = 'invalid_metadata_content_id'
+        with self.swap(
+            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected invalid_metadata_content_id to be a valid metadata content ID',
+            ):
+                suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_skill_translation_suggestion(self) -> None:
+        self.save_new_skill('skill1', self.author_id, description='Skill 1')
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            'skill1',
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                'language_code': 'hi',
+                'content_html': 'original description',
+                'translation_html': 'translated description',
+                'data_format': 'unicode',
+            },
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+        )
+
+        suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'non_existent_skill_id'
+        with self.assertRaisesRegex(
+            Exception, 'No skill exists with ID: non_existent_skill_id'
+        ):
+            suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'skill1'
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+        suggestion.change_cmd.content_id = feconf.SKILL_DESCRIPTION_CONTENT_ID
+
+        suggestion.target_id = 'skill1'
+        with self.swap(
+            opportunity_services,
+            'get_entity_by_type_and_id',
+            lambda *args, **kwargs: object(),
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected entity to be a translatable object',
+            ):
+                suggestion.pre_accept_validate()
+
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
         translations = (
@@ -1937,10 +2157,69 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translations[0].language_code, 'hi')
         self.assertEqual(len(translations[0].translations), 1)
 
+    def test_accept_suggestion_saves_to_current_exploration_version(
+        self,
+    ) -> None:
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        old_version = exp.version
+
+        exp_services.update_exploration(
+            self.author_id,
+            exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'New title',
+                    }
+                )
+            ],
+            'Updated title',
+        )
+        updated_exp = exp_fetchers.get_exploration_by_id(exp.id)
+        new_version = updated_exp.version
+        self.assertGreater(new_version, old_version)
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            old_version,
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            self.suggestion_dict['change_cmd'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.'
+        )
+
+        old_version_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, old_version
+            )
+        )
+        self.assertEqual(len(old_version_translations), 0)
+
+        new_version_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, new_version
+            )
+        )
+        self.assertEqual(len(new_version_translations), 1)
+        self.assertEqual(new_version_translations[0].language_code, 'hi')
+
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self,
     ) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
+
         translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
@@ -3255,7 +3534,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'default_state', content_id_generator
         ).to_dict()
         question_state_dict['content']['html'] = html_content
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -3316,7 +3595,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self) -> None:
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             original_image_content = f.read()
@@ -4222,7 +4501,7 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
     suggestion_type: str = feconf.SUGGESTION_TYPE_ADD_QUESTION
     language_code: str = 'en'
     suggestion_content: str = 'sample question'
-    submission_datetime: datetime.datetime = datetime.datetime.utcnow()
+    submission_datetime: datetime.datetime = utils.get_current_utc_datetime()
 
     def test_initial_object_with_valid_arguments_has_correct_properties(
         self,
@@ -4586,8 +4865,10 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = datetime.date.today()
-    LAST_CONTRIBUTION_DATE = datetime.date.today() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4695,8 +4976,10 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 1
     REJECTED_TRANSLATIONS_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = datetime.date.today()
-    LAST_CONTRIBUTION_DATE = datetime.date.today() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4795,8 +5078,10 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     ACCEPTED_QUESTION_WORD_COUNT: Final = 50
     REJECTED_QUESTIONS_COUNT: Final = 0
     REJECTED_QUESTION_WORD_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = datetime.date.today()
-    LAST_CONTRIBUTION_DATE = datetime.date.today() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4888,8 +5173,10 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     ACCEPTED_QUESTIONS_COUNT: Final = 1
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     REJECTED_QUESTIONS_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = datetime.date.today()
-    LAST_CONTRIBUTION_DATE = datetime.date.today() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'

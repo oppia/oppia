@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Callable, Final, List, OrderedDict, Tuple
+from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
 
 email_services = models.Registry.import_email_services()
 
@@ -477,6 +477,27 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         ):
             test_utils.FailingFunction(function, MockError, -1)
 
+    def test_failing_function_succeeds_after_num_tries(self) -> None:
+        """Test that the function successfully executes after failing
+        the specified number of times.
+        """
+
+        class MockError(Exception):
+            pass
+
+        function = lambda x: x**2
+        failing_func = test_utils.FailingFunction(
+            function, MockError('Dummy Exception'), 2
+        )
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        result = failing_func(4)
+        self.assertEqual(result, 16)
+
 
 class TestUtilsTests(test_utils.GenericTestBase):
 
@@ -521,6 +542,39 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], []
             )
+
+    def test_raises_error_with_aot_compiled_true(self) -> None:
+        """Test that mock_load_template uses the src folder when
+        template_is_aot_compiled is True.
+        """
+        with self.assertRaisesRegex(
+            Exception, 'No file exists for the given file name'
+        ):
+            test_utils.mock_load_template(
+                'invalid_path', template_is_aot_compiled=True
+            )
+
+    def test_add_explorations_to_story_with_empty_list_does_nothing(
+        self,
+    ) -> None:
+        """Tests that passing an empty list of explorations skips the update."""
+        topic_id = 'topic_id_for_empty_test'
+        story_id = 'story_id_for_empty_test'
+        owner_id = 'owner@example.com'
+
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Dummy Topic',
+            description='A topic for testing',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        self.save_new_story(story_id, owner_id, topic_id)
+        self.add_explorations_to_story(topic_id, story_id, [])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -803,16 +857,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 http_method=invalid_http_method,
             )
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
-    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'mocked_now must be datetime, got: 123'
-        ):
-            with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
-                pass
-
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No file exists for the given file name'
@@ -864,6 +908,38 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual('en', coordinator_rights_model[0].language_id)
         self.assertEqual('hi', coordinator_rights_model[1].language_id)
 
+    def test_save_new_question_suggestion_v27_with_custom_suggestion_id(
+        self,
+    ) -> None:
+        """Tests that passing an explicit suggestion_id skips the auto-generation."""
+        author_id = 'test_author_id'
+        skill_id = 'test_skill_id'
+        custom_suggestion_id = 'my_custom_suggestion_id'
+
+        returned_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+                author_id, skill_id, suggestion_id=custom_suggestion_id
+            )
+        )
+
+        self.assertEqual(returned_id, custom_suggestion_id)
+
+    def test_mock_set_constants_to_default_raises_exception(self) -> None:
+        """Test that mock_set_constants_to_default raises an exception."""
+        with self.assertRaisesRegex(
+            Exception,
+            r'Tests should mock common\.set_constants_to_default\(\) to avoid '
+            r'modifying the constants file during tests\.',
+        ):
+            self.mock_set_constants_to_default()
+
+    def test_generate_random_hexa_str_returns_valid_string(self) -> None:
+        """Tests that the generated string is 32 chars and valid hex."""
+        result = test_utils.generate_random_hexa_str()
+        self.assertEqual(len(result), 32)
+        valid_hex_chars = set('0123456789abcdefABCDEF')
+        self.assertTrue(all(c in valid_hex_chars for c in result))
+
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
@@ -885,7 +961,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index2')
         with self.assertRaisesRegex(
             elasticsearch.RequestError,
-            r'RequestError\(400, \'resource_already_exists_exception\'\)',
+            r'resource_already_exists_exception: index',
         ):
             stub.mock_create_index('index1')
 
@@ -893,10 +969,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete('index1', 'some_id')
 
@@ -905,7 +978,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index1')
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            r'NotFoundError\(404,',
+            r'document not found: \[index1\]\[doc_id\]',
         ):
             stub.mock_delete('index1', 'doc_id')
 
@@ -913,12 +986,29 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
+
+    def test_mock_search_ignores_duplicate_document_ids(self) -> None:
+        """Tests that mock_search correctly skips documents if their ID is
+        already present in the result set, ensuring branch coverage.
+        """
+        stub = test_utils.ElasticSearchStub()
+        stub._DB['index1'] = [  # pylint: disable=protected-access
+            {'id': 'duplicate_id_1', 'data': 'first_doc'},
+            {'id': 'duplicate_id_1', 'data': 'second_doc'},
+        ]
+        body: Dict[
+            str,
+            Dict[str, Dict[str, List[Dict[str, Union[str, int, float, bool]]]]],
+        ] = {'query': {'bool': {'filter': [], 'must': []}}}
+        result = stub.mock_search(body=body, index='index1', size=10, from_=0)
+
+        hits = result['hits']['hits']
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]['_id'], 'duplicate_id_1')
+        self.assertEqual(hits[0]['_source']['data'], 'first_doc')
 
 
 class EmailMockTests(test_utils.EmailTestBase):

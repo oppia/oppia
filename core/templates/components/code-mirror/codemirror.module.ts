@@ -18,7 +18,6 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import 'core-js/es7/reflect';
 import 'zone.js';
 import {CodemirrorModule} from '@ctrl/ngx-codemirror';
 import {CodemirrorMergeviewComponent} from './codemirror-mergeview.component';

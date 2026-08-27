@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-import datetime
 import itertools
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     email_manager,
     feedback_domain,
@@ -337,21 +336,18 @@ def create_messages(
         thread_model = thread_models[index]
         if updated_status:
             message_model.updated_status = updated_status
-            if message_model.message_id == 0:
-                # New thread.
-                if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if message_model.message_id == 0:
+                    # New thread.
                     event_services.FeedbackThreadCreatedEventHandler.record(
                         thread_model.entity_id
                     )
-            else:
-                # Thread status changed.
-                if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                    (
-                        event_services.FeedbackThreadStatusChangedEventHandler.record(
-                            thread_model.entity_id,
-                            thread_model.status,
-                            updated_status,
-                        )
+                else:
+                    # Thread status changed.
+                    event_services.FeedbackThreadStatusChangedEventHandler.record(
+                        thread_model.entity_id,
+                        thread_model.status,
+                        updated_status,
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
@@ -493,22 +489,33 @@ def delete_threads_for_multiple_entities(
         entity_ids: list(str). The ids of the entities.
     """
     threads = []
+    thread_ids: List[str] = []
+
     for entity_id in entity_ids:
-        threads.extend(get_threads(entity_type, entity_id))
+        entity_threads = get_threads(entity_type, entity_id)
+        threads.extend(entity_threads)
+        thread_ids.extend(thread.id for thread in entity_threads)
 
     model_keys = []
-    for thread in threads:
-        for message in get_messages(thread.id):
-            model_keys.append(
-                datastore_services.Key(
-                    feedback_models.GeneralFeedbackMessageModel, message.id
-                )
-            )
+
+    for thread_id in thread_ids:
+        message_models = (
+            feedback_models.GeneralFeedbackMessageModel.get_messages(thread_id)
+        )
         model_keys.append(
             datastore_services.Key(
-                feedback_models.GeneralFeedbackThreadModel, thread.id
+                feedback_models.GeneralFeedbackThreadModel, thread_id
             )
         )
+        for message_model in message_models:
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel,
+                    message_model.id,
+                )
+            )
+
+    for thread in threads:
         if thread.has_suggestion:
             model_keys.append(
                 datastore_services.Key(
@@ -516,7 +523,7 @@ def delete_threads_for_multiple_entities(
                 )
             )
 
-    model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
+    model_keys.extend(_get_threads_user_info_keys(thread_ids))
 
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
@@ -1185,7 +1192,7 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
-        datetime.datetime.utcnow() - model.created_on
+        utils.get_current_utc_datetime() - model.created_on
     ).seconds
 
     if (
@@ -1300,7 +1307,8 @@ def _get_all_recipient_ids(
     participant_ids = {
         message.author_id
         for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)
+        if message.author_id
+        and user_services.is_user_registered(message.author_id)
     }
 
     batch_recipient_ids = owner_ids - {author_id}
@@ -1442,7 +1450,6 @@ def _add_message_to_email_buffer(
             exploration_id,
             has_suggestion,
         )
-
     if message_length:
         # Send feedback message email only if message text is non empty (the
         # message text can be empty in the case when only status is changed).

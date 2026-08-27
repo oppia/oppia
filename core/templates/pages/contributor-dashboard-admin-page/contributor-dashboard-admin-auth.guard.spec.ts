@@ -52,6 +52,10 @@ describe('ContributorDashboardAdminAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should redirect user to 401 page if user is not cd-admin', done => {
     const getUserInfoAsyncSpy = spyOn(
       userService,

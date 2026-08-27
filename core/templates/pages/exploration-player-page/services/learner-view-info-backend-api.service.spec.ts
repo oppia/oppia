@@ -33,8 +33,8 @@ describe('Learner View Info Backend Api Service', () => {
       imports: [HttpClientTestingModule],
       providers: [LearnerViewInfoBackendApiService],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    lvibas = TestBed.get(LearnerViewInfoBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    lvibas = TestBed.inject(LearnerViewInfoBackendApiService);
   });
   afterEach(() => {
     httpTestingController.verify();
@@ -52,7 +52,7 @@ describe('Learner View Info Backend Api Service', () => {
 
     let req = httpTestingController.expectOne(
       '/explorationsummarieshandler/' +
-        'data?stringified_exp_ids=&include_private_explorations='
+        'data?stringified_exp_ids=&include_private_explorations=&display_in_language_code=en'
     );
     expect(req.request.method).toEqual('GET');
     req.flush(jobOutput);

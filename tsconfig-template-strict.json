@@ -1,0 +1,13 @@
+{
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictTemplates": true
+  },
+  "extends": "./tsconfig.json",
+  "files": [],
+  "include": [
+    "core",
+    "extensions",
+    "typings"
+  ]
+}

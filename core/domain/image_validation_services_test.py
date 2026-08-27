@@ -29,7 +29,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             self.raw_image = f.read()
@@ -86,6 +86,12 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             large_image,
             'image.svg',
             feconf.ENTITY_TYPE_BLOG_POST,
+            'Image exceeds file size limit of 1024 KB',
+        )
+        self._assert_image_validation_error(
+            large_image,
+            'image.svg',
+            feconf.ENTITY_TYPE_FEEDBACK,
             'Image exceeds file size limit of 1024 KB',
         )
 

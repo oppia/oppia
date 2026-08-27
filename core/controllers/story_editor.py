@@ -25,6 +25,7 @@ from core.domain import (
     story_domain,
     story_fetchers,
     story_services,
+    topic_domain,
     topic_fetchers,
     topic_services,
 )
@@ -135,13 +136,14 @@ class EditableStoryDataHandler(
             )
         )
 
+        story_is_published = False
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_is_published = story_reference.story_is_published
 
         self.values.update(
             {
-                'story': story.to_dict(),
+                'story_dict': story.to_dict(),
                 'topic_name': topic.name,
                 'story_is_published': story_is_published,
                 'skill_summaries': skill_summary_dicts,
@@ -184,7 +186,7 @@ class EditableStoryDataHandler(
 
         story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
-        self.values.update({'story': story_dict})
+        self.values.update({'story_dict': story_dict})
 
         self.render_json(self.values)
 
@@ -205,7 +207,7 @@ class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    new_story_status_is_public: bool
+    story_publication_action: str
 
 
 class StoryPublishHandler(
@@ -217,9 +219,16 @@ class StoryPublishHandler(
     URL_PATH_ARGS_SCHEMAS = {'story_id': {'schema': SCHEMA_FOR_STORY_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'new_story_status_is_public': {
-                'schema': {'type': 'bool'},
-            }
+            'story_publication_action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        topic_domain.STORY_PUBLICATION_ACTION_PUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+                    ],
+                },
+            },
         }
     }
 
@@ -235,14 +244,25 @@ class StoryPublishHandler(
         story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
 
-        new_story_status_is_public = self.normalized_payload[
-            'new_story_status_is_public'
+        story_publication_action = self.normalized_payload[
+            'story_publication_action'
         ]
 
-        if new_story_status_is_public:
-            topic_services.publish_story(topic_id, story_id, self.user_id)
+        if (
+            story_publication_action
+            == topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+        ):
+            try:
+                topic_services.publish_story(topic_id, story_id, self.user_id)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e) from e
         else:
-            topic_services.unpublish_story(topic_id, story_id, self.user_id)
+            topic_services.unpublish_story(
+                topic_id,
+                story_id,
+                self.user_id,
+                story_publication_action,
+            )
 
         self.render_json(self.values)
 

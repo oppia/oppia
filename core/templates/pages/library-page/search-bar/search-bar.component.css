@@ -35,7 +35,7 @@ oppia-search-bar .oppia-navbar-button-container {
   z-index: 15;
 }
 
-.search-bar-float-left {
+.search-bar-float-start {
   float: left;
 }
 
@@ -75,7 +75,11 @@ oppia-search-bar .oppia-navbar-button-container {
 }
 .oppia-search-bar-input.btn:hover,
 .oppia-search-bar-input.btn:focus {
+  background: #fff;
+  border-color: #257d76;
+  border-radius: 0;
   color: #257d76;
+  height: 35px;
 }
 
 .oppia-search-bar-input.btn:focus {

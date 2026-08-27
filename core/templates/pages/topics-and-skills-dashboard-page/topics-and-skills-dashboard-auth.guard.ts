@@ -44,10 +44,19 @@ export class TopicsAndSkillsDashboardAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin() || userInfo.isTopicManager()) {
+    if (
+      userInfo.isCurriculumAdmin() ||
+      userInfo.isTopicManager() ||
+      userInfo.isQuestionAdmin()
+    ) {
       return true;
     }
 
+    // Store error message in sessionStorage since location.replaceState will clear router state.
+    window.sessionStorage.setItem(
+      'oppia_401_error_message',
+      'You must be a curriculum admin or topic manager to access this page.'
+    );
     this.router
       .navigate([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,

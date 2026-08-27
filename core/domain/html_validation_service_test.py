@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import feconf, utils
+from core import feconf
 from core.domain import fs_services, html_validation_service
 from core.tests import test_utils
 
@@ -76,12 +76,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ]
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
+            tag = None
             if index == 0:
                 tag = soup.findAll(name='i')[1]
             elif index == 1:
                 tag = soup.find(name='br')
             elif index == 2:
                 tag = soup.find(name='b')
+            assert tag is not None
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
@@ -1128,7 +1130,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1162,7 +1164,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1204,7 +1206,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,

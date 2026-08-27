@@ -22,6 +22,7 @@ import os
 
 from core import feconf, utils
 from core.constants import constants
+from core.controllers import library as library_controllers
 from core.domain import (
     activity_domain,
     activity_services,
@@ -33,6 +34,8 @@ from core.domain import (
     rights_domain,
     rights_manager,
     summary_services,
+    translation_domain,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -81,6 +84,50 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('<oppia-root></oppia-root>')
+
+    def test_get_matching_activity_dicts_skips_collection_search_with_offset(
+        self,
+    ) -> None:
+        observed_calls = {'collection_query_called': False}
+
+        def mock_get_collection_ids_matching_query(
+            unused_query_string: str,
+            unused_categories: list[str],
+            unused_language_codes: list[str],
+        ) -> tuple[list[str], None]:
+            observed_calls['collection_query_called'] = True
+            return [], None
+
+        def mock_get_exploration_ids_matching_query(
+            unused_query_string: str,
+            unused_categories: list[str],
+            unused_language_codes: list[str],
+            offset: int,
+        ) -> tuple[list[str], int]:
+            self.assertEqual(offset, 1)
+            return [], 2
+
+        with self.swap(
+            collection_services,
+            'get_collection_ids_matching_query',
+            mock_get_collection_ids_matching_query,
+        ), self.swap(
+            exp_services,
+            'get_exploration_ids_matching_query',
+            mock_get_exploration_ids_matching_query,
+        ):
+            activity_list, new_search_offset = (
+                library_controllers.get_matching_activity_dicts(
+                    query_string='query',
+                    categories=[],
+                    language_codes=[],
+                    search_offset=1,
+                )
+            )
+
+        self.assertEqual(activity_list, [])
+        self.assertEqual(new_search_offset, 2)
+        self.assertFalse(observed_calls['collection_query_called'])
 
     def test_library_handler_for_collection_summaries(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -717,6 +764,43 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             response_dict['activity_list'][0],
         )
 
+    def test_library_group_index_handler_with_display_in_language_code(
+        self,
+    ) -> None:
+        """Test library group index handler with display_in_language_code."""
+        exp_services.load_demo('0')
+        exp_summary = exp_fetchers.get_exploration_summary_by_id('0')
+
+        translated_title = translation_domain.TranslatedContent(
+            'Hindi Welcome Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={
+                'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
+                'display_in_language_code': 'hi',
+            },
+        )
+        self.assertEqual(len(response_dict['activity_list']), 1)
+        self.assertEqual(
+            response_dict['activity_list'][0]['title'], 'Hindi Welcome Title'
+        )
+        self.assertEqual(
+            response_dict['activity_list'][0]['translated_metadata_fields'],
+            ['title'],
+        )
+
     def test_handler_for_top_rated_library_group_page(self) -> None:
         """Test library handler for top rated group page."""
 
@@ -898,6 +982,41 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
+
+        self.logout()
+
+    def test_can_get_translated_exploration_summaries(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(
+            self.PUBLIC_EXP_ID_EDITOR
+        )
+        translated_title = translation_domain.TranslatedContent(
+            'Public Exploration Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.PUBLIC_EXP_ID_EDITOR,
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps([self.PUBLIC_EXP_ID_EDITOR]),
+                'display_in_language_code': 'hi',
+            },
+        )
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(
+            summaries[0]['title'], 'Public Exploration Hindi Title'
+        )
 
         self.logout()
 

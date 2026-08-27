@@ -4,11 +4,11 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 oppia-hint-and-solution-buttons .list-inline {
-  right: 0;
+  inset-inline-end: 0;
 }
 
-oppia-hint-and-solution-buttons .close {
-  bottom: 10px;
+oppia-hint-and-solution-buttons .btn-close {
+  bottom: 6px;
   font-size: 22px;
   margin-left: 10px;
   position: relative;
@@ -18,7 +18,7 @@ oppia-hint-and-solution-buttons .hint-box-add-ons {
   left: -5.5px;
 }
 
-oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
   left: 0;
 }
 
@@ -112,10 +112,9 @@ oppia-hint-and-solution-buttons .hint-box::before {
 }
 
 @media screen and (max-width: 768px) {
-  oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+  oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
     bottom: 10px;
     font-size: 22px;
-    left: 310px;
     margin: 0 10px;
     position: fixed;
   }
@@ -132,15 +131,15 @@ oppia-hint-and-solution-buttons .hint-box::before {
     bottom: 80px;
     font-size: 15px;
     left: 5px;
+    pointer-events: auto;
   }
 
   oppia-hint-and-solution-buttons .hint-container {
-    right: 16px;
+    pointer-events: none;
     width: 100%;
   }
 
   .oppia-hint-and-solution-buttons ul {
-    bottom: -17px;
     padding: 0 10px;
     position: fixed;
   }
@@ -179,6 +178,7 @@ oppia-hint-and-solution-buttons .hint-box::before {
   min-width: 22px;
   padding: inherit;
   width: 32px;
+  z-index: 100;
 }
 
 .oppia-learner-hint-solution-button.viewed.mat-button.viewed {
@@ -201,7 +201,6 @@ oppia-hint-and-solution-buttons .hint-box::before {
 
 @media screen and (max-width: 546px) {
   oppia-hint-and-solution-buttons .hint-box {
-    bottom: 110px;
     font-size: 15px;
     left: 5px;
   }

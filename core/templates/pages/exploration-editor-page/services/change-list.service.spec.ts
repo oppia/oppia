@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import {async, fakeAsync, flush, TestBed} from '@angular/core/testing';
+import {waitForAsync, fakeAsync, flush, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeListService} from './change-list.service';
 import {LoaderService} from 'services/loader.service';
@@ -141,7 +141,7 @@ describe('Change List Service when changes are mergable', () => {
   let mockExplorationDataService: MockExplorationDataService1;
   let mockEventEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
     TestBed.configureTestingModule({
@@ -452,6 +452,47 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should correctly identify if change list affects automatic voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.editStateProperty(
+      'state',
+      'solution',
+      'oldValue',
+      'newValue'
+    );
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(true);
+
+    changeListService.explorationChangeList = [];
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    flush();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(false);
+  }));
+
   it('should mark voiceovers as needing update', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
@@ -649,7 +690,7 @@ describe('Change List Service when changes are not mergable', () => {
   let alertsSpy: jasmine.Spy;
   let mockExplorationDataService: MockExplorationDataService1;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService2();
     TestBed.configureTestingModule({
@@ -714,7 +755,7 @@ describe('Change List Service when internet is available', () => {
   let mockExplorationDataService: MockExplorationDataService3;
   let mockAutosaveInfoModalsService: MockAutosaveInfoModalsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService3();
     mockAutosaveInfoModalsService = new MockAutosaveInfoModalsService();

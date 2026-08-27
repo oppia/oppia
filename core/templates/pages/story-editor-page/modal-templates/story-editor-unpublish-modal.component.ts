@@ -18,6 +18,10 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+  STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+} from 'domain/story/editable-story-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
@@ -41,15 +45,40 @@ export class StoryEditorUnpublishModalComponent {
   selectedReasonText: string = this.badContentReasonText;
   unpublishingReason: string = 'BAD_CONTENT';
 
+  showingChoiceScreen: boolean = true;
+  mode:
+    | typeof STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+    | typeof STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH =
+    STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
+
+  selectTemporary(): void {
+    this.showingChoiceScreen = false;
+    this.mode = STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH;
+  }
+
+  selectPermanent(): void {
+    this.showingChoiceScreen = false;
+    this.mode = STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
+  }
+
   cancel(): void {
     this.activeModal.dismiss();
   }
 
   confirm(): void {
     if (this.isSerialChapterFeatureFlagEnabled()) {
-      this.activeModal.close(this.unpublishingReason);
-    } else {
-      this.activeModal.close();
+      this.activeModal.close({
+        mode: STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+        reason: this.unpublishingReason,
+      });
+      return;
+    }
+
+    if (!this.showingChoiceScreen) {
+      this.activeModal.close({
+        mode: this.mode,
+        reason: null,
+      });
     }
   }
 

@@ -54,8 +54,8 @@
 <div class="release-coordinator-navbar">
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-release-coordinator" role="navigation">
     <div class="navbar-container oppia-navbar-container">
-      <div class="navbar-header e2e-test-navbar-header float-left">
-        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+      <div class="navbar-header e2e-test-navbar-header float-start">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-start"
            href="/community-library">
           <picture>
             <source type="image/webp" [srcset]="logoWebpImageSrc">
@@ -72,13 +72,13 @@
           </li>
         </ul>
       </div>
-      <div class="navbar-header float-right">
+      <div class="navbar-header float-end">
         <ul class="nav oppia-navbar-nav oppia-navbar-profile-release-coordinator">
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator oppia-release-coordinator-page-dropdown">
-              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : dropdownMenuIsActive}">
+              <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : dropdownMenuIsActive}">
                 <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-toggle="dropdown"
+                   data-bs-toggle="dropdown"
                    (mouseenter)="activateDropdownMenu()"
                    (mouseleave)="deactivateDropdownMenu()">
                   <i class="fa fa-bars oppia-release-coordinator-page-dropdown-icon"></i>
@@ -90,7 +90,7 @@
                   <li>
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-beam-jobs-mobile"
                        (click)="switchTab(TAB_ID_BEAM_JOBS)"
-                       href="#"
+                       href="javascript:void(0);"
                        [ngClass]="{ 'active': activeTab == TAB_ID_BEAM_JOBS }"
                        ngbTooltip="Jobs"
                        placement="bottom"
@@ -101,7 +101,7 @@
                   <li>
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-features-tab-mobile"
                        (click)="switchTab(TAB_ID_FEATURES)"
-                       href="#"
+                       href="javascript:void(0);"
                        [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"
                        ngbTooltip="Features"
                        placement="bottom"
@@ -112,7 +112,7 @@
                   <li>
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-misc-tab-mobile"
                        (click)="switchTab(TAB_ID_MISC)"
-                       href="#"
+                       href="javascript:void(0);"
                        [ngClass]="{ 'active': activeTab == TAB_ID_MISC }"
                        ngbTooltip="Miscellaneous"
                        placement="bottom"
@@ -126,10 +126,10 @@
           </li>
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator oppia-hide-in-small-width-screens">
-              <li class="nav-item oppia-clickable-navbar-element float-right">
+              <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab e2e-test-beam-jobs"
                    (click)="switchTab(TAB_ID_BEAM_JOBS)"
-                   href="#"
+                   href="javascript:void(0);"
                    [ngClass]="{ 'active': activeTab == TAB_ID_BEAM_JOBS }"
                    ngbTooltip="Jobs"
                    placement="bottom"
@@ -137,10 +137,10 @@
                   Beam Jobs
                 </a>
               </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right e2e-test-features-tab">
+              <li class="nav-item oppia-clickable-navbar-element float-end e2e-test-features-tab">
                 <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_FEATURES)"
-                   href="#"
+                   href="javascript:void(0);"
                    [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"
                    ngbTooltip="Features"
                    placement="bottom"
@@ -148,10 +148,10 @@
                   Features
                 </a>
               </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right">
+              <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_MISC)"
-                   href="#"
+                   href="javascript:void(0);"
                    [ngClass]="{ 'active': activeTab == TAB_ID_MISC }"
                    ngbTooltip="Miscellaneous"
                    placement="bottom"
@@ -163,9 +163,9 @@
           </li>
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator">
-              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
+              <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : profileDropdownIsActive}">
                 <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-toggle="dropdown"
+                   data-bs-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
                   <picture *ngIf="profilePicturePngDataUrl">

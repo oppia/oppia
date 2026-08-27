@@ -40,10 +40,6 @@ const ROUTING_MODULE_FILE_PATHS = [
     ROOT_DIRECTORY,
     'core/templates/pages/oppia-root/routing/app.routing.module.ts'
   ),
-  path.resolve(
-    ROOT_DIRECTORY,
-    'core/templates/pages/lightweight-oppia-root/routing/app.routing.module.ts'
-  ),
 ];
 
 /**

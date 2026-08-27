@@ -181,7 +181,8 @@ export class State extends BaseTranslatableObject {
       ParamChanges.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
-      stateDict.inapplicable_skill_misconception_ids
+      // Always provide inapplicable_skill_misconception_ids as null if missing.This ensures strict typing and contract consistency between backend and frontend,since some backend payloads may omit this field but the frontend model expects null.
+      stateDict.inapplicable_skill_misconception_ids ?? null
     );
   }
 }

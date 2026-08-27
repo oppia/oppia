@@ -1,15 +1,6 @@
 <div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
-  </oppia-learner-dashboard-icons>
-
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
-            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
+            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge}"
             *ngIf="!isRefresherExploration"
             tabindex="0"
             [style.padding]="0"
@@ -96,6 +87,11 @@
             </span>
           </li>
         </ul>
+        <div *ngIf="tags && tags.length > 0" class="tags-section">
+          <span *ngFor="let tag of tags" class="tag-badge">
+            {{ tag }}
+          </span>
+        </div>
         <button *ngIf="isCollectionPreviewTile" class="oppia-learner-confirm-button oppia-play-exploration-button mat-button  mat-default-theme e2e-test-play-exploration-button">
           <span [innerHTML]="'I18N_PLAYER_PLAY_EXPLORATION' | translate"></span>
         </button>
@@ -111,14 +107,6 @@
 </div>
 
 <div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
-  </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">
@@ -135,8 +123,8 @@
               <span *ngIf="numViews">{{ numViews | summarizeNonnegativeNumber }}</span>
               <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
               </span>
-              <span *ngIf="numViews == '1'"  class="views-text">view</span>
-              <span *ngIf="numViews != '1'" class="views-text">views</span>
+              <span *ngIf="numViews === 1"  class="views-text">view</span>
+              <span *ngIf="numViews !== 1" class="views-text">views</span>
             </li>
             <li>
               <span>

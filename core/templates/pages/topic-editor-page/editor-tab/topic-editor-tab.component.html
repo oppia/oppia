@@ -164,14 +164,14 @@
       </div>
       <div *ngIf="topic.getThumbnailFilename() && mainTopicCardIsShown">
         <div *ngIf="!topicPreviewCardIsShown" >
-          <button class="btn btn-default show-topic-preview-button"
+          <button class="btn btn-secondary show-topic-preview-button"
                   (click)="togglePreview()">
             Expand Preview
             <i class="fa fa-angle-down"></i>
           </button>
         </div>
         <div *ngIf="topicPreviewCardIsShown">
-          <button class="btn btn-default show-topic-preview-button"
+          <button class="btn btn-secondary show-topic-preview-button"
                   (click)="togglePreview()">
             Collapse Preview
             <i class="fa fa-angle-up"></i>
@@ -412,7 +412,7 @@
         </mat-list-item>
         <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
           <select [formControl]="skillForDiagnosticTestFormControl"
-                  class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  class="form-select oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                   (change)="addSkillForDiagnosticTest()"
                   aria-label="selection dropdown">
             <option [ngValue]="null">Please select a skill...</option>

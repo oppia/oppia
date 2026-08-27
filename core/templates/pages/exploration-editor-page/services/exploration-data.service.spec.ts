@@ -192,46 +192,6 @@ describe('Exploration data service', function () {
     expect(errorCallback).toHaveBeenCalled();
   }));
 
-  it('should trigger errorcallback handler when version number is undefined', fakeAsync(() => {
-    let dataResults: ExplorationBackendDict = {
-      draft_change_list_id: 3,
-      version: undefined,
-      auto_tts_enabled: false,
-      draft_changes: [],
-      is_version_of_draft_valid: true,
-      init_state_name: 'init',
-      param_changes: [],
-      param_specs: {randomProp: {obj_type: 'randomVal'}},
-      states: {},
-      title: 'Test Exploration',
-      language_code: 'en',
-      next_content_id_index: 5,
-      exploration_metadata: {
-        title: 'Exploration',
-        category: 'Algebra',
-        objective: 'To learn',
-        language_code: 'en',
-        tags: [],
-        blurb: '',
-        author_notes: '',
-        states_schema_version: 50,
-        init_state_name: 'Introduction',
-        param_specs: {},
-        param_changes: [],
-        auto_tts_enabled: false,
-        edits_allowed: true,
-      },
-    };
-    eds.data = dataResults;
-    const errorCallback = jasmine.createSpy('error');
-    const successCallback = jasmine.createSpy('success');
-    eds.autosaveChangeListAsync([], successCallback, errorCallback);
-
-    flushMicrotasks();
-    expect(successCallback).not.toHaveBeenCalled();
-    expect(errorCallback).toHaveBeenCalled();
-  }));
-
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
     const successCallback = jasmine.createSpy('success');
@@ -448,6 +408,21 @@ describe('Exploration data service', function () {
     flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should throw error when version is undefined during autosave', fakeAsync(() => {
+    eds.data = {
+      ...sampleDataResults,
+      version: undefined as unknown as number,
+    };
+
+    const service = eds as unknown as {
+      _autosaveChangeListAsync: (c: unknown[]) => Promise<void>;
+    };
+
+    expectAsync(service._autosaveChangeListAsync([])).toBeRejectedWithError(
+      'Version cannot be undefined'
+    );
   }));
 });
 

@@ -23,9 +23,13 @@ import {TranslationTopicService} from 'pages/exploration-editor-page/translation
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-list-item.component';
 import {AppConstants} from 'app.constants';
-import {Subscription} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
+import './opportunities-list.component.css';
 
-type ExplorationOpportunitiesFetcherFunction = () => Promise<{
+type ExplorationOpportunitiesFetcherFunction = (
+  searchQuery?: string
+) => Promise<{
   opportunitiesDicts: ExplorationOpportunity[];
   more: boolean;
 }>;
@@ -33,7 +37,7 @@ type ExplorationOpportunitiesFetcherFunction = () => Promise<{
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list.component.css'],
 })
 export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -46,9 +50,11 @@ export class OpportunitiesListComponent {
 
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
+  @Input() disableButtonOnComplete: boolean = true;
 
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
+  @Input() showSearchBar: boolean = false;
 
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
@@ -65,6 +71,9 @@ export class OpportunitiesListComponent {
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities: ExplorationOpportunity[] = [];
+  searchQuery: string = '';
+  searchQueryChanged: Subject<string> = new Subject<string>();
+  private readonly SEARCH_DEBOUNCE_TIME_MS = 300;
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = AppConstants.OPPORTUNITIES_PAGE_SIZE;
@@ -138,6 +147,20 @@ export class OpportunitiesListComponent {
     this.activePageNumber = 1;
     this.fetchAndLoadOpportunities();
     this.subscribeToPinnedOpportunities();
+
+    this.directiveSubscriptions.add(
+      this.searchQueryChanged
+        .pipe(debounceTime(this.SEARCH_DEBOUNCE_TIME_MS))
+        .subscribe(query => {
+          this.searchQuery = query;
+          this.activePageNumber = 1;
+          this.fetchAndLoadOpportunities();
+        })
+    );
+  }
+
+  onSearchQueryChange(newQuery: string): void {
+    this.searchQueryChanged.next(newQuery);
   }
 
   subscribeToPinnedOpportunities(): void {
@@ -227,25 +250,27 @@ export class OpportunitiesListComponent {
     if (!this.loadOpportunities) {
       return;
     }
-    this.loadOpportunities().then(({opportunitiesDicts, more}) => {
-      // This ngZone run closure will not be required after \
-      // migration is complete.
-      this.zone.run(() => {
-        this.opportunities = opportunitiesDicts;
-        this.more = more;
-        this.visibleOpportunities = this.opportunities.slice(
-          0,
-          this.OPPORTUNITIES_PAGE_SIZE
-        );
-        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          this.opportunities,
-          this.OPPORTUNITIES_PAGE_SIZE,
-          this.activePageNumber,
-          this.more
-        );
-        this.loadingOpportunityData = false;
-      });
-    });
+    this.loadOpportunities(this.searchQuery).then(
+      ({opportunitiesDicts, more}) => {
+        // This ngZone run closure will not be required after \
+        // migration is complete.
+        this.zone.run(() => {
+          this.opportunities = opportunitiesDicts;
+          this.more = more;
+          this.visibleOpportunities = this.opportunities.slice(
+            0,
+            this.OPPORTUNITIES_PAGE_SIZE
+          );
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            this.activePageNumber,
+            this.more
+          );
+          this.loadingOpportunityData = false;
+        });
+      }
+    );
   }
 
   gotoPage(pageNumber: number): void {
@@ -256,21 +281,23 @@ export class OpportunitiesListComponent {
     if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
-      this.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
-        this.more = more;
-        this.opportunities = this.opportunities.concat(opportunitiesDicts);
-        this.visibleOpportunities = this.opportunities.slice(
-          startIndex,
-          endIndex
-        );
-        this.loadingOpportunityData = false;
-        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          this.opportunities,
-          this.OPPORTUNITIES_PAGE_SIZE,
-          pageNumber,
-          this.more
-        );
-      });
+      this.loadMoreOpportunities(this.searchQuery).then(
+        ({opportunitiesDicts, more}) => {
+          this.more = more;
+          this.opportunities = this.opportunities.concat(opportunitiesDicts);
+          this.visibleOpportunities = this.opportunities.slice(
+            startIndex,
+            endIndex
+          );
+          this.loadingOpportunityData = false;
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            pageNumber,
+            this.more
+          );
+        }
+      );
     } else {
       this.visibleOpportunities = this.opportunities.slice(
         startIndex,

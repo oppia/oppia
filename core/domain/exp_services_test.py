@@ -2191,13 +2191,13 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
         )
 
         for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.utcnow()
+            start_time = utils.get_current_utc_datetime()
 
             exp_services.load_demo(exp_id)
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exploration.validate(strict=True)
 
-            duration = datetime.datetime.utcnow() - start_time
+            duration = utils.get_current_utc_datetime() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1e6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)'
@@ -2402,6 +2402,282 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.owner_id, yaml_with_no_schema_version, self.EXP_ID, []
             )
+
+
+class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
+    test_utils.GenericTestBase
+):
+    """Tests for get_content_updates_from_cmd_edit_state_property_change."""
+
+    def test_returns_empty_mapping_for_non_edit_state_property_cmd(
+        self,
+    ) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State A',
+                'content_id_for_state_content': 'content_1',
+                'content_id_for_default_outcome': 'default_outcome_1',
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
+    def test_returns_empty_mapping_when_new_value_is_none(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': None,
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
+    def test_extracts_content_updates_for_content_property(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'content_id': 'content_1',
+                    'html': '<p>New content.</p>',
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'content_1': '<p>New content.</p>'},
+        )
+
+    def test_extracts_content_updates_for_default_outcome(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                ),
+                'new_value': {
+                    'feedback': {
+                        'content_id': 'default_outcome_1',
+                        'html': '<p>Try again.</p>',
+                    }
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'default_outcome_1': '<p>Try again.</p>'},
+        )
+
+    def test_extracts_content_updates_for_answer_groups(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                ),
+                'new_value': [
+                    {
+                        'outcome': {
+                            'feedback': {
+                                'content_id': 'answer_group_1',
+                                'html': '<p>Correct.</p>',
+                            }
+                        }
+                    },
+                    {
+                        'outcome': {
+                            'feedback': {
+                                'content_id': 'answer_group_2',
+                                'html': '<p>Incorrect.</p>',
+                            }
+                        }
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {
+                'answer_group_1': '<p>Correct.</p>',
+                'answer_group_2': '<p>Incorrect.</p>',
+            },
+        )
+
+    def test_extracts_content_updates_for_hints_and_solution(self) -> None:
+        hints_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': '<p>Hint 1.</p>',
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': '<p>Hint 2.</p>',
+                        }
+                    },
+                ],
+            }
+        )
+        solution_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'new_value': {
+                    'explanation': {
+                        'content_id': 'solution_1',
+                        'html': '<p>Explanation.</p>',
+                    }
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                hints_change
+            ),
+            {
+                'hint_1': '<p>Hint 1.</p>',
+                'hint_2': '<p>Hint 2.</p>',
+            },
+        )
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                solution_change
+            ),
+            {'solution_1': '<p>Explanation.</p>'},
+        )
+
+    def test_extracts_content_updates_for_customization_args(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_1',
+                            'unicode_str': 'Enter answer',
+                        }
+                    },
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>Choice 1</p>',
+                            },
+                            {
+                                'content_id': 'ca_choices_2',
+                                'unicode_str': '<p>Choice 2</p>',
+                            },
+                        ]
+                    },
+                    'rows': {'value': 1},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {
+                'ca_placeholder_1': 'Enter answer',
+                'ca_choices_1': '<p>Choice 1</p>',
+                'ca_choices_2': '<p>Choice 2</p>',
+            },
+        )
+
+    def test_extracts_content_updates_for_customization_args_html_dict(
+        self,
+    ) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': {
+                            'content_id': 'ca_question_1',
+                            'html': '<p>Question prompt</p>',
+                        }
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'ca_question_1': '<p>Question prompt</p>'},
+        )
+
+    def test_should_not_extract_content_for_invalid_customization_args(
+        self,
+    ) -> None:
+        # Invalid value type for customization arg.
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': [999],
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
 
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
@@ -3055,7 +3331,7 @@ version: 3
             'Add state name',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3213,7 +3489,7 @@ version: 3
             'Add state name',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3222,7 +3498,7 @@ version: 3
         )
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
         ) as f:
             raw_audio = f.read()
@@ -3340,7 +3616,7 @@ version: 3
                 }
             ),
         ]
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3695,7 +3971,7 @@ solicit_answer_details: false
             ),
         ]
         exploration.objective = 'The objective'
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -5583,23 +5859,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        original_timestamp = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        original_timestamp = utils.get_current_time_in_millisecs()
 
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End'
         )
 
-        timestamp_after_first_edit = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID,
@@ -6977,6 +7243,109 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
+    def test_translated_metadata_is_added_correctly_to_index(self) -> None:
+        exp_id = 'id0'
+        self.save_new_valid_exploration(
+            exp_id,
+            self.owner_id,
+            title='Fractions',
+            category='Mathematics',
+            objective='Learn about fractions',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            exp_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'tags',
+                        'new_value': ['numbers'],
+                    }
+                )
+            ],
+            'Add a tag.',
+        )
+        rights_manager.publish_exploration(self.owner, exp_id)
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
+
+        # Hindi translates the title, the objective and the tag. Bengali
+        # translates only the title, and its objective translation is stale.
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exp_id,
+            exp.version,
+            'hi',
+            {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                    'content_value': 'भिन्न',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
+                    'content_value': 'भिन्न के बारे में जानें',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
+                    'content_value': 'संख्याएँ',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+            },
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exp_id,
+            exp.version,
+            'bn',
+            {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                    'content_value': 'ভগ্নাংশ',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
+                    'content_value': 'পুরানো উদ্দেশ্য',
+                    'needs_update': True,
+                    'content_format': 'unicode',
+                },
+            },
+        ).put()
+
+        actual_docs = []
+
+        def mock_add_documents_to_index(
+            docs: List[Dict[str, str]], index: str
+        ) -> None:
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            actual_docs.extend(docs)
+
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            mock_add_documents_to_index,
+        )
+
+        with add_docs_swap:
+            exp_services.index_explorations_given_ids([exp_id])
+
+        self.assertEqual(len(actual_docs), 1)
+        indexed_doc = actual_docs[0]
+        # The English metadata is indexed unchanged.
+        self.assertEqual(indexed_doc['title'], 'Fractions')
+        self.assertEqual(indexed_doc['objective'], 'Learn about fractions')
+        self.assertEqual(indexed_doc['tags'], ['numbers'])
+        # Both title translations are indexed, sorted. Sorting is by Unicode
+        # code point, so the Devanagari title precedes the Bengali one.
+        self.assertEqual(indexed_doc['translated_titles'], ['भिन्न', 'ভগ্নাংশ'])
+        # The Bengali objective is stale, so only the Hindi one is indexed.
+        self.assertEqual(
+            indexed_doc['translated_objectives'], ['भिन्न के बारे में जानें']
+        )
+        # Only Hindi translated the tag.
+        self.assertEqual(indexed_doc['translated_tags'], ['संख्याएँ'])
+
     def test_updated_exploration_is_added_correctly_to_index(self) -> None:
         exp_id = 'id0'
         exp_title = 'title 0'
@@ -6985,20 +7354,26 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         initial_exp_doc = {
             'category': 'cat0',
             'id': 'id0',
-            'language_code': 'en',
+            'language_code': ['en'],
             'objective': 'An objective',
             'rank': 20,
             'tags': [],
             'title': 'title 0',
+            'translated_titles': [],
+            'translated_objectives': [],
+            'translated_tags': [],
         }
         updated_exp_doc = {
             'category': 'cat1',
             'id': 'id0',
-            'language_code': 'en',
+            'language_code': ['en'],
             'objective': 'An objective',
             'rank': 20,
             'tags': [],
             'title': 'title 0',
+            'translated_titles': [],
+            'translated_objectives': [],
+            'translated_tags': [],
         }
 
         def mock_add_documents_to_index(

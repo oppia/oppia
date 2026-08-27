@@ -50,6 +50,7 @@ import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
+import {LibraryPageConstants} from './library-page.constants';
 import {
   ActivityDict,
   LibraryIndexData,
@@ -381,49 +382,6 @@ describe('Library Page Component', () => {
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(componentInstance.initCarousels).toHaveBeenCalled();
-  }));
-
-  it('should initialize for non group pages and user is not logged in', fakeAsync(() => {
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(translateService.onLangChange, 'subscribe');
-    windowRef.nativeWindow.location.pathname = '/community-library';
-    fixture.detectChanges();
-    spyOn(
-      libraryPageBackendApiService,
-      'fetchLibraryIndexDataAsync'
-    ).and.returnValue(Promise.resolve(libraryIndexData));
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({isLoggedIn: () => false} as UserInfo)
-    );
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
-    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
-    spyOn(componentInstance, 'initCarousels');
-    spyOn(loggerService, 'error');
-    let actualWidth = 200;
-    spyOn(document, 'querySelector').and.returnValue({
-      clientWidth: 200,
-    } as HTMLElement);
-    componentInstance.ngOnInit();
-    tick();
-    tick();
-    tick();
-    tick();
-    tick(4000);
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    expect(userService.getUserInfoAsync).toHaveBeenCalled();
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'The actual width of tile is different than either of the ' +
-        'expected widths. Actual size: ' +
-        actualWidth +
-        ', Expected sizes: ' +
-        AppConstants.LIBRARY_TILE_WIDTH_PX +
-        '/' +
-        AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
-    );
   }));
 
   it('should log when invalid path is used', fakeAsync(() => {
@@ -768,14 +726,19 @@ describe('Library Page Component', () => {
   it('should unsubscribe on component destruction', () => {
     componentInstance.translateSubscription = new Subscription();
     componentInstance.resizeSubscription = new Subscription();
+    componentInstance.i18nLanguageCodeSubscription = new Subscription();
     spyOn(componentInstance.translateSubscription, 'unsubscribe');
     spyOn(componentInstance.resizeSubscription, 'unsubscribe');
+    spyOn(componentInstance.i18nLanguageCodeSubscription, 'unsubscribe');
     componentInstance.ngOnDestroy();
 
     expect(
       componentInstance.translateSubscription.unsubscribe
     ).toHaveBeenCalled();
     expect(componentInstance.resizeSubscription.unsubscribe).toHaveBeenCalled();
+    expect(
+      componentInstance.i18nLanguageCodeSubscription.unsubscribe
+    ).toHaveBeenCalled();
   });
 
   it('should get all classrooms data', fakeAsync(() => {
@@ -894,18 +857,17 @@ describe('Library Page Component', () => {
       'setStyle'
     ).and.callThrough();
 
-    // In ChromeHeadless (Karma), window.innerWidth, documentElement.clientWidth,
-    // and body.clientWidth may return unpredictable values (0, very large, or layout-dependent)
-    // because there is no real browser viewport or reflow happening like in a normal browser.
-    // This causes initCarousels() to calculate different tileDisplayCount values:
-    //   - Too small width  → 1 tile  → max-width = 200px
-    //   - Width in 2-tile range → 2 tiles → max-width = 400px (expected in this test)
-    //   - Too large width  → 3 or 4 tiles → max-width = 600px or 800px
-    // This results in flaky tests where the expected '400px' might become '200px', '600px',
-    // or '800px' depending on the runtime environment.
-    // We mock window.innerWidth to a fixed value within the 2-tile range (e.g., 600px)
-    // to make the calculation deterministic and match the expected '400px' result.
-
+    // In ChromeHeadless (Karma), window.innerWidth does not represent a real browser viewport.
+    // It starts with a default virtual width (often ~800px) and can change depending on page
+    // layout, global styles, or other tests modifying the viewport.
+    // Reference:
+    // https://stackoverflow.com/questions/44796194/how-to-set-window-size-to-fullscreen-for-headless-chrome-using-chrome-options/44827872#44827872
+    //
+    // In our case, when innerWidth becomes greater than 778px, initCarousels() calculates
+    // tileDisplayCount as 3, resulting in max-width = 600px instead of the expected
+    // 2 tiles (max-width = 400px). This makes the test fail depending on the runtime environment.
+    // We mock window.innerWidth to a fixed value within the 2-tile range to ensure consistent
+    // and deterministic test behavior.
     windowRef.nativeWindow.innerWidth = 600;
     componentInstance.initCarousels();
     tick();
@@ -1022,4 +984,32 @@ describe('Library Page Component', () => {
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
   });
+
+  it('should reload library data on site language change', fakeAsync(() => {
+    spyOn(componentInstance, 'loadLibraryData');
+    componentInstance.ngOnInit();
+    tick();
+    // The initial load in ngOnInit is discounted so that the assertion below
+    // only passes if the language change itself triggered a reload.
+    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+    tick();
+
+    expect(componentInstance.loadLibraryData).toHaveBeenCalled();
+  }));
+
+  it('should not reload library data on site language change in search mode', fakeAsync(() => {
+    spyOn(componentInstance, 'loadLibraryData');
+    componentInstance.ngOnInit();
+    tick();
+
+    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
+    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+    tick();
+
+    expect(componentInstance.loadLibraryData).not.toHaveBeenCalled();
+  }));
 });

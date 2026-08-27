@@ -55,7 +55,6 @@ describe('Site Moderator', function () {
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createMinimalExploration(
       'Test Exploration 2',
       'End Exploration'

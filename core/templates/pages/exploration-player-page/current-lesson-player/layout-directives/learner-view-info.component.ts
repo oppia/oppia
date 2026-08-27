@@ -35,8 +35,6 @@ import {
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 
-import './learner-view-info.component.css';
-
 @Component({
   selector: 'oppia-learner-view-info',
   templateUrl: './learner-view-info.component.html',
@@ -167,10 +165,8 @@ export class LearnerViewInfoComponent {
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.explorationTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.explorationTitleTranslationKey
     );
   }
 

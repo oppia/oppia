@@ -27,9 +27,12 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
+import './side-navigation-bar.component.css';
+
 @Component({
   selector: 'oppia-side-navigation-bar',
   templateUrl: './side-navigation-bar.component.html',
+  styleUrls: ['./side-navigation-bar.component.css'],
 })
 export class SideNavigationBarComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -146,5 +149,12 @@ export class SideNavigationBarComponent {
       NavbarAndFooterGATrackingPages.TEACH
     );
     this.windowRef.nativeWindow.location.href = '/teach';
+  }
+
+  navigateToBlogPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.BLOG
+    );
+    this.windowRef.nativeWindow.location.href = '/blog';
   }
 }

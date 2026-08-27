@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -43,7 +43,7 @@ describe('Contributor dashboard admin navbar component', () => {
   const profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ContributorDashboardAdminNavbarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [ContributorDashboardAdminNavbarComponent],
@@ -57,7 +57,7 @@ describe('Contributor dashboard admin navbar component', () => {
 
     fixture = TestBed.createComponent(ContributorDashboardAdminNavbarComponent);
     component = fixture.componentInstance;
-    userService = TestBed.get(UserService);
+    userService = TestBed.inject(UserService);
     fixture.detectChanges();
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',

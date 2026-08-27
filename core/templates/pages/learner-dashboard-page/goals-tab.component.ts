@@ -24,6 +24,7 @@ import {
   Input,
   OnInit,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
@@ -37,12 +38,12 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
-import './goals-tab.component.css';
 
 @Component({
   selector: 'oppia-goals-tab',
   templateUrl: './goals-tab.component.html',
   styleUrls: ['./goals-tab.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class GoalsTabComponent implements OnInit {
   constructor(
@@ -184,8 +185,12 @@ export class GoalsTabComponent implements OnInit {
   async addToLearnerGoals(
     topic: LearnerTopicSummary,
     topicId: string,
-    index: number
+    index: number,
+    event?: Event
   ): Promise<void> {
+    if (event) {
+      event.preventDefault();
+    }
     var activityId = topicId;
     var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {

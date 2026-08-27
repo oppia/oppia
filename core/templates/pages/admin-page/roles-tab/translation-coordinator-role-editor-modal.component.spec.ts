@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  async,
+  waitForAsync,
   tick,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -40,7 +40,7 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
   let adminBackendApiService: AdminBackendApiService;
   let alertsService: AlertsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, MaterialModule, HttpClientTestingModule],
       declarations: [TranslationCoordinatorRoleEditorModalComponent],
@@ -53,7 +53,7 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
       TranslationCoordinatorRoleEditorModalComponent
     );
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.get(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     alertsService = TestBed.inject(AlertsService);
     component.coordinatedLanguageIds = ['en', 'hi', 'ak'];

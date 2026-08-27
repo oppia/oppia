@@ -6,9 +6,9 @@
       </i>
     </span>
   </div>
-  <div class="form-group">
+  <div class="mb-3">
     <span>
-      <select class="form-control rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
+      <select class="form-select rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
               (change)="this.onRubricSelectionChange()">
         <option *ngFor="let option of this.rubricsOptions" [value]="option.id">{{ option.difficulty }}</option>
       </select>
@@ -23,15 +23,15 @@
           <div class="oppia-rule-preview">
             <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), idx)">
               <i *ngIf="this.isEditable()"
-                 class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
+                 class="fas fa-pen oppia-editor-edit-icon float-end e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
                  title="Edit Rubric Explanation">
               </i>
             </div>
-            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated()"
+            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated"
                   class="oppia-placeholder">
             The skill description will be autofilled here
             </span>
-            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated())"
+            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated)"
                   class="oppia-placeholder">
             This rubric has not yet been specified
             </span>
@@ -94,55 +94,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .dropdown-option {
-    padding: 10px;
-  }
-
-  .rubric-error-message {
-    color: #f00;
-    display: block;
-    font-size: 0.8em;
-  }
-
-  .oppia-card-content-limit-error {
-    background: #fff5c8;
-    border: 0.0625rem solid #827127;
-    border-radius: 0.25rem;
-    color: #333;
-    padding-left: 0.25rem;
-  }
-
-  .helper-text {
-    color: #595959;
-    font-size: 13px;
-  }
-
-  .dropdown {
-    display: inline-block;
-  }
-
-  .rubric-options {
-    width: 200px;
-  }
-
-  .add-explanation-button {
-    background-color: #058ca6;
-    color: #fff;
-    margin-top: 1vh;
-  }
-
-  .rubric-editor {
-    margin-right: 15px;
-    margin-top: 2vh;
-  }
-
-  .oppia-rule-save-cancel-buttons {
-    text-align: right;
-  }
-  .oppia-rule-save-cancel-buttons .rubric-cancel-button {
-    border: 1px solid #999;
-    margin: 0 4px;
-  }
-</style>

@@ -870,7 +870,7 @@ solicit_answer_details: false
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip',
         )
-        with utils.open_file(golden_zip_filepath, 'rb', encoding=None) as f:
+        with open(golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
@@ -3510,7 +3510,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
     EXP_ID2: Final = '2'
     EXP_ID3: Final = '3'
     # 30 days into the future.
-    NEWER_DATETIME: Final = datetime.datetime.utcnow() + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_current_utc_datetime() + datetime.timedelta(30)
+    )
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST: Final = [
@@ -4283,7 +4285,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4341,7 +4343,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4407,7 +4409,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             exp_id,
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4455,7 +4457,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             exp_id,
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()

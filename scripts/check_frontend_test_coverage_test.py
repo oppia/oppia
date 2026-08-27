@@ -21,7 +21,6 @@ import os
 import subprocess
 import sys
 
-from core import utils
 from core.tests import test_utils
 
 from typing import Dict, List, Literal, Optional
@@ -34,11 +33,11 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         super().setUp()
         self.lcov_items_list: Optional[str] = None
         self.check_function_calls = {
-            'open_file_is_called': False,
+            'open_is_called': False,
             'exists_is_called': False,
         }
         self.expected_check_function_calls = {
-            'open_file_is_called': True,
+            'open_is_called': True,
             'exists_is_called': True,
         }
         self.printed_messages: List[str] = []
@@ -52,10 +51,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ) -> Optional[str]:
                 return self.lcov_items_list
 
-        def mock_open_file(  # pylint: disable=unused-argument
-            file_name: str, option: Dict[str, str]
+        def mock_open(  # pylint: disable=unused-argument
+            file_name: str, option: Dict[str, str], encoding: str = 'utf-8'
         ) -> MockFile:  # pylint: disable=unused-argument
-            self.check_function_calls['open_file_is_called'] = True
+            self.check_function_calls['open_is_called'] = True
             return MockFile(self.lcov_items_list)
 
         def mock_exists(unused_path: str) -> Literal[True]:
@@ -70,7 +69,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         ) -> None:
             self.check_function_calls['check_call_is_called'] = True
 
-        self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)
+        self.open_swap = self.swap(builtins, 'open', mock_open)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.print_swap = self.swap(builtins, 'print', mock_print)
         self.check_call_swap = self.swap(
@@ -94,7 +93,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 'end_of_record',
             ]
         )
-        with self.open_file_swap:
+        with self.open_swap:
             stanzas = check_frontend_test_coverage.get_stanzas_from_lcov_file()
             self.assertEqual(stanzas[0].file_name, 'file.ts')
             self.assertEqual(stanzas[0].file_path, '/opensource/oppia/file.ts')
@@ -118,7 +117,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 'end_of_record',
             ]
         )
-        with self.open_file_swap:
+        with self.open_swap:
             with self.assertRaisesRegex(
                 Exception,
                 'The test path is empty or null. '
@@ -135,7 +134,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 'end_of_record',
             ]
         )
-        with self.open_file_swap:
+        with self.open_swap:
             with self.assertRaisesRegex(
                 Exception,
                 'It wasn\'t possible to get the total lines of file.ts file.'
@@ -152,7 +151,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 'end_of_record',
             ]
         )
-        with self.open_file_swap:
+        with self.open_swap:
             with self.assertRaisesRegex(
                 Exception,
                 'It wasn\'t possible to get the covered lines of file.ts file.'
@@ -190,7 +189,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
         with (
             sys_exit_swap
-        ), self.exists_swap, self.open_file_swap, self.print_swap:  # pylint: disable=line-too-long
+        ), self.exists_swap, self.open_swap, self.print_swap:  # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.check_coverage_changes()
             self.assertEqual(
@@ -231,7 +230,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
         )
 
-        with self.exists_swap, self.open_file_swap, self.print_swap:
+        with self.exists_swap, self.open_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
@@ -258,7 +257,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ['/opensource/oppia/file.ts'],
         )
 
-        with self.exists_swap, self.open_file_swap, self.print_swap:
+        with self.exists_swap, self.open_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
@@ -291,7 +290,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ['/opensource/oppia/file.ts'],
         )
 
-        with self.exists_swap, self.open_file_swap, self.print_swap:
+        with self.exists_swap, self.open_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
@@ -341,7 +340,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             check_function_calls['sys_exit_is_called'] = True
 
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with sys_exit_swap, self.exists_swap, self.open_file_swap:
+        with sys_exit_swap, self.exists_swap, self.open_swap:
             with self.print_swap, not_fully_covered_files_swap:
                 (
                     check_frontend_test_coverage.check_not_fully_covered_filenames_list_is_sorted()
@@ -369,7 +368,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ['/opensource/oppia/file.ts', '/opensource/oppia/anotherfile.ts'],
         )
 
-        with self.exists_swap, self.open_file_swap, self.print_swap:
+        with self.exists_swap, self.open_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     (
@@ -449,7 +448,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ['/opensource/oppia/file.ts', '/opensource/oppia/file2.ts'],
         )
 
-        with self.check_call_swap, self.exists_swap, self.open_file_swap:
+        with self.check_call_swap, self.exists_swap, self.open_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.main(
@@ -480,7 +479,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'NOT_FULLY_COVERED_FILENAMES',
             ['/opensource/oppia/file.ts'],
         )
-        with self.check_call_swap, self.exists_swap, self.open_file_swap:
+        with self.check_call_swap, self.exists_swap, self.open_swap:
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.main([])
             self.assertEqual(

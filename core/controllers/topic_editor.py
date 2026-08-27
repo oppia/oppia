@@ -221,6 +221,7 @@ class TopicEditorStoryHandler(
                     upcoming_chapters_expected_days
                 ),
                 'overdue_chapters_count': overdue_chapters_count,
+                'arcs': [arc.to_dict() for arc in story.story_contents.arcs],
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict
@@ -396,7 +397,7 @@ class EditableSubtopicPageDataHandler(
                 'The subtopic page with the given id doesn\'t exist.'
             )
 
-        self.values.update({'subtopic_page': subtopic_page.to_dict()})
+        self.values.update({'subtopic_page_dict': subtopic_page.to_dict()})
 
         self.render_json(self.values)
 
@@ -450,7 +451,7 @@ class EditableStudyGuideDataHandler(
                 'The study guide with the given id doesn\'t exist.'
             )
 
-        self.values.update({'study_guide': study_guide.to_dict()})
+        self.values.update({'study_guide_dict': study_guide.to_dict()})
 
         self.render_json(self.values)
 
@@ -814,8 +815,13 @@ class TopicRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             in user_actions_info.actions
         )
 
+        can_edit_question = topic_services.check_can_edit_question(
+            user_actions_info, topic_rights
+        )
+
         self.values.update(
             {
+                'can_edit_question': can_edit_question,
                 'can_edit_topic': can_edit_topic,
                 'published': topic_rights.topic_is_published,
                 'can_publish_topic': can_publish_topic,
@@ -981,7 +987,7 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_create_topic
+    @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.

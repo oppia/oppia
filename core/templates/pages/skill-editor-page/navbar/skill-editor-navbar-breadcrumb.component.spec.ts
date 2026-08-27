@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {SkillEditorNavbarBreadcrumbComponent} from './skill-editor-navbar-breadcrumb.component';
@@ -28,7 +28,7 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
   let skillObject: Skill;
   let skillEditorStateService: SkillEditorStateService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillEditorNavbarBreadcrumbComponent],

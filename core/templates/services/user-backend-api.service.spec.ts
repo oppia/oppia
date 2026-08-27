@@ -179,11 +179,13 @@ describe('User Backend Api Service', () => {
       preferred_audio_language_code: 'en',
       default_dashboard: 'learner',
       user_bio: '',
+      profile_name_for_certificate: 'test_name',
       subject_interests: '',
       can_receive_email_updates: true,
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: true,
       can_receive_subscription_email: true,
+      can_receive_contributor_dashboard_email: true,
       subscription_list: [],
     };
     userBackendApiService.getPreferencesAsync().then(preferencesData => {
@@ -197,7 +199,7 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should update preferred site langauge', fakeAsync(() => {
+  it('should update preferred site language', fakeAsync(() => {
     let siteLanguageUrl = '/save_site_language';
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');

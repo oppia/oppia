@@ -25,7 +25,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-import './player-header.component.css';
 import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';

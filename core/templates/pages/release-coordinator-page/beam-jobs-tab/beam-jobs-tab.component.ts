@@ -41,6 +41,7 @@ import {
 
 import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 import {BeamJob} from 'domain/jobs/beam-job.model';
+
 import {CancelBeamJobDialogComponent} from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import {ViewBeamJobOutputDialogComponent} from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';

@@ -30,6 +30,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 import './oppia-footer.component.css';
+import {FeedbackModalComponent} from './feedback-modal.component';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
 @Component({
   selector: 'oppia-footer',
@@ -134,17 +136,27 @@ export class OppiaFooterComponent {
     }
   }
 
-  navigateToAboutPage(): void {
+  onAboutLinkClick(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.ABOUT
     );
-    this.windowRef.nativeWindow.location.href = '/about';
   }
 
-  navigateToTeachPage(): void {
+  onTeachLinkClick(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.TEACH
     );
-    this.windowRef.nativeWindow.location.href = '/teach';
+  }
+
+  openSiteFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+  }
+
+  isWebFeedbackModalFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
   }
 }

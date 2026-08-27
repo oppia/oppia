@@ -16,7 +16,12 @@
  * @fileoverview Unit tests for adding syllabus items to learner group.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -41,7 +46,7 @@ import {LearnerGroupSyllabus} from 'domain/learner_group/learner-group-syllabus.
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -128,7 +133,7 @@ describe('AddSyllabusItemsComponent', () => {
       declarations: [
         AddSyllabusItemsComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {

@@ -25,6 +25,7 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
+import './outcome-if-stuck-destination-editor.component.css';
 
 interface DestinationChoice {
   id: string | null;
@@ -39,6 +40,7 @@ interface DestValidation {
 @Component({
   selector: 'oppia-outcome-if-stuck-destination-editor',
   templateUrl: './outcome-if-stuck-destination-editor.component.html',
+  styleUrls: ['./outcome-if-stuck-destination-editor.component.css'],
 })
 export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
@@ -205,7 +207,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       })
     );
 
-    this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+    this.newStateNamePattern = /^[a-zA-Z0-9.\s\-]+$/;
     this.destinationChoices = [];
   }
 

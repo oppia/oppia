@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {UserService} from 'services/user.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
@@ -28,11 +29,13 @@ describe('Site Analytics Service', () => {
   let gtagSpy: jasmine.Spy;
   let pathname = 'pathname';
   let localStorageService: jasmine.SpyObj<LocalStorageService>;
+  let userService: jasmine.SpyObj<UserService>;
   const explorationId = 'abc1';
 
   class MockWindowRef {
     nativeWindow = {
       gtag: () => {},
+      dataLayer: [],
       location: {
         pathname,
       },
@@ -44,6 +47,11 @@ describe('Site Analytics Service', () => {
       'getLastPageViewTime',
       'setLastPageViewTime',
     ]);
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'isLoggedIn',
+      'getUserInfoAsync',
+    ]);
+    userServiceSpy.getUserInfoAsync.and.returnValue(Promise.resolve());
     TestBed.configureTestingModule({
       providers: [
         SiteAnalyticsService,
@@ -52,12 +60,18 @@ describe('Site Analytics Service', () => {
           useClass: MockWindowRef,
         },
         {provide: LocalStorageService, useValue: localStorageServiceSpy},
+        {provide: UserService, useValue: userServiceSpy},
       ],
     }).compileComponents();
 
     sas = TestBed.inject(SiteAnalyticsService);
     ws = TestBed.inject(WindowRef);
-    localStorageService = TestBed.inject(LocalStorageService);
+    localStorageService = TestBed.inject(
+      LocalStorageService
+    ) as jasmine.SpyObj<LocalStorageService>;
+    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+
+    userService.isLoggedIn.and.returnValue(true);
   });
 
   it('should initialize google analytics', () => {
@@ -65,7 +79,8 @@ describe('Site Analytics Service', () => {
   });
 
   describe('when tested using gtag spy', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await Promise.resolve();
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
     });
 
@@ -76,6 +91,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'login', {
         source_element: 'LoginEventButton',
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -84,6 +100,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'sign_up', {
         source_element: 'srcElement',
+        login_status: 'logged_in',
       });
     });
 
@@ -95,6 +112,7 @@ describe('Site Analytics Service', () => {
         'browse_lessons_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -107,6 +125,7 @@ describe('Site Analytics Service', () => {
         'start_learning_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -119,6 +138,7 @@ describe('Site Analytics Service', () => {
         'start_contributing_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -129,6 +149,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'go_to_donation_site', {
         donation_site_name: donationSite,
+        login_status: 'logged_in',
       });
     });
 
@@ -138,7 +159,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'apply_to_teach_with_oppia',
-        {}
+        {login_status: 'logged_in'}
       );
     });
 
@@ -150,6 +171,7 @@ describe('Site Analytics Service', () => {
         'create_exploration_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -160,6 +182,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create_new_exploration', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -172,6 +195,7 @@ describe('Site Analytics Service', () => {
         'create_new_exploration_in_collection',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -182,6 +206,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create_new_collection', {
         collection_id: collectionId,
+        login_status: 'logged_in',
       });
     });
 
@@ -194,6 +219,7 @@ describe('Site Analytics Service', () => {
         'commit_changes_to_private_exploration',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -205,6 +231,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share_exploration', {
         network: network,
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -215,6 +242,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share_collection', {
         network: network,
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -225,6 +253,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share_blog_post', {
         network: network,
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -233,6 +262,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open_embed_info_modal', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -244,6 +274,7 @@ describe('Site Analytics Service', () => {
         'commit_changes_to_public_exploration',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -253,6 +284,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'tutorial_modal_open', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -261,6 +293,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'decline_tutorial_modal', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -269,6 +302,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'accept_tutorial_modal', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -277,6 +311,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click_help_button', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -285,6 +320,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'visit_help_center', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -296,6 +332,7 @@ describe('Site Analytics Service', () => {
         'open_tutorial_from_help_center',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -305,6 +342,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'skip_tutorial', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -313,6 +351,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'finish_tutorial', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -321,6 +360,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'editor_first_entry', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -329,6 +369,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'first_open_content_box', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -337,6 +378,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'first_save_content', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -348,6 +390,7 @@ describe('Site Analytics Service', () => {
         'first_click_add_interaction',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -360,6 +403,7 @@ describe('Site Analytics Service', () => {
         'first_select_interaction_type',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -369,6 +413,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'first_save_interaction', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -377,6 +422,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'first_save_rule', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -388,6 +434,7 @@ describe('Site Analytics Service', () => {
         'first_create_second_state',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -400,6 +447,7 @@ describe('Site Analytics Service', () => {
         'save_playable_exploration',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -412,6 +460,7 @@ describe('Site Analytics Service', () => {
         'open_publish_exploration_modal',
         {
           exploration_id: explorationId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -421,6 +470,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'publish_exploration', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -429,6 +479,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'visit_oppia_from_iframe', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -439,11 +490,12 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'new_card_load', {
         exploration_id: 'abc1',
         card_number: cardNumber,
+        login_status: 'logged_in',
       });
     });
 
     it(
-      'should register new card when card number is greather than 10 and' +
+      'should register new card when card number is greater than 10 and' +
         " it's a multiple of 10",
       () => {
         const cardNumber = 20;
@@ -452,6 +504,7 @@ describe('Site Analytics Service', () => {
         expect(gtagSpy).toHaveBeenCalledWith('event', 'new_card_load', {
           exploration_id: 'abc1',
           card_number: cardNumber,
+          login_status: 'logged_in',
         });
       }
     );
@@ -468,10 +521,11 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_completed', {
         exploration_id: '123',
+        login_status: 'logged_in',
       });
     });
 
-    it('should register finish curated lesson event', () => {
+    it('should register curated lesson started event', () => {
       sas.registerCuratedLessonStarted('Fractions', '123');
 
       expect(gtagSpy).toHaveBeenCalledWith(
@@ -480,11 +534,12 @@ describe('Site Analytics Service', () => {
         {
           topic_name: 'Fractions',
           exploration_id: '123',
+          login_status: 'logged_in',
         }
       );
     });
 
-    it('should register finish curated lesson event', () => {
+    it('should register curated lesson completed event', () => {
       sas.registerCuratedLessonCompleted(
         'math',
         'Fractions',
@@ -506,6 +561,7 @@ describe('Site Analytics Service', () => {
           chapter_number: '2',
           chapter_card_count: '3',
           exploration_language: 'en',
+          login_status: 'logged_in',
         }
       );
     });
@@ -519,6 +575,7 @@ describe('Site Analytics Service', () => {
         'open_fractions_from_landing_page',
         {
           collection_id: collectionId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -528,6 +585,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'save_recorded_audio', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -536,6 +594,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'start_audio_recording', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -544,6 +603,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'upload_recorded_audio', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
@@ -556,6 +616,7 @@ describe('Site Analytics Service', () => {
         'contributor_dashboard_suggest',
         {
           contribution_type: contributionType,
+          login_status: 'logged_in',
         }
       );
     });
@@ -569,6 +630,7 @@ describe('Site Analytics Service', () => {
         'contributor_dashboard_submit_suggestion',
         {
           contribution_type: contributionType,
+          login_status: 'logged_in',
         }
       );
     });
@@ -582,6 +644,7 @@ describe('Site Analytics Service', () => {
         'contributor_dashboard_view_suggestion_for_review',
         {
           contribution_type: contributionType,
+          login_status: 'logged_in',
         }
       );
     });
@@ -595,6 +658,7 @@ describe('Site Analytics Service', () => {
         'contributor_dashboard_accept_suggestion',
         {
           contribution_type: contributionType,
+          login_status: 'logged_in',
         }
       );
     });
@@ -608,6 +672,7 @@ describe('Site Analytics Service', () => {
         'contributor_dashboard_reject_suggestion',
         {
           contribution_type: contributionType,
+          login_status: 'logged_in',
         }
       );
     });
@@ -618,7 +683,9 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'active_user_start_and_saw_cards',
-        {}
+        {
+          login_status: 'logged_in',
+        }
       );
     });
 
@@ -627,17 +694,53 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_started', {
         exploration_id: explorationId,
+        login_status: 'logged_in',
       });
     });
 
+    it('should wait for user info before sending event if login state is unresolved', fakeAsync(() => {
+      let resolveUserInfoPromise!: () => void;
+      const userInfoPromise = new Promise<void>(resolve => {
+        resolveUserInfoPromise = resolve;
+      });
+
+      userService.getUserInfoAsync.and.returnValue(userInfoPromise);
+      userService.isLoggedIn.and.returnValue(false);
+
+      const delayedInitSas = new SiteAnalyticsService(
+        ws,
+        localStorageService,
+        userService
+      );
+
+      delayedInitSas.registerCommunityLessonStarted(explorationId);
+      expect(gtagSpy).not.toHaveBeenCalled();
+
+      userService.isLoggedIn.and.returnValue(true);
+      resolveUserInfoPromise();
+      flushMicrotasks();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'community_lesson_started',
+        {
+          exploration_id: explorationId,
+          login_status: 'logged_in',
+        }
+      );
+    }));
+
     it('should register classroom page viewed', () => {
-      spyOn(sas, '_sendEventToGoogleAnalytics');
+      spyOn(
+        sas as unknown as {_sendEventToGoogleAnalytics: Function},
+        '_sendEventToGoogleAnalytics'
+      );
 
       sas.registerClassroomPageViewed();
-      expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
-        'view_classroom',
-        {}
-      );
+      expect(
+        (sas as unknown as {_sendEventToGoogleAnalytics: jasmine.Spy})
+          ._sendEventToGoogleAnalytics
+      ).toHaveBeenCalledWith('view_classroom', {});
     });
 
     it('should register active classroom lesson usage', () => {
@@ -663,6 +766,7 @@ describe('Site Analytics Service', () => {
           chapter_number: '2',
           chapter_card_count: '3',
           exploration_language: 'en',
+          login_status: 'logged_in',
         }
       );
     });
@@ -675,6 +779,7 @@ describe('Site Analytics Service', () => {
         'community_lesson_completed',
         {
           exploration_id: 'exp_id',
+          login_status: 'logged_in',
         }
       );
     });
@@ -687,6 +792,7 @@ describe('Site Analytics Service', () => {
         'community_lesson_started',
         {
           exploration_id: 'exp_id',
+          login_status: 'logged_in',
         }
       );
     });
@@ -697,6 +803,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'audio_played', {
         exploration_id: 'exp_id',
         card_number: 0,
+        login_status: 'logged_in',
       });
     });
 
@@ -707,6 +814,7 @@ describe('Site Analytics Service', () => {
         classroom_name: 'math',
         topic_name: 'topic',
         practice_session_id: '1,2,3',
+        login_status: 'logged_in',
       });
     });
 
@@ -722,6 +830,7 @@ describe('Site Analytics Service', () => {
           practice_session_id: '1,2,3',
           questions_answered: 10,
           total_score: 10,
+          login_status: 'logged_in',
         }
       );
     });
@@ -729,7 +838,9 @@ describe('Site Analytics Service', () => {
     it('should register search results viewed event', () => {
       sas.registerSearchResultsViewedEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'view_search_results', {});
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'view_search_results', {
+        login_status: 'logged_in',
+      });
     });
 
     it('should register homepage start learning button click event', () => {
@@ -738,7 +849,9 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'discovery_start_learning',
-        {}
+        {
+          login_status: 'logged_in',
+        }
       );
     });
 
@@ -749,6 +862,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'answer_submitted', {
         exploration_id: explorationId,
         answer_is_correct: answerIsCorrect,
+        login_status: 'logged_in',
       });
     });
 
@@ -762,6 +876,7 @@ describe('Site Analytics Service', () => {
         {
           page_path: pathname,
           source_element: srcElement,
+          login_status: 'logged_in',
         }
       );
     });
@@ -776,6 +891,7 @@ describe('Site Analytics Service', () => {
         {
           page_path: pathname,
           source_element: srcElement,
+          login_status: 'logged_in',
         }
       );
     });
@@ -785,6 +901,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'donate_cta_button_click', {
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -796,6 +913,7 @@ describe('Site Analytics Service', () => {
         'get_android_app_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -808,6 +926,7 @@ describe('Site Analytics Service', () => {
         'learn_more_volunteer_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -820,6 +939,7 @@ describe('Site Analytics Service', () => {
         'learn_more_partner_button_click',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
     });
@@ -831,6 +951,7 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'navbar_button_click', {
         button_name: buttonName,
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
@@ -841,12 +962,13 @@ describe('Site Analytics Service', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'footer_button_click', {
         button_name: buttonName,
         page_path: pathname,
+        login_status: 'logged_in',
       });
     });
 
     it('should send first time page view in month event if time difference is more than one month', () => {
-      const thiryOneDaysInMillis = 31 * 24 * 60 * 60 * 1000;
-      const lastPageViewTime = new Date().getTime() - thiryOneDaysInMillis;
+      const thirtyOneDaysInMillis = 31 * 24 * 60 * 60 * 1000;
+      const lastPageViewTime = new Date().getTime() - thirtyOneDaysInMillis;
       localStorageService.getLastPageViewTime.and.returnValue(lastPageViewTime);
       const testKey = 'testKey';
       sas.registerFirstTimePageViewEvent(testKey);
@@ -856,6 +978,7 @@ describe('Site Analytics Service', () => {
         'first_time_page_view_in_month',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
       expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
@@ -875,6 +998,7 @@ describe('Site Analytics Service', () => {
         'first_time_page_view_in_week',
         {
           page_path: pathname,
+          login_status: 'logged_in',
         }
       );
       expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
@@ -914,6 +1038,7 @@ describe('Site Analytics Service', () => {
         page_path: pathname,
         source_element: srcElement,
         classroom_name: 'Math',
+        login_status: 'logged_in',
       });
     });
 
@@ -926,6 +1051,7 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: 'Math',
           topic_name: 'Addition',
+          login_status: 'logged_in',
         }
       );
     });
@@ -939,6 +1065,7 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: 'Math',
           topic_name: 'Addition',
+          login_status: 'logged_in',
         }
       );
     });
@@ -953,6 +1080,7 @@ describe('Site Analytics Service', () => {
         'diagnostic_test_completion',
         {
           classroom_name: classroomName,
+          login_status: 'logged_in',
         }
       );
     });
@@ -972,6 +1100,7 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: classroomName,
           topic_id: topicId,
+          login_status: 'logged_in',
         }
       );
     });
@@ -984,6 +1113,101 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'diagnostic_test_started', {
         classroom_name: classroomName,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register campaign page Donate CTA button click event', () => {
+      sas.registerCampaignBannerDonateButtonClick();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_donate_button_click',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register campaign page shown event', () => {
+      sas.registerCampaignBannerVisibility();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_shown',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson feedback modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonFeedbackModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_modal_open',
+        {
+          exploration_id: expId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal open event', () => {
+      const expId: string = 'exp_id';
+      sas.registerLessonIssueModalOpenEvent(expId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_modal_open', {
+        exploration_id: expId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      sas.registerWebsiteIssueModalOpenEvent();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'website_issue_modal_open',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson feedback modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonFeedbackSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'lesson_feedback_submitted',
+        {
+          exploration_id: expId,
+          feedbackId: feedbackId,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register lesson issue modal submit event', () => {
+      const expId: string = 'exp_id';
+      const feedbackId: string = 'feedback_id';
+      sas.registerLessonIssueSubmittedEvent(expId, feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'lesson_issue_submitted', {
+        exploration_id: expId,
+        feedbackId: feedbackId,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register website issue modal open event', () => {
+      const feedbackId: string = 'feedback_id';
+      sas.registerWebsiteIssueSubmittedEvent(feedbackId);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'website_issue_submitted', {
+        page_path: pathname,
+        feedbackId: feedbackId,
+        login_status: 'logged_in',
       });
     });
   });

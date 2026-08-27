@@ -48,7 +48,7 @@ var click = async function (elementName, clickableElement, elementIsMasked) {
   // It is expected that the masked element receives the click. Therefore, a
   // Javascript click action is used here to avoid the error.
   if (elementIsMasked) {
-    await browser.execute('$(arguments[0]).click()', clickableElement);
+    await browser.execute(el => el.click(), clickableElement);
   } else {
     await clickableElement.click();
   }

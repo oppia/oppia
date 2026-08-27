@@ -32,7 +32,7 @@ import {InteractionRulesService} from '../../../pages/exploration-player-page/se
 import {Interaction} from 'domain/exploration/interaction.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import {ExplorationPlayerConstants} from '../../../pages/exploration-player-page/current-lesson-player/exploration-player-page.constants.ts';
+import {ExplorationPlayerConstants} from '../../../pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {UrlService} from 'services/contextual/url.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {SkillPreviewTabComponent} from './skill-preview-tab.component';
@@ -40,7 +40,6 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -155,7 +154,6 @@ describe('Skill Preview Tab Component', () => {
       null
     ),
     [],
-    null as unknown as RecordedVoiceovers,
     ''
   );
 
@@ -236,7 +234,11 @@ describe('Skill Preview Tab Component', () => {
       questionPlayerEngineService as unknown as jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
     spyOn(questionPlayerEngineService, 'init').and.callFake(
-      (questionObject, successCallback, errorCallback) => {}
+      (
+        questionObject: [],
+        successCallback: () => void,
+        errorCallback: () => void
+      ) => {}
     );
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);
     component.ngOnInit();
@@ -273,7 +275,7 @@ describe('Skill Preview Tab Component', () => {
 
   it('should tell if current supplemental card is non empty', () => {
     component.displayedCard = displayedCard;
-    expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBe(false);
 
     component.displayedCard = new StateCard(
       '',
@@ -289,11 +291,10 @@ describe('Skill Preview Tab Component', () => {
         null
       ),
       [],
-      null as unknown as RecordedVoiceovers,
       ''
     );
 
-    expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBe(true);
   });
 
   it('should tell if window can show two cards', () => {
@@ -301,12 +302,12 @@ describe('Skill Preview Tab Component', () => {
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
     );
 
-    expect(component.canWindowShowTwoCards()).toBeTrue();
+    expect(component.canWindowShowTwoCards()).toBe(true);
   });
 
   it('should tell if supplemental card is non empty', () => {
     component.displayedCard = displayedCard;
-    expect(component.displayedCard.isInteractionInline()).toBeTrue();
+    expect(component.displayedCard.isInteractionInline()).toBe(true);
 
     component.displayedCard = new StateCard(
       '',
@@ -322,11 +323,10 @@ describe('Skill Preview Tab Component', () => {
         null
       ),
       [],
-      null as unknown as RecordedVoiceovers,
       ''
     );
 
-    expect(component.displayedCard.isInteractionInline()).toBeFalse();
+    expect(component.displayedCard.isInteractionInline()).toBe(false);
   });
 
   it('should filter the questions', () => {
@@ -369,6 +369,6 @@ describe('Skill Preview Tab Component', () => {
     component.ngOnInit();
     currentInteractionService.onSubmit('answer', mockInteractionRule);
 
-    expect(component.questionsFetched).toBeFalse();
+    expect(component.questionsFetched).toBe(false);
   }));
 });

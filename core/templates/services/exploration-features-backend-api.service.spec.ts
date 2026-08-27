@@ -40,10 +40,10 @@ describe('exploration features backend api service', () => {
       imports: [HttpClientTestingModule],
       providers: [ExplorationFeaturesBackendApiService],
     });
-    explorationFeaturesBackendApiService = TestBed.get(
+    explorationFeaturesBackendApiService = TestBed.inject(
       ExplorationFeaturesBackendApiService
     );
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

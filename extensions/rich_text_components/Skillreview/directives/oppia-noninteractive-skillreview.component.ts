@@ -139,7 +139,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
           'escape key press',
           'backdrop click',
         ];
-        if (res && !allowedDismissActions.includes(res)) {
+        if (typeof res === 'string' && !allowedDismissActions.includes(res)) {
           throw new Error(res);
         }
       }

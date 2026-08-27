@@ -22,10 +22,12 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
+import './admin-misc-tab.component.css';
 
 @Component({
   selector: 'oppia-admin-misc-tab',
   templateUrl: './admin-misc-tab.component.html',
+  styleUrls: ['./admin-misc-tab.component.css'],
 })
 export class AdminMiscTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
@@ -247,6 +249,54 @@ export class AdminMiscTabComponent implements OnInit {
         this.setStatusMessage.emit(
           'Successfully regenerated all topic summaries.'
         );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+  }
+
+  generateStudyGuideModels(): void {
+    this.setStatusMessage.emit('Generating study guide models...');
+    this.adminBackendApiService.generateStudyGuideModelsAsync().then(
+      () => {
+        this.setStatusMessage.emit(
+          'Successfully generated all study guide models.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+  }
+
+  deleteStudyGuideModels(): void {
+    this.setStatusMessage.emit(
+      'Starting the deletion of all Study Guide Models...'
+    );
+    this.adminBackendApiService.deleteStudyGuideModelsAsync().then(
+      () => {
+        this.setStatusMessage.emit(
+          'Successfully deleted all study guide models.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+  }
+
+  verifyStudyGuideModels(): void {
+    this.setStatusMessage.emit(
+      'Starting the verification of all Study Guide Models...'
+    );
+    this.adminBackendApiService.verifyStudyGuideModelsAsync().then(
+      issues => {
+        if (issues.issues[0].length === 0) {
+          this.setStatusMessage.emit('No issues found.');
+        } else {
+          this.setStatusMessage.emit('Issues found: ' + issues.issues);
+        }
       },
       errorResponse => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);

@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
@@ -29,6 +27,7 @@ from core.domain import (
     fs_services,
     learner_group_fetchers,
     learner_group_services,
+    question_services,
     rights_manager,
     skill_services,
     story_domain,
@@ -44,7 +43,7 @@ from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
 
-from typing import Dict, Final
+from typing import Dict, Final, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -198,7 +197,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         )
 
         banner_image = b''
-        with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+        with open(
+            'core/tests/data/classroom-banner.png', 'rb', encoding=None
+        ) as png_file:
             banner_image = png_file.read()
         fs_services.save_original_and_compressed_versions_of_image(
             'banner.png',
@@ -213,6 +214,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             classroom_id=classroom_id_1,
             name='math',
             url_fragment='math',
+            feedback_recipient_email='user@email.com',
             course_details='Math course details',
             teaser_text='Math teaser text',
             topic_list_intro='Start with our first topic.',
@@ -307,6 +309,636 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'invalid-topic'),
             params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=302,
+        )
+
+    def test_any_user_can_access_mastery_challenge_page(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/mastery-challenge'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            expected_status_int=200,
+        )
+
+    def test_any_user_can_access_lesson_practice_page(self) -> None:
+        story_id = 'story_id'
+        exp_id = 'exp_1'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'nonexistent_arc',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_lesson_practice_with_zero_node_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '0',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_lesson_practice_with_large_node_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '999',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_invalid_arc_number(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'abc',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_zero_arc_index(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '0',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_large_arc_index(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '999',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_lesson_practice_with_valid_node_and_deleted_story(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '1',
+            ),
+            expected_status_int=200,
+        )
+
+    def test_end_of_arc_page_with_valid_arc_and_deleted_story(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '1',
+            ),
+            expected_status_int=200,
+        )
+
+    def test_any_user_can_access_end_of_arc_page(self) -> None:
+        story_id = 'story_id_2'
+        exp_id = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '1',
+            ),
+            expected_status_int=200,
+        )
+
+    def test_any_user_can_access_end_of_arc_page_with_arc_position(
+        self,
+    ) -> None:
+        story_id = 'story_id_2'
+        exp_id = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
+                        'old_value': cast(List[str], []),
+                        'new_value': [self.skill_id1],
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'default_arc',
+                        'title': 'Default Arc',
+                        'description': 'Default arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added acquired skill IDs and arc.',
+        )
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '1',
+            ),
+            expected_status_int=200,
+        )
+
+    def test_end_of_arc_page_with_out_of_range_arc_position(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '999',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_lesson_practice_with_invalid_node_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'nonexistent_node',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_invalid_arc_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'nonexistent_arc',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_non_ascii_arc_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '%D9%A1',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_emoji_arc_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '%F0%9F%98%80',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_lesson_practice_with_story_that_does_not_exist(self) -> None:
+        story_id = 'story_id'
+        deleted_story_id = 'del_story'
+        exp_id = 'exp_1'
+        exp_id_2 = 'exp_3'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'nonexistent_node',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_end_of_arc_page_with_story_that_does_not_exist(self) -> None:
+        story_id = 'story_id_2'
+        deleted_story_id = 'del_story2'
+        exp_id = 'exp_2'
+        exp_id_2 = 'exp_4'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, deleted_story_id
+        )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
+
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                'nonexistent_arc',
+            ),
+            expected_status_int=404,
         )
 
 
@@ -1107,6 +1739,63 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
         )
 
 
+class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the story viewer page."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.skill_id = 'skill_1'
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description'
+        )
+        self.save_new_story(
+            self.story_id,
+            self.admin_id,
+            self.topic_id,
+            url_fragment='story-one',
+        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title', 'url-frag'
+        )
+        subtopic.skill_ids = [self.skill_id]
+        self.save_new_topic(
+            self.topic_id,
+            self.admin_id,
+            name='Topic Name',
+            abbreviated_name='topic-name',
+            url_fragment='topic-name',
+            description='Description',
+            canonical_story_ids=[self.story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id
+        )
+
+    def test_validation_returns_true_if_story_exists(self) -> None:
+        self.get_html_response(
+            '%s/can_access_story_viewer_page/staging/topic-name/story/story-one'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=200,
+        )
+
+    def test_validation_returns_false_if_story_does_not_exist(self) -> None:
+        self.get_json(
+            '%s/can_access_story_viewer_page/staging/topic-name/story/invalid-story'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=404,
+        )
+
+
 class CreateLearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):
@@ -1188,7 +1877,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             author_id='user_1',
             content='content',
             title='title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
             url_fragment='sample-url',
             tags=['news'],
             thumbnail_filename='thumbnail.svg',
@@ -1688,9 +2377,14 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id
-        )
+        with self.swap_to_always_return(
+            question_services,
+            'get_total_question_count_for_skill_ids',
+            10,
+        ):
+            topic_services.publish_story(
+                self.topic_id, self.story_id_1, self.admin_id
+            )
 
         self.login(self.VIEWER_EMAIL)
 
@@ -1716,3 +2410,46 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
             expected_status_int=404,
         )
+
+
+class TechnicalFeedbackDashboardAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test for technical feedback dashboard access validation."""
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.TECH_LEAD_EMAIL."""
+        super().setUp()
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
+        )
+
+    def test_guest_user_does_not_pass_validation(self) -> None:
+        self.get_json(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=401,
+        )
+
+    def test_exploration_editor_does_not_pass_validation(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+        self.get_json(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=401,
+        )
+        self.logout()
+
+    def test_tech_lead_passes_validation(self) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        self.get_html_response(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=200,
+        )
+        self.logout()

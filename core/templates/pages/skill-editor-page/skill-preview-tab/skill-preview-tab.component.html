@@ -12,7 +12,7 @@
                      [(ngModel)]="questionTextFilter"
                      (change)="applyFilters()">
               <select [(ngModel)]="interactionFilter"
-                      class="form-control"
+                      class="form-select"
                       (change)="applyFilters()">
                 <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
                   {{ interaction }}

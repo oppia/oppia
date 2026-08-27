@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
 import {State} from 'domain/state/state.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
@@ -39,10 +39,12 @@ import {QuestionSuggestionBackendApiService} from 'pages/contributor-dashboard-p
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import './question-suggestion-editor-modal.component.css';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
   templateUrl: './question-suggestion-editor-modal.component.html',
+  styleUrls: ['./question-suggestion-editor-modal.component.css'],
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal
@@ -172,6 +174,7 @@ export class QuestionSuggestionEditorModalComponent
         this.skillDifficulty,
         questionDict.question_state_data,
         questionDict.next_content_id_index,
+        questionDict.inapplicable_skill_misconception_ids,
         imagesData,
         () => {
           this.alertsService.addSuccessMessage('Updated question.');

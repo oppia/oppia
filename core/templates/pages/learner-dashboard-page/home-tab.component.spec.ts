@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -57,7 +57,7 @@ describe('Home tab Component', () => {
   }
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
@@ -751,7 +751,7 @@ describe('Home tab Component Loader visibility tests', () => {
   }
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, HomeTabComponent],
@@ -779,7 +779,7 @@ describe('Home tab Component Loader visibility tests', () => {
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     component.allCardsLoaded = false;
@@ -821,7 +821,7 @@ describe('Home tab Component Loader visibility tests', () => {
     ];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     component.allCardsLoaded = false;
@@ -864,7 +864,7 @@ describe('Home tab Component Loader visibility tests', () => {
     ];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');

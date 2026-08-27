@@ -19,7 +19,7 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SimpleChanges} from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -96,7 +96,7 @@ describe('NoninteractiveMath', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [NoninteractiveMath],
@@ -114,7 +114,7 @@ describe('NoninteractiveMath', () => {
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     pageContextService = TestBed.inject(PageContextService);
-    imagePreloaderService = TestBed.get(ImagePreloaderService);
+    imagePreloaderService = TestBed.inject(ImagePreloaderService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     fixture = TestBed.createComponent(NoninteractiveMath);
     component = fixture.componentInstance;

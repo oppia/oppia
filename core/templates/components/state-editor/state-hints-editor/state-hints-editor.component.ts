@@ -36,6 +36,7 @@ import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './state-hints-editor.component.css';
 
 interface DeleteValueResponse {
   index: number;
@@ -49,6 +50,7 @@ interface AddHintModalResponse {
 @Component({
   selector: 'oppia-state-hints-editor',
   templateUrl: './state-hints-editor.component.html',
+  styleUrls: ['./state-hints-editor.component.css'],
 })
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
@@ -232,10 +234,6 @@ export class StateHintsEditorComponent implements OnInit {
     this.hintCardIsShown = true;
     this.stateHintsService.setActiveHintIndex(null);
     this.canEdit = this.editabilityService.isEditable();
-    // When the page is scrolled so that the top of the page is above
-    // the browser viewport, there are some bugs in the positioning of
-    // the helper. This is a bug in jQueryUI that has not been fixed
-    // yet. For more details, see http://stackoverflow.com/q/5791886
     this.stateEditorService.updateStateHintsEditorInitialised();
   }
 }

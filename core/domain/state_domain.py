@@ -155,7 +155,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the answer group.
 
@@ -367,7 +370,10 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the hint.
 
@@ -492,7 +498,10 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the solution.
 
@@ -758,7 +767,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction instance.
 
@@ -1362,6 +1374,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
 
+                whole = 0
                 if rule_spec.rule_type not in inputs_without_fractions:
                     num = rule_spec.inputs['f']['numerator']
                     den = rule_spec.inputs['f']['denominator']
@@ -2351,7 +2364,10 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction customization args.
 
@@ -2480,21 +2496,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             Returns:
                 dict. The unmodified customization argument value.
             """
-            if (
-                schema_obj_type
+            return (
+                SubtitledUnicode(
+                    ca_value['content_id'], ca_value['unicode_str']
+                )
+                if schema_obj_type
                 == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-            ):
-                class_obj: Union[SubtitledUnicode, SubtitledHtml] = (
-                    SubtitledUnicode(
-                        ca_value['content_id'], ca_value['unicode_str']
-                    )
-                )
-
-            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
-                class_obj = SubtitledHtml(
-                    ca_value['content_id'], ca_value['html']
-                )
-            return class_obj
+                else SubtitledHtml(ca_value['content_id'], ca_value['html'])
+            )
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -2808,7 +2817,10 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the outcome.
 
@@ -3279,7 +3291,10 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the rule spec.
 
@@ -3830,7 +3845,10 @@ class State(translation_domain.BaseTranslatableObject):
         )
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the state.
 

@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 
 from core.tests import test_utils
@@ -470,3 +471,37 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_xml, expected_index_yaml
         )
+
+    def test_main_exits_early_when_web_inf_index_xml_does_not_exist(
+        self,
+    ) -> None:
+        # Create a swap that points to a non-existent file.
+        non_existent_file = '/tmp/non_existent_web_inf_index_xml.xml'
+        web_inf_index_xml_swap = self.swap(
+            extend_index_yaml, 'WEB_INF_INDEX_XML_PATH', non_existent_file
+        )
+
+        with self.index_yaml_swap, web_inf_index_xml_swap:
+            self.assertFalse(
+                os.path.exists(extend_index_yaml.WEB_INF_INDEX_XML_PATH)
+            )
+
+            # Record the initial state of the index yaml file.
+            initial_content = ''
+            with open(
+                extend_index_yaml.INDEX_YAML_PATH, 'r', encoding='utf-8'
+            ) as f:
+                initial_content = f.read()
+
+            extend_index_yaml.main()
+
+            # Assert that no file writes were done to index.yaml.
+            with open(
+                extend_index_yaml.INDEX_YAML_PATH, 'r', encoding='utf-8'
+            ) as f:
+                final_content = f.read()
+            self.assertEqual(
+                final_content,
+                initial_content,
+                'INDEX_YAML_PATH content changed unexpectedly',
+            )

@@ -25,8 +25,6 @@ const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
 const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
 
-import './progress-reminder-modal.component.css';
-
 @Component({
   selector: 'oppia-progress-reminder-modal',
   templateUrl: './progress-reminder-modal.component.html',

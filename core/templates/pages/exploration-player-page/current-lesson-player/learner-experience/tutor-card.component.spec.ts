@@ -57,6 +57,7 @@ import {UserInfo} from '../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
+import {of} from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {
@@ -122,14 +123,7 @@ describe('Tutor card component', () => {
       null
     ),
     [],
-    // This throws "Argument of type 'null' is not assignable to parameter of
-    // type 'RecordedVoiceovers'." We need to suppress this error because of
-    // the need to test validations. This throws an error only in the
-    // frontend tests and not in the frontend.
-    // @ts-ignore
-    null,
-    '',
-    null
+    ''
   );
 
   beforeEach(waitForAsync(() => {
@@ -224,6 +218,8 @@ describe('Tutor card component', () => {
     let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
     let isIframed = false;
 
+    chapterProgressService.completedChaptersCount$ = of(1);
+
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValues(
       true,
       false
@@ -251,6 +247,7 @@ describe('Tutor card component', () => {
     );
 
     componentInstance.ngOnInit();
+    tick();
     componentInstance.isAudioBarExpandedOnMobileDevice();
     mockOnOppiaFeedbackAvailableEventEmitter.emit();
     mockOnActiveCardChangedEventEmitter.emit();
@@ -273,6 +270,7 @@ describe('Tutor card component', () => {
     expect(deviceInfoService.isMobileDevice).toHaveBeenCalled();
     expect(audioBarStatusService.isAudioBarExpanded).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(componentInstance.completedChaptersCount).toBe(1);
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
@@ -510,7 +508,7 @@ describe('Tutor card component', () => {
   it('should correctly generate the milestone message', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(true);
-    chapterProgressService.setCompletedChaptersCount(1);
+    componentInstance.completedChaptersCount = 1;
     spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
     spyOn(translateService, 'instant').and.callThrough();
 
@@ -521,7 +519,7 @@ describe('Tutor card component', () => {
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_1'
     );
 
-    chapterProgressService.setCompletedChaptersCount(5);
+    componentInstance.completedChaptersCount = 5;
 
     expect(componentInstance.generateMilestoneMessage()).toBe(
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_2'
@@ -534,7 +532,7 @@ describe('Tutor card component', () => {
   it('should generate an empty message if the milestone is not to be displayed', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    chapterProgressService.setCompletedChaptersCount(1);
+    componentInstance.completedChaptersCount = 1;
     spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
     spyOn(translateService, 'instant').and.callThrough();
 
@@ -559,7 +557,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      chapterProgressService.setCompletedChaptersCount(2);
+      componentInstance.completedChaptersCount = 2;
       spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
       spyOn(translateService, 'instant').and.callThrough();
 
@@ -579,10 +577,25 @@ describe('Tutor card component', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone', fakeAsync(() => {
+    componentInstance.completedChaptersCount = 55;
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      55
+    );
+
+    spyOn(
+      componentInstance,
+      'isCompletedChaptersCountGreaterThanLastMilestone'
+    ).and.returnValue(false);
+
+    expect(
+      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
+    ).toBe(false);
+  }));
   it('should correctly show milestone progress bar', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    chapterProgressService.setCompletedChaptersCount(2);
+    componentInstance.completedChaptersCount = 2;
     spyOn(
       componentInstance,
       'setNextMilestoneAndCheckIfProgressBarIsShown'
@@ -593,7 +606,7 @@ describe('Tutor card component', () => {
     ).toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
-    chapterProgressService.setCompletedChaptersCount(4);
+    componentInstance.completedChaptersCount = 4;
 
     expect(
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
@@ -609,7 +622,7 @@ describe('Tutor card component', () => {
       'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
     ).and.returnValue(false);
     chapterProgressService.setChapterCompletedForTheFirstTime(true);
-    chapterProgressService.setCompletedChaptersCount(55);
+    componentInstance.completedChaptersCount = 55;
 
     expect(
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
@@ -622,7 +635,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      chapterProgressService.setCompletedChaptersCount(51);
+      componentInstance.completedChaptersCount = 51;
 
       spyOn(
         componentInstance,
@@ -639,7 +652,7 @@ describe('Tutor card component', () => {
   it('should not show milestone progress bar if not in story mode', () => {
     componentInstance.inStoryMode = false;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    chapterProgressService.setCompletedChaptersCount(1);
+    componentInstance.completedChaptersCount = 1;
 
     spyOn(
       componentInstance,
@@ -658,7 +671,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      chapterProgressService.setCompletedChaptersCount(1);
+      componentInstance.completedChaptersCount = 1;
 
       spyOn(
         componentInstance,
@@ -678,7 +691,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      chapterProgressService.setCompletedChaptersCount(10);
+      componentInstance.completedChaptersCount = 10;
 
       spyOn(
         componentInstance,
@@ -697,20 +710,20 @@ describe('Tutor card component', () => {
       'to be displayed',
     () => {
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      chapterProgressService.setCompletedChaptersCount(1);
+      componentInstance.completedChaptersCount = 1;
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
       ).toBe(true);
 
-      chapterProgressService.setCompletedChaptersCount(2);
+      componentInstance.completedChaptersCount = 2;
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
       ).toBe(false);
 
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      chapterProgressService.setCompletedChaptersCount(1);
+      componentInstance.completedChaptersCount = 1;
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
@@ -722,13 +735,13 @@ describe('Tutor card component', () => {
     'should correctly determine if completed chapters count is greater than ' +
       'last milestone',
     () => {
-      chapterProgressService.setCompletedChaptersCount(1);
+      componentInstance.completedChaptersCount = 1;
 
       expect(
         componentInstance.isCompletedChaptersCountGreaterThanLastMilestone()
       ).toBe(false);
 
-      chapterProgressService.setCompletedChaptersCount(51);
+      componentInstance.completedChaptersCount = 51;
 
       expect(
         componentInstance.isCompletedChaptersCountGreaterThanLastMilestone()
@@ -745,7 +758,7 @@ describe('Tutor card component', () => {
       mockOnNewCardAvailableEventEmitter
     );
     spyOn(currentInteractionService, 'registerPresubmitHook').and.callFake(
-      callb => callb()
+      (callb: () => void) => callb()
     );
     spyOn(audioPlayerService, 'clear');
     spyOn(audioPreloaderService, 'clearMostRecentlyRequestedAudioFilename');
@@ -780,7 +793,7 @@ describe('Tutor card component', () => {
   it('should tell if audio bar is expanded on mobile device', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
-    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBeTrue();
+    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBe(true);
   });
 
   it('should update displayed card', fakeAsync(() => {
@@ -791,15 +804,18 @@ describe('Tutor card component', () => {
     );
     mockOnNewCardAvailableEventEmitter.emit();
     spyOn(currentInteractionService, 'registerPresubmitHook').and.callFake(
-      callb => callb()
+      (callb: () => void) => callb()
     );
     spyOn(mockDisplayedCard, 'getInteraction').and.returnValue(
-      // This throws "Type 'null' is not assignable to type
-      // 'InteractionCustomizationArgs'." We need to suppress this error
-      // because of the need to test validations. This throws an error
-      // because the value of interaction is null.
-      // @ts-ignore
-      new Interaction([], [], null, null, [], '', null)
+      new Interaction(
+        [],
+        [],
+        {} as InteractionCustomizationArgs,
+        null,
+        [],
+        'TextInput',
+        null
+      )
     );
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
     spyOn(audioPlayerService, 'clear');
@@ -814,11 +830,11 @@ describe('Tutor card component', () => {
   it('should check if interaction is inline', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeTrue();
+    expect(componentInstance.isInteractionInline()).toBe(true);
     componentInstance.conceptCardIsBeingShown = false;
     spyOn(mockDisplayedCard, 'isInteractionInline').and.returnValue(false);
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeFalse();
+    expect(componentInstance.isInteractionInline()).toBe(false);
   });
 
   it('should get content audio highlight class', () => {
@@ -849,44 +865,44 @@ describe('Tutor card component', () => {
   it('should toggle show previous responses', () => {
     componentInstance.arePreviousResponsesShown = false;
     componentInstance.toggleShowPreviousResponses();
-    expect(componentInstance.arePreviousResponsesShown).toBeTrue();
+    expect(componentInstance.arePreviousResponsesShown).toBe(true);
   });
 
   it('should tell if window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    expect(componentInstance.isWindowNarrow()).toBeTrue();
+    expect(componentInstance.isWindowNarrow()).toBe(true);
   });
 
   it('should show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(300);
-    expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(false);
   });
 
   it('should tell if audio bar can be shown', () => {
     componentInstance.isIframed = false;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
-    expect(componentInstance.showAudioBar()).toBeTrue();
+    expect(componentInstance.showAudioBar()).toBe(true);
   });
 
   it('should tell if content audio translation is available', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeFalse();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(false);
     componentInstance.conceptCardIsBeingShown = false;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeTrue();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(true);
   });
 
   it('should check if current card is at end of transcript', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(false);
   });
 
   it('should tell if on a terminal card', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isTerminal').and.returnValue(true);
-    expect(componentInstance.isOnTerminalCard()).toBeTrue();
+    expect(componentInstance.isOnTerminalCard()).toBe(true);
   });
 
   it('should get input response pair id', () => {

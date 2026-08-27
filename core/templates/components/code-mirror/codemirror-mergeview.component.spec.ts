@@ -18,7 +18,7 @@
 
 import {NgZone, SimpleChanges} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import CodeMirror from '@types/codemirror';
+import CodeMirror from 'codemirror';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CodemirrorMergeviewComponent} from './codemirror-mergeview.component';
 

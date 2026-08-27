@@ -24,6 +24,7 @@ import {AlertsService} from 'services/alerts.service';
 import {AttributionService} from 'services/attribution.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationSuccessfullyFlaggedModalComponent} from '../modals/exploration-successfully-flagged-modal.component';
 import {
   FlagExplorationModalComponent,
@@ -31,10 +32,14 @@ import {
 } from '../modals/flag-exploration-modal.component';
 import {PageContextService} from 'services/page-context.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
+import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import './learner-local-nav.component.css';
 
 @Component({
   selector: 'oppia-learner-local-nav',
   templateUrl: './learner-local-nav.component.html',
+  styleUrls: ['./learner-local-nav.component.css'],
 })
 export class LearnerLocalNavComponent implements OnInit {
   canEdit: boolean = false;
@@ -50,6 +55,7 @@ export class LearnerLocalNavComponent implements OnInit {
     private alertsService: AlertsService,
     private attributionService: AttributionService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private userService: UserService,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
@@ -130,5 +136,27 @@ export class LearnerLocalNavComponent implements OnInit {
 
   closePopover(): void {
     this.feedbackPopOver.close();
+  }
+
+  isWebFeedbackModalFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
+  }
+
+  showReportAnIssueModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType =
+      FeedbackModalType.LESSON_ISSUE;
+  }
+
+  showSendLessonFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType =
+      FeedbackModalType.LESSON_FEEDBACK;
   }
 }

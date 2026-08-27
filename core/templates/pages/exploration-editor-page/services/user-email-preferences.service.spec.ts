@@ -28,7 +28,7 @@ import {ExplorationDataService} from './exploration-data.service';
 describe('User Email Preferences Service', () => {
   let expId = '12345';
   let sampleResponse = {
-    email_preferences: {
+    email_preferences_dict: {
       mute_feedback_notifications: false,
       mute_suggestion_notifications: false,
     },

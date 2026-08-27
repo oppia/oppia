@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import textwrap
 
-from core.constants import constants
 from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
@@ -34,22 +33,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         super().setUp()
         self.admin_email_address = 'testadmin@example.com'
         self.system_email_address = 'system@example.com'
-
-    def test_send_mail_raises_exception_for_invalid_permissions(self) -> None:
-        """Tests the send_mail exception raised for invalid user permissions."""
-        send_email_exception = self.assertRaisesRegex(
-            Exception, 'This app cannot send emails to users.'
-        )
-
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
-            email_services.send_mail(
-                self.system_email_address,
-                self.admin_email_address,
-                'subject',
-                'body',
-                'html',
-                bcc_admin=False,
-            )
 
     @test_utils.set_platform_parameters(
         [
@@ -105,43 +88,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].bcc, self.admin_email_address)
-
-    def test_send_bulk_mail_exception_for_invalid_permissions(self) -> None:
-        """Tests the send_bulk_mail exception raised for invalid user
-        permissions.
-        """
-        send_email_exception = self.assertRaisesRegex(
-            Exception, 'This app cannot send emails to users.'
-        )
-
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
-            email_services.send_bulk_mail(
-                self.system_email_address,
-                [self.admin_email_address],
-                'subject',
-                'body',
-                'html',
-            )
-
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
-    def test_send_bulk_mail_data_properly_sent(self) -> None:
-        """Verifies that the data sent in send_bulk_mail is correct
-        for each user in the recipient list.
-        """
-        recipients = [self.admin_email_address]
-
-        email_services.send_bulk_mail(
-            self.system_email_address, recipients, 'subject', 'body', 'html'
-        )
-        messages = self._get_sent_email_messages(self.admin_email_address)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].to, recipients)
 
     @test_utils.set_platform_parameters(
         [
@@ -222,36 +168,25 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'html',
             )
 
-        # Case when sender is malformed when calling send_bulk_mail.
-        malformed_sender_email = 'name email@email.com'
-        email_exception = self.assertRaisesRegex(
-            ValueError,
-            'Malformed sender email address: %s' % malformed_sender_email,
-        )
-        with email_exception:
-            email_services.send_bulk_mail(
-                malformed_sender_email,
-                ['recipient@example.com'],
-                'subject',
-                'body',
-                'html',
+        # Case when the sender email token is not wrapped in angle brackets
+        # when calling send_mail.
+        malformed_sender_emails = [
+            'Name malformed_email>',
+            'Name <malformed_email',
+        ]
+        for malformed_sender_email in malformed_sender_emails:
+            email_exception = self.assertRaisesRegex(
+                ValueError,
+                'Malformed sender email address: %s' % malformed_sender_email,
             )
-
-        # Case when sender is malformed when calling send_bulk_mail.
-        malformed_recipient_emails = ['a@a.com', 'email.com']
-        email_exception = self.assertRaisesRegex(
-            ValueError,
-            'Malformed recipient email address: %s'
-            % malformed_recipient_emails[1],
-        )
-        with email_exception:
-            email_services.send_bulk_mail(
-                'sender@example.com',
-                malformed_recipient_emails,
-                'subject',
-                'body',
-                'html',
-            )
+            with email_exception:
+                email_services.send_mail(
+                    malformed_sender_email,
+                    'recipient@example.com',
+                    'subject',
+                    'body',
+                    'html',
+                )
 
     @test_utils.set_platform_parameters(
         [
@@ -266,23 +201,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
     )
     def test_unsuccessful_status_codes_raises_exception(self) -> None:
         """Test that unsuccessful status codes returned raises an exception."""
-
-        email_exception = self.assertRaisesRegex(
-            Exception,
-            'Bulk email failed to send. Please try again later or'
-            ' contact us to report a bug at https://www.oppia.org/contact.',
-        )
-        swap_send_email_to_recipients = self.swap(
-            platform_email_services,
-            'send_email_to_recipients',
-            lambda *_, **__: False,
-        )
-        recipients = [self.admin_email_address]
-
-        with email_exception, swap_send_email_to_recipients:
-            email_services.send_bulk_mail(
-                self.system_email_address, recipients, 'subject', 'body', 'html'
-            )
 
         email_exception = self.assertRaisesRegex(
             Exception,
@@ -363,4 +281,72 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'body',
                 'html',
             ),
+        )
+
+    def test_should_be_able_to_log_email_successfully(self) -> None:
+        """Tests that emails are logged successfully."""
+
+        sender_email = 'test@oppia.org'
+        recipient_emails = [
+            'testrecipient@oppia.org',
+            'user1@gmail.com',
+            'user2@yahoo.com',
+            'user3@hotmail.com',
+        ]
+        subject = 'Test Subject'
+        plaintext_body = 'This is a test email.'
+        html_body = '<p>This is a test email.</p>'
+        cc = [
+            'test1@example.com',
+            'test2@example.com',
+            'test3@example.com',
+            'test4@example.com',
+        ]
+        bcc = [
+            'bccUser1@example.com',
+            'bccUser2@example.com',
+            'bccUser3@example.com',
+            'bccUser4@example.com',
+        ]
+        attachments = [
+            {'filename': 'file1.txt', 'path': '/path/to/file1.txt'},
+            {'filename': 'file2.jpg', 'path': '/path/to/file2.jpg'},
+        ]
+
+        response = email_services.convert_email_to_loggable_string(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            cc,
+            bcc,
+            reply_to=None,
+            recipient_variables=None,
+            attachments=attachments,
+        )
+
+        expected_email_log = """
+            EmailService.SendMail
+            From: test@oppia.org
+            To: testrecipient@oppia.org user1@gmail.com user2@yahoo.com... Total: 4 emails.
+            Subject: Test Subject
+            Body:
+                Content-type: text/plain
+                Data length: 21
+            Body:
+                Content-type: text/html
+                Data length: 28
+                Html content: <p>This is a test email.</p>
+
+            Cc: test1@example.com test2@example.com test3@example.com... Total: 4 emails.
+            Bcc: bccUser1@example.com bccUser2@example.com bccUser3@example.com... Total: 4 emails.
+            Reply_to: None
+            Recipient Variables:
+                Length: 0
+
+            Attachments: file1.txt, file2.jpg
+        """
+        self.assertEqual(
+            textwrap.dedent(expected_email_log).strip(), response.strip()
         )

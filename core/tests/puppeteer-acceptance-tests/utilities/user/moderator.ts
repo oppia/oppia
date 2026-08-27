@@ -28,7 +28,7 @@ const feedbackMessageRowSelector = '.e2e-test-feedback-messages-row';
 const featuredActivitiesTab = '.e2e-test-featured-activities-tab-link';
 const explorationIDField = 'input[aria-label="text input"]';
 const featuredActivityRowSelector =
-  '#e2e-test-schema-based-list-editor-table-row';
+  '.e2e-test-schema-based-list-editor-table-row';
 const deleteFeaturedActivityButton = '.e2e-test-delete-list-entry';
 
 const featuredActivitiesHeaderSelector = '.e2e-test-featured-activities-header';

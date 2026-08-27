@@ -23,6 +23,7 @@ from core.platform import models
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 
+import requests
 from mailchimp3 import mailchimpclient
 from typing import Dict, List
 
@@ -114,14 +115,24 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         dict. The updated status dict for users.
                     """
                     if not self.users_data:
+                        mock_response = requests.Response()
+                        mock_response.status_code = 401
                         raise mailchimpclient.MailChimpError(
-                            {'status': 401, 'detail': 'Server Error'}
+                            {
+                                'status': 401,
+                                'detail': 'Server Error',
+                                'response': mock_response,
+                            }
                         )
                     for user in self.users_data:
                         if user['email_hash'] == subscriber_hash:
                             return user
 
-                    raise mailchimpclient.MailChimpError({'status': 404})
+                    mock_response = requests.Response()
+                    mock_response.status_code = 404
+                    raise mailchimpclient.MailChimpError(
+                        {'status': 404, 'response': mock_response}
+                    )
 
                 def update(
                     self,
@@ -161,18 +172,24 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             }
                         )
                     elif data['email_address'] == 'test4@example.com':
+                        mock_response = requests.Response()
+                        mock_response.status_code = 400
                         raise mailchimpclient.MailChimpError(
                             {
                                 'status': 400,
                                 'title': 'Forgotten Email Not Subscribed',
+                                'response': mock_response,
                             }
                         )
                     else:
+                        mock_response = requests.Response()
+                        mock_response.status_code = 404
                         raise mailchimpclient.MailChimpError(
                             {
                                 'status': 404,
                                 'title': 'Invalid email',
                                 'detail': 'Server Issue',
+                                'response': mock_response,
                             }
                         )
 
@@ -389,12 +406,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1, {}, 'Web', can_receive_email_updates=True
                 )
-                self.assertItemsEqual(
-                    [
-                        'Mailchimp error prevented email signup: '
-                        '{\'status\': 401, \'detail\': \'Server Error\'}'
-                    ],
-                    logs,
+                self.assertEqual(len(logs), 1)
+                self.assertRegex(
+                    logs[0],
+                    r'Mailchimp error prevented email signup: '
+                    r'\{\'status\': 401, \'detail\': \'Server Error\', \'response\': <Response \[401\]>\}',
                 )
 
     @test_utils.set_platform_parameters(
@@ -470,9 +486,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     'Web',
                     can_receive_email_updates=True,
                 )
-                self.assertItemsEqual(
-                    ['Mailchimp error prevented email signup: Server Issue'],
-                    logs,
+                self.assertEqual(len(logs), 1)
+                self.assertRegex(
+                    logs[0],
+                    r'Mailchimp error prevented email signup: Server Issue',
                 )
 
     @test_utils.set_platform_parameters(

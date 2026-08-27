@@ -36,7 +36,6 @@ import {ExplorationPlayerConstants} from '../../current-lesson-player/exploratio
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 
-import './supplemental-card.component.css';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 

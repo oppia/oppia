@@ -22,6 +22,7 @@ import {md5} from 'hash-wasm';
 
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import firebase from 'firebase';
 
 describe('Auth service', function () {
@@ -32,6 +33,7 @@ describe('Auth service', function () {
   let creds: firebase.auth.UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
+  let signInEventService: jasmine.SpyObj<SignInEventService>;
 
   beforeEach(async () => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
@@ -45,11 +47,20 @@ describe('Auth service', function () {
       beginSessionAsync: Promise.resolve(),
       endSessionAsync: Promise.resolve(),
     });
+    signInEventService = jasmine.createSpyObj<SignInEventService>(
+      'SignInEventService',
+      [],
+      {onUserSignIn: new (await import('@angular/core')).EventEmitter<void>()}
+    );
 
     TestBed.configureTestingModule({
       providers: [
         {provide: AngularFireAuth, useValue: angularFireAuth},
         {provide: AuthBackendApiService, useValue: authBackendApiService},
+        {
+          provide: SignInEventService,
+          useValue: signInEventService,
+        },
       ],
     });
 
@@ -65,21 +76,15 @@ describe('Auth service', function () {
     };
   });
 
-  it(
-    'should return emulator config when using firebase endpoint in ' +
-      'docker environment',
-    () => {
-      spyOnProperty(
-        AuthService,
-        'firebaseEmulatorIsEnabled',
-        'get'
-      ).and.returnValue(true);
+  it('should return emulator config when emulator is enabled', () => {
+    spyOnProperty(
+      AuthService,
+      'firebaseEmulatorIsEnabled',
+      'get'
+    ).and.returnValue(true);
 
-      // TODO(#18260): Change this when we permanently move to the Docker Setup.
-      process.env.USE_FIREBASE_ENDPOINT = 'true';
-      expect(AuthService.firebaseEmulatorConfig).toEqual(['firebase', 9099]);
-    }
-  );
+    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
+  });
 
   it('should return undefined when emulator is disabled', () => {
     spyOnProperty(
@@ -105,19 +110,31 @@ describe('Auth service', function () {
 
   it('should throw if signOutAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).signOutAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        signInEventService
+      ).signOutAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
   it('should throw if signInWithRedirectAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).signInWithRedirectAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        signInEventService
+      ).signInWithRedirectAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
   it('should throw if handleRedirectResultAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).handleRedirectResultAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        signInEventService
+      ).handleRedirectResultAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
@@ -127,6 +144,7 @@ describe('Auth service', function () {
     });
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
 
+    spyOn(signInEventService.onUserSignIn, 'emit');
     await expectAsync(authService.signInWithEmail(email)).toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(
@@ -140,6 +158,7 @@ describe('Auth service', function () {
     expect(authBackendApiService.beginSessionAsync).toHaveBeenCalledWith(
       idToken
     );
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalled();
   });
 
   it('should propogate signInWithEmailAndPassword errors', async () => {
@@ -181,7 +200,11 @@ describe('Auth service', function () {
         additionalUserInfo: null,
       };
 
-      authService = new AuthService(angularFireAuth, authBackendApiService);
+      authService = new AuthService(
+        angularFireAuth,
+        authBackendApiService,
+        signInEventService
+      );
     });
 
     it('should fail to call signInWithEmail', async () => {
@@ -245,7 +268,11 @@ describe('Auth service', function () {
         'get'
       ).and.returnValue(true);
 
-      authService = new AuthService(angularFireAuth, authBackendApiService);
+      authService = new AuthService(
+        angularFireAuth,
+        authBackendApiService,
+        signInEventService
+      );
     });
 
     it('should not delegate to signInWithRedirectAsync', async () => {

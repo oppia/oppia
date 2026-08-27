@@ -799,6 +799,7 @@ def get_canonical_story_dicts(
         story_summary_dict: CannonicalStoryDict = (
             story_summary.to_human_readable_dict()  # type: ignore[assignment]
         )
+        story_summary_dict['node_titles'] = [node.title for node in all_nodes]
         story_summary_dict['topic_url_fragment'] = topic.url_fragment
         story_summary_dict['classroom_url_fragment'] = (
             classroom_config_services.get_classroom_url_fragment_for_topic_id(

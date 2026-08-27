@@ -20,6 +20,8 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   ViewChild,
   HostListener,
   Input,
@@ -56,7 +58,8 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
+import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -67,10 +70,11 @@ export interface Suggestion {
   };
   status: string;
   suggestion_type: string;
+  target_type?: string;
   target_id: string;
   suggestion_id: string;
   author_name: string;
-  exploration_content_html: string | null;
+  entity_content_html: string | null;
 }
 
 export interface ContributionsSummary {
@@ -100,11 +104,12 @@ export interface GetOpportunitiesResponse {
 }
 
 export interface ContributionDetails {
-  skill_description: string;
-  skill_rubrics: Rubric[];
-  chapter_title: string;
-  story_title: string;
+  skill_description?: string;
+  skill_rubrics?: Rubric[];
+  chapter_title?: string;
+  story_title?: string;
   topic_name: string;
+  entity_description?: string;
 }
 
 export interface SuggestionDetails {
@@ -128,11 +133,18 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css'],
 })
-export class ContributionsAndReview implements OnInit, OnDestroy {
+export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   @Input() activeTopicName: string;
+  @Input() activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
+
+  get ENTITY_TYPE_SKILL(): string {
+    return AppConstants.ENTITY_TYPE.SKILL;
+  }
 
   directiveSubscriptions = new Subscription();
 
@@ -204,7 +216,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private windowRef: WindowRef
   ) {}
 
   getQuestionContributionsSummary(
@@ -253,12 +266,21 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading =
           ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
       } else {
-        subheading =
-          details.topic_name +
-          ' / ' +
-          details.story_title +
-          ' / ' +
-          details.chapter_title;
+        if (suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL) {
+          subheading = details.skill_description || '';
+        } else if (
+          this.featureService.status.EnableTranslationOppsWithNewOppModels
+            .isEnabled
+        ) {
+          subheading = details.topic_name + ' / ' + details.entity_description;
+        } else {
+          subheading =
+            details.topic_name +
+            ' / ' +
+            details.story_title +
+            ' / ' +
+            details.chapter_title;
+        }
       }
 
       const requiredData = {
@@ -268,7 +290,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         labelText:
           // Missing exploration content means the translation suggestion is
           // now obsolete. See issue #16022.
-          suggestion.exploration_content_html === null
+          suggestion.entity_content_html === null
             ? 'Obsolete'
             : this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -284,6 +306,25 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
       translationContributionsSummaryList.push(requiredData);
     });
+
+    translationContributionsSummaryList.sort((a, b) => {
+      const getPriority = (statusLabel: string) => {
+        if (statusLabel === this.SUGGESTION_LABELS.rejected.text) {
+          return 0;
+        } else if (statusLabel === this.SUGGESTION_LABELS.review.text) {
+          return 1;
+        } else if (statusLabel === this.SUGGESTION_LABELS.accepted.text) {
+          return 2;
+        }
+        return 3;
+      };
+
+      const priorityA = getPriority(a.labelText);
+      const priorityB = getPriority(b.labelText);
+
+      return priorityA - priorityB;
+    });
+
     return translationContributionsSummaryList;
   }
 
@@ -324,6 +365,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
       suggestionId,
     ]);
+    // Reload opportunities to refresh progress bars after accepting suggestion.
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
   _showQuestionSuggestionModal(
@@ -333,7 +376,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     question: Question,
     misconceptionsBySkill: MisconceptionSkillMap
   ): void {
-    const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
@@ -364,9 +406,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
     modalRef.result.then(
       result => {
-        this.contributionAndReviewService.reviewSkillSuggestion(
-          targetId,
-          suggestionId,
+        this.contributionAndReviewService.reviewQuestionSuggestion(
+          result.targetId,
+          result.suggestionId,
           result.action,
           result.reviewMessage,
           result.skillDifficulty,
@@ -385,14 +427,29 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     initialSuggestionId: string,
     reviewable: boolean
   ): void {
-    const details = this.contributions[initialSuggestionId]
-      .details as ContributionDetails;
-    const subheading =
-      details.topic_name +
-      ' / ' +
-      details.story_title +
-      ' / ' +
-      details.chapter_title;
+    const contribution = this.contributions[
+      initialSuggestionId
+    ] as SuggestionDetails;
+    const details = contribution.details as ContributionDetails;
+    let subheading = '';
+    if (
+      contribution.suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+    ) {
+      // A skill's opportunity carries its description rather than the topic
+      // and chapter that an exploration's opportunity does.
+      subheading = details.skill_description || '';
+    } else if (
+      this.featureService.status.EnableTranslationOppsWithNewOppModels.isEnabled
+    ) {
+      subheading = details.topic_name + ' / ' + details.entity_description;
+    } else {
+      subheading =
+        details.topic_name +
+        ' / ' +
+        details.story_title +
+        ' / ' +
+        details.chapter_title;
+    }
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,
       {
@@ -469,24 +526,24 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;
 
-    this.contributionAndReviewService.reviewExplorationSuggestion(
+    const suggestionWasAccepted =
+      currentSuggestionSummary.action_status ===
+      AppConstants.ACTION_ACCEPT_SUGGESTION;
+
+    this.contributionAndReviewService.reviewTranslationSuggestion(
+      currentSuggestionSummary.target_type,
       currentSuggestionSummary.target_id,
       currentSuggestionSummary.suggestion_id,
       currentSuggestionSummary.action_status,
       currentSuggestionSummary.reviewer_message,
-      currentSuggestionSummary.action_status === 'accept' &&
-        currentSuggestionSummary.commit_message
+      // Only include commit_message for accepted suggestions.
+      suggestionWasAccepted && currentSuggestionSummary.commit_message
         ? currentSuggestionSummary.commit_message
         : null,
-      // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage(
-          `Suggestion ${
-            currentSuggestionSummary?.action_status === 'accept'
-              ? 'accepted'
-              : 'rejected'
-          }.`
+          `Suggestion ${suggestionWasAccepted ? 'accepted' : 'rejected'}.`
         );
         clearTimeout(this.commitTimeout);
         this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
@@ -531,6 +588,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   isActiveTab(tabType: string, subType: string): boolean {
     return this.activeTabType === tabType && this.activeTabSubtype === subType;
+  }
+
+  get activeReviewTab(): boolean {
+    return this.activeTabType === this.TAB_TYPE_REVIEWS;
   }
 
   isReviewTranslationsTab(): boolean {
@@ -630,6 +691,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   switchToTab(tabType: string, subType: string): void {
+    this.windowRef.nativeWindow.scrollTo(0, 0);
     this.activeTabType = tabType;
     this.dropdownShown = false;
     this.activeDropdownTabChoice = this.getActiveDropdownTabText(
@@ -654,7 +716,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.contributionOpportunitiesService
       .getReviewableTranslationOpportunitiesAsync(
         this.translationTopicService.getActiveTopicName(),
-        this.languageCode
+        this.languageCode,
+        this.activeEntityType
       )
       .then(response => {
         const opportunitiesDicts = [];
@@ -666,6 +729,22 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            totalCount: opportunity.getContentCount(),
+            translationsCount: opportunity.getTranslationsCount(
+              this.languageCode
+            ),
+            inReviewCount: opportunity.getTranslationsInReviewCount(
+              this.languageCode
+            ),
+            progressPercentage: opportunity
+              .getTranslationProgressPercentage(this.languageCode)
+              .toFixed(2),
+            // The list can mix entity types when the filter is on "All", so
+            // each opportunity carries its own type for the suggestion fetch
+            // that follows a click. Legacy opportunities carry no entity type
+            // and are always explorations.
+            entityType:
+              opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
           };
           opportunitiesDicts.push(opportunityDict);
         });
@@ -709,8 +788,20 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
   }
 
-  onClickReviewableTranslations(explorationId: string): void {
-    this.activeExplorationId = explorationId;
+  onClickReviewableTranslations(entityId: string): void {
+    this.activeExplorationId = entityId;
+  }
+
+  /**
+   * Returns the entity type to fetch suggestions for. An opened opportunity
+   * decides its own type, because the "All" filter lists several entity types
+   * side by side and the filter cannot say which one was clicked.
+   */
+  private getEntityTypeForSuggestionFetch(): string {
+    const activeOpportunity = this.opportunities.find(
+      opportunity => opportunity.id === this.activeExplorationId
+    );
+    return activeOpportunity?.entityType || this.activeEntityType;
   }
 
   onClickBackToReviewableLessons(): void {
@@ -778,6 +869,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   setReviewableQuestionsSortKey(sortKey: string): void {
     this.reviewableQuestionsSortKey = sortKey;
     this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // The first change is the initial binding, which arrives before the lists
+    // have loaded anything, so only a later change to the filter needs to
+    // close the open opportunity and reload.
+    if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
+      this.activeExplorationId = null;
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+    }
   }
 
   ngOnInit(): void {
@@ -944,14 +1045,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService.getUserCreatedTranslationSuggestionsAsync(
             shouldResetOffset,
-            this.userCreatedTranslationsSortKey
+            this.userCreatedTranslationsSortKey,
+            this.activeEntityType
           );
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService.getReviewableTranslationSuggestionsAsync(
             shouldResetOffset,
             this.reviewableTranslationsSortKey,
-            this.activeExplorationId
+            this.activeExplorationId,
+            this.getEntityTypeForSuggestionFetch()
           );
         },
       },

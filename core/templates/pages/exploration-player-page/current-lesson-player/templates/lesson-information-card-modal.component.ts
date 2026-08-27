@@ -21,7 +21,10 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -38,6 +41,8 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -48,8 +53,6 @@ const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
 const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
 const EXPLORATION_STATUS_PRIVATE = 'private';
-
-import './lesson-information-card-modal.component.css';
 
 @Component({
   selector: 'oppia-lesson-information-card-modal',
@@ -105,7 +108,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private localStorageService: LocalStorageService,
     private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
-    private playerPositionService: PlayerPositionService
+    private playerPositionService: PlayerPositionService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private signInEventService: SignInEventService
   ) {
     super(ngbActiveModal);
   }
@@ -234,19 +239,27 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
+  private isMetadataFieldTranslatedByBackend(
+    field: TranslatableExplorationMetadataField
+  ): boolean {
+    return (this.expInfo.translated_metadata_fields || []).includes(field);
+  }
+
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expTitleTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.TITLE
+      )
     );
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expDescTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expDescTranslationKey,
+      this.isMetadataFieldTranslatedByBackend(
+        TranslatableExplorationMetadataField.OBJECTIVE
+      )
     );
   }
 
@@ -277,6 +290,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
+      this.signInEventService.onUserSignIn.emit();
+      // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
+      // rather than manually being triggered by buttons.
+      this.siteAnalyticsService.registerStartLoginEvent(
+        'lessonInformationCardModal'
+      );
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });

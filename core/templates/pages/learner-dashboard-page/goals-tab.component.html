@@ -75,7 +75,7 @@
                         [disabled]="this.currentGoals.length === this.MAX_CURRENT_GOALS_LENGTH">
           </mat-checkbox>
           <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0"  checked class="oppia-checkbox e2e-test-remove-topic-from-current-goals-button"
-                        (click)="addToLearnerGoals(topic, topic.id, i)">
+                        (click)="addToLearnerGoals(topic, topic.id, i, $event)">
           </mat-checkbox>
         </div>
       </div>

@@ -1,31 +1,18 @@
-<ng-template #EditorTabTourContainer>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Creating in Oppia</h3>
+<div id="editorTabTourContainerContent" [hidden]="true">
   <p tabindex="0">Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
-</ng-template>
+</div>
 
-<ng-template #EditorTabTourTutorialComplete>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Tutorial Complete</h3>
-  <div tabindex="0">
-    <h4>Now for the fun part...</h4>
-      That's the end of the tour! To finish up, here are some things we suggest:
-    <ul>
-      <li>
-        Create your first card!
-      </li>
-      <li>
-        Preview your exploration.
-      </li>
-      <li>
-        Check out more resources in the
-        <a class="tutorial-help-link" href="https://oppia.github.io/#/" rel="noopener" target="_blank">
-          Help Center.
-        </a>
-      </li>
-    </ul>
-  </div>
-</ng-template>
+<div id="editorTabTourTutorialCompleteContent" [hidden]="true">
+  <p tabindex="0">Now for the fun part...</p>
+  <p tabindex="0">That's the end of the tour! To finish up, here are some things we suggest:</p>
+  <ul tabindex="0">
+    <li>Create your first card!</li>
+    <li>Preview your exploration.</li>
+    <li>Check out more resources in the <a href="https://oppia.github.io/#/" target="_blank" rel="noopener">Help Center</a>.</li>
+  </ul>
+</div>
 
-<div class="exp-editor-content-container"  joyrideStep="editorTabTourContainer" [stepContent]="EditorTabTourContainer">
+<div class="exp-editor-content-container" id="editorTabTourContainer">
   <div class="exp-editor-main-editor">
     <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
       <div class="oppia-editor-header">
@@ -66,7 +53,7 @@
   <div class="exp-editor-overview">
     <div class="exp-editor-overview-content">
       <oppia-exploration-graph></oppia-exploration-graph>
-      <div class="exp-editor-content-container"  joyrideStep="editorTabTourTutorialComplete" [stepContent]="EditorTabTourTutorialComplete"></div>
+      <div class="exp-editor-content-container" id="editorTabTourTutorialComplete"></div>
       <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
     <div class="exp-state-version-history">

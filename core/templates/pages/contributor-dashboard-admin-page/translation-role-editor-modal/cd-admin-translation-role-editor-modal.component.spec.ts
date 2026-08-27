@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  async,
+  waitForAsync,
   tick,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -40,7 +40,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
   let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let alertsService: AlertsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, MaterialModule, HttpClientTestingModule],
       declarations: [CdAdminTranslationRoleEditorModal],
@@ -55,7 +55,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CdAdminTranslationRoleEditorModal);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.get(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     contributorDashboardAdminBackendApiService = TestBed.inject(
       ContributorDashboardAdminBackendApiService
     );

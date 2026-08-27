@@ -25,16 +25,15 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import types
 
-from core import feconf
 from core.tests import test_utils
 
-from typing import Final, List, Tuple
+from typing import Final, List, Optional, Tuple, Type
 
 from . import (
     clean,
     common,
-    install_dependencies_json_packages,
     install_python_prod_dependencies,
     install_third_party_libs,
     pre_commit_hook,
@@ -75,10 +74,37 @@ class Ret:
     ) -> None:
         self.returncode = returncode
         self.communicate_val = communicate_val
+        self.stdout = None
+        self.args: List[str] = []
 
-    def communicate(self) -> Tuple[bytes, bytes]:
+    def communicate(
+        self,
+        _input: Optional[bytes] = None,  # pylint: disable=unused-argument
+        timeout: Optional[float] = None,  # pylint: disable=unused-argument
+    ) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val
+
+    def kill(self) -> None:
+        """Mock kill method."""
+        pass
+
+    def poll(self) -> int:
+        """Mock poll method."""
+        return self.returncode
+
+    def __enter__(self) -> 'Ret':
+        """Context manager enter."""
+        return self
+
+    def __exit__(
+        self,
+        _exc_type: Optional[Type[BaseException]],
+        _exc_val: Optional[BaseException],
+        _exc_tb: Optional[types.TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        pass
 
 
 class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
@@ -114,7 +140,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
-        self.Popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
+
+        def mock_popen(*_args: str, **_kwargs: str) -> Ret:
+            return Ret()
+
+        self.Popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.check_call_error_swap = self.swap(
             subprocess, 'check_call', mock_check_call_error
         )
@@ -129,11 +159,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists
         )
-
-    def test_install_third_party_main_under_docker(self) -> None:
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.check_call_swap:
-                install_third_party_libs.main()
 
     def test_install_third_party_main_also_installs_hooks(self) -> None:
         check_function_calls = {
@@ -152,6 +177,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             pass
 
         def mock_install_elasticsearch_dev_server() -> None:
+            pass
+
+        def mock_install_playwright_node() -> None:
             pass
 
         def mock_external_script_call() -> None:
@@ -201,11 +229,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'install_elasticsearch_dev_server',
             mock_install_elasticsearch_dev_server,
         )
-        swap_install_python_prod_main = self.swap(
-            install_python_prod_dependencies, 'main', mock_external_script_call
+        swap_install_playwright_node = self.swap(
+            install_third_party_libs,
+            'install_playwright_node',
+            mock_install_playwright_node,
         )
         swap_install_json_deps_main = self.swap(
-            install_dependencies_json_packages,
+            install_python_prod_dependencies,
             'main',
             mock_external_script_call,
         )
@@ -219,14 +249,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             pre_push_hook, 'main', mock_main_for_pre_push_hook
         )
 
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-            with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
-                with swap_install_gcloud_sdk, swap_install_python_prod_main:
-                    with pre_commit_hook_main_swap, pre_push_hook_main_swap:
-                        with swap_isdir, swap_mkdir, swap_copytree:
-                            with swap_install_elasticsearch_dev_server:
-                                with swap_install_json_deps_main:
-                                    install_third_party_libs.main()
+        with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
+            with swap_install_gcloud_sdk, swap_install_json_deps_main:
+                with pre_commit_hook_main_swap, pre_push_hook_main_swap:
+                    with swap_isdir, swap_mkdir, swap_copytree:
+                        with swap_install_elasticsearch_dev_server:
+                            with swap_install_playwright_node:
+                                install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -726,6 +755,100 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertIn('Node is installed.', print_list)
         self.assertNotIn('Installing Node.js', print_list)
         self.assertNotIn('Removing package-lock.json', print_list)
+
+    def test_install_playwright_node_with_darwin_x64(self) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+
+        with self.test_py_swap, os_name_swap:
+            with self.download_swap, self.rename_swap, self.exists_false_swap:
+                with self.is_x64_architecture_true_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s-darwin-x64.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+
+    def test_install_playwright_node_with_linux_x64(self) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+
+        with self.test_py_swap, os_name_swap:
+            with self.download_swap, self.rename_swap, self.exists_false_swap:
+                with self.is_x64_architecture_true_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s-linux-x64.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+
+    def test_install_playwright_node_with_unsupported_os_raises_exception(
+        self,
+    ) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+
+        with self.exists_false_swap, self.is_x64_architecture_true_swap:
+            with os_name_swap, self.assertRaisesRegex(
+                Exception, 'Unsupported OS'
+            ):
+                install_third_party_libs.install_playwright_node()
+
+    def test_install_playwright_node_with_non_x64_architecture(
+        self,
+    ) -> None:
+        all_cmd_tokens: List[str] = []
+
+        def mock_check_call(cmd_tokens: List[str]) -> None:
+            all_cmd_tokens.extend(cmd_tokens)
+
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with self.download_swap, self.rename_swap, self.exists_false_swap:
+            with self.is_x64_architecture_false_swap, self.cd_swap:
+                with check_call_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
+
+    def test_install_playwright_node_skips_if_already_installed(
+        self,
+    ) -> None:
+        print_list: List[str] = []
+
+        def mock_print(arg: str) -> None:
+            print_list.append(arg)
+
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, self.exists_true_swap:
+            install_third_party_libs.install_playwright_node()
+
+        self.assertIn('Playwright Node is installed.', print_list)
+        self.assertNotIn(
+            'Playwright Node not found. Installing Node.js', print_list
+        )
 
 
 class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):

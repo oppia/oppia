@@ -36,9 +36,11 @@ import {
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {SchemaUndefinedLastElementService} from 'services/schema-undefined-last-element.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import './schema-based-list-editor.component.css';
 @Component({
   selector: 'schema-based-list-editor',
   templateUrl: './schema-based-list-editor.component.html',
+  styleUrls: ['./schema-based-list-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -141,6 +143,17 @@ export class SchemaBasedListEditorComponent
         i--;
       }
     }
+  }
+
+  hasLastElementNonZeroLength(): boolean {
+    if (!this.localValue || this.localValue.length === 0) {
+      return false;
+    }
+    const lastElement = this.localValue[this.localValue.length - 1];
+    if (typeof lastElement === 'string' || Array.isArray(lastElement)) {
+      return lastElement.length > 0;
+    }
+    return false;
   }
 
   hasDuplicates(): boolean {

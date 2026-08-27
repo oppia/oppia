@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
@@ -160,7 +160,7 @@ def initialize_android_test_data() -> str:
     topic.update_page_title_fragment_for_web('page title for topic')
 
     # Save the dummy image to the filesystem to be used as thumbnail.
-    with utils.open_file(
+    with open(
         os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         raw_image = f.read()
@@ -226,7 +226,7 @@ def initialize_android_test_data() -> str:
     )
 
     # Save the dummy image to the filesystem to be used as thumbnail.
-    with utils.open_file(
+    with open(
         os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         raw_image = f.read()
@@ -637,7 +637,7 @@ def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
     """Uploads images to the local datastore to be fetched using the
     AssetDevHandler.
     """
-    with utils.open_file(
+    with open(
         os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         image_content = f.read()

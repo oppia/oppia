@@ -16,9 +16,15 @@
  * @fileoverview Component for the Editor tab in the exploration editor page.
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {
+  ApplicationRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {JoyrideService} from 'ngx-joyride';
+import {ShepherdService} from 'angular-shepherd';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {EditabilityService} from 'services/editability.service';
@@ -55,28 +61,18 @@ import {AlertsService} from 'services/alerts.service';
   templateUrl: './exploration-editor-tab.component.html',
 })
 export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
-  @Input() explorationIsLinkedToStory: boolean;
+  @Input() explorationIsLinkedToStory = false;
 
   directiveSubscriptions = new Subscription();
-  misconceptionsBySkill: MisconceptionSkillMap;
-  TabName: string;
-  interactionIsShown: boolean;
-  _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
+  misconceptionsBySkill: MisconceptionSkillMap = {};
+  TabName = '';
+  interactionIsShown = false;
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
-  tutorialInProgress: boolean;
-  explorationId: string;
-  stateName: string;
+  tutorialInProgress = false;
+  explorationId = '';
+  stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
-  joyRideSteps: string[] = [
-    'editorTabTourContainer',
-    'editorTabTourContentEditorTab',
-    'editorTabTourSlideStateInteractionEditorTab',
-    'editorTabTourStateResponsesTab',
-    'editorTabTourPreviewTab',
-    'editorTabTourSaveDraft',
-    'editorTabTourTutorialComplete',
-  ];
 
   constructor(
     private editabilityService: EditabilityService,
@@ -96,12 +92,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private stateEditorRefreshService: StateEditorRefreshService,
     private loaderService: LoaderService,
     private graphDataService: GraphDataService,
-    private joyride: JoyrideService,
+    private shepherdService: ShepherdService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private applicationRef: ApplicationRef
   ) {}
 
   private smoothScrollTo(targetY: number, duration: number): void {
@@ -132,120 +129,218 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  startTutorial(): void {
-    this.tutorialInProgress = true;
-    this.joyride
-      .startTour({
-        steps: this.joyRideSteps,
-        stepDefaultPosition: 'top',
-        themeColor: '#212f23',
-      })
-      .subscribe(
-        value => {
-          // This code make the joyride visible over navbar
-          // by overriding the properties of joyride-step__holder class.
-          document.querySelector<HTMLElement>(
-            '.joyride-step__holder'
-          ).style.zIndex = '1020';
-
-          document.querySelector<HTMLElement>(
-            '.joyride-step__counter'
-          ).tabIndex = 0;
-
-          document
-            .querySelector<HTMLElement>('.e2e-test-joyride-title')
-            .focus();
-
-          if (value.number === 2) {
-            this.smoothScrollTo(0, 1000);
-
-            document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            ).tabIndex = 0;
-
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
-          }
-
-          if (value.number === 4) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-
-            document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            ).tabIndex = 0;
-
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
-          }
-
-          if (value.number === 6) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-
-            document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            ).tabIndex = 0;
-
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
-          }
-        },
-        () => {},
-        () => {
-          this.siteAnalyticsService.registerFinishTutorialEvent(
-            this.explorationId
-          );
-          this.leaveTutorial();
-        }
-      );
+  private getTourContent(id: string): string {
+    const element = document.getElementById(id + 'Content');
+    // eslint-disable-next-line oppia/no-inner-html
+    return element ? element.innerHTML : '';
   }
 
-  // // Remove save from tutorial if user does not has edit rights for
-  // // exploration since in that case Save Draft button will not be
-  // // visible on the create page.
-  removeTutorialSaveButtonIfNoPermissions(): void {
+  private buildEditorTabTourSteps(): object[] {
+    const steps = [
+      {
+        id: 'editorTabTourContainer',
+        attachTo: {element: '#editorTabTourContainer', on: 'top'},
+        title: 'Creating in Oppia',
+        text: this.getTourContent('editorTabTourContainer'),
+        buttons: [
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourContentEditorTab',
+        attachTo: {element: '#editorTabTourContentEditorTab', on: 'top'},
+        title: 'Content',
+        text: this.getTourContent('editorTabTourContentEditorTab'),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourSlideStateInteractionEditorTab',
+        attachTo: {
+          element: '#editorTabTourSlideStateInteractionEditorTab',
+          on: 'top',
+        },
+        title: 'Interaction',
+        text: this.getTourContent(
+          'editorTabTourSlideStateInteractionEditorTab'
+        ),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourStateResponsesTab',
+        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'top'},
+        title: 'Responses',
+        text: this.getTourContent('editorTabTourStateResponsesTab'),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+          },
+        },
+      },
+      {
+        id: 'editorTabTourPreviewTab',
+        attachTo: {element: '#tutorialPreviewTab', on: 'top'},
+        title: 'Preview',
+        text: this.getTourContent('editorTabTourPreviewTab'),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourSaveDraft',
+        attachTo: {element: '#editorTabTourSaveDraft', on: 'top'},
+        title: 'Save',
+        text: this.getTourContent('editorTabTourSaveDraft'),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+          },
+        },
+      },
+      {
+        id: 'editorTabTourTutorialComplete',
+        attachTo: {element: '#editorTabTourTutorialComplete', on: 'top'},
+        title: 'Tutorial Complete',
+        text: this.getTourContent('editorTabTourTutorialComplete'),
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {
+            text: 'Done',
+            action: () => {
+              this.shepherdService.complete();
+              this.leaveTutorial();
+            },
+            classes: 'shepherd-button-primary',
+          },
+        ],
+      },
+    ];
+    return steps;
+  }
+
+  startTutorial(): void {
+    this.tutorialInProgress = true;
+    const steps = this.buildEditorTabTourSteps();
+
+    this.removeTutorialSaveButtonIfNoPermissions(steps);
+    this.addStepCounters(steps);
+
+    this.shepherdService.defaultStepOptions = {
+      scrollTo: false,
+      cancelIcon: {enabled: true},
+    };
+    this.shepherdService.modal = true;
+    this.shepherdService.addSteps(steps);
+    if (this.shepherdService.tourObject) {
+      this.shepherdService.tourObject.on('cancel', () => {
+        if (this.tutorialInProgress) {
+          this.handleTourFinish();
+          this.applicationRef.tick();
+        }
+      });
+    }
+    this.shepherdService.start();
+  }
+
+  private handleTourFinish(): void {
+    this.editabilityService.onEndTutorial();
+    this.stateTutorialFirstTimeService.markEditorTutorialFinished();
+    this.siteAnalyticsService.registerFinishTutorialEvent(this.explorationId);
+    this.tutorialInProgress = false;
+  }
+
+  leaveTutorial(): void {
+    this.shepherdService.complete();
+    this.handleTourFinish();
+  }
+
+  private addStepCounters(steps: object[]): void {
+    const totalSteps = steps.length;
+    steps.forEach((step, index) => {
+      const s = step as {
+        buttons?: {text: string; classes?: string; action?: () => void}[];
+      };
+      if (!s.buttons) {
+        s.buttons = [];
+      }
+      s.buttons.unshift({
+        text: `${index + 1}/${totalSteps}`,
+        classes: 'shepherd-step-counter',
+        action: () => {},
+      });
+    });
+  }
+
+  private removeTutorialSaveButtonIfNoPermissions(steps: object[]): void {
     this.userExplorationPermissionsService
       .getPermissionsAsync()
       .then(permissions => {
         if (!permissions.canEdit) {
-          this.joyRideSteps = [
-            'editorTabTourContainer',
-            'editorTabTourContentEditorTab',
-            'editorTabTourSlideStateInteractionEditorTab',
-            'editorTabTourStateResponsesTab',
-            'editorTabTourPreviewTab',
-            'editorTabTourTutorialComplete',
-          ];
+          const saveStepIndex = steps.findIndex(
+            (s: {id?: string}) =>
+              (s as {id: string}).id === 'editorTabTourSaveDraft'
+          );
+          if (saveStepIndex !== -1) {
+            steps.splice(saveStepIndex, 1);
+          }
         }
       });
   }
 
-  leaveTutorial(): void {
-    this.joyride.closeTour();
-    this.editabilityService.onEndTutorial();
-    this.stateTutorialFirstTimeService.markEditorTutorialFinished();
-    this.tutorialInProgress = false;
+  private getValidActiveStateName(): string {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      throw new Error('Expected active state name to be non-null.');
+    }
+    return activeStateName;
   }
 
   saveInteractionData(displayedValue: InteractionData): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionId(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue.interactionId)
     );
     this.stateEditorService.setInteractionId(
@@ -253,7 +348,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     );
 
     this.explorationStatesService.saveInteractionCustomizationArgs(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue.customizationArgs)
     );
     this.stateEditorService.setInteractionCustomizationArgs(
@@ -262,8 +357,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionAnswerGroups(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(newAnswerGroups)
     );
 
@@ -274,8 +370,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionDefaultOutcome(newOutcome: Outcome): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionDefaultOutcome(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(newOutcome)
     );
 
@@ -288,8 +385,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolution(displayedValue: Solution | SubtitledHtml): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveSolution(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue) as SubtitledHtml
     );
 
@@ -299,8 +397,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveHints(displayedValue: Hint[]): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveHints(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue)
     );
 
@@ -308,8 +407,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolicitAnswerDetails(displayedValue: boolean): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveSolicitAnswerDetails(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue)
     );
 
@@ -325,9 +425,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   onChangeCardIsCheckpoint(): void {
+    const activeStateName = this.getValidActiveStateName();
     let displayedValue = this.stateCardIsCheckpointService.displayed;
     this.explorationStatesService.saveCardIsCheckpoint(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue)
     );
     this.stateEditorService.setCardIsCheckpoint(cloneDeep(displayedValue));
@@ -339,10 +440,11 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   getStateContentPlaceholder(): string {
-    if (
-      this.stateEditorService.getActiveStateName() ===
-      this.explorationInitStateNameService.savedMemento
-    ) {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      return 'You can speak to the learner here, then ask them a question.';
+    }
+    if (activeStateName === this.explorationInitStateNameService.savedMemento) {
       return (
         'This is the first card of your exploration. Use this space ' +
         'to introduce your topic and engage the learner, then ask ' +
@@ -358,7 +460,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addState(newStateName: string): void {
-    this.explorationStatesService.addState(newStateName, null);
+    this.explorationStatesService.addState(newStateName, () => {});
   }
 
   refreshWarnings(): void {
@@ -366,9 +468,11 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   getLastEditedVersionNumberInCaseOfError(): number {
-    return this.versionHistoryService.fetchedStateVersionNumbers[
-      this.versionHistoryService.getCurrentPositionInStateVersionHistoryList()
-    ];
+    return (
+      this.versionHistoryService.fetchedStateVersionNumbers[
+        this.versionHistoryService.getCurrentPositionInStateVersionHistoryList()
+      ] ?? 0
+    );
   }
 
   populateMisconceptionsForState(skillId: string): void {
@@ -395,7 +499,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     );
     this.stateEditorService.setInQuestionMode(false);
 
-    let stateData = this.explorationStatesService.getState(this.stateName);
+    let stateData = this.stateName
+      ? this.explorationStatesService.getState(this.stateName)
+      : null;
     if (stateData && stateData.linkedSkillId) {
       this.populateMisconceptionsForState(stateData.linkedSkillId);
     }
@@ -433,12 +539,14 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         ''
       );
 
-      if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
+      const latestVersion =
+        this.versionHistoryService.getLatestVersionOfExploration();
+      if (latestVersion !== null) {
         this.versionHistoryBackendApiService
           .fetchStateVersionHistoryAsync(
-            this.pageContextService.getExplorationId(),
-            stateData.name,
-            this.versionHistoryService.getLatestVersionOfExploration()
+            this.pageContextService.getExplorationId() ?? '',
+            stateData.name ?? '',
+            latestVersion
           )
           .then(response => {
             if (response !== null) {
@@ -482,8 +590,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveStateContent(displayedValue: SubtitledHtml): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveStateContent(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue)
     );
     // Show the interaction when the text content is saved, even if no
@@ -492,26 +601,28 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveLinkedSkillId(displayedValue: string): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveLinkedSkillId(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       cloneDeep(displayedValue)
     );
 
     this.stateEditorService.setLinkedSkillId(cloneDeep(displayedValue));
     if (this.stateEditorService.getLinkedSkillId()) {
       this.populateMisconceptionsForState(
-        this.stateEditorService.getLinkedSkillId()
+        this.stateEditorService.getLinkedSkillId() ?? ''
       );
     }
     this.stateEditorService.onChangeLinkedSkillId.emit();
   }
 
   saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {
+    const activeStateName = this.getValidActiveStateName();
     this.stateEditorService.setInapplicableSkillMisconceptionIds(
       cloneDeep(displayedValue)
     );
     this.explorationStatesService.saveInapplicableSkillMisconceptionIds(
-      this.stateEditorService.getActiveStateName(),
+      activeStateName,
       displayedValue
     );
   }
@@ -532,7 +643,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     });
 
     this.interactionIsShown = false;
-    this.removeTutorialSaveButtonIfNoPermissions();
     this.generateContentIdService.init(
       () => {
         let indexToUse = this.explorationNextContentIdIndexService.displayed;

@@ -4,9 +4,12 @@
 READ ME FIRST:
 Please answer *all* questions below and check off every point from the Essential Checklist!
 If there is no corresponding issue number, fill in N/A where it says [fill_in_number_here] below in 1.
+You should delete either `fixes` or `fixes part of` so that line 1 reads
+`This PR fixes #123.` or `This PR fixes part of #123.`, where `#123` is replaced
+with the issue(s) addressed.
 -->
 
-1. This PR fixes or fixes part of #[fill_in_number_here].
+1. This PR fixes #[fill_in_number_here] or fixes part of #[fill_in_number_here].
 2. This PR does the following: [Explain here what your PR does and why]
 3. (For bug-fixing PRs only) The original bug occurred because: [Explain what
    the cause of the bug was, and which PR introduced it]
@@ -15,7 +18,7 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 Please follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
 
-- [ ] I have linked the issue that this PR fixes in the "Development" section of the sidebar.
+- [ ] I have referenced the issue(s) that this PR fixes or fixes part of on line 1 above. Once I open the PR, I will check that any issues this PR fully fixes are listed in the "Development" section of the sidebar.
 - [ ] I have checked the "Files Changed" tab and confirmed that the changes are what I want to make.
 - [ ] I have written tests for my code.
 - [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.
@@ -92,6 +95,6 @@ language set to Arabic as well (we use Arabic as it is a language written from r
 ## PR Pointers
 
 - Never force push! If you do, your PR will be closed.
-- To reply to reviewers, follow these instructions: https://github.com/oppia/oppia/wiki/Make-a-pull-request#step-5-address-review-comments-until-all-reviewers-approve
+- To reply to reviewers, follow these instructions: https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-5-address-review-comments-until-all-reviewers-approve
 - Some e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR).
 - See the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia's-code-owners-and-checks-to-be-carried-out-by-developers) for what code owners will expect.

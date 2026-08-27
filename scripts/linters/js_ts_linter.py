@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import os
 import re
-import shutil
 import subprocess
 
 from typing import Final, List, Tuple
@@ -29,23 +28,8 @@ from .. import common, concurrent_task_utils
 from . import linter_utils
 
 MYPY = False
-if MYPY:  # pragma: no cover
-    from scripts.linters import run_lint_checks
 
 COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
-
-# The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
-# to be included in angular-services.index.ts. These services are not required
-# for our application to run but are only present to aid tests or belong to a
-# class of legacy services that will soon be removed from the codebase.
-# NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
-# questions, please talk to @srijanreddy98.
-INJECTABLES_TO_IGNORE: Final = [
-    # This file is required for the js-ts-linter-test.
-    'MockIgnoredService',
-    # Route guards cannot be made injectables until migration is complete.
-    'CanAccessSplashPageGuard',
-]
 
 
 def compile_all_ts_files() -> None:
@@ -68,140 +52,6 @@ def compile_all_ts_files() -> None:
 
     if stderr:
         raise Exception(stderr)
-
-
-class JsTsLintChecksManager(linter_utils.BaseLinter):
-    """Manages all the Js and Ts linting functions."""
-
-    def __init__(
-        self,
-        js_files: List[str],
-        ts_files: List[str],
-        file_cache: run_lint_checks.FileCache,
-    ) -> None:
-        """Constructs a JsTsLintChecksManager object.
-
-        Args:
-            js_files: list(str). The list of js filepaths to be linted.
-            ts_files: list(str). The list of ts filepaths to be linted.
-            file_cache: object(FileCache). Provides thread-safe access to cached
-                file content.
-        """
-        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
-
-        self.js_files = js_files
-        self.ts_files = ts_files
-        self.file_cache = file_cache
-
-    @property
-    def js_filepaths(self) -> List[str]:
-        """Return all js filepaths."""
-        return self.js_files
-
-    @property
-    def ts_filepaths(self) -> List[str]:
-        """Return all ts filepaths."""
-        return self.ts_files
-
-    @property
-    def all_filepaths(self) -> List[str]:
-        """Return all filepaths."""
-        return self.js_filepaths + self.ts_filepaths
-
-    def _check_angular_services_index(self) -> concurrent_task_utils.TaskResult:
-        """Finds all @Injectable classes and makes sure that they are added to
-            Oppia root and Angular Services Index.
-
-        Returns:
-            TaskResult. TaskResult having all the messages returned by the
-            lint checks.
-        """
-        name = 'Angular Services Index file'
-        error_messages: List[str] = []
-        injectable_pattern = '%s%s' % (
-            'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
-            'export class ([A-Za-z0-9]*)',
-        )
-        angular_services_index_path = (
-            './core/templates/services/angular-services.index.ts'
-        )
-        angular_services_index = self.file_cache.read(
-            angular_services_index_path
-        )
-        error_messages = []
-        failed = False
-        for file_path in self.ts_files:
-            file_content = self.file_cache.read(file_path)
-            class_names = re.findall(injectable_pattern, file_content)
-            for class_name in class_names:
-                if class_name in INJECTABLES_TO_IGNORE:
-                    continue
-                import_statement_regex = 'import {[\\s*\\w+,]*%s' % class_name
-                if not re.search(
-                    import_statement_regex, angular_services_index
-                ):
-                    error_message = (
-                        'Please import %s to Angular Services Index file in %s'
-                        'from %s'
-                        % (class_name, angular_services_index_path, file_path)
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-
-                service_name_type_pair_regex = '\\[\'%s\',\\n*\\s*%s\\]' % (
-                    class_name,
-                    class_name,
-                )
-                service_name_type_pair = '[\'%s\', %s]' % (
-                    class_name,
-                    class_name,
-                )
-
-                if not re.search(
-                    service_name_type_pair_regex, angular_services_index
-                ):
-                    error_message = (
-                        'Please add the pair %s to the angularServices in %s'
-                        % (service_name_type_pair, angular_services_index_path)
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
-
-    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            list(TaskResult). A list of TaskResult objects representing the
-            results of the lint checks.
-        """
-
-        if not self.all_filepaths:
-            return [
-                concurrent_task_utils.TaskResult(
-                    'JS TS lint',
-                    False,
-                    [],
-                    ['There are no JavaScript or Typescript files to lint.'],
-                )
-            ]
-
-        # Clear temp compiled typescript files from the previous runs.
-        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        # Compiles all typescript files into COMPILED_TYPESCRIPT_TMP_PATH.
-        compile_all_ts_files()
-
-        linter_stdout = []
-
-        linter_stdout.append(self._check_angular_services_index())
-
-        # Clear temp compiled typescript files.
-        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-
-        return linter_stdout
 
 
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
@@ -346,27 +196,20 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
 def get_linters(
     js_filepaths: List[str],
     ts_filepaths: List[str],
-    file_cache: run_lint_checks.FileCache,
-) -> Tuple[JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager]:
-    """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
+) -> Tuple[ThirdPartyJsTsLintChecksManager, None]:
+    """Creates ThirdPartyJsTsLintChecksManager
         objects and return them.
 
     Args:
         js_filepaths: list(str). A list of js filepaths to lint.
         ts_filepaths: list(str). A list of ts filepaths to lint.
-        file_cache: object(FileCache). Provides thread-safe access to cached
-            file content.
 
     Returns:
-        tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. A 2-tuple
-        of custom and third_party linter objects.
+        tuple(ThirdPartyJsTsLintChecksManager, None). A 2-tuple of custom and
+        third_party linter objects.
     """
     js_ts_file_paths = js_filepaths + ts_filepaths
 
-    custom_linter = JsTsLintChecksManager(
-        js_filepaths, ts_filepaths, file_cache
-    )
-
     third_party_linter = ThirdPartyJsTsLintChecksManager(js_ts_file_paths)
 
-    return custom_linter, third_party_linter
+    return third_party_linter, None

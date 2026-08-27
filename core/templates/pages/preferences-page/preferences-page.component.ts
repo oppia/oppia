@@ -48,7 +48,7 @@ require('cropperjs/dist/cropper.min.css');
 import './preferences-page.component.css';
 import {FormControl, FormGroup} from '@angular/forms';
 
-interface AudioLangaugeChoice {
+interface AudioLanguageChoice {
   id: string;
   text: string;
 }
@@ -58,6 +58,7 @@ interface AudioLangaugeChoice {
 const BACKEND_UPDATE_TYPE_DICT: {[key: string]: BackendPreferenceUpdateType} = {
   profilePicturePngDataUrl: 'profile_picture_data_url',
   userBio: 'user_bio',
+  profileNameForCertificate: 'profile_name_for_certificate',
   defaultDashboard: 'default_dashboard',
   subjectInterests: 'subject_interests',
   preferredLanguageCodes: 'preferred_language_codes',
@@ -75,7 +76,7 @@ export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
+  AUDIO_LANGUAGE_CHOICES!: AudioLanguageChoice[];
   TAG_REGEX_STRING!: string;
   LANGUAGE_CHOICES!: LanguageIdAndText[];
   // The following two properties are set to null when the
@@ -265,6 +266,9 @@ export class PreferencesPageComponent {
           profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
           profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
           userBio: new FormControl(preferencesData.user_bio),
+          profileNameForCertificate: new FormControl(
+            preferencesData.profile_name_for_certificate
+          ),
           defaultDashboard: new FormControl(preferencesData.default_dashboard),
           subjectInterests: new FormControl(preferencesData.subject_interests),
           preferredLanguageCodes: new FormControl(
@@ -288,6 +292,9 @@ export class PreferencesPageComponent {
             ),
             canReceiveSubscriptionEmail: new FormControl(
               preferencesData.can_receive_subscription_email
+            ),
+            canReceiveContributorDashboardEmail: new FormControl(
+              preferencesData.can_receive_contributor_dashboard_email
             ),
           }),
         });
@@ -342,6 +349,8 @@ export class PreferencesPageComponent {
             emailFormData.canReceiveFeedbackMessageEmail,
           can_receive_subscription_email:
             emailFormData.canReceiveSubscriptionEmail,
+          can_receive_contributor_dashboard_email:
+            emailFormData.canReceiveContributorDashboardEmail,
         };
         updates.push({
           update_type: BACKEND_UPDATE_TYPE_DICT[key],

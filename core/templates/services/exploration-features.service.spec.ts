@@ -32,7 +32,7 @@ describe('ExplorationFeatureService', () => {
   let testParamChange: ParamChangeBackendDict;
 
   beforeEach(() => {
-    explorationFeatureService = TestBed.get(ExplorationFeaturesService);
+    explorationFeatureService = TestBed.inject(ExplorationFeaturesService);
     ExplorationFeaturesService.settings.areParametersEnabled = false;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;
@@ -84,6 +84,7 @@ describe('ExplorationFeatureService', () => {
           linked_skill_id: null,
           solicit_answer_details: false,
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
       },
     };

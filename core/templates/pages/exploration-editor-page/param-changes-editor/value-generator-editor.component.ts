@@ -27,18 +27,18 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import {CopierComponent} from 'value_generators/templates/copier.component';
-import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
+import {CopierComponent} from '../../../../../extensions/value_generators/templates/copier.component';
+import {RandomSelectorComponent} from '../../../../../extensions/value_generators/templates/random-selector.component';
 
 @Component({
   selector: 'oppia-value-generator-editor',
   templateUrl: './value-generator-editor.component.html',
 })
 export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
-  @Input() generatorId: string;
-  @Input() initArgs: string;
-  @Input() objType: string;
-  @Input() customizationArgs: {
+  @Input() generatorId!: string;
+  @Input() initArgs!: string;
+  @Input() objType!: string;
+  @Input() customizationArgs!: {
     value: string;
     list_of_values: string[];
   };
@@ -59,9 +59,9 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    let componentName = this.generatorId
+    const componentName: 'copier' | 'random-selector' = this.generatorId
       .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .toLowerCase();
+      .toLowerCase() as 'copier' | 'random-selector';
 
     const componentFactory =
       this.componentFactoryResolver.resolveComponentFactory<

@@ -27,11 +27,12 @@ import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {State} from '../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {SubtitledHtml} from '../../../domain/exploration/subtitled-html.model';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 class MockNgbModalRef {
   componentInstance = {
     skillId: null,
@@ -133,7 +134,6 @@ describe('ConceptCardManager service', () => {
           },
         },
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
@@ -175,17 +175,18 @@ describe('ConceptCardManager service', () => {
         ],
         solution: null,
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
-    mockConceptCard = {
-      getExplanation: () => ({
-        getHtml: () => 'Test explanation',
+    mockConceptCard = new ConceptCard(
+      SubtitledHtml.createFromBackendDict({
+        content_id: 'explanation',
+        html: 'Test explanation',
       }),
-      getWorkedExamples: () => [],
-      getSkillDescription: () => 'Test skill',
-    } as ConceptCard;
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {},
+      })
+    );
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -209,7 +210,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should open concept card modal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
@@ -258,7 +259,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should return if concept card for the state with the new name exists', fakeAsync(() => {
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -275,7 +276,6 @@ describe('ConceptCardManager service', () => {
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
       inapplicable_skill_misconception_ids: [],
@@ -302,7 +302,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should return false if concept card for state does not exist', () => {
-    const stateWithoutLinkedSkill = {
+    const stateWithoutLinkedSkill: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -315,14 +315,17 @@ describe('ConceptCardManager service', () => {
             value: 1,
           },
           placeholder: {
-            value: 'Enter text here',
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: 'Enter text here',
+            },
           },
-        },
+          catchMisspellings: {value: false},
+        } as InteractionCustomizationArgs,
         answer_groups: [],
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: null,
       inapplicable_skill_misconception_ids: [],

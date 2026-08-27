@@ -19,6 +19,7 @@
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
 
@@ -33,6 +34,8 @@ const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
 
 const modalDiv = 'div.modal-content';
+const changeSubtopicAssignmentModal =
+  '.oppia-change-subtopic-assignment-modal div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
 const photoBoxButton = 'div.e2e-test-photo-button';
@@ -42,8 +45,6 @@ const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -165,6 +166,8 @@ const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
 const newClassroomNameInputField = '.e2e-test-new-classroom-name';
 const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
+const newClassroomFeedbackRecipientInputField =
+  '.e2e-test-new-classroom-feedback-recipient';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
 const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
@@ -177,10 +180,14 @@ const editClassroomCourseDetailsInputField =
 const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
 const editClassroomUrlFragmentInputField = '.e2e-update-classroom-url-fragment';
+const editClassroomFeedbackRecipientInputField =
+  '.e2e-update-classroom-feedback-recipient';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
-const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
-const classroomBannerContainer = '.e2e-test-classroom-banner-container';
+const classroomThumbnailContainer =
+  '.e2e-test-classroom-thumbnail-container .e2e-test-photo-button';
+const classroomBannerContainer =
+  '.e2e-test-classroom-banner-container .e2e-test-photo-button';
 const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
@@ -280,6 +287,8 @@ const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
 const classroomNameSelector = '.e2e-test-classroom-name-view';
 const classroomURLSelector = '.e2e-test-classroom-url-view';
+const classroomFeedbackRecipientEmailSelector =
+  '.e2e-test-classroom-feedback-recipient-view';
 const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
 const classroomTopicListIntroSelector =
   '.e2e-test-classroom-topic-list-intro-view';
@@ -493,6 +502,7 @@ export class CurriculumAdmin extends TopicManager {
    * Checks if the classroom details are as expected.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} classroomURL - The URL of the classroom.
+   * @param {string} classroomFeedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} classroomTeaser - The teaser of the classroom.
    * @param {string} classroomTopicListIntro - The topic list intro of the classroom.
    * @param {string} classroomCourseDetails - The course details of the classroom.
@@ -502,12 +512,17 @@ export class CurriculumAdmin extends TopicManager {
     classroomURL: string,
     classroomTeaser: string,
     classroomTopicListIntro: string,
-    classroomCourseDetails: string
+    classroomCourseDetails: string,
+    classroomFeedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.openClassroomDetails(classroomName);
 
     await this.expectTextContentToBe(classroomNameSelector, classroomName);
     await this.expectTextContentToBe(classroomURLSelector, classroomURL);
+    await this.expectTextContentToBe(
+      classroomFeedbackRecipientEmailSelector,
+      classroomFeedbackRecipientEmail
+    );
     await this.expectTextContentToBe(classroomTeaserSelector, classroomTeaser);
     await this.expectTextContentToBe(
       classroomTopicListIntroSelector,
@@ -1391,7 +1406,9 @@ export class CurriculumAdmin extends TopicManager {
       `${confirmSkillAssignationButton}:not([disabled])`
     );
     await this.clickOnElementWithSelector(confirmSkillAssignationButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.page.waitForSelector(changeSubtopicAssignmentModal, {
+      hidden: true,
+    });
     await this.saveTopicDraft(topicName);
   }
 
@@ -1673,7 +1690,22 @@ export class CurriculumAdmin extends TopicManager {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(mobileOptionsDropdown);
+        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+        await this.page.click(mobileOptionsDropdown);
+        try {
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true, timeout: 10000}
+          );
+        } catch (error) {
+          await this.page.click(mobileOptionsDropdown);
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true}
+          );
+        }
+        // Ensure layout fully stabilized.
+        await this.waitForPageToFullyLoad();
       }
     } else {
       await this.page.waitForSelector(explorationSettingsTab, {visible: true});
@@ -1700,21 +1732,9 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Function to dismiss welcome modal
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForNetworkIdle();
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -1776,15 +1796,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.addChapter(chapterTitle, explorationId);
 
     await this.saveStoryDraft();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOnElementWithSelector(mobilePublishStoryButton);
-    } else {
-      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
-      await this.clickOnElementWithSelector(publishStoryButton);
-      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
-    }
+    await this.publishStoryDraft();
   }
 
   /**
@@ -2258,7 +2270,21 @@ export class CurriculumAdmin extends TopicManager {
    */
   async editClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.page.waitForSelector(classroomTileSelector);
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        const tiles = Array.from(document.querySelectorAll(selector));
+        return tiles.some(tile => {
+          const span =
+            tile.querySelector('.e2e-test-classroom-tile-name') ||
+            tile.querySelector('span');
+          return span && span.textContent?.trim() === name;
+        });
+      },
+      {},
+      classroomTileSelector,
+      classroomName
+    );
+
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
@@ -2294,13 +2320,18 @@ export class CurriculumAdmin extends TopicManager {
    */
   async createNewClassroom(
     classroomName: string,
-    urlFragment: string
+    urlFragment: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.clickOnElementWithSelector(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputField, classroomName);
     await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
+    await this.page.type(
+      newClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
     await this.clickOnElementWithSelector(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -2313,6 +2344,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} topicListIntro - The topic list intro of the classroom.
    * @param {string} courseDetails - The course details of the classroom.
    * @param {string} url - The URL of the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} thumbnailImage - The thumbnail image of the classroom.
    * @param {string} bannerImage - The banner image of the classroom.
    */
@@ -2323,7 +2355,8 @@ export class CurriculumAdmin extends TopicManager {
     courseDetails: string,
     url?: string,
     thumbnailImage: string = curriculumAdminThumbnailImage,
-    bannerImage: string = classroomBannerImage
+    bannerImage: string = classroomBannerImage,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
@@ -2336,6 +2369,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
       await this.page.type(editClassroomUrlFragmentInputField, url);
     }
+
+    await this.clearAllTextFrom(editClassroomFeedbackRecipientInputField);
+    await this.page.type(
+      editClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
 
     await this.clearAllTextFrom(editClassroomTeaserTextInputField);
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
@@ -2439,8 +2478,49 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
-    await this.clickOnElementWithSelector(topicSelector);
+
+    await this.page.waitForSelector(topicSelector, {visible: true});
+    const options = await this.page.$$(topicSelector);
+    let foundOption = false;
+
+    for (const option of options) {
+      const text = await option.evaluate(el => el.textContent?.trim());
+      if (text === topicName) {
+        await this.clickOnElement(option);
+        foundOption = true;
+        break;
+      }
+    }
+
+    if (!foundOption) {
+      throw new Error(`Could not find topic option matching: ${topicName}`);
+    }
+
     await this.page.waitForSelector(openTopicDropdownButton);
+
+    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
+
+    // Increased timeout to 60s because addTopicId makes an async API call that can take time.
+    await this.page.waitForFunction(
+      (
+        topicBoxSelector: string,
+        topicNameSelector: string,
+        expectedTopicName: string
+      ) => {
+        const topicBoxElements = document.querySelectorAll(topicBoxSelector);
+        for (const element of topicBoxElements) {
+          const topicNameElement = element.querySelector(topicNameSelector);
+          if (topicNameElement?.textContent?.trim() === expectedTopicName) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {timeout: 60000},
+      classroomTopicBoxSelector,
+      classroomTopicNameSelector,
+      topicName
+    );
 
     for (const prerequisiteTopic of prerequisiteTopics) {
       await this.addPrerequisiteTopicForATopicInClassroom(
@@ -2958,7 +3038,7 @@ export class CurriculumAdmin extends TopicManager {
           const element = document.querySelector(selector);
           return (element as HTMLInputElement).checked === true;
         },
-        {},
+        {timeout: 60000},
         practiceTabToggle
       );
     } catch (error) {
@@ -2971,14 +3051,22 @@ export class CurriculumAdmin extends TopicManager {
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
-   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback
+   * recipient email of the classroom
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned
+   * to the classroom.
    */
   async createAndPublishClassroom(
     classroomName: string,
     urlFragment: string,
-    topicToBeAssigned: string
+    topicToBeAssigned: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
-    await this.createNewClassroom(classroomName, urlFragment);
+    await this.createNewClassroom(
+      classroomName,
+      urlFragment,
+      feedbackRecipientEmail
+    );
     await this.updateClassroom(
       classroomName,
       'Welcome to Math classroom!',

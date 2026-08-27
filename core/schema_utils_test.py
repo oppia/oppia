@@ -21,7 +21,7 @@ from __future__ import annotations
 import inspect
 import re
 
-from core import schema_utils
+from core import schema_utils, utils
 from core.tests import test_utils
 
 from typing import Any, Dict, List, Tuple
@@ -724,7 +724,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
+            with self.assertRaisesRegex(
+                (AssertionError, KeyError, utils.InvalidInputException),
+                error_msg,
+            ):
                 validate_schema(schemas)  # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self) -> None:
@@ -786,6 +789,22 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_algebraic_expression('a+b*2'))
         self.assertTrue(is_valid_algebraic_expression('3+4/2'))
         self.assertFalse(is_valid_algebraic_expression('3+4/a*'))
+
+    def test_normalize_against_schema_raises_invalid_input_exception(
+        self,
+    ) -> None:
+        """Tests normalize_against_schema raises InvalidInputException when
+        custom validator fails.
+        """
+        schema = {
+            'type': 'unicode',
+            'validators': [{'id': 'does_not_contain_email'}],
+        }
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            r'^Validation failed: does_not_contain_email .* email@email.com$',
+        ):
+            schema_utils.normalize_against_schema('email@email.com', schema)
 
     def test_is_valid_numeric_expression_validator(self) -> None:
         """Tests for the is_valid_numeric_expression static method with
@@ -1446,6 +1465,24 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ' \'https://\'; received www.oppia.org',
         ):
             sanitize_url('www.oppia.org')
+
+    def test_weak_multiple_schema(self) -> None:
+        """Tests normalization and error handling for weak_multiple schema."""
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_WEAK_MULTIPLE,
+            'options': ['int', 'basestring'],
+        }
+
+        self.assertEqual(schema_utils.normalize_against_schema(1, schema), 1)
+        self.assertEqual(
+            schema_utils.normalize_against_schema('hello', schema), 'hello'
+        )
+
+        # Type not in options raises an exception.
+        with self.assertRaisesRegex(
+            Exception, 'Type of None is not present in options'
+        ):
+            schema_utils.normalize_against_schema(None, schema)
 
 
 class ValidateArgumentHavingSpecificClass(test_utils.GenericTestBase):

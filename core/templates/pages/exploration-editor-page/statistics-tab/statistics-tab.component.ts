@@ -32,6 +32,7 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {RouterService} from '../services/router.service';
 import {StateStatsModalComponent} from './templates/state-stats-modal.component';
 
+import './statistics-tab.component.css';
 interface PieChartOptions {
   chartAreaWidth: number;
   colors: string[];

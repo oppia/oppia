@@ -24,6 +24,7 @@ import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
+import './image-uploader.component.css';
 
 export interface ImageUploaderParameters {
   disabled: boolean;
@@ -51,6 +52,7 @@ export interface ImageUploaderData {
 @Component({
   selector: 'oppia-image-uploader',
   templateUrl: './image-uploader.component.html',
+  styleUrls: ['./image-uploader.component.css'],
 })
 export class ImageUploaderComponent implements OnInit {
   @Output() imageSave: EventEmitter<ImageUploaderData> = new EventEmitter();

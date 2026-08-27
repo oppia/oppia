@@ -26,8 +26,26 @@ var ExplorationEditorHistoryTab = function () {
    * Interactive elements
    */
   var historyGraph = $('.e2e-test-history-graph');
-  var codeMirrorElementSelector = function () {
-    return $$('.CodeMirror-code');
+  var codeMirrorMergePaneElementSelector = function () {
+    return $$('.CodeMirror-merge .CodeMirror-merge-pane .CodeMirror-code');
+  };
+  var getCodeMirrorMergePaneElement = async function (paneIndex) {
+    await browser.waitUntil(
+      async function () {
+        var elements = await codeMirrorMergePaneElementSelector();
+        return elements.length >= 2;
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: 'CodeMirror merge panes took too long to appear.',
+      }
+    );
+    var elements = await codeMirrorMergePaneElementSelector();
+    var firstPaneIndex = elements.length - 2;
+    if (paneIndex === 'left') {
+      return elements[firstPaneIndex];
+    }
+    return elements[firstPaneIndex + 1];
   };
   var toastSuccessElement = $('.toast-success');
   var firstVersionDropdown = $('.e2e-test-history-version-dropdown-first');
@@ -264,13 +282,14 @@ var ExplorationEditorHistoryTab = function () {
        *                     - highlighted: true or false
        */
       expectTextToMatch: async function (v1StateContents, v2StateContents) {
-        var codeMirrorElement = await codeMirrorElementSelector();
-        var lastElement = codeMirrorElement.length - 1;
+        var leftCodeMirrorElement = await getCodeMirrorMergePaneElement('left');
+        var rightCodeMirrorElement =
+          await getCodeMirrorMergePaneElement('right');
         await forms
-          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextToBe(v1StateContents);
         await forms
-          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .CodeMirrorChecker(rightCodeMirrorElement, 'last')
           .expectTextToBe(v2StateContents);
       },
       /*
@@ -288,13 +307,14 @@ var ExplorationEditorHistoryTab = function () {
         v1StateContents,
         v2StateContents
       ) {
-        var codeMirrorElement = await codeMirrorElementSelector();
-        var lastElement = codeMirrorElement.length - 1;
+        var leftCodeMirrorElement = await getCodeMirrorMergePaneElement('left');
+        var rightCodeMirrorElement =
+          await getCodeMirrorMergePaneElement('right');
         await forms
-          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextWithHighlightingToBe(v1StateContents);
         await forms
-          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .CodeMirrorChecker(rightCodeMirrorElement, 'last')
           .expectTextWithHighlightingToBe(v2StateContents);
       },
     };

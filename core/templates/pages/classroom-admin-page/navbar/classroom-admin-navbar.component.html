@@ -1,8 +1,8 @@
 <div>
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-classroom-admin" role="navigation">
     <div class="navbar-container oppia-navbar-container">
-      <div class="navbar-header e2e-test-navbar-header float-left">
-        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+      <div class="navbar-header e2e-test-navbar-header float-start">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-start"
            href="/community-library"
            [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
@@ -20,13 +20,13 @@
           </li>
         </ul>
       </div>
-      <div class="navbar-header float-right">
+      <div class="navbar-header float-end">
         <ul class="nav oppia-navbar-nav oppia-navbar-profile-classroom-admin">
           <li>
             <ul class="nav oppia-navbar-tabs-classroom-admin">
-              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
+              <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : profileDropdownIsActive}">
                 <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-toggle="dropdown"
+                   data-bs-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
                   <picture *ngIf="profilePicturePngDataUrl">
@@ -75,51 +75,3 @@
     </div>
   </nav>
 </div>
-<style>
-  .oppia-navbar-profile-classroom-admin .open > a,
-  .nav > li > a:focus,
-  .oppia-navbar-profile-classroom-admin > li > a:hover,
-  .oppia-navbar-profile-classroom-admin > li > a:focus,
-  .oppia-navbar-tabs-classroom-admin > li > a:hover,
-  .oppia-navbar-profile-classroom-admin .open > a:hover,
-  .oppia-navbar-profile-classroom-admin .open > a:focus,
-  .oppia-navbar-tabs-classroom-admin > li > a.active,
-  .oppia-classroom-admin-page-dropdown-icon {
-    background-color: #fff;
-    color: #00645c;
-  }
-  .oppia-navbar-tabs-classroom-admin .dropdown-toggle::after {
-    color: #fff;
-  }
-  .oppia-navbar-classroom-admin {
-    top: 0;
-  }
-  .oppia-navbar-tabs-classroom-admin:hover .dropdown-toggle::after,
-  .oppia-navbar-tabs-classroom-admin:focus .dropdown-toggle::after {
-    color: #00645c;
-  }
-  .navbar-container.oppia-navbar-container {
-    background-color: #00645c;
-  }
-  .nav .dropdown:hover > .dropdown-menu > li > a.oppia-dropdown-item-text {
-    color: #00645c;
-  }
-  .oppia-dropdown-toggle-icon {
-    margin-top: -1px;
-  }
-  @media screen and (max-width: 710px) {
-    .oppia-classroom-admin-page-dropdown {
-      display: block;
-    }
-    .oppia-hide-in-small-width-screens {
-      display: none;
-    }
-  }
-  @media screen and (min-width: 711px) {
-    .oppia-classroom-admin-page-dropdown,
-    .oppia-classroom-admin-page-dropdown-icon,
-    .oppia-classroom-admin-page-dropdown-menu {
-      display: none;
-    }
-  }
-</style>

@@ -32,6 +32,7 @@ import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssignSkillToTopicModalComponent} from '../modals/assign-skill-to-topic-modal.component';
 import {DeleteSkillModalComponent} from '../modals/delete-skill-modal.component';
+import './skills-list.component.css';
 import {
   TopicAssignmentsSummary,
   UnassignSkillFromTopicsModalComponent,
@@ -51,6 +52,7 @@ interface MergeModalResult {
 @Component({
   selector: 'oppia-skills-list',
   templateUrl: './skills-list.component.html',
+  styleUrls: ['./skills-list.component.css'],
 })
 export class SkillsListComponent {
   // These properties below are initialized using Angular lifecycle hooks

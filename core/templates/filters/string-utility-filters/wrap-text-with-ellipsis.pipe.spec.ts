@@ -28,7 +28,7 @@ describe('Testing filters', function () {
       providers: [WrapTextWithEllipsisPipe, NormalizeWhitespacePipe],
     });
 
-    wrapTextWithEllipsis = TestBed.get(WrapTextWithEllipsisPipe);
+    wrapTextWithEllipsis = TestBed.inject(WrapTextWithEllipsisPipe);
   });
 
   it('should wrap text with ellipses based on its length', () => {

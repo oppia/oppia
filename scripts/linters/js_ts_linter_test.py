@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import multiprocessing
 import os
-import shutil
 import subprocess
 
 from core.tests import test_utils
@@ -42,12 +41,6 @@ VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 INVALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts'
-)
-VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'valid_ignored.service.ts'
-)
-VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'valid_unlisted.service.ts'
 )
 
 
@@ -153,20 +146,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = ['SUCCESS  ESLint check passed']
         self.validate(lint_task_report, expected_messages, 0)
 
-    def test_custom_linter_with_no_files(self) -> None:
-        lint_task_report = js_ts_linter.JsTsLintChecksManager(
-            [], [], FILE_CACHE
-        ).perform_all_lint_checks()
-        self.assertEqual(
-            [
-                'There are no JavaScript or Typescript files to lint.',
-                'SUCCESS  JS TS lint check passed',
-            ],
-            lint_task_report[0].get_report(),
-        )
-        self.assertEqual('JS TS lint', lint_task_report[0].name)
-        self.assertFalse(lint_task_report[0].failed)
-
     def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             []
@@ -181,99 +160,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_angular_services_index_error(self) -> None:
-        def mock_compile_all_ts_files() -> None:
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s'
-                'scripts/linters/test_files/ -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*'
-            ) % (
-                js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
-                'true',
-                'es2017,dom',
-                'true',
-                'true',
-                'es5',
-                './node_modules/@types',
-                VALID_UNLISTED_SERVICE_PATH,
-            )
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
-        )
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True
-        )
-
-        angular_services_index_path = (
-            './core/templates/services/angular-services.index.ts'
-        )
-        class_name = 'UnlistedService'
-        service_name_type_pair = '[\'%s\', %s]' % (class_name, class_name)
-        expected_messages = [
-            'Please import %s to Angular Services Index file in %s'
-            'from %s'
-            % (
-                class_name,
-                angular_services_index_path,
-                VALID_UNLISTED_SERVICE_PATH,
-            ),
-            'Please add the pair %s to the angularServices in %s'
-            % (service_name_type_pair, angular_services_index_path),
-        ]
-        self.validate(lint_task_report, expected_messages, 1)
-
-    def test_angular_services_index_success(self) -> None:
-        def mock_compile_all_ts_files() -> None:
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s'
-                'scripts/linters/test_files/ -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*'
-            ) % (
-                js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
-                'true',
-                'es2017,dom',
-                'true',
-                'true',
-                'es5',
-                './node_modules/@types',
-                VALID_IGNORED_SERVICE_PATH,
-            )
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
-        )
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [],
-                [VALID_IGNORED_SERVICE_PATH],
-                FILE_CACHE,
-            ).perform_all_lint_checks()
-
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True
-        )
-
-        expected_messages = [
-            'SUCCESS  Angular Services Index file check passed'
-        ]
-        self.validate(lint_task_report, expected_messages, 0)
-
     def test_get_linters_with_success(self) -> None:
-        custom_linter, third_party = js_ts_linter.get_linters(
-            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH], FILE_CACHE
-        )
-        self.assertTrue(
-            isinstance(custom_linter, js_ts_linter.JsTsLintChecksManager)
+        third_party, _ = js_ts_linter.get_linters(
+            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH]
         )
         self.assertTrue(
             isinstance(
@@ -428,3 +317,43 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
         self.assertEqual(lint_task_report[0].name, 'ESLint')
         self.assertEqual(lint_task_report[0].trimmed_messages, [])
+
+    def test_validate_eslint_failure(self) -> None:
+        """A test that validates ESLint failure."""
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        mock_output = f"""
+        {INVALID_TS_FILEPATH}
+        10:5  error  Something bad  @typescript-eslint/no-unused-vars
+        11:3  error  Another issue  @typescript-eslint/no-redeclare
+
+        ✖ 2 problems (2 errors, 0 warnings)
+        """
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(
+                returncode=1, stdout=mock_output.encode('utf-8'), stderr=b''
+            )
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        expected_messages = [
+            '10:5    Something bad',
+            '11:3    Another issue',
+        ]
+
+        self.validate(
+            lint_task_report=lint_task_report,
+            expected_messages=expected_messages,
+            failed_count=1,
+        )

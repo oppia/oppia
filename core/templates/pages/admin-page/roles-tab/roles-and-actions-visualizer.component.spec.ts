@@ -42,7 +42,7 @@ describe('Roles and actions visualizer component', function () {
       providers: [UrlInterpolationService],
     }).compileComponents();
     fixture = TestBed.createComponent(RolesAndActionsVisualizerComponent);
-    adminBackendApiService = TestBed.get(AdminBackendApiService);
+    adminBackendApiService = TestBed.inject(AdminBackendApiService);
     component = fixture.componentInstance;
     component.viewableRoles = ['MODERATOR', 'TRANSLATION_ADMIN'];
     component.humanReadableRoles = {

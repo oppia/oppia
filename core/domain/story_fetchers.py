@@ -26,11 +26,13 @@ import copy
 import itertools
 
 from core import feconf
+from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
     exp_fetchers,
     story_domain,
+    topic_domain,
     topic_fetchers,
     user_services,
 )
@@ -42,7 +44,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
-(story_models, user_models) = models.Registry.import_models(
+story_models, user_models = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER]
 )
 
@@ -708,9 +710,13 @@ def get_pending_and_all_nodes_in_story(
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
+    all_nodes = []
 
+    for node in story.story_contents.nodes:
+        if node.status != constants.STORY_NODE_STATUS_DRAFT:
+            all_nodes.append(node)
     return {
-        'all_nodes': story.story_contents.nodes,
+        'all_nodes': all_nodes,
         'pending_nodes': pending_nodes,
     }
 
@@ -759,3 +765,41 @@ def get_node_index_by_story_id_and_node_id(story_id: str, node_id: str) -> int:
 
     node_index = story.story_contents.get_node_index(node_id)
     return node_index
+
+
+def get_all_nodes_for_topic(
+    topic: topic_domain.Topic,
+) -> List[story_domain.StoryNode]:
+    """Returns nodes from the first published story in the topic.
+
+    Args:
+        topic: Topic. The topic object.
+
+    Returns:
+        list(StoryNode). Nodes from the first published story in order.
+    """
+    story_ids = topic.get_canonical_story_ids(include_only_published=True)
+    stories = get_stories_by_ids(story_ids)
+    for story in stories:
+        if story is not None:
+            return story.story_contents.nodes
+    return []
+
+
+def get_all_arcs_with_stories_for_topic(
+    topic: topic_domain.Topic,
+) -> List[Tuple[story_domain.Story, story_domain.Arc]]:
+    """Returns arcs paired with the first published story in the topic.
+
+    Args:
+        topic: Topic. The topic object.
+
+    Returns:
+        list(tuple(Story, Arc)). Story-arc pairs from the first published story.
+    """
+    story_ids = topic.get_canonical_story_ids(include_only_published=True)
+    stories = get_stories_by_ids(story_ids)
+    for story in stories:
+        if story is not None:
+            return [(story, arc) for arc in story.story_contents.arcs]
+    return []

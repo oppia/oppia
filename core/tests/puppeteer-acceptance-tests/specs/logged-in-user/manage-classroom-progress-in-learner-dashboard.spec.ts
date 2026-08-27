@@ -34,71 +34,78 @@ describe('Logged-in User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculumAdmin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
+  beforeAll(
+    async function () {
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculumAdmin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
 
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
+      releaseCoordinator = await UserFactory.createNewUser(
+        'releaseCoordinator',
+        'release_coordinator@example.com',
+        [ROLES.RELEASE_COORDINATOR]
+      );
 
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
+      await releaseCoordinator.enableFeatureFlag(
+        'show_redesigned_learner_dashboard'
+      );
 
-    await curriculumAdmin.createNewClassroom('Math', 'math');
-    await curriculumAdmin.updateClassroom(
-      'Math',
-      'Welcome to Math classroom!',
-      'This course covers basic operations.',
-      'In this course, you will learn the following topics: Place Values.'
-    );
+      await curriculumAdmin.createNewClassroom('Math', 'math');
+      await curriculumAdmin.updateClassroom(
+        'Math',
+        'Welcome to Math classroom!',
+        'This course covers basic operations.',
+        'In this course, you will learn the following topics: Place Values.'
+      );
 
-    await curriculumAdmin.createAndPublishTopic(
-      'Place Values',
-      'Place Values subtopics',
-      'Place Values skills'
-    );
-    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-    await curriculumAdmin.publishClassroom('Math');
+      await curriculumAdmin.createAndPublishTopic(
+        'Place Values',
+        'Place Values subtopics',
+        'Place Values skills'
+      );
+      await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+      await curriculumAdmin.publishClassroom('Math');
 
-    const placeValueChapters = [
-      'What are the Place Values',
-      'Find the Value of a Number',
-      'Comparing Numbers',
-    ];
+      const placeValueChapters = [
+        'What are the Place Values',
+        'Find the Value of a Number',
+        'Comparing Numbers',
+      ];
 
-    const chapterIds: (string | null)[] = [];
+      const chapterIds: (string | null)[] = [];
 
-    for (const chapter of placeValueChapters) {
-      const id =
-        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
-      chapterIds.push(id);
-    }
+      for (const chapter of placeValueChapters) {
+        const id =
+          await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+        chapterIds.push(id);
+      }
 
-    await curriculumAdmin.addStoryToTopic(
-      "Jamie's Adventures in the Arcade",
-      'story',
-      'Place Values'
-    );
+      await curriculumAdmin.addStoryToTopic(
+        "Jamie's Adventures in the Arcade",
+        'story',
+        'Place Values'
+      );
 
-    for (const [index, id] of chapterIds.entries()) {
-      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
-    }
+      for (const [index, id] of chapterIds.entries()) {
+        await curriculumAdmin.addChapter(
+          placeValueChapters[index],
+          id as string
+        );
+      }
 
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
+      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.publishStoryDraft();
 
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser1',
-      'logged_in_user1@example.com'
-    );
-  }, 600000);
+      loggedInUser = await UserFactory.createNewUser(
+        'loggedInUser1',
+        'logged_in_user1@example.com'
+      );
+    },
+    // Setup takes about 12 minutes to complete.
+    12 * 60 * 1000
+  );
 
   /**
    * TODO(#22070): Add tests for home tab. Interactions involving recommended

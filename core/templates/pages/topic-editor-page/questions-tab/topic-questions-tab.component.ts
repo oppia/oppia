@@ -29,10 +29,12 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import './topic-questions-tab.component.css';
 
 @Component({
   selector: 'oppia-topic-questions-tab',
   templateUrl: './topic-questions-tab.component.html',
+  styleUrls: ['./topic-questions-tab.component.css'],
 })
 export class TopicQuestionsTabComponent
   implements OnInit, AfterViewInit, OnDestroy
@@ -82,7 +84,7 @@ export class TopicQuestionsTabComponent
         this.getSkillsCategorizedByTopics = response.categorizedSkillsDict;
         this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
-    this.canEditQuestion = this.topicRights.canEditTopic();
+    this.canEditQuestion = this.topicRights.canEditQuestion();
     this.questionEditorOpened =
       this.topicEditorStateService.isQuestionEditorOpened();
     this.newQuestionEditor = this.topicEditorStateService.isNewQuestionEditor();
