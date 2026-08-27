@@ -181,7 +181,7 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.clickLessonFeedbackButton(false);
     showMessage('Clicked on "Send Lesson Feedback" button.');
     await loggedOutLearner.expectFeedbackModalSubHeaderToBe(
-      'Create a free profile to send direct recommendations, track creator responses, and save your checkpoint milestones permanently!'
+      'Create a free profile to send direct recommendations, track creator responses and save your checkpoint milestones permanently!'
     );
     await loggedOutLearner.expectScreenshotToMatch(
       'sendALessonFeedbackModal',
