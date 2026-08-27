@@ -221,7 +221,8 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN_PAGE
+      .ROUTE,
     loadChildren: () =>
       import('pages/classroom-admin-page/classroom-admin-page.module').then(
         m => m.ClassroomAdminPageModule

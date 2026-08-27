@@ -441,7 +441,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
     def test_patch_lighthouse_target_manager_success(self) -> None:
         file_contents = (
-            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;"
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;'
         )
         temp_file_path: str
         with tempfile.NamedTemporaryFile(
@@ -453,14 +453,22 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
         swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
 
+        # Capture the real open before swapping builtins.open below; otherwise
+        # this mock would call itself recursively when reading the patched
+        # target-manager.js file.
+        real_open = open
+
+        # Here we use object because open() can receive arbitrary positional
+        # and keyword arguments whose concrete types are not relevant to the
+        # mock for this test.
         def mock_open(
-            path: str, mode: str = 'r', **unused_kwargs: object
+            unused_path: str, mode: str = 'r', **unused_kwargs: object
         ) -> object:
-            return open(temp_file_path, mode)
+            return real_open(temp_file_path, mode, encoding='utf-8')
 
         swap_open = self.swap(builtins, 'open', mock_open)
         with self.print_swap, swap_isfile, swap_join, swap_open:
-            run_lighthouse_tests._patch_lighthouse_target_manager()
+            run_lighthouse_tests._patch_lighthouse_target_manager()  # pylint: disable=protected-access
 
         with open(temp_file_path, 'r', encoding='utf-8') as read_file:
             patched = read_file.read()
@@ -477,7 +485,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 RuntimeError, 'Could not find Lighthouse target-manager.js'
             ):
-                run_lighthouse_tests._patch_lighthouse_target_manager()
+                run_lighthouse_tests._patch_lighthouse_target_manager()  # pylint: disable=protected-access
 
     def test_patch_lighthouse_target_manager_substitution_not_found(
         self,
@@ -491,10 +499,18 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
         swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
 
+        # Capture the real open before swapping builtins.open below; otherwise
+        # this mock would call itself recursively when reading the patched
+        # target-manager.js file.
+        real_open = open
+
+        # Here we use object because open() can receive arbitrary positional
+        # and keyword arguments whose concrete types are not relevant to the
+        # mock for this test.
         def mock_open(
-            path: str, mode: str = 'r', **unused_kwargs: object
+            unused_path: str, mode: str = 'r', **unused_kwargs: object
         ) -> object:
-            return open(temp_file_path, mode)
+            return real_open(temp_file_path, mode, encoding='utf-8')
 
         swap_open = self.swap(builtins, 'open', mock_open)
         with self.print_swap, swap_isfile, swap_join, swap_open:
@@ -502,7 +518,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 RuntimeError,
                 'the expected upstream source line was not found',
             ):
-                run_lighthouse_tests._patch_lighthouse_target_manager()
+                run_lighthouse_tests._patch_lighthouse_target_manager()  # pylint: disable=protected-access
         os.remove(temp_file_path)
 
     def test_run_lighthouse_checks_succesfully(self) -> None:
