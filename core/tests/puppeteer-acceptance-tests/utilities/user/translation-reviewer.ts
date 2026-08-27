@@ -315,7 +315,13 @@ export class TranslationReviewer extends BaseUser {
    * Clicks on update translation button.
    */
   async clickOnUpdateTranslationButton(): Promise<void> {
-    await this.clickOnElementWithSelector(updateTranslationBtnSelector);
+    const updateBtn = await this.page.waitForSelector(
+      updateTranslationBtnSelector
+    );
+    if (!updateBtn) {
+      throw new Error('Update translation button not found.');
+    }
+    await updateBtn.evaluate(el => (el as HTMLElement).click());
     await this.expectElementToBeVisible(updateTranslationBtnSelector, false);
   }
 

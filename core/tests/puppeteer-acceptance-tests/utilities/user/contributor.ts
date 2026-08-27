@@ -411,7 +411,11 @@ export class Contributor extends ExplorationEditor {
       await this.waitForPageToFullyLoad();
     }
 
-    await this.clickOnElementWithSelector(selectedOptionSelector);
+    const dropdown = await this.page.waitForSelector(selectedOptionSelector);
+    if (!dropdown) {
+      throw new Error(`Dropdown ${selectedOptionSelector} not found.`);
+    }
+    await dropdown.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
@@ -434,7 +438,7 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Click on the option.
-    await optionElement.click();
+    await optionElement.evaluate(el => (el as HTMLElement).click());
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedOptionSelector, contributionType);
@@ -445,7 +449,11 @@ export class Contributor extends ExplorationEditor {
    * @param {string} topicName - The name of the topic to filter by.
    */
   async filterContentByTopic(topicName: string): Promise<void> {
-    await this.clickOnElementWithSelector(topicSelector);
+    const dropdown = await this.page.waitForSelector(topicSelector);
+    if (!dropdown) {
+      throw new Error(`Dropdown ${topicSelector} not found.`);
+    }
+    await dropdown.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const optionElements = await this.page.$$(topicOptionSelector);
@@ -464,7 +472,7 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Click on the option.
-    await optionElement.click();
+    await optionElement.evaluate(el => (el as HTMLElement).click());
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, topicName);
@@ -709,7 +717,15 @@ export class Contributor extends ExplorationEditor {
       tooltipMessage
     );
 
-    await this.clickOnElementWithSelector(languageDropdownToggleArrowSelector);
+    const dropdownToggle = await this.page.waitForSelector(
+      languageDropdownToggleArrowSelector
+    );
+    if (!dropdownToggle) {
+      throw new Error(
+        `Dropdown toggle ${languageDropdownToggleArrowSelector} not found.`
+      );
+    }
+    await dropdownToggle.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(languageOptionSelector, false);
   }
