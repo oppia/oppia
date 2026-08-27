@@ -437,6 +437,85 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH),
         )
 
+    def test_get_lighthouse_environment_prepends_lighthouse_node(self) -> None:
+        environ_swap = self.swap(
+            os, 'environ', {'PATH': '/original/path', 'HOME': '/home'}
+        )
+        with environ_swap:
+            env = run_lighthouse_tests._get_lighthouse_environment()
+
+        self.assertEqual(
+            env['PATH'].split(os.pathsep)[0],
+            os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH),
+        )
+        self.assertIn('/original/path', env['PATH'])
+        self.assertEqual(env['HOME'], '/home')
+
+    def test_patch_lighthouse_target_manager_success(self) -> None:
+        file_contents = (
+            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;"
+        )
+        temp_file_path: str
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.js', delete=False
+        ) as f:
+            f.write(file_contents)
+            temp_file_path = f.name
+
+        swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
+
+        def mock_open(
+            unused_path: str, mode: str = 'r', encoding: str = 'utf-8'
+        ) -> object:
+            return open(temp_file_path, mode, encoding=encoding)
+
+        swap_open = self.swap(builtins, 'open', mock_open)
+        with self.print_swap, swap_join, swap_open:
+            run_lighthouse_tests._patch_lighthouse_target_manager()
+
+        with open(temp_file_path, 'r', encoding='utf-8') as read_file:
+            patched = read_file.read()
+        self.assertIn('/Not allowed/.test(err.message)', patched)
+        self.assertIn(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.',
+            self.print_arr,
+        )
+        os.remove(temp_file_path)
+
+    def test_patch_lighthouse_target_manager_when_already_patched(
+        self,
+    ) -> None:
+        file_contents = (
+            "if (/'Target.getTargetInfo' wasn't found/.test(err)) return;\n"
+            '      if (/Not allowed/.test(err.message)) return;'
+        )
+        temp_file_path: str
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.js', delete=False
+        ) as f:
+            f.write(file_contents)
+            temp_file_path = f.name
+
+        swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
+
+        def mock_open(
+            unused_path: str, mode: str = 'r', encoding: str = 'utf-8'
+        ) -> object:
+            return open(temp_file_path, mode, encoding=encoding)
+
+        swap_open = self.swap(builtins, 'open', mock_open)
+        with self.print_swap, swap_join, swap_open:
+            run_lighthouse_tests._patch_lighthouse_target_manager()
+
+        with open(temp_file_path, 'r', encoding='utf-8') as read_file:
+            content = read_file.read()
+        self.assertEqual(content, file_contents)
+        self.assertNotIn(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.',
+            self.print_arr,
+        )
+        os.remove(temp_file_path)
+
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
             returncode = 0

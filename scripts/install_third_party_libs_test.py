@@ -126,6 +126,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             **_kwargs: str,
         ) -> Ret:
             self.check_function_calls['check_call_is_called'] = True
+            # The mock records every command that install_third_party_libs
+            # runs. Tests that only care about the yarn install command still
+            # receive all other commands here (e.g. the pre-commit hook setup
+            # and git-clang-format), so these records are unused by those
+            # tests and are looked up via self.all_cmd_tokens.index().
             self.all_cmd_tokens.append(unused_cmd_tokens)
             self.all_envs.append(env)
             return Ret(0, (b'', b''))
