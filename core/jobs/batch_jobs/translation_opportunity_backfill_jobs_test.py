@@ -271,7 +271,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 'needs_update': False,
             }
 
-        # Here use cast because mypy infers the dictionary comprehension as a generic
+        # Here we use cast because mypy infers the dictionary comprehension as a generic
         # Dict instead of the required TranslatedContentDict type.
         translations_es = cast(
             Dict[str, translation_models.TranslatedContentDict],
