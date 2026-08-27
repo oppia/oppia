@@ -18,6 +18,7 @@
 
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 
 import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -113,11 +114,11 @@ describe('AdventureEndTestCardComponent', () => {
     );
     component.thumbnailUrl = '/assets/broken-thumbnail.png';
     fixture.detectChanges();
-    const thumbnail = fixture.nativeElement.querySelector(
-      '.adventure-end-test-card-image'
+    const thumbnail = fixture.debugElement.query(
+      By.css('.adventure-end-test-card-image')
     );
 
-    thumbnail.dispatchEvent(new Event('error'));
+    thumbnail.nativeElement.dispatchEvent(new Event('error'));
     fixture.detectChanges();
 
     expect(component.resolvedThumbnailUrl).toBe(
@@ -125,12 +126,14 @@ describe('AdventureEndTestCardComponent', () => {
     );
     expect(component.isThumbnailVisible).toBeTrue();
 
-    thumbnail.dispatchEvent(new Event('error'));
+    thumbnail.nativeElement.dispatchEvent(new Event('error'));
     fixture.detectChanges();
 
     expect(component.isThumbnailVisible).toBeFalse();
     expect(
-      thumbnail.classList.contains('adventure-end-test-card-image-hidden')
+      thumbnail.nativeElement.classList.contains(
+        'adventure-end-test-card-image-hidden'
+      )
     ).toBeTrue();
   });
 

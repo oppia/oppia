@@ -1009,27 +1009,6 @@ describe('TopicLessonCardComponent', () => {
     expect(componentRef.getLanguageDescription('xx')).toBe('xx');
   });
 
-  it('should return true for showCheckpointBar when not coming_soon and checkpoints exist', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 5;
-
-    expect(component.showCheckpointBar).toBeTrue();
-  });
-
-  it('should return false for showCheckpointBar when coming_soon', () => {
-    component.lessonProgressStatus = 'coming_soon';
-    component.totalCheckpointsCount = 5;
-
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
-  it('should return false for showCheckpointBar when no checkpoints', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 0;
-
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
   it('should emit startLessonClick with voiceover language query param when voiceover is selected', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';

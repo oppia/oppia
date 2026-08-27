@@ -45,7 +45,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 
 import constants from 'assets/constants';
@@ -79,8 +78,6 @@ interface LessonCardData {
   hasPracticeQuestions: boolean;
   nodeId: string;
   lessonProgressStatus: LessonProgressStatus;
-  totalCheckpointsCount: number;
-  visitedCheckpointsCount: number;
   isComingSoon: boolean;
   isPublished: boolean;
   isNewLabelVisible: boolean;
@@ -661,7 +658,7 @@ export class TopicStorySectionComponent
     }, 300);
   }
 
-  private scrollToMasteryChallenge(): void {
+  public scrollToMasteryChallenge(): void {
     setTimeout(() => {
       const el = document.querySelector('.mastery-challenge-card');
       if (el) {
@@ -695,7 +692,6 @@ export class TopicStorySectionComponent
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private questionBackendApiService: QuestionBackendApiService,
@@ -709,7 +705,6 @@ export class TopicStorySectionComponent
 
   ngOnInit(): void {
     this.populateFromInputs();
-    void this.loadChapterProgress();
     this.directiveSubscriptions.add(
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         this.topicSessionFallbackLanguageService.clearSelection();
@@ -735,9 +730,6 @@ export class TopicStorySectionComponent
     }
     if (changes.practiceSubtopicIds) {
       this.practiceCard = this.getPracticeCardData();
-    }
-    if (changes.storySummary && !changes.storySummary.firstChange) {
-      void this.loadChapterProgress();
     }
   }
 
@@ -788,82 +780,6 @@ export class TopicStorySectionComponent
     }
 
     return 'not_started';
-  }
-
-  private async loadChapterProgress(): Promise<void> {
-    const explorationIds = this.storySummary
-      .getAllNodes()
-      .map(node => node.getExplorationId())
-      .filter(id => id !== null) as string[];
-
-    if (explorationIds.length === 0) {
-      return;
-    }
-
-    try {
-      await this.chapterProgressLoaderService.loadChapterProgressForStory(
-        this.storySummary.getId(),
-        explorationIds
-      );
-    } catch {
-      return;
-    }
-
-    const allNodes = this.storySummary.getAllNodes();
-    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
-      const lessonProgressStatus = this.getLessonProgressStatus(node);
-
-      return {
-        lessonNumber: index + 1,
-        lessonTitle: node.getTitle(),
-        lessonDescription: node.getDescription(),
-        thumbnailUrl: this.getLessonThumbnailUrl(node),
-        startUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonStartUrl(node),
-        practiceUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonPracticeUrl(node.getId().split('_').pop() || ''),
-        skillIds: node.getAcquiredSkillIds(),
-        hasPracticeQuestions: false,
-        lessonProgressStatus,
-        nodeId: node.getId(),
-        isComingSoon: lessonProgressStatus === 'coming_soon',
-        isPublished: this.isChapterPublished(node),
-        isNewLabelVisible: this.isNewChapterLabelVisible(node),
-        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-        availableVoiceoverLanguageCodes:
-          node.getAvailableVoiceoverLanguageCodes(),
-        availableVoiceoverLanguageAccentDescriptions:
-          node.getAvailableVoiceoverLanguageAccentDescriptions(),
-        totalCheckpointsCount: 0,
-        visitedCheckpointsCount: 0,
-      };
-    });
-
-    allNodes.forEach((node, index) => {
-      const explorationId = node.getExplorationId();
-      if (explorationId) {
-        const summary =
-          this.chapterProgressLoaderService.getChapterProgressSummary(
-            explorationId
-          );
-        if (summary) {
-          this.lessonCards[index].totalCheckpointsCount =
-            summary.totalCheckpoints;
-          this.lessonCards[index].visitedCheckpointsCount =
-            summary.visitedCheckpoints;
-        }
-      }
-    });
-
-    this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.restoreSkippedAdventures();
-    this.updateVisibleSections();
-    this.practiceAvailabilityPending = this.loadPracticeQuestionAvailability();
-    this.maybeShowAdventureMasteredModal();
   }
 
   private buildAdventureGroups(allNodes: StoryNode[]): AdventureGroupData[] {
@@ -949,25 +865,7 @@ export class TopicStorySectionComponent
           node.getAvailableVoiceoverLanguageCodes(),
         availableVoiceoverLanguageAccentDescriptions:
           node.getAvailableVoiceoverLanguageAccentDescriptions(),
-        totalCheckpointsCount: 0,
-        visitedCheckpointsCount: 0,
       };
-    });
-
-    allNodes.forEach((node, index) => {
-      const explorationId = node.getExplorationId();
-      if (explorationId) {
-        const summary =
-          this.chapterProgressLoaderService.getChapterProgressSummary(
-            explorationId
-          );
-        if (summary) {
-          this.lessonCards[index].totalCheckpointsCount =
-            summary.totalCheckpoints;
-          this.lessonCards[index].visitedCheckpointsCount =
-            summary.visitedCheckpoints;
-        }
-      }
     });
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);

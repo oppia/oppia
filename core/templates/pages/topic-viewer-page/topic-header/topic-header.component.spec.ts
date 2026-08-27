@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   I18nLanguageCodeService,
@@ -95,10 +96,10 @@ describe('TopicHeaderComponent', () => {
     component.classroomUrlFragment = 'math';
     fixture.detectChanges();
 
-    const classroomBreadcrumb = fixture.nativeElement.querySelector(
-      '.topic-header-breadcrumbs-desktop a[href="/learn/math"]'
+    const classroomBreadcrumb = fixture.debugElement.query(
+      By.css('.topic-header-breadcrumbs-desktop a[href="/learn/math"]')
     );
-    expect(classroomBreadcrumb.textContent.trim()).toBe('Math');
+    expect(classroomBreadcrumb.nativeElement.textContent.trim()).toBe('Math');
   });
 
   it('should return /learn/<fragment> or /learn', () => {

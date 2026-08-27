@@ -68,8 +68,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() adventureAccentColor: string = '#00645c';
   @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus: LessonProgressStatus = 'not_started';
-  @Input() totalCheckpointsCount: number = 0;
-  @Input() visitedCheckpointsCount: number = 0;
   @Input() availableTextLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageAccentDescriptions: {
@@ -138,13 +136,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       }
       this.previousLessonProgressStatus = currentStatus;
     }
-  }
-
-  get showCheckpointBar(): boolean {
-    return (
-      this.lessonProgressStatus !== 'coming_soon' &&
-      this.totalCheckpointsCount > 0
-    );
   }
 
   get isComingSoonLesson(): boolean {
