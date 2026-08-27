@@ -24,6 +24,7 @@ from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
+    exp_fetchers,
     opportunity_services,
     rights_manager,
     skill_domain,
@@ -250,10 +251,52 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         self.assertEqual(model.entity_type, 'exploration')
         self.assertEqual(model.entity_id, self.exp_id)
         self.assertEqual(model.topic_ids, ['topic_id'])
-        # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
         self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
         self.assertEqual(model.translation_missing_reasons, {'hi': ['new']})
+
+    def test_creates_translation_opportunity_model_with_update_needed(
+        self,
+    ) -> None:
+        exp = exp_fetchers.get_exploration_by_id(self.exp_id)
+        translatable_contents = exp.get_translatable_contents_collection(
+            override_metadata_feature_flag=True
+        ).content_id_to_translatable_content
+
+        translations = {}
+        for content_id, content in translatable_contents.items():
+            translations[content_id] = {
+                'content_format': content.content_format.value,
+                'content_value': content.content_value,
+                'needs_update': False,
+            }
+
+        # Set a non-empty content to needs_update.
+        translations[feconf.EXPLORATION_TITLE_CONTENT_ID]['needs_update'] = True
+
+        translation_model = (
+            translation_models.EntityTranslationsModel.get_model(
+                feconf.TranslatableEntityType.EXPLORATION, self.exp_id, 1, 'hi'
+            )
+        )
+        translation_model.translations = translations
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.EXPLORATION, self.exp_id
+        )
+        self.assertIsNotNone(model)
+        self.assertEqual(model.translation_counts, {'hi': 3})
+        self.assertEqual(model.translation_missing_reasons, {'hi': ['update']})
 
     def test_translation_count_ignores_content_the_exploration_does_not_have(
         self,
@@ -405,6 +448,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
                 content_count=2,
                 incomplete_translation_language_codes=['hi'],
                 translation_counts={'hi': 1},
+                translation_missing_reasons={},
             )
         )
         skill_opportunity.update_timestamps()
@@ -958,9 +1002,9 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
             entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
             entity_id=self.exp_id,
             topic_ids=['topic_id'],
-            content_count=10,
+            content_count=4,
             incomplete_translation_language_codes=[],
-            translation_counts={},
+            translation_counts={'hi': 1},
             translation_missing_reasons={},
         )
         discrepant_model.update_timestamps()
@@ -975,16 +1019,16 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 1\n'
                         '- Orphaned in Datastore: 0\n'
-                        '- Total Content Count (Existing): 10\n'
+                        '- Total Content Count (Existing): 4\n'
                         '- Total Content Count (Computed): 4\n'
-                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
                         'Discrepancy for model exploration.exp_1: '
-                        'Existing (content_count=10, translation_counts={}, translation_missing_reasons={}), '
+                        'Existing (content_count=4, translation_counts={\'hi\': 1}, translation_missing_reasons={}), '
                         'Computed (content_count=4, translation_counts={\'hi\': 1}, translation_missing_reasons={\'hi\': [\'new\']})'
                     )
                 ),
@@ -1069,6 +1113,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                 content_count=2,
                 incomplete_translation_language_codes=['hi'],
                 translation_counts={'hi': 1},
+                translation_missing_reasons={},
             )
         )
         skill_opportunity.update_timestamps()
@@ -1379,6 +1424,7 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
             content_count=content_count,
             incomplete_translation_language_codes=['hi'],
             translation_counts=translation_counts,
+            translation_missing_reasons={},
         )
         model.update_timestamps()
         model.put()
@@ -1486,8 +1532,8 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
                 job_run_result.JobRunResult(
                     stderr=(
                         'Discrepancy for model skill.skill_1: '
-                        'Existing (content_count=10, translation_counts={}), '
-                        'Computed (content_count=1, translation_counts={})'
+                        'Existing (content_count=10, translation_counts={}, translation_missing_reasons={}), '
+                        'Computed (content_count=1, translation_counts={}, translation_missing_reasons={})'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -1529,6 +1575,7 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
                 content_count=4,
                 incomplete_translation_language_codes=['hi'],
                 translation_counts={'hi': 1},
+                translation_missing_reasons={},
             )
         )
         exp_opportunity.update_timestamps()

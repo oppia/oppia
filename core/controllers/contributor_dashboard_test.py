@@ -1706,6 +1706,88 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         }
         self.assertEqual(output, expected_output)
 
+    def test_handler_returns_update_needed_for_changed_source_content(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': 'add_written_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0',
+            1,
+            self.owner_id,
+            change_dict,
+            'description',
+        )
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id,
+            self.admin_id,
+            'Accepting suggestion',
+            None,
+        )
+
+        exp_services.update_exploration(
+            self.owner_id,
+            '0',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>A content to translate.</p>',
+                        },
+                    }
+                )
+            ],
+            'Changes content.',
+        )
+
+        output = self.get_json(
+            '/gettranslatabletexthandler',
+            params={'language_code': 'hi', 'exp_id': '0'},
+        )
+
+        expected_output = {
+            'version': 2,
+            'state_names_to_content_id_mapping': {
+                'Introduction': {
+                    'content_0': {
+                        'content_value': ('<p>A content to translate.</p>'),
+                        'content_id': 'content_0',
+                        'content_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None,
+                        'status': 'update_needed',
+                    }
+                },
+                'End State': {
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None,
+                        'status': 'new',
+                    }
+                },
+            },
+        }
+
+        self.assertEqual(output, expected_output)
+
 
 class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
     """Tests for MachineTranslationStateTextsHandler"""

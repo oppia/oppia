@@ -194,15 +194,17 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
                         translation_model
                     )
                 )
-                pending_contents = exp.get_all_contents_which_need_translations(
-                    entity_translation, override_metadata_feature_flag=True
-                ).values()
+                pending_contents = (
+                    entity.get_all_contents_which_need_translations(
+                        entity_translation, override_metadata_feature_flag=True
+                    ).values()
+                )
                 for content in pending_contents:
                     reasons.add(content.status.value)
                 if reasons:
-                    translation_missing_reasons[lang_code] = sorted(
-                        list(reasons)
-                    )
+                    translation_missing_reasons[
+                        translation_model.language_code
+                    ] = sorted(list(reasons))
 
             audio_language_codes = set(
                 language['id']
@@ -399,15 +401,17 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
             ):
                 yield ('discrepancy', 1)
                 yield (
-                    f'error_details: Discrepancy for model {opp_id}: '
-                    f'Existing (content_count={exist_model.content_count}, '
-                    f'translation_counts={exist_model.translation_counts}, '
-                    f'translation_missing_reasons='
-                    f'{exist_model.translation_missing_reasons}), '
-                    f'Computed (content_count={comp_model.content_count}, '
-                    f'translation_counts={comp_model.translation_counts}, '
-                    f'translation_missing_reasons='
-                    f'{comp_model.translation_missing_reasons})',
+                    (
+                        f'error_details: Discrepancy for model {opp_id}: '
+                        f'Existing (content_count={exist_model.content_count}, '
+                        f'translation_counts={exist_model.translation_counts}, '
+                        f'translation_missing_reasons='
+                        f'{exist_model.translation_missing_reasons}), '
+                        f'Computed (content_count={comp_model.content_count}, '
+                        f'translation_counts={comp_model.translation_counts}, '
+                        f'translation_missing_reasons='
+                        f'{comp_model.translation_missing_reasons})'
+                    ),
                     1,
                 )
             else:

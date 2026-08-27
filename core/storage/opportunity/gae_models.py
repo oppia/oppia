@@ -95,6 +95,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translation_missing_reasons': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_with_assigned_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_needing_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'reviewer_only_content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -339,6 +340,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translation_missing_reasons': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 

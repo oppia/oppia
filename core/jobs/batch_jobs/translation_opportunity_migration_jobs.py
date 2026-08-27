@@ -152,6 +152,17 @@ class BackfillTranslationMissingReasonsJob(base_jobs.JobBase):
         )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the backfill job.
+
+        This job uses ExplorationModels as input to backfill the missing
+        reasons for translations in TranslationOpportunityModels and
+        ExplorationOpportunitySummaryModels, writing the updated models
+        back to the datastore.
+
+        Returns:
+            PCollection. A PCollection of JobRunResult instances reporting
+            the outcomes of the job.
+        """
         exp_models_pcoll = (
             self.pipeline
             | 'Get all ExplorationModels'

@@ -173,7 +173,9 @@ def _construct_new_opportunity_summary_models(
                 opportunity_summary.incomplete_translation_language_codes
             ),
             translation_counts=opportunity_summary.translation_counts,
-            translation_missing_reasons=opportunity_summary.translation_missing_reasons,
+            translation_missing_reasons=(
+                opportunity_summary.translation_missing_reasons
+            ),
             language_codes_needing_voice_artists=(
                 opportunity_summary.language_codes_needing_voice_artists
             ),
@@ -779,7 +781,9 @@ def _construct_new_translation_opportunity_models(
                 opportunity.incomplete_translation_language_codes
             ),
             translation_counts=opportunity.translation_counts,
-            translation_missing_reasons=opportunity.translation_missing_reasons,
+            translation_missing_reasons=(
+                opportunity.translation_missing_reasons
+            ),
         )
         translation_opportunity_model_list.append(model)
 

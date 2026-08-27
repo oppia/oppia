@@ -103,15 +103,15 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
           ? opportunity.translationMissingReasons[languageCode]
           : [];
 
+      if (!this.userIsReviewer) {
+        totalCount -= reviewerOnlyContentCount;
+      }
+
       if (
         translationMissingReasons.length === 0 &&
         translationsCount + inReviewCount < totalCount
       ) {
         translationMissingReasons = ['new'];
-      }
-
-      if (!this.userIsReviewer) {
-        totalCount -= reviewerOnlyContentCount;
       }
 
       let progressPercentage = 0;
