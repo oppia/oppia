@@ -25,7 +25,7 @@ const PLAYWRIGHT_RESULTS_DIR = path.resolve(
 );
 
 const isMobile = process.env.MOBILE === 'true';
-const isCI = process.env.PROD_ENV === 'true';
+const isProd = process.env.PROD_ENV === 'true';
 
 export default defineConfig({
   expect: {
@@ -52,13 +52,13 @@ export default defineConfig({
   projects: isMobile
     ? [
         {
-          name: isCI ? 'prod-mobile' : 'dev-mobile',
+          name: isProd ? 'prod-mobile' : 'dev-mobile',
           use: {...devices['Pixel 7'], video: 'on'},
         },
       ]
     : [
         {
-          name: isCI ? 'prod-desktop' : 'dev-desktop',
+          name: isProd ? 'prod-desktop' : 'dev-desktop',
           use: {...devices['Desktop Chrome'], video: 'on'},
         },
       ],

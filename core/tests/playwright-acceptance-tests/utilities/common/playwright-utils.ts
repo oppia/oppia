@@ -684,6 +684,8 @@ export class BaseUser {
     await currentPage.mouse.move(-1, -1);
     await currentPage.waitForTimeout(5000);
 
+    const runningInCI = !!process.env.CI;
+
     const snapshotPath = test
       .info()
       .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
@@ -692,10 +694,16 @@ export class BaseUser {
       !fs.existsSync(snapshotPath) &&
       process.env.UPDATE_SNAPSHOTS !== 'true'
     ) {
-      throw new Error(
-        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
-          'Run with --update_snapshots to generate it.'
-      );
+      let errorMessage = `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}.`;
+      if (runningInCI) {
+        errorMessage +=
+          '\r\nBaselines cannot be generated in CI — this run only compares against existing ones.' +
+          ' Run the update-snapshots workflow to generate baselines for both dev and prod.';
+      } else {
+        errorMessage +=
+          '\r\nRun with --update_snapshots to generate it locally, then commit the new screenshot.';
+      }
+      throw new Error(errorMessage);
     }
 
     let failureTrigger = 0;
@@ -716,10 +724,25 @@ export class BaseUser {
       }
     }
 
-    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
-      maxDiffPixelRatio: failureTrigger,
-      ...options,
-    });
+    try {
+      await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+        maxDiffPixelRatio: failureTrigger,
+        ...options,
+      });
+    } catch (error) {
+      let errorMessage = (error as Error).message;
+      if (runningInCI) {
+        errorMessage +=
+          '\r\nDownload the playwright-report artifact from the GitHub workflow run to check the difference between the old' +
+          ' screenshot(s) and the new one(s). To download it, go to "Summary" of the CI job of the PR and find the "Artifacts" section.';
+      }
+      errorMessage +=
+        '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference' +
+        ' percentage across multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshot(s),' +
+        ' either run the update-snapshots workflow in CI (covers both dev and prod), or run locally with --update_snapshots' +
+        ' for dev-only baselines.';
+      throw new Error(errorMessage);
+    }
   }
 
   /**
