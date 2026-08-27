@@ -1782,6 +1782,8 @@ def delete_explorations(
     feedback_services.delete_threads_for_multiple_entities(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_ids
     )
+    if exploration_ids:
+        suggestion_services.regenerate_contributor_stats()
 
     # Remove from subscribers.
     taskqueue_services.defer(
