@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * https://docs.google.com/spreadsheets/d/17Y5yOGuy0y5YFPPCUF5fZAZjEyY60bq6J0lik6yH3KE/
  *
  * LO.16. Submit a platform defect report from a non-lesson page
  */
@@ -47,8 +47,20 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.navigateToAboutPage();
     await loggedOutLearner.scrollToBottomOfPage();
     await loggedOutLearner.openReportASiteIssueModalFromGlobalFooter(false);
-    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
     showMessage('Clicked on "Report a Website Issue" button.');
+
+    await loggedOutLearner.expectFeedbackModalSubHeaderToBe(
+      'Your report helps our engineering team fix website bugs.'
+    );
+    await loggedOutLearner.expectFeedbackTextareaPlaceholderToBe(
+      "What's broken? Let us know if an image is missing, a button isn't working, or text is overlapping."
+    );
+    await loggedOutLearner.expectLessonSpecificCategoryChipsToBePresent(false);
+    await loggedOutLearner.expectScreenshotDropZoneTextToBe(
+      'Drag an image into this area'
+    );
+    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
+
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModal',
       __dirname
@@ -88,7 +100,7 @@ describe('Logged-Out User', function () {
 
     // Should clear the screenshoterror by dropping a valid screenshot image into the box.
     await loggedOutLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    // In the screenshot, test is seen that all error messages are cleared.
+    await loggedOutLearner.expectFeedbackScreenshotPreviewToBePresent(true);
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterDroppingValidScreenshot',
       __dirname

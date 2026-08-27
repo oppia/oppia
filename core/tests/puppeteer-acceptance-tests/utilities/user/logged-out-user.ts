@@ -652,6 +652,9 @@ const mobileOpenOptionsButton = '.e2e-test-mobile-open-options-button';
 const lessonFeedbackButtonSelector = '.e2e-test-lesson-feedback-button';
 const lessonReportButtonSelector = '.e2e-test-lesson-report-button';
 const feedbackModaltextarea = '.e2e-test-feedback-modal-textarea';
+const feedbackCharacterCount = '.e2e-test-feedback-text-count';
+const lessonSpecificCategoryChips = '.e2e-test-flag-category-chips';
+const screenshotDropZoneSelector = '.e2e-test-screenshot-dropzone-text';
 const reportIssueTypoChipSelector = '.e2e-test-report-issue-typo-chip';
 const photoUploadErrorMessage = '.e2e-test-upload-error';
 const reportIssueConfusingOrIncorrectChipSelector =
@@ -665,6 +668,9 @@ const reportWebsiteIssueLink = '.e2e-test-report-website-issue-link';
 const feedbackCaptchaContainer = '.e2e-test-feedback-captcha-container';
 const cancelFeedbackUploadButtonSelector =
   '.e2e-test-cancel-feedback-upload-button';
+const feedbackScreenshotPreviewSelector =
+  '.e2e-test-feedback-screenshot-preview';
+const feedbackModalSubHeader = '.e2e-test-modal-subHeader';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6644,6 +6650,70 @@ export class LoggedOutUser extends BaseUser {
       cancelFeedbackUploadButtonSelector,
       false
     );
+  }
+
+  /**
+   * Checks if the sub-header of the feedback modal matches the expected text.
+   * @param expectedText - The expected text of the sub-header.
+   */
+  async expectFeedbackModalSubHeaderToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackModalSubHeader);
+    await this.expectTextContentToContain(feedbackModalSubHeader, expectedText);
+  }
+
+  /**
+   * Checks if the feedback textarea placeholder matches the expected text.
+   *
+   * @param expectedPlaceholder - Expected placeholder text of the textarea.
+   */
+  async expectFeedbackTextareaPlaceholderToBe(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      feedbackModaltextarea,
+      expectedPlaceholder
+    );
+
+    await this.expectTextContentToContain(feedbackCharacterCount, '0 / 2500');
+  }
+
+  async expectLessonSpecificCategoryChipsToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    if (shouldBePresent) {
+      await this.expectElementToBeVisible(
+        lessonSpecificCategoryChips,
+        shouldBePresent
+      );
+    }
+  }
+
+  async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(screenshotDropZoneSelector);
+    await this.expectTextContentToContain(
+      screenshotDropZoneSelector,
+      expectedText
+    );
+  }
+
+  async expectFeedbackScreenshotPreviewToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    if (shouldBePresent) {
+      await this.expectElementToBeVisible(
+        feedbackScreenshotPreviewSelector,
+        shouldBePresent
+      );
+      await this.expectElementToBeVisible(
+        cancelFeedbackUploadButtonSelector,
+        shouldBePresent
+      );
+    }
   }
 
   /**

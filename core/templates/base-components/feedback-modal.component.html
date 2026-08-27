@@ -47,7 +47,7 @@
         </div>
         <div>
           <h3 class="e2e-test-modal-header">{{ title | translate }}</h3>
-          <p>{{ subTitle | translate }}</p>
+          <p class="e2e-test-modal-subHeader" >{{ subTitle | translate }}</p>
         </div>
       </div>
     </div>
@@ -72,7 +72,7 @@
           </span>
         </div>
 
-        <div class="oppia-flag-category-chips" aria-label="Issue category">
+        <div class="oppia-flag-category-chips e2e-test-flag-category-chips" aria-label="Issue category">
           <button type="button"
                   class="oppia-flag-category-chip e2e-test-report-issue-typo-chip"
                   [class.selected]="category === ReportAnIssueCategory.TYPO"
@@ -120,7 +120,7 @@
       <div *ngIf="formError" class="oppia-feedback-error-text e2e-test-form-error">
         {{ formError }}
       </div>
-      <div class="oppia-flag-character-count">
+      <div class="oppia-flag-character-count e2e-test-feedback-text-count ">
         {{ feedbackText.length }}
         /
         {{ MAX_REPORT_MESSAGE_LENGTH }}
@@ -139,7 +139,7 @@
             </oppia-image-receiver>
           </div>
         </div>
-        <div *ngIf="screenshotPreviewDataUrl" class="oppia-feedback-screenshot-preview">
+        <div *ngIf="screenshotPreviewDataUrl" class="oppia-feedback-screenshot-preview e2e-test-feedback-screenshot-preview">
           <button type="button"
                   class="oppia-feedback-screenshot-remove-button e2e-test-cancel-feedback-upload-button"
                   aria-label="Remove screenshot"
