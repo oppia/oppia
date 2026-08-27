@@ -53,6 +53,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './learner-dashboard-page.component.css';
 
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
@@ -598,7 +599,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .MY_CERTIFICATES:
-        return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
+        return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION_HEADING';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }
