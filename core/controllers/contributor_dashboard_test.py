@@ -1748,7 +1748,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                             'html': '<p>A content to translate.</p>',
                         },
                     }
-                )
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+                        'content_id': 'content_0',
+                    }
+                ),
             ],
             'Changes content.',
         )
