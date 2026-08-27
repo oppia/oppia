@@ -171,6 +171,13 @@ def _get_lighthouse_environment() -> dict[str, str]:
     env['PATH'] = os.pathsep.join(
         [os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH), env['PATH']]
     )
+    # The heap limit is set through NODE_OPTIONS, not as a command-line flag.
+    # A flag placed after the LHCI script path is consumed by LHCI instead of
+    # Node, so the limit would never be applied. NODE_OPTIONS is picked up by
+    # Node itself and propagated to all child Node processes (e.g. the
+    # Lighthouse subprocesses spawned by LHCI). See:
+    # https://stackoverflow.com/a/59572966
+    env['NODE_OPTIONS'] = '--max-old-space-size=4096'
     return env
 
 
@@ -189,19 +196,33 @@ def _patch_lighthouse_target_manager() -> None:
         'driver',
         'target-manager.js',
     )
+    if not os.path.isfile(target_manager_path):
+        raise RuntimeError(
+            'Could not find Lighthouse target-manager.js at %s to apply '
+            'the cross-origin CDP patch. A Lighthouse upgrade may have moved '
+            'or renamed this file; update the patch in this script.'
+            % target_manager_path
+        )
     with open(target_manager_path, 'r', encoding='utf-8') as f:
         content = f.read()
     # Only patch if not already applied.
     if '/Not allowed/' not in content:
-        content = content.replace(
+        patched_content = content.replace(
             'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;',
             'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;\n'
             '      // Chrome may reject Target.getTargetInfo for '
             'cross-origin targets.\n'
             '      if (/Not allowed/.test(err.message)) return;',
         )
+        if patched_content == content:
+            raise RuntimeError(
+                'Could not apply the cross-origin CDP patch to '
+                'target-manager.js: the expected upstream source line was '
+                'not found. A Lighthouse upgrade may have changed it; '
+                'update the patch in this script.'
+            )
         with open(target_manager_path, 'w', encoding='utf-8') as f:
-            f.write(content)
+            f.write(patched_content)
         print(
             'Patched lighthouse target-manager.js for cross-origin CDP errors.'
         )
@@ -210,14 +231,11 @@ def _patch_lighthouse_target_manager() -> None:
 def _run_lighthouse_checks_for_config(config_filename: str) -> None:
     """Runs the Lighthouse checks through the given Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    # The max-old-space-size is a quick fix for node running out of heap memory
-    # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
         common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
         '--config=%s' % config_filename,
-        '--max-old-space-size=4096',
     ]
 
     process = subprocess.Popen(
