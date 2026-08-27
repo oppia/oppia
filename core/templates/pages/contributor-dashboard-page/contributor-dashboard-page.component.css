@@ -97,13 +97,13 @@ button.oppia-autofocus:focus {
 .oppia-short-contributor-username-container,
 .oppia-long-contributor-username-container {
   color: #009688;
+  flex-shrink: 0;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 24px;
-  flex-shrink: 0;
-  white-space: nowrap;
   height: 30%;
   min-width: 0;
   padding-top: 10px;
+  white-space: nowrap;
 }
 .oppia-short-contributor-username-container {
   min-width: 100px;

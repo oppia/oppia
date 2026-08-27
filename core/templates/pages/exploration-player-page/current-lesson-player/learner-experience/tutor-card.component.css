@@ -41,6 +41,7 @@ oppia-content-language-selector {
   display: inline-flex;
   margin-right: 0;
 }
+/* stylelint-disable selector-pseudo-element-no-unknown */
 ::ng-deep .oppia-content-language-selector-icon {
   color: rgb(75, 74, 74);
   font-size: 20px;
@@ -55,6 +56,7 @@ oppia-content-language-selector {
 ::ng-deep .oppia-exploration-language {
   padding: 0 4px;
 }
+/* stylelint-enable selector-pseudo-element-no-unknown */
 
 .oppia-learner-view-card-content {
   word-wrap: break-word;
