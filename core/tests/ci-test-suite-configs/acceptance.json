@@ -1,6 +1,11 @@
 {
   "suites": [
     {
+      "name": "logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue.spec.ts",
       "framework": "puppeteer"
