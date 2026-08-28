@@ -37,7 +37,7 @@ import '../static/item_selection_input.css';
 @Component({
   selector: 'oppia-interactive-item-selection-input',
   templateUrl: './item-selection-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['../static/item_selection_input.css'],
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

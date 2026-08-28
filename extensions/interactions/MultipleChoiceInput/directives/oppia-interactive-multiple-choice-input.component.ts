@@ -38,6 +38,7 @@ import '../static/multiple_choice_input.css';
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
   templateUrl: './multiple-choice-input-interaction.component.html',
+  styleUrls: ['../static/multiple_choice_input.css'],
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
