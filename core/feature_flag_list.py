@@ -378,7 +378,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
