@@ -145,9 +145,9 @@
     ora "5.3.0"
     rxjs "6.6.3"
 
-"@angular-eslint/builder@^14.0.0":
+"@angular-eslint/builder@14":
   version "14.4.0"
-  resolved "https://registry.npmjs.org/@angular-eslint/builder/-/builder-14.4.0.tgz#f2cfc6ba44c170f440ce386027a2bdc6f824b12f"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/builder/-/builder-14.4.0.tgz#f2cfc6ba44c170f440ce386027a2bdc6f824b12f"
   integrity sha512-AhAUFvSg0urtb6Lsowvuxwu6DMXUy0BPwrnfNOBGjRt9vG7F9kgXXAsm5DnIS0GNy/mLZ9mSfa86fv++1e0KUA==
 
 "@angular-eslint/bundled-angular-compiler@14.4.0":
@@ -155,9 +155,9 @@
   resolved "https://registry.yarnpkg.com/@angular-eslint/bundled-angular-compiler/-/bundled-angular-compiler-14.4.0.tgz#3cf20f8b2df9702f55ae8f319b381ef3789fe6b3"
   integrity sha512-KMHPHd24s0HVvAP/DxSSqhYBWhwW8FgS/r0Uwv8eWpsIdc/z/Chd2ush2SgPchmmquAXTgOZsbEY7ZmW+XkJfQ==
 
-"@angular-eslint/eslint-plugin-template@14.4.0", "@angular-eslint/eslint-plugin-template@^14.0.0":
+"@angular-eslint/eslint-plugin-template@14", "@angular-eslint/eslint-plugin-template@14.4.0":
   version "14.4.0"
-  resolved "https://registry.npmjs.org/@angular-eslint/eslint-plugin-template/-/eslint-plugin-template-14.4.0.tgz#4b6bbfee889bb176cde39aa6179a36ad496bf790"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin-template/-/eslint-plugin-template-14.4.0.tgz#4b6bbfee889bb176cde39aa6179a36ad496bf790"
   integrity sha512-d3GM/EU2iWzr+BrITwO4gBf9WfDfuOdTjfinV/zN84oXMFaK2ENo+IP6OEsD9hh36rdPps+m2gFGDdx+rTzBpg==
   dependencies:
     "@angular-eslint/bundled-angular-compiler" "14.4.0"
@@ -167,17 +167,17 @@
     aria-query "5.1.3"
     axobject-query "3.1.1"
 
-"@angular-eslint/eslint-plugin@14.4.0", "@angular-eslint/eslint-plugin@^14.0.0":
+"@angular-eslint/eslint-plugin@14", "@angular-eslint/eslint-plugin@14.4.0":
   version "14.4.0"
-  resolved "https://registry.npmjs.org/@angular-eslint/eslint-plugin/-/eslint-plugin-14.4.0.tgz#fd37623f549389c785692437a62a4ed247e2feee"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin/-/eslint-plugin-14.4.0.tgz#fd37623f549389c785692437a62a4ed247e2feee"
   integrity sha512-2rZQ4mt7tEUW+lI5jjuj3HWaT4VQtWTG6+LDnmuUmx76m8hqQ7NvFUpOcNDofu5KbEVBP+oF2DA6wjoZOIuSOA==
   dependencies:
     "@angular-eslint/utils" "14.4.0"
     "@typescript-eslint/utils" "5.43.0"
 
-"@angular-eslint/schematics@^14.0.0":
+"@angular-eslint/schematics@14":
   version "14.4.0"
-  resolved "https://registry.npmjs.org/@angular-eslint/schematics/-/schematics-14.4.0.tgz#f16c11818d566e64bca30809d19e08f344159023"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/schematics/-/schematics-14.4.0.tgz#f16c11818d566e64bca30809d19e08f344159023"
   integrity sha512-BrGkPug+CZQWOfmNRsJDrEtYJcxvzF/kLlV7RjvIN9Ky5TjUiJVCeafl3VY6COSY32tjlh2GvBdl1AQKWWovbA==
   dependencies:
     "@angular-eslint/eslint-plugin" "14.4.0"
@@ -186,9 +186,9 @@
     strip-json-comments "3.1.1"
     tmp "0.2.1"
 
-"@angular-eslint/template-parser@^14.0.0":
+"@angular-eslint/template-parser@14":
   version "14.4.0"
-  resolved "https://registry.npmjs.org/@angular-eslint/template-parser/-/template-parser-14.4.0.tgz#ad6158c9c3e8d907a42ce448ed14fc11bd9943b2"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/template-parser/-/template-parser-14.4.0.tgz#ad6158c9c3e8d907a42ce448ed14fc11bd9943b2"
   integrity sha512-zq888KpQB0YTEK26mkKcT4fs8LDWWT1oAEXU8DrXhvkikS8XavTSHOWJye/bVZR4oJRFCF5YTJV75DEMcGNIpQ==
   dependencies:
     "@angular-eslint/bundled-angular-compiler" "14.4.0"
@@ -4293,6 +4293,11 @@ ajv@^8.0.1:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
+alphanum-sort@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
+  integrity sha512-0FcBfdcmaumGPQ0qPn7Q5qTgz/ooXgIyp1rf8ik5bGX8mpE2YHjC0P/eyQvxu1GURYQgq9ozf2mteQ5ZD9YiyQ==
+
 angular-shepherd@^11.0.0:
   version "11.0.0"
   resolved "https://registry.yarnpkg.com/angular-shepherd/-/angular-shepherd-11.0.0.tgz#b0a7028bac8b84ea86256a001bc8a64314fff4ff"
@@ -4300,6 +4305,13 @@ angular-shepherd@^11.0.0:
   dependencies:
     shepherd.js "^8.0.1"
     tslib "^2.0.0"
+
+angular2-template-loader@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/angular2-template-loader/-/angular2-template-loader-0.6.2.tgz#c0d44e90fff0fac95e8b23f043acda7fd1c51d7c"
+  integrity sha512-jBSrm2yDsTA48GG0H57upn8rmTfJS3/R7EhUeAL/3ryWS8deT9You8UQKWpW4eVSEY7uMJ52iFwpOYXc8QEtGg==
+  dependencies:
+    loader-utils "^0.2.15"
 
 ansi-align@^3.0.0:
   version "3.0.1"
