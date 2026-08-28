@@ -66,7 +66,13 @@ describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () =>
   >;
 
   beforeEach(waitForAsync(() => {
-    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue({
+      subscribe: () => {},
+    });
     TestBed.configureTestingModule({
       declarations: [ConfirmFormulaAsTextModalComponent],
       providers: [
