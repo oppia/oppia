@@ -296,13 +296,50 @@ describe('Search bar component', () => {
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
-  it('should trigger search query only when dropdown is closed', () => {
+  it('should not trigger search when dropdown opens', () => {
     spyOn(component, 'onSearchQueryChangeExec');
-    component.triggerSearchOnDropdownClose(true);
+    component.triggerSearchOnDropdownClose(true, 'languageCodes');
     expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
-    component.triggerSearchOnDropdownClose(false);
-    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
+
+  it(
+    'should not trigger search when dropdown closes with no ' +
+      'selection change',
+    () => {
+      spyOn(component, 'onSearchQueryChangeExec');
+      component.triggerSearchOnDropdownClose(true, 'languageCodes');
+      component.triggerSearchOnDropdownClose(false, 'languageCodes');
+      expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should trigger search when dropdown closes after a selection ' + 'change',
+    () => {
+      spyOn(component, 'onSearchQueryChangeExec');
+      component.triggerSearchOnDropdownClose(true, 'languageCodes');
+      component.selectionDetails.languageCodes.selections.en = true;
+      component.triggerSearchOnDropdownClose(false, 'languageCodes');
+      expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should track categories and languageCodes selections ' + 'independently',
+    () => {
+      spyOn(component, 'onSearchQueryChangeExec');
+      component.triggerSearchOnDropdownClose(true, 'categories');
+      component.triggerSearchOnDropdownClose(true, 'languageCodes');
+      component.selectionDetails.categories.selections.id_1 = true;
+      // Closing languageCodes should not fire, since only categories
+      // changed.
+      component.triggerSearchOnDropdownClose(false, 'languageCodes');
+      expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
+      // Closing categories should fire, since it changed.
+      component.triggerSearchOnDropdownClose(false, 'categories');
+      expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    }
+  );
 
   it('should deselectAll', () => {
     spyOn(component, 'updateSelectionDetails');
