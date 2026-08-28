@@ -99,7 +99,11 @@ describe('AddAFollowUpNoteModalComponent', () => {
   });
 
   it('should submit successfully', fakeAsync(() => {
-    feedbackBackendApiSpy.and.returnValue(Promise.resolve());
+    feedbackBackendApiSpy.and.returnValue(
+      Promise.resolve({
+        success: true,
+      })
+    );
     component.followUpText = 'test';
     component.submit();
     tick();
@@ -205,7 +209,11 @@ describe('AddAFollowUpNoteModalComponent opened as a bottom sheet', () => {
     spyOn(
       feedbackBackendApiService,
       'submitMyFeedbackFollowUpAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(
+      Promise.resolve({
+        success: true,
+      })
+    );
     component.followUpText = 'test';
     component.submit();
     tick();
