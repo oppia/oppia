@@ -3851,6 +3851,17 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
+    def test_get_reviewable_translation_count_missing_language_code(
+        self,
+    ) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/reviewable_translation',
+            expected_status_int=400,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
     def test_get_invalid_opportunity_type(self) -> None:
         self.get_json(
             '/opportunitiescounthandler/invalid_type', expected_status_int=404

@@ -2743,3 +2743,9 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             ),
             0,
         )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', 'invalid_topic'
+            ),
+            0,
+        )

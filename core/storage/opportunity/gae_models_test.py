@@ -627,6 +627,18 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             ),
             1,
         )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                None, 'topic2', 'hi'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                None, None, 'hi'
+            ),
+            3,
+        )
 
     def test_get_by_entity_type_and_topic_pagination(self) -> None:
         for i in range(5):
