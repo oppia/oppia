@@ -90,6 +90,28 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(self.blog_post_a_id, blog_posts[0].id)
 
+    def test_get_blog_post_summary_models_by_ids(self) -> None:
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two
+        )
+        change_dict: blog_services.BlogPostChangeDict = {
+            'title': 'Sample title B',
+            'thumbnail_filename': 'test.svg',
+            'content': '<p>hi<p>',
+            'tags': ['one', 'two'],
+        }
+        blog_services.update_blog_post(self.blog_post_b_id, change_dict)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        blog_services.publish_blog_post(self.blog_post_b_id)
+
+        blog_post_summaries = blog_services.get_blog_post_summary_models_by_ids(
+            [self.blog_post_a_id, self.blog_post_b_id]
+        )
+        self.assertEqual(
+            {summary.id for summary in blog_post_summaries},
+            {self.blog_post_a_id, self.blog_post_b_id},
+        )
+
     def test_get_new_blog_post_id(self) -> None:
         blog_post_id = blog_services.get_new_blog_post_id()
         self.assertFalse(blog_post_id == self.blog_post_a_id)

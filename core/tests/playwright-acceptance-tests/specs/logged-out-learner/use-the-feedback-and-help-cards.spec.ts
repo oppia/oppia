@@ -39,6 +39,7 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Logged-Out Learner', function () {
   let explorationEditor: ExplorationEditor;
+  let explorationId: string;
   let loggedOutLearner: LoggedOutUser;
 
   test.beforeAll(async function ({browser}) {

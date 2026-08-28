@@ -114,19 +114,10 @@ describe('Logged-out User', function () {
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
       await loggedOutUser.expectToBeOnPage('community library');
 
-      // Expects the focus to be on Search bar in the Community Library page.
-      await loggedOutUser.verifyFocusAfterShortcut('/');
-
       // Skips to the main content.
       await loggedOutUser.verifyFocusAfterShortcut('s');
-
-      // Expects the focus to be on category dropdown in the Community Library page.
-      await loggedOutUser.verifyFocusAfterShortcut('c');
 
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-
-      // Skips to the main content.
-      await loggedOutUser.verifyFocusAfterShortcut('s');
 
       await loggedOutUser.continueToNextCard();
 

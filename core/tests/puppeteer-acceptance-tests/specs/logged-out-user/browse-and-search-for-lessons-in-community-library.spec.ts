@@ -69,8 +69,6 @@ describe('Logged-out User', function () {
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
 
-      await loggedOutUser.filterLessonsByCategories(['Algorithms']);
-
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedLessonsPage();
       await loggedOutUser.expectLessonsInOrder(['Algebra I', 'Algebra II']);

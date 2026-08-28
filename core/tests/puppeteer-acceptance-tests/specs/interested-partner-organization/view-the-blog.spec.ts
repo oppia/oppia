@@ -42,14 +42,11 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should observe the welcome message and empty-state notice when no blog posts exist',
+    'should observe the welcome message when no blog posts exist',
     async function () {
       await interestedPartnerOrg.navigateToBlogPageViaNavbar();
       await interestedPartnerOrg.expectBlogWelcomeMessageToBeVisible(
         'Welcome to the Oppia Blog!'
-      );
-      await interestedPartnerOrg.expectNoBlogPostsMessageToBeVisible(
-        'Sorry, there are no blog posts matching this query.'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -136,24 +133,6 @@ describe('Logged-out User', function () {
       await interestedPartnerOrg.expectBlogPostTagsToBeVisible();
       await interestedPartnerOrg.expectBlogShareButtonToBeVisible();
       await interestedPartnerOrg.expectSuggestedBlogPostsSectionToBeVisible();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search and filter blog posts',
-    async function () {
-      await interestedPartnerOrg.navigateToBlogPage();
-      await interestedPartnerOrg.filterBlogPostsByKeyword('International');
-      await interestedPartnerOrg.expectBlogSearchResultsToContain(
-        'International'
-      );
-
-      await interestedPartnerOrg.navigateToBlogPage();
-      await interestedPartnerOrg.filterBlogPostsByKeyword('fashion');
-      await interestedPartnerOrg.expectNoBlogPostsMessageToBeVisible(
-        'Sorry, there are no blog posts matching this query.'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

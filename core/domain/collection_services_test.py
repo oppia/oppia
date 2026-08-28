@@ -1178,6 +1178,22 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID
         )
 
+    def test_publish_collection_and_update_user_profiles_raises_when_no_summary(
+        self,
+    ) -> None:
+        self.save_new_valid_collection('collection_id', self.owner_id)
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_summary_by_id', None
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No collection summary model exists for the given id: collection_id',
+            ):
+                collection_services.publish_collection_and_update_user_profiles(
+                    self.owner, 'collection_id'
+                )
+
     def test_save_and_retrieve_collection(self) -> None:
         collection = self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id
