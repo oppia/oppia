@@ -211,11 +211,18 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner.waitForPageToFullyLoad();
 
+      // The exploration has two cards connected by a Continue button
+      // interaction, so advance past the first card to reach the end state.
+      await loggedInLearner.clickOnContinueButtonInInteractionCard();
+
       await loggedInLearner.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      await loggedInLearner.returnToTopicPageAfterCompletingExploration();
+      // Navigate back to the redesigned topic viewer page so the completed
+      // chapter is shown with the completed state.
+      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
+      await loggedInLearner.waitForPageToFullyLoad();
 
       await loggedInLearner.expectElementToBeVisible(
         redesignedContainerSelector

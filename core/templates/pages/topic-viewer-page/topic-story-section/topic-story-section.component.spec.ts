@@ -1502,6 +1502,56 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureExpanded(0)).toBe(true);
   });
 
+  it('should auto-expand the adventure with a completed lesson and the active lesson', () => {
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Completed Node',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Active Node',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Completed Node', 'Active Node'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    storySummary.isNodeCompleted.and.callFake(
+      (title: string) => title === 'Completed Node'
+    );
+    storySummary.getCompletedNodeTitles.and.returnValue(['Completed Node']);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isAdventureExpanded(1)).toBe(true);
+  });
+
   it('should persist skipped adventures when proceeding with skip confirmation', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',

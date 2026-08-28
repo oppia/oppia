@@ -120,6 +120,7 @@
           </div>
           <button class="topic-lesson-card-start-button e2e-test-lesson-card-start-button"
                   type="button"
+                  *ngIf="isExpanded || isComingSoonSectionCard"
                   [disabled]="isComingSoonLesson || !startUrl"
                   (click)="onStartButtonClick()">
             <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">play_arrow</i>

@@ -1041,14 +1041,46 @@ export class TopicStorySectionComponent
       this.visibleAdventureGroups.length &&
       this._expandedAdventureIndices.size === 0
     ) {
-      // Do not auto-expand an adventure that was previously skipped; expand
-      // the first adventure that was not skipped instead.
-      const firstNonSkippedIndex = this.visibleAdventureGroups.findIndex(
-        (_group, index) => !this.skippedAdventureIndices.has(index)
+      // Expand the adventure(s) that contain lessons the learner has already
+      // completed (so their progress stays visible), plus the adventure that
+      // contains the active (next) lesson so the chapter they should work on
+      // next is immediately shown. This keeps both the completed chapter and
+      // the next chapter visible after a lesson has been completed. Fall back
+      // to the first non-skipped adventure (or the first adventure when all
+      // are skipped) when no completed lessons or active lesson are found.
+      const expandedIndices = new Set<number>();
+      this.visibleAdventureGroups.forEach((group, index) => {
+        const hasCompletedLesson = group.lessonCards.some(
+          card => card.lessonProgressStatus === 'completed'
+        );
+        if (hasCompletedLesson && !this.skippedAdventureIndices.has(index)) {
+          expandedIndices.add(index);
+        }
+      });
+
+      const activeAdventureIndex = this.visibleAdventureGroups.findIndex(
+        group =>
+          group.lessonCards.some(
+            card => card.lessonNumber === this.getActiveLessonNumber()
+          )
       );
-      this._expandedAdventureIndices = new Set([
-        firstNonSkippedIndex === -1 ? 0 : firstNonSkippedIndex,
-      ]);
+      if (
+        activeAdventureIndex !== -1 &&
+        !this.skippedAdventureIndices.has(activeAdventureIndex)
+      ) {
+        expandedIndices.add(activeAdventureIndex);
+      }
+
+      if (expandedIndices.size === 0) {
+        const firstNonSkippedIndex = this.visibleAdventureGroups.findIndex(
+          (_group, index) => !this.skippedAdventureIndices.has(index)
+        );
+        expandedIndices.add(
+          firstNonSkippedIndex === -1 ? 0 : firstNonSkippedIndex
+        );
+      }
+
+      this._expandedAdventureIndices = expandedIndices;
     }
   }
 

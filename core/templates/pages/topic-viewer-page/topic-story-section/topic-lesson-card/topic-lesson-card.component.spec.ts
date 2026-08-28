@@ -721,6 +721,43 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isExpanded).toBeFalse();
   });
 
+  it('should not render the start button when the lesson card is collapsed', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = false;
+    component.lessonProgressStatus = 'not_started';
+    component.isComingSoonSectionCard = false;
+
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.e2e-test-lesson-card-start-button')
+    ).toBeNull();
+  });
+
+  it('should render the start button when the lesson card is expanded', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+    component.lessonProgressStatus = 'not_started';
+    component.isComingSoonSectionCard = false;
+
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.e2e-test-lesson-card-start-button')
+    ).not.toBeNull();
+  });
+
+  it('should render the start button for coming soon lesson cards', () => {
+    component.isComingSoonSectionCard = true;
+    component.lessonProgressStatus = 'coming_soon';
+
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.e2e-test-lesson-card-start-button')
+    ).not.toBeNull();
+  });
+
   it('should navigate to practiceUrl when provided', () => {
     spyOn(component, 'navigateTo');
     component.practiceUrl = '/practice/123';
@@ -996,6 +1033,25 @@ describe('TopicLessonCardComponent', () => {
     component.ngOnInit();
 
     expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should expand the active lesson so its actions are visible', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not expand the active lesson when it is completed', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+    component.lessonProgressStatus = 'completed';
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeFalse();
   });
 
   it('should not expand first lesson by default when it is completed', () => {
