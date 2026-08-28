@@ -530,23 +530,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
-            #  Optional:
-            #    * A JS file called webdriverio.js.
             interaction_dir_contents = self._listdir_omit_ignored(
                 interaction_dir
             )
 
             interaction_dir_optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(
-                    os.path.isfile(
-                        os.path.join(interaction_dir, 'webdriverio.js')
-                    )
-                )
-                interaction_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(
