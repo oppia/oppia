@@ -321,6 +321,7 @@ export class TranslationReviewer extends BaseUser {
     if (!updateBtn) {
       throw new Error('Update translation button not found.');
     }
+    await this.waitForElementToStabilize(updateBtn);
     await updateBtn.evaluate(el => (el as HTMLElement).click());
     await this.expectElementToBeVisible(updateTranslationBtnSelector, false);
   }

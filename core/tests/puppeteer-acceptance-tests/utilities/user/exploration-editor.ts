@@ -2837,12 +2837,17 @@ export class ExplorationEditor extends BaseUser {
     const confirmPublish = async (): Promise<string> => {
       await this.clickOnElementWithSelector(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
-      await this.page.waitForSelector(explorationConfirmPublishButton, {
-        visible: true,
-      });
-      await this.page.$eval(explorationConfirmPublishButton, el =>
-        (el as HTMLElement).click()
+      const publishBtn = await this.page.waitForSelector(
+        explorationConfirmPublishButton,
+        {
+          visible: true,
+        }
       );
+      if (!publishBtn) {
+        throw new Error('Confirm publish button not found.');
+      }
+      await this.waitForElementToStabilize(publishBtn);
+      await publishBtn.evaluate(el => (el as HTMLElement).click());
       const success = await this.page
         .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
         .then(() => true)
@@ -4117,9 +4122,13 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.$eval(closeModalButtonSelector, el =>
-        (el as HTMLElement).click()
+      const closeBtn = await this.page.waitForSelector(
+        closeModalButtonSelector
       );
+      if (closeBtn) {
+        await this.waitForElementToStabilize(closeBtn);
+        await closeBtn.evaluate(el => (el as HTMLElement).click());
+      }
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
@@ -6779,9 +6788,13 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.$eval(closeModalButtonSelector, el =>
-        (el as HTMLElement).click()
+      const closeBtn = await this.page.waitForSelector(
+        closeModalButtonSelector
       );
+      if (closeBtn) {
+        await this.waitForElementToStabilize(closeBtn);
+        await closeBtn.evaluate(el => (el as HTMLElement).click());
+      }
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
