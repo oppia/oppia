@@ -24,6 +24,7 @@ from core.constants import constants
 from core.domain import (
     blog_services,
     caching_services,
+    classroom_config_domain,
     classroom_config_services,
     collection_services,
     exp_domain,
@@ -877,6 +878,112 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 {
                     'action': 'generate_dummy_classroom',
                     'num_dummy_classrooms_to_generate': num_classrooms,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def _create_dummy_classroom_for_topics_test(self) -> str:
+        """Creates a single dummy math classroom and returns its ID."""
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
+            name='math',
+            url_fragment='math',
+            feedback_recipient_email='user@email.com',
+            course_details='Math course details',
+            teaser_text='Math teaser text',
+            topic_list_intro='Start with our first topic.',
+            topic_id_to_prerequisite_topic_ids={},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg', 'transparent', 1000
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.png', 'transparent', 1000
+            ),
+            index=0,
+        )
+        classroom_config_services.create_new_classroom(classroom)
+        return classroom_id
+
+    def test_generate_dummy_topics_data(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_topics',
+                'num_dummy_topics_to_generate': 2,
+                'dummy_topic_classroom_id': classroom_id,
+            },
+            csrf_token=csrf_token,
+        )
+        topics = topic_fetchers.get_all_topics()
+        self.assertEqual(len(topics), 2)
+        topic_ids = [topic.id for topic in topics]
+        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        topic_id_to_prerequisite_topic_ids = (
+            classroom.topic_id_to_prerequisite_topic_ids
+        )
+        for topic_id in topic_ids:
+            self.assertIn(topic_id, topic_id_to_prerequisite_topic_ids)
+        self.logout()
+
+    def test_generate_dummy_topics_data_is_idempotent(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': classroom_id,
+                },
+                csrf_token=csrf_token,
+            )
+        topics = topic_fetchers.get_all_topics()
+        # The two runs generate distinct topics because each reuses the base
+        # names with an appended letter suffix (Addition-a, Subtraction-a,
+        # Addition-b, Subtraction-b, ...).
+        self.assertEqual(len(topics), 4)
+        self.logout()
+
+    def test_generate_dummy_topics_requires_existing_classroom(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(Exception, 'does not exist'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'non_existent_classroom',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_topics_data(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'math',
                 },
                 csrf_token=csrf_token,
             )

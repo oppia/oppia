@@ -242,6 +242,8 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     num_dummy_stories_to_generate: Optional[int]
     num_dummy_chapters_to_generate: Optional[int]
     num_dummy_classrooms_to_generate: Optional[int]
+    num_dummy_topics_to_generate: Optional[int]
+    dummy_topic_classroom_id: Optional[str]
     topic_id: Optional[str]
     story_id: Optional[str]
     platform_param_name: Optional[str]
@@ -263,6 +265,30 @@ class AdminHandler(
     # every generated topic URL fragment within this limit.
     _MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH = 20
 
+    # Fixed base names and URL fragments for dummy topics. They are cycled
+    # through (with an appended lowercase letter suffix) when a request asks to
+    # generate topics that can fit into an existing classroom without name or
+    # URL fragment collisions.
+    _DUMMY_TOPIC_NAMES = [
+        'Addition',
+        'Subtraction',
+        'Multiplication',
+        'Division',
+        'Fraction',
+    ]
+    _DUMMY_TOPIC_URL_FRAGMENTS = [
+        'add',
+        'subtraction',
+        'multiplication',
+        'division',
+        'fraction',
+    ]
+
+    # Tracks, for each dummy topic base name, how many topics have already been
+    # generated with a letter suffix in the current request. It is reset at the
+    # start of every generation.
+    _dummy_topic_letter_counts: List[int] = []
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -281,6 +307,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
+                        'generate_dummy_topics',
                         'generate_dummy_chapters',
                         'generate_dummy_question_suggestions',
                         'generate_dummy_stories',
@@ -321,6 +348,14 @@ class AdminHandler(
             },
             'num_dummy_classrooms_to_generate': {
                 'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'num_dummy_topics_to_generate': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'dummy_topic_classroom_id': {
+                'schema': {'type': 'basestring'},
                 'default_value': None,
             },
             'num_dummy_exps_to_publish': {
@@ -438,6 +473,16 @@ class AdminHandler(
                 'platform_params_dicts': platform_params_dicts,
                 'skill_list': skill_summary_dicts,
                 'story_list': story_dicts,
+                'classroom_list': [
+                    {
+                        'classroom_id': classroom.classroom_id,
+                        'name': classroom.name,
+                    }
+                    for classroom in sorted(
+                        classroom_config_services.get_all_classrooms(),
+                        key=lambda classroom: classroom.index,
+                    )
+                ],
             }
         )
 
@@ -573,6 +618,23 @@ class AdminHandler(
                 if num_dummy_classrooms_to_generate is None:
                     num_dummy_classrooms_to_generate = 1
                 self._generate_dummy_classroom(num_dummy_classrooms_to_generate)
+            elif action == 'generate_dummy_topics':
+                num_dummy_topics_to_generate = self.normalized_payload.get(
+                    'num_dummy_topics_to_generate'
+                )
+                dummy_topic_classroom_id = self.normalized_payload.get(
+                    'dummy_topic_classroom_id'
+                )
+                if num_dummy_topics_to_generate is None:
+                    num_dummy_topics_to_generate = 1
+                if dummy_topic_classroom_id is None:
+                    raise Exception(
+                        'The \'dummy_topic_classroom_id\' must be provided when'
+                        ' the action is generate_dummy_topics.'
+                    )
+                self._generate_dummy_topics(
+                    num_dummy_topics_to_generate, dummy_topic_classroom_id
+                )
             elif action == 'generate_dummy_question_suggestions':
                 skill_id = self.normalized_payload.get('skill_id')
                 if skill_id is None:
@@ -2206,6 +2268,198 @@ class AdminHandler(
         )
 
         classroom_config_services.create_new_classroom(classroom_1)
+
+    def _generate_dummy_topics(
+        self, num_topics: int, classroom_id: str
+    ) -> None:
+        """Generates and loads the database with the specified number of topics
+        and publishes them under the given classroom.
+
+        Each generated topic contains one skill and three linked questions, and
+        is added to the classroom's topic list so that it appears on the
+        classroom's /learn page. The topics are globally unique in both name and
+        URL fragment, so the generation appends an unused lowercase letter
+        suffix to a fixed list of base topic names that cycles as more topics
+        are requested.
+
+        Args:
+            num_topics: int. The number of dummy topics to create.
+            classroom_id: str. The ID of the classroom under which the
+                generated topics should be published.
+
+        Raises:
+            Exception. Cannot generate dummy topics in production.
+            Exception. User does not have enough rights to generate data.
+            Exception. The given classroom does not exist.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.'
+                )
+            classroom = classroom_config_services.get_classroom_by_id(
+                classroom_id, strict=False
+            )
+            if classroom is None:
+                raise Exception(
+                    'Classroom with id \'%s\' does not exist.' % classroom_id
+                )
+            # Reset the per-base suffix counters for this new request so that
+            # each run starts from the first unused suffix again.
+            self._dummy_topic_letter_counts = [0] * len(self._DUMMY_TOPIC_NAMES)
+            generated_topic_ids: List[str] = []
+            for i in range(num_topics):
+                generated_topic_ids.append(
+                    self._create_dummy_topic(i % len(self._DUMMY_TOPIC_NAMES))
+                )
+            self._attach_topics_to_classroom(classroom, generated_topic_ids)
+        else:
+            raise Exception('Cannot generate dummy topics in production.')
+
+    def _create_dummy_topic(self, base_index: int) -> str:
+        """Creates, publishes, and returns the ID of a single dummy topic with
+        one skill and three linked questions.
+
+        The topic reuses the base name and URL fragment at the given index with
+        the next unused letter suffix so that it does not collide with topics
+        that already exist in the database.
+
+        Args:
+            base_index: int. The index of the dummy topic base name to use.
+
+        Returns:
+            str. The ID of the created dummy topic.
+        """
+        assert self.user_id is not None
+        suffix = self._get_next_dummy_topic_suffix(base_index)
+        topic_name = '%s%s' % (self._DUMMY_TOPIC_NAMES[base_index], suffix)
+        topic_url_fragment = '%s%s' % (
+            self._DUMMY_TOPIC_URL_FRAGMENTS[base_index],
+            suffix,
+        )
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        skill_id = skill_services.get_new_skill_id()
+        question_ids = [
+            question_services.get_new_question_id() for _ in range(3)
+        ]
+
+        questions = [
+            self._create_dummy_question(
+                question_ids[j],
+                'Question %d' % (j + 1),
+                [skill_id],
+            )
+            for j in range(3)
+        ]
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, topic_url_fragment, 'description', 'fragm'
+        )
+        topic.skill_ids_for_diagnostic_test = [skill_id]
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                [skill_id],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-three',
+            )
+        ]
+        topic.next_subtopic_id = 2
+
+        for question in questions:
+            question_services.add_question(self.user_id, question)
+        skill = self._create_dummy_skill(
+            skill_id, 'Skill1%s' % suffix, '<p>Dummy Explanation 1</p>'
+        )
+        skill_services.save_new_skill(self.user_id, skill)
+        self._save_dummy_topic_thumbnail_image(topic)
+        topic_services.save_new_topic(self.user_id, topic)
+        topic_services.publish_topic(topic_id, self.user_id)
+        for question_id in question_ids:
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id, skill_id, 0.5
+            )
+        return topic_id
+
+    def _get_next_dummy_topic_suffix(self, base_index: int) -> str:
+        """Returns the next unused letter suffix for the dummy topic base at
+        the given index.
+
+        The search scans letter suffixes (a, b, ..., z, aa, ...) until it finds
+        one such that neither the proposed topic name nor its URL fragment
+        already exists in the database. This lets a single run generate many
+        topics while keeping the resulting topics globally unique.
+
+        Args:
+            base_index: int. The index of the dummy topic base name being used.
+
+        Returns:
+            str. The lowercase letter suffix (including the leading hyphen) to
+            append to the base name and URL fragment.
+
+        Raises:
+            Exception. The requested number of dummy topics would need a URL
+                fragment longer than the supported maximum.
+        """
+        count = self._dummy_topic_letter_counts[base_index] + 1
+        while True:
+            suffix_letters = self._dummy_classroom_suffix_letters(count)
+            suffix = '' if not suffix_letters else '-%s' % suffix_letters
+            proposed_name = '%s%s' % (
+                self._DUMMY_TOPIC_NAMES[base_index],
+                suffix,
+            )
+            proposed_fragment = '%s%s' % (
+                self._DUMMY_TOPIC_URL_FRAGMENTS[base_index],
+                suffix,
+            )
+            if (
+                len(proposed_fragment)
+                > self._MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH
+            ):
+                raise Exception(
+                    'Cannot generate more dummy topics with supported unique '
+                    'URL fragments at once.'
+                )
+            if not (
+                topic_services.does_topic_with_name_exist(proposed_name)
+                or topic_services.does_topic_with_url_fragment_exist(
+                    proposed_fragment
+                )
+            ):
+                self._dummy_topic_letter_counts[base_index] = count
+                return suffix
+            count += 1
+
+    def _attach_topics_to_classroom(
+        self,
+        classroom: classroom_config_domain.Classroom,
+        topic_ids: List[str],
+    ) -> None:
+        """Adds the given topic IDs to the classroom's topic list so that they
+        appear on the classroom's /learn page.
+
+        Args:
+            classroom: classroom_config_domain.Classroom. The classroom to
+                which the generated topics should be added.
+            topic_ids: list(str). The IDs of the generated topics.
+        """
+        topic_id_to_prerequisite_topic_ids = (
+            classroom.topic_id_to_prerequisite_topic_ids
+        )
+        for topic_id in topic_ids:
+            topic_id_to_prerequisite_topic_ids.setdefault(topic_id, [])
+        classroom.topic_id_to_prerequisite_topic_ids = (
+            topic_id_to_prerequisite_topic_ids
+        )
+        classroom_config_services.update_classroom(classroom)
 
     def _generate_dummy_question_suggestions(
         self, skill_id: str, num_dummy_question_suggestions_generate: int

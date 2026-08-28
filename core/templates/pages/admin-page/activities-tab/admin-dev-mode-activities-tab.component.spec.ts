@@ -95,6 +95,12 @@ describe('Admin dev mode activities tab', () => {
     platformParameters: [],
     skillList: [skillSummary],
     storyList: [story],
+    classroomList: [
+      {
+        classroomId: 'classroomId1',
+        name: 'math',
+      },
+    ],
   };
   let mockConfirmResult: (val: boolean) => void;
 
@@ -658,6 +664,50 @@ describe('Admin dev mode activities tab', () => {
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Server error: New classroom data not generated.'
+        );
+      });
+    }));
+  });
+
+  describe('.generateNewTopics', () => {
+    it('should generate topic data', waitForAsync(() => {
+      spyOn(adminBackendApiService, 'generateDummyTopicsAsync').and.returnValue(
+        Promise.resolve()
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.numDummyTopicsToGenerate = 3;
+      component.selectedClassroomId = 'classroom1';
+
+      component.generateNewTopics();
+
+      expect(
+        adminBackendApiService.generateDummyTopicsAsync
+      ).toHaveBeenCalledWith(3, 'classroom1');
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy new topics generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message if new topic data is not generated', waitForAsync(() => {
+      spyOn(adminBackendApiService, 'generateDummyTopicsAsync').and.returnValue(
+        Promise.reject('New topic data not generated.')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateNewTopics();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: New topic data not generated.'
         );
       });
     }));

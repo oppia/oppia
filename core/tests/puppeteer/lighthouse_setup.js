@@ -99,6 +99,8 @@ var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
+var generateClassroomCountInput =
+  '#label-target-number-of-classrooms-to-generate';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
@@ -490,6 +492,7 @@ const generateDataForClassroom = async function (browser, page) {
     });
 
     await page.waitForSelector(generateClassroomButton);
+    await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
     const successMessage = 'Dummy new classroom generated successfully.';

@@ -139,6 +139,12 @@ describe('Admin backend api service', () => {
         meta_tag_content: 'dummy_meta',
       },
     ],
+    classroom_list: [
+      {
+        classroom_id: 'classroomId1',
+        name: 'math',
+      },
+    ],
   };
   let adminDataObject: AdminPageData;
 
@@ -172,6 +178,10 @@ describe('Admin backend api service', () => {
       storyList: adminBackendResponse.story_list.map(dict =>
         Story.createFromBackendDict(dict)
       ),
+      classroomList: adminBackendResponse.classroom_list.map(dict => ({
+        classroomId: dict.classroom_id,
+        name: dict.name,
+      })),
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
@@ -1976,6 +1986,57 @@ describe('Admin backend api service', () => {
     );
     flushMicrotasks();
 
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
+
+  it('should generate dummy topic data', fakeAsync(() => {
+    let action = 'generate_dummy_topics';
+    let payload = {
+      action: action,
+      num_dummy_topics_to_generate: 3,
+      dummy_topic_classroom_id: 'classroomId1',
+    };
+
+    abas
+      .generateDummyTopicsAsync(3, 'classroomId1')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle generate dummy new topic data request failure', fakeAsync(() => {
+    let action = 'generate_dummy_topics';
+    let payload = {
+      action: action,
+      num_dummy_topics_to_generate: 3,
+      dummy_topic_classroom_id: 'classroomId1',
+    };
+
+    abas
+      .generateDummyTopicsAsync(3, 'classroomId1')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      {
+        error: 'Failed to get data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }));

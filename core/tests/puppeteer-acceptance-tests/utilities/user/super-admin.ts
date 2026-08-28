@@ -765,6 +765,7 @@ export class SuperAdmin extends BaseUser {
   async generateDummyMathClassroom(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
+    await this.page.type('#label-target-number-of-classrooms-to-generate', '1');
     await this.clickOnElementWithSelector(loadDummyMathClassRoomButton);
 
     await this.waitForNetworkIdle();
