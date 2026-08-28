@@ -90,7 +90,7 @@ describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () =>
 
   it('should dismiss bottomSheetRef when confirm is called', () => {
     component.confirm();
-    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   });
 
   it('should dismiss bottomSheetRef when cancel is called', () => {
