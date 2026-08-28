@@ -274,6 +274,7 @@ const tabSelectorMap: Record<string, string> = {
   Home: '.e2e-test-home-section',
   Goals: '.e2e-test-goals-section',
   Progress: '.e2e-test-progress-section',
+  My_Suggestions: '.e2e-test-my-suggestions-section',
 };
 
 // Learner Dashboard > Progress section selectors.
@@ -4623,7 +4624,7 @@ export class LoggedInUser extends BaseUser {
 
   async navigateToMySuggestionsTab(): Promise<void> {
     await this.navigateToLearnerDashboard();
-    await this.clickOnElementWithSelector(mySuggestionsTab);
+    await this.clickOnElementWithSelector(tabSelectorMap['My_Suggestions']);
   }
 }
 

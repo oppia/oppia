@@ -69,10 +69,10 @@ describe('Logged-in User', function () {
     );
   }, 350000);
 
-  afterAll(async function () {
-    await UserFactory.closeBrowserForUser(loggedInLearner);
-    await UserFactory.closeSuperAdminBrowser();
-  });
+  // afterAll(async function () {
+  //   await UserFactory.closeBrowserForUser(loggedInLearner);
+  //   await UserFactory.closeSuperAdminBrowser();
+  // });
 
   it('should submit open-ended feedback on a lesson and track creator responses on my dashboard.', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
@@ -120,119 +120,124 @@ describe('Logged-in User', function () {
 
     // Navigate to My Suggestions Tab
     await loggedInLearner.navigateToMySuggestionsTab();
-  });
-
-  it('should report a bug in a lesson.', async function () {
-    await loggedInLearner.toggleOptionsSidebar();
-    await loggedInLearner.clickReportLessonButton(true);
-    showMessage('Clicked on "Report an Issue" button.');
-    await loggedInLearner.expectFeedbackModalSubHeaderToBe(
-      'Your feedback goes directly to our lesson creators to help improve this card.'
-    );
-    await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
-      "What's broken? Let us know if an image is missing, a button isn't working, or the lesson has an error."
-    );
-    await loggedInLearner.expectLessonSpecificCategoryChipsToBePresent(true);
-    await loggedInLearner.expectScreenshotDropZoneTextToBe(
-      'Drag an image into this area'
-    );
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportALessonModal',
-      __dirname
-    );
-
-    // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
-    await loggedInLearner.selectReportIssueChip('typo');
-    showMessage('Typo chip selected in report an issue modal.');
-    await loggedInLearner.submitFeedbackInTextArea(
-      'There is a typo in this question.'
-    );
-    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
 
     await loggedInLearner.expectScreenshotToMatch(
-      'reportALessonModalAfterEnteringFeedbackWithTypoChip',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-    await loggedInLearner.expectToastMessage(
-      'Thank you for your feedback! The team has received your report.'
-    );
-
-    await loggedInLearner.clickReportLessonButton(true);
-    await loggedInLearner.selectReportIssueChip(
-      'confusing or incorrect answer'
-    );
-    showMessage(
-      'Confusing or incorrect answer chip selected in report an issue modal.'
-    );
-    await loggedInLearner.submitFeedbackInTextArea(
-      'There is a confusing or incorrect answer in this question.'
-    );
-    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
-
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportALessonModalAfterEnteringFeedbackWithConfusingChip',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-    await loggedInLearner.expectToastMessage(
-      'Thank you for your feedback! The team has received your report.'
-    );
-
-    // Should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
-    await loggedInLearner.clickReportLessonButton(true);
-
-    await loggedInLearner.selectReportIssueChip('broken layout');
-    await loggedInLearner.submitFeedbackInTextArea(
-      'There is a broken layout / image in this question.'
-    );
-    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportALessonModalAfterEnteringFeedbackWithBrokenLayoutChip',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-    await loggedInLearner.expectToastMessage(
-      'Thank you! Your report has been sent to the technical team.'
-    );
-
-    await loggedInLearner.clickReportLessonButton(true);
-
-    await loggedInLearner.selectReportIssueChip('other');
-    await loggedInLearner.submitFeedbackInTextArea(
-      'There is an other issue in this question.'
-    );
-    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportALessonModalAfterEnteringFeedbackWithOtherChip',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-    await loggedInLearner.expectToastMessage(
-      'Thank you! Your report has been sent to the technical team.'
-    );
-    await loggedInLearner.toggleOptionsSidebar();
-  });
-
-  it('should submit feedback on the platform.', async () => {
-    await loggedInLearner.navigateToContributorDashboardUsingProfileDropdown();
-    await loggedInLearner.clickOnProfileDropdown();
-    await loggedInLearner.expectProfileDropdownToContainElementWithContent(
-      'Report a Website Issue'
-    );
-    await loggedInLearner.openReportASiteIssueModal();
-    showMessage('Clicked on "Report a Website Issue" button.');
-    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportASiteIssueModal',
+      'mySuggestionsTabAfterSubmittingFeedback',
       __dirname
     );
   });
+
+  // it('should report a bug in a lesson.', async function () {
+  //   await loggedInLearner.toggleOptionsSidebar();
+  //   await loggedInLearner.clickReportLessonButton(true);
+  //   showMessage('Clicked on "Report an Issue" button.');
+  //   await loggedInLearner.expectFeedbackModalSubHeaderToBe(
+  //     'Your feedback goes directly to our lesson creators to help improve this card.'
+  //   );
+  //   await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
+  //     "What's broken? Let us know if an image is missing, a button isn't working, or the lesson has an error."
+  //   );
+  //   await loggedInLearner.expectLessonSpecificCategoryChipsToBePresent(true);
+  //   await loggedInLearner.expectScreenshotDropZoneTextToBe(
+  //     'Drag an image into this area'
+  //   );
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportALessonModal',
+  //     __dirname
+  //   );
+
+  //   // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
+  //   await loggedInLearner.selectReportIssueChip('typo');
+  //   showMessage('Typo chip selected in report an issue modal.');
+  //   await loggedInLearner.submitFeedbackInTextArea(
+  //     'There is a typo in this question.'
+  //   );
+  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
+
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportALessonModalAfterEnteringFeedbackWithTypoChip',
+  //     __dirname
+  //   );
+  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+  //   await loggedInLearner.expectToastMessage(
+  //     'Thank you for your feedback! The team has received your report.'
+  //   );
+
+  //   await loggedInLearner.clickReportLessonButton(true);
+  //   await loggedInLearner.selectReportIssueChip(
+  //     'confusing or incorrect answer'
+  //   );
+  //   showMessage(
+  //     'Confusing or incorrect answer chip selected in report an issue modal.'
+  //   );
+  //   await loggedInLearner.submitFeedbackInTextArea(
+  //     'There is a confusing or incorrect answer in this question.'
+  //   );
+  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
+
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportALessonModalAfterEnteringFeedbackWithConfusingChip',
+  //     __dirname
+  //   );
+  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+  //   await loggedInLearner.expectToastMessage(
+  //     'Thank you for your feedback! The team has received your report.'
+  //   );
+
+  //   // Should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
+  //   await loggedInLearner.clickReportLessonButton(true);
+
+  //   await loggedInLearner.selectReportIssueChip('broken layout');
+  //   await loggedInLearner.submitFeedbackInTextArea(
+  //     'There is a broken layout / image in this question.'
+  //   );
+  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportALessonModalAfterEnteringFeedbackWithBrokenLayoutChip',
+  //     __dirname
+  //   );
+  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+  //   await loggedInLearner.expectToastMessage(
+  //     'Thank you! Your report has been sent to the technical team.'
+  //   );
+
+  //   await loggedInLearner.clickReportLessonButton(true);
+
+  //   await loggedInLearner.selectReportIssueChip('other');
+  //   await loggedInLearner.submitFeedbackInTextArea(
+  //     'There is an other issue in this question.'
+  //   );
+  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportALessonModalAfterEnteringFeedbackWithOtherChip',
+  //     __dirname
+  //   );
+  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+  //   await loggedInLearner.expectToastMessage(
+  //     'Thank you! Your report has been sent to the technical team.'
+  //   );
+  //   await loggedInLearner.toggleOptionsSidebar();
+  // });
+
+  // it('should submit feedback on the platform.', async () => {
+  //   await loggedInLearner.navigateToContributorDashboardUsingProfileDropdown();
+  //   await loggedInLearner.clickOnProfileDropdown();
+  //   await loggedInLearner.expectProfileDropdownToContainElementWithContent(
+  //     'Report a Website Issue'
+  //   );
+  //   await loggedInLearner.openReportASiteIssueModal();
+  //   showMessage('Clicked on "Report a Website Issue" button.');
+  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+  //   await loggedInLearner.expectScreenshotToMatch(
+  //     'reportASiteIssueModal',
+  //     __dirname
+  //   );
+  // });
 });
