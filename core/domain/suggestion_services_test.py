@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     feedback_services,
     opportunity_services,
+    feature_flag_services,
     question_domain,
     rights_domain,
     rights_manager,
@@ -5885,7 +5886,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         with self.swap(
-            suggestion_services.feature_flag_services,
+            feature_flag_services,
             'is_feature_flag_enabled',
             lambda feature_name, user_id: True,
         ):
