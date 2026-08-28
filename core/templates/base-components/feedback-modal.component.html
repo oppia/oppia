@@ -187,7 +187,10 @@
         | translate
         }}
       </button>
-      <button class="btn btn-success e2e-test-confirm-action-button" (click)="submit()">
+      <button class="btn btn-success e2e-test-confirm-action-button"
+              type="button"
+              [disabled]="isSubmittingFeedback"
+              (click)="submit()">
         {{
         'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT'
         | translate
