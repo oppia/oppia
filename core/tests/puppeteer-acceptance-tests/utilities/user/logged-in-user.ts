@@ -4620,6 +4620,11 @@ export class LoggedInUser extends BaseUser {
     await this.expectModalTitleToBe('Report a Website Issue');
     await this.waitForNetworkIdle();
   }
+
+  async navigateToMySuggestionsTab(): Promise<void> {
+    await this.navigateToLearnerDashboard();
+    await this.clickOnElementWithSelector(mySuggestionsTab);
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

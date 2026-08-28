@@ -85,6 +85,17 @@ describe('Logged-in User', function () {
       'sendALessonFeedbackModal',
       __dirname
     );
+    await loggedInLearner.expectFeedbackModalSubHeaderToBe(
+      'Your message and recent lesson path will be shared with the Lessons Team to help improve this lesson.'
+    );
+    await loggedInLearner.expectLessonFeedbackModalmicrocopyToBe(
+      'To protect your safety, do not type names, phone numbers, ' +
+        'or email addresses in your note. Responses or updates from ' +
+        'authors will appear directly in your Learner Dashboard.'
+    );
+    await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
+      'Write a note here! What did you like? Do you have an idea to make this lesson better?'
+    );
 
     await loggedInLearner.submitFeedbackInTextArea(
       'This fraction model is awesome, but can we get more marble examples?'
@@ -106,6 +117,9 @@ describe('Logged-in User', function () {
     );
     await loggedInLearner.toggleOptionsSidebar();
     showMessage('Submitted Lesson feedback.');
+
+    // Navigate to My Suggestions Tab
+    await loggedInLearner.navigateToMySuggestionsTab();
   });
 
   it('should report a bug in a lesson.', async function () {
