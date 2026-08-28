@@ -821,11 +821,65 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        self.logout()
+
+    def test_generate_dummy_classroom_data_with_default_count(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
             {'action': 'generate_dummy_classroom'},
             csrf_token=csrf_token,
         )
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
+        self.logout()
+
+    def test_generate_dummy_classroom_data_is_idempotent(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_classroom',
+                    'num_dummy_classrooms_to_generate': 3,
+                },
+                csrf_token=csrf_token,
+            )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        self.logout()
+
+    def test_generate_more_classrooms_than_supported_raises(self) -> None:
+        # A count whose final classroom index would need a suffix longer than
+        # five letters, which would make the longest generated topic URL
+        # fragment exceed the 20-character limit. 26**5 classrooms are
+        # supported before suffixes grow past five characters, so requesting
+        # one more than that triggers the guard.
+        num_classrooms = 26**5 + 1
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_classroom',
+                    'num_dummy_classrooms_to_generate': num_classrooms,
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     @test_utils.enable_feature_flags(

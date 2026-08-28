@@ -145,18 +145,26 @@
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ms-0">
-      <h3>Generate a dummy math classroom (only curriculum admins)</h3>
+      <h3>Generate dummy math classrooms (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-4">
-          Generate a dummy math classroom with 5 published topics containing 1
+          Generate dummy math classrooms, each with 5 published topics containing 1
           skill per topic and 3 questions linked per skill.
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
-          <button type="button"
-                  class="btn btn-secondary float-end load-dummy-math-classroom"
-                  (click)="generateNewClassroom()">
-            Generate Data
-          </button>
+        <span class="col-lg-4 col-md-4 col-sm-8 mt-2">
+          <label for="label-target-number-of-classrooms-to-generate" class="form-label">Number of classrooms to generate</label>
+          <div class="d-flex align-items-center gap-2">
+            <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+                   [(ngModel)]="numDummyClassroomsToGenerate"
+                   placeholder="Classrooms to generate" type="number" min="0"
+                   id="label-target-number-of-classrooms-to-generate"
+                   aria-label="Number of classrooms to generate">
+            <button type="button"
+                    class="btn btn-secondary load-dummy-math-classroom"
+                    (click)="generateNewClassroom()">
+              Generate Data
+            </button>
+          </div>
         </span>
       </div>
       <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and

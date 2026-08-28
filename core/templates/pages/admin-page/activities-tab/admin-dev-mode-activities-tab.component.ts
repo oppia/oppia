@@ -43,6 +43,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyStoriesToGenerate: number = 0;
   topicList: CreatorTopicSummary[] = [];
   numDummyChaptersToGenerate: number = 0;
+  numDummyClassroomsToGenerate: number = 0;
   storyList: Story[] = [];
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
@@ -323,17 +324,19 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    this.adminBackendApiService.generateDummyClassroomDataAsync().then(
-      () => {
-        this.getDataAsync();
-        this.setStatusMessage.emit(
-          'Dummy new classroom generated successfully.'
-        );
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      }
-    );
+    this.adminBackendApiService
+      .generateDummyClassroomDataAsync(this.numDummyClassroomsToGenerate)
+      .then(
+        () => {
+          this.getDataAsync();
+          this.setStatusMessage.emit(
+            'Dummy new classroom generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
     this.adminTaskManagerService.finishTask();
   }
 

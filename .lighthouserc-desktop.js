@@ -103,6 +103,17 @@ module.exports = {
             accessibilityMinScore: 0.93,
           },
           {
+            matchingUrlPattern: 'http://[^/]+/android$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 19000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+          },
+          {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
             pagePerfThresholds: {
               fcp: 2835,
@@ -112,6 +123,17 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.92,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/blog$',
+            pagePerfThresholds: {
+              fcp: 6000,
+              speedIndex: 6000,
+              lcp: 15000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
@@ -269,6 +291,17 @@ module.exports = {
             accessibilityMinScore: 0.92,
           },
           {
+            matchingUrlPattern: 'http://[^/]+/partnerships$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+          },
+          {
             matchingUrlPattern: 'http://[^/]+/preferences$',
             pagePerfThresholds: {
               fcp: 2955,
@@ -414,6 +447,28 @@ module.exports = {
               'errors-in-console': ['error', {minScore: 0}],
               'offscreen-images': ['error', {minScore: 0}],
             },
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/classroom-admin$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/learn$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/learn/math$',

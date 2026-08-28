@@ -1938,9 +1938,10 @@ describe('Admin backend api service', () => {
     let action = 'generate_dummy_classroom';
     let payload = {
       action: action,
+      num_dummy_classrooms_to_generate: 3,
     };
 
-    abas.generateDummyClassroomDataAsync().then(successHandler, failHandler);
+    abas.generateDummyClassroomDataAsync(3).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
@@ -1956,9 +1957,10 @@ describe('Admin backend api service', () => {
     let action = 'generate_dummy_classroom';
     let payload = {
       action: action,
+      num_dummy_classrooms_to_generate: 3,
     };
 
-    abas.generateDummyClassroomDataAsync().then(successHandler, failHandler);
+    abas.generateDummyClassroomDataAsync(3).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');

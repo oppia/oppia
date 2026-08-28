@@ -619,9 +619,13 @@ describe('Admin dev mode activities tab', () => {
         'generateDummyClassroomDataAsync'
       ).and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
+      component.numDummyClassroomsToGenerate = 3;
 
       component.generateNewClassroom();
 
+      expect(
+        adminBackendApiService.generateDummyClassroomDataAsync
+      ).toHaveBeenCalledWith(3);
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Processing...'
       );

@@ -683,9 +683,12 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyClassroomDataAsync(): Promise<void> {
+  async generateDummyClassroomDataAsync(
+    numberOfClassrooms: number
+  ): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_classroom',
+      num_dummy_classrooms_to_generate: numberOfClassrooms,
     });
   }
 
