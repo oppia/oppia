@@ -182,6 +182,30 @@ describe('Number with units interaction component', () => {
     expect(component.answer).toBe('24 km');
   });
 
+  it('should restore the answer from lastAnswer when re-opening the interaction', () => {
+    component.lastAnswer = {
+      type: 'real',
+      real: 24,
+      fraction: {
+        isNegative: false,
+        wholeNumber: 0,
+        numerator: 0,
+        denominator: 1,
+      },
+      units: [
+        {
+          unit: 'km',
+          exponent: 1,
+        },
+      ],
+    };
+    component.answer = '';
+
+    component.ngOnInit();
+
+    expect(component.answer).toBe('24 km');
+  });
+
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
     spyOn(currentInteractionService, 'showNoResponseError');
