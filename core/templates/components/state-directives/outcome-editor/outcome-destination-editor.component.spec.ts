@@ -127,7 +127,6 @@ describe('Outcome Destination Editor', () => {
     tick(10);
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
-    expect(component.canEditRefresherExplorationId).toBeFalse();
     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s\-]+$/);
     expect(component.destinationChoices).toEqual([
       {
@@ -207,27 +206,6 @@ describe('Outcome Destination Editor', () => {
       expect(
         editorFirstTimeEventsService.registerFirstCreateSecondStateEvent
       ).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should allow admin and moderators to edit refresher' + ' exploration id',
-    fakeAsync(() => {
-      let userInfo = {
-        isCurriculumAdmin: () => true,
-        isModerator: () => false,
-      } as UserInfo;
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo)
-      );
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
-
-      expect(component.canEditRefresherExplorationId).toBeFalse();
-
-      component.ngOnInit();
-      tick(10);
-
-      expect(component.canEditRefresherExplorationId).toBeTrue();
     })
   );
 

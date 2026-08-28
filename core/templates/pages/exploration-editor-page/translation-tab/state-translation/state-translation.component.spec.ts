@@ -167,7 +167,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -184,7 +183,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -199,7 +197,6 @@ describe('State translation component', () => {
           dest: 'default',
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
           feedback: {
@@ -797,7 +794,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -814,7 +810,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -829,7 +824,6 @@ describe('State translation component', () => {
           dest: 'default',
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
           feedback: {
@@ -1213,7 +1207,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -1230,7 +1223,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -1245,7 +1237,6 @@ describe('State translation component', () => {
           dest: 'default',
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
           feedback: {
@@ -1309,7 +1300,6 @@ describe('State translation component', () => {
         default_outcome: {
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'default',
           dest_if_really_stuck: null,
@@ -1720,7 +1710,6 @@ describe('State translation component', () => {
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
           paramChanges: [],
-          refresherExplorationId: null,
         },
         rules: [],
         taggedSkillMisconceptionId: null,
@@ -1739,7 +1728,6 @@ describe('State translation component', () => {
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
           paramChanges: [],
-          refresherExplorationId: null,
         },
         rules: [],
         taggedSkillMisconceptionId: null,
@@ -1758,7 +1746,6 @@ describe('State translation component', () => {
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
           paramChanges: [],
-          refresherExplorationId: null,
         },
         rules: [],
         taggedSkillMisconceptionId: null,
@@ -1931,7 +1918,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -1946,7 +1932,6 @@ describe('State translation component', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
@@ -1961,7 +1946,6 @@ describe('State translation component', () => {
           dest: 'default',
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
           feedback: {

@@ -171,42 +171,38 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       18: {
-        text: '    refresher_exploration_id: null',
-        highlighted: false,
-      },
-      19: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      20: {
+      19: {
         text: '  hints: []',
         highlighted: false,
       },
-      21: {
+      20: {
         text: '  id: null',
         highlighted: true,
       },
-      22: {
+      21: {
         text: '  solution: null',
         highlighted: false,
       },
-      23: {
+      22: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      24: {
+      23: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      25: {
+      24: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      26: {
+      25: {
         text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
-      27: {
+      26: {
         text: '',
         highlighted: false,
       },
@@ -290,106 +286,98 @@ describe('Exploration history', function () {
         highlighted: true,
       },
       20: {
-        text: '        refresher_exploration_id: null',
-        highlighted: true,
-      },
-      21: {
         text: '        missing_prerequisite_skill_id: null',
         highlighted: true,
       },
-      22: {
+      21: {
         text: '      training_data: []',
         highlighted: true,
       },
-      23: {
+      22: {
         text: '      tagged_skill_misconception_id: null',
         highlighted: true,
       },
-      24: {
+      23: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: true,
       },
-      25: {
+      24: {
         text: '  customization_args:',
         highlighted: true,
       },
-      26: {
+      25: {
         text: '    requireNonnegativeInput:',
         highlighted: true,
       },
-      27: {
+      26: {
         text: '      value: false',
         highlighted: true,
       },
-      28: {
+      27: {
         text: '  default_outcome:',
         highlighted: true,
       },
-      29: {
+      28: {
         text: '    dest: first',
         highlighted: true,
       },
-      30: {
+      29: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      31: {
+      30: {
         text: '    feedback:',
         highlighted: false,
       },
-      32: {
+      31: {
         text: "      html: ''",
         highlighted: false,
       },
-      33: {
+      32: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      34: {
+      33: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      35: {
+      34: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      36: {
-        text: '    refresher_exploration_id: null',
-        highlighted: false,
-      },
-      37: {
+      35: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      38: {
+      36: {
         text: '  hints: []',
         highlighted: false,
       },
-      39: {
+      37: {
         text: '  id: NumericInput',
         highlighted: true,
       },
-      40: {
+      38: {
         text: '  solution: null',
         highlighted: false,
       },
-      41: {
+      39: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      42: {
+      40: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      43: {
+      41: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      44: {
+      42: {
         text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
-      45: {
+      43: {
         text: '',
         highlighted: false,
       },
@@ -417,7 +405,6 @@ describe('Exploration history', function () {
       '      content_id: default_outcome_4\n' +
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
-      '    refresher_exploration_id: null\n' +
       '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +

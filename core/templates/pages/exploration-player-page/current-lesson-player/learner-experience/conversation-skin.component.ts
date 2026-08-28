@@ -279,11 +279,6 @@ export class ConversationSkinComponent {
       this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
       this.preventPageUnloadEventService.addListener(() => {
-        let redirectToRefresherExplorationConfirmed =
-          this.conversationFlowService.getRedirectToRefresherExplorationConfirmed();
-        if (redirectToRefresherExplorationConfirmed) {
-          return false;
-        }
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
           !this._editorPreviewMode &&

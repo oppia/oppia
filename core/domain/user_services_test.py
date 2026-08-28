@@ -2547,7 +2547,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     False,
                     [],
                     None,
-                    None,
                 ),
                 [
                     state_domain.RuleSpec(
@@ -2584,7 +2583,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     ),
                     False,
                     [],
-                    None,
                     None,
                 ),
                 [
@@ -2660,7 +2658,6 @@ states:
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
-          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -2688,7 +2685,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints:
       - hint_content:
           content_id: hint_1
@@ -2771,7 +2767,6 @@ states:
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null

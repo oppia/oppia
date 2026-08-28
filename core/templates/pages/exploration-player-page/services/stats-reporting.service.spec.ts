@@ -272,25 +272,6 @@ describe('Stats reporting service ', () => {
     expect(recordSolutionHitSpy).toHaveBeenCalled();
   });
 
-  it('should record stats when refresher exploration is opened', () => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      classroom_url_fragment: 'classroom',
-    });
-    let recordLeaveForRefresherExpSpy = spyOn(
-      statsReportingBackendApiService,
-      'recordLeaveForRefresherExpAsync'
-    ).and.returnValue(Promise.resolve({}));
-    expect(statsReportingService.nextExpId).toBeUndefined();
-
-    statsReportingService.recordLeaveForRefresherExp(
-      'firstState',
-      'refresherExp'
-    );
-
-    expect(statsReportingService.nextExpId).toBe('refresherExp');
-    expect(recordLeaveForRefresherExpSpy).toHaveBeenCalled();
-  });
-
   it('should record stats for community exp when state is changed', () => {
     let recordStateHitSpy = spyOn(
       statsReportingBackendApiService,

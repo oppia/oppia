@@ -330,7 +330,6 @@ describe('ExplorationFooterComponent', () => {
                   html: '',
                   content_id: 'This is a new feedback text',
                 },
-                refresher_exploration_id: 'test',
                 missing_prerequisite_skill_id: 'test_skill_id',
                 labelled_as_correct: true,
                 param_changes: [],
@@ -349,7 +348,6 @@ describe('ExplorationFooterComponent', () => {
             },
             labelled_as_correct: true,
             param_changes: [],
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
           },
           confirmed_unclassified_answers: [],
@@ -743,7 +741,6 @@ describe('ExplorationFooterComponent', () => {
                 {
                   outcome: {
                     missing_prerequisite_skill_id: null,
-                    refresher_exploration_id: null,
                     labelled_as_correct: false,
                     feedback: {
                       content_id: 'feedback_1',
@@ -770,7 +767,6 @@ describe('ExplorationFooterComponent', () => {
               ],
               default_outcome: {
                 missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'default_outcome',
@@ -841,7 +837,6 @@ describe('ExplorationFooterComponent', () => {
                 {
                   outcome: {
                     missing_prerequisite_skill_id: null,
-                    refresher_exploration_id: null,
                     labelled_as_correct: false,
                     feedback: {
                       content_id: 'feedback_1',
@@ -868,7 +863,6 @@ describe('ExplorationFooterComponent', () => {
               ],
               default_outcome: {
                 missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'default_outcome',
@@ -1088,7 +1082,6 @@ describe('ExplorationFooterComponent', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
@@ -1170,7 +1163,6 @@ describe('ExplorationFooterComponent', () => {
                   content_id: 'content',
                 },
                 labelled_as_correct: true,
-                refresher_exploration_id: 'exp',
                 missing_prerequisite_skill_id: null,
               },
               confirmed_unclassified_answers: [],
@@ -1263,7 +1255,6 @@ describe('ExplorationFooterComponent', () => {
                   content_id: 'content',
                 },
                 labelled_as_correct: true,
-                refresher_exploration_id: 'exp',
                 missing_prerequisite_skill_id: null,
               },
               confirmed_unclassified_answers: [],

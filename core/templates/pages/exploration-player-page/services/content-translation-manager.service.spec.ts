@@ -182,7 +182,6 @@ describe('Content translation manager service', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
 
@@ -208,7 +207,6 @@ describe('Content translation manager service', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         training_data: ['training_data'],

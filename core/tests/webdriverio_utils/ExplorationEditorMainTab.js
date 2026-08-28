@@ -40,9 +40,6 @@ var ExplorationEditorMainTab = function () {
   var ckEditorElement = $('.e2e-test-ck-editor');
   var defaultResponseTab = $('.e2e-test-default-response-tab');
   var deleteNodeLocator = '.e2e-test-delete-node';
-  var editOutcomeDestAddExplorationId = $(
-    '.e2e-test-add-refresher-exploration-id'
-  );
   var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
   var editOutcomeDestForm = $('.e2e-test-dest-form');
   var editOutcomeDestDropdownOptions = $(
@@ -383,8 +380,7 @@ var ExplorationEditorMainTab = function () {
       //    created at this point.
       setDestination: async function (
         destinationName,
-        createNewState,
-        refresherExplorationId
+        createNewState
       ) {
         // Begin editing destination.
         await action.click(
@@ -395,8 +391,7 @@ var ExplorationEditorMainTab = function () {
         // Set destination contents.
         await _setOutcomeDest(
           destinationName,
-          createNewState,
-          refresherExplorationId
+          createNewState
         );
 
         // Save destination.
@@ -500,8 +495,7 @@ var ExplorationEditorMainTab = function () {
 
   var _setOutcomeDest = async function (
     destName,
-    createNewDest,
-    refresherExplorationId
+    createNewDest
   ) {
     expect(destName === null && createNewDest).toBe(false);
 
@@ -532,12 +526,6 @@ var ExplorationEditorMainTab = function () {
         'Edit Outcome State Input',
         editOutcomeDestStateInput,
         destName
-      );
-    } else if (refresherExplorationId) {
-      await action.setValue(
-        'Edit Outcome Add Exploration Id',
-        editOutcomeDestAddExplorationId,
-        refresherExplorationId
       );
     }
   };

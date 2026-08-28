@@ -13,7 +13,7 @@
        class="conversation-skin-final-recommendations">
     <ng-container *ngIf="recommendedExplorationSummaries.length > 0">
       <div class="conversation-skin-final-recommendations-header-container">
-        <span *ngIf="!collectionSummary && !getIsRefresherExploration()" class="conversation-skin-final-recommendations-header"
+        <span *ngIf="!collectionSummary" class="conversation-skin-final-recommendations-header"
               translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
         </span>
       </div>
@@ -22,7 +22,6 @@
                                         [collectionId]="collectionId"
                                         [explorationId]="exp.id"
                                         [explorationTitle]="exp.title"
-                                        [parentExplorationIds]="getParentExplorationIds()"
                                         [lastUpdatedMsec]="exp.lastUpdatedMsec"
                                         [objective]="exp.objective"
                                         [category]="exp.category"

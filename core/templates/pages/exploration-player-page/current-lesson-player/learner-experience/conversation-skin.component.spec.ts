@@ -199,7 +199,6 @@ describe('Conversation skin component', () => {
           {
             outcome: {
               missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
               labelled_as_correct: false,
               feedback: {
                 content_id: 'feedback_1',
@@ -226,7 +225,6 @@ describe('Conversation skin component', () => {
         ],
         default_outcome: {
           missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
           labelled_as_correct: false,
           feedback: {
             content_id: 'default_outcome',
@@ -297,7 +295,6 @@ describe('Conversation skin component', () => {
           {
             outcome: {
               missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
               labelled_as_correct: false,
               feedback: {
                 content_id: 'feedback_1',
@@ -324,7 +321,6 @@ describe('Conversation skin component', () => {
         ],
         default_outcome: {
           missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
           labelled_as_correct: false,
           feedback: {
             content_id: 'default_outcome',
@@ -713,7 +709,6 @@ describe('Conversation skin component', () => {
     tick(100);
 
     expect(componentInstance.continueToReviseStateButtonIsVisible).toBe(true);
-    conversationFlowService.setRedirectToRefresherExplorationConfirmed(true);
 
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
@@ -2420,10 +2415,6 @@ describe('Conversation skin component', () => {
       expect(capturedCallback).toBeDefined();
 
       // Mock dependencies for callback logic.
-      const getRedirectSpy = spyOn(
-        conversationFlowService,
-        'getRedirectToRefresherExplorationConfirmed'
-      );
       const getHasInteractedSpy = spyOn(
         conversationFlowService,
         'getHasInteractedAtLeastOnce'
@@ -2445,12 +2436,7 @@ describe('Conversation skin component', () => {
       );
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
 
-      // Case 1: Redirect confirmed -> should return false (allow unload).
-      getRedirectSpy.and.returnValue(true);
-      expect(capturedCallback()).toBe(false);
-
-      // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
-      getRedirectSpy.and.returnValue(false);
+      // Case 2: Interacted, Valid state -> should return true (prevent unload).
       getHasInteractedSpy.and.returnValue(true);
       componentInstance._editorPreviewMode = false;
       const mockStateCard = jasmine.createSpyObj('StateCard', ['isTerminal']);

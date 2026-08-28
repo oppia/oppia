@@ -231,16 +231,12 @@ export class OutcomeEditorComponent implements OnInit {
     this.stateEditorService.onSaveOutcomeDestDetails.emit();
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
-    if (!this.isSelfLoop(this.outcome)) {
-      this.outcome.refresherExplorationId = null;
-    } else {
+    if (this.isSelfLoop(this.outcome)) {
       if (this.outcome.labelledAsCorrect) {
         this.outcome.labelledAsCorrect = false;
         this.onChangeCorrectnessLabel();
       }
     }
-    this.savedOutcome.refresherExplorationId =
-      this.outcome.refresherExplorationId;
     this.savedOutcome.missingPrerequisiteSkillId =
       this.outcome.missingPrerequisiteSkillId;
 
@@ -269,8 +265,6 @@ export class OutcomeEditorComponent implements OnInit {
 
   cancelThisDestinationEdit(): void {
     this.outcome.dest = cloneDeep(this.savedOutcome.dest);
-    this.outcome.refresherExplorationId =
-      this.savedOutcome.refresherExplorationId;
     this.outcome.missingPrerequisiteSkillId =
       this.savedOutcome.missingPrerequisiteSkillId;
     this.destinationEditorIsOpen = false;

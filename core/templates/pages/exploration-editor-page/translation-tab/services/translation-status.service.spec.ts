@@ -130,7 +130,6 @@ describe('Translation status service', () => {
             {
               tagged_skill_misconception_id: null,
               outcome: {
-                refresher_exploration_id: null,
                 param_changes: [],
                 labelled_as_correct: false,
                 feedback: {
@@ -152,7 +151,6 @@ describe('Translation status service', () => {
             {
               tagged_skill_misconception_id: null,
               outcome: {
-                refresher_exploration_id: null,
                 param_changes: [],
                 labelled_as_correct: false,
                 feedback: {
@@ -182,7 +180,6 @@ describe('Translation status service', () => {
             showChoicesInShuffledOrder: {value: false},
           },
           default_outcome: {
-            refresher_exploration_id: null,
             param_changes: [],
             labelled_as_correct: false,
             feedback: {
@@ -212,7 +209,6 @@ describe('Translation status service', () => {
             {
               tagged_skill_misconception_id: null,
               outcome: {
-                refresher_exploration_id: null,
                 param_changes: [],
                 labelled_as_correct: false,
                 feedback: {
@@ -242,7 +238,6 @@ describe('Translation status service', () => {
             showChoicesInShuffledOrder: {value: false},
           },
           default_outcome: {
-            refresher_exploration_id: null,
             param_changes: [],
             labelled_as_correct: false,
             feedback: {

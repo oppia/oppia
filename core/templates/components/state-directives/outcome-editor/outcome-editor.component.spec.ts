@@ -302,7 +302,6 @@ describe('Outcome Editor Component', () => {
       // Post-check.
       expect(component.destinationEditorIsOpen).toBeFalse();
       expect(component.outcome.dest).toBe('Introduction');
-      expect(component.outcome.refresherExplorationId).toBe('ExpId');
       expect(component.outcome.missingPrerequisiteSkillId).toBe('SkillId');
     }
   );
@@ -551,38 +550,6 @@ describe('Outcome Editor Component', () => {
       component.saveThisFeedback();
     }).toThrowError('The active state name is null in the outcome editor.');
   });
-
-  it(
-    'should set refresher exploration ID as null on saving destination' +
-      ' when state is not in self loop',
-    () => {
-      component.savedOutcome = new Outcome(
-        'Saved Dest',
-        null,
-        new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
-        false,
-        [],
-        'ExpId',
-        ''
-      );
-      component.outcome = new Outcome(
-        'Dest',
-        null,
-        new SubtitledHtml('<p>Outcome</p>', 'contentId'),
-        true,
-        [],
-        'OutcomeExpId',
-        'SkillId'
-      );
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Dest1');
-
-      component.saveThisDestination();
-
-      expect(component.outcome.refresherExplorationId).toBe(null);
-      expect(component.savedOutcome.refresherExplorationId).toBe(null);
-      expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
-    }
-  );
 
   it(
     'should set labelled as correct to false on saving destination' +

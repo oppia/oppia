@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 import datetime
 import re
+from typing import Any, Dict, cast
 
 from core import feconf, utils
 from core.domain import (
@@ -340,7 +341,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 False,
                 [],
                 None,
-                None,
             ),
             [
                 state_domain.RuleSpec(
@@ -455,11 +455,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         state.interaction.default_outcome.dest_if_really_stuck = None
         state.interaction.default_outcome.labelled_as_correct = False
-        state.interaction.default_outcome.refresher_exploration_id = 'Not None'
-        self._assert_question_domain_validation_error(
-            'refresher_exploration_id should be None for '
-            'Question default outcome.'
-        )
 
     def test_strict_validation_for_answer_groups(self) -> None:
         """Test to verify validate method of Question domain object with
@@ -485,7 +480,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': True,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                     },
                     'rule_specs': [
@@ -516,7 +510,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': True,
                         'param_changes': [],
-                        'refresher_exploration_id': None,
                         'missing_prerequisite_skill_id': None,
                     },
                     'rule_specs': [
@@ -534,37 +527,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
             'stuck learner as None.'
-        )
-
-        state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Feedback</p>',
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': 'not None',
-                        'missing_prerequisite_skill_id': None,
-                    },
-                    'rule_specs': [
-                        {
-                            'inputs': {'x': rule_spec_input_test_dict},
-                            'rule_type': 'Contains',
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': None,
-                }
-            )
-        ]
-
-        self._assert_question_domain_validation_error(
-            'refresher_exploration_id should be None for Question outcome.'
         )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -667,6 +629,52 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 self.question.question_state_data_schema_version,
             )
         )
+
+    def test_convert_state_v57_dict_to_v58_dict(self) -> None:
+        """Test _convert_state_v57_dict_to_v58_dict removes refresher_exploration_id."""
+        v57_state_dict = {
+            'interaction': {
+                'answer_groups': [
+                    {
+                        'outcome': {
+                            'dest': 'State1',
+                            'dest_if_really_stuck': None,
+                            'feedback': {
+                                'content_id': 'feedback_1',
+                                'html': '',
+                            },
+                            'labelled_as_correct': False,
+                            'param_changes': [],
+                            'refresher_exploration_id': 'exp_refresher',
+                            'missing_prerequisite_skill_id': None,
+                        }
+                    }
+                ],
+                'default_outcome': {
+                    'dest': 'State1',
+                    'dest_if_really_stuck': None,
+                    'feedback': {'content_id': 'default_outcome', 'html': ''},
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': 'exp_refresher_2',
+                    'missing_prerequisite_skill_id': None,
+                },
+            }
+        }
+        v58_state_dict = (
+            question_domain.Question._convert_state_v57_dict_to_v58_dict(
+                cast(state_domain.StateDict, v57_state_dict)
+            )
+        )
+        outcome = cast(
+            Dict[str, Any],
+            v58_state_dict['interaction']['answer_groups'][0]['outcome'],
+        )
+        default_outcome = cast(
+            Dict[str, Any], v58_state_dict['interaction']['default_outcome']
+        )
+        self.assertNotIn('refresher_exploration_id', outcome)
+        self.assertNotIn('refresher_exploration_id', default_outcome)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -1570,7 +1578,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1612,7 +1619,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1708,7 +1714,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1757,7 +1762,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1815,7 +1819,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1891,7 +1894,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -1948,7 +1950,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -2017,7 +2018,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -2057,7 +2057,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'training_data': [],
@@ -2225,7 +2224,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
-                    'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                 },
                 'rule_specs': [

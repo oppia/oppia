@@ -74,10 +74,6 @@ export class RatingsAndRecommendationsComponent {
   @Input() collectionSummary!: CollectionSummary;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
 
-  // TODO(#22780): Remove these variable and related code.
-  isRefresherExploration!: boolean;
-  parentExplorationIds!: string[];
-
   // The below property will be undefined when the current chapter
   // is the last chapter of a story.
   @Input() nextLessonLink!: string | undefined;
@@ -209,14 +205,6 @@ export class RatingsAndRecommendationsComponent {
     this.localStorageService.updateEndChapterSignUpSectionHiddenPreference(
       'true'
     );
-  }
-
-  getIsRefresherExploration(): boolean {
-    return this.conversationFlowService.getIsRefresherExploration();
-  }
-
-  getParentExplorationIds(): string[] {
-    return this.conversationFlowService.getParentExplorationIds();
   }
 
   isSignUpSectionHidden(): boolean {

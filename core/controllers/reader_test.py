@@ -2977,55 +2977,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-    def test_leaving_an_exploration(self) -> None:
-        self.login(self.VIEWER_EMAIL)
-        # Load demo exploration.
-        exp_id = '6'
-        exp_services.delete_demo(exp_id)
-        exp_services.load_demo(exp_id)
-        exp_version = 1
-
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
-        self.assertEqual(all_models.count(), 0)
-
-        self.post_json(
-            '/explorehandler/leave_for_refresher_exp_event/%s' % exp_id,
-            {
-                'state_name': 'state_name',
-                'exp_version': exp_version,
-                'time_spent_in_state_secs': 2.0,
-                'session_id': 'session_id',
-                'refresher_exp_id': 'refresher_exp_id',
-            },
-        )
-
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
-        self.assertEqual(all_models.count(), 1)
-
-        exp_event_log_model = all_models.get()
-        assert exp_event_log_model is not None
-        model = exp_event_log_model
-
-        self.assertEqual(model.exp_id, exp_id)
-        self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
-        self.assertEqual(model.state_name, 'state_name')
-        self.assertEqual(model.session_id, 'session_id')
-        self.assertEqual(model.exp_version, exp_version)
-        self.assertEqual(model.time_spent_in_state_secs, 2.0)
-
-        self.logout()
-
-
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:

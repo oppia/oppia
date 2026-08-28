@@ -902,10 +902,6 @@ URLS = [
         '/progress/<unique_progress_url_id>', reader.TransientCheckpointUrlPage
     ),
     get_redirect_route(
-        r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
-        reader.LeaveForRefresherExpEventHandler,
-    ),
-    get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler,
     ),

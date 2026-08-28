@@ -30,7 +30,6 @@ export interface OutcomeBackendDict {
   feedback: SubtitledHtmlBackendDict;
   labelled_as_correct: boolean;
   param_changes: readonly ParamChangeBackendDict[];
-  refresher_exploration_id: string | null;
   missing_prerequisite_skill_id: string | null;
 }
 
@@ -40,7 +39,6 @@ export class Outcome extends BaseTranslatableObject {
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
   paramChanges: readonly ParamChangeBackendDict[];
-  refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
     dest: string | null,
@@ -48,7 +46,6 @@ export class Outcome extends BaseTranslatableObject {
     feedback: SubtitledHtml,
     labelledAsCorrect: boolean,
     paramChanges: readonly ParamChangeBackendDict[],
-    refresherExplorationId: string | null,
     missingPrerequisiteSkillId: string | null
   ) {
     super();
@@ -58,7 +55,6 @@ export class Outcome extends BaseTranslatableObject {
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
     this.paramChanges = paramChanges;
-    this.refresherExplorationId = refresherExplorationId;
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
   }
 
@@ -85,7 +81,6 @@ export class Outcome extends BaseTranslatableObject {
       feedback: this.feedback.toBackendDict(),
       labelled_as_correct: this.labelledAsCorrect,
       param_changes: this.paramChanges,
-      refresher_exploration_id: this.refresherExplorationId,
       missing_prerequisite_skill_id: this.missingPrerequisiteSkillId,
     };
   }
@@ -95,15 +90,10 @@ export class Outcome extends BaseTranslatableObject {
   }
 
   /**
-   * Returns true iff an outcome has a self-loop, no feedback, and no
-   * refresher exploration.
+   * Returns true iff an outcome has a self-loop and no feedback.
    */
   isConfusing(currentStateName: string): boolean {
-    return (
-      this.dest === currentStateName &&
-      !this.hasNonemptyFeedback() &&
-      this.refresherExplorationId === null
-    );
+    return this.dest === currentStateName && !this.hasNonemptyFeedback();
   }
   static createNew(
     dest: string | null,
@@ -117,7 +107,6 @@ export class Outcome extends BaseTranslatableObject {
       SubtitledHtml.createDefault(feedbackText, feedbackTextId),
       false,
       paramChanges,
-      null,
       null
     );
   }
@@ -129,7 +118,6 @@ export class Outcome extends BaseTranslatableObject {
       SubtitledHtml.createFromBackendDict(outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
       outcomeDict.param_changes,
-      outcomeDict.refresher_exploration_id,
       outcomeDict.missing_prerequisite_skill_id
     );
   }
