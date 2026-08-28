@@ -1492,6 +1492,10 @@ URLS = [
         feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER,
         certificate_assessment.CertificateAssessmentAttemptsHandler,
     ),
+    get_redirect_route(
+        feconf.CERTIFICATE_QUESTION_HANDLER,
+        certificate_assessment.CertificateQuestionHandler,
+    ),
 ]
 
 # Adding redirects for topic landing pages.
