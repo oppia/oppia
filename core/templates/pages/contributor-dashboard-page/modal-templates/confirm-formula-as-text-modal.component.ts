@@ -27,26 +27,10 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 })
 export class ConfirmFormulaAsTextModalComponent extends ConfirmOrCancelModal {
   constructor(
-    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() ngbActiveModal: NgbActiveModal,
     @Optional()
-    private bottomSheetRef: MatBottomSheetRef<ConfirmFormulaAsTextModalComponent>
+    bottomSheetRef?: MatBottomSheetRef<ConfirmFormulaAsTextModalComponent>
   ) {
-    super(ngbActiveModal);
-  }
-
-  confirm(): void {
-    if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss();
-    } else if (this.ngbActiveModal) {
-      super.confirm();
-    }
-  }
-
-  cancel(): void {
-    if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss('cancel');
-    } else if (this.ngbActiveModal) {
-      super.cancel();
-    }
+    super(ngbActiveModal, bottomSheetRef);
   }
 }
