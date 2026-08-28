@@ -259,9 +259,10 @@ describe('Logged-In Learner', function () {
       );
 
       if (startCtas.length > 0) {
-        await startCtas[0].click();
-
-        await loggedInLearner.page.waitForTimeout(500);
+        // Use the stabilized click helper instead of a raw Puppeteer click:
+        // the page is still smooth-scrolling toward the previously selected
+        // arc, and a raw click's coordinates can land off-target mid-scroll.
+        await loggedInLearner.clickOnElement(startCtas[0]);
 
         await loggedInLearner.expectElementToBeVisible(
           skippedAdventureCardSelector,
