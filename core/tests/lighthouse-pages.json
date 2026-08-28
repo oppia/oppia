@@ -7,13 +7,57 @@
     "url": "http://localhost:8181/about",
     "page_module": "core/templates/pages/about-page/about-page.module.ts"
   },
-  "admin": {
-    "url": "http://localhost:8181/admin",
-    "page_module": "core/templates/pages/admin-page/admin-page.module.ts"
-  },
   "android": {
     "url": "http://localhost:8181/android",
     "page_module": "core/templates/pages/android-page/android-page.module.ts"
+  },
+  "contact": {
+    "url": "http://localhost:8181/contact",
+    "page_module": "core/templates/pages/contact-page/contact-page.module.ts"
+  },
+  "creator-guidelines": {
+    "url": "http://localhost:8181/creator-guidelines",
+    "page_module": "core/templates/pages/participation-playbook/playbook.module.ts"
+  },
+  "donate": {
+    "url": "http://localhost:8181/donate",
+    "page_module": "core/templates/pages/donate-page/donate-page.module.ts"
+  },
+  "get-started": {
+    "url": "http://localhost:8181/get-started",
+    "page_module": "core/templates/pages/get-started-page/get-started-page.module.ts"
+  },
+  "license": {
+    "url": "http://localhost:8181/license",
+    "page_module": "core/templates/pages/license-page/license.module.ts"
+  },
+  "partnerships": {
+    "url": "http://localhost:8181/partnerships",
+    "page_module": "core/templates/pages/partnerships-page/partnerships-page.module.ts"
+  },
+  "privacy-policy": {
+    "url": "http://localhost:8181/privacy-policy",
+    "page_module": "core/templates/pages/privacy-page/privacy-page.module.ts"
+  },
+  "teach": {
+    "url": "http://localhost:8181/teach",
+    "page_module": "core/templates/pages/teach-page/teach-page.module.ts"
+  },
+  "terms": {
+    "url": "http://localhost:8181/terms",
+    "page_module": "core/templates/pages/terms-page/terms-page.module.ts"
+  },
+  "thanks": {
+    "url": "http://localhost:8181/thanks",
+    "page_module": "core/templates/pages/thanks-page/thanks-page.module.ts"
+  },
+  "volunteer": {
+    "url": "http://localhost:8181/volunteer",
+    "page_module": "core/templates/pages/volunteer-page/volunteer-page.module.ts"
+  },
+  "admin": {
+    "url": "http://localhost:8181/admin",
+    "page_module": "core/templates/pages/admin-page/admin-page.module.ts"
   },
   "blog-dashboard": {
     "url": "http://localhost:8181/blog-dashboard",
@@ -27,10 +71,6 @@
     "url": "http://localhost:8181/community-library",
     "page_module": "core/templates/pages/library-page/library-page.module.ts"
   },
-  "contact": {
-    "url": "http://localhost:8181/contact",
-    "page_module": "core/templates/pages/contact-page/contact-page.module.ts"
-  },
   "contributor-dashboard": {
     "url": "http://localhost:8181/contributor-dashboard",
     "page_module": "core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.module.ts"
@@ -39,45 +79,21 @@
     "url": "http://localhost:8181/creator-dashboard",
     "page_module": "core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts"
   },
-  "creator-guidelines": {
-    "url": "http://localhost:8181/creator-guidelines",
-    "page_module": "core/templates/pages/participation-playbook/playbook.module.ts"
-  },
   "delete-account": {
     "url": "http://localhost:8181/delete-account",
     "page_module": "core/templates/pages/delete-account-page/delete-account-page.module.ts"
-  },
-  "donate": {
-    "url": "http://localhost:8181/donate",
-    "page_module": "core/templates/pages/donate-page/donate-page.module.ts"
-  },
-  "get-started": {
-    "url": "http://localhost:8181/get-started",
-    "page_module": "core/templates/pages/get-started-page/get-started-page.module.ts"
   },
   "learner-dashboard": {
     "url": "http://localhost:8181/learner-dashboard",
     "page_module": "core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts"
   },
-  "license": {
-    "url": "http://localhost:8181/license",
-    "page_module": "core/templates/pages/license-page/license.module.ts"
-  },
   "moderator": {
     "url": "http://localhost:8181/moderator",
     "page_module": "core/templates/pages/moderator-page/moderator-page.module.ts"
   },
-  "partnerships": {
-    "url": "http://localhost:8181/partnerships",
-    "page_module": "core/templates/pages/partnerships-page/partnerships-page.module.ts"
-  },
   "preferences": {
     "url": "http://localhost:8181/preferences",
     "page_module": "core/templates/pages/preferences-page/preferences-page.module.ts"
-  },
-  "privacy-policy": {
-    "url": "http://localhost:8181/privacy-policy",
-    "page_module": "core/templates/pages/privacy-page/privacy-page.module.ts"
   },
   "profile": {
     "url": "http://localhost:8181/profile/username1",
@@ -87,25 +103,9 @@
     "url": "http://localhost:8181/signup?return_url=%2F",
     "page_module": "core/templates/pages/signup-page/signup-page.module.ts"
   },
-  "teach": {
-    "url": "http://localhost:8181/teach",
-    "page_module": "core/templates/pages/teach-page/teach-page.module.ts"
-  },
   "topics-and-skills-dashboard": {
     "url": "http://localhost:8181/topics-and-skills-dashboard",
     "page_module": "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts"
-  },
-  "terms": {
-    "url": "http://localhost:8181/terms",
-    "page_module": "core/templates/pages/terms-page/terms-page.module.ts"
-  },
-  "thanks": {
-    "url": "http://localhost:8181/thanks",
-    "page_module": "core/templates/pages/thanks-page/thanks-page.module.ts"
-  },
-  "volunteer": {
-    "url": "http://localhost:8181/volunteer",
-    "page_module": "core/templates/pages/volunteer-page/volunteer-page.module.ts"
   },
   "topic-viewer": {
     "url": "http://localhost:8181/learn/staging/dummy-topic-one/story",
@@ -146,5 +146,109 @@
   "story-editor": {
     "url": "http://localhost:8181/story_editor/{{story_id}}",
     "page_module": "core/templates/pages/story-editor-page/story-editor-page.module.ts"
+  },
+  "blog-admin": {
+    "url": "http://localhost:8181/blog-admin",
+    "page_module": "core/templates/pages/blog-admin-page/blog-admin-page.module.ts"
+  },
+  "blog-post": {
+    "url": "http://localhost:8181/blog/dummy-post",
+    "page_module": "core/templates/pages/blog-post-page/blog-post-page.module.ts"
+  },
+  "certificate-assessment-player": {
+    "url": "http://localhost:8181/certificate-assessment/{{certificate_id}}",
+    "page_module": "core/templates/pages/certificate-assessment-player-page/certificate-assessment-player-page.module.ts"
+  },
+  "certificate-assessment-result": {
+    "url": "http://localhost:8181/certificate-assessment-result/{{attempt_id}}",
+    "page_module": "core/templates/pages/certificate-assessment-result-page/certificate-assessment-result-page.module.ts"
+  },
+  "certificate-creator-dashboard": {
+    "url": "http://localhost:8181/certificate-creator-dashboard",
+    "page_module": "core/templates/pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module.ts"
+  },
+  "certificate-offering-available": {
+    "url": "http://localhost:8181/learn/staging/certificate-offering-available",
+    "page_module": "core/templates/pages/certificate-offering-available-page/certificate-offering-available-page.module.ts"
+  },
+  "contributor-admin-dashboard": {
+    "url": "http://localhost:8181/contributor-admin-dashboard",
+    "page_module": "core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.module.ts"
+  },
+  "create-certificate-offering": {
+    "url": "http://localhost:8181/create-certificate-assessment-offering",
+    "page_module": "core/templates/pages/create-certificate-offering-page/create-certificate-offering-page.module.ts"
+  },
+  "diagnostic-test-player": {
+    "url": "http://localhost:8181/diagnostic-test-player?classroom=staging",
+    "page_module": "core/templates/pages/diagnostic-test-player-page/diagnostic-test-player-page.module.ts"
+  },
+  "edit-certificate-offering": {
+    "url": "http://localhost:8181/edit-certificate-assessment-offering/{{certificate_offering_id}}",
+    "page_module": "core/templates/pages/edit-certificate-offering-page/edit-certificate-offering-page.module.ts"
+  },
+  "end-of-arc-test": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/test/arc/help-jamie-win-arcade",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "facilitator-dashboard": {
+    "url": "http://localhost:8181/facilitator-dashboard",
+    "page_module": "core/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.module.ts"
+  },
+  "feedback-updates": {
+    "url": "http://localhost:8181/feedback-updates",
+    "page_module": "core/templates/pages/feedback-updates-page/feedback-updates-page.module.ts"
+  },
+  "create-learner-group": {
+    "url": "http://localhost:8181/create-learner-group",
+    "page_module": "core/templates/pages/learner-group-pages/create-group/create-learner-group-page.module.ts"
+  },
+  "edit-learner-group": {
+    "url": "http://localhost:8181/edit-learner-group/{{learner_group_id}}",
+    "page_module": "core/templates/pages/learner-group-pages/edit-group/edit-learner-group-page.module.ts"
+  },
+  "learner-group-viewer": {
+    "url": "http://localhost:8181/learner-group/{{learner_group_id}}",
+    "page_module": "core/templates/pages/learner-group-pages/view-group/view-learner-group-page.module.ts"
+  },
+  "mastery-challenge": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/mastery-challenge",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "new-lesson-player": {
+    "url": "http://localhost:8181/lesson/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.module.ts"
+  },
+  "node-practice-session": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/help-jamie-win-arcade",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "pending-account-deletion": {
+    "url": "http://localhost:8181/pending-account-deletion",
+    "page_module": "core/templates/pages/pending-account-deletion-page/pending-account-deletion-page.module.ts"
+  },
+  "practice-session": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/session",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "release-coordinator": {
+    "url": "http://localhost:8181/release-coordinator",
+    "page_module": "core/templates/pages/release-coordinator-page/release-coordinator-page.module.ts"
+  },
+  "subtopic-viewer": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/studyguide/dummysubtopic",
+    "page_module": "core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.module.ts"
+  },
+  "technical-feedback-dashboard": {
+    "url": "http://localhost:8181/technical-feedback-dashboard",
+    "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
+  },
+  "technical-feedback-detail": {
+    "url": "http://localhost:8181/technical-feedback-dashboard/test-team/1",
+    "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
+  },
+  "voiceover-admin": {
+    "url": "http://localhost:8181/voiceover-admin",
+    "page_module": "core/templates/pages/voiceover-admin-page/voiceover-admin-page.module.ts"
   }
 }

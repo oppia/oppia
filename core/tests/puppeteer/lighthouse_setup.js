@@ -492,7 +492,7 @@ const generateDataForClassroom = async function (browser, page) {
     });
 
     await page.waitForSelector(generateClassroomButton);
-    await page.type(generateClassroomCountInput, '1');
+    await page.type(generateClassroomCountInput, '10');
     await page.click(generateClassroomButton);
 
     const successMessage = 'Dummy new classroom generated successfully.';
