@@ -270,6 +270,56 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch the opportunities count data with empty topic and language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', '', '')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 10});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(10);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch the opportunities count data on error', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Failed to fetch opportunities count data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch opportunities count data.')
+    );
+  }));
+
   it('should fetch skill opportunities with a search query', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
