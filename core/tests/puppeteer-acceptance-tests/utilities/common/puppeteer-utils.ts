@@ -105,6 +105,7 @@ export class BaseUser {
      */
     const skipSiteIsolationWorkaround = [
       'logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page',
+      'logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue',
     ].includes(specName ?? '');
     if (!headless && !skipSiteIsolationWorkaround) {
       args.push('--disable-site-isolation-trials');

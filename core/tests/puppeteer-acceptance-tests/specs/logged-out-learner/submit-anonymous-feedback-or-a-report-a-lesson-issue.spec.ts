@@ -238,7 +238,7 @@ describe('Logged-Out User', function () {
     );
   });
 
-  // afterAll(async function () {
-  //   await UserFactory.closeAllBrowsers();
-  // });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });
