@@ -650,7 +650,10 @@ const metaApplicationNameSelector = 'meta[name="application-name"]';
 const lessonPlayerSideBarToggleButton = '.e2e-test-player-sidebar-toggle';
 const mobileOpenOptionsButton = '.e2e-test-mobile-open-options-button';
 const lessonFeedbackButtonSelector = '.e2e-test-lesson-feedback-button';
-const lessonReportButtonSelector = '.e2e-test-lesson-report-button';
+const desktopLessonReportButtonSelector =
+  '.e2e-test-lesson-desktop-report-button';
+const mobileLessonReportButtonSelector =
+  '.e2e-test-lesson-mobile-report-button';
 const feedbackModaltextarea = '.e2e-test-feedback-modal-textarea';
 const feedbackCharacterCount = '.e2e-test-feedback-text-count';
 const lessonSpecificCategoryChips = '.e2e-test-flag-category-chips';
@@ -6579,7 +6582,12 @@ export class LoggedOutUser extends BaseUser {
    * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
    */
   async clickReportLessonButton(isUserLoggedIn: boolean): Promise<void> {
-    await this.clickOnElementWithSelector(lessonReportButtonSelector);
+    const isMobileViewport = this.isViewportAtMobileWidth();
+
+    const selector = isMobileViewport
+      ? mobileLessonReportButtonSelector
+      : desktopLessonReportButtonSelector;
+    await this.clickOnElementWithSelector(selector);
     await this.expectModalTitleToBe('Report an Issue');
     await this.expectElementToBeVisible(commonModalBodySelector);
     await this.expectElementToBeVisible(feedbackModaltextarea);

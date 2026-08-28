@@ -63,7 +63,7 @@ describe('Logged-Out User', function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
   }, 350000);
 
-  it('submit anonymous feedback or report a lesson issue.', async () => {
+  it('should submit anonymous feedback or report a lesson issue.', async () => {
     // Navigating to a lesson page and clicking on the "Report an Issue" flag icon in the options sidebar.
     await loggedOutLearner.playLesson(expId);
     await loggedOutLearner.toggleOptionsSidebar();
@@ -238,7 +238,7 @@ describe('Logged-Out User', function () {
     );
   });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
+  // afterAll(async function () {
+  //   await UserFactory.closeAllBrowsers();
+  // });
 });

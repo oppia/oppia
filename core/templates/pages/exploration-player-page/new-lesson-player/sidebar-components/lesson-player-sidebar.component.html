@@ -57,7 +57,7 @@
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button e2e-test-lesson-report-button"
+      <button class="player-sidebar-button e2e-test-lesson-desktop-report-button"
               aria-label="Report an issue"
               (click)="showReportAnIssueModal()"
               *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
@@ -97,7 +97,7 @@
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </button>
-        <button class="e2e-test-lesson-report-button"
+        <button class="e2e-test-lesson-mobile-report-button"
                 (click)="showReportAnIssueModal()"
                 *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
           <i class="fa fa-lg fa-flag"></i>
