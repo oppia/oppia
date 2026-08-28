@@ -78,8 +78,10 @@ describe('Logged-In Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -159,9 +161,7 @@ describe('Logged-In Learner', function () {
   it(
     'should navigate to topic page and display adventure navigation dock',
     async function () {
-      await loggedInLearner.goto(
-        `${BASE_URL}/learn/math/fractions/the-fraction-journey`
-      );
+      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
       await loggedInLearner.waitForPageToFullyLoad();
 
       await loggedInLearner.expectElementToBeVisible(

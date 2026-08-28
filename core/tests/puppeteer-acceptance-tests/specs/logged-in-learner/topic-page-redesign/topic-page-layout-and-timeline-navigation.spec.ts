@@ -84,9 +84,10 @@ describe('Logged-In Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
-    await UserFactory.closeBrowserForUser(releaseCoordinator);
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -101,6 +102,14 @@ describe('Logged-In Learner', function () {
       'Fraction subtopics',
       'Fraction skills'
     );
+    // Asking for extra questions for the "Fraction skills" skill so that, when
+    // the serial "publish chapters" flow below publishes the first batch of
+    // chapters, the backend's story-publish validation (which requires each
+    // acquired skill to have at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+    // questions) passes. Without this, the story would not be marked as
+    // published in the topic and would not appear on the redesigned topic
+    // viewer page.
+    await curriculumAdmin.createQuestionsForSkill('Fraction skills', 7);
     await curriculumAdmin.addTopicToClassroom('Math', 'Fractions');
     await curriculumAdmin.publishClassroom('Math');
 
@@ -154,20 +163,47 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
+
+    // The "split into adventure" action is only available in the arcs story
+    // editor, which is hidden once the serial-chapter feature flag is enabled
+    // (see story-editor.component.html). So the serial-chapter flag used for
+    // the ready-to-publish / publish-up-to flows below must be enabled only
+    // after the split has been performed.
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'serial_chapter_launch_curriculum_admin_view'
+    );
+    await UserFactory.closeBrowserForUser(releaseCoordinator);
+
+    // Mark the final chapter as "Ready to Publish" so the learner sees it as a
+    // "Coming Soon" placeholder card on the redesigned topic page. A DRAFT
+    // chapter is filtered out of the topic viewer data, so it must be in
+    // ready-to-publish status (not DRAFT, not Published) to be shown.
+    await curriculumAdmin.readyToPublish(
+      'Multiplying Fractions',
+      'The Fraction Journey',
+      'Fractions',
+      'Fraction skills'
+    );
+
+    // Publish the first three chapters via the serial "publish up to" flow.
+    // This sets each Published chapter's first publication date, which the
+    // learner topic page needs in order to render the "New" badge.
+    await curriculumAdmin.publishChapter(
+      'The Fraction Journey',
+      'Fractions',
+      '2'
+    );
 
     loggedInLearner = await UserFactory.createNewUser(
       'learner1',
       'learner_topic_page1@example.com'
     );
-  }, 900000);
+  }, 6000000);
 
   it(
     'should render the topic page with correct title and vertical timeline layout',
     async function () {
-      await loggedInLearner.goto(
-        `${BASE_URL}/learn/math/fractions/the-fraction-journey`
-      );
+      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
       await loggedInLearner.waitForPageToFullyLoad();
 
       await loggedInLearner.expectElementToBeVisible(
@@ -258,7 +294,7 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.expectElementToBeVisible(comingSoonTitleSelector);
       await loggedInLearner.expectTextContentToContain(
         comingSoonTitleSelector,
-        'Coming Soon'
+        'COMING SOON CHAPTERS'
       );
 
       await loggedInLearner.expectElementToBeVisible(comingSoonWrapperSelector);
