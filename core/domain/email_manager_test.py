@@ -310,7 +310,19 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_role_notification_email(
@@ -1940,9 +1952,16 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
             (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
             ),
         ]
     )
@@ -1950,20 +1969,11 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_submission_email(feedback)
 
-        mock_send_email.assert_not_called()
+        email_manager.send_feedback_submission_email(feedback)
+
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
         [
@@ -2227,9 +2237,16 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
             (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
             ),
         ]
     )
@@ -2237,24 +2254,14 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_status_change_email(
-                    feedback,
-                    self.user.user_id,
-                )
+        email_manager.send_feedback_status_change_email(
+            feedback,
+            self.user.user_id,
+        )
 
-        mock_send_email.assert_not_called()
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
         [
@@ -2336,9 +2343,16 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
             (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
             ),
         ]
     )
@@ -2346,24 +2360,15 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_reply_email(
-                    feedback,
-                    'Thanks for the suggestion.',
-                    self.user.user_id,
-                )
 
-        mock_send_email.assert_not_called()
+        email_manager.send_feedback_reply_email(
+            feedback,
+            'Thanks for the suggestion.',
+            self.user.user_id,
+        )
+
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
         [
@@ -2468,7 +2473,19 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
@@ -2639,7 +2656,14 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+        ]
     )
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
         email_manager.send_suggestion_email(
@@ -2777,7 +2801,16 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
         ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
@@ -2903,7 +2936,19 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_instant_feedback_message_email(
@@ -3052,7 +3097,19 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
         self.report_text = 'AD'
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_flag_exploration_email(
@@ -3254,7 +3311,19 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_mail_to_onboard_new_reviewers(
@@ -3346,7 +3415,19 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_mail_to_notify_users_to_review(
@@ -3431,7 +3512,18 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         contributor_ranking_email_info = (
@@ -4063,20 +4155,32 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+            (
+                param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+                True,
+            ),  # pylint: disable=line-too-long
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
-                    [self.reviewer_1_id],
-                    [[self.reviewable_suggestion_email_info]],
-                )
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+            [self.reviewer_1_id],
+            [[self.reviewable_suggestion_email_info]],
+        )
 
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -6249,29 +6353,34 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+            (
+                param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+                True,
+            ),  # pylint: disable=line-too-long
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                with self.swap(
-                    suggestion_models,
-                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
-                    0,
-                ):
-                    (
-                        email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [],
-                            [],
-                            [self.reviewable_suggestion_email_info],
-                        )
-                    )
+        email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
+            [self.admin_1_id],
+            [],
+            [],
+            [self.reviewable_suggestion_email_info],
+        )
 
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -7297,28 +7406,40 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         return translation_suggestion
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+            (
+                param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+                True,
+            ),  # pylint: disable=line-too-long
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                reviewer_ids_by_language: DefaultDict[str, List[str]] = (
-                    DefaultDict(list)
-                )
-                suggestions_by_language: DefaultDict[
-                    str, List[suggestion_registry.ReviewableSuggestionEmailInfo]
-                ] = DefaultDict(list)
-                reviewer_ids_by_language['en'] = []
-                suggestions_by_language['en'] = []
+        reviewer_ids_by_language: DefaultDict[str, List[str]] = DefaultDict(
+            list
+        )
+        suggestions_by_language: DefaultDict[
+            str, List[suggestion_registry.ReviewableSuggestionEmailInfo]
+        ] = DefaultDict(list)
+        reviewer_ids_by_language['en'] = []
+        suggestions_by_language['en'] = []
 
-                email_manager.send_reviewer_notifications(
-                    reviewer_ids_by_language, suggestions_by_language
-                )
+        email_manager.send_reviewer_notifications(
+            reviewer_ids_by_language, suggestions_by_language
+        )
 
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -7592,22 +7713,34 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+            (
+                param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+                True,
+            ),  # pylint: disable=line-too-long
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
-                    [self.admin_1_id],
-                    [],
-                    [],
-                    self.suggestion_types_needing_reviewers,
-                )
+        email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
+            [self.admin_1_id],
+            [],
+            [],
+            self.suggestion_types_needing_reviewers,
+        )
 
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -8410,7 +8543,19 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_account_deleted_email(
@@ -8768,7 +8913,19 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
         self,
@@ -9023,7 +9180,19 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
         email_manager.send_email_to_removed_cd_user(
@@ -9349,7 +9518,19 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
