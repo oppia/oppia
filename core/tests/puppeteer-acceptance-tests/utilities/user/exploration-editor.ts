@@ -2840,9 +2840,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.page.$eval(explorationConfirmPublishButton, el =>
-        (el as HTMLElement).click()
-      );
+      await this.clickOnElementWithSelector(explorationConfirmPublishButton);
       const success = await this.page
         .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
         .then(() => true)
@@ -4117,9 +4115,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.$eval(closeModalButtonSelector, el =>
-        (el as HTMLElement).click()
-      );
+      await this.page.click(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
@@ -6779,9 +6775,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.$eval(closeModalButtonSelector, el =>
-        (el as HTMLElement).click()
-      );
+      await this.page.click(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
