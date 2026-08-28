@@ -5859,13 +5859,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             created_on=None,
             last_updated=datetime.datetime.now(),
         )
-
+        # pylint: disable=protected-access
         submission_datetime = (
             suggestion_services._get_suggestion_submission_datetime(
                 suggestion_model
             )
         )
-
+        # pylint: enable=protected-access
         self.assertEqual(
             submission_datetime,
             suggestion_model.last_updated,
@@ -5896,11 +5896,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'get_translation_opportunities_by_entity_ids',
                 lambda target_type, target_ids: {'0': None},
             ):
+                # pylint: disable=protected-access
                 topic_id = (
                     suggestion_services._get_topic_id_of_translation_target(
                         suggestion
                     )
                 )
+                # pylint: enable=protected-access
 
         self.assertEqual(topic_id, 'uncategorized')
 
