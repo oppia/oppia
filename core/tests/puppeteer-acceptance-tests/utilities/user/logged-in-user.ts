@@ -146,6 +146,7 @@ const addInteractionModalSelector = 'customize-interaction-body-container';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
+const reportSiteProblemLink = '.e2e-test-report-site-problem-link';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
@@ -4603,6 +4604,21 @@ export class LoggedInUser extends BaseUser {
       {},
       expectedProfilePath
     );
+  }
+
+  /**
+   * Opens the Report a Site Issue Modal from the Profile Dropdown.
+   */
+  async openReportASiteIssueModal(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(reportSiteProblemLink, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(reportSiteProblemLink);
+    await this.expectModalTitleToBe('Report a Website Issue');
+    await this.waitForNetworkIdle();
   }
 }
 

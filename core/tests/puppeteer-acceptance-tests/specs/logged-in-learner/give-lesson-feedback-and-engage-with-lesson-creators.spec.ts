@@ -112,15 +112,23 @@ describe('Logged-in User', function () {
     await loggedInLearner.toggleOptionsSidebar();
     await loggedInLearner.clickReportLessonButton(true);
     showMessage('Clicked on "Report an Issue" button.');
-
+    await loggedInLearner.expectFeedbackModalSubHeaderToBe(
+      'Your feedback goes directly to our lesson creators to help improve this card.'
+    );
+    await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
+      "What's broken? Let us know if an image is missing, a button isn't working, or the lesson has an error."
+    );
+    await loggedInLearner.expectLessonSpecificCategoryChipsToBePresent(true);
+    await loggedInLearner.expectScreenshotDropZoneTextToBe(
+      'Drag an image into this area'
+    );
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
     await loggedInLearner.expectScreenshotToMatch(
       'reportALessonModal',
       __dirname
     );
 
     // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
-    await loggedInLearner.clickReportLessonButton(true);
-
     await loggedInLearner.selectReportIssueChip('typo');
     showMessage('Typo chip selected in report an issue modal.');
     await loggedInLearner.submitFeedbackInTextArea(
