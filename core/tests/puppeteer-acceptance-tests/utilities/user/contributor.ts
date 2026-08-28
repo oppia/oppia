@@ -415,7 +415,6 @@ export class Contributor extends ExplorationEditor {
     if (!dropdown) {
       throw new Error(`Dropdown ${selectedOptionSelector} not found.`);
     }
-    await this.waitForElementToStabilize(dropdown);
     await dropdown.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(topicOptionSelector);
@@ -439,7 +438,6 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Click on the option.
-    await this.waitForElementToStabilize(optionElement);
     await optionElement.evaluate(el => (el as HTMLElement).click());
 
     // Verify option is selected.
@@ -455,7 +453,6 @@ export class Contributor extends ExplorationEditor {
     if (!dropdown) {
       throw new Error(`Dropdown ${topicSelector} not found.`);
     }
-    await this.waitForElementToStabilize(dropdown);
     await dropdown.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(topicOptionSelector);
@@ -475,7 +472,6 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Click on the option.
-    await this.waitForElementToStabilize(optionElement);
     await optionElement.evaluate(el => (el as HTMLElement).click());
 
     // Verify option is selected.
@@ -729,7 +725,6 @@ export class Contributor extends ExplorationEditor {
         `Dropdown toggle ${languageDropdownToggleArrowSelector} not found.`
       );
     }
-    await this.waitForElementToStabilize(dropdownToggle);
     await dropdownToggle.evaluate(el => (el as HTMLElement).click());
 
     await this.expectElementToBeVisible(languageOptionSelector, false);
