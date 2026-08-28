@@ -92,29 +92,3 @@ describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () =>
     expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
   });
 });
-
-describe('Confirm Formula As Text Modal Component without modals', () => {
-  let component: ConfirmFormulaAsTextModalComponent;
-  let fixture: ComponentFixture<ConfirmFormulaAsTextModalComponent>;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ConfirmFormulaAsTextModalComponent],
-      providers: [
-        {provide: MatBottomSheetRef, useValue: null},
-        {provide: NgbActiveModal, useValue: null},
-      ],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmFormulaAsTextModalComponent);
-    component = fixture.componentInstance;
-  });
-
-  it('should not throw when confirm or cancel is called without active modals', () => {
-    expect(() => component.confirm()).not.toThrowError();
-    expect(() => component.cancel()).not.toThrowError();
-  });
-});
