@@ -62,8 +62,9 @@ describe('Voiceover regeneration information modal', () => {
       cloudTaskName:
         'projects/proj123/locations/us1/queues/myqueue/tasks/task456',
     } as CloudTaskRun;
+    componentInstance.ngOnInit();
 
-    expect(componentInstance.getCloudTaskConsoleUrl()).toBe(
+    expect(componentInstance.cloudTaskUrl).toBe(
       'https://console.cloud.google.com/cloudtasks/queue/us1/myqueue?project=proj123'
     );
   });
@@ -72,8 +73,9 @@ describe('Voiceover regeneration information modal', () => {
     componentInstance.cloudTaskRun = {
       cloudTaskName: 'not-a-valid-task-name',
     } as CloudTaskRun;
+    componentInstance.ngOnInit();
 
-    expect(componentInstance.getCloudTaskConsoleUrl()).toBeNull();
+    expect(componentInstance.cloudTaskUrl).toBeNull();
   });
 
   it('should get frontend function id text', () => {

@@ -7,7 +7,7 @@
       <span>Cloud task name:</span>
     </div>
     <div class="messages-container">
-      <a *ngIf="getCloudTaskConsoleUrl() as cloudTaskUrl; else plainCloudTaskName"
+      <a *ngIf="cloudTaskUrl; else plainCloudTaskName"
          [href]="cloudTaskUrl"
          target="_blank"
          rel="noopener noreferrer">
