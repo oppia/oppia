@@ -37,6 +37,12 @@ import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.mod
 import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import './creator-dashboard-page.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  FeedbackStatusCounts,
+  FeedbackStatusCountsBackendResponse,
+} from 'domain/feedback/feedback.model';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -59,6 +65,7 @@ export class CreatorDashboardPageComponent {
   // 'lastWeekStats' is null for a new creator.
   lastWeekStats!: CreatorDashboardStats | null;
   dashboardStats!: CreatorDashboardStats;
+  feedbackStatusCounts: FeedbackStatusCounts | null = null;
   relativeChangeInTotalPlays!: number;
   getLocaleAbbreviatedDatetimeString!: (millisSinceEpoch: number) => string;
   getHumanReadableStatus!: (status: string) => string;
@@ -97,7 +104,9 @@ export class CreatorDashboardPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
+    private feedbackBackendApiService: FeedbackBackendApiService
   ) {}
 
   EXP_PUBLISH_TEXTS = {
@@ -241,6 +250,10 @@ export class CreatorDashboardPageComponent {
       this.lastWeekStats = responseData.lastWeekStats;
       this.myExplorationsView = responseData.displayPreference;
 
+      if (this.isNewCreatorFeedbackTabEnabled()) {
+        this.fetchAggregatedFeedbackStatusCounts();
+      }
+
       if (this.dashboardStats && this.lastWeekStats) {
         this.relativeChangeInTotalPlays =
           this.dashboardStats.totalPlays - this.lastWeekStats.totalPlays;
@@ -280,6 +293,60 @@ export class CreatorDashboardPageComponent {
 
   createNewExploration(): void {
     this.explorationCreationService.createNewExploration();
+  }
+
+  isNewCreatorFeedbackTabEnabled(): boolean {
+    return this.platformFeatureService.status
+      .ExplorationEditorNewCreatorFeedbackTab.isEnabled;
+  }
+
+  private fetchAggregatedFeedbackStatusCounts(): void {
+    const publicExplorationIds = this.explorationsList
+      .filter(exploration => exploration.status !== 'private')
+      .map(exploration => exploration.id);
+
+    if (publicExplorationIds.length === 0) {
+      return;
+    }
+
+    Promise.all(
+      publicExplorationIds.map(explorationId =>
+        this.feedbackBackendApiService.fetchLessonFeedbackStatusCountsAsync(
+          explorationId
+        )
+      )
+    )
+      .then(responses => {
+        this.feedbackStatusCounts = this.mergeFeedbackStatusCounts(responses);
+      })
+      .catch(() => {
+        // The status breakdown is supplementary, so it stays hidden if any
+        // of its requests fails.
+        this.feedbackStatusCounts = null;
+      });
+  }
+
+  private mergeFeedbackStatusCounts(
+    responses: FeedbackStatusCountsBackendResponse[]
+  ): FeedbackStatusCounts {
+    const merged: FeedbackStatusCounts = {
+      open: 0,
+      fixed: 0,
+      compliment: 0,
+      not_actionable: 0,
+      transferred_to_github: 0,
+      total: 0,
+    };
+    responses.forEach(response => {
+      const counts = response.lesson_feedback_counts;
+      merged.open += counts.open;
+      merged.fixed += counts.fixed;
+      merged.compliment += counts.compliment;
+      merged.not_actionable += counts.not_actionable;
+      merged.transferred_to_github += counts.transferred_to_github;
+      merged.total += counts.total;
+    });
+    return merged;
   }
 
   returnZero(): number {
