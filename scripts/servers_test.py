@@ -26,12 +26,10 @@ import os
 import re
 import shutil
 import signal
-import ssl
 import subprocess
 import sys
 import threading
 import time
-from urllib import request as urlrequest
 
 from core.tests import test_utils
 from scripts import common, scripts_test_utils, servers
@@ -862,140 +860,6 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
         )
 
-    def test_managed_webdriverio_server_fails_to_get_chrome_version(
-        self,
-    ) -> None:
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(subprocess, 'check_output', error=OSError)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common,
-                'wait_for_port_to_be_in_use',
-                lambda _: None,
-                called=False,
-            )
-        )
-
-        expected_regexp = 'Failed to execute "google-chrome --version" command'
-        with self.assertRaisesRegex(Exception, expected_regexp):
-            self.exit_stack.enter_context(servers.managed_webdriverio_server())
-
-        self.assertEqual(len(popen_calls), 0)
-
-    def test_managed_webdriverio_with_invalid_sharding_instances(self) -> None:
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_webdriverio_server(sharding_instances=0)
-            )
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_webdriverio_server(sharding_instances=-1)
-            )
-
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 0)
-
-    def test_managed_webdriverio(self) -> None:
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(
-            servers.managed_webdriverio_server(chrome_version='104.0.5112.79')
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
-        program_args = popen_calls[0].program_args
-        self.assertIn(
-            '%s --unhandled-rejections=strict %s %s --suite full %s'
-            % (
-                common.NPX_BIN_PATH,
-                common.NODEMODULES_WDIO_BIN_PATH,
-                common.WEBDRIVERIO_CONFIG_FILE_PATH,
-                '104.0.5112.79',
-            ),
-            program_args,
-        )
-        self.assertNotIn('DEBUG=true', program_args)
-        self.assertIn('--suite full', program_args)
-        self.assertIn('--params.devMode=True', program_args)
-
-    def test_managed_webdriverio_mobile(self) -> None:
-        attempts = []
-
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
-            attempts.append(url)
-            self.assertLessEqual(len(attempts), 1)
-            self.assertTrue(
-                url.startswith(
-                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-                )
-            )
-            self.assertIsNotNone(context)
-            return io.BytesIO(b'content')
-
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-        with urlopen_swap:
-            with servers.managed_webdriverio_server(mobile=True):
-                self.assertEqual(os.getenv('MOBILE'), 'true')
-
-    def test_managed_webdriverio_with_explicit_args(self) -> None:
-        attempts = []
-
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
-            attempts.append(url)
-            self.assertLessEqual(len(attempts), 1)
-            self.assertTrue(
-                url.startswith(
-                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-                )
-            )
-            self.assertIsNotNone(context)
-            return io.BytesIO(b'content')
-
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        with urlopen_swap:
-            self.exit_stack.enter_context(
-                servers.managed_webdriverio_server(
-                    suite_name='abc',
-                    sharding_instances=3,
-                    debug_mode=True,
-                    dev_mode=False,
-                    stdout=subprocess.PIPE,
-                )
-            )
-            self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
-        program_args = popen_calls[0].program_args
-        # From debug_mode=True.
-        self.assertIn('DEBUG=true', program_args)
-        # From sharding_instances=3.
-        self.assertIn('--capabilities[0].maxInstances=3', program_args)
-        # From dev_mode=True.
-        self.assertIn('--params.devMode=False', program_args)
-        # From suite='full'.
-        self.assertIn('--suite abc', program_args)
-
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         test_file_path = (
@@ -1320,6 +1184,20 @@ class GetChromedriverVersionTests(test_utils.TestBase):
                 servers.get_chromedriver_version(),
                 '115.0.3626.123',
             )
+
+    def test_raises_exception_when_chrome_version_command_fails(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            raise OSError
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+
+        expected_regexp = 'Failed to execute "google-chrome --version" command'
+        with os_name_swap, check_output_swap:
+            with self.assertRaisesRegex(Exception, expected_regexp):
+                servers.get_chromedriver_version()
 
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(

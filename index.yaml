@@ -731,7 +731,6 @@ indexes:
   - name: created_on
     direction: desc
 
-<<<<<<< HEAD
 - kind: CollectionSummaryModel
   properties:
   - name: category
@@ -747,7 +746,8 @@ indexes:
   - name: language_code
   - name: status
   - name: scaled_average_rating
-=======
+    direction: desc
+
 - kind: GeneralSuggestionModel
   properties:
   - name: author_id
@@ -811,5 +811,4 @@ indexes:
   properties:
   - name: target_type
   - name: created_on
->>>>>>> upstream/develop
     direction: desc

@@ -150,29 +150,6 @@ ANALYTICS_CONSTANTS_FILE_PATH = os.path.join(
 )
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
-
-WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
-WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
-    WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'
-)
-WEBDRIVER_PROVIDER_PATH = os.path.join(
-    WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'
-)
-GECKO_PROVIDER_FILE_PATH = os.path.join(
-    WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'
-)
-CHROME_PROVIDER_FILE_PATH = os.path.join(
-    WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'
-)
-
-PROTRACTOR_BIN_PATH = os.path.join(
-    NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'
-)
-PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
-    'core', 'tests', 'protractor.conf.js'
-)
-WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
-NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
 HASHES_JSON_FILEPATH = os.path.join('assets', 'hashes.json')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
@@ -202,9 +179,9 @@ ACCEPTANCE_TEST_CONFIG_FILE_PATH = os.path.join(
     CURR_DIR, 'core', 'tests', 'ci-test-suite-configs', 'acceptance.json'
 )
 
-GAE_PORT_FOR_E2E_TESTING: Final = 8181
-PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
-    GAE_PORT_FOR_E2E_TESTING,
+GAE_PORT_FOR_ACCEPTANCE_TESTING: Final = 8181
+PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_ACCEPTANCE_TESTING: Final = [
+    GAE_PORT_FOR_ACCEPTANCE_TESTING,
 ]
 
 
@@ -1036,11 +1013,11 @@ def is_oppia_server_already_running() -> bool:
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
+    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_ACCEPTANCE_TESTING:
         if is_port_in_use(port):
             print(
                 'There is already a server running on localhost:%s. '
-                'Please terminate it before running the end-to-end tests. '
+                'Please terminate it before running the acceptance tests. '
                 'Exiting.' % port
             )
             return True
