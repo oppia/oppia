@@ -53,6 +53,22 @@ class PlatformParameterSnapshotContentModel(
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class BasePlatformParameterConfigModel(base_models.VersionedModel):
+    """Abstract base model for platform parameter configuration.
+
+    This model defines the common storage structure for platform parameters
+    across Web and Android. It must not be instantiated directly.
+
+    The id field represents the unique platform parameter name.
+
+    Fields:
+        id: str. Unique name of the platform parameter.
+    """
+
+    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
+
+
 class PlatformParameterModel(base_models.VersionedModel):
     """A class that represents a named dynamic platform parameter.
     This model only stores fields that can be updated in run time.
@@ -87,9 +103,9 @@ class PlatformParameterModel(base_models.VersionedModel):
         return dict(
             super(cls, cls).get_export_policy(),
             **{
-                'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                "rules": base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                "rule_schema_version": base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                "default_value": base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
@@ -134,6 +150,19 @@ class PlatformParameterModel(base_models.VersionedModel):
         )
 
 
+class BaseFeatureFlagConfigModel(base_models.BaseModel):
+    """Abstract base model for feature flag configuration.
+
+    This model defines the common structure for all feature flags across
+    Web and Android. It must not be instantiated directly.
+
+    The id field represents the globally unique feature flag name.
+
+    Fields:
+        id: str. Unique name of the feature flag.
+    """
+
+
 class FeatureFlagConfigModel(base_models.BaseModel):
     """A class that represents named dynamic feature-flag.
     This model only stores fields that can be updated in run time.
@@ -171,11 +200,11 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         return dict(
             super(cls, cls).get_export_policy(),
             **{
-                'force_enable_for_all_users': (
+                "force_enable_for_all_users": (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                "rollout_percentage": base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                "user_group_ids": base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
