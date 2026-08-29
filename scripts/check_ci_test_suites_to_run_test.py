@@ -369,7 +369,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     },
                 ],
             },
-            'lighthouse_accessibility': {
+            'lighthouse': {
                 'count': 2,
                 'suites': [
                     {
@@ -884,7 +884,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -993,7 +992,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
