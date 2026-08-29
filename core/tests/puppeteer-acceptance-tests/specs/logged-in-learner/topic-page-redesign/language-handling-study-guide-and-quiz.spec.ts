@@ -78,7 +78,13 @@ describe('Logged-In Learner', function () {
       'redesigned_topic_viewer_page'
     );
     await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
-    await UserFactory.closeBrowserForUser(releaseCoordinator);
+    // This flag lets the curriculum admin modify translations, which is needed
+    // when adding a non-English translation to an exploration later in the
+    // setup (so that the language selector and fallback info tooltip render on
+    // the redesigned topic viewer page).
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'exploration_editor_can_modify_translations'
+    );
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -93,6 +99,11 @@ describe('Logged-In Learner', function () {
       'Fraction subtopics',
       'Fraction skills'
     );
+    // Asking for extra questions for the "Fraction skills" skill so that, when
+    // the serial "publish chapters" flow below publishes the chapters, the
+    // backend's story-publish validation (which requires each acquired skill to
+    // have at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH questions) passes.
+    await curriculumAdmin.createQuestionsForSkill('Fraction skills', 7);
     await curriculumAdmin.addTopicToClassroom('Math', 'Fractions');
     await curriculumAdmin.publishClassroom('Math');
 
@@ -101,6 +112,7 @@ describe('Logged-In Learner', function () {
         'Introduction to Fractions',
         'Algebra'
       );
+
     secondExplorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Adding Fractions',
@@ -146,13 +158,52 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
+
+    // The "split into adventure" action is only available in the arcs story
+    // editor, which is hidden once the serial-chapter feature flag is enabled.
+    // So the serial-chapter flag used for the ready-to-publish / publish-up-to
+    // flows below must be enabled only after the split has been performed.
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'serial_chapter_launch_curriculum_admin_view'
+    );
+    await UserFactory.closeBrowserForUser(releaseCoordinator);
+
+    // Mark the final chapter as "Ready to Publish" so the learner sees it as a
+    // "Coming Soon" placeholder card on the redesigned topic page. A DRAFT
+    // chapter is filtered out of the topic viewer data, so it must be in
+    // ready-to-publish status (not DRAFT, not Published) to be shown.
+    await curriculumAdmin.readyToPublish(
+      'Multiplying Fractions',
+      'The Fraction Journey',
+      'Fractions',
+      'Fraction skills'
+    );
+
+    // Publish the first three chapters via the serial "publish up to" flow.
+    // This sets each Published chapter's first publication date, which the
+    // learner topic page needs in order to render the "New" badge.
+    await curriculumAdmin.publishChapter(
+      'The Fraction Journey',
+      'Fractions',
+      '2'
+    );
+
+    // Add a Hindi translation to the first exploration (which is already linked
+    // to the story above). This gives the first, expanded lesson card a
+    // non-English text language, which causes the language selector and the
+    // fallback info tooltip to render for the learner on the redesigned topic
+    // viewer page.
+    await curriculumAdmin.addHindiTranslationToExploration(
+      firstExplorationId as string
+    );
 
     loggedInLearner = await UserFactory.createNewUser(
       'learner4',
       'learner_topic_page4@example.com'
     );
-  }, 900000);
+    // The setup adds translations, questions, and runs the serial publish flow,
+    // which takes a long time, so a generous timeout is needed.
+  }, 6000000);
 
   it(
     'should display the story card with title',
@@ -222,12 +273,19 @@ describe('Logged-In Learner', function () {
           lessonFallbackInfoIconSelector
         );
 
-        const tooltipText = await loggedInLearner.page.evaluate(() => {
-          const icon = document.querySelector(
-            '.e2e-test-lesson-fallback-info-icon'
-          );
-          return icon?.getAttribute('mattooltip') || '';
+        // The tooltip text is not stored in an HTML attribute; Angular Material
+        // resolves the `[matTooltip]` binding into the visible tooltip element
+        // (assigned role="tooltip") that is rendered when the icon is hovered.
+        // Hover first, then read the visible tooltip's text.
+        await loggedInLearner.page.hover(lessonFallbackInfoIconSelector);
+        await loggedInLearner.page.waitForSelector('[role="tooltip"]', {
+          visible: true,
         });
+
+        const tooltipText = await loggedInLearner.page.$eval(
+          '[role="tooltip"]',
+          el => el.textContent?.trim() || ''
+        );
 
         expect(tooltipText).toBeTruthy();
       }

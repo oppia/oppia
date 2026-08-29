@@ -4999,6 +4999,28 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds a Hindi translation to the "Content" of the "Introduction" card of the
+   * given published exploration, then saves the draft. This is used in
+   * acceptance tests to give a lesson a non-English text language so that the
+   * language selector and fallback info tooltip render on the redesigned topic
+   * viewer page. The exploration must already be linked to a story so that the
+   * translation-mode switcher is available in the translation tab.
+   */
+  async addHindiTranslationToExploration(explorationId: string): Promise<void> {
+    await this.navigateToExplorationEditor(explorationId);
+    await this.waitForPageToFullyLoad();
+    await this.navigateToCard('Introduction');
+    await this.navigateToTranslationsTab();
+    await this.dismissTranslationTabWelcomeModal();
+    await this.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Content',
+      'यह अंशों का परिचय है।'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
    * Function to verify if the preview is on a particular card by checking the content of the card.
    * @param {string} cardName - The name of the card to check.
    * @param {string} expectedCardContent - The expected text content of the card.
