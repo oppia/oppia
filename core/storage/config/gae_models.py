@@ -68,6 +68,11 @@ class BasePlatformParameterConfigModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """BasePlatformParameterConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
 
 class PlatformParameterModel(base_models.VersionedModel):
     """A class that represents a named dynamic platform parameter.
@@ -162,7 +167,10 @@ class BaseFeatureFlagConfigModel(base_models.BaseModel):
         id: str. Unique name of the feature flag.
     """
 
-    pass
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """BaseFeatureFlagConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class FeatureFlagConfigModel(base_models.BaseModel):
