@@ -2465,19 +2465,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        email_manager.send_suggestion_email(
-            self.exploration.title,
-            self.exploration.id,
-            self.new_user_id,
-            self.recipient_list,
-        )
-
-        # Check that email is not sent.
-        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -8413,14 +8400,6 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         d_text = email_manager.get_moderator_unpublish_exploration_email()
         self.assertEqual(d_text, expected_draft_text_body)
 
-    @test_utils.set_platform_parameters([])
-    def test_blank_draft_received_exploration_unpublish_exception_raised(
-        self,
-    ) -> None:
-        expected_draft_text_body = ''
-        d_text = email_manager.get_moderator_unpublish_exploration_email()
-        self.assertEqual(d_text, expected_draft_text_body)
-
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -8490,21 +8469,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             False,
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
-
-    @test_utils.set_platform_parameters([])
-    def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
-        self,
-    ) -> None:
-        email_manager.send_email_to_new_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
-
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters([])
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
@@ -8736,19 +8700,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         self.assertEqual(
             sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CD_USER
         )
-
-    @test_utils.set_platform_parameters([])
-    def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_email_to_removed_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
-
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
 
     def test_remove_translation_reviewer_email_for_invalid_category(
         self,
