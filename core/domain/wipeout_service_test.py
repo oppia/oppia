@@ -329,6 +329,52 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
                 wipeout_domain.USER_VERIFICATION_SUCCESS,
             )
 
+    def test_pre_delete_user_email_subscriptions(self) -> None:
+        email_preferences = user_services.get_email_preferences(self.user_1_id)
+        self.assertEqual(
+            email_preferences.can_receive_email_updates,
+            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+        )
+        self.assertEqual(
+            email_preferences.can_receive_editor_role_email,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+        )
+        self.assertEqual(
+            email_preferences.can_receive_feedback_message_email,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+        )
+        self.assertEqual(
+            email_preferences.can_receive_subscription_email,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+        )
+
+        observed_log_messages: List[str] = []
+
+        def _mock_logging_function(msg: str, *args: str) -> None:
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        email_preferences = user_services.get_email_preferences(self.user_1_id)
+        # TODO(release-scripts#137): Update once project ID is verified on
+        # all servers.
+        self.assertItemsEqual(
+            observed_log_messages,
+            [
+                'Email ID %s permanently deleted from bulk email provider\'s db. '
+                'Cannot access API, since this is a dev environment'
+                % self.USER_1_EMAIL
+            ]
+            + (['Logging project ID for debugging: dev-project-id'] * 6),
+        )
+        self.assertFalse(email_preferences.can_receive_email_updates)
+        self.assertFalse(email_preferences.can_receive_editor_role_email)
+        self.assertFalse(email_preferences.can_receive_feedback_message_email)
+        self.assertFalse(email_preferences.can_receive_subscription_email)
+
     def test_pre_delete_profile_users_works_correctly(self) -> None:
         user_settings = user_services.get_user_settings(self.profile_user_id)
         self.assertFalse(user_settings.deleted)
