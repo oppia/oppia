@@ -15,7 +15,7 @@
  * @fileoverview Filter bar with Apply/Clear pattern. Emits
  * filter state on Apply only (not on every keystroke).
  */
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
 import {
   FeedbackStatus,
   TechnicalTeamType,
@@ -35,7 +35,7 @@ import './feedback-filter-bar.component.css';
   templateUrl: './feedback-filter-bar.component.html',
   styleUrls: ['./feedback-filter-bar.component.css'],
 })
-export class FeedbackFilterBarComponent {
+export class FeedbackFilterBarComponent implements OnInit {
   @Input() config!: FeedbackFilterConfig;
   @Output() filterChange = new EventEmitter<FeedbackFilterState>();
 
@@ -46,13 +46,17 @@ export class FeedbackFilterBarComponent {
   readonly creatorFeedbackTypeOptions = Object.values(CreatorFeedbackType);
 
   today: string = new Date().toISOString().split('T')[0];
-  selectedStatus: FeedbackStatus = FeedbackStatus.OPEN;
+  selectedStatus!: FeedbackStatus;
   searchText: string = '';
   fromDate: string = '';
   toDate: string = '';
   selectedTechnicalTeam: TechnicalTeamType = TechnicalTeamType.TECH_EXTERNAL;
   selectedCreatorFeedbackType: CreatorFeedbackType =
     CreatorFeedbackType.FEEDBACK;
+
+  ngOnInit(): void {
+    this.selectedStatus = this.config.statusOptions[0];
+  }
 
   get statusOptions(): FeedbackStatus[] {
     return this.config.statusOptions;
@@ -73,7 +77,7 @@ export class FeedbackFilterBarComponent {
   }
 
   clearAllFilters(): void {
-    this.selectedStatus = FeedbackStatus.OPEN;
+    this.selectedStatus = this.config.statusOptions[0];
     this.searchText = '';
     this.fromDate = '';
     this.toDate = '';

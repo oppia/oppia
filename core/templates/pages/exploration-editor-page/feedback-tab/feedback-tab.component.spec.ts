@@ -74,9 +74,12 @@ class MockPlatformFeatureService {
 const mockLessonFeedbackSummary: LessonFeedbackSummary = {
   id: 'lesson_feedback_1',
   feedback_text_preview: 'Lesson feedback',
+  latest_response_preview: '',
   status: FeedbackStatus.OPEN,
   source: ReportType.LESSON,
+  lesson_title: 'exp_1',
   unread_response_count: 0,
+  last_updated_msecs: 12345,
 };
 
 const mockPlatformFeedbackSummary: PlatformFeedbackSummary = {
@@ -922,9 +925,12 @@ describe('Feedback Tab Component', () => {
     const lessonFeedbackSummary: LessonFeedbackSummary = {
       id: 'id',
       feedback_text_preview: 'Need help with fractions',
+      latest_response_preview: '',
       status: FeedbackStatus.OPEN,
       source: ReportType.LESSON,
+      lesson_title: 'exp_1',
       unread_response_count: 0,
+      last_updated_msecs: 12345,
     };
 
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
