@@ -74,7 +74,6 @@ class LighthouseTestSuiteDict(GenericTestSuiteDict):
 class TestSuitesByTypeDict(TypedDict):
     """A dictionary representing all of the test suites of each test type."""
 
-    e2e: List[GenericTestSuiteDict]
     acceptance: List[GenericTestSuiteDict]
     acceptance_playwright: List[GenericTestSuiteDict]
     lighthouse_performance: List[LighthouseTestSuiteDict]
@@ -91,7 +90,6 @@ class CITestSuitesDict(TypedDict):
 class CITestSuitesToRunDict(TypedDict):
     """A dictionary representing the test suites to run in the CI."""
 
-    e2e: CITestSuitesDict
     acceptance: CITestSuitesDict
     acceptance_playwright: CITestSuitesDict
     lighthouse_performance: CITestSuitesDict
@@ -141,7 +139,6 @@ def create_ci_test_suites_dict(
 
 
 def create_ci_test_suites_to_run_dict(
-    e2e: Optional[CITestSuitesDict] = None,
     acceptance: Optional[CITestSuitesDict] = None,
     acceptance_playwright: Optional[CITestSuitesDict] = None,
     lighthouse_performance: Optional[CITestSuitesDict] = None,
@@ -150,7 +147,6 @@ def create_ci_test_suites_to_run_dict(
     """Creates a CITestSuitesToRunDict with the given parameters.
 
     Args:
-        e2e: dict | None. The e2e test suites to run in the CI.
         acceptance: dict | None. The acceptance test suites to run in the CI.
         acceptance_playwright: dict | None. The Playwright acceptance test
             suites to run in the CI.
@@ -163,7 +159,6 @@ def create_ci_test_suites_to_run_dict(
         dict. The CITestSuitesToRunDict with the given parameters.
     """
     return {
-        'e2e': e2e or create_ci_test_suites_dict(),
         'acceptance': acceptance or create_ci_test_suites_dict(),
         'acceptance_playwright': acceptance_playwright
         or create_ci_test_suites_dict(),
@@ -262,7 +257,6 @@ def output_test_suites_to_run_to_github_workflow(
         test_suites_to_run: dict. The test suites to run.
     """
     test_suites_to_run_output = {
-        'e2e': test_suites_to_run['e2e'],
         'acceptance': test_suites_to_run['acceptance'],
         'acceptance_playwright': test_suites_to_run['acceptance_playwright'],
         'lighthouse_performance': test_suites_to_run['lighthouse_performance'],
@@ -354,9 +348,6 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
         dict. The test suites configurations for each test type.
     """
 
-    e2e_test_suites = get_test_suites_from_config(
-        os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'e2e.json')
-    )
     acceptance_test_suites = get_test_suites_from_config(
         os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'acceptance.json')
     )
@@ -376,7 +367,6 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
     )
 
     return {
-        'e2e': e2e_test_suites,
         'acceptance': acceptance_test_suites,
         'acceptance_playwright': acceptance_playwright_suites,
         'lighthouse_accessibility': lighthouse_accessibility_test_suites,
@@ -388,7 +378,6 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
     """Outputs all test suites to run to the GitHub workflow."""
     all_test_suites_by_type = get_all_test_suites_by_type()
     test_suites_to_run = create_ci_test_suites_to_run_dict(
-        e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
         acceptance=create_ci_test_suites_dict(
             all_test_suites_by_type['acceptance']
         ),
@@ -656,7 +645,6 @@ def get_ci_test_suites_to_run(
     )
 
     return create_ci_test_suites_to_run_dict(
-        e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
         acceptance=create_ci_test_suites_dict(acceptance_test_suites),
         acceptance_playwright=create_ci_test_suites_dict(
             acceptance_playwright_test_suites
@@ -703,7 +691,7 @@ def main(args: Optional[list[str]] = None) -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when check_e2e_tests_are_captured_in_ci.py
+# it will only be called when check_ci_test_suites_to_run.py
 # is used as a script.
 if __name__ == '__main__':  # pragma: no cover
     main()
