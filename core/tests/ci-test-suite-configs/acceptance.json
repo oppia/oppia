@@ -746,8 +746,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/adventure-navigation-skipping-and-mastery-challenge",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/adventure-navigation-skipping-and-mastery-challenge.spec.ts",
+      "name": "logged-in-learner/arc-navigation-skipping-and-mastery-challenge",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/arc-navigation-skipping-and-mastery-challenge.spec.ts",
       "framework": "puppeteer"
     },
     {

@@ -14,14 +14,14 @@
 
 /**
  * @fileoverview Acceptance tests for CUJ L.O.2 (part 3):
- * Adventure Navigation, Skipping & Mastery Challenge.
+ * Arc Navigation, Skipping & Mastery Challenge.
  *
  * Covers:
  * - Adventure navigation dock with clickable lesson nodes.
- * - Clicking a later adventure node triggers skip confirmation modal.
- * - Confirming skip marks earlier adventures as skipped with SKIPPED badge.
- * - Skipped adventure cards show "Start" / "Resume" CTA to revisit.
- * - Smooth-scroll navigates to the selected Adventure.
+ * - Clicking a later arc node triggers skip confirmation modal.
+ * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
+ * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
+ * - Smooth-scroll navigates to the selected Arc.
  * - Mastery Challenge card at end of story.
  * - Navigate to practice session from Mastery Challenge button.
  */
@@ -43,12 +43,9 @@ const redesignedContainerSelector =
 const adventureNavigationSelector = '.e2e-test-adventure-navigation';
 const adventureTitleSelector = '.e2e-test-adventure-title';
 const adventureGroupSelector = '.e2e-test-adventure-group';
-const adventureSkipModalSelector =
-  '.e2e-test-adventure-skip-confirmation-modal';
-const adventureSkipProceedSelector =
-  '.e2e-test-adventure-skip-confirmation-proceed';
-const adventureSkipCancelSelector =
-  '.e2e-test-adventure-skip-confirmation-cancel';
+const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
+const arcSkipProceedSelector = '.e2e-test-arc-skip-confirmation-proceed';
+const arcSkipCancelSelector = '.e2e-test-arc-skip-confirmation-cancel';
 const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
 const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
 const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
@@ -145,7 +142,7 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure features
+    // Split the story into two Adventures so that the Adventure (arc) features
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
@@ -189,7 +186,7 @@ describe('Logged-in Learner', function () {
   );
 
   it(
-    'should show skip confirmation modal when clicking a later adventure node',
+    'should show skip confirmation modal when clicking a later arc node',
     async function () {
       const circleBadges = await loggedInLearner.page.$$(
         `${adventureNavigationSelector} topic-adventure-circle-badge`
@@ -198,21 +195,13 @@ describe('Logged-in Learner', function () {
       if (circleBadges.length >= 3) {
         await circleBadges[2].click();
 
-        await loggedInLearner.expectElementToBeVisible(
-          adventureSkipModalSelector
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          adventureSkipCancelSelector
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          adventureSkipProceedSelector
-        );
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipProceedSelector);
 
-        await loggedInLearner.clickOnElementWithSelector(
-          adventureSkipCancelSelector
-        );
+        await loggedInLearner.clickOnElementWithSelector(arcSkipCancelSelector);
         await loggedInLearner.expectElementToBeVisible(
-          adventureSkipModalSelector,
+          arcSkipModalSelector,
           false
         );
       }
@@ -221,7 +210,7 @@ describe('Logged-in Learner', function () {
   );
 
   it(
-    'should skip to later adventure and show skipped adventure cards',
+    'should skip to later arc and show skipped adventure cards',
     async function () {
       const circleBadges = await loggedInLearner.page.$$(
         `${adventureNavigationSelector} topic-adventure-circle-badge`
@@ -230,11 +219,9 @@ describe('Logged-in Learner', function () {
       if (circleBadges.length >= 3) {
         await circleBadges[2].click();
 
-        await loggedInLearner.expectElementToBeVisible(
-          adventureSkipModalSelector
-        );
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
         await loggedInLearner.clickOnElementWithSelector(
-          adventureSkipProceedSelector
+          arcSkipProceedSelector
         );
 
         await loggedInLearner.page.waitForTimeout(1000);
@@ -272,8 +259,7 @@ describe('Logged-in Learner', function () {
       if (startCtas.length > 0) {
         // Use the stabilized click helper instead of a raw Puppeteer click:
         // the page is still smooth-scrolling toward the previously selected
-        // adventure, and a raw click's coordinates can land off-target
-        // mid-scroll.
+        // arc, and a raw click's coordinates can land off-target mid-scroll.
         await loggedInLearner.clickOnElement(startCtas[0]);
 
         await loggedInLearner.expectElementToBeVisible(

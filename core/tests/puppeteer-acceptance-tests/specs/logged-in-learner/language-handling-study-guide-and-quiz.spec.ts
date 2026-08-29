@@ -150,18 +150,17 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure features
+    // Split the story into two Adventures so that the Adventure (arc) features
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
 
-    // The "split into adventure" action is only available in the story
-    // editor's adventure (arcs) view, which is hidden once the serial-chapter
-    // feature flag is enabled. So the serial-chapter flag used for the
-    // ready-to-publish / publish-up-to flows below must be enabled only after
-    // the split has been performed.
+    // The "split into adventure" action is only available in the arcs story
+    // editor, which is hidden once the serial-chapter feature flag is enabled.
+    // So the serial-chapter flag used for the ready-to-publish / publish-up-to
+    // flows below must be enabled only after the split has been performed.
     await releaseCoordinator.enableFeatureFlag(
       'serial_chapter_launch_curriculum_admin_view'
     );

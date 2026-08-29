@@ -17,9 +17,9 @@
  * Check out the topic and see what to do next.
  *
  * Covers:
- * - Topic page renders with correct title, vertical timeline, and Adventure blocks.
+ * - Topic page renders with correct title, vertical timeline, and Arc blocks.
  * - Sticky Progress Navigation Dock appears on scroll (mobile + desktop).
- * - Timeline displays bold thematic Adventure headers, active chapter card in
+ * - Timeline displays bold thematic Arc headers, active chapter card in
  *   expanded state, narrative description, Play CTA, Practice, and Study Guide.
  * - New badge for recently published lessons.
  * - Coming Soon section with placeholder card and blocked navigation.
@@ -152,18 +152,18 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure features
+    // Split the story into two Adventures so that the Adventure (arc) features
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
 
-    // The "split into adventure" action is only available in the story
-    // editor's adventure (arcs) view, which is hidden once the serial-chapter
-    // feature flag is enabled (see story-editor.component.html). So the
-    // serial-chapter flag used for the ready-to-publish / publish-up-to flows
-    // below must be enabled only after the split has been performed.
+    // The "split into adventure" action is only available in the arcs story
+    // editor, which is hidden once the serial-chapter feature flag is enabled
+    // (see story-editor.component.html). So the serial-chapter flag used for
+    // the ready-to-publish / publish-up-to flows below must be enabled only
+    // after the split has been performed.
     await releaseCoordinator.enableFeatureFlag(
       'serial_chapter_launch_curriculum_admin_view'
     );
@@ -233,7 +233,7 @@ describe('Logged-in Learner', function () {
       );
       if (adventureGroups.length === 0) {
         throw new Error(
-          'Expected at least one adventure group in the timeline.'
+          'Expected at least one adventure group (arc) in the timeline.'
         );
       }
 

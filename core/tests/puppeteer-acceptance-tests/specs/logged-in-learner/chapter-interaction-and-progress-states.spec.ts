@@ -17,7 +17,7 @@
  * Look down the timeline and choose a lesson.
  *
  * Covers:
- * - Adventure headers and chapter card expansion with description, Play CTA,
+ * - Arc headers and chapter card expansion with description, Play CTA,
  *   Practice, and Study Guide actions.
  * - Complete a lesson and verify chapter progression (collapsed row,
  *   completed indicator, Play Again action).
@@ -150,7 +150,7 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure features
+    // Split the story into two Adventures so that the Adventure (arc) features
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
@@ -165,7 +165,7 @@ describe('Logged-in Learner', function () {
   }, 900000);
 
   it(
-    'should display bold thematic Adventure headers on the timeline',
+    'should display bold thematic Arc headers on the timeline',
     async function () {
       await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
       await loggedInLearner.waitForPageToFullyLoad();
@@ -175,11 +175,11 @@ describe('Logged-in Learner', function () {
       );
       await loggedInLearner.expectElementToBeVisible(adventureTitleSelector);
 
-      const adventureTitles = await loggedInLearner.page.$$eval(
+      const arcTitles = await loggedInLearner.page.$$eval(
         adventureTitleSelector,
         elements => elements.map(el => (el as HTMLElement).textContent?.trim())
       );
-      expect(adventureTitles.length).toBeGreaterThan(0);
+      expect(arcTitles.length).toBeGreaterThan(0);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
