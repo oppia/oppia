@@ -792,7 +792,13 @@ class SignupEmailTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
+            (param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, EMAIL_BODY),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
         ]
     )
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
