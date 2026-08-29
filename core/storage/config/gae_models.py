@@ -162,6 +162,8 @@ class BaseFeatureFlagConfigModel(base_models.BaseModel):
         id: str. Unique name of the feature flag.
     """
 
+    pass
+
 
 class FeatureFlagConfigModel(base_models.BaseModel):
     """A class that represents named dynamic feature-flag.
@@ -200,11 +202,11 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         return dict(
             super(cls, cls).get_export_policy(),
             **{
-                "force_enable_for_all_users": (
+                'force_enable_for_all_users': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                "rollout_percentage": base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                "user_group_ids": base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
