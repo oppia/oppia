@@ -159,7 +159,6 @@ const createNewSkillButtonInSkillDashboardSelector =
 const mobileCreateSkillButton =
   '.e2e-test-mobile-create-skill-button-secondary';
 
-const errorPageHeading = '.e2e-test-error-page-heading';
 const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
 
 const editConceptCard = '.e2e-test-edit-concept-card';
@@ -1133,26 +1132,6 @@ export class CurriculumAdmin extends TopicManager {
       await questionsLoaded;
     }
     showMessage(`All questions removed from skill "${skillName}".`);
-  }
-
-  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
-    await this.page.waitForSelector(errorPageHeading);
-    const errorText = await this.page.$eval(
-      errorPageHeading,
-      el => (el as HTMLElement).textContent
-    );
-    if (!errorText) {
-      throw new Error(
-        `Error page heading not visible. URL: ${this.page.url()}`
-      );
-    }
-    const currentCode = Number(errorText.replace(/\D/g, ''));
-    if (currentCode !== statusCode) {
-      throw new Error(
-        `Expected error page ${statusCode} but found ${currentCode}.`
-      );
-    }
-    showMessage(`Error page ${statusCode} is visible.`);
   }
 
   async createSkillFromTopicsAndSkillsDashboard(
