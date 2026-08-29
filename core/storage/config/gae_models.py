@@ -103,9 +103,9 @@ class PlatformParameterModel(base_models.VersionedModel):
         return dict(
             super(cls, cls).get_export_policy(),
             **{
-                "rules": base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                "rule_schema_version": base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                "default_value": base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
