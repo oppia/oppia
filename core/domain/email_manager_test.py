@@ -306,18 +306,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_role_notification_email(
-            self.editor_id,
-            self.new_user_id,
-            rights_domain.ROLE_OWNER,
-            self.exploration.id,
-            self.exploration.title,
-        )
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters([])
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2301,22 +2289,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
-            self.exploration.id: {
-                'title': self.exploration.title,
-                'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3'],
-            }
-        }
-        email_manager.send_feedback_message_email(
-            self.editor_id, feedback_messages
-        )
-
-        # Check that email is not sent.
-        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2587,19 +2559,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_emails_to_subscribers(
-            self.editor_id, self.exploration.id, self.exploration.title
-        )
-
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-        ]
-    )
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2706,22 +2665,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_instant_feedback_message_email(
-            self.new_user_id,
-            self.editor_id,
-            'editor message',
-            'New Oppia message in "a subject"',
-            self.exploration.title,
-            self.exploration.id,
-            'a subject',
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
@@ -2850,19 +2793,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
         self.owner_ids = [self.editor_id]
 
         self.report_text = 'AD'
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_flag_exploration_email(
-            self.exploration.title,
-            self.exploration.id,
-            self.new_user_id,
-            self.report_text,
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -3049,16 +2979,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_mail_to_onboard_new_reviewers(
-            self.reviewer_id, 'Algebra'
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -3138,15 +3058,6 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_mail_to_notify_users_to_review(
-            self.reviewer_id, 'Algebra'
-        )
-
-        messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -3219,21 +3130,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             False,
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        contributor_ranking_email_info = (
-            suggestion_registry.ContributorMilestoneEmailInfo(
-                self.user_id, 'question', 'edit', None, 'Initial Contributor'
-            )
-        )
-        email_manager.send_mail_to_notify_contributor_ranking_achievement(
-            contributor_ranking_email_info
-        )
-
-        messages = self._get_sent_email_messages(self.USER_EMAIL)
-
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -3842,20 +3738,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.reviewable_suggestion_email_info = suggestion_services.create_reviewable_suggestion_email_info_from_suggestion(
             question_suggestion
         )
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
-                    [self.reviewer_1_id],
-                    [[self.reviewable_suggestion_email_info]],
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
         [
@@ -6004,29 +5886,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             question_suggestion
         )
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                with self.swap(
-                    suggestion_models,
-                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
-                    0,
-                ):
-                    (
-                        email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [],
-                            [],
-                            [self.reviewable_suggestion_email_info],
-                        )
-                    )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
     @test_utils.set_platform_parameters(
         [
             (
@@ -7040,28 +6899,6 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         translation_suggestion.last_updated = submission_datetime
         return translation_suggestion
 
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                reviewer_ids_by_language: DefaultDict[str, List[str]] = (
-                    DefaultDict(list)
-                )
-                suggestions_by_language: DefaultDict[
-                    str, List[suggestion_registry.ReviewableSuggestionEmailInfo]
-                ] = DefaultDict(list)
-                reviewer_ids_by_language['en'] = []
-                suggestions_by_language['en'] = []
-
-                email_manager.send_reviewer_notifications(
-                    reviewer_ids_by_language, suggestions_by_language
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -7330,22 +7167,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.suggestion_types_needing_reviewers: Dict[str, Set[str]] = {
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
-                    [self.admin_1_id],
-                    [],
-                    [],
-                    self.suggestion_types_needing_reviewers,
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
         [
@@ -8135,15 +7956,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_account_deleted_email(
-            self.applicant_id, self.APPLICANT_EMAIL
-        )
-
-        messages = self._get_sent_email_messages(self.APPLICANT_EMAIL)
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters(
         [
@@ -9007,17 +8819,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             self.CURRICULUM_ADMIN_2_EMAIL
         )
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
-
-    @test_utils.set_platform_parameters([])
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_reminder_mail_to_notify_curriculum_admins(
-            [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL], []
-        )
-
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 0)
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
-        self.assertEqual(len(messages), 0)
 
     @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
