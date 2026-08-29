@@ -1887,6 +1887,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             response_list=[],
             unread_response_count=0,
             created_on_msecs=0,
+            last_updated_msecs=0,
         )
 
     def _get_platform_feedback(
