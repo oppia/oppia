@@ -321,8 +321,7 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
     """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.Names:
-        yield name
+    yield from models.Names
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
@@ -3152,6 +3151,8 @@ version: 1
                 msg='Expected params to be a dict, received %s' % params,
             )
 
+        response = None
+
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
@@ -3173,7 +3174,7 @@ version: 1
             )
         elif http_method != 'GET':
             raise Exception('Invalid http method %s' % http_method)
-
+        assert response is not None
         self.assertIn(response.status_int, expected_status_int_list)
 
         return response
@@ -3407,21 +3408,20 @@ version: 1
             webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
-        if upload_files is not None:
-            encoded_upload_files = tuple(
-                tuple(
-                    f.encode('utf-8') if isinstance(f, str) else f
-                    for f in upload_file
-                )
-                for upload_file in upload_files
+        encoded_upload_files = tuple(
+            tuple(
+                f.encode('utf-8') if isinstance(f, str) else f
+                for f in upload_file
             )
+            for upload_file in (upload_files or ())
+        )
 
         return app.post(
             url,
             params=data,
             headers=headers,
             status=expected_status_int,
-            upload_files=(encoded_upload_files if upload_files else None),
+            upload_files=encoded_upload_files or None,
             expect_errors=expect_errors,
         )
 

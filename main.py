@@ -1093,6 +1093,10 @@ URLS = [
         general_feedback.MyFeedbackListHandler,
     ),
     get_redirect_route(
+        r'%s/unread_count' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackUnreadCountHandler,
+    ),
+    get_redirect_route(
         r'%s/<feedback_id>' % feconf.MY_FEEDBACK_URL,
         general_feedback.MyFeedbackDetailHandler,
     ),
@@ -1107,6 +1111,10 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.LESSON_FEEDBACK_URL,
         general_feedback.LessonFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_STATUS_COUNTS_URL,
+        general_feedback.FeedbackStatusCountsHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.PLATFORM_FEEDBACK_URL,
