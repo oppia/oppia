@@ -812,7 +812,7 @@ def send_post_signup_email(
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    SERVER_CAN_SEND_EMAILS platform parameter is False).
+    email_services.is_email_sending_allowed() is False).
 
     Args:
         user_id: str. User ID of the user that signed up.
@@ -923,13 +923,13 @@ def require_moderator_email_prereqs_are_satisfied() -> None:
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        ValidationError. The SERVER_CAN_SEND_EMAILS platform parameter is False.
+        ValidationError. Email sending is not allowed.
     """
 
     if not email_services.is_email_sending_allowed():
         raise utils.ValidationError(
-            'For moderator emails to be sent, please ensure that '
-            'SERVER_CAN_SEND_EMAILS is set to True.'
+            'For moderator emails to be sent, please ensure that email '
+            'sending is allowed.'
         )
 
 
@@ -944,7 +944,7 @@ def send_moderator_action_email(
     delete) to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    SERVER_CAN_SEND_EMAILS platform parameter is False).
+    email_services.is_email_sending_allowed() is False).
 
     Args:
         sender_id: str. User ID of the sender.

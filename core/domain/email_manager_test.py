@@ -8803,7 +8803,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
-            'SERVER_CAN_SEND_EMAILS is set to True.',
+            'email sending is allowed.',
         ):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
