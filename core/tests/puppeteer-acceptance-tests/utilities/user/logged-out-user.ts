@@ -6598,7 +6598,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  clearFeedbackTextArea(): Promise<void> {
+  /**
+   * Clears the feedback text area.
+   */
+  async clearFeedbackTextArea(): Promise<void> {
     return this.clearAllTextFrom(feedbackModaltextarea);
   }
 
@@ -6692,6 +6695,10 @@ export class LoggedOutUser extends BaseUser {
     await this.expectTextContentToContain(feedbackCharacterCount, '0 / 2500');
   }
 
+  /**
+   * Checks if the lesson specific category chips are present.
+   * @param shouldBePresent - Whether the lesson specific category chips should be present.
+   */
   async expectLessonSpecificCategoryChipsToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {
@@ -6701,6 +6708,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if the screenshot drop zone text matches the expected text.
+   * @param expectedText - The expected text.
+   */
   async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
     await this.expectElementToBeVisible(screenshotDropZoneSelector);
     await this.expectTextContentToContain(
@@ -6709,6 +6720,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if the feedback screenshot preview is present.
+   * @param shouldBePresent - Whether the feedback screenshot preview should be present.
+   */
   async expectFeedbackScreenshotPreviewToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {

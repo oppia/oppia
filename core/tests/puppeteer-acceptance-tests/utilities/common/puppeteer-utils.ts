@@ -2298,7 +2298,10 @@ export class BaseUser {
    * Expects the text content of the toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
-  async expectToastMessage(expectedMessage: string): Promise<void> {
+  async expectToastMessage(
+    expectedMessage: string,
+    timeout?: number
+  ): Promise<void> {
     // The toast message disappears after a few seconds, so we need to process
     // the toastMessageElement as soon as we receive it. Otherwise, the text
     // within it may no longer be showing at the time of evaluation.
@@ -2320,6 +2323,68 @@ export class BaseUser {
       await this.page.click(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
+   * Verifies that the currently visible toast notification shows the expected
+   * message, has a small manual "X" dismiss button, and auto-fades after the
+   * expected timeout if left untouched.
+   * @param {string} expectedMessage - The expected message of the toast.
+   * @param {number} timeoutMilliseconds - The expected auto-fade duration.
+   */
+  async expectToastMessageWithDismissButtonToAutoDismiss(
+    expectedMessage: string,
+    timeoutMilliseconds: number
+  ): Promise<void> {
+    const toastMessageElement = await this.page.waitForSelector(
+      toastMessageSelector,
+      {visible: true}
+    );
+    const startTimeInMilliseconds = Date.now();
+
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+
+    const hasDismissButton = await this.page.evaluate(
+      (messageSelector: string) => {
+        const messageElement = document.querySelector(messageSelector);
+        const toastElement = messageElement?.closest('.ngx-toastr, .toast');
+        return Boolean(
+          toastElement?.querySelector('button.toast-close-button')
+        );
+      },
+      toastMessageSelector
+    );
+    if (!hasDismissButton) {
+      throw new Error(
+        'Expected the toast notification to have a small "X" dismiss button, ' +
+          'but it was not found.'
+      );
+    }
+
+    await this.page.waitForSelector(toastMessageSelector, {
+      hidden: true,
+      timeout: 20000,
+    });
+    const autoDismissTimeInMilliseconds = Date.now() - startTimeInMilliseconds;
+    if (
+      autoDismissTimeInMilliseconds < timeoutMilliseconds - 1000 ||
+      autoDismissTimeInMilliseconds > timeoutMilliseconds + 5000
+    ) {
+      throw new Error(
+        `Expected the toast notification to auto-fade after ${timeoutMilliseconds} ms, but it lasted ${autoDismissTimeInMilliseconds} ms.`
+      );
+    }
+    showMessage(
+      `Verified that the toast notification auto-fades after ${autoDismissTimeInMilliseconds} ms.`
+    );
   }
 
   /**

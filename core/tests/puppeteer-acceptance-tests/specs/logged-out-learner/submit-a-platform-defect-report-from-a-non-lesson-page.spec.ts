@@ -26,6 +26,7 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
 
 describe('Logged-Out User', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -82,16 +83,16 @@ describe('Logged-Out User', function () {
     // Add a screenshot of size greater than 1MB.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_HIGH_RES);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
-      'The maximum allowed file size is 1024 KB'
+      'The maximum allowed file size is 1024 KB (2.1 MB given)'
     );
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterEnteringFeedbackWithLargeFile',
       __dirname
     );
     // Add an invalid file type.
-    await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_BMP);
+    await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.SAMPLE_TEST_PDF);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
-      'This image format is not supported'
+      'This file is not recognized as an image'
     );
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterEnteringFeedbackWithInvalidFileType',
@@ -119,8 +120,17 @@ describe('Logged-Out User', function () {
       'Report a Website Issue',
       'confirm'
     );
-    await loggedOutLearner.expectToastMessage(
-      'Thank you! Your report has been sent to the technical team.'
+    // The underlying lesson player returns to full opacity immediately,
+    // bringing the student back to where they left off.
+    await loggedOutLearner.expectElementToBeVisible(
+      activeModalBackdropSelector,
+      false
+    );
+    // The toast notification has a small, manual "X" dismiss button, and
+    // auto-fades after 7 seconds if left untouched.
+    await loggedOutLearner.expectToastMessageWithDismissButtonToAutoDismiss(
+      'Thank you! Your report has been sent to the technical team.',
+      7000
     );
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterSubmittingFeedback',
