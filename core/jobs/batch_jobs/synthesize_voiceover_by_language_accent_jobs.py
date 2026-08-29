@@ -500,9 +500,6 @@ class VoiceoverSynthesisByAccentJob(base_jobs.JobBase):
             containing job run results with the IDs of the
             EntityVoiceoversModels that were updated or created.
         """
-        time.sleep(
-            10
-        )  # Sleep for 10 seconds to ensure that the job is not run too frequently.
         exploration_models = (
             self.pipeline
             | 'Get exploration models'

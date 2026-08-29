@@ -1,8 +1,8 @@
 <mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
   <h3 class="header-text">Update language/accent pairs that learners and voice artists can select</h3>
   <div class="card-content">
-    <div *ngIf="!pageIsInitialized">
-      <p>Loading ...</p>
+    <div *ngIf="!pageIsInitialized" class="oppia-voiceover-admin-loading-container">
+      <p>Loading<loading-dots></loading-dots></p>
     </div>
 
     <div *ngIf="pageIsInitialized">
@@ -22,20 +22,25 @@
         <span class="language-accent-action-header" aria-hidden="true"></span>
       </p>
     </div>
-
     <div *ngIf="pageIsInitialized">
       <div>
         <mat-list class="oppia-supported-language-list">
           <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
             <div class="oppia-language-accent-list">
               <span class="language-accent-status-column">
-                <mat-icon *ngIf="getBeamJobStateIcon(languageAccentCodeToDescription.key) as icon"
+                <mat-spinner *ngIf="languageAccentCodeBeingUpdated === languageAccentCodeToDescription.key"
+                             class="language-accent-job-status-spinner"
+                             color="accent"
+                             [diameter]="20">
+                </mat-spinner>
+                <mat-icon *ngIf="languageAccentCodeBeingUpdated !== languageAccentCodeToDescription.key && getBeamJobStateIcon(languageAccentCodeToDescription.key) as icon"
                           class="language-accent-job-status"
                           [class.error-icon]="getBeamJobStateIcon(languageAccentCodeToDescription.key) === 'error'"
                           [matTooltip]="getBeamJobStateTooltip(languageAccentCodeToDescription.key)"
                           [color]="getBeamJobStateMaterialThemeColor(languageAccentCodeToDescription.key)">
                   {{icon}}
                 </mat-icon>
+
               </span>
               <span class="language-accent-description">
                 {{languageAccentCodeToDescription.value}}
@@ -409,6 +414,9 @@
     height: 24px;
     width: 24px;
   }
+  .language-accent-job-status-spinner {
+    display: inline-block;
+  }
   .language-accent-remove-button {
     justify-self: center;
     margin-left: 0;
@@ -540,6 +548,10 @@
 
   .autogeneration-disabled-text {
     margin-right: 15px;
+  }
+
+  .oppia-voiceover-admin-loading-container {
+    padding: 10px 0;
   }
 
   @media (max-width: 600px) {

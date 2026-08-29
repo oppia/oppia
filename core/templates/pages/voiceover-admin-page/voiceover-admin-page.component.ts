@@ -117,6 +117,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   selectedLanguageAccentForExplorationVoiceoverRegeneration: string | null =
     null;
   toastMessage: string = '';
+  languageAccentCodeBeingUpdated: string | null = null;
 
   languageAccentControl = new FormControl(null);
 
@@ -218,7 +219,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageAccentCodeIsPresent =
       Object.keys(this.supportedLanguageAccentCodesToDescriptions).length !== 0;
     this.removeLanguageAccentDropdown();
-    this.saveUpdatedLanguageAccentSupport();
+    this.saveUpdatedLanguageAccentSupport(languageAccentCodeToAdd);
   }
 
   isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
@@ -304,7 +305,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       () => {
         this.languageCodesMapping[languageCode][languageAccentCode] =
           supportsAutogeneration;
-        this.saveUpdatedLanguageAccentSupport();
+        this.saveUpdatedLanguageAccentSupport(languageAccentCode);
         if (
           supportsAutogeneration &&
           this.platformFeatureService.status.EnableBackgroundVoiceoverSynthesis
@@ -362,7 +363,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageAccentCodeIsPresent =
           Object.keys(this.supportedLanguageAccentCodesToDescriptions)
             .length !== 0;
-        this.saveUpdatedLanguageAccentSupport();
+        this.saveUpdatedLanguageAccentSupport(languageAccentCodeToRemove);
         this.cdr.detectChanges();
       },
       () => {
@@ -373,12 +374,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
     );
   }
 
-  saveUpdatedLanguageAccentSupport(): void {
+  saveUpdatedLanguageAccentSupport(languageAccentCode: string): void {
+    this.languageAccentCodeBeingUpdated = languageAccentCode;
     this.voiceoverBackendApiService
       .updateVoiceoverLanguageCodesMappingAsync(this.languageCodesMapping)
       .then(languageAccentCodeToBeamJobState => {
         this.languageAccentCodeToBeamJobState =
           languageAccentCodeToBeamJobState;
+        this.languageAccentCodeBeingUpdated = null;
         this.removeLanguageAccentDropdown();
         this.cdr.detectChanges();
       });

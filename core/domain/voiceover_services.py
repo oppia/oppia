@@ -65,6 +65,18 @@ def save_language_accent_code_to_beam_job_run_model(
     language_accent_code: str, beam_job_run_id: str
 ) -> None:
     """Saves the Beam job run ID for a language-accent code."""
+    existing_model = gae_models.LanguageAccentCodeToBeamJobRunModel.get(
+        gae_models.LanguageAccentCodeToBeamJobRunModel.generate_id(
+            language_accent_code
+        ),
+        strict=False,
+    )
+    if existing_model is not None:
+        existing_model.beam_job_run_id = beam_job_run_id
+        existing_model.update_timestamps()
+        existing_model.put()
+        return
+
     language_accent_code_to_beam_job_run_model = (
         gae_models.LanguageAccentCodeToBeamJobRunModel.create_new(
             language_accent_code, beam_job_run_id
