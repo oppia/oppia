@@ -2121,6 +2121,11 @@ export class BaseUser {
    * a hover, because the `mouseenter` listener is not bound there. This helper
    * dispatches touch events through the Chrome DevTools Protocol, holding the
    * touch for longer than Material's `LONGPRESS_DELAY` (500 ms).
+   *
+   * The element is scrolled into view before the touch is dispatched: the
+   * touch coordinates are resolved relative to the layout viewport, so an
+   * element that is below the fold would not receive the touch even though it
+   * counts as "visible" for Puppeteer's selector checks.
    * @param {string} selector - The selector of the element to long-press.
    */
   async longPressOnElementWithSelector(selector: string): Promise<void> {
@@ -2128,6 +2133,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for selector: ${selector}`);
     }
+    await element.scrollIntoViewIfNeeded();
     const boundingBox = await element.boundingBox();
     if (!boundingBox) {
       throw new Error(`Element has no bounding box for selector: ${selector}`);

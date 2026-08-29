@@ -21,7 +21,7 @@
  * - Clicking a later arc node triggers skip confirmation modal.
  * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
  * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
- * - Smooth-scroll navigates to the selected Arc.
+ * - Smooth-scroll navigates to the selected Arc without reloading the page.
  * - Mastery Challenge card at end of story.
  * - Navigate to practice session from Mastery Challenge button.
  */
@@ -193,10 +193,7 @@ describe('Logged-in Learner', function () {
       );
 
       if (circleBadges.length >= 3) {
-        // Use the stabilized click helper instead of a raw Puppeteer click:
-        // on mobile the navigation dock can scroll while the page is
-        // smooth-scrolling, so a raw click's coordinates can land off-target.
-        await loggedInLearner.clickOnElement(circleBadges[2]);
+        await circleBadges[2].click();
 
         await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
         await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
@@ -220,10 +217,7 @@ describe('Logged-in Learner', function () {
       );
 
       if (circleBadges.length >= 3) {
-        // Use the stabilized click helper instead of a raw Puppeteer click:
-        // on mobile the navigation dock can scroll while the page is
-        // smooth-scrolling, so a raw click's coordinates can land off-target.
-        await loggedInLearner.clickOnElement(circleBadges[2]);
+        await circleBadges[2].click();
 
         await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
         await loggedInLearner.clickOnElementWithSelector(
@@ -249,6 +243,71 @@ describe('Logged-in Learner', function () {
         );
         await loggedInLearner.expectElementToBeVisible(
           skippedAdventureStartCtaSelector
+        );
+      }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should navigate to a later arc milestone with smooth scrolling and no page reload',
+    async function () {
+      const circleBadges = await loggedInLearner.page.$$(
+        `${adventureNavigationSelector} topic-adventure-circle-badge`
+      );
+
+      if (circleBadges.length >= 3) {
+        // Start from the top of the page and record the browser's navigation
+        // time origin. If the page reloaded during dock navigation, the time
+        // origin would change, which is how we verify there is no reload.
+        await loggedInLearner.page.evaluate(() => {
+          window.scrollTo(0, 0);
+        });
+        await loggedInLearner.page.waitForTimeout(300);
+        const timeOriginBeforeNavigation = await loggedInLearner.page.evaluate(
+          () => performance.timeOrigin
+        );
+        const urlBeforeNavigation = loggedInLearner.page.url();
+        const scrollYBeforeNavigation = await loggedInLearner.page.evaluate(
+          () => window.scrollY
+        );
+
+        // Use the stabilized click helper instead of a raw Puppeteer click:
+        // on mobile the navigation dock can scroll while the page is
+        // smooth-scrolling, so a raw click's coordinates can land off-target.
+        await loggedInLearner.clickOnElement(circleBadges[2]);
+
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.clickOnElementWithSelector(
+          arcSkipProceedSelector
+        );
+
+        // The dock scrolls to the selected milestone with a 300 ms delay before
+        // a smooth scroll, so give the smooth scroll time to finish.
+        await loggedInLearner.page.waitForTimeout(2500);
+
+        expect(loggedInLearner.page.url()).toBe(urlBeforeNavigation);
+        const timeOriginAfterNavigation = await loggedInLearner.page.evaluate(
+          () => performance.timeOrigin
+        );
+        expect(timeOriginAfterNavigation).toBe(timeOriginBeforeNavigation);
+
+        // The page must have scrolled down to the selected milestone (the
+        // lesson whose badge was clicked, which is the third lesson).
+        const scrollYAfterNavigation = await loggedInLearner.page.evaluate(
+          () => window.scrollY
+        );
+        expect(scrollYAfterNavigation).toBeGreaterThan(
+          scrollYBeforeNavigation + 100
+        );
+
+        const selectedLessonTop = await loggedInLearner.page.evaluate(() => {
+          const element = document.getElementById('lesson-3');
+          return element ? element.getBoundingClientRect().top : null;
+        });
+        expect(selectedLessonTop).not.toBeNull();
+        expect(selectedLessonTop as number).toBeLessThan(
+          await loggedInLearner.page.evaluate(() => window.innerHeight * 0.6)
         );
       }
     },

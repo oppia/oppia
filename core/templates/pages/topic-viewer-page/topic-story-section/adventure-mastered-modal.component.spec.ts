@@ -92,7 +92,6 @@ describe('AdventureMasteredModalComponent', () => {
       TestBed.configureTestingModule({
         declarations: [AdventureMasteredModalComponent, MockTranslatePipe],
         providers: [
-          {provide: NgbActiveModal, useValue: ngbActiveModal},
           {provide: MatBottomSheetRef, useValue: bottomSheetRef},
           {
             provide: MAT_BOTTOM_SHEET_DATA,

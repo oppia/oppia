@@ -21,6 +21,9 @@
  * - Language fallback info tooltip shows when lesson is not in preferred language.
  * - Language auto-selection waterfall: i18n → session fallback → English.
  * - Session persistence of language choice within a tab.
+ * - Voiceover dropdown is filtered to be compatible with the selected text
+ *   language and enables/disables accordingly.
+ * - Starting a lesson uses the selected text and voiceover languages in the URL.
  * - Story card with title and Study Skills CTA.
  * - New chapter badge for recently published lessons.
  * - Footer with Contact Us link.
@@ -46,6 +49,10 @@ const textLanguageSelector = '.e2e-test-topic-lesson-text-language-selector';
 const voiceoverLanguageSelector =
   '.e2e-test-topic-lesson-voiceover-language-selector';
 const lessonFallbackInfoIconSelector = '.e2e-test-lesson-fallback-info-icon';
+const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
+const conversationSkinCardsContainerSelector =
+  '.e2e-test-conversation-skin-cards-container';
+const topicSessionFallbackStorageKey = 'topic_session_fallback_language';
 const storyCardSelector = '.e2e-test-story-card';
 const storyTitleSelector = '.e2e-test-story-title';
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
@@ -60,6 +67,7 @@ describe('Logged-in Learner', function () {
   let secondExplorationId: string | null;
   let thirdExplorationId: string | null;
   let fourthExplorationId: string | null;
+  let fifthExplorationId: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -126,6 +134,11 @@ describe('Logged-in Learner', function () {
         'Multiplying Fractions',
         'Algebra'
       );
+    fifthExplorationId =
+      await curriculumAdmin.createAndPublishExplorationWithCards(
+        'Mastering Fractions',
+        'Algebra'
+      );
 
     await curriculumAdmin.addStoryToTopic(
       'The Fraction Journey',
@@ -154,6 +167,15 @@ describe('Logged-in Learner', function () {
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
+
+    // Add a fifth chapter that stays in DRAFT status. Draft nodes are filtered
+    // out of the learner-facing topic viewer data, so this chapter must not be
+    // rendered either in the timeline or in the coming-soon/navigation sections.
+    // It is added after the arc split so that it is not part of any Adventure.
+    await curriculumAdmin.addChapter(
+      'Mastering Fractions',
+      fifthExplorationId as string
+    );
 
     await curriculumAdmin.saveStoryDraft();
 
@@ -194,6 +216,27 @@ describe('Logged-in Learner', function () {
     await curriculumAdmin.addHindiTranslationToExploration(
       firstExplorationId as string
     );
+
+    // Add a Hindi voiceover for the first card's content of the first
+    // exploration. The topic viewer only exposes voiceover languages for an
+    // exploration when actual voiceover entities exist for it, so without this
+    // the learner's voiceover dropdown would stay permanently disabled.
+    await curriculumAdmin.navigateToExplorationEditor(
+      firstExplorationId as string
+    );
+    await curriculumAdmin.waitForPageToFullyLoad();
+    await curriculumAdmin.navigateToCard('Introduction');
+    await curriculumAdmin.navigateToTranslationsTab();
+    // The voiceover language option text in the exploration editor is the
+    // language's description ("हिन्दी (Hindi)"), and the accent option text is
+    // the accent's description ("Hindi (India)").
+    await curriculumAdmin.addVoiceoverToContent(
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
+      'Content',
+      testConstants.data.IntroContentVoiceoverInHindi
+    );
+    await curriculumAdmin.saveExplorationDraft();
 
     loggedInLearner = await UserFactory.createNewUser(
       'learner4',
@@ -328,6 +371,166 @@ describe('Logged-in Learner', function () {
           expect(storedLanguage).toBe(initialLanguage);
         }
       }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should recall the session language when the site language is not available',
+    async function () {
+      // Empty out any session fallback language left over from earlier tests.
+      await loggedInLearner.page.evaluate(
+        (storageKey: string) => window.sessionStorage.removeItem(storageKey),
+        topicSessionFallbackStorageKey
+      );
+
+      // Switch the site language to Portuguese. The lesson offers only English
+      // and Hindi, so Portuguese is unavailable and the waterfall falls back to
+      // English (the default lesson language).
+      await loggedInLearner.changeSiteLanguage('pt-br');
+      await loggedInLearner.expectElementToBeVisible(
+        redesignedContainerSelector
+      );
+
+      // The lesson is not available in the preferred (site) language, so the
+      // fallback info icon is shown.
+      await loggedInLearner.expectElementToBeVisible(
+        lessonFallbackInfoIconSelector
+      );
+      let selectedTextLanguage = await loggedInLearner.page.$eval(
+        textLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      expect(selectedTextLanguage).toBe('en');
+
+      // Manually choose Hindi. This persists the choice in the session, which
+      // the waterfall should recall for the next lessons instead of English.
+      await loggedInLearner.select(textLanguageSelector, 'hi');
+      await loggedInLearner.page.waitForTimeout(500);
+
+      await loggedInLearner.page.reload();
+      await loggedInLearner.waitForPageToFullyLoad();
+      await loggedInLearner.expectElementToBeVisible(
+        redesignedContainerSelector
+      );
+
+      // The session fallback (Hindi) is still available, so it is re-selected
+      // over English even though the site language (Portuguese) is unavailable.
+      // Poll for the re-selected value and then re-check after a short settle
+      // period, since the language can be (re)applied asynchronously on load.
+      await loggedInLearner.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return element?.value === 'hi';
+        },
+        {},
+        textLanguageSelector
+      );
+      await loggedInLearner.page.waitForTimeout(1500);
+      selectedTextLanguage = await loggedInLearner.page.$eval(
+        textLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      expect(selectedTextLanguage).toBe('hi');
+
+      const storedSession = await loggedInLearner.page.evaluate(
+        (storageKey: string) => {
+          const stored = window.sessionStorage.getItem(storageKey);
+          if (stored) {
+            const parsed = JSON.parse(stored) as {textLanguageCode?: string};
+            return parsed.textLanguageCode || '';
+          }
+          return '';
+        },
+        topicSessionFallbackStorageKey
+      );
+      expect(storedSession).toBe('hi');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should fall back to English when the saved session language is no longer available',
+    async function () {
+      // Simulate a saved session language that the lesson no longer offers.
+      await loggedInLearner.page.evaluate((storageKey: string) => {
+        window.sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({textLanguageCode: 'es', voiceoverLanguageCode: null})
+        );
+      }, topicSessionFallbackStorageKey);
+
+      await loggedInLearner.page.reload();
+      await loggedInLearner.waitForPageToFullyLoad();
+      await loggedInLearner.expectElementToBeVisible(
+        redesignedContainerSelector
+      );
+
+      const selectedTextLanguage = await loggedInLearner.page.$eval(
+        textLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      expect(selectedTextLanguage).toBe('en');
+
+      // With English selected, there is no voiceover compatible with it (only
+      // Hindi has a voiceover), so the voiceover dropdown is disabled.
+      const voiceoverDisabled = await loggedInLearner.page.$eval(
+        voiceoverLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).disabled
+      );
+      expect(voiceoverDisabled).toBe(true);
+
+      // Switching the text language to Hindi enables the voiceover dropdown and
+      // syncs it to the compatible Hindi voiceover.
+      await loggedInLearner.select(textLanguageSelector, 'hi');
+      await loggedInLearner.page.waitForTimeout(500);
+
+      const voiceoverNowDisabled = await loggedInLearner.page.$eval(
+        voiceoverLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).disabled
+      );
+      expect(voiceoverNowDisabled).toBe(false);
+      // The topic reacts to the Hindi text language by syncing the voiceover to
+      // the compatible Hindi (India) accent code.
+      const selectedVoiceoverLanguage = await loggedInLearner.page.$eval(
+        voiceoverLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      expect(selectedVoiceoverLanguage).toBe('hi-IN');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should start a lesson with the selected text and voiceover languages',
+    async function () {
+      // Select Hindi for both text and (compatible) voiceover so that the
+      // start URL is deterministic regardless of the state left behind by the
+      // previous tests.
+      await loggedInLearner.select(textLanguageSelector, 'hi');
+      await loggedInLearner.page.waitForTimeout(500);
+
+      const urlBeforeStart = loggedInLearner.page.url();
+      expect(urlBeforeStart).toContain('/learn/math/fractions');
+
+      await loggedInLearner.clickOnElementWithSelector(
+        lessonCardStartButtonSelector
+      );
+      await loggedInLearner.waitForPageToFullyLoad();
+
+      const startUrl = loggedInLearner.page.url();
+      expect(startUrl).not.toBe(urlBeforeStart);
+      expect(startUrl).toContain('initialContentLanguageCode=hi');
+      // The voiceover code in the start URL is the Hindi (India) accent code
+      // that was selected in the voiceover dropdown.
+      expect(startUrl).toContain('initialVoiceoverLanguageCode=hi-IN');
+
+      // The lesson player has loaded and renders the first card.
+      await loggedInLearner.expectElementToBeVisible(
+        conversationSkinCardsContainerSelector
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

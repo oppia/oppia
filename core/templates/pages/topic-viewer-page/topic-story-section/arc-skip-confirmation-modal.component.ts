@@ -18,6 +18,7 @@
  */
 
 import {Component, Inject, Input, Optional} from '@angular/core';
+
 import {
   MAT_BOTTOM_SHEET_DATA,
   MatBottomSheetRef,
@@ -39,7 +40,10 @@ export class ArcSkipConfirmationModalComponent extends ConfirmOrCancelModal {
 
   protected bottomSheetRef: MatBottomSheetRef | undefined;
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    // The modal is opened via NgbModal on desktop and via MatBottomSheet on
+    // mobile. NgbActiveModal is only injected by NgbModalStack, so it must be
+    // optional for the bottom-sheet path to work.
+    @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() bottomSheetRef: MatBottomSheetRef | null,
     @Optional()
     @Inject(MAT_BOTTOM_SHEET_DATA)

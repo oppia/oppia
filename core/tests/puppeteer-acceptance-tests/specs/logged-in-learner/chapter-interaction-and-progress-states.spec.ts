@@ -22,6 +22,8 @@
  * - Complete a lesson and verify chapter progression (collapsed row,
  *   completed indicator, Play Again action).
  * - Mastery Challenge card with description and helper tooltip when locked.
+ * - Mastery Challenge unlocks after completing all chapters and navigates to
+ *   the practice session.
  * - Practice test card with Practice Test button.
  */
 
@@ -63,6 +65,7 @@ const adventureEndTestCardSelector = '.e2e-test-adventure-end-test-card';
 const adventureEndTestTitleSelector = '.e2e-test-adventure-end-test-card-title';
 const adventureEndTestPracticeButtonSelector =
   '.e2e-test-adventure-end-test-card-practice-button';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 
 describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -321,6 +324,86 @@ describe('Logged-in Learner', function () {
           false
         );
       }
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should unlock the Mastery Challenge and navigate to the practice session after completing all chapters',
+    async function () {
+      // Complete the remaining chapters (2 and 3) by playing them, as done for
+      // the first chapter above. Lesson 4 is a "Coming Soon" placeholder, so it
+      // is not part of the available lessons the learner must complete.
+      for (let completedCount = 0; completedCount < 2; completedCount++) {
+        await loggedInLearner.waitForPageToFullyLoad();
+        await loggedInLearner.clickOnElementWithSelector(
+          lessonCardStartButtonSelector
+        );
+        await loggedInLearner.waitForPageToFullyLoad();
+
+        await loggedInLearner.clickOnContinueButtonInInteractionCard();
+        await loggedInLearner.expectExplorationCompletionToastMessage(
+          'Congratulations for completing this lesson!'
+        );
+
+        await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
+        await loggedInLearner.waitForPageToFullyLoad();
+        await loggedInLearner.expectElementToBeVisible(
+          redesignedContainerSelector
+        );
+
+        // The chapter just completed collapses into a compact row, and the next
+        // Published chapter becomes the active lesson with a Play CTA.
+        await loggedInLearner.expectElementToBeVisible(
+          completedLessonClassSelector
+        );
+      }
+
+      await loggedInLearner.page.evaluate(() => {
+        document
+          .querySelector('.e2e-test-mastery-challenge-card')
+          ?.scrollIntoView({behavior: 'smooth'});
+      });
+
+      await loggedInLearner.expectElementToBeVisible(
+        masteryChallengeCardSelector
+      );
+
+      const isUnlocked = await loggedInLearner.page.evaluate(() => {
+        const btn = document.querySelector(
+          '.e2e-test-mastery-challenge-button'
+        ) as HTMLButtonElement;
+        return (
+          !btn?.disabled &&
+          !btn?.classList.contains('mastery-challenge-button-locked')
+        );
+      });
+      expect(isUnlocked).toBe(true);
+
+      const topicUrlBeforeNavigation = loggedInLearner.page.url();
+
+      await loggedInLearner.clickOnElementWithSelector(
+        masteryChallengeButtonSelector
+      );
+      await loggedInLearner.waitForPageToFullyLoad();
+
+      expect(loggedInLearner.page.url()).toContain('/mastery-challenge');
+      expect(loggedInLearner.page.url()).not.toBe(topicUrlBeforeNavigation);
+
+      // The practice session page renders the question player with the topic
+      // skills' questions, which is the evidence that the Mastery Challenge was
+      // unlocked and started.
+      await loggedInLearner.expectElementToBeVisible(
+        practiceSessionContainerSelector
+      );
+
+      // Return to the topic page so the final test can run against the topic
+      // page, where the Mastery Challenge now stays unlocked for this learner.
+      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
+      await loggedInLearner.waitForPageToFullyLoad();
+      await loggedInLearner.expectElementToBeVisible(
+        redesignedContainerSelector
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
