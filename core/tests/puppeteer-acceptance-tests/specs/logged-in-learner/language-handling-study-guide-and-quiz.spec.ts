@@ -274,9 +274,17 @@ describe('Logged-in Learner', function () {
         // The tooltip text is not stored in an HTML attribute. Angular Material
         // renders the `[matTooltip]` binding into a `div.mat-tooltip` overlay
         // element (this version of Material does not set role="tooltip"). It is
-        // attached to the DOM only while the icon is hovered, so hover first and
-        // then read the visible tooltip's text.
-        await loggedInLearner.page.hover(lessonFallbackInfoIconSelector);
+        // attached to the DOM only while the icon is interacted with, so
+        // interact with it first and then read the visible tooltip's text. Note
+        // that on touch (mobile) viewports there is no mouse, so the tooltip is
+        // shown only after a long-press instead of a hover.
+        if (loggedInLearner.isViewportAtMobileWidth()) {
+          await loggedInLearner.longPressOnElementWithSelector(
+            lessonFallbackInfoIconSelector
+          );
+        } else {
+          await loggedInLearner.page.hover(lessonFallbackInfoIconSelector);
+        }
         await loggedInLearner.page.waitForSelector('div.mat-tooltip', {
           visible: true,
         });

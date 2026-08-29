@@ -193,7 +193,10 @@ describe('Logged-in Learner', function () {
       );
 
       if (circleBadges.length >= 3) {
-        await circleBadges[2].click();
+        // Use the stabilized click helper instead of a raw Puppeteer click:
+        // on mobile the navigation dock can scroll while the page is
+        // smooth-scrolling, so a raw click's coordinates can land off-target.
+        await loggedInLearner.clickOnElement(circleBadges[2]);
 
         await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
         await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
@@ -217,7 +220,10 @@ describe('Logged-in Learner', function () {
       );
 
       if (circleBadges.length >= 3) {
-        await circleBadges[2].click();
+        // Use the stabilized click helper instead of a raw Puppeteer click:
+        // on mobile the navigation dock can scroll while the page is
+        // smooth-scrolling, so a raw click's coordinates can land off-target.
+        await loggedInLearner.clickOnElement(circleBadges[2]);
 
         await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
         await loggedInLearner.clickOnElementWithSelector(
