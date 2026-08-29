@@ -288,29 +288,8 @@ export class ReleaseCoordinator extends BaseUser {
         if (featureFlagName === featureName) {
           await featureFlags[i].waitForSelector(enableFeatureSelector);
           const selectElement = await featureFlags[i].$(enableFeatureSelector);
-
-          let currentValue: string | null = null;
           if (selectElement) {
-            currentValue = await this.page.evaluate(
-              element => (element as HTMLSelectElement).value,
-              selectElement
-            );
-          }
-
-          const targetValue: string = enable ? '0: true' : '1: false';
-
-          // The Save button stays disabled unless the flag value has changed,
-          // so skip re-saving when the flag already has the desired value.
-          if (selectElement && currentValue === targetValue) {
-            showMessage(
-              `Feature flag: "${featureName}" is already ` +
-                `${enable ? 'enabled' : 'disabled'}; skipping.`
-            );
-            return;
-          }
-
-          if (selectElement) {
-            await selectElement.select(targetValue);
+            await selectElement.select(enable ? '0: true' : '1: false');
           } else {
             throw new Error(
               `Value selector not found for feature flag: "${featureName}"`
@@ -347,36 +326,6 @@ export class ReleaseCoordinator extends BaseUser {
       );
       throw error;
     }
-  }
-
-  /**
-   * Enables (or disables) a feature flag with retries. The feature-flag Save
-   * flow occasionally does not take effect on the first attempt (for example,
-   * when the page attempts to save before the value model has been marked as
-   * changed or when the network is slow), so retry a few times before failing.
-   * @param featureName The name of the feature flag to set.
-   * @param enable Whether to enable (true) or disable (false) the flag.
-   * @param maxRetries The number of retry attempts after the first try.
-   */
-  async enableFeatureFlagWithRetries(
-    featureName: string,
-    enable: boolean = true,
-    maxRetries: number = 3
-  ): Promise<void> {
-    let lastError: Error = new Error('No attempt was made.');
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        await this.enableFeatureFlag(featureName, enable);
-        return;
-      } catch (error) {
-        lastError = error;
-        console.warn(
-          `enableFeatureFlag attempt ${attempt + 1}/${maxRetries + 1} ` +
-            `failed for "${featureName}": ${error.message}`
-        );
-      }
-    }
-    throw lastError;
   }
 
   /**

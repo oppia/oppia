@@ -74,15 +74,13 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlagWithRetries(
-      'redesigned_topic_viewer_page'
-    );
-    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     // This flag lets the curriculum admin modify translations, which is needed
     // when adding a non-English translation to an exploration later in the
     // setup (so that the language selector and fallback info tooltip render on
     // the redesigned topic viewer page).
-    await releaseCoordinator.enableFeatureFlagWithRetries(
+    await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
 
@@ -152,18 +150,19 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure (arc) features
+    // Split the story into two Adventures so that the Adventure features
     // (navigation dock, skip confirmation modal, skipped-adventure cards)
     // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
 
-    // The "split into adventure" action is only available in the arcs story
-    // editor, which is hidden once the serial-chapter feature flag is enabled.
-    // So the serial-chapter flag used for the ready-to-publish / publish-up-to
-    // flows below must be enabled only after the split has been performed.
-    await releaseCoordinator.enableFeatureFlagWithRetries(
+    // The "split into adventure" action is only available in the story
+    // editor's adventure (arcs) view, which is hidden once the serial-chapter
+    // feature flag is enabled. So the serial-chapter flag used for the
+    // ready-to-publish / publish-up-to flows below must be enabled only after
+    // the split has been performed.
+    await releaseCoordinator.enableFeatureFlag(
       'serial_chapter_launch_curriculum_admin_view'
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
