@@ -1067,9 +1067,6 @@ export class TopicManager extends BaseUser {
   /**
    * Toggles the "Show practice tab to learners" in Topic Editor.
    */
-  /**
-   * Toggles the "Show practice tab to learners" in Topic Editor.
-   */
   async togglePracticeTabCheckbox(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
@@ -1158,9 +1155,6 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  /**
-   * Assert the toast/confirmation message shown after an action.
-   */
   /**
    * Assert the toast/confirmation message shown after an action.
    */

@@ -134,13 +134,13 @@ export class SuperAdmin extends LoggedInUser {
    * Selects a topic for the Topic Manager role.
    * @param {string} topicName - The name of the topic to select.
    */
- private async selectTopicForTopicManagerRole(
+  private async selectTopicForTopicManagerRole(
     topicName: string
   ): Promise<void> {
-    // 1. Wait for the dropdown element itself to be visible
+    // 1. Wait for the dropdown element itself to be visible.
     await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
-    
-    // 2. CRITICAL FIX: Wait for the <option> elements to actually populate in the DOM. 
+
+    // 2. CRITICAL FIX: Wait for the <option> elements to actually populate in the DOM.
     // We use 'attached' because options are hidden by the OS, so 'visible' will cause a timeout.
     await this.page.waitForSelector(`${selectTopicForAssignmentSelector} option`, { state: 'attached' });
 
@@ -159,8 +159,8 @@ export class SuperAdmin extends LoggedInUser {
         el => el.textContent,
         optionElement
       );
-      
-      // Safely skip empty default options rather than crashing
+
+      // Safely skip empty default options rather than crashing.
       if (!optionText) {
         continue;
       }

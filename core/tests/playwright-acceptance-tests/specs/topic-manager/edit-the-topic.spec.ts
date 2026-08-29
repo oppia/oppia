@@ -1,7 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import { UserFactory } from '../../utilities/common/user-factory';
-import { CurriculumAdmin } from '../../utilities/user/curriculum-admin';
 import { TopicManager } from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -10,6 +9,7 @@ test.describe.configure({ timeout: 4800000 });
 
 test.describe('Topic Manager', () => {
   let topicManager: TopicManager;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let curriculumAdmin: any;
 
   test.beforeAll(async ({ browser }, testInfo) => {
@@ -18,12 +18,10 @@ test.describe('Topic Manager', () => {
     const warmupContext = await browser.newContext();
     const warmupPage = await warmupContext.newPage();
     try {
-      console.log('Warming up the server (this may take up to 60s)...');
       await warmupPage.goto('http://localhost:8181', { timeout: 120000 });
       await warmupPage.waitForSelector('.e2e-test-oppia-cookie-banner-accept-button', { state: 'visible', timeout: 120000 });
-      console.log('Server is warmed up and ready!');
     } catch (e) {
-      console.log('Warmup encountered an issue, proceeding anyway...');
+      // Warmup encountered an issue; proceed anyway.
     } finally {
       await warmupPage.close();
       await warmupContext.close();
@@ -40,7 +38,7 @@ test.describe('Topic Manager', () => {
   true
 );
     
-    // NOTE: This function automatically creates the 'Addition' skill, subtopic, AND 3 questions!
+    // Note: This function automatically creates the 'Addition' skill, subtopic, and 3 questions.
     await curriculumAdmin.createAndPublishTopic('Arithmetic Operations', 'Addition', 'Addition');
     await curriculumAdmin.addStoryToTopic('The Broken Calculator', 'the-broken-calculator', 'Arithmetic Operations');
     await curriculumAdmin.addChapter('Solving problems without a calculator', explorationId);
@@ -50,14 +48,14 @@ test.describe('Topic Manager', () => {
     await curriculumAdmin.createSkillForTopic('Subtraction', 'Arithmetic Operations', false);
     await curriculumAdmin.createSkillForTopic('Word Problems', 'Arithmetic Operations', false);
 
-    // CREATE THE REMAINING 7 QUESTIONS HERE! (Making the total 10)
-    // Doing this BEFORE logging in the Topic Manager prevents the Topic Manager's tab from idling out and freezing.
+    // Create the remaining 7 questions here (making the total 10). 
+    // Doing this before logging in the Topic Manager prevents the Topic Manager tab from idling out.
     await curriculumAdmin.createQuestionsForSkill('Addition', 7);
 
     await curriculumAdmin.waitForNetworkIdle();
     await curriculumAdmin.page.waitForTimeout(5000);
 
-    // CREATE TOPIC MANAGER AFTER ALL QUESTIONS ARE DONE! (Session is 100% fresh)
+    // Create topic manager after all questions are done.
     topicManager = await UserFactory.createNewUser(
       'topicManager', 
       'topic_manager@example.com', 
@@ -70,7 +68,7 @@ test.describe('Topic Manager', () => {
   test('should be able to edit the topic', async () => {
     test.setTimeout(4800000);
 
-    // Since the topic manager was just created, this tab is wide awake and fast!
+    // Since the topic manager was just created, this tab is wide awake and fast.
     await topicManager.navigateToTopicAndSkillsDashboardPage();
     await topicManager.waitForNetworkIdle();
 
@@ -86,17 +84,16 @@ test.describe('Topic Manager', () => {
     await topicManager.saveTopicDraft('AO 101');
     await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
-    // Enable practice tab. (All 10 questions are already made!)
+    // Enable practice tab.
     await topicManager.navigateToTopicAndSkillsDashboardPage();
     await topicManager.openTopicEditor('AO 101');
     
     await topicManager.togglePracticeTabCheckbox();
     await topicManager.expectSaveChangesButtonInTopicEditorToBe('enabled');
-   // await topicManager.expectScreenshotToMatch('arithmeticOperationsWithPracticeTab');
     await topicManager.saveTopicDraft('AO 101');
     await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
-   if (process.env.MOBILE !== 'true') {
+  if (process.env.MOBILE !== 'true') {
       await topicManager.navigateToTopicPreviewTab();
       await topicManager.expectTopicPreviewToHaveTitleAndDescription(
         'AO 101', 'Arithmetic Operations (New): This is the new topic description.'

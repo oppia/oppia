@@ -580,7 +580,7 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/access-dashboard-using-profile-dropdown.spec.ts",
       "framework": "puppeteer"
     },
-   {
+    {
       "name": "topic-manager/edit-the-topic",
       "module": "core/tests/playwright-acceptance-tests/specs/topic-manager/edit-the-topic.spec.ts",
       "framework": "playwright"
