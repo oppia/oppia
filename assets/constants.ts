@@ -6074,6 +6074,19 @@ export default {
       // eslint-disable-next-line max-len
       "Refer to Glossary - https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0"
     ],
+    // Hinglish.
+    "hi-en": [
+      // eslint-disable-next-line max-len
+      "For mathematical terms in Hinglish, use the English words (e.g. numerator, denominator) instead of their Hindi equivalents (e.g. Bhinn, Ansh).",
+      // eslint-disable-next-line max-len
+      "Use respectful pronouns (like “Aap” instead of “Tum/Tu”) and a corresponding respectful tone like “kariye, karenge”.",
+      // eslint-disable-next-line max-len
+      "Feel free to change the voice and sequence of phrases to make the sentence more readable.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hinglish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+    ],
     // Spanish.
     "es": [
       "Include proper punctuation, ¡blank!, ¿question? and accent marks.",
@@ -6336,6 +6349,7 @@ export default {
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
+  "MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE": 50,
   "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
   "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
   "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,

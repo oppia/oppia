@@ -127,6 +127,10 @@ describe('Translation Modal Component', () => {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
     gtag: jasmine.Spy;
+    location: {
+      pathname: string;
+      href: string;
+    };
   };
 
   const opportunity: TranslationOpportunity = {
@@ -139,6 +143,7 @@ describe('Translation Modal Component', () => {
     totalCount: 50,
     translationsCount: 20,
     reviewerOnlyContentCount: 0,
+    entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
@@ -157,6 +162,10 @@ describe('Translation Modal Component', () => {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
       gtag: jasmine.createSpy('gtag'),
+      location: {
+        pathname: '/signup',
+        href: '',
+      },
     };
 
     TestBed.configureTestingModule({
@@ -1570,6 +1579,17 @@ describe('Translation Modal Component', () => {
       expect(component.getFormattedContentType('ca')).toBe('label');
       expect(component.getFormattedContentType('rule')).toBe('input rule');
       expect(component.getFormattedContentType('content')).toBe('content');
+      // A skill's content types are stored under the name of the field they
+      // came from, and are spelled out for the contributor.
+      expect(component.getFormattedContentType('skill_description')).toBe(
+        'skill description'
+      );
+      expect(component.getFormattedContentType('skill_explanation')).toBe(
+        'skill explanation'
+      );
+      expect(component.getFormattedContentType('misconception_feedback')).toBe(
+        'misconception feedback'
+      );
     });
   });
 });

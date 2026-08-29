@@ -16,9 +16,13 @@
  * @fileoverview Component for RteHelperModal.
  */
 
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild, Optional, Inject} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
@@ -33,6 +37,7 @@ import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
+import './rte-helper-modal.component.css';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -105,9 +110,17 @@ export type RteComponentId = {
   [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['frontend_id'];
 }[keyof ComponentSpecsType];
 
+interface RteHelperModalData {
+  componentId: RteComponentId;
+  customizationArgSpecs: CustomizationArgsSpecsType;
+  attrsCustomizationArgsDict: CustomizationArgsForRteType;
+  componentIsNewlyCreated: boolean;
+}
+
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
+  styleUrls: ['./rte-helper-modal.component.css'],
 })
 export class RteHelperModalComponent {
   @Input() componentId: RteComponentId;
@@ -144,7 +157,6 @@ export class RteHelperModalComponent {
   };
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
     private externalRteSaveService: ExternalRteSaveService,
     private alertsService: AlertsService,
     private fb: FormBuilder,
@@ -154,9 +166,28 @@ export class RteHelperModalComponent {
     private imageUploadHelperService: ImageUploadHelperService,
     private htmlLengthService: HtmlLengthService,
     private translationLanguageService: TranslationLanguageService
+        @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private rteHelperBottomSheetRef?: MatBottomSheetRef<RteHelperModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data?: RteHelperModalData
   ) {}
 
   ngOnInit(): void {
+    if (this.data) {
+      this.componentId = this.data.componentId;
+      this.customizationArgSpecs = this.data.customizationArgSpecs;
+      this.attrsCustomizationArgsDict = this.data.attrsCustomizationArgsDict;
+      this.componentIsNewlyCreated = this.data.componentIsNewlyCreated;
+    }
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.rteHelperBottomSheetRef?.dismiss();
+        }
+      });
+    }
     const activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
     const activeLanguageDirection = activeLanguageCode
@@ -176,7 +207,6 @@ export class RteHelperModalComponent {
         schema.ui_config.languageDirection = activeLanguageDirection;
       }
     });
-
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
@@ -253,16 +283,21 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
-    if (this.componentIsNewlyCreated) {
-      this.ngbActiveModal.dismiss(true);
+    const dismissValue = this.componentIsNewlyCreated ? true : false;
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss(dismissValue);
     } else {
-      this.ngbActiveModal.dismiss(false);
+      this.ngbActiveModal.dismiss(dismissValue);
     }
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
   delete(): void {
-    this.ngbActiveModal.dismiss(true);
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss(true);
+    } else {
+      this.ngbActiveModal.dismiss(true);
+    }
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
@@ -527,7 +562,11 @@ export class RteHelperModalComponent {
           'The rawLatex or svgFileName for a Math expression should not ' +
             'be empty.'
         );
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
       const resampledFile =
@@ -552,7 +591,11 @@ export class RteHelperModalComponent {
             "and '+ z^2'",
           5000
         );
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
       if (
@@ -566,7 +609,11 @@ export class RteHelperModalComponent {
         };
         const caName = tmpCustomizationArgs[0].name;
         customizationArgsDict[caName] = mathContentDict;
-        this.ngbActiveModal.close(customizationArgsDict);
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+        } else {
+          this.ngbActiveModal.close(customizationArgsDict);
+        }
         return;
       }
       this.assetsBackendApiService
@@ -584,13 +631,21 @@ export class RteHelperModalComponent {
             };
             const caName = tmpCustomizationArgs[0].name;
             customizationArgsDict[caName] = mathContentDict;
-            this.ngbActiveModal.close(customizationArgsDict);
+            if (this.rteHelperBottomSheetRef) {
+              this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+            } else {
+              this.ngbActiveModal.close(customizationArgsDict);
+            }
           },
           errorResponse => {
             this.alertsService.addWarning(
               errorResponse.error || 'Error communicating with server.'
             );
-            this.ngbActiveModal.dismiss('cancel');
+            if (this.rteHelperBottomSheetRef) {
+              this.rteHelperBottomSheetRef.dismiss('cancel');
+            } else {
+              this.ngbActiveModal.dismiss('cancel');
+            }
           }
         );
     } else {
@@ -610,7 +665,11 @@ export class RteHelperModalComponent {
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
       }
-      this.ngbActiveModal.close(customizationArgsDict);
+      if (this.rteHelperBottomSheetRef) {
+        this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+      } else {
+        this.ngbActiveModal.close(customizationArgsDict);
+      }
       this.customizationArgsFormSubscription.unsubscribe();
     }
   }

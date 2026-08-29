@@ -1,4 +1,4 @@
-oppia-checkpoint-celebration-footer .inner-container {
+.inner-container {
   -webkit-animation-delay: 0.5s;
   -ms-animation-delay: 0.5s;
   -webkit-animation-direction: normal;
@@ -37,7 +37,7 @@ oppia-checkpoint-celebration-footer .inner-container {
   text-align: center;
 }
 
-oppia-checkpoint-celebration-footer .inner-container-alignment {
+.inner-container-alignment {
   bottom: 60px;
   left: 50%;
   padding-left: 30px;
@@ -45,16 +45,16 @@ oppia-checkpoint-celebration-footer .inner-container-alignment {
   position: fixed;
   transform: translateX(-50%);
 }
-oppia-checkpoint-celebration-footer .tick-symbol {
+.tick-symbol {
   font-size: 42px;
   vertical-align: middle;
 }
 
-oppia-checkpoint-celebration-footer .inner-content {
+.inner-content {
   padding-left: 8px;
 }
 
-oppia-checkpoint-celebration-footer .inner-container-fade-out {
+.inner-container-fade-out {
   animation: fadeout 5s 1;
 }
 
@@ -398,17 +398,17 @@ oppia-checkpoint-celebration-footer .dot18 {
 }
 
 @media(max-width: 959px) {
-  oppia-checkpoint-celebration-footer .inner-container {
+  .inner-container {
     max-width: 650px;
   }
 }
 
 @media(max-width: 480px) {
-  oppia-checkpoint-celebration-footer .inner-container {
+  .inner-container {
     min-width: 250px;
   }
 
-  oppia-checkpoint-celebration-footer .inner-content {
+  .inner-content {
     font-size: 16px;
   }
 

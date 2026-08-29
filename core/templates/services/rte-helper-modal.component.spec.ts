@@ -43,6 +43,11 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 describe('RteHelperModalComponent', () => {
   let component: RteHelperModalComponent;
@@ -1060,4 +1065,342 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+});
+
+const rteSaveEmitter = new EventEmitter<void>();
+describe('RteHelperModalComponent in bottom sheet mode', () => {
+  let component: RteHelperModalComponent;
+  let fixture: ComponentFixture<RteHelperModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownSubject: Subject<KeyboardEvent>;
+  let pageContextService: PageContextService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let imageUploadHelperService: ImageUploadHelperService;
+  let alertsService: AlertsService;
+
+  const modalData = {
+    componentId: 'Math',
+    customizationArgSpecs: [],
+    attrsCustomizationArgsDict: {},
+    componentIsNewlyCreated: true,
+  };
+
+  beforeEach(waitForAsync(() => {
+    keydownSubject = new Subject<KeyboardEvent>();
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(keydownSubject.asObservable());
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [
+        SharedFormsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        DirectivesModule,
+        NgbModalModule,
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
+      declarations: [RteHelperModalComponent],
+      providers: [
+        AlertsService,
+        PageContextService,
+        ImageLocalStorageService,
+        AssetsBackendApiService,
+        ImageUploadHelperService,
+        {
+          provide: NgbActiveModal,
+          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss']),
+        },
+        {
+          provide: ExternalRteSaveService,
+          useValue: {onExternalRteSave: rteSaveEmitter},
+        },
+        TranslateService,
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {provide: MAT_BOTTOM_SHEET_DATA, useValue: modalData},
+      ],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RteHelperModalComponent);
+    component = fixture.componentInstance;
+    pageContextService = TestBed.inject(PageContextService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    alertsService = TestBed.inject(AlertsService);
+    fixture.detectChanges();
+  });
+
+  it('should set properties from the injected bottom sheet data', () => {
+    expect(component.componentId).toEqual('Math');
+    expect(component.componentIsNewlyCreated).toBe(true);
+  });
+
+  it('should dismiss the bottom sheet when Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should not dismiss the bottom sheet when a non-Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('should dismiss the bottom sheet with true when newly created and cancelled', () => {
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
+  });
+
+  it('should dismiss the bottom sheet with true when deleted', () => {
+    component.delete();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
+  });
+
+  it('should dismiss the bottom sheet with false when cancelled and not newly created', fakeAsync(() => {
+    component.componentId = 'link';
+    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.customizationArgSpecs = [
+      {name: 'filepath', default_value: ''},
+      {name: 'caption', default_value: ''},
+      {name: 'alt', default_value: ''},
+    ];
+    component.ngOnInit();
+    flush();
+    component.componentIsNewlyCreated = false;
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(false);
+  }));
+
+  it('should dismiss the bottom sheet with the customization args on save', fakeAsync(() => {
+    component.componentId = 'link';
+    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.customizationArgSpecs = [
+      {name: 'filepath', default_value: ''},
+      {name: 'caption', default_value: ''},
+      {name: 'alt', default_value: ''},
+    ];
+    component.ngOnInit();
+    flush();
+    component.save();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  }));
+
+  it('should dismiss the bottom sheet with math customization args on save', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(assetsBackendApiService, 'saveMathExpressionImage').and.returnValue(
+      Promise.resolve({filename: 'mathImage.svg'})
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      math_content: {raw_latex: 'x^2', svg_filename: 'mathImage.svg'},
+    });
+  }));
+
+  it('should dismiss on server error while saving math', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(alertsService, 'addWarning');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    spyOn(assetsBackendApiService, 'saveMathExpressionImage').and.returnValue(
+      Promise.reject({error: 'Error communicating with server.'})
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet when math SVG exceeds 100 KB', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(
+      new Blob([new ArrayBuffer(102 * 1024)], {
+        type: 'application/octet-stream',
+      })
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet when SVG exceeds 1 MB for blog post', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.BLOG_POST
+    );
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(
+      new Blob([new ArrayBuffer(102 * 1024 * 1024)], {
+        type: 'application/octet-stream',
+      })
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet while saving math in local storage', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      math_content: {raw_latex: 'x^2', svg_filename: 'mathImage.svg'},
+    });
+  }));
+
+  it('should dismiss the bottom sheet with cancel when rawLatex or filename is empty', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: {raw_latex: '', svg_filename: ''},
+      },
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: '',
+      svgFile: null,
+      svg_filename: '',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
 });

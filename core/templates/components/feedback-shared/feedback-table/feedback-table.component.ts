@@ -25,10 +25,16 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import {CATEGORY_LABELS, SOURCE_LABELS} from 'domain/feedback/feedback.model';
+import {
+  CATEGORY_LABELS,
+  FeedbackStatus,
+  SOURCE_LABELS,
+} from 'domain/feedback/feedback.model';
 import type {
   PlatformFeedbackSummary,
   FeedbackCardConfig,
+  LessonFeedbackSummary,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
 import './feedback-table.component.css';
 
@@ -39,7 +45,10 @@ import './feedback-table.component.css';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {
-  @Input() feedbackSummaries: PlatformFeedbackSummary[] = [];
+  @Input() feedbackSummaries: (
+    | LessonFeedbackSummary
+    | PlatformFeedbackSummary
+  )[] = [];
   @Input() currentPage = 1;
   @Input() feedbackCardConfig!: FeedbackCardConfig;
   @Input() moreFeedbackAvailable = false;
@@ -56,5 +65,60 @@ export class FeedbackTableComponent {
 
   getSourceLabel(source: string): string {
     return SOURCE_LABELS[source];
+  }
+
+  getFeedbackDescription(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string {
+    if ('report_message_preview' in feedback) {
+      return feedback.report_message_preview;
+    }
+
+    return feedback.feedback_text_preview;
+  }
+
+  getNotificationSummary(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string | null {
+    if (!('unread_response_count' in feedback)) {
+      return null;
+    }
+    if (feedback.unread_response_count === 0) {
+      return null;
+    }
+    if (
+      feedback.status === FeedbackStatus.FIXED ||
+      feedback.status === FeedbackStatus.LESSON_UPDATED
+    ) {
+      return (
+        'A creator fixed an error you reported. Thank you for helping make ' +
+        'Oppia better for everyone!'
+      );
+    }
+    return 'A creator responded to your feedback!';
+  }
+
+  getUnreadResponseCount(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): number {
+    return 'unread_response_count' in feedback
+      ? feedback.unread_response_count
+      : 0;
+  }
+
+  getLessonTitle(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string {
+    return 'lesson_title' in feedback ? feedback.lesson_title : '';
+  }
+
+  getFeedbackCategory(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): ReportAnIssueCategory | null {
+    if ('category' in feedback) {
+      return feedback.category;
+    }
+
+    return null;
   }
 }
