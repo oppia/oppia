@@ -45,12 +45,15 @@ otherwise they will interfere with the iframed conversation skin directive. */
 }
 
 .new-conversation-skin-cards-container {
-  align-items: flex-start;
+  align-items: center;
   display: -webkit-flex;
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  padding: 80px 14px 50px;
+  margin-bottom: 50px;
+  margin-top: 50px;
+  padding: 56px 14px 0;
+  padding-bottom: 50px;
   width: 100%;
 }
 

@@ -1284,6 +1284,15 @@ export class ConversationFlowService {
             refreshInteraction,
             refresherExplorationId
           );
+          if (refreshInteraction) {
+            this._nextFocusLabel =
+              this.focusManagerService.generateFocusLabel();
+          } else {
+            this._nextFocusLabel = this._getContentFocusLabel(
+              this.playerPositionService.getDisplayedCardIndex()
+            );
+          }
+          this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
         }
       }
       return;
@@ -1357,6 +1366,10 @@ export class ConversationFlowService {
         );
         if (refreshInteraction) {
           this._nextFocusLabel = this.focusManagerService.generateFocusLabel();
+        } else {
+          this._nextFocusLabel = this._getContentFocusLabel(
+            this.playerPositionService.getDisplayedCardIndex()
+          );
         }
         this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
         this.cardAnimationService.scrollToBottom();
