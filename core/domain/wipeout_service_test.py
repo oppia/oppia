@@ -364,11 +364,14 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             [
+                'Updated status of email ID %s\'s bulk email preference in the service '
+                'provider\'s db to False. Cannot access API, since this is a dev '
+                'environment.' % self.USER_1_EMAIL,
                 'Email ID %s permanently deleted from bulk email provider\'s db. '
                 'Cannot access API, since this is a dev environment'
-                % self.USER_1_EMAIL
+                % self.USER_1_EMAIL,
             ]
-            + (['Logging project ID for debugging: dev-project-id'] * 6),
+            + (['Logging project ID for debugging: dev-project-id'] * 5),
         )
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
