@@ -52,7 +52,7 @@ const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const lessonCardNewChapterSelector = '.e2e-test-lesson-card-new-label';
 const studySkillsCtaSelector = '.e2e-test-study-skills-cta';
 
-describe('Logged-In Learner', function () {
+describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedInLearner: LoggedInUser & LoggedOutUser;

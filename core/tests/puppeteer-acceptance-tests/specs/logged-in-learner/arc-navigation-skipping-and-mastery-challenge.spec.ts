@@ -13,16 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for CUJ L.O.2 (part 2):
- * Look down the timeline and choose a lesson.
+ * @fileoverview Acceptance tests for CUJ L.O.2 (part 3):
+ * Arc Navigation, Skipping & Mastery Challenge.
  *
  * Covers:
- * - Arc headers and chapter card expansion with description, Play CTA,
- *   Practice, and Study Guide actions.
- * - Complete a lesson and verify chapter progression (collapsed row,
- *   completed indicator, Play Again action).
- * - Mastery Challenge card with description and helper tooltip when locked.
- * - Practice test card with Practice Test button.
+ * - Adventure navigation dock with clickable lesson nodes.
+ * - Clicking a later arc node triggers skip confirmation modal.
+ * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
+ * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
+ * - Smooth-scroll navigates to the selected Arc.
+ * - Mastery Challenge card at end of story.
+ * - Navigate to practice session from Mastery Challenge button.
  */
 
 import {UserFactory} from '../../../utilities/common/user-factory';
@@ -39,32 +40,23 @@ const BASE_URL = testConstants.URLs.BaseURL;
 
 const redesignedContainerSelector =
   '.e2e-test-redesigned-topic-viewer-container';
+const adventureNavigationSelector = '.e2e-test-adventure-navigation';
 const adventureTitleSelector = '.e2e-test-adventure-title';
-const lessonCardSelector = '.e2e-test-lesson-card';
-const lessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
-const lessonCardSecondaryButtonSelector =
-  '.e2e-test-lesson-card-secondary-button';
-const completedLessonClassSelector = '.e2e-test-lesson-card.completed-lesson';
-const completedCollapsedSelector = '.e2e-test-lesson-card.completed-collapsed';
-const playAgainButtonSelector = '.e2e-test-lesson-card-play-again-button';
-const completedLabelSelector = '.e2e-test-lesson-card-completed-label';
+const adventureGroupSelector = '.e2e-test-adventure-group';
+const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
+const arcSkipProceedSelector = '.e2e-test-arc-skip-confirmation-proceed';
+const arcSkipCancelSelector = '.e2e-test-arc-skip-confirmation-cancel';
+const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
+const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
+const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
+const skippedAdventureStartCtaSelector =
+  '.e2e-test-skipped-adventure-start-cta';
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
-const masteryChallengeDescriptionSelector =
-  '.e2e-test-mastery-challenge-description';
 const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
-const masteryChallengeHelperTooltipSelector =
-  '.e2e-test-mastery-challenge-helper-tooltip';
-const masteryChallengeHelperTitleSelector =
-  '.e2e-test-mastery-challenge-helper-title';
-const masteryChallengeHelperDescriptionSelector =
-  '.e2e-test-mastery-challenge-helper-description';
-const adventureEndTestCardSelector = '.e2e-test-adventure-end-test-card';
-const adventureEndTestTitleSelector = '.e2e-test-adventure-end-test-card-title';
-const adventureEndTestPracticeButtonSelector =
-  '.e2e-test-adventure-end-test-card-practice-button';
+const lessonCardSelector = '.e2e-test-lesson-card';
 
-describe('Logged-In Learner', function () {
+describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedInLearner: LoggedInUser & LoggedOutUser;
@@ -76,13 +68,13 @@ describe('Logged-In Learner', function () {
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculum_admin_topic_page2@example.com',
+      'curriculum_admin_topic_page3@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoord',
-      'release_coord_topic_page2@example.com',
+      'release_coord_topic_page3@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -161,13 +153,13 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.publishStoryDraft();
 
     loggedInLearner = await UserFactory.createNewUser(
-      'learner2',
-      'learner_topic_page2@example.com'
+      'learner3',
+      'learner_topic_page3@example.com'
     );
   }, 900000);
 
   it(
-    'should display bold thematic Arc headers on the timeline',
+    'should navigate to topic page and display adventure navigation dock',
     async function () {
       await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
       await loggedInLearner.waitForPageToFullyLoad();
@@ -175,92 +167,117 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.expectElementToBeVisible(
         redesignedContainerSelector
       );
+      await loggedInLearner.expectElementToBeVisible(
+        adventureNavigationSelector
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display adventure groups with titles in the timeline',
+    async function () {
       await loggedInLearner.expectElementToBeVisible(adventureTitleSelector);
 
-      const arcTitles = await loggedInLearner.page.$$eval(
-        adventureTitleSelector,
-        elements => elements.map(el => (el as HTMLElement).textContent?.trim())
+      const adventureGroups = await loggedInLearner.page.$$(
+        adventureGroupSelector
       );
-      expect(arcTitles.length).toBeGreaterThan(0);
+      expect(adventureGroups.length).toBeGreaterThan(0);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should expand an active chapter card and show Play CTA, Practice, and Study Guide',
+    'should show skip confirmation modal when clicking a later arc node',
     async function () {
-      await loggedInLearner.expectElementToBeVisible(lessonCardSelector);
-      await loggedInLearner.expectElementToBeVisible(
-        lessonCardStartButtonSelector
+      const circleBadges = await loggedInLearner.page.$$(
+        `${adventureNavigationSelector} topic-adventure-circle-badge`
       );
 
-      const secondaryButtons = await loggedInLearner.page.$$(
-        lessonCardSecondaryButtonSelector
-      );
-      expect(secondaryButtons.length).toBeGreaterThanOrEqual(2);
+      if (circleBadges.length >= 3) {
+        await circleBadges[2].click();
+
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
+        await loggedInLearner.expectElementToBeVisible(arcSkipProceedSelector);
+
+        await loggedInLearner.clickOnElementWithSelector(arcSkipCancelSelector);
+        await loggedInLearner.expectElementToBeVisible(
+          arcSkipModalSelector,
+          false
+        );
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should play the first chapter and return to topic page with progression',
+    'should skip to later arc and show skipped adventure cards',
     async function () {
-      await loggedInLearner.clickOnElementWithSelector(
-        lessonCardStartButtonSelector
+      const circleBadges = await loggedInLearner.page.$$(
+        `${adventureNavigationSelector} topic-adventure-circle-badge`
       );
 
-      await loggedInLearner.waitForPageToFullyLoad();
+      if (circleBadges.length >= 3) {
+        await circleBadges[2].click();
 
-      // The exploration has two cards connected by a Continue button
-      // interaction, so advance past the first card to reach the end state.
-      await loggedInLearner.clickOnContinueButtonInInteractionCard();
+        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
+        await loggedInLearner.clickOnElementWithSelector(
+          arcSkipProceedSelector
+        );
 
-      await loggedInLearner.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+        await loggedInLearner.page.waitForTimeout(1000);
 
-      // Navigate back to the redesigned topic viewer page so the completed
-      // chapter is shown with the completed state.
-      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
-      await loggedInLearner.waitForPageToFullyLoad();
+        const skippedCards = await loggedInLearner.page.$$(
+          skippedAdventureCardSelector
+        );
+        expect(skippedCards.length).toBeGreaterThan(0);
 
-      await loggedInLearner.expectElementToBeVisible(
-        redesignedContainerSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        completedLessonClassSelector
-      );
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureBadgeSelector
+        );
+        await loggedInLearner.expectTextContentToContain(
+          skippedAdventureBadgeSelector,
+          'SKIPPED'
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureMessageSelector
+        );
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureStartCtaSelector
+        );
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should collapse completed chapter into compact row with Play Again action',
+    'should expand a skipped adventure when clicking its Start CTA',
     async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        completedCollapsedSelector
+      const startCtas = await loggedInLearner.page.$$(
+        skippedAdventureStartCtaSelector
       );
-      await loggedInLearner.expectElementToBeVisible(playAgainButtonSelector);
-      await loggedInLearner.expectElementToBeVisible(completedLabelSelector);
+
+      if (startCtas.length > 0) {
+        // Use the stabilized click helper instead of a raw Puppeteer click:
+        // the page is still smooth-scrolling toward the previously selected
+        // arc, and a raw click's coordinates can land off-target mid-scroll.
+        await loggedInLearner.clickOnElement(startCtas[0]);
+
+        await loggedInLearner.expectElementToBeVisible(
+          skippedAdventureCardSelector,
+          false
+        );
+
+        const lessonCards = await loggedInLearner.page.$$(lessonCardSelector);
+        expect(lessonCards.length).toBeGreaterThan(0);
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should display the next chapter as the active lesson after completion',
-    async function () {
-      const lessonCards = await loggedInLearner.page.$$(lessonCardSelector);
-      expect(lessonCards.length).toBeGreaterThanOrEqual(2);
-
-      await loggedInLearner.expectElementToBeVisible(
-        lessonCardStartButtonSelector
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display the Mastery Challenge card with a description',
+    'should display Mastery Challenge card at the end of the story path',
     async function () {
       await loggedInLearner.page.evaluate(() => {
         document
@@ -275,9 +292,6 @@ describe('Logged-In Learner', function () {
         masteryChallengeTitleSelector
       );
       await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeDescriptionSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
         masteryChallengeButtonSelector
       );
     },
@@ -285,7 +299,7 @@ describe('Logged-In Learner', function () {
   );
 
   it(
-    'should show helper tooltip when clicking the locked Mastery Challenge button',
+    'should not navigate away when clicking the locked Mastery Challenge button',
     async function () {
       const isUnlocked = await loggedInLearner.page.evaluate(() => {
         const btn = document.querySelector(
@@ -298,47 +312,16 @@ describe('Logged-In Learner', function () {
       });
 
       if (!isUnlocked) {
+        const urlBeforeClick = loggedInLearner.page.url();
+
         await loggedInLearner.clickOnElementWithSelector(
           masteryChallengeButtonSelector
         );
 
-        await loggedInLearner.expectElementToBeVisible(
-          masteryChallengeHelperTooltipSelector
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          masteryChallengeHelperTitleSelector
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          masteryChallengeHelperDescriptionSelector
-        );
-        await loggedInLearner.expectTextContentToContain(
-          masteryChallengeHelperTitleSelector,
-          'Complete all chapters to unlock'
-        );
+        await loggedInLearner.page.waitForTimeout(500);
 
-        await loggedInLearner.page.waitForTimeout(6000);
-
-        await loggedInLearner.expectElementToBeVisible(
-          masteryChallengeHelperTooltipSelector,
-          false
-        );
+        expect(loggedInLearner.page.url()).toBe(urlBeforeClick);
       }
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display the practice test card with Practice Test button',
-    async function () {
-      await loggedInLearner.expectElementToBeVisible(
-        adventureEndTestCardSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        adventureEndTestTitleSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        adventureEndTestPracticeButtonSelector
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

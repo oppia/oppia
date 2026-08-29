@@ -62,7 +62,7 @@ const studySkillsCtaSelector = '.e2e-test-study-skills-cta';
 const adventureGroupSelector = '.e2e-test-adventure-group';
 const adventureTitleSelector = '.e2e-test-adventure-title';
 
-describe('Logged-In Learner', function () {
+describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedInLearner: LoggedInUser & LoggedOutUser;
@@ -103,12 +103,9 @@ describe('Logged-In Learner', function () {
       'Fraction skills'
     );
     // Asking for extra questions for the "Fraction skills" skill so that, when
-    // the serial "publish chapters" flow below publishes the first batch of
-    // chapters, the backend's story-publish validation (which requires each
-    // acquired skill to have at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
-    // questions) passes. Without this, the story would not be marked as
-    // published in the topic and would not appear on the redesigned topic
-    // viewer page.
+    // the serial "publish chapters" flow below publishes the chapters, the
+    // backend's story-publish validation (which requires each acquired skill to
+    // have at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH questions) passes.
     await curriculumAdmin.createQuestionsForSkill('Fraction skills', 7);
     await curriculumAdmin.addTopicToClassroom('Math', 'Fractions');
     await curriculumAdmin.publishClassroom('Math');
