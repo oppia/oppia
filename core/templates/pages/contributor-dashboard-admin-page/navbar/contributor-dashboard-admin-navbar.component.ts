@@ -22,10 +22,12 @@ import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
 import {AppConstants} from 'app.constants';
+import './contributor-dashboard-admin-navbar.component.css';
 
 @Component({
   selector: 'oppia-contributor-dashboard-admin-navbar',
   templateUrl: './contributor-dashboard-admin-navbar.component.html',
+  styleUrls: ['./contributor-dashboard-admin-navbar.component.css'],
 })
 export class ContributorDashboardAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

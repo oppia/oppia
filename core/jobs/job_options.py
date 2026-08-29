@@ -73,6 +73,18 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         ),
     }
 
+    # A subset of Google Cloud options related to security and networking.
+    # For the complete list of available options, refer to:
+    # https://docs.cloud.google.com/dataflow/docs/reference/pipeline-options#security_and_networking
+    GOOGLE_CLOUD_OPTIONS = {
+        'service_account_email': (
+            str,
+            'Identifies a user-managed worker service account to run virtual '
+            'machines as. If not set, workers use the Compute Engine service '
+            'account of the project as the worker service account.',
+        ),
+    }
+
     def __init__(
         self,
         flags: Optional[List[str]] = None,
@@ -92,7 +104,9 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             ValueError. Unsupported job option(s).
         """
         allowed_options = set(self.JOB_OPTIONS.keys()).union(
-            self.DATAFLOW_RESOURCE_OPTIONS, self.SPECIAL_JOB_OPTIONS
+            self.DATAFLOW_RESOURCE_OPTIONS,
+            self.SPECIAL_JOB_OPTIONS,
+            self.GOOGLE_CLOUD_OPTIONS,
         )
         unsupported_options = set(job_options).difference(allowed_options)
         if unsupported_options:

@@ -20,10 +20,12 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import './assign-skill-to-topic-modal.component.css';
 
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',
   templateUrl: './assign-skill-to-topic-modal.component.html',
+  styleUrls: ['./assign-skill-to-topic-modal.component.css'],
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using component interactions

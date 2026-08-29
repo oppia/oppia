@@ -16,7 +16,12 @@
  * @fileoverview Unit tests for State Responses Component.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -50,7 +55,7 @@ import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
-class MockParameterizeRuleDescriptionPipe {
+class MockParameterizeRuleDescriptionPipe implements PipeTransform {
   transform(
     rule: Rule | null,
     interactionId: string | null,
@@ -60,21 +65,21 @@ class MockParameterizeRuleDescriptionPipe {
   }
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
-class MockWrapTextWithEllipsisPipe {
+class MockWrapTextWithEllipsisPipe implements PipeTransform {
   transform(input: string, characterCount: number): string {
     return '';
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
 }
 
 @Pipe({name: 'convertToPlainText'})
-class MockConvertToPlainTextPipe {
+class MockConvertToPlainTextPipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }

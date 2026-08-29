@@ -17,8 +17,9 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 
 describe('AssessmentInstructionPanelComponent', () => {
@@ -27,12 +28,69 @@ describe('AssessmentInstructionPanelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AssessmentInstructionPanelComponent],
+      declarations: [AssessmentInstructionPanelComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AssessmentInstructionPanelComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('should default the certificate title to an empty string', () => {
+    expect(component.certificateTitle).toBe('');
+  });
+
+  it('should default the assessment duration in minutes to zero', () => {
+    expect(component.timeLimitInMinutes).toBe(0);
+  });
+
+  it('should default the total questions to zero', () => {
+    expect(component.totalQuestions).toBe(0);
+  });
+
+  it('should allow values to be set via input bindings', () => {
+    component.certificateTitle = 'Everyday Arithmetic & Number Confidence';
+    component.timeLimitInMinutes = 60;
+    component.totalQuestions = 12;
+
+    expect(component.certificateTitle).toBe(
+      'Everyday Arithmetic & Number Confidence'
+    );
+    expect(component.timeLimitInMinutes).toBe(60);
+    expect(component.totalQuestions).toBe(12);
+  });
+
+  it('should have the correct i18n key for the instructions heading', () => {
+    expect(component.instructionsHeadingI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTIONS_HEADING'
+    );
+  });
+
+  it('should have the correct i18n key for the time limit instruction', () => {
+    expect(component.timeLimitInstructionI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT'
+    );
+  });
+
+  it('should have the correct i18n key for the question count instruction', () => {
+    expect(component.questionCountInstructionI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT'
+    );
+  });
+
+  it('should list the correct i18n keys for the static instructions', () => {
+    expect(component.staticInstructionI18nKeys).toEqual([
+      'I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT',
+      'I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME',
+      'I18N_ASSESSMENT_INSTRUCTION_NAVIGATION',
+      'I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS',
+      'I18N_ASSESSMENT_INSTRUCTION_FINAL_SUBMISSION',
+      'I18N_ASSESSMENT_INSTRUCTION_UNANSWERED_MARKED_INCORRECT',
+      'I18N_ASSESSMENT_INSTRUCTION_MULTIPLE_ATTEMPTS',
+      'I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED',
+      'I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT',
+    ]);
   });
 
   it('should emit startAssessment when onStartAssessment is called', () => {
@@ -43,12 +101,17 @@ describe('AssessmentInstructionPanelComponent', () => {
     expect(component.startAssessment.emit).toHaveBeenCalled();
   });
 
-  it('should emit startAssessment when the start button is clicked', () => {
-    spyOn(component.startAssessment, 'emit');
+  it('should emit back exactly once when onBack is called', () => {
+    spyOn(component.back, 'emit');
 
-    const button = fixture.debugElement.query(By.css('button'));
-    button.triggerEventHandler('click', null);
+    component.onBack();
 
-    expect(component.startAssessment.emit).toHaveBeenCalled();
+    expect(component.back.emit).toHaveBeenCalledTimes(1);
+  });
+
+  it('should have the correct i18n key for the start assessment button', () => {
+    expect(component.startAssessmentButtonI18nKey).toBe(
+      'I18N_ASSESSMENT_START_BUTTON'
+    );
   });
 });

@@ -1,0 +1,28 @@
+<div class="assessment-modal-card">
+  <div class="assessment-modal-header">
+    <div class="assessment-modal-header-content">
+      <img class="assessment-modal-icon" src="/assets/images/certificates/unanswered-warning-icon.svg" alt="">
+      <h2 id="unanswered-question-modal-title" class="assessment-modal-title">{{ 'I18N_UNANSWERED_QUESTION_MODAL_TITLE' | translate }}</h2>
+    </div>
+
+    <button type="button" class="btn-close" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON' | translate" (click)="goBackToAssessment()"></button>
+  </div>
+
+  <p id="unanswered-question-modal-message" class="assessment-modal-message">
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_MESSAGE' | translate:{unansweredQuestionCount: unansweredQuestionCount} }}
+  </p>
+
+  <p class="assessment-modal-message">
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE' | translate }}
+    <button type="button" class="assessment-modal-inline-key" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT' | translate" (click)="goBackToAssessment()">
+      &times;
+    </button>
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER' | translate }}
+  </p>
+
+  <div class="assessment-modal-actions">
+    <button type="button" class="btn btn-primary assessment-modal-action-button" (click)="submitAnyway()">
+      {{ 'I18N_UNANSWERED_QUESTION_MODAL_SUBMIT_BUTTON' | translate }}
+    </button>
+  </div>
+</div>

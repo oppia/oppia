@@ -34,6 +34,7 @@ import {
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
+import './review-translation-language-selector.component.css';
 
 interface Options {
   id: string;
@@ -43,6 +44,7 @@ interface Options {
 @Component({
   selector: 'review-translation-language-selector',
   templateUrl: './review-translation-language-selector.component.html',
+  styleUrls: ['./review-translation-language-selector.component.css'],
 })
 export class ReviewTranslationLanguageSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

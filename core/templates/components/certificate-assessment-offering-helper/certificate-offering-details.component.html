@@ -2,18 +2,19 @@
   <div class="oppia-certificate-section">
     <h3 class="oppia-certificate-section-title">Add Certificate Details</h3>
 
-    <div class="form-group">
+    <div class="form-group" [class.disabled]="isLoadingClassrooms">
       <label class="oppia-certificate-label" for="certificate-offering-title">
         Certificate Title<span class="oppia-certificate-required">*</span>
       </label>
       <input id="certificate-offering-title" name="certificateOfferingTitle"
              class="oppia-certificate-input" type="text" required
-             [attr.maxlength]="TITLE_MAX_LENGTH" [(ngModel)]="title"
+             [attr.maxlength]="MAX_TITLE_LENGTH" [(ngModel)]="title"
+             [disabled]="isLoadingClassrooms"
              placeholder="Enter title" aria-required="true">
       <small class="form-text text-muted">
-        <em> Certificate title should be at most {{TITLE_MAX_LENGTH}} characters.</em>
+        <em> Certificate title should be at most {{MAX_TITLE_LENGTH}} characters.</em>
         <span *ngIf="title?.length > 0">
-          <em> Characters used: {{title.length}}/{{TITLE_MAX_LENGTH}}</em>
+          <em> Characters used: {{title.length}}/{{MAX_TITLE_LENGTH}}</em>
         </span>
       </small>
     </div>
@@ -26,13 +27,14 @@
         <div class="oppia-certificate-textarea-wrap">
           <textarea id="certificate-offering-description" name="certificateOfferingDescription"
                     class="oppia-certificate-textarea" required rows="6"
-                    [attr.maxlength]="DESCRIPTION_MAX_LENGTH" [(ngModel)]="description"
+                    [attr.maxlength]="MAX_DESCRIPTION_LENGTH" [(ngModel)]="description"
+                    [disabled]="isLoadingClassrooms"
                     placeholder="Enter description" aria-required="true">
           </textarea>
           <small class="form-text text-muted">
-            <em> Certificate description should be at most {{DESCRIPTION_MAX_LENGTH}} characters.</em>
+            <em> Certificate description should be at most {{MAX_DESCRIPTION_LENGTH}} characters.</em>
             <span *ngIf="description?.length > 0">
-              <em> Characters used: {{description.length}}/{{DESCRIPTION_MAX_LENGTH}}</em>
+              <em> Characters used: {{description.length}}/{{MAX_DESCRIPTION_LENGTH}}</em>
             </span>
           </small>
         </div>
@@ -40,25 +42,29 @@
 
       <div class="oppia-certificate-col-right">
         <div class="form-group"
-             [ngClass]="{'has-error': timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > TIME_LIMIT_MAX_VALUE}">
+             [ngClass]="{'has-error': timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > MAX_TIME_LIMIT_IN_MINUTES}">
           <label class="oppia-certificate-label" for="certificate-offering-time-limit">
             Time Limit<span class="oppia-certificate-required">*</span>
           </label>
           <input id="certificate-offering-time-limit" name="certificateOfferingTimeLimit"
-                 class="oppia-certificate-input" type="number" required min="1"
-                 max="60" [(ngModel)]="timeLimitInMinutes" placeholder="Enter time limit in minutes" aria-required="true">
+                 class="oppia-certificate-input" type="number" required
+                 [attr.min]="MIN_TIME_LIMIT_IN_MINUTES"
+                 [attr.max]="MAX_TIME_LIMIT_IN_MINUTES"
+                 [(ngModel)]="timeLimitInMinutes"
+                 [disabled]="isLoadingClassrooms"
+                 placeholder="Enter time limit in minutes" aria-required="true">
           <small class="form-text" [ngClass]="{
               'text-muted': !getTimeLimitValidationError(),
               'text-danger': getTimeLimitValidationError()
             }">
             <em>
               <span *ngIf="!getTimeLimitValidationError()">
-                Time limit should be at most {{TIME_LIMIT_MAX_VALUE}} minutes.
+                Time limit should be between {{MIN_TIME_LIMIT_IN_MINUTES}} and {{MAX_TIME_LIMIT_IN_MINUTES}} minutes.
               </span>
               <span *ngIf="getTimeLimitValidationError()">
                 {{ getTimeLimitValidationError() }}
                 <span *ngIf="timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > 0">
-                  Minutes entered: {{timeLimitInMinutes}}/{{TIME_LIMIT_MAX_VALUE}}
+                  Minutes entered: {{timeLimitInMinutes}}/{{MAX_TIME_LIMIT_IN_MINUTES}}
                 </span>
               </span>
             </em>
@@ -66,13 +72,16 @@
         </div>
 
         <div class="form-group"
-          [ngClass]="{'has-error': totalQuestions !== null && totalQuestions !== undefined && totalQuestions > TOTAL_QUESTIONS_MAX_VALUE}">
+          [ngClass]="{'has-error': totalQuestions !== null && totalQuestions !== undefined && totalQuestions > MAX_TOTAL_QUESTIONS}">
           <label class="oppia-certificate-label" for="certificate-offering-total-questions">
             Total Number of Questions<span class="oppia-certificate-required">*</span>
           </label>
           <input id="certificate-offering-total-questions" name="certificateOfferingTotalQuestions"
-                 class="oppia-certificate-input" type="number" required min="1" max="50"
+                 class="oppia-certificate-input" type="number" required
+                 [attr.min]="MIN_TOTAL_QUESTIONS"
+                 [attr.max]="MAX_TOTAL_QUESTIONS"
                  [(ngModel)]="totalQuestions"
+                 [disabled]="isLoadingClassrooms"
                  placeholder="Enter total questions" aria-required="true">
           <small class="form-text" [ngClass]="{
               'text-muted': !getTotalQuestionsValidationError(),
@@ -80,12 +89,12 @@
             }">
             <em>
               <span *ngIf="!getTotalQuestionsValidationError()">
-                Total number of questions should be at most {{TOTAL_QUESTIONS_MAX_VALUE}}.
+                Total number of questions should be between {{MIN_TOTAL_QUESTIONS}} and {{MAX_TOTAL_QUESTIONS}}.
               </span>
               <span *ngIf="getTotalQuestionsValidationError()">
                 {{ getTotalQuestionsValidationError() }}
                 <span *ngIf="totalQuestions !== null && totalQuestions !== undefined && totalQuestions > 0">
-                  Questions entered: {{totalQuestions}}/{{TOTAL_QUESTIONS_MAX_VALUE}}
+                  Questions entered: {{totalQuestions}}/{{MAX_TOTAL_QUESTIONS}}
                 </span>
               </span>
             </em>
@@ -98,10 +107,11 @@
           </label>
           <select id="certificate-offering-classroom" name="certificateOfferingClassroom"
                   class="oppia-certificate-input" required [(ngModel)]="classroomId"
+                  [disabled]="isLoadingClassrooms"
                   aria-label="Select classroom" aria-required="true">
-            <option value="">Select a classroom</option>
+            <option value="" disabled selected>Select a classroom</option>
             <option *ngFor="let classroom of classroomOptions" [value]="classroom.classroom_id">
-              {{ classroom.name }}
+              {{ classroom.name | titlecase }}
             </option>
           </select>
           <small *ngIf="classroomLoadErrorMessage" class="form-text text-danger">
@@ -131,14 +141,17 @@
         <input class="oppia-certificate-input oppia-certificate-outcome-input"
                [(ngModel)]="demonstratesList[i]" [name]="'demonstrates_' + i"
                [id]="'demonstrates_' + i" placeholder="Enter a learning outcome..." required aria-required="true"
+               [disabled]="isLoadingClassrooms"
         >
         <button *ngIf="demonstratesList.length > 1" class="oppia-certificate-outcome-remove"
-                type="button" aria-label="Remove outcome" (click)="removeOutcome(i)">
+                type="button" aria-label="Remove outcome" [disabled]="isLoadingClassrooms"
+                (click)="removeOutcome(i)">
           &times;
         </button>
       </div>
 
-      <button class="oppia-certificate-outcome-add" type="button" (click)="addOutcome()">
+      <button class="oppia-certificate-outcome-add" type="button" [disabled]="isLoadingClassrooms"
+              (click)="addOutcome()">
         <span aria-hidden="true">+</span> Add another outcome
       </button>
     </div>
@@ -146,7 +159,7 @@
 
   <div class="oppia-certificate-offering-details-actions">
     <button class="e2e-test-certificate-offering-details-next-button oppia-certificate-btn-next"
-            type="button" [disabled]="!isFormValid()" [attr.aria-disabled]="!isFormValid()"
+            type="button" [disabled]="!isFormValid() || isLoadingClassrooms" [attr.aria-disabled]="!isFormValid() || isLoadingClassrooms"
             (click)="onNextClicked()"
     >
       Next

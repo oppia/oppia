@@ -1,78 +1,91 @@
 <div class="topic-preview-parent e2e-test-topic-preview-container">
-  <div>
-    <background-banner></background-banner>
-  </div>
-  <div class="topic-preview-nav">
-    <div class="topic-preview-navbar-tabs">
-      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'story'}"
-           (click)="changePreviewTab('story')">
-        <div class="topic-preview-icon">
-          <img alt="" class="tab-icon"
-               [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+  <topic-viewer-content
+    *ngIf="isRedesignedTopicViewerPageFeatureEnabled()"
+    [topicName]="topicName"
+    [topicDescription]="topic.getDescription()"
+    [topicId]="topic.getId()"
+    [classroomName]="classroomName"
+    [classroomUrlFragment]="classroomUrlFragment"
+    [topicUrlFragment]="topicUrlFragment"
+    [canonicalStorySectionData]="canonicalStorySectionData"
+    [isInTopicEditorPreview]="true">
+  </topic-viewer-content>
+  <div *ngIf="!isRedesignedTopicViewerPageFeatureEnabled()">
+    <div>
+      <background-banner></background-banner>
+    </div>
+    <div class="topic-preview-nav">
+      <div class="topic-preview-navbar-tabs">
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'story'}"
+             (click)="changePreviewTab('story')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon"
+                 [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Learn
+          </div>
         </div>
-        <div class="topic-preview-text">
-          Learn
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'practice'}"
+             (click)="changePreviewTab('practice')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Practice
+          </div>
         </div>
-      </div>
-      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'practice'}"
-           (click)="changePreviewTab('practice')">
-        <div class="topic-preview-icon">
-          <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
-        </div>
-        <div class="topic-preview-text">
-          Practice
-        </div>
-      </div>
-      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'subtopic'}"
-           (click)="changePreviewTab('subtopic')">
-        <div class="topic-preview-icon">
-          <img alt="" class="tab-icon"
-               [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
-        </div>
-        <div class="topic-preview-text">
-          Study
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'subtopic'}"
+             (click)="changePreviewTab('subtopic')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon"
+                 [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Study
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="topic-preview-container">
-    <div *ngIf="activeTab === 'story'" class="topic-preview-tab-content">
-      <stories-list class="topic-preview-mode"
-                    [topicName]="topic.getName()"
-                    [topicId]="topic.getId()"
-                    [topicDescription]="topic.getDescription()"
-                    [canonicalStorySummaries]="canonicalStorySummaries"
-                    [classroomUrlFragment]="classroomUrlFragment"
-                    [classroomName]="classroomName"
-                    [topicUrlFragment]="topicUrlFragment">
-      </stories-list>
-    </div>
-    <div *ngIf="activeTab === 'subtopic'" class="topic-preview-tab-content">
-      <subtopics-list class="topic-preview-mode"
-                      [classroomUrlFragment]="''"
-                      [subtopicsList]="subtopics"
+    <div class="topic-preview-container">
+      <div *ngIf="activeTab === 'story'" class="topic-preview-tab-content">
+        <stories-list class="topic-preview-mode"
+                      [topicName]="topic.getName()"
                       [topicId]="topic.getId()"
+                      [topicDescription]="topic.getDescription()"
+                      [canonicalStorySummaries]="canonicalStorySummaries"
+                      [classroomUrlFragment]="classroomUrlFragment"
+                      [classroomName]="classroomName"
+                      [topicUrlFragment]="topicUrlFragment">
+        </stories-list>
+      </div>
+      <div *ngIf="activeTab === 'subtopic'" class="topic-preview-tab-content">
+        <subtopics-list class="topic-preview-mode"
+                        [classroomUrlFragment]="''"
+                        [subtopicsList]="subtopics"
+                        [topicId]="topic.getId()"
+                        [topicName]="topicName"
+                        [topicUrlFragment]="''">
+        </subtopics-list>
+      </div>
+      <div *ngIf="activeTab === 'practice'" class="topic-preview-tab-content">
+        <practice-tab class="topic-preview-mode"
+                      *ngIf="isPracticeTabEnabled()"
+                      [subtopicsList]="subtopics"
                       [topicName]="topicName"
-                      [topicUrlFragment]="''">
-      </subtopics-list>
-    </div>
-    <div *ngIf="activeTab === 'practice'" class="topic-preview-tab-content">
-      <practice-tab class="topic-preview-mode"
-                    *ngIf="isPracticeTabEnabled()"
-                    [subtopicsList]="subtopics"
-                    [topicName]="topicName"
-                    [topicUrlFragment]="topicUrlFragment"
-                    [classroomUrlFragment]="classroomUrlFragment">
-      </practice-tab>
-      <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
-        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
-        </h2>
-        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
-        </div>
-      </mat-card>
+                      [topicUrlFragment]="topicUrlFragment"
+                      [classroomUrlFragment]="classroomUrlFragment">
+        </practice-tab>
+        <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
+          <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+          </h2>
+          <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+          </div>
+        </mat-card>
+      </div>
     </div>
   </div>
 </div>
@@ -137,6 +150,17 @@
     margin-bottom: 0;
     margin-top: 0;
     width: 100%;
+  }
+  .coming-soon-title {
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 1.5em;
+    margin: 1em;
+    padding-top: 1em;
+  }
+  .coming-soon-text {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 1.1em;
+    margin-left: 1.4em;
   }
   @media screen and (max-width: 1000px) {
     .topic-preview-container {

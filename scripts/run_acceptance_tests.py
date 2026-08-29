@@ -209,7 +209,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         stack.enter_context(
             servers.managed_dev_appserver(
                 app_yaml_path,
-                port=common.GAE_PORT_FOR_E2E_TESTING,
+                port=common.GAE_PORT_FOR_ACCEPTANCE_TESTING,
                 log_level=args.server_log_level,
                 # Automatic restart can be disabled since we don't expect code
                 # changes to happen while the acceptance tests are running.

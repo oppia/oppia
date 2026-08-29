@@ -7,20 +7,12 @@
 .topic-lesson-language-selector {
   display: flex;
   flex-direction: column;
-  width: 308px;
-}
-
-.topic-lesson-language-selector-row {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  min-width: auto;
-  overflow: visible;
+  max-width: 468px;
   width: 100%;
 }
 
-.topic-lesson-language-selector-row--compact {
-  align-items: center;
+.topic-lesson-language-selector-row {
+  align-items: flex-start;
   display: flex;
   gap: 8px;
   min-width: auto;
@@ -34,8 +26,8 @@
   border-radius: 4px;
   display: flex;
   flex: 1;
-  height: 38px;
-  max-width: 150px;
+  height: 44px;
+  max-width: 230px;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -47,7 +39,7 @@
 
 .topic-lesson-language-selector-leading-icon {
   color: #006f67;
-  font-size: 18px;
+  font-size: 22px;
   left: 12px;
   pointer-events: none;
   position: absolute;
@@ -71,7 +63,7 @@
 
 .topic-lesson-language-selector-chip-label {
   color: #006f67;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1;
 }
@@ -89,7 +81,7 @@
 
 .topic-lesson-language-selector-trailing-icon {
   color: #006f67;
-  font-size: 18px;
+  font-size: 20px;
   pointer-events: none;
   position: absolute;
   right: 14px;
@@ -107,7 +99,7 @@
   cursor: pointer;
   font-size: 14px;
   height: 100%;
-  padding: 0 36px 0 36px;
+  padding: 0 30px 0 30px;
   width: 100%;
   z-index: 1;
 }
@@ -124,7 +116,7 @@
 .topic-lesson-language-selector-error {
   color: #c62828;
   font-size: 12px;
-  margin: 0;
+  margin: 6px 0 0;
   width: 100%;
 }
 
@@ -132,7 +124,7 @@
   color: #5f6368;
   font-size: 12px;
   line-height: 1.35;
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   padding-left: 2px;
   width: 100%;
 }
@@ -146,16 +138,19 @@
   .topic-lesson-language-selector-row--compact {
     align-items: center;
     flex-direction: row;
+    gap: 6px;
   }
 
   .topic-lesson-language-selector-select-container {
+    height: 40px;
     max-width: none;
+    min-width: 0;
     width: 100%;
   }
 
   .topic-lesson-language-selector-leading-icon {
     font-size: 16px;
-    left: 12px;
+    left: 10px;
   }
 
   .topic-lesson-language-selector-chip-label {
@@ -163,8 +158,8 @@
   }
 
   .topic-lesson-language-selector-text-block {
-    left: 36px;
-    right: 34px;
+    left: 34px;
+    right: 32px;
   }
 
   .topic-lesson-language-selector-selected-value {
@@ -173,6 +168,13 @@
 
   .topic-lesson-language-selector-trailing-icon {
     font-size: 16px;
-    right: 12px;
+    right: 10px;
+  }
+
+  .topic-lesson-language-selector-note,
+  .topic-lesson-language-selector-error {
+    margin-top: 6px;
+    position: static;
+    top: auto;
   }
 }

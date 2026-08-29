@@ -19,6 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    question_services,
     story_domain,
     story_services,
     topic_domain,
@@ -121,9 +122,14 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id
-        )
+        with self.swap_to_always_return(
+            question_services,
+            'get_total_question_count_for_skill_ids',
+            10,
+        ):
+            topic_services.publish_story(
+                self.topic_id, self.story_id_1, self.admin_id
+            )
 
         self.login(self.VIEWER_EMAIL)
 
@@ -190,9 +196,14 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         story.story_contents.next_node_id = self.node_id_2
         story_services.save_new_story(self.admin_id, story)
 
-        topic_services.publish_story(
-            self.topic_id, self.story_id_3, self.admin_id
-        )
+        with self.swap_to_always_return(
+            question_services,
+            'get_total_question_count_for_skill_ids',
+            10,
+        ):
+            topic_services.publish_story(
+                self.topic_id, self.story_id_3, self.admin_id
+            )
 
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.story_id_3, node_id

@@ -38,6 +38,7 @@ import {UserService} from 'services/user.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   opportunities: SkillOpportunityBackendDict[];
@@ -180,19 +181,22 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
     languageCode: string,
     topicName: string,
-    cursor: string
+    cursor: string,
+    entityType?: string
   ): Promise<TranslationContributionOpportunities> {
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      const params = {
+      const params: Record<string, string> = {
         language_code: languageCode,
         topic_name:
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
-        entity_type: AppConstants.ENTITY_TYPE.EXPLORATION,
       };
+      if (this.shouldFilterByEntityType(entityType)) {
+        params.entity_type = entityType as string;
+      }
 
       return this.http
         .get<TranslationContributionOpportunitiesBackendDictV2>(
@@ -254,18 +258,31 @@ export class ContributionOpportunitiesBackendApiService {
       );
   }
 
+  /**
+   * Returns whether the opportunity request should carry an entity_type
+   * parameter. An absent entity type, or the "all" sentinel, both mean that
+   * opportunities of every entity type are wanted, which the handlers express
+   * by the parameter being omitted.
+   */
+  private shouldFilterByEntityType(entityType?: string): boolean {
+    return (
+      entityType !== undefined &&
+      entityType !== '' &&
+      entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+    );
+  }
+
   async fetchReviewableTranslationOpportunitiesAsync(
     topicName: string,
-    languageCode?: string
+    languageCode?: string,
+    entityType?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
-    const params: {
-      topic_name?: string;
-      language_code?: string;
-      entity_type?: string;
-    } = {};
+    const params: Record<string, string> = {};
+
     if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
+
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
@@ -274,7 +291,9 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      params.entity_type = AppConstants.ENTITY_TYPE.EXPLORATION;
+      if (this.shouldFilterByEntityType(entityType)) {
+        params.entity_type = entityType as string;
+      }
       return this.http
         .get<ReviewableTranslationOpportunitiesBackendDictV2>(
           '/getreviewableopportunitieshandlerv2',

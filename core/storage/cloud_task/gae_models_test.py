@@ -49,6 +49,9 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
                 'exception_messages_for_failed_runs': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
+                'additional_contextual_information': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,

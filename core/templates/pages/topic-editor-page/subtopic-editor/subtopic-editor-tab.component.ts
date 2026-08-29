@@ -39,10 +39,12 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import './subtopic-editor-tab.component.css';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
   templateUrl: './subtopic-editor-tab.component.html',
+  styleUrls: ['./subtopic-editor-tab.component.css'],
 })
 export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   hostname!: string;

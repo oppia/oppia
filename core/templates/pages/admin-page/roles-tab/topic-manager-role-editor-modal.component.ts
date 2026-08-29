@@ -21,10 +21,12 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import './topic-manager-role-editor-modal.component.css';
 
 @Component({
   selector: 'oppia-topic-manager-role-editor-modal',
   templateUrl: './topic-manager-role-editor-modal.component.html',
+  styleUrls: ['./topic-manager-role-editor-modal.component.css'],
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

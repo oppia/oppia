@@ -110,8 +110,8 @@ test.describe('Logged-out User', function () {
   });
 
   test('should be able to resume progress using 72-hour link.', async function () {
-    await loggedOutLearner.playExploration(explorationId);
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.openLessonInfoModal();

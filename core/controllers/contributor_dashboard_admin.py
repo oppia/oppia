@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -789,7 +787,7 @@ def get_translation_coordinator_frontend_dict(
             assert user_setting.last_logged_in is not None
             last_activity = user_setting.last_logged_in
             last_activity_days = int(
-                (datetime.datetime.today() - last_activity).days
+                (utils.get_current_local_datetime() - last_activity).days
             )
 
             coordinator_activity_list.append(
@@ -833,7 +831,7 @@ def get_question_coordinator_frontend_dict(
 
         last_activity = user_setting.last_logged_in
         last_activity_days = int(
-            (datetime.datetime.today() - last_activity).days
+            (utils.get_current_local_datetime() - last_activity).days
         )
 
         stats.append(

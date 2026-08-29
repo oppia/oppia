@@ -23,6 +23,7 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {Subtopic} from 'domain/topic/subtopic.model';
+import './subtopic-summary-tile.component.css';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -31,6 +32,7 @@ import {
 @Component({
   selector: 'oppia-subtopic-summary-tile',
   templateUrl: './subtopic-summary-tile.component.html',
+  styleUrls: ['./subtopic-summary-tile.component.css'],
 })
 export class SubtopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

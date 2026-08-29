@@ -258,6 +258,32 @@ export class UrlService {
   }
 
   /**
+   * This function returns the node ID from the lesson practice URL.
+   * @return {string} the node ID.
+   */
+  getNodeIdFromPracticeUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/practice\/(\d+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
+  }
+
+  /**
+   * This function returns the arc ID from the end-of-arc URL.
+   * @return {string} the arc ID.
+   */
+  getArcIdFromUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/test\/arc\/(\d+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
+  }
+
+  /**
    * This function is used to find the classroom URL fragment from the learner's
    * URL.
    * @return {string} the classroom URL fragment.

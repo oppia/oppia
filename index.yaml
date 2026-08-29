@@ -684,3 +684,146 @@ indexes:
   - name: entity_type
   - name: incomplete_translation_language_codes
   - name: created_on
+
+- kind: TranslationOpportunityModel
+  properties:
+  - name: entity_type
+  - name: incomplete_translation_language_codes
+  - name: topic_ids
+  - name: created_on
+
+- kind: TranslationOpportunityModel
+  properties:
+  - name: incomplete_translation_language_codes
+  - name: created_on
+
+- kind: TranslationOpportunityModel
+  properties:
+  - name: incomplete_translation_language_codes
+  - name: topic_ids
+  - name: created_on
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: destination_dashboard
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: CertificateAssessmentAttemptModel
+  properties:
+  - name: learner_id
+  - name: certificate_id
+  - name: is_submitted
+  - name: attempt_index
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: destination_dashboard
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: last_updated
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: status
+  - name: last_updated
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: suggestion_type
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_id
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_type
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_id
+  - name: target_type
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_type
+  - name: author_id
+  - name: target_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: target_type
+  - name: created_on
+    direction: desc

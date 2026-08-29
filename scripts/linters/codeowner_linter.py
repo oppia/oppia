@@ -119,8 +119,7 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
             if (not self._is_path_ignored(dir_path + '/')) and (
                 dir_path not in exclude_dirs
             ):
-                for x in self._walk_with_gitignore(dir_path, exclude_dirs):
-                    yield x
+                yield from self._walk_with_gitignore(dir_path, exclude_dirs)
 
     def _is_path_ignored(self, path_to_check: str) -> bool:
         """Checks whether the given path is ignored by git.

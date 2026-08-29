@@ -1,0 +1,358 @@
+.mastery-challenge-card {
+  align-items: center;
+  background: #fff8ef;
+  border: 1px solid #f0e4d2;
+  border-radius: 12px;
+  display: flex;
+  gap: 26px;
+  margin-top: 18px;
+  padding: 26px 30px;
+}
+
+.mastery-challenge-icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 138px;
+  justify-content: center;
+}
+
+.mastery-challenge-icon-image {
+  display: block;
+  height: 138px;
+  width: 138px;
+}
+
+.mastery-challenge-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mastery-challenge-action-wrapper {
+  align-items: flex-end;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  position: relative;
+}
+
+.mastery-challenge-title {
+  color: #373a3e;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.mastery-challenge-description {
+  color: #373a3e;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 24px;
+  margin: 0;
+}
+
+.mastery-challenge-button {
+  align-items: center;
+  background: #00645c;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14);
+  color: #fff;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 10px;
+  height: 44px;
+  justify-content: center;
+  min-width: 160px;
+  padding: 0 24px;
+}
+
+.mastery-challenge-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 100, 92, 0.2);
+  outline: none;
+}
+
+.mastery-challenge-button:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.mastery-challenge-button.mastery-challenge-button-locked {
+  background: #fff;
+  border: 2px solid #78a8a2;
+  box-shadow: none;
+  color: #3f7f79;
+}
+
+.mastery-challenge-button.mastery-challenge-button-locked:hover:not(:disabled) {
+  background: #f7fbfa;
+  filter: none;
+}
+
+.mastery-challenge-button-icon {
+  align-items: center;
+  background: #fbbc04;
+  border-radius: 50%;
+  color: #0d4e47;
+  display: inline-flex;
+  font-size: 18px;
+  font-weight: 700;
+  height: 32px;
+  justify-content: center;
+  line-height: 1;
+  width: 32px;
+}
+
+.mastery-challenge-button-icon .material-icons {
+  font-size: 18px;
+}
+
+.mastery-challenge-button-icon.mastery-challenge-button-icon-locked {
+  background: #eaf3f2;
+  color: #3f7f79;
+}
+
+.mastery-challenge-helper-tooltip {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e5e9;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  max-width: min(440px, calc(100vw - 48px));
+  min-width: 380px;
+  padding: 16px 18px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 1000;
+}
+
+.mastery-challenge-helper-tooltip::before {
+  border-bottom: 12px solid #e2e5e9;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  content: '';
+  position: absolute;
+  right: 56px;
+  top: -12px;
+}
+
+.mastery-challenge-helper-tooltip::after {
+  border-bottom: 11px solid #fff;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  content: '';
+  position: absolute;
+  right: 57px;
+  top: -10px;
+}
+
+.mastery-challenge-helper-icon {
+  align-items: center;
+  background: #fff5df;
+  border-radius: 50%;
+  color: #f4ab17;
+  display: inline-flex;
+  flex: 0 0 72px;
+  height: 72px;
+  justify-content: center;
+  width: 72px;
+}
+
+.mastery-challenge-helper-icon .material-icons {
+  font-size: 30px;
+}
+
+.mastery-challenge-helper-content {
+  min-width: 0;
+}
+
+.mastery-challenge-helper-title {
+  color: #2f3b52;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  margin: 0 0 6px;
+}
+
+.mastery-challenge-helper-description {
+  color: #2f3b52;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+}
+
+.mastery-challenge-button-icon.mastery-challenge-button-icon-locked .material-icons {
+  font-size: 17px;
+}
+
+@media (max-width: 768px) {
+  .mastery-challenge-card {
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .mastery-challenge-icon {
+    flex: 0 0 72px;
+  }
+
+  .mastery-challenge-icon-image {
+    height: 72px;
+    width: 72px;
+  }
+
+  .mastery-challenge-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mastery-challenge-title {
+    font-size: 20px;
+    line-height: 22px;
+    margin: 0 0 6px;
+  }
+
+  .mastery-challenge-description {
+    font-size: 15px;
+    line-height: 21px;
+  }
+
+  .mastery-challenge-button {
+    font-size: 14px;
+    height: 38px;
+    min-width: 140px;
+    padding: 0 14px;
+  }
+
+  .mastery-challenge-button-icon {
+    height: 26px;
+    width: 26px;
+  }
+
+  .mastery-challenge-button-icon .material-icons {
+    font-size: 16px;
+  }
+
+  .mastery-challenge-helper-tooltip {
+    left: 50%;
+    min-width: min(380px, calc(100vw - 32px));
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .mastery-challenge-helper-tooltip::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .mastery-challenge-helper-tooltip::after {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .mastery-challenge-helper-title {
+    font-size: 17px;
+    line-height: 22px;
+  }
+
+  .mastery-challenge-helper-description {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+@media (max-width: 450px) {
+  .mastery-challenge-card {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  .mastery-challenge-icon {
+    flex: none;
+  }
+
+  .mastery-challenge-icon-image {
+    height: 64px;
+    width: 64px;
+  }
+
+  .mastery-challenge-title {
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .mastery-challenge-description {
+    font-size: 13px;
+    line-height: 19px;
+    text-align: center;
+  }
+
+  .mastery-challenge-button {
+    font-size: 15px;
+    height: 40px;
+    min-width: 0;
+    padding: 0 12px;
+    width: 100%;
+  }
+
+  .mastery-challenge-button-icon {
+    height: 24px;
+    width: 24px;
+  }
+
+  .mastery-challenge-button-icon .material-icons {
+    font-size: 14px;
+  }
+
+  .mastery-challenge-action-wrapper {
+    width: 100%;
+  }
+
+  .mastery-challenge-helper-tooltip {
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    min-width: calc(100vw - 44px);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .mastery-challenge-helper-icon {
+    flex: 0 0 64px;
+    height: 64px;
+    width: 64px;
+  }
+
+  .mastery-challenge-helper-icon .material-icons {
+    font-size: 30px;
+  }
+
+  .mastery-challenge-helper-title {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 8px;
+  }
+
+  .mastery-challenge-helper-description {
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .mastery-challenge-button-icon.mastery-challenge-button-icon-locked .material-icons {
+    font-size: 13px;
+  }
+}

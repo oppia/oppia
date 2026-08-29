@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
-import {Pipe} from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -41,7 +41,7 @@ import {SharingLinksComponent} from 'components/common-layout-directives/common-
 import {BlogPostPageService} from './services/blog-post-page.service';
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

@@ -25,9 +25,9 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
   templateUrl: './edit-certificate-offering-page-root.component.html',
 })
 export class EditCertificateOfferingPageRootComponent extends BaseRootComponent {
-  certificateOfferingDashboardRoute =
+  certificateCreatorDashboardRoute =
     '/' +
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
       .ROUTE;
 
   title: string =

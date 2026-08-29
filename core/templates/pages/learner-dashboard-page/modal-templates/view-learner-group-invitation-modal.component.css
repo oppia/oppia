@@ -1,0 +1,45 @@
+.modal-header-title {
+  border-bottom: solid 1px #e0e0e0;
+}
+
+.modal-header-title p {
+  margin: 0;
+}
+
+.primary-color {
+  color: #00645c;
+}
+
+.btn-primary {
+  background-color: #00645c;
+  border: solid 1px #00645c;
+  margin-right: 20px;
+  padding: 6px 16px;
+}
+
+.btn-secondary {
+  border: solid 1px #00645c;
+  color: #00645c;
+  margin-right: 20px;
+  padding: 6px 16px;
+}
+
+.btn-danger {
+  background: #fff;
+  border: solid 1px #a53417;
+  color: #a53417;
+  padding: 6px 16px;
+}
+
+.modal-header .btn-close {
+  cursor: pointer;
+  margin: 0.75rem 0 0.75rem auto;
+  opacity: 0.5;
+}
+
+.group-title,
+.group-description,
+.learner-groups-progress-sharing-info,
+.group-facilitator {
+  margin-bottom: 15px;
+}

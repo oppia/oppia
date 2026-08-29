@@ -30,6 +30,7 @@ import {StateSolutionService} from 'components/state-editor/state-editor-propert
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import './add-or-update-solution-modal.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -56,6 +57,7 @@ interface SolutionInterface {
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
   templateUrl: './add-or-update-solution-modal.component.html',
+  styleUrls: ['./add-or-update-solution-modal.component.css'],
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal

@@ -75,15 +75,15 @@ import {Interaction} from 'domain/exploration/interaction.model';
 interface AnswerResponseData {
   displayedCard: StateCard;
   editorPreviewMode: boolean;
-  nextCard: StateCard;
+  nextCard: StateCard | null;
   refreshInteraction: boolean;
   feedbackHtml: string;
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   remainOnCurrentCard: boolean;
-  taggedSkillMisconceptionId: string;
-  wasOldStateInitial: boolean;
-  isFirstHit: boolean;
+  taggedSkillMisconceptionId: string | null;
+  wasOldStateInitial: boolean | null;
+  isFirstHit: boolean | null;
   isFinalQuestion: boolean;
   nextCardIfReallyStuck: StateCard | null;
   focusLabel: string;
@@ -409,15 +409,15 @@ export class ConversationFlowService {
       answer,
       interactionRulesService,
       (
-        nextCard: StateCard,
+        nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
         refresherExplorationId: string | null,
-        missingPrerequisiteSkillId: string,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
         isFinalQuestion: boolean,
         nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
@@ -1263,6 +1263,32 @@ export class ConversationFlowService {
     timeAtServerCall,
     currentEngineService,
   }: AnswerResponseData): void {
+    // NextCard is null only in question player mode on the final question.
+    // In that context isPresentingIsolatedQuestions() returns true, so all
+    // blocks below that use nextCard are already guarded. We handle question
+    // player specific logic here and return early to satisfy strict typing.
+    if (nextCard === null) {
+      this.setNextCardIfStuck(nextCardIfReallyStuck);
+      if (this.explorationModeService.isInQuestionPlayerMode()) {
+        this.questionPlayerEngineService.recordAnswerSubmitted(
+          this.questionPlayerEngineService.getCurrentQuestion(),
+          !remainOnCurrentCard,
+          taggedSkillMisconceptionId
+        );
+        if (!remainOnCurrentCard) {
+          this._moveToNewCard(feedbackHtml, isFinalQuestion);
+        } else {
+          this._giveFeedbackAndStayOnCurrentCard(
+            feedbackHtml,
+            missingPrerequisiteSkillId,
+            refreshInteraction,
+            refresherExplorationId
+          );
+        }
+      }
+      return;
+    }
+
     this.setNextStateCard(nextCard);
     this.setNextCardIfStuck(nextCardIfReallyStuck);
 
@@ -1281,7 +1307,7 @@ export class ConversationFlowService {
           nextCard.getStateName(),
           lastAnswer,
           this.learnerParamsService.getAllParams(),
-          isFirstHit,
+          isFirstHit ?? false,
           String(completedChaptersCount && completedChaptersCount + 1),
           String(this.playerTranscriptService.getNumCards()),
           currentEngineService.getLanguageCode()

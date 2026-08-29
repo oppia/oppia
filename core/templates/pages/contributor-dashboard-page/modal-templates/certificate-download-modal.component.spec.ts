@@ -62,6 +62,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     contribution_hours: 1.0,
     contribution_word_count: 300,
     language: 'Hindi',
+    certificate_profile_name: 'test_name',
   };
   const certificateDataResponse: ContributorCertificateResponse = {
     certificate_data: certificateData,
@@ -118,7 +119,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.downloadCertificate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -144,7 +145,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.downloadCertificate();
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -162,7 +163,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.downloadCertificate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -201,7 +202,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       "Please select a 'To' date that is not in the future."
     );
@@ -220,7 +221,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       'There are no contributions for the given date range.'
     );
@@ -235,7 +236,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
@@ -251,7 +252,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(component.errorMessage).toEqual('');
   });
 
@@ -305,8 +306,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.printCertificate();
 
-    expect(component.isPrinting).toBeTrue();
-    expect(component.isCancelled).toBeFalse();
+    expect(component.isPrinting).toBe(true);
+    expect(component.isCancelled).toBe(false);
 
     flushMicrotasks();
 
@@ -314,7 +315,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       certificateData,
       true
     );
-    expect(component.isPrinting).toBeFalse();
+    expect(component.isPrinting).toBe(false);
   }));
 
   it('should show error when printing with no contributions', fakeAsync(() => {
@@ -329,11 +330,11 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       'There are no contributions for the given date range.'
     );
-    expect(component.isPrinting).toBeFalse();
+    expect(component.isPrinting).toBe(false);
   }));
 
   it('should handle errors in printCertificate', fakeAsync(() => {
@@ -347,8 +348,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
-    expect(component.isPrinting).toBeFalse();
+    expect(component.errorsFound).toBe(true);
+    expect(component.isPrinting).toBe(false);
     expect(component.errorMessage).toBe('Print error');
   }));
 
@@ -364,7 +365,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(component.createCertificate).not.toHaveBeenCalled();
   }));
 
@@ -380,7 +381,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(component.createCertificate).not.toHaveBeenCalled();
   }));
 
@@ -396,8 +397,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
-    expect(component.errorsFound).toBeFalse();
+    expect(component.isCancelled).toBe(true);
+    expect(component.errorsFound).toBe(false);
   }));
 
   it('should not show error if print is cancelled during error', fakeAsync(() => {
@@ -412,28 +413,28 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
-    expect(component.errorsFound).toBeFalse();
+    expect(component.isCancelled).toBe(true);
+    expect(component.errorsFound).toBe(false);
   }));
 
   it('should return true for isDownloadDisabled when downloading', () => {
     component.isDownloading = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when printing', () => {
     component.isPrinting = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when errors found', () => {
     component.errorsFound = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when dates are undefined', () => {
     component.fromDate = undefined as unknown as string;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return false for isDownloadDisabled when everything is valid', () => {
@@ -442,14 +443,14 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.errorsFound = false;
     component.fromDate = '2022/01/01';
     component.toDate = '2022/10/31';
-    expect(component.isDownloadDisabled).toBeFalse();
+    expect(component.isDownloadDisabled).toBe(false);
   });
 
   it('should set isCancelled to true when close is called', () => {
     spyOn(activeModal, 'close');
-    expect(component.isCancelled).toBeFalse();
+    expect(component.isCancelled).toBe(false);
     component.close();
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(activeModal.close).toHaveBeenCalled();
   });
 
@@ -459,7 +460,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
@@ -469,19 +470,28 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
   it('should return true for disableDownloadButton when toDate is undefined', () => {
     component.toDate = undefined as unknown as string;
-    expect(component.disableDownloadButton()).toBeTrue();
+    expect(component.disableDownloadButton()).toBe(true);
   });
 
-  it('should trigger print flow when createCertificate is called with isPrinting true', () => {
+  it('should trigger print flow when createCertificate is called with isPrinting true', fakeAsync(() => {
     const mockBlob = new Blob(['image'], {type: 'image/png'});
     const mockUrl = 'blob:mock-url';
-    const mockIframe = document.createElement('iframe');
+    let capturedIframeOnload: () => void = () => {};
+    const mockPrint = jasmine.createSpy('print');
+    const mockIframe = {
+      style: {display: ''},
+      src: '',
+      contentWindow: {print: mockPrint},
+      set onload(fn: () => void) {
+        capturedIframeOnload = fn;
+      },
+    };
 
     const mockCanvas = {
       width: 0,
@@ -503,15 +513,29 @@ describe('Contributor Certificate Download Modal Component', () => {
       toDataURL: () => '',
     };
 
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
     spyOn(document, 'createElement').and.callFake((tag: string) => {
       if (tag === 'canvas') {
         return mockCanvas as unknown as HTMLCanvasElement;
       }
       if (tag === 'iframe') {
-        return mockIframe;
+        return mockIframe as unknown as HTMLIFrameElement;
       }
       return document.createElement(tag);
     });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
 
     spyOn(URL, 'createObjectURL').and.returnValue(mockUrl);
     spyOn(URL, 'revokeObjectURL');
@@ -520,8 +544,75 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.createCertificate(certificateData, true);
 
-    const image = new Image();
-    image.dispatchEvent(new Event('load'));
+    window.Image = originalImage;
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
+    expect(document.body.appendChild).toHaveBeenCalled();
+
+    // Trigger iframe.onload to cover the print and cleanup logic.
+    expect(capturedIframeOnload).not.toBeNull();
+    if (capturedIframeOnload) {
+      capturedIframeOnload();
+    }
+
+    expect(mockPrint).toHaveBeenCalled();
+
+    // Advance past the 1000ms setTimeout inside iframe.onload.
+    tick(1000);
+
+    expect(document.body.removeChild).toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
+  }));
+
+  it('should not throw error when toBlob returns null during print', () => {
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: (cb: (blob: Blob | null) => void) => cb(null),
+      toDataURL: () => '',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    spyOn(URL, 'createObjectURL');
+
+    component.createCertificate(certificateData, true);
+
+    window.Image = originalImage;
+
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
 
   it('should draw updated three-line text for translation certificates', () => {

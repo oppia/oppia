@@ -24,10 +24,13 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
+    exp_domain,
     exp_fetchers,
     feature_flag_services,
     opportunity_domain,
     opportunity_services,
+    skill_domain,
+    skill_fetchers,
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
@@ -338,7 +341,8 @@ class ContributionOpportunitiesHandlerV2(
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
-                }
+                },
+                'default_value': None,
             },
         }
     }
@@ -356,7 +360,7 @@ class ContributionOpportunitiesHandlerV2(
         cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request['language_code']
         topic_name = self.normalized_request.get('topic_name')
-        entity_type = self.normalized_request['entity_type']
+        entity_type = self.normalized_request.get('entity_type')
 
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities_with_new_models(
@@ -544,7 +548,8 @@ class ReviewableOpportunitiesHandlerV2(
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
-                }
+                },
+                'default_value': None,
             },
         }
     }
@@ -561,7 +566,7 @@ class ReviewableOpportunitiesHandlerV2(
 
         topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
-        entity_type = self.normalized_request['entity_type']
+        entity_type = self.normalized_request.get('entity_type')
 
         opportunity_dicts = []
         if self.user_id:
@@ -577,7 +582,7 @@ class ReviewableOpportunitiesHandlerV2(
     def _get_reviewable_translation_opportunities(
         self,
         user_id: str,
-        entity_type: str,
+        entity_type: Optional[str],
         topic_name: Optional[str],
         language: Optional[str],
     ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
@@ -586,7 +591,9 @@ class ReviewableOpportunitiesHandlerV2(
 
         Args:
             user_id: str. The user ID of the user.
-            entity_type: str. The type of the entity.
+            entity_type: str|None. The type of the entity to filter by. If
+                None, opportunities of every translatable entity type are
+                returned.
             topic_name: str|None. A topic name.
             language: str|None. ISO 639-1 language code.
 
@@ -594,7 +601,12 @@ class ReviewableOpportunitiesHandlerV2(
             list(TranslationOpportunityCardInfo). A list of the matching
             translation opportunities.
         """
-        if topic_name:
+        # The dashboard sends an empty topic name when its topic filter is set
+        # to "all", which means the same thing as sending no topic at all.
+        if not topic_name:
+            topic_name = None
+
+        if topic_name is not None:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
@@ -602,7 +614,7 @@ class ReviewableOpportunitiesHandlerV2(
                 )
 
         in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
-            user_id, language
+            user_id, language, target_type=entity_type
         )
 
         if not in_review_suggestion_target_ids:
@@ -611,9 +623,21 @@ class ReviewableOpportunitiesHandlerV2(
         if language is None:
             language = ''
 
-        opportunities = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            entity_type, in_review_suggestion_target_ids, language
+        # An absent entity type means the dashboard's content type filter is
+        # set to "all", so opportunities are gathered for every translatable
+        # entity type instead of defaulting to one of them.
+        entity_types_to_fetch = (
+            [entity_type] if entity_type else feconf.TRANSLATABLE_ENTITY_TYPES
         )
+        opportunities = []
+        for entity_type_to_fetch in entity_types_to_fetch:
+            opportunities.extend(
+                opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+                    entity_type_to_fetch,
+                    in_review_suggestion_target_ids,
+                    language,
+                )
+            )
 
         filtered_opportunities = []
         for opp in opportunities:
@@ -674,9 +698,15 @@ class TranslatableContentsHandlerV2(
         entity_id = self.normalized_request['entity_id']
         language_code = self.normalized_request['language_code']
 
-        domain_object = None
+        domain_object: Optional[
+            Union[exp_domain.Exploration, skill_domain.Skill]
+        ] = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             domain_object = exp_fetchers.get_exploration_by_id(
+                entity_id, strict=False
+            )
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            domain_object = skill_fetchers.get_skill_by_id(
                 entity_id, strict=False
             )
         else:
@@ -720,6 +750,7 @@ class TranslatableContentsHandlerV2(
 
         content_id_to_grouping_key = {}
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            assert isinstance(domain_object, exp_domain.Exploration)
             for state_name, state in domain_object.states.items():
                 translatable_contents_collection = (
                     state.get_translatable_contents_collection()

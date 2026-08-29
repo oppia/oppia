@@ -101,8 +101,22 @@ export class TranslatableTexts {
           null
         );
     }
+    const orderedStateNamesToContentIdMapping: StateNamesToContentIdMapping =
+      {};
+    const genericStateName = AppConstants.DEFAULT_SUGGESTION_STATE_NAME;
+    if (stateNamesToContentIdMapping.hasOwnProperty(genericStateName)) {
+      orderedStateNamesToContentIdMapping[genericStateName] =
+        stateNamesToContentIdMapping[genericStateName];
+    }
+    for (const stateName in stateNamesToContentIdMapping) {
+      if (stateName !== genericStateName) {
+        orderedStateNamesToContentIdMapping[stateName] =
+          stateNamesToContentIdMapping[stateName];
+      }
+    }
+
     return new TranslatableTexts(
-      stateNamesToContentIdMapping,
+      orderedStateNamesToContentIdMapping,
       backendDict.version
     );
   }

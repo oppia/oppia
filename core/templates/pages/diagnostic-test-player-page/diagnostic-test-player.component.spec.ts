@@ -146,6 +146,7 @@ const dummyClassroomData = new ClassroomData(
   'id',
   'math',
   'math',
+  'user@email.com',
   [topicData1, topicData2],
   'dummy',
   'dummy',

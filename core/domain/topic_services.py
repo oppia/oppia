@@ -31,6 +31,7 @@ from core.domain import (
     feedback_services,
     fs_services,
     opportunity_services,
+    question_services,
     rights_domain,
     role_services,
     skill_domain,
@@ -710,8 +711,8 @@ def _apply_study_guide_change(
             # become standard.)
             heading_html = (
                 '<p><strong>'
-                + f'{section_dict["heading"]["unicode_str"]}'
-                + '</strong></p>'
+                f'{section_dict["heading"]["unicode_str"]}'
+                '</strong></p>'
             )
             concatenated_html_parts.append(heading_html)
             concatenated_html_parts.append(section_dict['content']['html'])
@@ -1555,18 +1556,25 @@ def delete_uncategorized_skill(
         change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        opportunity_services.remove_topic_from_translation_opportunities(
+            topic_id, {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
+        )
 
 
 def add_uncategorized_skill(
     user_id: str, topic_id: str, uncategorized_skill_id: str
 ) -> None:
-    """Adds a skill with given id to the topic.
+    """Adds skill with given id to the topic.
 
     Args:
         user_id: str. The id of the user who is performing the action.
-        topic_id: str. The id of the topic to which the skill is to be added.
-        uncategorized_skill_id: str. The id of the uncategorized skill to add
-            to the topic.
+        topic_id: str. The id of the topic to which to add the skill.
+        uncategorized_skill_id: str. The uncategorized skill to add to the
+            topic.
     """
     change_list = [
         topic_domain.TopicChange(
@@ -1582,6 +1590,14 @@ def add_uncategorized_skill(
         change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]},
+            topic_ids=[topic_id],
+        )
 
 
 def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
@@ -1628,6 +1644,41 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
+
+    # If the story has any already-published nodes, this is a re-publish
+    # (e.g. after editing an already-published story). In that case, skip
+    # the question-count check so that stories published before this
+    # validation existed can still be edited and re-published.
+    has_existing_published_nodes = any(
+        node.status == constants.STORY_NODE_STATUS_PUBLISHED
+        for node in story.story_contents.nodes
+    )
+    if not has_existing_published_nodes:
+        all_acquired_skill_ids = set()
+        for node in story.story_contents.nodes:
+            for skill_id in node.acquired_skill_ids:
+                all_acquired_skill_ids.add(skill_id)
+        # Note: this loop performs a datastore call per skill (N+1).
+        # Since story publishing is an infrequent admin operation and the
+        # number of skills per story is typically small (<=5), this is
+        # acceptable.
+        for skill_id in all_acquired_skill_ids:
+            question_count = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]
+                )
+            )
+            if question_count < feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH:
+                raise utils.ValidationError(
+                    'Skill %s has only %d questions. Each skill linked to a '
+                    'story node must have at least %d questions before '
+                    'publishing.'
+                    % (
+                        skill_id,
+                        question_count,
+                        feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH,
+                    )
+                )
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])
@@ -1907,6 +1958,8 @@ def delete_topic(
     # Delete the summary of the topic (regardless of whether
     # force_deletion is True or not).
     delete_topic_summary(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
@@ -1949,6 +2002,16 @@ def delete_topic(
             topic_id
         )
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        if topic is not None:
+            topic_skills = topic.get_all_skill_ids()
+            if topic_skills:
+                opportunity_services.remove_topic_from_translation_opportunities(
+                    topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
+                )
 
 
 def delete_topic_summary(topic_id: str) -> None:
@@ -2906,3 +2969,28 @@ def get_all_published_story_exploration_ids(
     )
 
     return list(set(exp_ids))
+
+
+def get_topic_ids_for_exploration_id(
+    exploration_id: str,
+) -> List[str]:
+    """Returns a list of topic ids for which the given exploration is a part of.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+
+    Returns:
+        list(str). A list of topic ids.
+    """
+    topic_ids = []
+    topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+    for topic_summary in topic_summaries:
+        for (
+            exploration_ids
+        ) in topic_summary.published_story_exploration_mapping.values():
+            if exploration_id in exploration_ids:
+                topic_ids.append(topic_summary.id)
+                break
+
+    return topic_ids

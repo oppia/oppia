@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.platform import models
 
 from typing import List, Sequence
@@ -54,7 +54,7 @@ def delete_models_marked_as_deleted() -> None:
     """Hard-delete all models that are marked as deleted (have deleted field set
     to True) and were last updated more than eight weeks ago.
     """
-    date_now = datetime.datetime.utcnow()
+    date_now = utils.get_current_utc_datetime()
     date_before_which_to_hard_delete = (
         date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
     )
@@ -85,7 +85,7 @@ def mark_outdated_models_as_deleted() -> None:
     models_to_mark_as_deleted: List[base_models.BaseModel] = []
     for model_class, period_to_keep in MODEL_CLASSES_TO_MARK_AS_DELETED.items():
         date_before_which_to_mark_as_deleted = (
-            datetime.datetime.utcnow() - period_to_keep
+            utils.get_current_utc_datetime() - period_to_keep
         )
         models_to_mark_as_deleted.extend(
             model_class.query(

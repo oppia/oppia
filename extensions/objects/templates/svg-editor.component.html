@@ -460,6 +460,8 @@
     border: 1px solid #555;
     bottom: 0;
     left: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
     top: 0;
     width: 68px;
   }
@@ -516,10 +518,9 @@
   }
 
   .svg-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
-    bottom: 0;
     left: 0;
-    position: absolute;
-    right: 0
+    position: static;
+    right: 0;
   }
 
   .svg-editor .svg-editor .color-well {

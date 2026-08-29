@@ -39,6 +39,7 @@ import {AppConstants} from 'app.constants';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import './ratings-and-recommendations.component.css';
 
 interface ResultActionButton {
   type: string;
@@ -61,6 +62,7 @@ export interface QuestionPlayerConfig {
 @Component({
   selector: 'oppia-ratings-and-recommendations',
   templateUrl: './ratings-and-recommendations.component.html',
+  styleUrls: ['./ratings-and-recommendations.component.css'],
 })
 export class RatingsAndRecommendationsComponent {
   // These properties are initialized using Angular lifecycle hooks

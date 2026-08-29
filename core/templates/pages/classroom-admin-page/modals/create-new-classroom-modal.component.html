@@ -29,6 +29,20 @@
       </p>
     </div>
   </div>
+
+  <div class="row new-classroom-input-data">
+    <span class="col-lg-3 col-md-3 col-sm-3 classroom-url-fragment-label">Feedback Recipient Email</span>
+    <div class="new-classroom-name-input">
+      <input [(ngModel)]="tempClassroom._feedbackRecipientEmail"
+             rows="1"
+             type="email"
+             class="e2e-test-new-classroom-feedback-recipient form-control required"
+             (ngModelChange)="validateClassroom(tempClassroom, classroom)">
+      <p *ngIf="feedbackRecipientEmailValidationError.length > 0" class="oppia-warning-text">
+        {{ feedbackRecipientEmailValidationError }}
+      </p>
+    </div>
+  </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary"
@@ -46,29 +60,3 @@
     </mat-spinner>
   </button>
 </div>
-
-<style>
-  .new-classroom-input-data {
-    margin: 10px;
-  }
-  /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
-  :host /deep/ .oppia-create-classroom-spinning-button circle {
-    stroke: #fff;
-  }
-  .oppia-create-classroom-spinning-button {
-    margin: 0 5px;
-  }
-  .new-classroom-name-input {
-    width: 400px;
-  }
-  .oppia-warning-text {
-    color: #f00;
-    font-size: 0.8em;
-  }
-
-  @media screen and (max-width: 768px) {
-    .classroom-name-label, .classroom-url-fragment-label {
-      padding-left: 0;
-    }
-  }
-</style>

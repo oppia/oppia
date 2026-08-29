@@ -1,0 +1,63 @@
+feedback-tab > .btn-sm {
+  padding: 1px 5px 1px 5px;
+}
+/* Overwrite the default "success" color to a darker shade of green in order
+  to prevent this overshadowing the active action buttons (like "Create New
+  Thread"). */
+.oppia-feedback-card span.badge.bg-success {
+  background-color: #038603;
+}
+.activeThreadView {
+  margin-top: 10px;
+  word-wrap: break-word;
+}
+.oppia-back-arrow-icon {
+  font-size: 19px;
+}
+.oppia-feedback-card .oppia-thread-button {
+  margin-top: 15px;
+}
+.oppia-feedback-card .oppia-thread-text {
+  font-size: larger;
+}
+.oppia-feedback-card .oppia-view-suggestion-button-container {
+  white-space: pre-wrap;
+  word-break: break-word
+}
+.oppia-feedback-card .oppia-view-suggestion-btn {
+  margin-bottom: 6px;
+  margin-top: 6px;
+}
+.oppia-feedback-card .oppia-icon-container {
+  color: #f00;
+  margin-top: 7px;
+}
+.oppia-feedback-card .oppia-feedback-response-send-btn {
+  margin-top: 10px;
+}
+.oppia-new-editor-card {
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-width: 80vw;
+  min-height: 70vh;
+  padding: 24px 32px;
+  position: relative;
+  top: 25px;
+  z-index: 1;
+}
+
+.oppia-feedback-table {
+  display: flex;
+  flex: 1;
+  max-height: 55vh;
+}
+
+.oppia-feedback-detail-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+}

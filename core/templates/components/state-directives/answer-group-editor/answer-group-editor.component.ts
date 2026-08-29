@@ -45,6 +45,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+import './answer-group-editor.component.css';
 
 interface MisconceptionOutcome {
   feedback: SubtitledHtmlBackendDict;
@@ -59,6 +60,7 @@ interface TaggedMisconception {
 @Component({
   selector: 'oppia-answer-group-editor',
   templateUrl: './answer-group-editor.component.html',
+  styleUrls: ['./answer-group-editor.component.css'],
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Input() displayFeedback!: boolean;

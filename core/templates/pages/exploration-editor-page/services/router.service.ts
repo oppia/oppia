@@ -154,7 +154,7 @@ export class RouterService {
         forceRefresh: false,
       });
       this._activeTabName = this.TABS.HISTORY.name;
-    } else if (newPath === this.TABS.FEEDBACK.path) {
+    } else if (newPath.indexOf(this.TABS.FEEDBACK.path) === 0) {
       this._activeTabName = this.TABS.FEEDBACK.name;
     } else if (newPath.indexOf('/gui/') === 0) {
       this._activeTabName = this.TABS.MAIN.name;

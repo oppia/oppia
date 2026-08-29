@@ -136,6 +136,7 @@ export class SuperAdmin extends BaseUser {
    */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
     await this.goto(adminPageActivitiesTab);
+    await this.waitForNetworkIdle();
   }
 
   async navigateToAdminPageMiscTab(): Promise<void> {
@@ -569,19 +570,31 @@ export class SuperAdmin extends BaseUser {
   async reloadCollections(collectionName: string): Promise<void> {
     try {
       await this.navigateToAdminPageActivitiesTab();
-      await this.page.waitForSelector(reloadCollectionsRowsSelector);
 
+      await this.page.waitForSelector(reloadCollectionsRowsSelector, {
+        visible: true,
+        timeout: 30000,
+      });
       const reloadCollectionRows = await this.page.$$(
         reloadCollectionsRowsSelector
       );
+
+      if (reloadCollectionRows.length === 0) {
+        throw new Error(
+          `No collection rows found. "${collectionName}" may not be seeded in prod_env.`
+        );
+      }
       for (let i = 0; i < reloadCollectionRows.length; i++) {
         const collectionNameElement = await reloadCollectionRows[i].$(
           reloadCollectionTitleSelector
         );
-        await this.page.waitForSelector(reloadCollectionTitleSelector, {
-          visible: true,
-        });
 
+        await reloadCollectionRows[i].waitForSelector(
+          reloadCollectionTitleSelector,
+          {
+            visible: true,
+          }
+        );
         const name = await this.page.evaluate(
           element => element.innerText,
           collectionNameElement
@@ -590,10 +603,12 @@ export class SuperAdmin extends BaseUser {
           const reloadButton = await reloadCollectionRows[i].$(
             reloadCollectionButton
           );
-          await this.page.waitForSelector(reloadCollectionButton, {
-            visible: true,
-          });
-
+          await reloadCollectionRows[i].waitForSelector(
+            reloadCollectionButton,
+            {
+              visible: true,
+            }
+          );
           if (!reloadButton) {
             throw new Error(
               `Reload button not found for collection "${collectionName}"`
@@ -601,7 +616,6 @@ export class SuperAdmin extends BaseUser {
           }
           await this.waitForElementToBeClickable(reloadButton);
           await reloadButton.click();
-
           await this.waitForNetworkIdle();
           await this.expectActionStatusMessageToBe(
             'Data reloaded successfully.'
@@ -609,7 +623,6 @@ export class SuperAdmin extends BaseUser {
           return;
         }
       }
-
       throw new Error(`Collection "${collectionName}" not found`);
     } catch (error) {
       console.error(
@@ -619,7 +632,6 @@ export class SuperAdmin extends BaseUser {
       throw error;
     }
   }
-
   /**
    * Generates and publishes dummy activities.
    * @param {number} noToGenerate - The number of activities to generate.
@@ -1019,12 +1031,13 @@ export class SuperAdmin extends BaseUser {
       );
       showMessage('Default value changed successfully.');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       console.error(
         `Failed to change default value of platform parameter "${platformParam}".\n` +
           'Original Error:\n' +
-          error.stack
+          err.stack
       );
-      throw error;
+      throw err;
     }
   }
 

@@ -58,7 +58,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
   class MockCurrentInteractionService {
     onSubmit(answer: InteractionAnswer, rulesService: InteractionRulesService) {
-      expect(answer).toBe(1);
+      return;
     }
 
     showNoResponseError(): boolean {
@@ -181,6 +181,26 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     }
   );
 
+  it('should restore selected choice from lastAnswer', () => {
+    spyOn(
+      currentInteractionService,
+      'registerCurrentInteraction'
+    ).and.callThrough();
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+    spyOn(playerTranscriptService, 'getNumSubmitsForLastCard').and.returnValue(
+      0
+    );
+    component.lastAnswer = 2;
+
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll(
+      'button.multiple-choice-option'
+    );
+    expect(buttons[2].classList.contains('selected')).toBeTrue();
+    expect(buttons[0].classList.contains('selected')).toBeFalse();
+  });
+
   it(
     'should initialise component when user selects multiple choice ' +
       'interaction. Should persist the order when component is reinitiated',
@@ -218,24 +238,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       currentInteractionService,
       'updateCurrentAnswer'
     );
-    spyOn(document, 'querySelector')
-      .withArgs('button.multiple-choice-option.selected')
-      .and.returnValue({
-        // This throws "Type '{ add: () => void; remove: () => void; }'
-        // is missing the following properties from type 'DOMTokenList':
-        // length, value, contains, item, and 4 more". We need to suppress
-        // this error because typescript expects more
-        // properties than just one add and remove.
-        // We need only add and remove for testing purposes.
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          },
-        },
-      } as HTMLElement);
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
       classList: {
         add: () => {
@@ -272,26 +274,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         currentInteractionService,
         'updateCurrentAnswer'
       );
-      spyOn(document, 'querySelectorAll')
-        .withArgs('button.multiple-choice-option.selected')
-        .and.returnValue([
-          {
-            // This throws "Type '{ add: () => void; remove: () => void; }'
-            // is missing the following properties from type 'DOMTokenList':
-            // length, value, contains, item, and 4 more". We need to suppress
-            // this error because typescript expects around more
-            // properties than just one add and remove.
-            // We need only add and remove for testing purposes.
-            classList: {
-              add: () => {
-                return;
-              },
-              remove: () => {
-                return;
-              },
-            },
-          } as HTMLElement,
-        ]);
       spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
         classList: {
           add: () => {

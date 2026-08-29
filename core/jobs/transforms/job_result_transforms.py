@@ -22,7 +22,92 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 import result
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Protocol
+
+
+class TaggedOutputs(Protocol):
+    """A read-only mapping of PCollections addressable by string tags.
+
+    This allows FromTaggedOutputs to accept any tagged-output container without
+    coupling it to a concrete type.
+    """
+
+    def __getitem__(self, tag: str) -> beam.PCollection: ...
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
+    """Builds JobRunResults from PCollections organized into tagged outputs.
+
+    Example:
+        FromTaggedOutputs('PASS', 'FAIL'):
+            stdout='PASS: 30'
+            stderr='FAIL: 1st error message'
+                   'FAIL: 2nd error message'
+                   'FAIL: 3rd error message'
+        FromTaggedOutputs('OK', 'ERR', 'WARN', prefix='MyJob'):
+            stdout='MyJob OK: 30'
+            stderr='MyJob ERR: 1st error message'
+                   'MyJob ERR: 2nd error message'
+                   'MyJob ERR: 3rd error message'
+                   'MyJob WARN: 1st warning message'
+                   'MyJob WARN: 2nd warning message'
+
+    Attributes:
+        pass_tag: str. Tag mapped to some PCollection[int]. Defaults to 'main'.
+        fail_tags: tuple[str, ...]. Tags mapped to some PCollection[str].
+        prefix: str. Prepended to every message.
+    """
+
+    def __init__(
+        self,
+        pass_tag: str,
+        *fail_tags: str,
+        prefix: str = '',
+        label: str | None = None,
+    ) -> None:
+        if (pass_tag := pass_tag or 'main') in fail_tags:
+            raise ValueError(f'{pass_tag=!r} must not be one of {fail_tags=!r}')
+        super().__init__(label=label)
+        self.pass_tag = pass_tag
+        self.fail_tags = tuple(sorted(set(fail_tags)))
+        self.prefix = (prefix.removesuffix(' ') + ' ') if prefix else ''
+
+    def expand(
+        self, out: TaggedOutputs
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Formats pass/fail tagged outputs as stdout/stderr job run results."""
+
+        stdout = (
+            out[tag := self.pass_tag]
+            | f'Sum of {tag}' >> beam.CombineGlobally(sum).without_defaults()
+            | f'Format {tag}' >> beam.Map(self._format_pass_tag)
+            | f'Output {tag}' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        )
+        stderr_iter = (
+            out[tag]
+            | f'Format {tag}' >> beam.Map(self._format_fail_tag, tag)
+            | f'Output {tag}' >> beam.Map(job_run_result.JobRunResult.as_stderr)
+            for tag in self.fail_tags
+        )
+        return (stdout, *stderr_iter) | 'Flatten outputs' >> beam.Flatten()
+
+    def _extract_input_pvalues(
+        self, out: TaggedOutputs
+    ) -> tuple[TaggedOutputs, dict[str, beam.PCollection]]:
+        """Needs to be overridden when input type isn't a subclass of PValue."""
+
+        return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}
+
+    def _format_pass_tag(self, pass_num: int) -> str:
+        """Formats the "pass" number."""
+
+        return f'{self.prefix}{self.pass_tag}: {pass_num}'
+
+    def _format_fail_tag(self, fail_msg: str, fail_tag: str) -> str:
+        """Formats the "fail" message."""
+
+        return f'{self.prefix}{fail_tag}: {fail_msg}'
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -79,7 +164,7 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
 
     @staticmethod
     def _add_count_to_job_run_result(
-        job_result_and_count: Tuple[job_run_result.JobRunResult, int],
+        job_result_and_count: tuple[job_run_result.JobRunResult, int],
     ) -> job_run_result.JobRunResult:
         """Adds count to the stdout or stderr of the JobRunResult.
 
@@ -148,8 +233,9 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
             prefix: str|None. The prefix for the result string.
             label: str|None. The label of the PTransform.
         """
-        super().__init__(label=label)
-        self.prefix = '%s ' % prefix if prefix else ''
+        prefix = f'{prefix} ' if prefix else ''
+        super().__init__(label=label or f'{prefix}Get Object Count as stdout')
+        self.prefix = prefix
 
     # Here we use type Any because this method can accept any kind of
     # Pcollection object to return the unique JobRunResult objects

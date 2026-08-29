@@ -3499,6 +3499,7 @@ def get_exp_with_draft_applied(
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     draft_change_list = []
+    draft_change_list_exp_version = None
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (
@@ -3532,6 +3533,7 @@ def get_exp_with_draft_applied(
     if (
         exp_user_data
         and exp_user_data.draft_change_list
+        and draft_change_list_exp_version is not None
         and are_changes_mergeable(
             exp_id, draft_change_list_exp_version, draft_change_list
         )
@@ -3963,7 +3965,7 @@ def update_logged_out_user_progress(
     checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
         state_name
     )
-    checkpoint_url_model.last_updated = datetime.datetime.utcnow()
+    checkpoint_url_model.last_updated = utils.get_current_utc_datetime()
     checkpoint_url_model.update_timestamps()
     checkpoint_url_model.put()
 

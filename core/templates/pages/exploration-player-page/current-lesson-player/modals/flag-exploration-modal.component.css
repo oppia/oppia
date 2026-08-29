@@ -1,0 +1,17 @@
+.oppia-long-text h4 {
+  font-size: 16px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.oppia-flag-modal-long-text input {
+  height: 15px;
+  margin-right: 5px;
+}
+.oppia-flag-modal-long-text label {
+  font-weight: lighter;
+  height: 15px;
+}
+.report-exploration-dialog-box-textarea {
+  height: 210px;
+  resize: none;
+}

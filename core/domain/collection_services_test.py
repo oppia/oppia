@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import os
 
@@ -1640,13 +1639,13 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             msg='There must be at least one demo collection.',
         )
         for collection_id in feconf.DEMO_COLLECTIONS:
-            start_time = datetime.datetime.utcnow()
+            start_time = utils.get_current_utc_datetime()
 
             collection_services.load_demo(collection_id)
             collection = collection_services.get_collection_by_id(collection_id)
             collection.validate()
 
-            duration = datetime.datetime.utcnow() - start_time
+            duration = utils.get_current_utc_datetime() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1e6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)'

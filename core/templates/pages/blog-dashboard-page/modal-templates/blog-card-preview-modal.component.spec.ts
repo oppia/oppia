@@ -26,7 +26,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
-import {Pipe} from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import {MatCardModule} from '@angular/material/card';
@@ -45,7 +45,7 @@ class MockActiveModal {
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }

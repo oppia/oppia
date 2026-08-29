@@ -17,7 +17,7 @@
  * its components.
  */
 
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -38,13 +38,13 @@ interface AvailabilityStatus {
 @Injectable({
   providedIn: 'root',
 })
-export class TranslationStatusService implements OnInit {
+export class TranslationStatusService {
   AUDIO_NEEDS_UPDATE_MESSAGE: string[] = ['Audio needs update!'];
   TRANSLATION_NEEDS_UPDATE_MESSAGE: string[] = ['Translation needs update!'];
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
-  // These properties are initialized using init method and we need to do
+  // These properties are initialized in the constructor and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   langCode!: string;
@@ -64,9 +64,7 @@ export class TranslationStatusService implements OnInit {
     private stateEditorService: StateEditorService,
     private platformFeatureService: PlatformFeatureService,
     private entityVoiceoversService: EntityVoiceoversService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.stateNeedsUpdateWarnings = {};
     this.stateWiseStatusColor = {};
@@ -164,7 +162,9 @@ export class TranslationStatusService implements OnInit {
         let noVoiceoverCount = 0;
 
         let allContentIds =
-          this.explorationStatesService.getAllContentIdsByStateName(stateName);
+          this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
+            stateName
+          );
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as

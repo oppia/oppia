@@ -1,0 +1,35 @@
+.oppia-feedback-empty {
+  align-items: center;
+  border-top: black 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.oppia-feedback-empty-icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #00645c;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 60px;
+  height: 60px;
+  justify-content: center;
+  margin-top: 2px;
+  width: 60px;
+}
+
+.oppia-feedback-empty-title {
+  color: #424242;
+  font-size: 25px;
+  font-weight: 500;
+  margin: 0 0 6px 0;
+}
+
+.oppia-feedback-empty-msg {
+  color: #635e5e;
+  font-size: 20px;
+  line-height: 18px;
+}

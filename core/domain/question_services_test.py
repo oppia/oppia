@@ -808,6 +808,39 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.language_code, 'bn')
         self.assertEqual(question.version, 2)
 
+    def test_update_question_ignores_unrelated_change_and_updates_next_index(
+        self,
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        original_next_content_id_index = question.next_content_id_index
+
+        change_list: list[question_domain.QuestionChange] = [
+            question_domain.CreateNewQuestionCmd({'cmd': 'create_new'}),
+            question_domain.QuestionChange(
+                {
+                    'cmd': 'update_question_property',
+                    'property_name': 'next_content_id_index',
+                    'old_value': original_next_content_id_index,
+                    'new_value': original_next_content_id_index + 1,
+                }
+            ),
+        ]
+
+        question_services.update_question(
+            self.editor_id,
+            self.question_id,
+            change_list,
+            'updated next content id index',
+        )
+
+        updated_question = question_services.get_question_by_id(
+            self.question_id
+        )
+        self.assertEqual(
+            updated_question.next_content_id_index,
+            original_next_content_id_index + 1,
+        )
+
     def test_update_inapplicable_skill_misconception_ids(self) -> None:
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
@@ -1077,6 +1110,27 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(Exception, 'No questions exists with'):
             question_services.get_interaction_id_for_question('fake_q_id')
+
+    def test_get_question_by_id_and_version_returns_pinned_version(
+        self,
+    ) -> None:
+        question = question_services.get_question_by_id_and_version(
+            self.question_id, 1
+        )
+        self.assertEqual(question.id, self.question_id)
+        self.assertEqual(question.version, 1)
+
+    def test_get_question_by_id_and_version_raises_for_missing_snapshot(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            question_services.QuestionSnapshotNotFoundError,
+            'Question snapshot for question %s version 2 was not found.'
+            % self.question_id,
+        ):
+            question_services.get_question_by_id_and_version(
+                self.question_id, 2
+            )
 
     def test_untag_deleted_misconceptions_on_no_change_to_skill(self) -> None:
         misconceptions = [

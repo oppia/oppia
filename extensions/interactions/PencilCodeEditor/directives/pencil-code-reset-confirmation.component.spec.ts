@@ -21,6 +21,8 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {PencilCodeResetConfirmation} from './pencil-code-reset-confirmation.component';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 class MockActiveModal {
   dismiss(): void {
@@ -67,5 +69,61 @@ describe('Pencil Code Reset Confirmation Modal', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
+  });
+});
+
+describe('Pencil Code Reset Confirmation Modal in bottom sheet mode', () => {
+  let component: PencilCodeResetConfirmation;
+  let fixture: ComponentFixture<PencilCodeResetConfirmation>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownSubject: Subject<KeyboardEvent>;
+
+  beforeEach(() => {
+    keydownSubject = new Subject<KeyboardEvent>();
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(keydownSubject.asObservable());
+
+    TestBed.configureTestingModule({
+      declarations: [PencilCodeResetConfirmation, MockTranslatePipe],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
+        {
+          provide: MatBottomSheetRef,
+          useValue: bottomSheetRef,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PencilCodeResetConfirmation);
+    component = fixture.componentInstance;
+  });
+
+  it('should dismiss the bottom sheet when confirmed', () => {
+    component.confirm();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
+  });
+
+  it('should dismiss the bottom sheet when cancelled', () => {
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(false);
+  });
+
+  it('should dismiss the bottom sheet when Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should not dismiss the bottom sheet when a non-Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
   });
 });

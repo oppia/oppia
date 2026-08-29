@@ -39,6 +39,7 @@ import {
 import {CompareVersionsService} from './services/compare-versions.service';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {LoggerService} from 'services/contextual/logger.service';
+import './history-tab.component.css';
 
 interface VersionMetadata {
   versionNumber: number;
@@ -55,6 +56,7 @@ interface Metadata {
 @Component({
   selector: 'oppia-history-tab',
   templateUrl: './history-tab.component.html',
+  styleUrls: ['./history-tab.component.css'],
 })
 export class HistoryTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

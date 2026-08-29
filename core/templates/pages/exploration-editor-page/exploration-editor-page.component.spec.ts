@@ -999,8 +999,13 @@ describe('Exploration editor page component', () => {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       explorationData.version = 1;
+      const stateEditorService = TestBed.inject(StateEditorService);
       spyOn(ics, 'startCheckingConnection');
       spyOn(cls, 'loadAutosavedChangeList');
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        'Introduction'
+      );
+      spyOn(sers.onRefreshStateEditor, 'emit');
       isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
 
       expect(component.explorationEditorPageHasInitialized).toEqual(false);
@@ -1008,6 +1013,7 @@ describe('Exploration editor page component', () => {
       tick();
 
       expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
       expect(component.explorationEditorPageHasInitialized).toEqual(true);
 
       flush();

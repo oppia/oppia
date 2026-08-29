@@ -459,6 +459,29 @@ describe('Blog Post Editor Component', () => {
     expect(detectChangesSpy).toHaveBeenCalled();
   });
 
+  it('should not update local edited content when value is not a string', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    component.localEditedContent = '<p>Hello Worlds</p>';
+
+    component.updateLocalEditedContent(1);
+
+    expect(component.localEditedContent).toBe('<p>Hello Worlds</p>');
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should hide edit image icon when thumbnail upload is cancelled', () => {
+    component.showEditImageIcon = true;
+
+    component.cancel();
+
+    expect(component.showEditImageIcon).toBeFalse();
+  });
+
   it('should update local content value', fakeAsync(() => {
     spyOn(blogPostUpdateService, 'setBlogPostContent');
     component.localEditedContent = '<p>Sample content changed</p>';

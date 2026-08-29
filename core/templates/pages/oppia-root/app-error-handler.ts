@@ -24,7 +24,6 @@
 import {HttpClient} from '@angular/common/http';
 import {ErrorHandler} from '@angular/core';
 import {LoggerService} from 'services/contextual/logger.service';
-import firebase from 'firebase/app';
 
 export class AppErrorHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -64,10 +63,14 @@ export class AppErrorHandler extends ErrorHandler {
 
   handleError(error: Error): void {
     if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      typeof (error as {code: string}).code === 'string' &&
       AppErrorHandler.EXPECTED_ERROR_CODES.includes(
         // The firebase.auth.Error is not compatible with javascript's Error type.
         // That's why explicit type conversion is used here.
-        (error as unknown as firebase.auth.Error).code
+        (error as {code: string}).code
       )
     ) {
       return;
@@ -83,7 +86,7 @@ export class AppErrorHandler extends ErrorHandler {
     if (
       errorType !== '[object Error]' &&
       errorType !== '[object DOMException]' &&
-      !(errorType instanceof Error)
+      !(error instanceof Error)
     ) {
       // The error passed to this handler in some cases does not provide
       // a meaningful stack trace of the exception. Different browsers set

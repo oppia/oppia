@@ -35,6 +35,7 @@ export class ClassroomAdminDataService {
   nameValidationError: string = '';
   urlValidationError: string = '';
   topicsGraphValidationError: string = '';
+  feedbackRecipientEmailValidationError: string = '';
   classroomValidationErrors: string[] = [];
 
   onClassroomNameChange(classroom: ClassroomData): void {
@@ -76,6 +77,11 @@ export class ClassroomAdminDataService {
       });
   }
 
+  onFeedbackRecipientEmailChange(classroom: ClassroomData): void {
+    this.feedbackRecipientEmailValidationError =
+      classroom.getFeedbackRecipientEmailValidationErrors();
+  }
+
   onTopicDependencyChange(classroom: ExistingClassroomData): void {
     this.topicsGraphValidationError = classroom.validateDependencyGraph();
   }
@@ -89,6 +95,7 @@ export class ClassroomAdminDataService {
       tempClassroom,
       existingClassroom.getClassroomUrlFragment()
     );
+    this.onFeedbackRecipientEmailChange(tempClassroom);
     if (tempClassroom instanceof ExistingClassroomData) {
       this.onTopicDependencyChange(tempClassroom);
       this.classroomValidationErrors = tempClassroom.getAllValidationErrors();
@@ -97,7 +104,8 @@ export class ClassroomAdminDataService {
     tempClassroom.setClassroomValidityFlag(
       this.nameValidationError === '' &&
         this.urlValidationError === '' &&
-        this.topicsGraphValidationError === ''
+        this.topicsGraphValidationError === '' &&
+        this.feedbackRecipientEmailValidationError === ''
     );
   }
 
@@ -106,15 +114,18 @@ export class ClassroomAdminDataService {
   }
 
   getSaveClassroomValidationErrors(): string[] {
-    return [this.nameValidationError, this.urlValidationError].filter(
-      error => error !== ''
-    );
+    return [
+      this.nameValidationError,
+      this.urlValidationError,
+      this.feedbackRecipientEmailValidationError,
+    ].filter(error => error !== '');
   }
 
   reinitializeErrorMsgs(): void {
     this.classroomValidationErrors = [];
     this.nameValidationError = '';
     this.urlValidationError = '';
+    this.feedbackRecipientEmailValidationError = '';
     this.topicsGraphValidationError = '';
   }
 }

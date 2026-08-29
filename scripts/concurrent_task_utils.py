@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
-import datetime
 import threading
 import time
 import traceback
+
+from core import utils
 
 from typing import Any, Callable, Final, List, Optional
 
@@ -39,7 +40,9 @@ def log(message: str, show_time: bool = False) -> None:
     """
     with LOG_LOCK:
         if show_time:
-            print(datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
+            print(
+                utils.get_current_utc_datetime().strftime('%H:%M:%S'), message
+            )
         else:
             print(message)
 

@@ -6,7 +6,8 @@
 
 <div class="modal-body">
   <oppia-concept-card [skillIds]="skillIds"
-                      [index]="index">
+                      [index]="index"
+                      (skillDescriptionLoaded)="onSkillDescriptionLoaded($event)">
   </oppia-concept-card>
 </div>
 

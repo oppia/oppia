@@ -123,6 +123,8 @@ const newChapterPhotoBoxButton =
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const newChapterErrorMessageSelector =
   '.acceptance-restricted-interaction-error';
+const publishedChaptersDropErrorSelector =
+  '.e2e-test-published-chapters-drop-error';
 
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
@@ -403,6 +405,15 @@ const mobileAcquiredSkillsSectionBodySelector =
   '.e2e-test-section-body-acquired-skills';
 const warningIndicatorSelector = '.e2e-test-warning-indicator';
 const warningTextSelector = '.e2e-test-warnings-text';
+const dragHandleSelector = 'tr.cdk-drag';
+const dragHandlerSelector = '.drag-handler';
+
+// Adventure (Arc) selectors.
+const arcEditButtonSelector = '.arc-edit-button';
+const arcRemoveButtonSelector = '.arc-remove-button';
+const editArcTitleFieldSelector = '.e2e-test-edit-arc-title-field';
+const editArcDescriptionFieldSelector = '.e2e-test-edit-arc-description-field';
+const saveEditArcButtonSelector = '.e2e-test-save-edit-arc-button';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -5723,6 +5734,354 @@ export class TopicManager extends BaseUser {
     await this.openStoryEditor(storyName, topicName);
     await this.publishStoryDraftChapterUpto(dropdownValue);
     await this.publishStoryDraftSerialChapter();
+  }
+
+  /**
+   * Drags a chapter from one position to another in the Story Editor chapter panel.
+   * @param storyName - The name of the story.
+   * @param topicName - The name of the topic under which the story exists.
+   * @param fromChapterName - The name of the chapter to be moved.
+   * @param toChapterName - The name of the target chapter where the dragged chapter will be placed.
+   */
+
+  async dragChapterByName(
+    storyName: string,
+    topicName: string,
+    fromChapterName: string,
+    toChapterName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+
+    await this.page.waitForSelector(dragHandleSelector);
+
+    const rows = await this.page.$$(dragHandleSelector);
+
+    let sourceHandle = null;
+    let targetHandle = null;
+
+    for (const row of rows) {
+      const titleEl = await row.$(chapterTitleSelector);
+
+      if (!titleEl) {
+        continue;
+      }
+      const text = await titleEl.evaluate(el => el.textContent?.trim() || '');
+
+      if (text.includes(fromChapterName)) {
+        sourceHandle = await row.$(dragHandlerSelector);
+      }
+
+      if (text.includes(toChapterName)) {
+        targetHandle = await row.$(dragHandlerSelector);
+      }
+    }
+
+    if (!sourceHandle) {
+      throw new Error(`Source chapter "${fromChapterName}" not found`);
+    }
+
+    if (!targetHandle) {
+      throw new Error(`Target chapter "${toChapterName}" not found`);
+    }
+
+    const s = await sourceHandle.boundingBox();
+    const t = await targetHandle.boundingBox();
+
+    if (!s || !t) {
+      throw new Error('Could not get drag coordinates');
+    }
+
+    await this.page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
+
+    await this.page.mouse.down();
+
+    await this.page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, {
+      steps: 25,
+    });
+
+    await this.page.mouse.up();
+
+    await this.page.waitForTimeout(500);
+
+    showMessage(
+      `Dragged chapter "${fromChapterName}" to chapter "${toChapterName}"`
+    );
+  }
+
+  /**
+   * Splits into a new adventure (arc) after the specified chapter.
+   * Finds the split button that appears between the target chapter and the
+   * next chapter, and clicks it to create a new adventure boundary.
+   * @param {string} afterChapterName - The name of the chapter after which
+   *     to split.
+   */
+  async splitIntoAdventure(afterChapterName: string): Promise<void> {
+    await this.expectChapterListIsVisible();
+    const chapterTitleElements = await this.page.$$(chapterTitleSelector);
+
+    let foundTarget = false;
+    for (const titleElement of chapterTitleElements) {
+      const title = await this.page.evaluate(
+        el => el.textContent?.trim() ?? '',
+        titleElement
+      );
+
+      if (foundTarget) {
+        const splitButtonHandle = await titleElement.evaluateHandle(el => {
+          const parent =
+            el.closest('[cdkDrag]') ||
+            el.closest('.story-editor-node')?.parentElement;
+          if (!parent) {
+            return null;
+          }
+          return parent.querySelector('.split-into-arc-button');
+        });
+
+        const splitButtonElement = splitButtonHandle.asElement();
+        if (splitButtonElement) {
+          await this.clickOnElement(splitButtonElement);
+          await this.waitForPageToFullyLoad();
+          showMessage(
+            `Split adventure created after chapter "${afterChapterName}".`
+          );
+          return;
+        }
+
+        throw new Error(
+          `Split button not found between "${afterChapterName}" and "${title}". ` +
+            'They may already be in different adventures.'
+        );
+      }
+
+      if (title === afterChapterName) {
+        foundTarget = true;
+      }
+    }
+
+    if (!foundTarget) {
+      throw new Error(`Chapter "${afterChapterName}" not found.`);
+    }
+    throw new Error(`No chapter found after "${afterChapterName}" to split.`);
+  }
+
+  /**
+   * Opens the edit modal for the first non-default adventure and fills in its
+   * title and description without saving.
+   * @param {string} title - The new title for the adventure.
+   * @param {string} description - The new description for the adventure.
+   */
+  async fillEditAdventureModal(
+    title: string,
+    description?: string
+  ): Promise<void> {
+    const editButtons = await this.page.$$(arcEditButtonSelector);
+    if (editButtons.length < 2) {
+      throw new Error(
+        'No non-default adventure found to edit. ' +
+          `Only ${editButtons.length} adventure(s) present.`
+      );
+    }
+    await this.clickOnElement(editButtons[1]);
+    await this.expectElementToBeVisible(editArcTitleFieldSelector);
+
+    // Wait until the modal form is fully initialized (title populated) before
+    // clearing, otherwise the clear may run before ngModel sets the value.
+    await this.page.waitForFunction(
+      (modalSelector: string) => {
+        const el = document.querySelector(
+          modalSelector
+        ) as HTMLInputElement | null;
+        return el !== null && el.value.length > 0;
+      },
+      {timeout: 15000},
+      editArcTitleFieldSelector
+    );
+
+    await this.clearAllTextFrom(editArcTitleFieldSelector);
+    await this.typeInInputField(editArcTitleFieldSelector, title);
+    await this.expectElementValueToBe(editArcTitleFieldSelector, title);
+
+    if (description !== undefined) {
+      await this.clearAllTextFrom(editArcDescriptionFieldSelector);
+      await this.typeInInputField(editArcDescriptionFieldSelector, description);
+      await this.expectElementValueToBe(
+        editArcDescriptionFieldSelector,
+        description
+      );
+    }
+  }
+
+  /** Saves the adventure metadata and closes the edit modal. */
+  async saveEditAdventureModal(): Promise<void> {
+    await this.clickOnElementWithSelector(saveEditArcButtonSelector);
+    await this.expectElementToBeVisible(editArcTitleFieldSelector, false);
+  }
+
+  /**
+   * Closes the mobile navbar options panel if it is open. This is needed
+   * before story editor screenshots so that the capture is deterministic even
+   * when a previous test in the same suite failed before re-navigating to the
+   * story editor (which is what would normally have collapsed the panel).
+   */
+  async closeStoryEditorMobileNavbarOptions(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+    if (await this.isElementVisible(navigationContainerSelector, true, 1000)) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.expectElementToBeVisible(navigationContainerSelector, false);
+    }
+  }
+
+  /**
+   * Removes the last adventure boundary by clicking the Remove Arc Boundary
+   * button on the last non-default adventure header. The chapters from the
+   * removed adventure are merged into the previous adventure.
+   */
+  async removeAdventureBoundary(): Promise<void> {
+    const removeButtons = await this.page.$$(arcRemoveButtonSelector);
+    if (removeButtons.length < 1) {
+      throw new Error('No removable adventure boundary found.');
+    }
+    await this.clickOnElement(removeButtons[removeButtons.length - 1]);
+    await this.waitForPageToFullyLoad();
+    showMessage('Adventure boundary removed.');
+  }
+
+  /**
+   * Expects an adventure header with the given title to be visible or not.
+   * @param {string} title - The expected adventure title.
+   * @param {boolean} visible - Whether the adventure header should be visible.
+   */
+  async expectAdventureHeaderToBeVisible(
+    title: string,
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectChapterListIsVisible();
+    await this.page.waitForFunction(
+      (titleText: string, shouldBeVisible: boolean) => {
+        const headers = document.querySelectorAll('.arc-boundary-title');
+        const found = Array.from(headers).some(
+          el => el.textContent?.trim() === titleText
+        );
+        return found === shouldBeVisible;
+      },
+      {timeout: 10000},
+      title,
+      visible
+    );
+    showMessage(
+      `Adventure header "${title}" is ${visible ? 'visible' : 'not visible'} ` +
+        'as expected.'
+    );
+  }
+
+  /**
+   * Verifies that published chapters cannot be reordered.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic under which the story exists.
+   * @param {string} publishedChapterName - The name of the published chapter to drag.
+   * @param {string} targetChapterName - The chapter used as the drag target.
+   * @param {string} dropdownValue - The published chapter dropdown value to publish up to.
+   */
+  async expectPublishedChapterReorderToBeBlocked(
+    storyName: string,
+    topicName: string,
+    publishedChapterName: string,
+    targetChapterName: string,
+    dropdownValue: string
+  ): Promise<void> {
+    await this.publishChapter(storyName, topicName, dropdownValue);
+
+    await this.dragChapterByName(
+      storyName,
+      topicName,
+      publishedChapterName,
+      targetChapterName
+    );
+
+    await this.page.waitForSelector(publishedChaptersDropErrorSelector);
+    await this.expectElementContentToBe(
+      publishedChaptersDropErrorSelector,
+      'The positions of published chapters cannot be changed.'
+    );
+  }
+
+  /**
+   * Expects the number of adventure (arc) boundaries to match the given count.
+   * @param {number} count - The expected number of adventures.
+   */
+  async expectAdventureCount(count: number): Promise<void> {
+    await this.expectChapterListIsVisible();
+    await this.page.waitForFunction(
+      (expectedCount: number) => {
+        const headers = document.querySelectorAll('.arc-boundary-header');
+        return headers.length === expectedCount;
+      },
+      {timeout: 10000},
+      count
+    );
+    showMessage(`Expected ${count} adventures found.`);
+  }
+
+  /**
+   * Expects an adventure header to have the given title and description.
+   * @param {string} title - The expected adventure title.
+   * @param {string} description - The expected adventure description.
+   */
+  async expectAdventureToHave(
+    title: string,
+    description?: string
+  ): Promise<void> {
+    await this.expectChapterListIsVisible();
+    await this.page.waitForFunction(
+      (titleText: string) => {
+        const headers = document.querySelectorAll('.arc-boundary-header');
+        return Array.from(headers).some(header => {
+          const titleEl = header.querySelector('.arc-boundary-title');
+          return titleEl?.textContent?.trim() === titleText;
+        });
+      },
+      {timeout: 10000},
+      title
+    );
+
+    if (description !== undefined) {
+      await this.page.waitForFunction(
+        (titleText: string, descText: string) => {
+          const headers = document.querySelectorAll('.arc-boundary-header');
+          return Array.from(headers).some(header => {
+            const titleEl = header.querySelector('.arc-boundary-title');
+            const descEl = header.querySelector('.arc-boundary-description');
+            return (
+              titleEl?.textContent?.trim() === titleText &&
+              descEl?.textContent?.trim() === descText
+            );
+          });
+        },
+        {timeout: 10000},
+        title,
+        description
+      );
+    }
+
+    showMessage(`Adventure "${title}" has the expected metadata.`);
+  }
+
+  /**
+   * Expects the given chapters to be in the default "All Chapters" adventure.
+   * This is verified by checking that no other adventure boundaries exist.
+   * @param {string[]} chapterNames - The chapter names expected in the story.
+   */
+  async expectAllChaptersInSingleAdventure(
+    chapterNames: string[]
+  ): Promise<void> {
+    await this.expectAdventureCount(1);
+    await this.expectAdventureHeaderToBeVisible('All Chapters');
+    await this.expectChaptersOrderToBe(chapterNames);
+    showMessage(
+      `All chapters [${chapterNames.join(', ')}] are in a single adventure.`
+    );
   }
 }
 export let TopicManagerFactory = (): TopicManager => new TopicManager();

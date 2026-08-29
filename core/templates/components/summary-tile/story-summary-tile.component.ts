@@ -16,7 +16,7 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {Input} from '@angular/core';
@@ -39,7 +39,6 @@ import constants from 'assets/constants';
   selector: 'oppia-story-summary-tile',
   templateUrl: './story-summary-tile.component.html',
   styleUrls: ['./story-summary-tile.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -24,45 +24,118 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 import result
+from apache_beam import pvalue
+
+
+class FromTaggedOutputsTests(job_test_utils.PipelinedTestBase):
+    def test_init_with_pass_tag_in_fail_tags_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be one of'):
+            job_result_transforms.FromTaggedOutputs('OK', 'OK')
+
+    def test_init_with_main_as_fail_tag_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be one of'):
+            job_result_transforms.FromTaggedOutputs('', 'main')
+
+    def test_results_with_nothing_produces_nothing(self) -> None:
+        self.assert_pcoll_empty(self.run_from_tagged_outputs(('OK', 'ERR')))
+
+    def test_results_with_only_pass_yields_only_stdout(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_from_tagged_outputs(('OK', 'ERR'), ('OK', 3), ('OK', 5)),
+            [job_run_result.JobRunResult(stdout='OK: 8')],
+        )
+
+    def test_results_with_only_fail_yields_only_stderrs(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_from_tagged_outputs(
+                ('OK', 'ERR'), ('ERR', 'oh no!'), ('ERR', 'uh-oh')
+            ),
+            [
+                job_run_result.JobRunResult(stderr='ERR: oh no!'),
+                job_run_result.JobRunResult(stderr='ERR: uh-oh'),
+            ],
+        )
+
+    def test_results_with_pass_and_fail_yields_stdout_and_stderr(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_from_tagged_outputs(
+                ('OK', 'ERR'), ('OK', 3), ('ERR', 'uh-oh'), ('OK', 5)
+            ),
+            [
+                job_run_result.JobRunResult(stdout='OK: 8'),
+                job_run_result.JobRunResult(stderr='ERR: uh-oh'),
+            ],
+        )
+
+    def test_results_with_prefix(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_from_tagged_outputs(
+                ('OK', 'ERR'), ('OK', 2), ('ERR', 'uh-oh'), prefix='MyJob'
+            ),
+            [
+                job_run_result.JobRunResult(stdout='MyJob OK: 2'),
+                job_run_result.JobRunResult(stderr='MyJob ERR: uh-oh'),
+            ],
+        )
+
+    def test_results_with_prefix_preserves_whitespace_in_prefix(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_from_tagged_outputs(
+                ('OK', 'ERR'), ('OK', 2), ('ERR', 'uh-oh'), prefix='   MyJob:  '
+            ),
+            [
+                job_run_result.JobRunResult(stdout='   MyJob:  OK: 2'),
+                job_run_result.JobRunResult(stderr='   MyJob:  ERR: uh-oh'),
+            ],
+        )
+
+    def run_from_tagged_outputs(
+        self,
+        tags: tuple[str, ...],
+        *args_list: tuple[str, str | int],
+        prefix: str = '',
+    ) -> pvalue.DoOutputsTuple:
+        """Runs a pipeline to run FromTaggedOutputs with the given test data."""
+
+        return (
+            self.pipeline
+            | beam.Create(args_list)
+            | beam.ParDo(
+                lambda args: [pvalue.TaggedOutput(*args)]
+            ).with_outputs(*tags)
+            | job_result_transforms.FromTaggedOutputs(*tags, prefix=prefix)
+        )
 
 
 class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
-
     def test_ok_results_without_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create([result.Ok('ok'), result.Ok('ok')])
-            | job_result_transforms.ResultsToJobRunResults()
-        )
-
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create([result.Ok('ok'), result.Ok('ok')])
+                | job_result_transforms.ResultsToJobRunResults()
+            ),
             [job_run_result.JobRunResult.as_stdout('SUCCESS: 2')],
         )
 
     def test_ok_results_with_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create([result.Ok('ok'), result.Ok('ok')])
-            | job_result_transforms.ResultsToJobRunResults('PREFIX')
-        )
-
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create([result.Ok('ok'), result.Ok('ok')])
+                | job_result_transforms.ResultsToJobRunResults('PREFIX')
+            ),
             [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 2')],
         )
 
     def test_err_results_without_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create(
-                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
-            )
-            | job_result_transforms.ResultsToJobRunResults()
-        )
-
+        errors = [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create(errors)
+                | job_result_transforms.ResultsToJobRunResults()
+            ),
             [
                 job_run_result.JobRunResult.as_stderr('ERROR: "err 1": 1'),
                 job_run_result.JobRunResult.as_stderr('ERROR: "err 2": 2'),
@@ -70,16 +143,13 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_err_results_with_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create(
-                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
-            )
-            | job_result_transforms.ResultsToJobRunResults('PRE')
-        )
-
+        errors = [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create(errors)
+                | job_result_transforms.ResultsToJobRunResults('PRE')
+            ),
             [
                 job_run_result.JobRunResult.as_stderr('PRE ERROR: "err 1": 1'),
                 job_run_result.JobRunResult.as_stderr('PRE ERROR: "err 2": 2'),
@@ -88,36 +158,31 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
 
 class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
-
     def test_three_objects_without_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create(['item', 'item', 'item'])
-            | job_result_transforms.CountObjectsToJobRunResult()
-        )
-
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create(['item', 'item', 'item'])
+                | job_result_transforms.CountObjectsToJobRunResult()
+            ),
             [job_run_result.JobRunResult.as_stdout('SUCCESS: 3')],
         )
 
     def test_three_objects_with_prefix_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create(['item', 'item', 'item'])
-            | job_result_transforms.CountObjectsToJobRunResult('PREFIX')
-        )
-
         self.assert_pcoll_equal(
-            transform_result,
+            (
+                self.pipeline
+                | beam.Create(['item', 'item', 'item'])
+                | job_result_transforms.CountObjectsToJobRunResult('PREFIX')
+            ),
             [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 3')],
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create([])
-            | job_result_transforms.CountObjectsToJobRunResult()
+        self.assert_pcoll_empty(
+            (
+                self.pipeline
+                | beam.Create([])
+                | job_result_transforms.CountObjectsToJobRunResult()
+            )
         )
-
-        self.assert_pcoll_empty(transform_result)

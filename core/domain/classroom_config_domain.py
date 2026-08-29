@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import re
 
 from core import utils
 from core.constants import constants
@@ -32,6 +33,7 @@ class ClassroomDict(TypedDict):
     classroom_id: str
     name: str
     url_fragment: str
+    feedback_recipient_email: str
     course_details: str
     teaser_text: str
     topic_list_intro: str
@@ -58,6 +60,7 @@ class Classroom:
         classroom_id: str,
         name: str,
         url_fragment: str,
+        feedback_recipient_email: str,
         course_details: str,
         teaser_text: str,
         topic_list_intro: str,
@@ -74,6 +77,7 @@ class Classroom:
             classroom_id: str. The ID of the classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. Course details for the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
             topic_list_intro: str. Topic list introduction for the classroom.
@@ -91,6 +95,7 @@ class Classroom:
         self.classroom_id = classroom_id
         self.name = name
         self.url_fragment = url_fragment
+        self.feedback_recipient_email = feedback_recipient_email
         self.course_details = course_details
         self.teaser_text = teaser_text
         self.topic_list_intro = topic_list_intro
@@ -118,6 +123,7 @@ class Classroom:
             classroom_dict['classroom_id'],
             classroom_dict['name'],
             classroom_dict['url_fragment'],
+            classroom_dict['feedback_recipient_email'],
             classroom_dict['course_details'],
             classroom_dict['teaser_text'],
             classroom_dict['topic_list_intro'],
@@ -139,6 +145,7 @@ class Classroom:
             'classroom_id': self.classroom_id,
             'name': self.name,
             'url_fragment': self.url_fragment,
+            'feedback_recipient_email': self.feedback_recipient_email,
             'course_details': self.course_details,
             'teaser_text': self.teaser_text,
             'topic_list_intro': self.topic_list_intro,
@@ -295,6 +302,32 @@ class Classroom:
         )
 
     @classmethod
+    def require_valid_feedback_recipient_email(
+        cls, feedback_recipient_email: str
+    ) -> None:
+        """Checks whether the feedback recipient email is valid.
+
+        Args:
+            feedback_recipient_email: str. The email of the feedback recipient.
+        """
+        if not isinstance(feedback_recipient_email, str):
+            raise utils.ValidationError(
+                'Expected feedback_recipient_email of the classroom to be a '
+                'string, received: %s.' % feedback_recipient_email
+            )
+
+        if feedback_recipient_email == '':
+            raise utils.ValidationError(
+                'feedback_recipient_email field should not be empty'
+            )
+
+        if not re.match(constants.EMAIL_REGEX, feedback_recipient_email):
+            raise utils.ValidationError(
+                'Invalid feedback_recipient_email: %s.'
+                % feedback_recipient_email
+            )
+
+    @classmethod
     def require_valid_bg_color(cls, bg_color: str, is_thumbnail: bool) -> None:
         """Checks whether the image bg_color of the classroom is valid.
 
@@ -366,6 +399,9 @@ class Classroom:
             )
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
+        self.require_valid_feedback_recipient_email(
+            self.feedback_recipient_email
+        )
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids
         )

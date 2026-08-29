@@ -41,3 +41,9 @@ cron:
 - description: weekly job to mark stale voiceover regeneration content as failed
   url: /cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed
   schedule: every 48 hours
+- description: daily job to clean up expired LessonFeedbackModel entries by clearing their feedback text
+  url: /cron/feedback/lesson_feedback_cleanup
+  schedule: every day 01:00
+- description: daily job to delete expired PlatformFeedbackModel entries together with their associated FeedbackSessionLogModel entries and uploaded screenshots
+  url: /cron/feedback/platform_feedback_cleanup
+  schedule: every day 02:00

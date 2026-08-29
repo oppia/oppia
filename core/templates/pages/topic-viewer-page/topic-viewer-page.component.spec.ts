@@ -33,7 +33,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {StorySummary} from 'domain/story/story-summary.model';
 
 class MockPlatformFeatureService {
   status = {
@@ -184,6 +183,7 @@ describe('Topic viewer page', () => {
   });
 
   afterEach(() => {
+    topicViewerPageComponent.ngOnDestroy();
     httpTestingController.verify();
   });
 
@@ -443,32 +443,6 @@ describe('Topic viewer page', () => {
 
     expect(alertsService.addWarning).not.toHaveBeenCalled();
   }));
-
-  it('should track story data by story id', () => {
-    const storySummarySpy = jasmine.createSpyObj<StorySummary>('StorySummary', [
-      'getId',
-      'getTitle',
-      'getDescription',
-      'getNodeTitles',
-      'getAllNodes',
-      'getUrlFragment',
-    ]);
-    storySummarySpy.getId.and.returnValue('story_1');
-
-    expect(
-      topicViewerPageComponent.trackStoryDataById(0, {
-        storyId: 'story_1',
-        storyTitle: 'Story 1',
-        storyDescription: 'Description',
-        lessonCount: 3,
-        practiceCount: 2,
-        storySummary: storySummarySpy,
-        practiceSubtopicIds: [],
-        classroomUrlFragment: '',
-        topicUrlFragment: '',
-      })
-    ).toBe('story_1');
-  });
 
   it('should get static image url', () => {
     var imagePath = '/path/to/image.png';

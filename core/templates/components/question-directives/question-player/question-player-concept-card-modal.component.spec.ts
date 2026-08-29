@@ -116,6 +116,24 @@ describe('Question Player Concept Card Modal component', () => {
     })
   );
 
+  it('should show the translated skill description in the header', () => {
+    component.skills = ['name1', 'name2'];
+    component.ngOnInit();
+
+    component.onSkillDescriptionLoaded('nombre1');
+
+    expect(component.modalHeader).toEqual('nombre1');
+  });
+
+  it('should keep the original header when no description is loaded', () => {
+    component.skills = ['name1', 'name2'];
+    component.ngOnInit();
+
+    component.onSkillDescriptionLoaded('');
+
+    expect(component.modalHeader).toEqual('name1');
+  });
+
   it('should refresh page when retrying a practice test', () => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       selected_subtopic_ids: 'selected_subtopic_ids',

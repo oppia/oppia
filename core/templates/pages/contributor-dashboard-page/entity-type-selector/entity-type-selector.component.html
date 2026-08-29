@@ -1,0 +1,22 @@
+<div #dropdown class="oppia-entity-type-selector-container e2e-test-entity-type-selector">
+  <div class="oppia-entity-type-selector-inner-container e2e-test-entity-type-selector-selected"
+       tabindex="0"
+       (keydown.enter)="toggleDropdown()"
+       (click)="toggleDropdown()">
+    {{ getActiveEntityTypeLabel() }}
+    <span class="fas fa-caret-down oppia-entity-type-selector-inner-container-arrow"
+          [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+    </span>
+  </div>
+
+  <div *ngIf="dropdownShown" class="oppia-entity-type-selector-dropdown-container e2e-test-entity-type-selector-dropdown">
+    <div class="oppia-entity-type-selector-dropdown-option e2e-test-entity-type-selector-option"
+         *ngFor="let option of entityTypeOptions"
+         (click)="selectOption(option.id)"
+         (keydown.enter)="selectOption(option.id)"
+         tabindex="0"
+         [ngClass]="{'oppia-entity-type-selector-dropdown-option-selected' : option.id === activeEntityType}">
+      {{ option.label }}
+    </div>
+  </div>
+</div>

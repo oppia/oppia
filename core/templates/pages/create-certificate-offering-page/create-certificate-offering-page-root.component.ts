@@ -29,9 +29,9 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 })
 export class CreateCertificateOfferingPageRootComponent extends BaseRootComponent {
   isCertificateOfferingEnabled: boolean;
-  createCertificateOfferingRoute =
+  certificateCreatorDashboardRoute =
     '/' +
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
       .ROUTE;
 
   title: string =

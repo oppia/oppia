@@ -22,10 +22,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './welcome-translation-modal.component.css';
 
 @Component({
   selector: 'oppia-welcome-translation-modal',
   templateUrl: './welcome-translation-modal.component.html',
+  styleUrls: ['./welcome-translation-modal.component.css'],
 })
 export class WelcomeTranslationModalComponent
   extends ConfirmOrCancelModal

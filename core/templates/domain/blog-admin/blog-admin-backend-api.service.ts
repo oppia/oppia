@@ -18,9 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-interface PlatformParameterSchema {
-  type: string;
-}
+import {Schema} from 'services/schema-default-value.service';
 
 interface UserRolesBackendResponse {
   [role: string]: string;
@@ -34,7 +32,7 @@ export interface PlatformParameterBackendResponse {
   [property: string]: {
     description: string;
     value: string[] | number;
-    schema: PlatformParameterSchema;
+    schema: Schema;
   };
 }
 

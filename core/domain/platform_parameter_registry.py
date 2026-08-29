@@ -378,12 +378,15 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.EMAIL_FOOTER,
-    'The footer to append to all outgoing emails. (This should '
-    'be written in HTML and include an unsubscribe link.)',
+    'The footer to append to all outgoing emails. This should be '
+    'written in HTML and include an unsubscribe link. The '
+    'LINK_TO_PREFERENCES_PAGE placeholder is replaced with the '
+    'preferences page URL before sending.',
     platform_parameter_domain.DataTypes.STRING,
     default=(
         'You can change your email preferences via the '
-        '<a href="LINK_TO_PREFERENCES_PAGE">Preferences</a> page.'
+        '<a href="%s">Preferences</a> page.'
+        % feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER
     ),
 )
 

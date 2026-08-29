@@ -115,4 +115,12 @@ describe('Blog Dashboard Page Component', () => {
       blogDashboardPageService.updateNavTitleEventEmitter.subscribe
     ).toHaveBeenCalled();
   });
+
+  it('should navigate to main tab', () => {
+    spyOn(blogDashboardPageService, 'navigateToMainTab');
+
+    component.navigateToMainTab();
+
+    expect(blogDashboardPageService.navigateToMainTab).toHaveBeenCalled();
+  });
 });

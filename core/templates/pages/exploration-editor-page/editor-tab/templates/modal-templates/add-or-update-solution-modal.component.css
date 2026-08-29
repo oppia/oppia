@@ -1,0 +1,6 @@
+schema-based-editor schema-based-float-editor .form-control {
+  width: auto;
+}
+.oppia-learner-submit-answer-button:focus {
+  border: 2px solid #000;
+}

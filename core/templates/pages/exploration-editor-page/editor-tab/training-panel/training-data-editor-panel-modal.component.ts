@@ -53,6 +53,7 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import './training-data-editor-panel-modal.component.css';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -78,6 +79,7 @@ interface TrainingData {
 @Component({
   selector: 'training-data-editor-panel',
   templateUrl: './training-data-editor-panel-modal.component.html',
+  styleUrls: ['./training-data-editor-panel-modal.component.css'],
 })
 export class TrainingDataEditorPanelComponent
   extends ConfirmOrCancelModal

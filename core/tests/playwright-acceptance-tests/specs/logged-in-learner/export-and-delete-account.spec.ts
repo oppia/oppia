@@ -46,11 +46,13 @@ test.describe('Logged-In Learner', function () {
     // Delete Account.
     await loggedInLearner.deleteAccount();
     // Initiating account deletion from /preferences page redirects to /delete-account page.
-    await loggedInLearner.expectToBeOnPage('delete account');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser('delete account');
     await loggedInLearner.confirmAccountDeletion('loggedInLearner');
 
     // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
-    await loggedInLearner.expectToBeOnPage('pending account deletion');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser(
+      'pending account deletion'
+    );
   });
 
   test.afterAll(async function () {

@@ -78,6 +78,7 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import './exploration-editor-page.component.css';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -111,6 +112,7 @@ interface ExplorationData extends ExplorationBackendDict {
 @Component({
   selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html',
+  styleUrls: ['./exploration-editor-page.component.css'],
 })
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -816,8 +818,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     ).then(improvementsTabIsEnabledResponse => {
       this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
     });
-
-    this.initExplorationPage();
   }
 
   isImprovementsTabEnabled(): boolean {

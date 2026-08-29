@@ -29,7 +29,10 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {EventEmitter} from '@angular/core';
-import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {
+  OppiaRteNode,
+  OppiaRteParserService,
+} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -229,7 +232,7 @@ describe('RTE display component', () => {
   }));
 
   it('should return early when rteString is null', () => {
-    component.rteString = null as unknown as string;
+    (component as {rteString: string | null}).rteString = null;
 
     expect(() => {
       // This throws "Property '_updateNode' is private". We need to
@@ -320,6 +323,22 @@ describe('RTE display component', () => {
     ).and.returnValue('en');
     let outputWrappedString =
       component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve ordered list structure while wrapping list items', fakeAsync(() => {
+    let rteString =
+      '<ol><li>First item.</li><li>Second item.</li><li>Third item.</li></ol>';
+    let expectedOutputWrappedString =
+      '<ol><li><span class="highlightBlock1">First item.</span></li><li><span class="highlightBlock2">Second item.</span></li><li><span class="highlightBlock3">Third item.</span></li></ol>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
@@ -1065,4 +1084,37 @@ describe('RTE display component', () => {
 
     expect(component.shouldHighlightContent()).toBeFalse();
   });
+
+  it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
+    const mockNode = new OppiaRteNode('oppia-noninteractive-image');
+    // Override the readonly selector property to simulate an unknown
+    // component selector that is not in the supported component map.
+    Object.defineProperty(mockNode, 'selector', {
+      value: 'oppia-noninteractive-unknown',
+      writable: false,
+      configurable: true,
+    });
+    mockNode.children = [];
+
+    spyOn(rteParserService, 'constructFromDomParser').and.returnValue(mockNode);
+    spyOn(component, 'isHighlightSentencesFeatureEnabled').and.returnValue(
+      false
+    );
+
+    component.rteString = '<p>test</p>';
+    const changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: '<p>test</p>',
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    };
+
+    component.ngOnChanges(changes);
+    tick(100);
+
+    expect(mockNode.portal).toBeUndefined();
+    discardPeriodicTasks();
+  }));
 });

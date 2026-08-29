@@ -1,0 +1,35 @@
+<div class="assessment-unavailable-overlay" *ngIf="isVisible" (keydown)="containFocusWithinModal($event)">
+  <div class="assessment-unavailable-card"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="assessment-unavailable-title"
+       aria-describedby="assessment-unavailable-message"
+       tabindex="-1">
+    <h2 id="assessment-unavailable-title" class="assessment-unavailable-title">{{ 'I18N_ASSESSMENT_UNAVAILABLE_TITLE' | translate }}</h2>
+
+    <p id="assessment-unavailable-message" class="assessment-unavailable-message">
+      {{ 'I18N_ASSESSMENT_UNAVAILABLE_MESSAGE' | translate }}
+    </p>
+
+    <p class="assessment-unavailable-message">
+      {{ 'I18N_ASSESSMENT_UNAVAILABLE_ALERTED_CREATOR_MESSAGE' | translate }}
+    </p>
+
+    <p class="assessment-unavailable-message">
+      {{ 'I18N_ASSESSMENT_UNAVAILABLE_TRY_OTHER_MESSAGE' | translate }}
+    </p>
+
+    <div class="assessment-unavailable-note">
+      <span aria-hidden="true" class="assessment-unavailable-note-icon">i</span>
+      <p class="assessment-unavailable-note-text">
+        {{ 'I18N_ASSESSMENT_UNAVAILABLE_NOTE_TEXT' | translate }}
+      </p>
+    </div>
+
+    <div class="assessment-unavailable-actions">
+      <button #goToCertificatesButton type="button" class="btn btn-primary assessment-unavailable-action-button" (click)="onGoToAvailableCertificates()">
+        {{ 'I18N_ASSESSMENT_UNAVAILABLE_GO_TO_CERTIFICATES_BUTTON' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

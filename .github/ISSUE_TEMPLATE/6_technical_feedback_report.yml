@@ -1,0 +1,92 @@
+name: Technical feedback report
+description: Create an issue from the Oppia technical feedback dashboard
+title: "[BUG]: "
+labels: [triage needed, bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form is used for reports transferred from the Oppia technical feedback dashboard.
+  - type: textarea
+    id: describe-the-bug
+    attributes:
+      label: Describe the bug
+      description: Details copied from the technical feedback report.
+    validations:
+      required: true
+  - type: input
+    id: page-url
+    attributes:
+      label: URL of the page where the issue is observed.
+      description: The URL captured by the technical feedback report.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps To Reproduce
+      description: Triage steps inferred from the transferred report.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: The expected user-facing behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots-videos
+    attributes:
+      label: Screenshots/Videos
+      description: Screenshot details copied from the technical feedback report.
+    validations:
+      required: false
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Device type inferred from the captured user agent.
+    validations:
+      required: false
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: Operating system inferred from the captured user agent.
+    validations:
+      required: false
+  - type: input
+    id: browsers
+    attributes:
+      label: Browser
+      description: Browser inferred from the captured user agent.
+    validations:
+      required: false
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser version
+      description: Browser version inferred from the captured user agent.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Feedback metadata and session logs copied from the dashboard.
+    validations:
+      required: false
+  - type: textarea
+    id: tips-for-developers
+    attributes:
+      label: Tips for developers
+      description: Please leave this section as-is.
+      value: |
+        Before addressing the bug, please identify which PR caused the issue (you can follow the steps [here](https://github.com/oppia/oppia/wiki/How-to-find-the-commit-which-introduced-a-bug)). If you identify the PR, comment on the issue with a link to it. If not, mention the commit hash of the oldest commit you saw the bug on (and the month and year it was made in).
+
+        Then, please leave a comment with details of the approach that you plan to take to fix the issue (see [example](https://github.com/oppia/oppia/issues/19157#issuecomment-1858788463)).
+
+        **Note:** If this is your first Oppia issue, please make sure to follow our guidelines for [choosing an issue](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#choosing-a-good-first-issue) and [setting things up](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up). You will also need to show a demo of the fix working correctly on your local machine. Thanks!
+    validations:
+      required: true

@@ -22,6 +22,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import './topic-summary-tile.component.css';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -30,6 +31,7 @@ import {
 @Component({
   selector: 'oppia-topic-summary-tile',
   templateUrl: './topic-summary-tile.component.html',
+  styleUrls: ['./topic-summary-tile.component.css'],
 })
 export class TopicSummaryTileComponent {
   // These properties are initialized using Angular lifecycle hooks

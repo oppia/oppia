@@ -99,6 +99,35 @@ describe('Current Interaction Service', () => {
     );
   });
 
+  it('should properly clear the registered onSubmitFn', () => {
+    let answerState = null;
+    let dummyOnSubmitFn: OnSubmitFn = (answer: Object) => {
+      answerState = answer;
+    };
+
+    currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
+    currentInteractionService.clearOnSubmitFn(dummyOnSubmitFn);
+    expect(() => {
+      currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
+    }).toThrowError('No onSubmit function has been registered.');
+    expect(answerState).toBeNull();
+  });
+
+  it('should not clear an onSubmitFn registered by another component', () => {
+    let answerState = null;
+    let firstOnSubmitFn: OnSubmitFn = (answer: Object) => {
+      answerState = answer;
+    };
+    let secondOnSubmitFn: OnSubmitFn = () => {
+      answerState = 'second';
+    };
+
+    currentInteractionService.setOnSubmitFn(firstOnSubmitFn);
+    currentInteractionService.clearOnSubmitFn(secondOnSubmitFn);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
+    expect(answerState).toEqual(DUMMY_ANSWER);
+  });
+
   it('should handle case where validityCheckFn is null', () => {
     let dummySubmitAnswerFn = () => {
       return false;
@@ -113,6 +142,20 @@ describe('Current Interaction Service', () => {
   it('should handle case where submitAnswerFn is null', () => {
     currentInteractionService.registerCurrentInteraction(null, null);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
+  });
+
+  it('should report whether a submit answer function is registered', () => {
+    const dummySubmitAnswerFn = () => {
+      return false;
+    };
+    currentInteractionService.registerCurrentInteraction(
+      dummySubmitAnswerFn,
+      null
+    );
+    expect(currentInteractionService.isSubmitAnswerFnRegistered()).toBe(true);
+
+    currentInteractionService.registerCurrentInteraction(null, null);
+    expect(currentInteractionService.isSubmitAnswerFnRegistered()).toBe(false);
   });
 
   it('should properly register and clear presubmit hooks', () => {
@@ -221,6 +264,13 @@ describe('Current Interaction Service', () => {
 
     expect(currentInteractionService.showNoResponseError()).toBe(true);
   });
+  it('should return false for no response error when no card is displayed', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      undefined
+    );
+
+    expect(currentInteractionService.showNoResponseError()).toBe(false);
+  });
   it('should update answer validity using updateAnswerIsValid', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
       displayedCard
@@ -246,5 +296,13 @@ describe('Current Interaction Service', () => {
     expect(currentInteractionService.showInvalidResponseError()).toBe(true);
     expect(currentInteractionService.showInvalidResponseError()).toBe(false);
     expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return false for invalid response error when no card is displayed', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      undefined
+    );
+
+    expect(currentInteractionService.showInvalidResponseError()).toBe(false);
   });
 });

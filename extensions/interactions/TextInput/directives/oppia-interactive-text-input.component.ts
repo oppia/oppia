@@ -47,6 +47,7 @@ export class InteractiveTextInputComponent implements OnInit {
   @Input() placeholderWithValue!: string;
   @Input() rowsWithValue!: string;
   @Input() catchMisspellingsWithValue!: string;
+  @Input() lastAnswer!: TextInputAnswer | null;
   @Input() savedSolution!: TextInputAnswer;
   @Input() labelForFocusTarget!: string;
   answer!: TextInputAnswer;
@@ -84,7 +85,12 @@ export class InteractiveTextInputComponent implements OnInit {
     this.placeholder = placeholder.value.unicode;
     this.rows = rows.value;
     this.catchMisspellings = catchMisspellings.value;
-    this.answer = this.savedSolution !== undefined ? this.savedSolution : '';
+    this.answer =
+      this.lastAnswer !== null && this.lastAnswer !== undefined
+        ? this.lastAnswer
+        : this.savedSolution !== undefined
+          ? this.savedSolution
+          : '';
 
     this.schema = {
       type: 'unicode',

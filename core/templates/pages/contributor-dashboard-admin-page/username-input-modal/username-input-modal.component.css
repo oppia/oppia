@@ -1,0 +1,42 @@
+.username-input-modal.disabled {
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  color: #888;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.username-input-box {
+  border: 1.2px #d0d5dd solid;
+  border-radius: 4px;
+  margin: 5px;
+  padding: 5px;
+  width: 100%;
+}
+.question-role-editor-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: end;
+  padding: 15px;
+}
+.cancel-button {
+  border-color: #00645c;
+  border-radius: 5px;
+  color: #00645c;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.30px;
+  padding: 5px;
+  text-transform: uppercase;
+}
+.save-button {
+  background: #00645c;
+  border-radius: 5px;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.30px;
+  padding: 5px;
+  text-transform: uppercase;
+}

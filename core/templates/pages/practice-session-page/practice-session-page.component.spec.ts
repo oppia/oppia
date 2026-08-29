@@ -45,6 +45,9 @@ class MockPlatformFeatureService {
     NewLessonPlayer: {
       isEnabled: false,
     },
+    StoryEditorArcs: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -55,12 +58,14 @@ describe('Practice session page', () => {
   let pageTitleService: PageTitleService;
   let urlService: UrlService;
   let translateService: TranslateService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let practiceSessionsBackendApiService: PracticeSessionsBackendApiService;
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
+
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
@@ -227,4 +232,186 @@ describe('Practice session page', () => {
     loaderService.onLoadingMessageChange.emit(testMessage);
     expect(component.loadingMessage).toBe(testMessage);
   });
+
+  it('should determine lesson session type from pathname', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['sessionType']).toBe('lesson');
+  }));
+
+  it('should determine arc session type from pathname', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/123'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['sessionType']).toBe('arc');
+  }));
+
+  it('should determine mastery session type from pathname', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/mastery-challenge'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['sessionType']).toBe('mastery');
+  }));
+
+  it('should determine legacy session type from pathname with subtopic ids', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/session'
+    );
+    (urlService.getSelectedSubtopicsFromUrl as jasmine.Spy).and.returnValue(
+      '[1,2]'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['sessionType']).toBe('legacy');
+  }));
+
+  it('should build correct data URL for lesson practice', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
+  }));
+
+  it('should build correct retry URL for arc practice', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
+  }));
+
+  it('should build correct retry URL for mastery challenge', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/mastery-challenge'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['_getRetryUrl']()).toContain(
+      'abbrev-topic/mastery-challenge'
+    );
+  }));
+
+  it('should append arc mastered markers to dashboard URL for arc sessions', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+    spyOn(urlService, 'getArcIdFromUrl').and.returnValue('1');
+    spyOn(urlService, 'getNodeIdFromPracticeUrl').and.returnValue(null);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    const dashboardActionButton =
+      component.questionPlayerConfig.resultActionButtons.find(
+        (button: {type: string}) => button.type === 'DASHBOARD'
+      );
+    expect(dashboardActionButton?.url).toContain('arc_mastered=true');
+    expect(dashboardActionButton?.url).toContain('arc_id=1');
+  }));
 });

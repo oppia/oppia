@@ -381,21 +381,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             pre_push_hook.does_diff_include_ci_config_or_test_files(
-                [b'core/tests/wdio.conf.js', b'test.html']
-            )
-        )
-        self.assertTrue(
-            pre_push_hook.does_diff_include_ci_config_or_test_files(
-                [b'webdriverio_desktop/test.js', b'test.html']
-            )
-        )
-        self.assertTrue(
-            pre_push_hook.does_diff_include_ci_config_or_test_files(
-                [b'webdriverio/test.js', b'test.js']
-            )
-        )
-        self.assertTrue(
-            pre_push_hook.does_diff_include_ci_config_or_test_files(
                 [
                     b'core/tests/puppeteer-acceptance-tests/specs/test.spec.ts',
                     b'test.ts',

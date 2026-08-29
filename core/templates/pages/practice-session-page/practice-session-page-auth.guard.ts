@@ -26,6 +26,7 @@ import {
 
 import {AppConstants} from 'app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +34,7 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 export class PracticeSessionAccessGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
+    private platformFeatureService: PlatformFeatureService,
     private router: Router,
     private location: Location
   ) {}
@@ -45,13 +47,61 @@ export class PracticeSessionAccessGuard implements CanActivate {
     const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+    const nodeId = route.paramMap.get('node_id') || '';
+    const arcId = route.paramMap.get('arc_id') || '';
+
+    const isStoryEditorArcsEnabled =
+      this.platformFeatureService.status.StoryEditorArcs.isEnabled;
+
+    if (
+      (nodeId || arcId || (!selectedSubtopicIds && !nodeId && !arcId)) &&
+      !isStoryEditorArcsEnabled
+    ) {
+      return new Promise<boolean>(resolve => {
+        this.router
+          .navigate([
+            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+          ])
+          .then(() => {
+            this.location.replaceState(state.url);
+            resolve(false);
+          });
+      });
+    }
+
     return new Promise<boolean>(resolve => {
-      this.accessValidationBackendApiService
-        .validateAccessToPracticeSessionPage(
-          classroomUrlFragment,
-          topicUrlFragment,
-          selectedSubtopicIds
-        )
+      let validationPromise: Promise<void>;
+
+      if (arcId) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToEndOfArcPage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            arcId
+          );
+      } else if (selectedSubtopicIds) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToPracticeSessionPage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            selectedSubtopicIds
+          );
+      } else if (nodeId) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            nodeId
+          );
+      } else {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToMasteryChallengePage(
+            classroomUrlFragment,
+            topicUrlFragment
+          );
+      }
+
+      validationPromise
         .then(() => {
           resolve(true);
         })

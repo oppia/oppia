@@ -17,9 +17,11 @@
  */
 import {Component, EventEmitter, Output} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
+import './content-toggle-button.component.css';
 @Component({
   selector: 'oppia-content-toggle-button',
   templateUrl: './content-toggle-button.component.html',
+  styleUrls: ['./content-toggle-button.component.css'],
 })
 export class ContentToggleButtonComponent {
   isExpanded: boolean = false;

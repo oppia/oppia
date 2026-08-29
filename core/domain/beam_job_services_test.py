@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-import datetime
 import itertools
 
+from core import utils
 from core.domain import beam_job_domain, beam_job_services
 from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
@@ -278,7 +278,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_is_state_terminal(self) -> None:
 
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_utc_datetime()
 
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
             '123',

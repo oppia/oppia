@@ -126,48 +126,48 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
-      'Fractions'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE(
       'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
     );
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Chemical Reactions" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Chemical Reactions',
-      'States of Matter'
+      'Exploration - States of Matter'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
   }, 1200000);
 
   it('should be able to filter by topic', async function () {
@@ -177,18 +177,18 @@ describe('Translation Reviewer V2', function () {
     // Translation of "States of Matter" should not be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Chemical Reactions',
-      'States of Matter',
+      'Exploration - States of Matter',
       false
     );
     // Translation of "Fractions" should be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions',
+      'Exploration - Fractions',
       true
     );
     await translationReviewer.expectOpportunityToBePresent(
       'Trading Slices',
-      'Fractions',
+      'Exploration - Fractions',
       true
     );
   });
@@ -199,13 +199,13 @@ describe('Translation Reviewer V2', function () {
     // Translation in Hindi should be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions',
+      'Exploration - Fractions',
       true
     );
     // Translation in Akan should not be present.
     await translationReviewer.expectOpportunityToBePresent(
       'Trading Slices',
-      'Fractions',
+      'Exploration - Fractions',
       false
     );
   });

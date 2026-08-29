@@ -30,11 +30,15 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {ConceptCardComponent} from './concept-card.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 
 describe('Concept card component', () => {
   let fixture: ComponentFixture<ConceptCardComponent>;
   let componentInstance: ConceptCardComponent;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let contentTranslationLanguageService: ContentTranslationLanguageService;
   let conceptCard = new ConceptCard(
     new SubtitledHtml('', '1'),
     RecordedVoiceovers.createEmpty()
@@ -53,6 +57,10 @@ describe('Concept card component', () => {
     fixture = TestBed.createComponent(ConceptCardComponent);
     componentInstance = fixture.componentInstance;
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    contentTranslationLanguageService = TestBed.inject(
+      ContentTranslationLanguageService
+    );
   });
 
   it('should initialize and load concept cards successfully', fakeAsync(() => {
@@ -69,6 +77,43 @@ describe('Concept card component', () => {
     expect(componentInstance.currentConceptCard).toEqual(conceptCard);
   }));
 
+  it('should emit the skill description once the concept card loads', fakeAsync(() => {
+    const translatedConceptCard = new ConceptCard(
+      new SubtitledHtml('', '1'),
+      RecordedVoiceovers.createEmpty(),
+      'nombre de la habilidad'
+    );
+    spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve([translatedConceptCard]));
+    const emitSpy = spyOn(componentInstance.skillDescriptionLoaded, 'emit');
+    componentInstance.index = 0;
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(emitSpy).toHaveBeenCalledWith('nombre de la habilidad');
+  }));
+
+  it("should load concept cards in the learner's selected language", fakeAsync(() => {
+    spyOn(
+      i18nLanguageCodeService,
+      'getCurrentI18nLanguageCode'
+    ).and.returnValue('es');
+    const loadConceptCardsSpy = spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve(conceptCardObjects));
+    componentInstance.index = 0;
+    componentInstance.skillIds = ['skill_1'];
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(loadConceptCardsSpy).toHaveBeenCalledWith(['skill_1'], 'es');
+  }));
+
   it('should initialize and handle error if fails to load concept cards', fakeAsync(() => {
     spyOn(
       conceptCardBackendApiService,
@@ -82,5 +127,27 @@ describe('Concept card component', () => {
     expect(componentInstance.skillDeletedMessage).toEqual(
       'Oops, it looks like this skill has been deleted.'
     );
+  }));
+
+  it("should prioritize the lesson's study language over the site language", fakeAsync(() => {
+    spyOn(
+      i18nLanguageCodeService,
+      'getCurrentI18nLanguageCode'
+    ).and.returnValue('es');
+    spyOn(
+      contentTranslationLanguageService,
+      'getCurrentContentLanguageCode'
+    ).and.returnValue('hi');
+    const loadConceptCardsSpy = spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve(conceptCardObjects));
+    componentInstance.index = 0;
+    componentInstance.skillIds = ['skill_1'];
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(loadConceptCardsSpy).toHaveBeenCalledWith(['skill_1'], 'hi');
   }));
 });

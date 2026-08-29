@@ -1,0 +1,76 @@
+.language-selector-text {
+  float: left;
+  width: 50%;
+}
+.language-selector-form {
+  width: 210px;
+}
+.language-selector-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+  margin: auto;
+  text-align: center;
+  width: 500px;
+}
+.oppia-translator-overview {
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 5px;
+  text-align: center;
+}
+.oppia-translation-progress {
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+.oppia-translation-progress-bar {
+  background-color: #c1e9f3;
+  margin: 7px 5px 7px 15px;
+  width: 350px;
+}
+.oppia-translation-language-selector {
+  border-radius: 8px;
+}
+.oppia-numerical-progress-status {
+  font-size: 12px;
+  padding: 2px;
+}
+.oppia-translation-mode {
+  border-radius: 15px 0 0 15px;
+}
+.oppia-voiceover-mode {
+  border-radius: 0 15px 15px 0;
+}
+.oppia-translation-tab-mode-changer {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: inset -1px -2px 5px 0 grey;
+  height: 25px;
+  width: 50px;
+}
+.oppia-mode-change-section {
+  display: flex;
+  position: absolute;
+  right: -20px;
+  top: 150px;
+  width: 200px;
+}
+.oppia-active-mode {
+  box-shadow: inset 3px 2px 5px 0 grey;
+  color: #1a73e8;
+}
+.oppia-mode-change-label {
+  margin: 3px 8px;
+}
+translator-overview .oppia-language-selector-label {
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  .oppia-mode-change-section {
+    top: 20%;
+  }
+}

@@ -18,6 +18,7 @@
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
+  CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
@@ -40,14 +41,27 @@ describe('Certificate offering confirmation modal component', () => {
   it('should expose create copy and action for create flow', () => {
     component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
 
-    expect(component.modalTitle).toBe('Save Certificate');
-    expect(component.confirmButtonText).toBe('Create Certificate');
-    expect(component.confirmationText).toContain('create it now');
-    expect(component.disabledText).toContain('Create Certificate');
+    expect(component.modalTitle).toBe('Publish Certificate');
+    expect(component.confirmButtonText).toBe('Publish Certificate');
+    expect(component.confirmationText).toContain('publish it now');
+    expect(component.disabledText).toContain('Publish Certificate');
   });
 
-  it('should expose update copy and action for update flow', () => {
+  it('should expose publish copy for update flow when not yet available', () => {
     component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+    component.currentAsyncStatus =
+      CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY;
+
+    expect(component.modalTitle).toBe('Publish Certificate');
+    expect(component.confirmButtonText).toBe('Publish Certificate');
+    expect(component.confirmationText).toContain('publish it now');
+    expect(component.disabledText).toContain('Publish Certificate');
+  });
+
+  it('should expose update copy for an available certificate', () => {
+    component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+    component.currentAsyncStatus =
+      CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE;
 
     expect(component.modalTitle).toBe('Update Certificate');
     expect(component.confirmButtonText).toBe('Update Certificate');

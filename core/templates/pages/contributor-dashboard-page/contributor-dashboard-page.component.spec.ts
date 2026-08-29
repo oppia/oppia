@@ -26,16 +26,27 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ContributorDashboardPageComponent} from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
+import {EntityTypeSelectorComponent} from './entity-type-selector/entity-type-selector.component';
 import {ContributionAndReviewService} from './services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UserInfo} from 'domain/user/user-info.model';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableTranslationOppsWithNewOppModels: {
+      isEnabled: true,
+    },
+  };
+}
 
 describe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
@@ -45,6 +56,7 @@ describe('Contributor dashboard page', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
@@ -58,9 +70,13 @@ describe('Contributor dashboard page', () => {
   let contributionAndReviewService: ContributionAndReviewService;
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [ContributorDashboardPageComponent],
+      declarations: [
+        ContributorDashboardPageComponent,
+        EntityTypeSelectorComponent,
+      ],
       providers: [
         LocalStorageService,
         UserService,
@@ -68,6 +84,10 @@ describe('Contributor dashboard page', () => {
         TranslationTopicService,
         ContributionOpportunitiesService,
         ContributionAndReviewService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -335,6 +355,99 @@ describe('Contributor dashboard page', () => {
       component.onTabClick(changedTab);
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
+    });
+
+    it('should change active entity type when clicking on entity type selector', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      expect(component.activeEntityType).toBe(
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+      );
+
+      component.onChangeEntityType(AppConstants.ENTITY_TYPE.SKILL);
+
+      expect(component.activeEntityType).toBe(AppConstants.ENTITY_TYPE.SKILL);
+    });
+
+    it('should show entity type selector based on active tab and feature flag', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('translate_content');
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      expect(component.activeTabName).toBe('myContributionTab');
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      component.onTabClick('translateTextTab');
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+      expect(component.showEntityTypeSelector()).toBe(false);
+    });
+
+    it('should show the entity type selector on the Translate Text tab whatever was last viewed', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      // The Translate Text tab lists only translation opportunities, so it is
+      // filterable no matter which list the user came from.
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('add_question');
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+
+      component.onTabClick('translateTextTab');
+
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    });
+
+    it('should hide entity type selector for question suggestions', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      const activeSuggestionTypeSpy = spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      );
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+
+      // Question contributions and question reviews are both shown inside the
+      // My Contributions tab, and neither can be filtered by entity type.
+      component.onTabClick('myContributionTab');
+      activeSuggestionTypeSpy.and.returnValue('add_question');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      activeSuggestionTypeSpy.and.returnValue('translate_content');
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      // The accomplishments pages show contribution stats and badges rather
+      // than a list of suggestions, so there is nothing to filter there.
+      activeSuggestionTypeSpy.and.returnValue('stats');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      activeSuggestionTypeSpy.and.returnValue('badges');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      // The Submit Question tab has no entity type filter either.
+      activeSuggestionTypeSpy.and.returnValue('translate_content');
+      component.onTabClick('submitQuestionTab');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
     });
 
     it('should show topic selector for questions reviews', () => {

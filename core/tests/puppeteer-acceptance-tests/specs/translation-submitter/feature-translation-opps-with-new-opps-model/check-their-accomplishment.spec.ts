@@ -19,7 +19,6 @@
  * TS.CD.02 Check their accomplishment.
  */
 
-import path from 'path';
 import testConstants from '../../../utilities/common/test-constants';
 import {UserFactory} from '../../../utilities/common/user-factory';
 import {Contributor} from '../../../utilities/user/contributor';
@@ -98,19 +97,19 @@ describe('Translation Submitter V2', function () {
       'Cutting the Pies',
       'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
@@ -138,7 +137,7 @@ describe('Translation Submitter V2', function () {
     );
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterAccomplishment',
-      path.join(__dirname, '..')
+      __dirname
     );
     await translationSubmitter.expectContributionTableToContainRow([
       null, // Date can't be compared as it will be different every time.
@@ -156,7 +155,7 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.navigateToTabInMyContributions('Badges');
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterBadges',
-      path.join(__dirname, '..')
+      __dirname
     );
     await translationSubmitter.expectBadgesToContain(
       '1',

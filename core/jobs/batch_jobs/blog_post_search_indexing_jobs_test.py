@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import math
 
 from core import utils
@@ -65,7 +64,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()
@@ -100,7 +99,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             )
 
     def test_indexes_non_deleted_models(self) -> None:
-        date_time_now = datetime.datetime.utcnow()
+        date_time_now = utils.get_current_utc_datetime()
         for i in range(5):
             blog_summary = self.create_model(
                 blog_models.BlogPostSummaryModel,
@@ -164,7 +163,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()
@@ -219,7 +218,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()

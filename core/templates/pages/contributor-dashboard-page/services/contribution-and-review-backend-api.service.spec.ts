@@ -23,6 +23,7 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {AppConstants} from 'app.constants';
 import {ContributionAndReviewBackendApiService} from './contribution-and-review-backend-api.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('Contribution and review backend API service', () => {
   let carbas: ContributionAndReviewBackendApiService;
@@ -97,10 +98,12 @@ describe('Contribution and review backend API service', () => {
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
-    it('should fetch submitted translation suggestions', fakeAsync(() => {
+    it('should fetch submitted translation suggestions of every target type when none is given', fakeAsync(() => {
       spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
+      // No target type filter means suggestions of every entity type, which
+      // the endpoint expresses with the "all" sentinel.
       const url =
-        '/getsubmittedsuggestions/exploration/translate_content' +
+        '/getsubmittedsuggestions/all/translate_content' +
         '?limit=10&offset=0&sort_key=Date';
 
       carbas
@@ -119,7 +122,7 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchSubmittedSuggestionsAsync).toHaveBeenCalledWith(
-        'exploration',
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
         'translate_content',
         AppConstants.OPPORTUNITIES_PAGE_SIZE,
         0,
@@ -166,8 +169,8 @@ describe('Contribution and review backend API service', () => {
     it('should fetch reviewable suggestions from exp1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url =
-        '/getreviewablesuggestions/exploration/translate_content' +
-        '?offset=0&sort_key=Date&exploration_id=exp1';
+        '/getreviewablesuggestions/all/translate_content' +
+        '?offset=0&sort_key=Date&entity_id=exp1';
 
       carbas
         .fetchSuggestionsAsync(
@@ -185,12 +188,47 @@ describe('Contribution and review backend API service', () => {
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync).toHaveBeenCalledWith(
-        'exploration',
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
         'translate_content',
         null,
         0,
         'Date',
         explorationId,
+        null
+      );
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should fetch reviewable suggestions for a single target type', fakeAsync(() => {
+      spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+      const url =
+        '/getreviewablesuggestions/skill/translate_content' +
+        '?offset=0&sort_key=Date&entity_id=skill1';
+
+      carbas
+        .fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'skill1',
+          null,
+          AppConstants.ENTITY_TYPE.SKILL
+        )
+        .then(successHandler, failureHandler);
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(suggestionsBackendObject);
+      flushMicrotasks();
+
+      expect(carbas.fetchReviewableSuggestionsAsync).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'translate_content',
+        null,
+        0,
+        'Date',
+        'skill1',
         null
       );
       expect(successHandler).toHaveBeenCalled();
@@ -244,7 +282,7 @@ describe('Contribution and review backend API service', () => {
     const putBody = {
       action: 'accept',
       review_message: 'test review message',
-      skill_difficulty: 'easy',
+      skill_difficulty: 0.3,
     };
 
     carbas

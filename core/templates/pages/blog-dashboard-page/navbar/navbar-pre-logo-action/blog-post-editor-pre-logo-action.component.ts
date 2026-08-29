@@ -20,10 +20,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import './blog-post-editor-pre-logo-action.component.css';
 
 @Component({
   selector: 'oppia-blog-post-editor-pre-logo-action',
   templateUrl: './blog-post-editor-pre-logo-action.component.html',
+  styleUrls: ['./blog-post-editor-pre-logo-action.component.css'],
 })
 export class BlogPostEditorNavbarPreLogoActionComponent
   implements OnInit, OnDestroy
@@ -46,5 +48,9 @@ export class BlogPostEditorNavbarPreLogoActionComponent
 
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
+  }
+
+  navigateToMainTab(): void {
+    this.blogDashboardPageService.navigateToMainTab();
   }
 }

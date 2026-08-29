@@ -155,8 +155,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         )
 
         # Yield entity voiceovers to main output.
-        for entity_voiceovers in entity_voiceovers_list:
-            yield entity_voiceovers
+        yield from entity_voiceovers_list
 
         # Yield status string to tagged side output.
         yield beam.pvalue.TaggedOutput('status', status_string)

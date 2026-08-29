@@ -29,13 +29,25 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
-
 import './topic-lesson-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
+const LESSON_THUMBNAIL_ALT_TEXT_PREFIX = 'Lesson thumbnail for ';
+const DEFAULT_LESSON_THUMBNAIL_ALT_TEXT = 'Lesson thumbnail';
+const STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_PREFIX =
+  'This story is still in ';
+const STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_SUFFIX =
+  ', but you can still play it!';
+const STORY_PLAYBACK_LANGUAGE_MESSAGE_PREFIX = 'The story will be played in ';
+
+export type LessonProgressStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'completed'
+  | 'coming_soon';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -43,15 +55,16 @@ const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   styleUrls: ['./topic-lesson-card.component.css'],
 })
 export class TopicLessonCardComponent implements OnInit, OnChanges {
+  @Input() lessonNumber: number = 1;
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
-  @Input() lessonProgressStatus:
-    | 'not_started'
-    | 'in_progress'
-    | 'completed'
-    | 'coming_soon' = 'not_started';
+  @Input() studyUrl: string = '';
+  @Input() practiceUrl: string = '';
+  @Input() adventureAccentColor: string = '#00645c';
+  @Input() isActiveLesson: boolean = false;
+  @Input() lessonProgressStatus: LessonProgressStatus = 'not_started';
   @Input() totalCheckpointsCount: number = 0;
   @Input() visitedCheckpointsCount: number = 0;
   @Input() availableTextLanguageCodes: string[] = [];
@@ -59,10 +72,15 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() availableVoiceoverLanguageAccentDescriptions: {
     [accentCode: string]: string;
   } = {};
+  @Input() isNewLessonLabelVisible: boolean = false;
+  @Input() isComingSoonSectionCard: boolean = false;
+  @Input() navigatedLessonNumber: number | null = null;
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
+  isExpanded: boolean = false;
+  private previousLessonProgressStatus: LessonProgressStatus = 'not_started';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -76,6 +94,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
+    // Expand the first lesson by default, or the navigated lesson.
+    this.isExpanded =
+      !this.isComingSoonSectionCard &&
+      (this.navigatedLessonNumber === this.lessonNumber ||
+        (this.lessonNumber === 1 && this.lessonProgressStatus !== 'completed'));
+    this.previousLessonProgressStatus = this.lessonProgressStatus;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,6 +108,28 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       changes.availableVoiceoverLanguageCodes
     ) {
       this.initializeLanguageSelection();
+    }
+    if (changes.navigatedLessonNumber) {
+      // Auto-expand this lesson if it's the navigated lesson from the navbar.
+      if (
+        !this.isComingSoonSectionCard &&
+        this.navigatedLessonNumber === this.lessonNumber
+      ) {
+        this.isExpanded = true;
+      }
+    }
+
+    if (changes.lessonProgressStatus) {
+      const currentStatus = changes.lessonProgressStatus
+        .currentValue as LessonProgressStatus;
+      if (
+        currentStatus === 'completed' &&
+        this.previousLessonProgressStatus !== 'completed' &&
+        !this.isComingSoonSectionCard
+      ) {
+        this.isExpanded = false;
+      }
+      this.previousLessonProgressStatus = currentStatus;
     }
   }
 
@@ -94,6 +140,14 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
   }
 
+  get isComingSoonLesson(): boolean {
+    return this.lessonProgressStatus === 'coming_soon';
+  }
+
+  get isCompletedLesson(): boolean {
+    return this.lessonProgressStatus === 'completed';
+  }
+
   navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
@@ -101,11 +155,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onStartButtonClick(): void {
-    if (!this.startUrl) {
+    if (!this.startUrl || this.isComingSoonLesson) {
       return;
     }
 
-    if (!this.shouldShowFallbackCta() || !this.selectedTextLanguageCode) {
+    if (!this.selectedTextLanguageCode) {
       this.navigateTo(this.startUrl);
       return;
     }
@@ -116,6 +170,31 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
         this.selectedVoiceoverLanguageCode
       )
     );
+  }
+
+  onPracticeButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
+    this.navigateTo(this.practiceUrl || this.startUrl);
+  }
+
+  onStudyButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
+    this.navigateTo(this.studyUrl || this.startUrl);
+  }
+
+  toggleExpanded(): void {
+    if (this.isComingSoonSectionCard) {
+      return;
+    }
+    this.isExpanded = !this.isExpanded;
+  }
+
+  onPlayAgainClick(): void {
+    this.onStartButtonClick();
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {
@@ -163,19 +242,21 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
     if (this.isLessonUnavailableInPreferredLanguage()) {
       return (
-        'This story is still in ' +
+        STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_PREFIX +
         selectedLanguageDescription +
-        ', but you can still play it!'
+        STORY_NOT_IN_PREFERRED_LANGUAGE_MESSAGE_SUFFIX
       );
     }
 
-    return 'The story will be played in ' + selectedLanguageDescription + '.';
+    return (
+      STORY_PLAYBACK_LANGUAGE_MESSAGE_PREFIX + selectedLanguageDescription + '.'
+    );
   }
 
   getThumbnailAltText(): string {
     return this.lessonTitle
-      ? 'Lesson thumbnail for ' + this.lessonTitle
-      : 'Lesson thumbnail';
+      ? LESSON_THUMBNAIL_ALT_TEXT_PREFIX + this.lessonTitle
+      : DEFAULT_LESSON_THUMBNAIL_ALT_TEXT;
   }
 
   private initializeLanguageSelection(): void {

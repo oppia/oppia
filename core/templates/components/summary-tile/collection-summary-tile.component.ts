@@ -26,10 +26,12 @@ import {UserService} from 'services/user.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UrlService} from 'services/contextual/url.service';
 import {Subscription} from 'rxjs';
+import './collection-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
+  styleUrls: ['./collection-summary-tile.component.css'],
 })
 export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

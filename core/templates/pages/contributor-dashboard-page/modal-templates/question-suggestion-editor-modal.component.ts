@@ -39,10 +39,12 @@ import {QuestionSuggestionBackendApiService} from 'pages/contributor-dashboard-p
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import './question-suggestion-editor-modal.component.css';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
   templateUrl: './question-suggestion-editor-modal.component.html',
+  styleUrls: ['./question-suggestion-editor-modal.component.css'],
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal

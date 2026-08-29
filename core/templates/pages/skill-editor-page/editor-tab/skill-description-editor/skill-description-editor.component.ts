@@ -30,10 +30,12 @@ import {Skill} from 'domain/skill/skill.model';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 import {ValidatorsService} from 'services/validators.service';
+import './skill-description-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-description-editor',
   templateUrl: './skill-description-editor.component.html',
+  styleUrls: ['./skill-description-editor.component.css'],
 })
 export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveDescription = new EventEmitter<void>();

@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './delete-learner-group-modal.component.css';
 
 @Component({
   selector: 'oppia-delete-learner-group-modal',
   templateUrl: './delete-learner-group-modal.component.html',
+  styleUrls: ['./delete-learner-group-modal.component.css'],
 })
 export class DeleteLearnerGroupModalComponent extends ConfirmOrCancelModal {
   learnerGroupTitle!: string;

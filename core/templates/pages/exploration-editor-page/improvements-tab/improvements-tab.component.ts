@@ -30,10 +30,12 @@ import {
   StateTasks,
 } from 'services/exploration-improvements-task-registry.service';
 import {RouterService} from '../services/router.service';
+import './improvements-tab.component.css';
 
 @Component({
   selector: 'oppia-improvements-tab',
   templateUrl: './improvements-tab.component.html',
+  styleUrls: ['./improvements-tab.component.css'],
 })
 export class ImprovementsTabComponent implements OnInit {
   stateRetentions!: Map<string, number>;

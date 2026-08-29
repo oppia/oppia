@@ -24,6 +24,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import './add-misconception-modal.component.css';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -33,6 +34,7 @@ interface MisconceptionFormSchema {
 @Component({
   selector: 'oppia-add-misconception-modal',
   templateUrl: './add-misconception-modal.component.html',
+  styleUrls: ['./add-misconception-modal.component.css'],
 })
 export class AddMisconceptionModalComponent
   extends ConfirmOrCancelModal

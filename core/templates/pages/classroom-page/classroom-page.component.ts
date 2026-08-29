@@ -65,6 +65,7 @@ export class ClassroomPageComponent implements OnDestroy {
   firstTopicUrl: string = '';
   publicClassroomsCount!: number;
   showPrivateClassroomBanner: boolean = false;
+  isUserLoggedIn: boolean = false;
   classroomThumbnail = '';
   classroomBanner = '';
   classroomTranslationKeys!: ClassroomTranslationKeys;
@@ -178,9 +179,11 @@ export class ClassroomPageComponent implements OnDestroy {
       }
       try {
         const userInfo = await this.userService.getUserInfoAsync();
+        this.isUserLoggedIn = userInfo.isLoggedIn();
         this.showPrivateClassroomBanner =
           userInfo.isCurriculumAdmin() && !this.classroomData.getIsPublished();
       } catch {
+        this.isUserLoggedIn = false;
         this.showPrivateClassroomBanner = false;
       }
       this.loaderService.hideLoadingScreen();

@@ -31,6 +31,11 @@ import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {MaterialModule} from 'modules/material.module';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 describe('Select Skill Modal', () => {
   let fixture: ComponentFixture<SelectSkillModalComponent>;
@@ -207,5 +212,93 @@ describe('Select Skill Modal', () => {
     const secondUndefinedCall =
       componentInstance.untriagedSkillSummariesForSelector;
     expect(secondUndefinedCall).toBe(undefinedCall);
+  });
+});
+
+describe('Select Skill Modal in bottom sheet mode', () => {
+  let fixture: ComponentFixture<SelectSkillModalComponent>;
+  let componentInstance: SelectSkillModalComponent;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let shortSkillSummary: ShortSkillSummary =
+    ShortSkillSummary.createFromBackendDict({
+      skill_id: '3',
+      skill_description: 'description3',
+    });
+  let skillSummaryBackendDict: SkillSummaryBackendDict = {
+    id: '3',
+    description: 'description3',
+    language_code: 'language_code',
+    version: 1,
+    misconception_count: 0,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 3,
+  };
+  let categorizedSkills: CategorizedSkills = {
+    'Dummy Topic': {
+      Subtopic1: [shortSkillSummary],
+      uncategorized: [],
+    },
+  };
+
+  const configureWithData = (data: object) => {
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(
+      new Subject<KeyboardEvent>().asObservable()
+    );
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [
+        MatCardModule,
+        MatRadioModule,
+        MatCheckboxModule,
+        MaterialModule,
+        FormsModule,
+        HttpClientTestingModule,
+      ],
+      declarations: [SelectSkillModalComponent, SkillSelectorComponent],
+      providers: [
+        NgbActiveModal,
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {provide: MAT_BOTTOM_SHEET_DATA, useValue: data},
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(SelectSkillModalComponent);
+    componentInstance = fixture.componentInstance;
+  };
+
+  it('should set properties from the injected bottom sheet data', () => {
+    configureWithData({
+      categorizedSkills: categorizedSkills,
+      skillsInSameTopicCount: 3,
+      skillSummaries: [skillSummaryBackendDict],
+      untriagedSkillSummaries: [skillSummaryBackendDict],
+      allowSkillsFromOtherTopics: true,
+      associatedSkillSummaries: [shortSkillSummary],
+    });
+
+    expect(componentInstance.categorizedSkills).toEqual(categorizedSkills);
+    expect(componentInstance.skillsInSameTopicCount).toBe(3);
+    expect(componentInstance.allowSkillsFromOtherTopics).toBe(true);
+    expect(componentInstance.associatedSkillSummaries).toEqual([
+      shortSkillSummary,
+    ]);
+  });
+
+  it('should not set associated skill summaries when absent from data', () => {
+    configureWithData({
+      categorizedSkills: categorizedSkills,
+      skillsInSameTopicCount: 3,
+      skillSummaries: [skillSummaryBackendDict],
+      untriagedSkillSummaries: [skillSummaryBackendDict],
+      allowSkillsFromOtherTopics: false,
+    });
+
+    expect(componentInstance.allowSkillsFromOtherTopics).toBe(false);
+    expect(componentInstance.associatedSkillSummaries).toBeUndefined();
   });
 });

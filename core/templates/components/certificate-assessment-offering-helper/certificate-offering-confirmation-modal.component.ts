@@ -20,18 +20,24 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
+  CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CertificateOfferingConfirmationAction,
+  CertificateOfferingAsyncStatus,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
+import './certificate-offering-confirmation-modal.component.css';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',
   templateUrl: './certificate-offering-confirmation-modal.component.html',
+  styleUrls: ['./certificate-offering-confirmation-modal.component.css'],
 })
 export class CertificateOfferingConfirmationModalComponent {
   @Input() action: CertificateOfferingConfirmationAction =
     CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
+  @Input() currentAsyncStatus: CertificateOfferingAsyncStatus =
+    CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY;
   @Input() isCertificateValid: boolean = false;
 
   constructor(private ngbActiveModal: NgbActiveModal) {}
@@ -49,26 +55,33 @@ export class CertificateOfferingConfirmationModalComponent {
   }
 
   get modalTitle(): string {
-    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
-      ? 'Save Certificate'
-      : 'Update Certificate';
+    return this.isPublishedCertificate()
+      ? 'Update Certificate'
+      : 'Publish Certificate';
   }
 
   get confirmButtonText(): string {
-    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
-      ? 'Create Certificate'
-      : 'Update Certificate';
+    return this.isPublishedCertificate()
+      ? 'Update Certificate'
+      : 'Publish Certificate';
   }
 
   get confirmationText(): string {
-    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
-      ? 'Choose whether to save this certificate as not ready or create it now.'
-      : 'Choose whether to save this certificate as not ready or update it now.';
+    return this.isPublishedCertificate()
+      ? 'Choose whether to save this certificate as not ready or update it now.'
+      : 'Choose whether to save this certificate as not ready or publish it now.';
   }
 
   get disabledText(): string {
-    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
-      ? 'Create Certificate is disabled until validation passes.'
-      : 'Update Certificate is disabled until validation passes.';
+    return this.isPublishedCertificate()
+      ? 'Update Certificate is disabled until validation passes.'
+      : 'Publish Certificate is disabled until validation passes.';
+  }
+
+  private isPublishedCertificate(): boolean {
+    return (
+      this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE &&
+      this.currentAsyncStatus === CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE
+    );
   }
 }

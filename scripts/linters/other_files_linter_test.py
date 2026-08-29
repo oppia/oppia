@@ -400,6 +400,196 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             ).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
 
+    def test_check_duplicate_method_names_in_user_utilities_no_duplicates(
+        self,
+    ) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'logged-in-user.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async addHint(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('logged-in-user.ts'):
+                return '\n'.join(
+                    [
+                        'export class LoggedInUser extends BaseUser {',
+                        '  async expectToBeOnPage(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'SUCCESS  Duplicate method names in user utilities check passed'
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertFalse(task_results.failed)
+
+    def test_check_duplicate_method_names_in_user_utilities_with_duplicates(
+        self,
+    ) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'logged-out-user.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async continueToNextCard(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('logged-out-user.ts'):
+                return '\n'.join(
+                    [
+                        'export class LoggedOutUser extends BaseUser {',
+                        '  async continueToNextCard(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'Method "continueToNextCard" is defined in multiple user '
+            'utility files: exploration-editor.ts, logged-out-user.ts. '
+            'Rename to disambiguate, following the convention '
+            '{action}In{PageContext}Page.',
+            'FAILED  Duplicate method names in user utilities check failed',
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertTrue(task_results.failed)
+
+    def test_check_duplicate_method_names_in_user_utilities_ignores_non_ts(
+        self,
+    ) -> None:
+        """Non-.ts files in the directory (e.g. the duplicate-functions
+        report itself) must not be scanned for method names.
+        """
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['exploration-editor.ts', 'duplicate-functions.md']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('exploration-editor.ts'):
+                return '\n'.join(
+                    [
+                        'export class ExplorationEditor extends BaseUser {',
+                        '  async addHint(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            'SUCCESS  Duplicate method names in user utilities check passed'
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+            self.assertEqual(task_results.get_report(), expected)
+        self.assertFalse(task_results.failed)
+
+    def test_check_duplicate_method_names_flags_private_methods_too(
+        self,
+    ) -> None:
+        """Edge case: two different classes with a same-named private
+        method should still be flagged, since the check is name-based
+        across files rather than access-modifier-aware.
+        """
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['curriculum-admin.ts', 'topic-manager.ts']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('curriculum-admin.ts'):
+                return '\n'.join(
+                    [
+                        'export class CurriculumAdmin extends BaseUser {',
+                        '  private async waitForSave(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            elif path.endswith('topic-manager.ts'):
+                return '\n'.join(
+                    [
+                        'export class TopicManager extends BaseUser {',
+                        '  private async waitForSave(): Promise<void> {}',
+                        '}',
+                    ]
+                )
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path
+            )
+
+        listdir_swap = self.swap_with_checks(
+            os,
+            'listdir',
+            mock_listdir,
+            expected_args=[(other_files_linter.PLAYWRIGHT_USER_UTILITIES_DIR,)],
+        )
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_duplicate_method_names_in_user_utilities()
+        self.assertTrue(task_results.failed)
+        self.assertTrue(
+            any(
+                'waitForSave' in message
+                for message in task_results.get_report()
+            )
+        )
+
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(
             FILE_CACHE

@@ -21,21 +21,6 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 import {AppConstants} from 'app.constants';
 
-type nodeAttr =
-  | 'style'
-  | 'about'
-  | 'class'
-  | 'content'
-  | 'datatype'
-  | 'id'
-  | 'lang'
-  | 'property'
-  | 'rel'
-  | 'resource'
-  | 'rev'
-  | 'tabindex'
-  | 'typeof';
-
 type keyOfSvgAttrsAllowlist = keyof typeof AppConstants.SVG_ATTRS_ALLOWLIST;
 
 @Injectable({
@@ -142,9 +127,9 @@ export class SvgSanitizerService {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
           if (
-            AppConstants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
-              nodeAttrName as nodeAttr
-            ) === -1
+            (
+              AppConstants.SVG_ATTRS_ALLOWLIST[nodeTagName] as readonly string[]
+            ).indexOf(nodeAttrName) === -1
           ) {
             invalidAttrs.push(node.tagName + ':' + node.attributes[i].name);
           }

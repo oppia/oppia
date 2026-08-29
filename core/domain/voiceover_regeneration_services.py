@@ -348,9 +348,9 @@ def synthesize_voiceover_for_html_string(
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
     is_cached_model_used_for_voiceovers = False
+    error_details = None
 
     if cached_model is not None:
-        error_details = None
         try:
             if cached_model.plaintext == parsed_text:
                 audio_offset_list = cached_model.audio_offset_list

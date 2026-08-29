@@ -114,7 +114,7 @@
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
-                     [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
+                     [ngModelOptions]="{ updateOn: 'change', standalone: true }"
                      aria-label="Search bar"
                      (keydown.enter)="onSearchQueryChangeExec()">
             </div>

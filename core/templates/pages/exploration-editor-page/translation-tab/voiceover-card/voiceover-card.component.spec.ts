@@ -25,7 +25,12 @@ import {
   discardPeriodicTasks,
   waitForAsync,
 } from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
+import {
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  EventEmitter,
+  PipeTransform,
+} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {PageContextService} from 'services/page-context.service';
@@ -51,7 +56,7 @@ import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-j
 import {StateBackendDict} from 'domain/state/state.model';
 
 @Pipe({name: 'formatTime'})
-class MockFormatTimePipe {
+class MockFormatTimePipe implements PipeTransform {
   transform(value: number): string {
     return String(value);
   }

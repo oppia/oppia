@@ -44,7 +44,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
-(story_models, user_models) = models.Registry.import_models(
+story_models, user_models = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER]
 )
 

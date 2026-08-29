@@ -67,7 +67,6 @@ import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
-import {LearnerDashboardIconsComponent} from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import {OutcomeEditorComponent} from './state-directives/outcome-editor/outcome-editor.component';
 import {OutcomeFeedbackEditorComponent} from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import {OnScreenKeyboardComponent} from './on-screen-keyboard/on-screen-keyboard.component';
@@ -369,7 +368,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     UploadActivityModalComponent,
-    LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
     QuestionMisconceptionSelectorComponent,
@@ -544,7 +542,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TagMisconceptionModalComponent,
-    LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
     AddHintModalComponent,
@@ -731,7 +728,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     UploadActivityModalComponent,
     SummarizeNonnegativeNumberPipe,
     SavePendingChangesModalComponent,
-    LearnerDashboardIconsComponent,
     AddOrUpdateSolutionModalComponent,
     AddOutcomeModalComponent,
     QuestionMisconceptionSelectorComponent,

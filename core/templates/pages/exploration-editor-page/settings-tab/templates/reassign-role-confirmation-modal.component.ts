@@ -19,10 +19,12 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './reassign-role-confirmation-modal.component.css';
 
 @Component({
   selector: 'oppia-remove-role-confirmation-modal',
   templateUrl: './reassign-role-confirmation-modal.component.html',
+  styleUrls: ['./reassign-role-confirmation-modal.component.css'],
 })
 export class ReassignRoleConfirmationModalComponent extends ConfirmOrCancelModal {
   @Input() username!: string;

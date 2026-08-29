@@ -23,16 +23,6 @@ core/templates/components/version-diff-visualization/version-diff-visualization.
 core/templates/pages/about-page/about-page.component.ts
 core/templates/pages/about-page/cta-section/cta-section.component.ts
 core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.ts
-core/templates/pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component.ts
-core/templates/pages/android-page/android-page.component.ts
-core/templates/pages/blog-admin-page/blog-admin-page.component.ts
-core/templates/pages/blog-author-profile-page/blog-author-profile-page.component.ts
-core/templates/pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component.ts
-core/templates/pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component.ts
-core/templates/pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component.ts
-core/templates/pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts
-core/templates/pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts
-core/templates/pages/blog-home-page/blog-home-page.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts

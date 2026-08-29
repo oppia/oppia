@@ -21,6 +21,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AssignedSkill} from 'domain/skill/assigned-skill.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import './unassign-skill-from-topics-modal.component.css';
 import {
   TopicsAndSkillsDashboardBackendApiService,
   TopicIdToDiagnosticTestSkillIdsResponse,
@@ -39,6 +40,7 @@ export interface TopicNameToTopicAssignments {
 @Component({
   selector: 'oppia-unassign-skill-from-topics-modal',
   templateUrl: './unassign-skill-from-topics-modal.component.html',
+  styleUrls: ['./unassign-skill-from-topics-modal.component.css'],
 })
 export class UnassignSkillFromTopicsModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
