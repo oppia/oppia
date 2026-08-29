@@ -24,7 +24,7 @@ import uuid
 
 from core import feconf, schema_utils
 from core.constants import constants
-from core.domain import exp_domain, exp_services
+from core.domain import beam_job_services, exp_domain, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
@@ -736,6 +736,56 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             retrieved_language_codes_mapping, language_codes_mapping
         )
+
+
+class LanguageAccentCodeToBeamJobRunServicesTests(test_utils.GenericTestBase):
+    def test_save_language_accent_code_to_beam_job_run_model(self) -> None:
+        voiceover_services.save_language_accent_code_to_beam_job_run_model(
+            'en-US', 'beam-job-run-id'
+        )
+
+        model = voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+            'en-US'
+        )
+        assert model is not None
+        self.assertEqual(model.language_accent_code, 'en-US')
+        self.assertEqual(model.beam_job_run_id, 'beam-job-run-id')
+
+    def test_get_language_accent_code_to_beam_job_run_status(
+        self,
+    ) -> None:
+        en_us_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        en_us_beam_job_run_model.latest_job_state = 'RUNNING'
+        en_us_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'en-US', en_us_beam_job_run_model.id
+        ).put()
+
+        hi_in_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        hi_in_beam_job_run_model.latest_job_state = 'FAILED'
+        hi_in_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'hi-IN', hi_in_beam_job_run_model.id
+        ).put()
+
+        status = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
+        )
+
+        self.assertDictEqual(status, {'en-US': 'RUNNING', 'hi-IN': 'FAILED'})
+
+    def test_get_language_accent_code_to_beam_job_run_status_when_missing(
+        self,
+    ) -> None:
+        status = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
+        )
+
+        self.assertDictEqual(status, {})
 
     def test_get_and_set_azure_config_for_automatic_voiceovers(self) -> None:
         voiceover_autogeneration_policy_model = (

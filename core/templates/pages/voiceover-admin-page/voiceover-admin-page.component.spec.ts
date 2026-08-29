@@ -113,6 +113,8 @@ describe('Voiceover Admin Page component ', () => {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      autoGeneratableLanguageAccentCodes: ['en-US'],
+      languageAccentCodeToBeamJobState: {},
     };
     spyOn(
       voiceoverBackendApiService,
@@ -271,6 +273,26 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       component.isAutogenerationSupportedByCloudService('en-IN')
     ).toBeFalsy();
+  });
+
+  it('should return the icon for a Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'FAILED'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('error');
+    expect(component.getBeamJobStateTooltip('en-US')).toBe(
+      'Voiceover synthesis job: FAILED'
+    );
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe(null);
+  });
+
+  it('should hide the icon for completed Beam job states', () => {
+    component.languageAccentCodeToBeamJobState = {
+      'en-US': 'DONE',
+      'hi-IN': 'UPDATED',
+    };
+
+    expect(component.getBeamJobStateIcon('en-US')).toBeNull();
+    expect(component.getBeamJobStateIcon('hi-IN')).toBeNull();
   });
 
   it('should be able to update cloud supported language accent codes', fakeAsync(() => {

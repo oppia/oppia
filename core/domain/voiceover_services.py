@@ -47,17 +47,67 @@ from typing import Dict, List, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, voiceover_models
+    from mypy_imports import beam_job_models, exp_models, voiceover_models
 
 (
+    beam_job_models,
     exp_models,
     voiceover_models,
 ) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.VOICEOVER]
+    [models.Names.BEAM_JOB, models.Names.EXPLORATION, models.Names.VOICEOVER]
 )
 
 
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
+
+
+def save_language_accent_code_to_beam_job_run_model(
+    language_accent_code: str, beam_job_run_id: str
+) -> None:
+    """Saves the Beam job run ID for a language-accent code."""
+    language_accent_code_to_beam_job_run_model = (
+        gae_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            language_accent_code, beam_job_run_id
+        )
+    )
+    language_accent_code_to_beam_job_run_model.put()
+
+
+def get_language_accent_code_to_beam_job_run_status() -> Dict[str, str]:
+    """Returns the Beam job state for each language-accent code."""
+    language_accent_code_to_beam_job_run_models = (
+        gae_models.LanguageAccentCodeToBeamJobRunModel.query().fetch()
+    )
+    language_accent_code_to_status: Dict[str, str] = {}
+    completed_models_to_delete = []
+
+    for (
+        language_accent_code_to_beam_job_run_model
+    ) in language_accent_code_to_beam_job_run_models:
+        beam_job_run_model = beam_job_models.BeamJobRunModel.get(
+            language_accent_code_to_beam_job_run_model.beam_job_run_id,
+            strict=False,
+        )
+        if beam_job_run_model is not None:
+            language_accent_code_to_status[
+                language_accent_code_to_beam_job_run_model.language_accent_code
+            ] = beam_job_run_model.latest_job_state
+
+            # Once voiceover generation has finished, we no longer need to
+            # track the beam job run for the language-accent code.
+            if (
+                beam_job_run_model.latest_job_state
+                == beam_job_models.BeamJobState.DONE.value
+            ):
+                completed_models_to_delete.append(
+                    language_accent_code_to_beam_job_run_model
+                )
+
+    gae_models.LanguageAccentCodeToBeamJobRunModel.delete_multi(
+        completed_models_to_delete
+    )
+
+    return language_accent_code_to_status
 
 
 def get_entity_voiceovers_from_model(

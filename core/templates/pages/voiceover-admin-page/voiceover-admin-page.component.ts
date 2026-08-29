@@ -29,6 +29,7 @@ import {
   LanguageCodesMapping,
   LanguageAccentMasterList,
   LanguageAccentCodesToSupportsAutogeneration,
+  LanguageAccentCodeToBeamJobState,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
 import {NativeDateAdapter} from '@angular/material/core';
@@ -70,6 +71,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
   languageAccentCodesToSupportsAutogeneration!: LanguageAccentCodesToSupportsAutogeneration;
+  languageAccentCodeToBeamJobState!: LanguageAccentCodeToBeamJobState;
   availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
@@ -128,6 +130,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageAccentCodesToDescriptionsMasterList = {};
         this.availableLanguageAccentDescriptionsToCodes = {};
         this.languageAccentCodesToSupportsAutogeneration = {};
+        this.languageAccentCodeToBeamJobState =
+          response.languageAccentCodeToBeamJobState;
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList
         );
@@ -219,6 +223,59 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
     return this.cloudSupportedLanguageAccentCodes?.includes(languageAccentCode);
+  }
+
+  getBeamJobStateIcon(languageAccentCode: string): string | null {
+    switch (this.languageAccentCodeToBeamJobState[languageAccentCode]) {
+      case 'RUNNING':
+        return 'run_circle';
+      case 'PENDING':
+      case 'CANCELLING':
+        return 'pending';
+      case 'STOPPED':
+        return 'pause_circle';
+      case 'CANCELLED':
+        return 'cancel';
+      case 'DRAINING':
+        return 'hourglass_top';
+      case 'DRAINED':
+        return 'hourglass_bottom';
+      case 'UPDATED':
+      case 'DONE':
+        return null;
+      case 'FAILED':
+        return 'error';
+      case 'UNKNOWN':
+        return 'help';
+      default:
+        return null;
+    }
+  }
+
+  getBeamJobStateTooltip(languageAccentCode: string): string {
+    return 'Please re-add the language accent code to the system to trigger a new voiceover synthesis job.';
+  }
+
+  getBeamJobStateMaterialThemeColor(languageAccentCode: string): string | null {
+    switch (this.languageAccentCodeToBeamJobState[languageAccentCode]) {
+      case 'RUNNING':
+      case 'PENDING':
+      case 'STOPPED':
+      case 'DRAINING':
+        return 'accent';
+      case 'UPDATED':
+      case 'DONE':
+        return 'primary';
+      case 'FAILED':
+        return null;
+      case 'UNKNOWN':
+        return 'warn';
+      case 'CANCELLING':
+      case 'CANCELLED':
+      case 'DRAINED':
+      default:
+        return null;
+    }
   }
 
   updateSupportsAutogenerationField(
@@ -319,8 +376,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
   saveUpdatedLanguageAccentSupport(): void {
     this.voiceoverBackendApiService
       .updateVoiceoverLanguageCodesMappingAsync(this.languageCodesMapping)
-      .then(() => {
+      .then(languageAccentCodeToBeamJobState => {
+        this.languageAccentCodeToBeamJobState =
+          languageAccentCodeToBeamJobState;
         this.removeLanguageAccentDropdown();
+        this.cdr.detectChanges();
       });
   }
 

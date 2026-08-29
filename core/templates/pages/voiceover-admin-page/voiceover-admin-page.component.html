@@ -6,18 +6,20 @@
     </div>
 
     <div *ngIf="pageIsInitialized">
-      <p class="oppia-supported-language-pair-heading"
+      <p class="oppia-supported-language-pair-heading-with-no-language"
          *ngIf="!languageAccentCodeIsPresent">
         No language/accent pairs added!
       </p>
       <p class="oppia-supported-language-pair-heading"
          *ngIf="languageAccentCodeIsPresent">
-        <span class="language-accent-header">
+        <span class="language-accent-status-column-header" aria-hidden="true"></span>
+        <span class="language-accent-description-header">
           Supported language/accent pairs
         </span>
-        <span>
+        <span class="language-accent-autogeneration-header">
           Supports autogeneration?
         </span>
+        <span class="language-accent-action-header" aria-hidden="true"></span>
       </p>
     </div>
 
@@ -26,6 +28,15 @@
         <mat-list class="oppia-supported-language-list">
           <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
             <div class="oppia-language-accent-list">
+              <span class="language-accent-status-column">
+                <mat-icon *ngIf="getBeamJobStateIcon(languageAccentCodeToDescription.key) as icon"
+                          class="language-accent-job-status"
+                          [class.error-icon]="getBeamJobStateIcon(languageAccentCodeToDescription.key) === 'error'"
+                          [matTooltip]="getBeamJobStateTooltip(languageAccentCodeToDescription.key)"
+                          [color]="getBeamJobStateMaterialThemeColor(languageAccentCodeToDescription.key)">
+                  {{icon}}
+                </mat-icon>
+              </span>
               <span class="language-accent-description">
                 {{languageAccentCodeToDescription.value}}
               </span>
@@ -50,6 +61,7 @@
                 </mat-form-field>
               </span>
               <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                      class="language-accent-remove-button"
                       mat-icon-button
                       mat-button>
                 <mat-icon>close</mat-icon>
@@ -373,15 +385,33 @@
   .datepicker-form-container {
     width: 30%;
   }
-  .language-accent-header {
-    margin-right: 23%;
+  .language-accent-status-column,
+  .language-accent-status-column-header {
+    align-items: center;
+    display: flex;
+    justify-content: center;
   }
-  .language-accent-autogeneration-status {
+  .language-accent-description,
+  .language-accent-description-header {
+    min-width: 0;
+  }
+  .language-accent-autogeneration-status,
+  .language-accent-autogeneration-header {
     cursor: pointer;
-    width: 20%;
+    min-width: 0;
   }
-  .language-accent-description {
-    width: 30%;
+  .language-accent-action-header {
+    justify-self: center;
+    width: 48px;
+  }
+  .language-accent-job-status {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+  .language-accent-remove-button {
+    justify-self: center;
+    margin-left: 0;
   }
   .table-container {
     max-height: 500px;
@@ -434,8 +464,9 @@
   .oppia-language-accent-list {
     align-items: center;
     border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
+    column-gap: 8px;
+    display: grid;
+    grid-template-columns: 12% minmax(0, 44%) minmax(0, 32%) 48px;
     padding: 0 10px;
     width: -webkit-fill-available;
   }
@@ -458,12 +489,32 @@
     color: #00645c;
   }
   .oppia-supported-language-pair-heading {
+    align-items: center;
+    column-gap: 8px;
+    display: grid;
     font-weight: bold;
-    margin-left: 25px;
+    grid-template-columns: 12% minmax(0, 44%) minmax(0, 32%) 48px;
+    margin-left: 0;
+    padding: 0 10px 0 0;
+    width: 100%;
+  }
+  .oppia-supported-language-pair-heading-with-no-language {
+    align-items: center;
+    column-gap: 8px;
+    font-weight: bold;
+    grid-template-columns: 12% minmax(0, 44%) minmax(0, 32%) 48px;
+    margin-left: 0;
+    padding: 0 10px 0 0;
+    width: 100%;
   }
   .oppia-supported-language-list {
     max-height: 300px;
     overflow-y: auto;
+  }
+  /* :ng-deep is used to style Angular Material list internals. */
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .oppia-supported-language-list .mat-list-item-content {
+    padding: 0;
   }
   .mat-card.oppia-page-card {
     background: rgb(255,255,255);
@@ -492,8 +543,9 @@
   }
 
   @media (max-width: 600px) {
-    .language-accent-description {
-      width: 50%;
+    .oppia-supported-language-pair-heading,
+    .oppia-language-accent-list {
+      grid-template-columns: 14% minmax(0, 50%) minmax(0, 36%) 48px;
     }
     .oppia-supported-language-pair-heading {
       font-size: 1rem;
@@ -501,9 +553,6 @@
     }
     .oppia-long-text-card {
       padding: 8px 2px 8px 2px;
-    }
-    .language-accent-header {
-      margin-right: 0%;
     }
     .header-text {
       font-size: 1.2rem;
@@ -513,13 +562,8 @@
       font-family: inherit;
       font-size: 1rem;
       font-weight: bold;
-      gap: 8px;
-      justify-content: flex-start;
       padding: 5px 0;
       width: 100%;
-    }
-    .language-accent-autogeneration-status {
-      width: 30%;
     }
     .autogeneration-select-field {
       width: 100%;

@@ -21,6 +21,7 @@ import uuid
 
 from core import constants, feature_flag_list, feconf
 from core.domain import (
+    beam_job_services,
     cloud_task_domain,
     exp_domain,
     exp_fetchers,
@@ -70,6 +71,9 @@ class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
         )
         self.assertDictEqual(
             json_response['language_codes_mapping'], language_codes_mapping
+        )
+        self.assertDictEqual(
+            json_response['language_accent_code_to_beam_job_state'], {}
         )
 
         self.logout()
