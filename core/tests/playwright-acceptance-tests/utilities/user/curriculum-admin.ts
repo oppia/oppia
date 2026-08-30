@@ -277,7 +277,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Navigate to the question editor tab present in the skills tab.
    */
-  async navigateToSkillQuestionEditorTab(): Promise<void> {
+  async navigateToSkillQuestionEditorTabInCurriculumAdminPage(): Promise<void> {
     // If the URL hash already targets the questions tab (e.g. after a
     // page.reload() that preserves the #/questions hash inside the loop in
     // removeAllQuestionsFromTheSkill), skip the click. On desktop,
@@ -334,7 +334,7 @@ export class CurriculumAdmin extends TopicManager {
    * Open the skill editor page for a skill.
    * @param {string} skillName - The name of the skill to be opened in the editor.
    */
-  async openSkillEditor(skillName: string): Promise<void> {
+  async openSkillEditorInCurriculumAdminPage(skillName: string): Promise<void> {
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
@@ -352,7 +352,7 @@ export class CurriculumAdmin extends TopicManager {
    * Open the topic editor page for a topic.
    * @param {string} topicName - The name of the topic to be opened in the editor.
    */
-  async openTopicEditor(topicName: string): Promise<void> {
+  async openTopicEditorInCurriculumAdminPage(topicName: string): Promise<void> {
     const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
@@ -860,7 +860,7 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   async unpublishTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdminPage(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
@@ -1076,7 +1076,7 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+    await this.openSkillEditorInCurriculumAdminPage(skillName);
 
     // Register before navigating so we capture the questions-list API request
     // that fires immediately when the tab mounts.
@@ -1084,7 +1084,7 @@ export class CurriculumAdmin extends TopicManager {
       response => response.url().includes('/questions_list_handler/'),
       {timeout: 15000}
     );
-    await this.navigateToSkillQuestionEditorTab();
+    await this.navigateToSkillQuestionEditorTabInCurriculumAdminPage();
     // Angular initialises questionSummariesForOneSkill as [] and shows the
     // "no questions" placeholder before the API responds. We must wait for the
     // real API response before reading the DOM, otherwise waitForFunction finds
@@ -1148,7 +1148,7 @@ export class CurriculumAdmin extends TopicManager {
     }
     await this.addWorkedExampleRteComponent('Type the number one', '1');
     await this.clickOnElementWithSelector(confirmSkillCreationButton);
-    await this.openSkillEditor(description);
+    await this.openSkillEditorInCurriculumAdminPage(description);
     showMessage(`Skill "${description}" created from dashboard.`);
   }
 
@@ -1270,7 +1270,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string,
     addWorkedExample: boolean = false
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdminPage(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicReassignHeader);
     }

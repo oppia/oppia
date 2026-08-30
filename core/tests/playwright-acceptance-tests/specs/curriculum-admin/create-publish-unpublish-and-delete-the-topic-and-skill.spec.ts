@@ -88,7 +88,7 @@ test.describe('Curriculum Admin', function () {
       1
     );
 
-    await curriculumAdmin.openTopicEditor('Test Topic 1');
+    await curriculumAdmin.openTopicEditorInCurriculumAdminPage('Test Topic 1');
     await curriculumAdmin.expectUnpublishTopicButtonToBeVisible();
   });
 
@@ -118,7 +118,7 @@ test.describe('Curriculum Admin', function () {
   });
 
   test('should be able to delete a skill', async function () {
-    await curriculumAdmin.openSkillEditor('Test Skill 1');
+    await curriculumAdmin.openSkillEditorInCurriculumAdminPage('Test Skill 1');
     const pageURL = curriculumAdmin.page.url();
     await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
     await curriculumAdmin.deleteSkill('Test Skill 1');
