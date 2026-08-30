@@ -326,6 +326,22 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should preserve ordered list structure while wrapping list items', fakeAsync(() => {
+    let rteString =
+      '<ol><li>First item.</li><li>Second item.</li><li>Third item.</li></ol>';
+    let expectedOutputWrappedString =
+      '<ol><li><span class="highlightBlock1">First item.</span></li><li><span class="highlightBlock2">Second item.</span></li><li><span class="highlightBlock3">Third item.</span></li></ol>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly wrap custom oppia tags inside span tag for highlighting', fakeAsync(() => {
     let rteString =
       '<p><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></p>' +

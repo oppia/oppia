@@ -16,6 +16,11 @@
             Source
           </th>
 
+          <th *ngIf="feedbackCardConfig.showLesson"
+              class="oppia-feedback-table-th oppia-feedback-table-col-lesson-title">
+            Lesson
+          </th>
+
           <th *ngIf="feedbackCardConfig.showCategory"
               class="oppia-feedback-table-th oppia-feedback-table-col-category">
             Category
@@ -38,10 +43,22 @@
             <span class="oppia-feedback-table-desc">
               {{ getFeedbackDescription(feedback) }}
             </span>
+            <span *ngIf="feedbackCardConfig.showNotificationSummary && getNotificationSummary(feedback) as notificationSummary"
+                  class="oppia-my-suggestions-notification-summary">
+              {{ notificationSummary }}
+              <span class="oppia-my-suggestions-unread">
+                {{ getUnreadResponseCount(feedback) }}
+              </span>
+            </span>
           </td>
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-source">
             {{ getSourceLabel(feedback.source) }}
+          </td>
+
+          <td *ngIf="feedbackCardConfig.showLesson"
+              class="oppia-feedback-table-td oppia-feedback-table-col-lesson-title">
+            {{ getLessonTitle(feedback) }}
           </td>
 
           <td *ngIf="feedbackCardConfig.showCategory"
