@@ -1113,6 +1113,39 @@ describe('Certificate Assessment Offering backend api service', () => {
     );
   }));
 
+  it('should propagate the structured cooldown error body when starting a certificate assessment fails with a cooldown', fakeAsync(() => {
+    caos
+      .attemptCertificateAssessmentAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.START_CERTIFICATE_ASSESSMENT_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+        error_type: 'cooldown',
+        remaining_minutes: 6,
+        status_code: 429,
+      },
+      {
+        status: 429,
+        statusText: 'Too Many Requests',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith({
+      error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+      error_type: 'cooldown',
+      remaining_minutes: 6,
+      status_code: 429,
+    });
+  }));
+
   it('should successfully submit a certificate assessment attempt', fakeAsync(() => {
     caos
       .submitCertificateAssessmentAttemptAsync('mock_attempt_id', [
