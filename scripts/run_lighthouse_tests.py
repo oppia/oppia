@@ -152,6 +152,8 @@ def get_entity(line: str) -> tuple[str, str] | None:
         return 'story_id', url_parts[4]
     elif 'skill_editor' in line:
         return 'skill_id', url_parts[4]
+    elif '/blog/' in line:
+        return 'blog_post_url_fragment', url_parts[4]
 
     return None
 
