@@ -1312,6 +1312,11 @@ class AdminHandler(
             story_services.update_story_node_acquired_skill_ids_after_publish(
                 self.user_id, story_id, skill_ids_by_node_id
             )
+            # Seed a supported language accent pair so that the voiceover admin
+            # page renders real content during lighthouse runs.
+            voiceover_services.save_language_accent_support(
+                {'en': {'en-US': True}}
+            )
         else:
             raise Exception('Cannot load new structures data in production.')
 

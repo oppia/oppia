@@ -766,6 +766,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             subtopic_page.page_contents.subtitled_html.html,
             '<p>Dummy subtopic page content.</p>',
         )
+        self.assertEqual(
+            voiceover_services.get_all_language_accent_codes_for_voiceovers(),
+            {'en': {'en-US': True}},
+        )
         self.logout()
 
     @test_utils.enable_feature_flags(
