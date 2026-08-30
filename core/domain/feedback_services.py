@@ -23,6 +23,7 @@ import itertools
 from core import feconf, utils
 from core.domain import (
     email_manager,
+    email_services,
     feedback_domain,
     rights_manager,
     subscription_services,
@@ -414,7 +415,8 @@ def create_messages(
         len(text) > 0 or old_statuses[index] != new_statuses[index]
     )
     if (
-        feconf.CAN_SEND_TRANSACTIONAL_EMAILS
+        email_services.is_email_sending_allowed()
+        and feconf.CAN_SEND_TRANSACTIONAL_EMAILS
         and author_id is not None
         and user_services.is_user_registered(author_id)
         and message_changed

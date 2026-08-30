@@ -171,20 +171,19 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         )
 
         blog_post_id = 'test_blog_post_id'
-        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
-            feedback_services.create_thread(
-                feconf.ENTITY_TYPE_BLOG_POST,
-                blog_post_id,
-                self.user_id,
-                'Blog subject',
-                'Initial message for blog post',
-            )
-            thread_id_blog_post = feedback_services.get_threads(
-                feconf.ENTITY_TYPE_BLOG_POST, blog_post_id
-            )[0].id
-            feedback_services.create_message(
-                thread_id_blog_post, self.user_id, None, None, 'some text'
-            )
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_BLOG_POST,
+            blog_post_id,
+            self.user_id,
+            'Blog subject',
+            'Initial message for blog post',
+        )
+        thread_id_blog_post = feedback_services.get_threads(
+            feconf.ENTITY_TYPE_BLOG_POST, blog_post_id
+        )[0].id
+        feedback_services.create_message(
+            thread_id_blog_post, self.user_id, None, None, 'some text'
+        )
         feedback_models.FeedbackAnalyticsModel(id=blog_post_id).put()
 
         feedback_services.delete_threads_for_multiple_entities(
@@ -803,21 +802,16 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def test_get_thread_summaries_only_returns_threads_for_explorations(
         self,
     ) -> None:
-        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
-            exp_thread_id = feedback_services.create_thread(
-                'exploration',
-                self.EXP_ID_1,
-                self.user_id,
-                'unused subject',
-                'unused text',
-            )
-            skill_thread_id = feedback_services.create_thread(
-                'skill',
-                'skillid1',
-                self.user_id,
-                'unused subject',
-                'unused text',
-            )
+        exp_thread_id = feedback_services.create_thread(
+            'exploration',
+            self.EXP_ID_1,
+            self.user_id,
+            'unused subject',
+            'unused text',
+        )
+        skill_thread_id = feedback_services.create_thread(
+            'skill', 'skillid1', self.user_id, 'unused subject', 'unused text'
+        )
 
         thread_summaries, _ = feedback_services.get_exp_thread_summaries(
             self.owner_id, [exp_thread_id, skill_thread_id]
