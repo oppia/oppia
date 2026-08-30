@@ -68,10 +68,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             common.LIGHTHOUSE_NODE_BIN_PATH,
             puppeteer_path,
         ]
-        self.puppeteer_bash_command = [
-            common.LIGHTHOUSE_NODE_BIN_PATH,
-            puppeteer_path,
-        ]
         lhci_path = os.path.join(
             'node_modules', '@lhci', 'cli', 'src', 'cli.js'
         )
@@ -661,52 +657,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
 
-    def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
-        class MockTask:
-            returncode = 0
-
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (b'Task output', b'No error.')
-
-        swap_run_lighthouse_tests = self.swap_with_checks(
-            run_lighthouse_tests,
-            'run_lighthouse_checks',
-            lambda *unused_args: None,
-            expected_args=[('accessibility',)],
-        )
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
-        swap_build = self.swap_with_checks(
-            build, 'main', lambda args: None, expected_kwargs=[{'args': []}]
-        )
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
-
-        with swap_popen, swap_isdir, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
-                    with self.swap_redis_server, swap_run_lighthouse_tests:
-                        with self.lighthouse_pages_json_filepath_swap:
-                            run_lighthouse_tests.main(
-                                args=['--mode', 'accessibility']
-                            )
-                            expected_all_lighthouse_urls = ','.join(
-                                [
-                                    'http://localhost:8181/',
-                                    'http://localhost:8181/about',
-                                    'http://localhost:8181/contact',
-                                ]
-                            )
-                            self.assertEqual(
-                                os.environ['ALL_LIGHTHOUSE_URLS'],
-                                expected_all_lighthouse_urls,
-                            )
-
-        self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
-        )
-
-    def test_run_lighthouse_tests_in_performance_mode(self) -> None:
+    def test_run_lighthouse_tests_successfully(self) -> None:
         class MockTask:
             returncode = 0
 
@@ -742,7 +693,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-                                run_lighthouse_tests.main(args=[])
                                 run_lighthouse_tests.main(args=[])
                                 expected_all_lighthouse_urls = ','.join(
                                     [
