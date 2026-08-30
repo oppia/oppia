@@ -112,8 +112,9 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
 };
 
 const LIGHTHOUSE_MODULES = [
-  '.lighthouserc-performance.js',
-  '.lighthouserc-accessibility.js',
+  '.lighthouserc.js',
+  '.lighthouserc-base.js',
+  '.lighthouserc-desktop.js',
 ];
 
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
