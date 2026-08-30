@@ -1324,7 +1324,9 @@ class CommonTests(test_utils.GenericTestBase):
                 self.swap_with_checks(
                     common,
                     'is_port_in_use',
-                    lambda port: port == common.GAE_PORT_FOR_E2E_TESTING,
+                    lambda port: (
+                        port == common.GAE_PORT_FOR_ACCEPTANCE_TESTING
+                    ),
                 )
             )
 
