@@ -21,6 +21,7 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {
   InteractionSpecsConstants,
@@ -205,5 +206,9 @@ export class CardInteractionControlsComponent {
 
   onClickContinueButton(): void {
     this.conversationFlowService.showUpcomingCard();
+  }
+
+  get continueButtonCustomizationArgs(): ContinueCustomizationArgs {
+    return this.interactionCustomizationArgs as ContinueCustomizationArgs;
   }
 }
