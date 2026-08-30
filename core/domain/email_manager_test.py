@@ -9483,7 +9483,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
 
-def test_failed_send_mail_does_not_create_sent_email_model(self) -> None:
+    def test_failed_send_mail_does_not_create_sent_email_model(self) -> None:
         """Test that a failed send does not create a SentEmailModel record."""
 
         class SimulatedEmailFailure(Exception):
