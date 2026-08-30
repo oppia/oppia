@@ -233,31 +233,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     }
                 )
             )
-        with open(
-            os.path.join(ci_test_suite_configs_directory, 'e2e.json'),
-            'w',
-            encoding='utf-8',
-        ) as f:
-            f.write(
-                json.dumps(
-                    {
-                        'suites': [
-                            {
-                                'name': 'accessibility',
-                                'module': 'accessibility.js',
-                            },
-                            {
-                                'name': 'additionalEditorFeatures',
-                                'module': 'additionalEditorFeatures.js',
-                            },
-                            {
-                                'name': 'additionalEditorFeaturesModals',
-                                'module': 'additionalEditorFeaturesModals.js',
-                            },
-                        ]
-                    }
-                )
-            )
         test_modules_mapping_directory = os.path.join(
             self.tempdir.name, 'test-modules-mapping'
         )
@@ -391,20 +366,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'name': 'exploration-player/view-exploration',
                         'module': 'exploration-player/view-exploration.spec.ts',
                         'framework': 'playwright',
-                    },
-                ],
-            },
-            'e2e': {
-                'count': 3,
-                'suites': [
-                    {'name': 'accessibility', 'module': 'accessibility.js'},
-                    {
-                        'name': 'additionalEditorFeatures',
-                        'module': 'additionalEditorFeatures.js',
-                    },
-                    {
-                        'name': 'additionalEditorFeaturesModals',
-                        'module': 'additionalEditorFeaturesModals.js',
                     },
                 ],
             },
@@ -744,7 +705,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),  # pylint: disable=line-too-long
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -812,7 +772,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [
@@ -876,7 +835,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [
@@ -926,7 +884,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -981,7 +938,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -1036,7 +992,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -1107,7 +1062,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [

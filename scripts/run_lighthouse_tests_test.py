@@ -68,6 +68,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             common.LIGHTHOUSE_NODE_BIN_PATH,
             puppeteer_path,
         ]
+        self.puppeteer_bash_command = [
+            common.LIGHTHOUSE_NODE_BIN_PATH,
+            puppeteer_path,
+        ]
         lhci_path = os.path.join(
             'node_modules', '@lhci', 'cli', 'src', 'cli.js'
         )
@@ -521,6 +525,63 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 run_lighthouse_tests._patch_lighthouse_target_manager()  # pylint: disable=protected-access
         os.remove(temp_file_path)
 
+    def test_get_lighthouse_environment_prepends_lighthouse_node(self) -> None:
+        environ_swap = self.swap(
+            os, 'environ', {'PATH': '/original/path', 'HOME': '/home'}
+        )
+        with environ_swap:
+            env = (
+                run_lighthouse_tests._get_lighthouse_environment()  # pylint: disable=protected-access
+            )
+
+        self.assertEqual(
+            env['PATH'].split(os.pathsep)[0],
+            os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH),
+        )
+        self.assertIn('/original/path', env['PATH'])
+        self.assertEqual(env['HOME'], '/home')
+
+    def test_patch_lighthouse_target_manager_when_already_patched(
+        self,
+    ) -> None:
+        file_contents = (
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;\n'
+            '      if (/Not allowed/.test(err.message)) return;'
+        )
+        temp_file_path: str
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.js', delete=False
+        ) as f:
+            f.write(file_contents)
+            temp_file_path = f.name
+
+        swap_join = self.swap(os.path, 'join', lambda *_unused: temp_file_path)
+
+        # Capture the real open before swapping builtins.open below; otherwise
+        # this mock would call itself recursively when reading the patched
+        # target-manager.js file.
+        real_open = open
+
+        # Here we use object because open() can receive arbitrary arguments
+        # whose concrete types are not relevant to the mock for this test.
+        def mock_open(
+            unused_path: str, mode: str = 'r', encoding: str = 'utf-8'
+        ) -> object:
+            return real_open(temp_file_path, mode, encoding=encoding)
+
+        swap_open = self.swap(builtins, 'open', mock_open)
+        with self.print_swap, swap_join, swap_open:
+            run_lighthouse_tests._patch_lighthouse_target_manager()  # pylint: disable=protected-access
+
+        with open(temp_file_path, 'r', encoding='utf-8') as read_file:
+            content = read_file.read()
+        self.assertEqual(content, file_contents)
+        self.assertNotIn(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.',
+            self.print_arr,
+        )
+        os.remove(temp_file_path)
+
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
             returncode = 0
@@ -600,7 +661,52 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
 
-    def test_run_lighthouse_tests_successfully(self) -> None:
+    def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
+        class MockTask:
+            returncode = 0
+
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
+                return (b'Task output', b'No error.')
+
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_checks',
+            lambda *unused_args: None,
+            expected_args=[('accessibility',)],
+        )
+        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None, expected_kwargs=[{'args': []}]
+        )
+        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+
+        with swap_popen, swap_isdir, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                    with self.swap_redis_server, swap_run_lighthouse_tests:
+                        with self.lighthouse_pages_json_filepath_swap:
+                            run_lighthouse_tests.main(
+                                args=['--mode', 'accessibility']
+                            )
+                            expected_all_lighthouse_urls = ','.join(
+                                [
+                                    'http://localhost:8181/',
+                                    'http://localhost:8181/about',
+                                    'http://localhost:8181/contact',
+                                ]
+                            )
+                            self.assertEqual(
+                                os.environ['ALL_LIGHTHOUSE_URLS'],
+                                expected_all_lighthouse_urls,
+                            )
+
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr
+        )
+
+    def test_run_lighthouse_tests_in_performance_mode(self) -> None:
         class MockTask:
             returncode = 0
 
@@ -636,6 +742,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
+                                run_lighthouse_tests.main(args=[])
                                 run_lighthouse_tests.main(args=[])
                                 expected_all_lighthouse_urls = ','.join(
                                     [

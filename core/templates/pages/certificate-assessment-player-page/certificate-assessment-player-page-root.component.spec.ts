@@ -182,6 +182,77 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('intro');
   }));
 
+  it('should load the classroom fragment before starting a session attempt', fakeAsync(async () => {
+    await configureComponent('session');
+    const classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    let resolveClassroom!: (value: {
+      classroomDict: {urlFragment: string};
+    }) => void;
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      new Promise(resolve => {
+        resolveClassroom = resolve;
+      })
+    );
+
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.callFake(() => Promise.reject('Error'));
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      TestBed.inject(ActivatedRoute),
+      alertsService,
+      certificateAssessmentOfferingBackendApiService,
+      playerStateService,
+      classroomBackendApiServiceSpy,
+      {} as PageHeadService,
+      router,
+      translateService
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(
+      classroomBackendApiServiceSpy.getClassroomDataAsync
+    ).toHaveBeenCalled();
+
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
+
+    resolveClassroom({classroomDict: {urlFragment: 'math'}});
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
+  }));
+
+  it('should not start a session attempt when the offering fails to load', fakeAsync(async () => {
+    await configureComponent('session');
+    (
+      certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.hasError).toBeTrue();
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
+  }));
+
   it('should stay on the intro stage when the session route fails to start an attempt', fakeAsync(async () => {
     await configureComponent('session');
     (
@@ -193,12 +264,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -344,7 +410,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   }));
 
-  it('should show a warning when starting the attempt fails', fakeAsync(() => {
+  it('should show the unavailable modal when starting the attempt fails', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -353,12 +419,49 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
+    expect(component.showAssessmentUnavailableModal).toBeTrue();
+  }));
+
+  it('should show a localized cooldown warning when the attempt is within the cooldown', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.reject({
+        error_type: 'cooldown',
+        remaining_minutes: 2,
+        error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+        status_code: 429,
+      })
+    );
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.currentStage).toBe('intro');
+    expect(component.showAssessmentUnavailableModal).toBeFalse();
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+      {remainingMinutes: 2}
     );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'
     );
+  }));
+
+  it('should hide the unavailable modal and navigate to available certificates', fakeAsync(() => {
+    component.showAssessmentUnavailableModal = true;
+    component.classroomUrlFragment = 'math';
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
   }));
 
   it('should submit the attempt and navigate to the result page on assessmentSubmitted', fakeAsync(() => {

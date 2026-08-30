@@ -104,19 +104,21 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 # email.
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
-SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
-    [suggestion_registry.SuggestionTranslateContent], str
-] = lambda suggestion: suggestion.change_cmd.translation_html
 
-SUGGESTION_ADD_QUESTION_HTML: Callable[
-    [suggestion_registry.SuggestionAddQuestion], str
-] = lambda suggestion: suggestion.change_cmd.question_dict[
-    'question_state_data'
-][
-    'content'
-][
-    'html'
-]
+def get_translation_html_from_suggestion(
+    suggestion: suggestion_registry.SuggestionTranslateContent,
+) -> str:
+    """Returns the HTML str from the given SuggestionTranslateContent object."""
+    return suggestion.change_cmd.translation_html
+
+
+def get_question_html_from_suggestion(
+    suggestion: suggestion_registry.SuggestionAddQuestion,
+) -> str:
+    """Returns the HTML str from the given SuggestionAddQuestion object."""
+    data = suggestion.change_cmd.question_dict['question_state_data']
+    return data['content']['html']
+
 
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
@@ -126,8 +128,8 @@ SUGGESTION_ADD_QUESTION_HTML: Callable[
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
 SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: SUGGESTION_TRANSLATE_CONTENT_HTML,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION: SUGGESTION_ADD_QUESTION_HTML,
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: get_translation_html_from_suggestion,
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: get_question_html_from_suggestion,
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
