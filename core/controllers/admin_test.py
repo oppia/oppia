@@ -45,6 +45,7 @@ from core.domain import (
     story_fetchers,
     story_services,
     study_guide_services,
+    subtopic_page_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
@@ -720,11 +721,22 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             .canonical_story_references[0]
             .story_id
         )
-        self.assertIsNotNone(
-            story_fetchers.get_story_by_id(story_id, strict=False)
-        )
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        self.assertIsNotNone(story)
+        assert story is not None
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
+        # Each story node should have a distinct dummy skill attached to it so
+        # that the node practice and end of arc test pages have questions.
+        node_skill_ids = [
+            node.acquired_skill_ids[0] for node in story.story_contents.nodes
+        ]
+        self.assertEqual(len(node_skill_ids), 3)
+        self.assertEqual(len(set(node_skill_ids)), 3)
+        self.assertEqual(
+            set(node_skill_ids),
+            {skill_summary.id for skill_summary in skill_summaries},
+        )
         questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10,
@@ -745,6 +757,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', '', None)
         )
         self.assertEqual(len(translation_opportunities), 3)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_summaries[0].id, 1, strict=False
+        )
+        self.assertIsNotNone(subtopic_page)
+        assert subtopic_page is not None
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>Dummy subtopic page content.</p>',
+        )
         self.logout()
 
     @test_utils.enable_feature_flags(

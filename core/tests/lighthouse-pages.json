@@ -152,7 +152,7 @@
     "page_module": "core/templates/pages/blog-admin-page/blog-admin-page.module.ts"
   },
   "blog-post": {
-    "url": "http://localhost:8181/blog/dummy-post",
+    "url": "http://localhost:8181/blog/{{blog_post_url_fragment}}",
     "page_module": "core/templates/pages/blog-post-page/blog-post-page.module.ts"
   },
   "certificate-assessment-player": {
@@ -180,7 +180,7 @@
     "page_module": "core/templates/pages/create-certificate-offering-page/create-certificate-offering-page.module.ts"
   },
   "diagnostic-test-player": {
-    "url": "http://localhost:8181/diagnostic-test-player?classroom=staging",
+    "url": "http://localhost:8181/diagnostic-test-player?classroom=math",
     "page_module": "core/templates/pages/diagnostic-test-player-page/diagnostic-test-player-page.module.ts"
   },
   "edit-certificate-offering": {
@@ -188,7 +188,7 @@
     "page_module": "core/templates/pages/edit-certificate-offering-page/edit-certificate-offering-page.module.ts"
   },
   "end-of-arc-test": {
-    "url": "http://localhost:8181/learn/staging/dummy-topic-one/test/arc/help-jamie-win-arcade",
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/test/arc/1",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
   },
   "facilitator-dashboard": {
@@ -220,7 +220,7 @@
     "page_module": "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.module.ts"
   },
   "node-practice-session": {
-    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/help-jamie-win-arcade",
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/1",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
   },
   "pending-account-deletion": {
@@ -228,7 +228,7 @@
     "page_module": "core/templates/pages/pending-account-deletion-page/pending-account-deletion-page.module.ts"
   },
   "practice-session": {
-    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/session",
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/session?selected_subtopic_ids=[1]",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
   },
   "release-coordinator": {
