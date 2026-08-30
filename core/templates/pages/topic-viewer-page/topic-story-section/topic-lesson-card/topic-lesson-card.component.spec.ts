@@ -164,6 +164,19 @@ describe('TopicLessonCardComponent', () => {
     expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
   });
 
+  it('should return the static image url for the provided image path', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/icons/practice-pencil-icon.svg'
+    );
+
+    expect(component.getStaticImageUrl('/icons/practice-pencil-icon.svg')).toBe(
+      '/assets/icons/practice-pencil-icon.svg'
+    );
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      '/icons/practice-pencil-icon.svg'
+    );
+  });
+
   it('should execute navigateTo when url is provided', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
 
