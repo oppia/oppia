@@ -89,8 +89,10 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -331,10 +333,10 @@ describe('Logged-in Learner', function () {
   it(
     'should unlock the Mastery Challenge and navigate to the practice session after completing all chapters',
     async function () {
-      // Complete the remaining chapters (2 and 3) by playing them, as done for
-      // the first chapter above. Lesson 4 is a "Coming Soon" placeholder, so it
-      // is not part of the available lessons the learner must complete.
-      for (let completedCount = 0; completedCount < 2; completedCount++) {
+      // Complete the remaining three chapters (2, 3, and 4) by playing them, as
+      // done for the first chapter above. The Mastery Challenge unlocks only
+      // after every published chapter is completed.
+      for (let completedCount = 0; completedCount < 3; completedCount++) {
         await loggedInLearner.waitForPageToFullyLoad();
         await loggedInLearner.clickOnElementWithSelector(
           lessonCardStartButtonSelector

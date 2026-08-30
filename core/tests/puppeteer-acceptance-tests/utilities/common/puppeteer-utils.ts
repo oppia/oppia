@@ -25,6 +25,94 @@ import {showMessage} from './show-message';
 
 var path = require('path');
 var fs = require('fs');
+var os = require('os');
+var childProcess = require('child_process');
+
+/**
+ * Candidate paths for a natively-built Chrome/Chromium on macOS.
+ *
+ * The Chromium revision bundled with Puppeteer 13 (r982053) predates Apple
+ * Silicon builds, so on Apple Silicon Macs it only has x86_64 binaries that
+ * execute under Rosetta emulation. Rosetta execution is slow and unreliable
+ * under the heavy load of the acceptance-tests setup (causing 'Timed out ...
+ * while trying to connect to the browser'). When we can detect this case we
+ * prefer a native arm64 Chrome if one is installed.
+ */
+const NATIVE_MAC_CHROME_PATHS = [
+  // Standard Google Chrome installation on macOS.
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  // Homebrew Chromium installation on Apple Silicon.
+  '/opt/homebrew/bin/chromium',
+];
+
+/**
+ * Returns true when the current Node process is an x86_64 binary executing
+ * under Rosetta translation on Apple Silicon hardware. On Intel Macs and in
+ * native arm64 processes this is false.
+ */
+const isRunningUnderRosetta = function (): boolean {
+  if (process.platform !== 'darwin' || process.arch !== 'x64') {
+    return false;
+  }
+  try {
+    // Only Rosetta-translated processes report '1' for proc_translated.
+    return (
+      childProcess
+        .execFileSync('/usr/sbin/sysctl', ['-n', 'sysctl.proc_translated'], {
+          encoding: 'utf8',
+        })
+        .trim() === '1'
+    );
+  } catch (error) {
+    // The sysctl key is unavailable on older macOS versions; treat as native.
+    return false;
+  }
+};
+
+/**
+ * Returns the path of a native arm64 Chrome/Chromium installed on macOS, or an
+ * empty string when none is available or the machine could run the bundled
+ * Chromium natively. The empty string lets Puppeteer resolve its own bundled
+ * Chromium.
+ */
+const getNativeMacChromePath = function (): string {
+  if (
+    process.platform !== 'darwin' ||
+    (process.arch !== 'arm64' && !isRunningUnderRosetta())
+  ) {
+    return '';
+  }
+  for (const chromePath of NATIVE_MAC_CHROME_PATHS) {
+    try {
+      fs.accessSync(chromePath, fs.constants.X_OK);
+      return chromePath;
+    } catch (error) {
+      // The candidate is missing or not executable; keep looking.
+    }
+  }
+  return '';
+};
+
+/**
+ * Creates an executable shim that launches the given Chrome binary via
+ * `arch -arm64`. When the test process itself is an x86_64 Node running under
+ * Rosetta, macOS would otherwise execute the x86_64 slice of the browser (even
+ * when a native Chrome path is passed to Puppeteer). The shim forces the native
+ * arm64 slice, which starts reliably within Puppeteer's connection timeout.
+ */
+const createArm64ChromeWrapper = function (chromePath: string): string {
+  const escapedChromePath = chromePath.replace(/'/g, "'\\''");
+  const wrapperPath = path.join(
+    os.tmpdir(),
+    `oppia-chrome-arm64-${process.pid}-${Date.now()}.sh`
+  );
+  fs.writeFileSync(
+    wrapperPath,
+    `#!/bin/bash\nexec /usr/bin/arch -arm64 '${escapedChromePath}' "$@"\n`
+  );
+  fs.chmodSync(wrapperPath, 0o755);
+  return wrapperPath;
+};
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
 import {PuppeteerScreenRecorder} from 'puppeteer-screen-recorder';
@@ -79,6 +167,7 @@ export class BaseUser {
   username: string | null = null;
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
+  chromeWrapperPath: string | null = null;
   static instances: BaseUser[] = []; // Track instances.
   static serverErrors: string[] = []; // Track server errors.
 
@@ -107,6 +196,22 @@ export class BaseUser {
       args.push('--disable-site-isolation-trials');
     }
 
+    const nativeChromePath = getNativeMacChromePath();
+    this.chromeWrapperPath = null;
+    let executablePath = '';
+    if (nativeChromePath !== '') {
+      if (isRunningUnderRosetta()) {
+        // An x86_64 parent forces the x86_64 slice of the universal Chrome
+        // binary under Rosetta (10-20s cold start, often over Puppeteer's 30s
+        // connection timeout under the running test stack). Route the launch
+        // through an `arch -arm64` shim so the native slice runs instead.
+        this.chromeWrapperPath = createArm64ChromeWrapper(nativeChromePath);
+        executablePath = this.chromeWrapperPath;
+      } else {
+        executablePath = nativeChromePath;
+      }
+    }
+
     await puppeteer
       .launch({
         /** TODO(#17761): Right now some acceptance tests are failing on
@@ -114,6 +219,7 @@ export class BaseUser {
          * every test passes on both modes. */
         headless,
         args,
+        ...(executablePath !== '' ? {executablePath} : {}),
       })
       .then(async browser => {
         this.startTimeInMilliseconds = Date.now();
@@ -1115,6 +1221,14 @@ export class BaseUser {
       }
     }
     await this.browserObject.close();
+    if (this.chromeWrapperPath !== null) {
+      try {
+        fs.unlinkSync(this.chromeWrapperPath);
+      } catch (error) {
+        // The shim may already have been removed; nothing to clean up.
+      }
+      this.chromeWrapperPath = null;
+    }
     showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
   }
 
@@ -2133,7 +2247,12 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for selector: ${selector}`);
     }
-    await element.scrollIntoViewIfNeeded();
+    // Puppeteer 13 no longer exposes ElementHandle#scrollIntoViewIfNeeded, so
+    // scroll through the native DOM API. 'nearest' scrolls the minimum amount
+    // needed to bring the element fully into view.
+    await element.evaluate(el => {
+      el.scrollIntoView({block: 'nearest', inline: 'nearest'});
+    });
     const boundingBox = await element.boundingBox();
     if (!boundingBox) {
       throw new Error(`Element has no bounding box for selector: ${selector}`);

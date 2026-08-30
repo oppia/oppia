@@ -103,8 +103,10 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -192,7 +194,7 @@ describe('Logged-in Learner', function () {
     );
     await curriculumAdmin.splitIntoAdventure('Subtracting Fractions');
     await curriculumAdmin.splitIntoAdventure('Equivalent Fractions');
-    await curriculumAdmin.splitIntoAdventure('Ordering Fractions');
+    await curriculumAdmin.splitIntoAdventure('Fractions on a Number Line');
 
     // Add a final chapter that stays in DRAFT status. Draft nodes are filtered
     // out of the learner-facing topic viewer data, so this chapter must not be
@@ -207,7 +209,7 @@ describe('Logged-in Learner', function () {
     // (see story-editor.component.html). So the serial-chapter flag used for
     // the ready-to-publish / publish-up-to flows below must be enabled only
     // after the split has been performed.
-    await releaseCoordinator.enableFeatureFlag(
+    await releaseCoordinator.enableFeatureFlagWithRetries(
       'serial_chapter_launch_curriculum_admin_view'
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
