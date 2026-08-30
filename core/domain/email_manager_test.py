@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import pathlib
 import types
 from unittest import mock
 
@@ -604,7 +605,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -2276,17 +2276,16 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
-            email_manager.send_feedback_submission_email(unittest.mock.Mock())
+            email_manager.send_feedback_submission_email(mock.Mock())
             email_manager.send_feedback_status_change_email(
-                unittest.mock.Mock(), 'dummy'
+                mock.Mock(), 'dummy'
             )
             email_manager.send_feedback_reply_email(
-                unittest.mock.Mock(), 'dummy', 'dummy'
+                mock.Mock(), 'dummy', 'dummy'
             )
         self.assertEqual(
             logs,
@@ -2448,13 +2447,12 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_feedback_message_email(
-                'dummy', {'dummy': unittest.mock.Mock()}
+                'dummy', {'dummy': mock.Mock()}
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -2575,13 +2573,12 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_suggestion_email(
-                'dummy', 'dummy', 'dummy', [unittest.mock.Mock()]
+                'dummy', 'dummy', 'dummy', [mock.Mock()]
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -2700,7 +2697,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -2829,7 +2825,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -3011,7 +3006,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -3125,7 +3119,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -3206,7 +3199,6 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -3640,13 +3632,12 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
-                unittest.mock.Mock()
+                mock.Mock()
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -5800,13 +5791,12 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                [unittest.mock.Mock()], [unittest.mock.Mock()]
+                [mock.Mock()], [mock.Mock()]
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -6870,16 +6860,15 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
-                [unittest.mock.Mock()],
-                [unittest.mock.Mock()],
-                [unittest.mock.Mock()],
-                [unittest.mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -7159,14 +7148,11 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
-            email_manager.send_reviewer_notifications(
-                unittest.mock.Mock(), unittest.mock.Mock()
-            )
+            email_manager.send_reviewer_notifications(mock.Mock(), mock.Mock())
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
@@ -8097,16 +8083,15 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [unittest.mock.Mock()],
-                [unittest.mock.Mock()],
-                [unittest.mock.Mock()],
-                {'dummy': unittest.mock.Mock()},
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+                {'dummy': mock.Mock()},
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -8197,7 +8182,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -8409,7 +8393,6 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
@@ -8902,16 +8885,15 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_email_to_new_cd_user(
-                'dummy', 'dummy', unittest.mock.Mock()
+                'dummy', 'dummy', mock.Mock()
             )
             email_manager.send_email_to_removed_cd_user(
-                'dummy', 'dummy', unittest.mock.Mock()
+                'dummy', 'dummy', mock.Mock()
             )
         self.assertEqual(
             logs,
@@ -8966,13 +8948,12 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_not_mergeable_change_list_to_admin_for_review(
-                'dummy', 1, 1, [unittest.mock.Mock()]
+                'dummy', 1, 1, [mock.Mock()]
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -9194,13 +9175,12 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         self.assertEqual(sent_email_model.html_body, expected_email_html_body)
 
     def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
-        import unittest.mock
 
         with self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         ), self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
-                [unittest.mock.Mock()], [unittest.mock.Mock()]
+                [mock.Mock()], [mock.Mock()]
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
 
@@ -9508,22 +9488,12 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
     """Tests to cover specific branches in email_manager.py."""
 
     def test_coverage_branches(self) -> None:
-        import unittest.mock
-        import pathlib
-        from core.domain import email_manager
-        from core.domain import user_services
-        from core.domain import topic_services
-        from core.domain import classroom_config_services
-        from core.domain import subscription_services
-        from core import feconf
-        from core.constants import constants
-
-        mock_prefs = unittest.mock.Mock()
+        mock_prefs = mock.Mock()
         mock_prefs.can_receive_subscription_email = False
         mock_prefs.can_receive_email_updates = False
         mock_prefs.can_receive_feedback_message_email = False
 
-        mock_settings = unittest.mock.Mock()
+        mock_settings = mock.Mock()
         mock_settings.username = 'dummy_username'
 
         with self.swap(
@@ -9547,16 +9517,12 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
             'get_usernames',
             lambda *args, **kwargs: ['subscriber_username'],
         ):
-
-            # 1131
             email_manager.send_emails_to_subscribers(
                 'creator_id', 'exp_id', 'exp_title'
             )
-            # 1812
             email_manager.send_suggestion_email(
-                'dummy_type', 'category', 'exp_id', 'target_node_id'
+                'dummy_type', 'category', 'exp_id', ['target_node_id']
             )
-            # 1873
             email_manager.send_instant_feedback_message_email(
                 'recipient_id',
                 'sender_id',
@@ -9566,21 +9532,17 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
                 'exp_id',
                 'thread_title',
             )
-            # 2009
             email_manager.send_mail_to_onboard_new_reviewers(
                 'recipient_id', 'category'
             )
-            # 2070
             email_manager.send_mail_to_notify_users_to_review(
                 'recipient_id', 'category'
             )
-            # 3086
             email_manager.send_email_to_new_cd_user(
                 'recipient_id',
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 None,
             )
-            # 3174
             email_manager.send_email_to_removed_cd_user(
                 'recipient_id',
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
@@ -9596,10 +9558,10 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
             'get_classroom_by_topic_id',
             lambda x: None,
         ):
-            # 1251
-            email_manager._get_classroom_feedback_recipient_email('exp_id')
+            getattr(email_manager, '_get_classroom_feedback_recipient_email')(
+                'exp_id'
+            )
 
-        # 3063
         dummy_data = {
             'task': 'dummy',
             'category': 'dummy',
@@ -9623,16 +9585,9 @@ class EmailManagerCoverageTests(test_utils.EmailTestBase):
                 )
         finally:
             del email_manager.NEW_CD_USER_EMAIL_DATA['DUMMY']
-
-        # 3330
-        class MockPath:
-            def __init__(self, path):
-                pass
-
-            def exists(self):
-                return False
-
-        with self.swap(pathlib, 'Path', MockPath):
-            email_manager._delete_voiceover_error_attachments(
+        mock_path_instance = mock.Mock()
+        mock_path_instance.exists.return_value = False
+        with self.swap(pathlib, 'Path', lambda path: mock_path_instance):
+            email_manager._delete_voiceover_error_attachments(  # pylint: disable=protected-access
                 [{'filename': 'dummy', 'path': 'dummy'}]
             )
