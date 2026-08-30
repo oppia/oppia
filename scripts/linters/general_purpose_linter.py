@@ -109,8 +109,6 @@ EXCLUDED_PATHS: Final = (
 GENERATED_FILE_PATHS: Final = ('core/templates/expressions/parser.js',)
 
 CONFIG_FILE_PATHS: Final = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/wdio.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
@@ -710,7 +708,6 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 filepath.endswith(('.js'))
                 and filepath.startswith(('core/templates', 'extensions'))
                 and (filepath not in build.JS_FILEPATHS_NOT_TO_BUILD)
-                and not filepath.endswith('webdriverio.js')
             ):
                 error_message = '%s  --> Found extra .js file' % filepath
                 error_messages.append(error_message)
