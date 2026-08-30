@@ -368,6 +368,94 @@ const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const availableChapters = '.e2e-test-available-chapters';
 const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
 const chapterSelector = '.e2e-test-chapter-title';
+
+// Redesigned topic viewer page.
+const topicViewerContainerSelector =
+  '.e2e-test-redesigned-topic-viewer-container';
+const topicHeaderTitleSelector = '.topic-header-title';
+const topicHeaderDescriptionSelector = '.topic-header-description';
+const topicHeaderBreadcrumbSelector =
+  'nav.topic-header-breadcrumbs[aria-label="Breadcrumb"]';
+const desktopClassroomBreadcrumbLinkSelector =
+  '.topic-header-breadcrumbs-desktop a[href="/learn/math"]';
+const mobileClassroomBreadcrumbLinkSelector =
+  '.e2e-test-mobile-breadcrumbs-classroom';
+const adventureNavigationSelector = '.e2e-test-adventure-navigation';
+const adventureNavigationWrapperSelector = '.adventure-navigation-wrapper';
+const adventureNavigationArrowLeftSelector =
+  '.adventure-navigation-arrow--left';
+const adventureNavigationArrowRightSelector =
+  '.adventure-navigation-arrow--right';
+const topicStoryCardSelector = '.e2e-test-story-card';
+const topicStoryTitleSelector = '.e2e-test-story-title';
+const topicLessonCardSelector = '.e2e-test-lesson-card';
+const topicLessonCardTitleSelector = '.e2e-test-lesson-card-title';
+const topicLessonCardDescriptionSelector = '.e2e-test-lesson-card-description';
+const topicLessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
+const topicLessonCardSecondaryButtonSelector =
+  '.e2e-test-lesson-card-secondary-button';
+const topicLessonCardNewLabelSelector = '.e2e-test-lesson-card-new-label';
+const topicLessonCardCompletedClassSelector =
+  '.e2e-test-lesson-card.completed-lesson';
+const topicLessonCardCompletedCollapsedSelector =
+  '.e2e-test-lesson-card.completed-collapsed';
+const topicLessonCardPlayAgainButtonSelector =
+  '.e2e-test-lesson-card-play-again-button';
+const topicLessonCardCompletedLabelSelector =
+  '.e2e-test-lesson-card-completed-label';
+const comingSoonChaptersTitleSelector = '.e2e-test-coming-soon-chapters-title';
+const comingSoonChaptersCountSelector = '.coming-soon-chapters-count';
+const comingSoonLessonCardWrapperSelector =
+  '.e2e-test-coming-soon-lesson-card-wrapper';
+const comingSoonLessonCardLabelSelector =
+  '.e2e-test-lesson-card-coming-soon-label';
+const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
+const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
+const masteryChallengeDescriptionSelector =
+  '.e2e-test-mastery-challenge-description';
+const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
+const masteryChallengeButtonLockedClass = 'mastery-challenge-button-locked';
+const masteryChallengeHelperTooltipSelector =
+  '.e2e-test-mastery-challenge-helper-tooltip';
+const masteryChallengeHelperTitleSelector =
+  '.e2e-test-mastery-challenge-helper-title';
+const masteryChallengeHelperDescriptionSelector =
+  '.e2e-test-mastery-challenge-helper-description';
+const topicStudySkillsCtaSelector = '.e2e-test-study-skills-cta';
+const adventureGroupSelector = '.e2e-test-adventure-group';
+const adventureTitleSelector = '.e2e-test-adventure-title';
+const adventureHeaderSelector = '.adventure-header';
+const adventureEndTestCardSelector = '.e2e-test-adventure-end-test-card';
+const adventureEndTestTitleSelector = '.e2e-test-adventure-end-test-card-title';
+const adventureEndTestPracticeButtonSelector =
+  '.e2e-test-adventure-end-test-card-practice-button';
+const topicPracticeSessionContainerSelector =
+  '.e2e-test-practice-session-container';
+const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
+const arcSkipProceedButtonSelector = '.e2e-test-arc-skip-confirmation-proceed';
+const arcSkipCancelButtonSelector = '.e2e-test-arc-skip-confirmation-cancel';
+const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
+const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
+const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
+const skippedAdventureStartCtaSelector =
+  '.e2e-test-skipped-adventure-start-cta';
+const topicLessonLanguageSelector = '.e2e-test-topic-lesson-language-selector';
+const topicTextLanguageSelector =
+  '.e2e-test-topic-lesson-text-language-selector';
+const topicVoiceoverLanguageSelector =
+  '.e2e-test-topic-lesson-voiceover-language-selector';
+const lessonFallbackInfoIconSelector = '.e2e-test-lesson-fallback-info-icon';
+const conversationSkinCardsContainerSelector =
+  '.e2e-test-conversation-skin-cards-container';
+const topicSessionFallbackLanguageStorageKey =
+  'topic_session_fallback_language';
+const dockBadgeSelector =
+  '.adventure-navigation-group topic-adventure-circle-badge ' +
+  '.adventure-circle-badge';
+const dockBadgeLabelSelector =
+  '.adventure-navigation-group topic-adventure-circle-badge ' +
+  '.adventure-circle-badge-label';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -4603,6 +4691,1116 @@ export class LoggedInUser extends BaseUser {
       {},
       expectedProfilePath
     );
+  }
+
+  /**
+   * Opens the redesigned topic viewer page for the given classroom and topic
+   * and waits for the page to be fully loaded.
+   * @param {string} classroomUrlFragment - The classroom URL fragment.
+   * @param {string} topicUrlFragment - The topic URL fragment.
+   */
+  async openTopicPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string
+  ): Promise<void> {
+    await this.goto(
+      `${baseUrl}/learn/${classroomUrlFragment}/${topicUrlFragment}`
+    );
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
+  }
+
+  /**
+   * Verifies that the redesigned topic viewer container is visible.
+   */
+  async expectTopicPageToBeFullyLoaded(): Promise<void> {
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
+  }
+
+  /**
+   * Verifies that the topic page header displays the given title.
+   * @param {string} title - The expected topic title.
+   */
+  async expectTopicPageTitleToContain(title: string): Promise<void> {
+    await this.expectElementToBeVisible(topicHeaderTitleSelector);
+    await this.expectTextContentToContain(topicHeaderTitleSelector, title);
+  }
+
+  /**
+   * Verifies that the topic page header displays a non-empty description.
+   */
+  async expectTopicPageDescriptionToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(topicHeaderDescriptionSelector);
+    const topicDescription = await this.page.$eval(
+      topicHeaderDescriptionSelector,
+      el => el.textContent?.trim() || ''
+    );
+    expect(topicDescription.length).toBeGreaterThan(0);
+  }
+
+  /**
+   * Verifies that the topic page breadcrumb contains the given text.
+   * @param {string} text - The expected breadcrumb text.
+   */
+  async expectTopicPageBreadcrumbToContain(text: string): Promise<void> {
+    await this.expectElementToBeVisible(topicHeaderBreadcrumbSelector);
+    await this.expectTextContentToContain(topicHeaderBreadcrumbSelector, text);
+  }
+
+  /**
+   * Clicks the classroom link in the topic page breadcrumb. The desktop
+   * breadcrumb is hidden on mobile viewports, where the mobile breadcrumb is
+   * shown instead, so the visible link is clicked.
+   */
+  async clickClassroomBreadcrumbLink(): Promise<void> {
+    if (await this.isElementVisible(desktopClassroomBreadcrumbLinkSelector)) {
+      await this.clickOnElementWithSelector(
+        desktopClassroomBreadcrumbLinkSelector
+      );
+    } else {
+      await this.clickOnElementWithSelector(
+        mobileClassroomBreadcrumbLinkSelector
+      );
+    }
+  }
+
+  /**
+   * Verifies that the current page is the classroom page with the given URL
+   * fragment.
+   * @param {string} classroomUrlFragment - The expected classroom URL fragment.
+   */
+  async expectToBeOnClassroomPage(classroomUrlFragment: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const url = this.page.url();
+    expect(url).toContain(`/learn/${classroomUrlFragment}`);
+  }
+
+  /**
+   * Verifies that the story card on the topic page is visible.
+   */
+  async expectStoryCardToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(topicStoryCardSelector);
+  }
+
+  /**
+   * Verifies that the story card title on the topic page contains the given
+   * text.
+   * @param {string} title - The expected story title.
+   */
+  async expectStoryTitleToContain(title: string): Promise<void> {
+    await this.expectElementToBeVisible(topicStoryTitleSelector);
+    await this.expectTextContentToContain(topicStoryTitleSelector, title);
+  }
+
+  /**
+   * Verifies that the adventure navigation dock is visible.
+   */
+  async expectAdventureNavigationDockToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(adventureNavigationSelector);
+  }
+
+  /**
+   * Verifies that the given number of adventure groups is present on the
+   * timeline.
+   * @param {number} count - The expected number of adventures.
+   */
+  async expectAdventureCountToBe(count: number): Promise<void> {
+    const adventureGroups = await this.page.$$(adventureGroupSelector);
+    expect(adventureGroups.length).toBe(count);
+  }
+
+  /**
+   * Verifies that at least one adventure group is present on the timeline.
+   */
+  async expectAdventureCountToBeGreaterThanZero(): Promise<void> {
+    const adventureGroups = await this.page.$$(adventureGroupSelector);
+    expect(adventureGroups.length).toBeGreaterThan(0);
+  }
+
+  /**
+   * Verifies that adventure titles are visible on the timeline.
+   */
+  async expectAdventureTitlesToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(adventureTitleSelector);
+  }
+
+  /**
+   * Verifies that every adventure group on the timeline contains the given
+   * number of lesson cards. Collapsed adventure groups are expanded first so
+   * that their lessons can be counted.
+   * @param {number} lessonCount - The expected number of lessons per adventure.
+   */
+  async expectEachAdventureToHaveLessonCount(
+    lessonCount: number
+  ): Promise<void> {
+    const adventureGroups = await this.page.$$(adventureGroupSelector);
+    for (const group of adventureGroups) {
+      let lessonCards = await group.$$(topicLessonCardSelector);
+      if (lessonCards.length === 0) {
+        const adventureHeader = await group.$(adventureHeaderSelector);
+        if (!adventureHeader) {
+          throw new Error('Adventure header not found.');
+        }
+        await this.clickOnElement(adventureHeader);
+        await this.page.waitForTimeout(500);
+        lessonCards = await group.$$(topicLessonCardSelector);
+      }
+      expect(lessonCards.length).toBe(lessonCount);
+    }
+  }
+
+  /**
+   * Verifies that the navigation dock sticks to the top of the viewport when
+   * the page is scrolled and that the active milestone badge is highlighted
+   * with the adventure's accent color.
+   */
+  async expectDockToStickToTopWithActiveMilestoneHighlighted(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 700);
+    });
+    await this.page.waitForTimeout(500);
+
+    const dockState = await this.page.evaluate(
+      (adventureNavigationSel: string, badgeSel: string) => {
+        const headerElement = document.querySelector('.topic-header');
+        const dockElement = document.querySelector(adventureNavigationSel);
+        const dockBadges = document.querySelectorAll(badgeSel);
+        return {
+          headerBottom: headerElement?.getBoundingClientRect().bottom ?? 0,
+          dockPosition: dockElement
+            ? getComputedStyle(dockElement).position
+            : '',
+          dockTop: dockElement?.getBoundingClientRect().top ?? 0,
+          activeBadgeBackground: dockBadges.length
+            ? (dockBadges[0] as HTMLElement).style.backgroundColor
+            : '',
+          activeBadgeColor: dockBadges.length
+            ? (dockBadges[0] as HTMLElement).style.color
+            : '',
+          inactiveBadgeBackground:
+            dockBadges.length > 1
+              ? (dockBadges[1] as HTMLElement).style.backgroundColor
+              : '',
+        };
+      },
+      adventureNavigationSelector,
+      dockBadgeSelector
+    );
+
+    // The topic header must have been scrolled out of view.
+    expect(dockState.headerBottom).toBeLessThan(0);
+
+    // The dock sticks to the top of the viewport (sticky top is 56px).
+    expect(dockState.dockPosition).toBe('sticky');
+    expect(Math.abs(dockState.dockTop - 56)).toBeLessThanOrEqual(2);
+
+    // The first badge represents the active (next) lesson, so it uses the
+    // adventure's accent color with white text, while the following badge
+    // (a not-yet-started lesson) keeps a white background.
+    expect(dockState.activeBadgeBackground).not.toBe('rgb(255, 255, 255)');
+    expect(dockState.activeBadgeColor).toBe('rgb(255, 255, 255)');
+    expect(dockState.inactiveBadgeBackground).toBe('rgb(255, 255, 255)');
+
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Verifies that the navigation dock scroll arrows are shown only when the
+   * dock overflows its container. On a overflowing (narrow) viewport the right
+   * arrow scrolls the dock horizontally (revealing the left arrow), and both
+   * arrows are hidden when the dock fits the viewport.
+   */
+  async expectDockScrollArrowsToBeShownOnlyWhenOverflowing(): Promise<void> {
+    const hasRightArrow = await this.isElementVisible(
+      adventureNavigationArrowRightSelector
+    );
+
+    if (hasRightArrow) {
+      // Overflowing dock (narrow/mobile viewport): the right arrow is
+      // visible. Click it and verify the dock scrolls horizontally, revealing
+      // the left arrow.
+      await this.clickOnElementWithSelector(
+        adventureNavigationArrowRightSelector
+      );
+      await this.page.waitForTimeout(700);
+
+      const scrolledState = await this.page.evaluate(
+        (wrapperSel: string, leftArrowSel: string) => {
+          const wrapper = document.querySelector(wrapperSel);
+          const leftArrow = document.querySelector(leftArrowSel);
+          return {
+            scrollLeft: wrapper ? wrapper.scrollLeft : 0,
+            leftArrowVisible: leftArrow ? true : false,
+          };
+        },
+        adventureNavigationWrapperSelector,
+        adventureNavigationArrowLeftSelector
+      );
+      expect(scrolledState.scrollLeft).toBeGreaterThan(5);
+      expect(scrolledState.leftArrowVisible).toBe(true);
+
+      // Scroll back to the start, which hides the left arrow again.
+      await this.clickOnElementWithSelector(
+        adventureNavigationArrowLeftSelector
+      );
+      await this.page.waitForTimeout(700);
+
+      const resetState = await this.page.evaluate(
+        (wrapperSel: string, leftArrowSel: string) => {
+          const wrapper = document.querySelector(wrapperSel);
+          const leftArrow = document.querySelector(leftArrowSel);
+          return {
+            scrollLeft: wrapper ? wrapper.scrollLeft : 0,
+            leftArrowVisible: leftArrow ? true : false,
+          };
+        },
+        adventureNavigationWrapperSelector,
+        adventureNavigationArrowLeftSelector
+      );
+      expect(resetState.scrollLeft).toBeLessThan(5);
+      expect(resetState.leftArrowVisible).toBe(false);
+    } else {
+      // Dock fits within the viewport (desktop): no overflow, so neither
+      // arrow is shown and the wrapper is not scrollable.
+      const dockState = await this.page.evaluate(
+        (wrapperSel: string, leftArrowSel: string) => {
+          const wrapper = document.querySelector(wrapperSel);
+          const leftArrow = document.querySelector(leftArrowSel);
+          return {
+            scrollWidth: wrapper ? wrapper.scrollWidth : 0,
+            clientWidth: wrapper ? wrapper.clientWidth : 0,
+            leftArrowVisible: leftArrow ? true : false,
+          };
+        },
+        adventureNavigationWrapperSelector,
+        adventureNavigationArrowLeftSelector
+      );
+      expect(dockState.leftArrowVisible).toBe(false);
+      expect(dockState.scrollWidth).toBeLessThanOrEqual(dockState.clientWidth);
+    }
+  }
+
+  /**
+   * Verifies that the numbers on the navigation dock badges correspond to the
+   * lessons in the first `publishedLessonCount` positions and that none of the
+   * given unpublished lesson numbers (e.g. Coming Soon or draft lessons)
+   * appear.
+   * @param {number} publishedLessonCount - The number of published lessons.
+   * @param {number[]} unpublishedLessonNumbers - Lesson numbers that must be
+   *   absent from the dock.
+   */
+  async expectDockLessonNumbersToBe(
+    publishedLessonCount: number,
+    unpublishedLessonNumbers: number[]
+  ): Promise<void> {
+    const dockLessonNumbers = await this.page.$$eval(
+      dockBadgeLabelSelector,
+      elements =>
+        elements
+          .map(el => el.textContent?.trim() || '')
+          .filter(label => /^\d+$/.test(label))
+    );
+    expect(dockLessonNumbers.length).toBe(publishedLessonCount);
+    for (
+      let lessonNumber = 1;
+      lessonNumber <= publishedLessonCount;
+      lessonNumber++
+    ) {
+      expect(dockLessonNumbers).toContain(String(lessonNumber));
+    }
+    for (const lessonNumber of unpublishedLessonNumbers) {
+      expect(dockLessonNumbers).not.toContain(String(lessonNumber));
+    }
+  }
+
+  /**
+   * Verifies that the first, expanded chapter card shows its title,
+   * description, Play CTA, and at least one secondary action button.
+   */
+  async expectFirstChapterCardToShowStartAndSecondaryActions(): Promise<void> {
+    await this.expectElementToBeVisible(topicLessonCardSelector);
+    await this.expectElementToBeVisible(topicLessonCardTitleSelector);
+    await this.expectElementToBeVisible(topicLessonCardDescriptionSelector);
+    await this.expectElementToBeVisible(topicLessonCardStartButtonSelector);
+    const secondaryButtons = await this.page.$$(
+      topicLessonCardSecondaryButtonSelector
+    );
+    if (secondaryButtons.length === 0) {
+      throw new Error(
+        'Expected at least one secondary action button on the chapter card.'
+      );
+    }
+  }
+
+  /**
+   * Verifies that the New badge for recently published lessons is visible.
+   */
+  async expectNewLessonBadgeToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(topicLessonCardNewLabelSelector);
+  }
+
+  /**
+   * Scrolls the Coming Soon chapters section into view.
+   */
+  async scrollComingSoonSectionIntoView(): Promise<void> {
+    await this.page.evaluate(sectionSelector => {
+      document
+        .querySelector(sectionSelector)
+        ?.scrollIntoView({behavior: 'smooth'});
+    }, comingSoonChaptersListSelector);
+  }
+
+  /**
+   * Verifies that the Coming Soon chapters section is visible.
+   */
+  async expectComingSoonSectionToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(comingSoonChaptersListSelector);
+  }
+
+  /**
+   * Verifies that the Coming Soon chapters section title contains the given
+   * text.
+   * @param {string} text - The expected section title text.
+   */
+  async expectComingSoonTitleToContain(text: string): Promise<void> {
+    await this.expectElementToBeVisible(comingSoonChaptersTitleSelector);
+    await this.expectTextContentToContain(
+      comingSoonChaptersTitleSelector,
+      text
+    );
+  }
+
+  /**
+   * Verifies that the Coming Soon placeholder lesson card and its label are
+   * visible.
+   */
+  async expectComingSoonSectionToShowLessonCard(): Promise<void> {
+    await this.expectElementToBeVisible(comingSoonLessonCardWrapperSelector);
+    await this.expectElementToBeVisible(comingSoonLessonCardLabelSelector);
+  }
+
+  /**
+   * Verifies that the Coming Soon chapters section shows the given number of
+   * chapters.
+   * @param {number} numberOfChapters - The expected number of chapters.
+   */
+  async expectComingSoonSectionToContainChapterCount(
+    numberOfChapters: number
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      comingSoonChaptersCountSelector,
+      `${numberOfChapters} chapter`
+    );
+    const comingSoonCardCount = await this.page.$$eval(
+      `${comingSoonChaptersListSelector} ${topicLessonCardSelector}`,
+      elements => elements.length
+    );
+    expect(comingSoonCardCount).toBe(numberOfChapters);
+  }
+
+  /**
+   * Verifies that the Coming Soon lesson card description contains the given
+   * text.
+   * @param {string} text - The expected availability message.
+   */
+  async expectComingSoonDescriptionToContain(text: string): Promise<void> {
+    await this.expectTextContentToContain(
+      `${comingSoonChaptersListSelector} ${topicLessonCardDescriptionSelector}`,
+      text
+    );
+  }
+
+  /**
+   * Clicks the Coming Soon placeholder card and verifies that navigation does
+   * not occur (the URL stays on the topic page).
+   * @param {string} topicUrl - The topic page URL that should be preserved.
+   */
+  async clickComingSoonCardAndExpectNoNavigation(
+    topicUrl: string
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(comingSoonLessonCardWrapperSelector);
+    const currentUrl = this.page.url();
+    if (!currentUrl.includes(topicUrl)) {
+      throw new Error(
+        'Navigation should not occur when clicking a Coming Soon card.'
+      );
+    }
+  }
+
+  /**
+   * Verifies that the page text does not contain the given text.
+   * @param {string} text - The text that must be absent from the page.
+   */
+  async expectPageTextNotToContain(text: string): Promise<void> {
+    const pageText = await this.page.evaluate(
+      () => document.body.textContent || ''
+    );
+    expect(pageText).not.toContain(text);
+  }
+
+  /**
+   * Scrolls to the very bottom of the topic page.
+   */
+  async scrollToEndOfTopicPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  }
+
+  /**
+   * Scrolls the Mastery Challenge card into view.
+   */
+  async scrollMasteryChallengeCardIntoView(): Promise<void> {
+    await this.page.evaluate(cardSelector => {
+      document
+        .querySelector(cardSelector)
+        ?.scrollIntoView({behavior: 'smooth'});
+    }, masteryChallengeCardSelector);
+  }
+
+  /**
+   * Verifies that the Mastery Challenge card is visible.
+   */
+  async expectMasteryChallengeCardToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(masteryChallengeCardSelector);
+  }
+
+  /**
+   * Verifies that the Mastery Challenge title is visible.
+   */
+  async expectMasteryChallengeTitleToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(masteryChallengeTitleSelector);
+  }
+
+  /**
+   * Verifies that the Mastery Challenge description is visible.
+   */
+  async expectMasteryChallengeDescriptionToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(masteryChallengeDescriptionSelector);
+  }
+
+  /**
+   * Verifies that the Mastery Challenge button is visible.
+   */
+  async expectMasteryChallengeButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(masteryChallengeButtonSelector);
+  }
+
+  /**
+   * Verifies that the Mastery Challenge card shows its title, description, and
+   * button.
+   */
+  async expectMasteryChallengeCardToShowDescription(): Promise<void> {
+    await this.expectMasteryChallengeCardToBeVisible();
+    await this.expectMasteryChallengeTitleToBeVisible();
+    await this.expectMasteryChallengeDescriptionToBeVisible();
+    await this.expectMasteryChallengeButtonToBeVisible();
+  }
+
+  /**
+   * Returns whether the Mastery Challenge button is unlocked (not disabled and
+   * not carrying the locked class).
+   */
+  async isMasteryChallengeUnlocked(): Promise<boolean> {
+    return await this.page.evaluate(
+      (buttonSelector: string, lockedClass: string) => {
+        const btn = document.querySelector(buttonSelector) as HTMLButtonElement;
+        return !btn?.disabled && !btn?.classList.contains(lockedClass);
+      },
+      masteryChallengeButtonSelector,
+      masteryChallengeButtonLockedClass
+    );
+  }
+
+  /**
+   * Verifies that clicking the locked Mastery Challenge button does not
+   * navigate away from the topic page.
+   */
+  async expectClickingLockedMasteryChallengeButtonToNotNavigate(): Promise<void> {
+    if (!(await this.isMasteryChallengeUnlocked())) {
+      const urlBeforeClick = this.page.url();
+      await this.clickOnElementWithSelector(masteryChallengeButtonSelector);
+      await this.page.waitForTimeout(500);
+      expect(this.page.url()).toBe(urlBeforeClick);
+    }
+  }
+
+  /**
+   * Clicks the locked Mastery Challenge button and verifies that the helper
+   * tooltip (with its title and description) is shown and then disappears.
+   */
+  async clickLockedMasteryChallengeButtonAndExpectHelperTooltip(): Promise<void> {
+    if (!(await this.isMasteryChallengeUnlocked())) {
+      await this.clickOnElementWithSelector(masteryChallengeButtonSelector);
+      await this.expectElementToBeVisible(
+        masteryChallengeHelperTooltipSelector
+      );
+      await this.expectElementToBeVisible(masteryChallengeHelperTitleSelector);
+      await this.expectElementToBeVisible(
+        masteryChallengeHelperDescriptionSelector
+      );
+      await this.expectTextContentToContain(
+        masteryChallengeHelperTitleSelector,
+        'Complete all chapters to unlock'
+      );
+      await this.page.waitForTimeout(6000);
+      await this.expectElementToBeVisible(
+        masteryChallengeHelperTooltipSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Verifies that the Mastery Challenge button is unlocked.
+   */
+  async expectMasteryChallengeToBeUnlocked(): Promise<void> {
+    await this.expectMasteryChallengeCardToBeVisible();
+    const isUnlocked = await this.isMasteryChallengeUnlocked();
+    expect(isUnlocked).toBe(true);
+  }
+
+  /**
+   * Clicks the unlocked Mastery Challenge button and verifies that the
+   * practice session page opens.
+   */
+  async clickMasteryChallengeAndNavigateToPracticeSession(): Promise<void> {
+    const topicUrlBeforeNavigation = this.page.url();
+    await this.clickOnElementWithSelector(masteryChallengeButtonSelector);
+    await this.waitForPageToFullyLoad();
+    expect(this.page.url()).toContain('/mastery-challenge');
+    expect(this.page.url()).not.toBe(topicUrlBeforeNavigation);
+    await this.expectElementToBeVisible(topicPracticeSessionContainerSelector);
+  }
+
+  /**
+   * Verifies that the adventure end-of-arc practice test card and its Practice
+   * Test button are visible.
+   */
+  async expectPracticeTestCardToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(adventureEndTestCardSelector);
+    await this.expectElementToBeVisible(adventureEndTestTitleSelector);
+    await this.expectElementToBeVisible(adventureEndTestPracticeButtonSelector);
+  }
+
+  /**
+   * Scrolls the topic page back to the top.
+   */
+  async scrollToTopOfTopicPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Verifies that the Study Skills CTA in the story card header is visible.
+   */
+  async expectStudySkillsCtaToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(topicStudySkillsCtaSelector);
+  }
+
+  /**
+   * Returns the lesson circle badges in the adventure navigation dock.
+   */
+  private async getDockCircleBadges(): Promise<ElementHandle<Element>[]> {
+    return this.page.$$(
+      `${adventureNavigationSelector} topic-adventure-circle-badge`
+    );
+  }
+
+  /**
+   * Clicks the dock badge for the later arc at the given index, verifies that
+   * the skip confirmation modal (with Cancel and Proceed) opens, and then
+   * dismisses it with Cancel.
+   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   */
+  async clickDockBadgeAndExpectSkipModalToShowThenCancel(
+    arcNodeIndex: number
+  ): Promise<void> {
+    const circleBadges = await this.getDockCircleBadges();
+    if (circleBadges.length >= 3) {
+      await circleBadges[arcNodeIndex].click();
+      await this.expectElementToBeVisible(arcSkipModalSelector);
+      await this.expectElementToBeVisible(arcSkipCancelButtonSelector);
+      await this.expectElementToBeVisible(arcSkipProceedButtonSelector);
+      await this.clickOnElementWithSelector(arcSkipCancelButtonSelector);
+      await this.expectElementToBeVisible(arcSkipModalSelector, false);
+    }
+  }
+
+  /**
+   * Clicks the dock badge for the later arc at the given index, confirms the
+   * skip, and verifies that the earlier adventures are shown as skipped cards
+   * with the SKIPPED badge, message, and Start CTA.
+   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   */
+  async skipToLaterArcAndExpectSkippedAdventureCards(
+    arcNodeIndex: number
+  ): Promise<void> {
+    const circleBadges = await this.getDockCircleBadges();
+    if (circleBadges.length >= 3) {
+      await circleBadges[arcNodeIndex].click();
+      await this.expectElementToBeVisible(arcSkipModalSelector);
+      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
+      await this.page.waitForTimeout(1000);
+      const skippedCards = await this.page.$$(skippedAdventureCardSelector);
+      expect(skippedCards.length).toBeGreaterThan(0);
+      await this.expectElementToBeVisible(skippedAdventureBadgeSelector);
+      await this.expectTextContentToContain(
+        skippedAdventureBadgeSelector,
+        'SKIPPED'
+      );
+      await this.expectElementToBeVisible(skippedAdventureMessageSelector);
+      await this.expectElementToBeVisible(skippedAdventureStartCtaSelector);
+    }
+  }
+
+  /**
+   * Clicks the dock badge for the later arc at the given index, confirms the
+   * skip, and verifies that the page smooth-scrolls to the selected milestone
+   * without reloading.
+   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   */
+  async navigateToLaterArcMilestoneAndExpectNoPageReload(
+    arcNodeIndex: number
+  ): Promise<void> {
+    const circleBadges = await this.getDockCircleBadges();
+    if (circleBadges.length >= 3) {
+      // Start from the top of the page and record the browser's navigation
+      // time origin. If the page reloaded during dock navigation, the time
+      // origin would change, which is how we verify there is no reload.
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+      await this.page.waitForTimeout(300);
+      const timeOriginBeforeNavigation = await this.page.evaluate(
+        () => performance.timeOrigin
+      );
+      const urlBeforeNavigation = this.page.url();
+      const scrollYBeforeNavigation = await this.page.evaluate(
+        () => window.scrollY
+      );
+
+      // Use the stabilized click helper instead of a raw Puppeteer click:
+      // on mobile the navigation dock can scroll while the page is
+      // smooth-scrolling, so a raw click's coordinates can land off-target.
+      await this.clickOnElement(circleBadges[arcNodeIndex]);
+      await this.expectElementToBeVisible(arcSkipModalSelector);
+      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
+
+      // The dock scrolls to the selected milestone with a 300 ms delay before
+      // a smooth scroll, so give the smooth scroll time to finish.
+      await this.page.waitForTimeout(2500);
+
+      expect(this.page.url()).toBe(urlBeforeNavigation);
+      const timeOriginAfterNavigation = await this.page.evaluate(
+        () => performance.timeOrigin
+      );
+      expect(timeOriginAfterNavigation).toBe(timeOriginBeforeNavigation);
+
+      // The page must have scrolled down to the selected milestone (the
+      // lesson whose badge was clicked).
+      const scrollYAfterNavigation = await this.page.evaluate(
+        () => window.scrollY
+      );
+      expect(scrollYAfterNavigation).toBeGreaterThan(
+        scrollYBeforeNavigation + 100
+      );
+
+      const lessonElementId = `lesson-${arcNodeIndex + 1}`;
+      const selectedLessonTop = await this.page.evaluate(
+        (elementId: string) => {
+          const element = document.getElementById(elementId);
+          return element ? element.getBoundingClientRect().top : null;
+        },
+        lessonElementId
+      );
+      expect(selectedLessonTop).not.toBeNull();
+      expect(selectedLessonTop as number).toBeLessThan(
+        await this.page.evaluate(() => window.innerHeight * 0.6)
+      );
+    }
+  }
+
+  /**
+   * Clicks the Start CTA of the first skipped adventure card and verifies that
+   * the skipped adventure expands to show its lessons.
+   */
+  async expandSkippedAdventureByClickingStartCta(): Promise<void> {
+    const startCtas = await this.page.$$(skippedAdventureStartCtaSelector);
+    if (startCtas.length > 0) {
+      // Use the stabilized click helper instead of a raw Puppeteer click:
+      // the page is still smooth-scrolling toward the previously selected
+      // arc, and a raw click's coordinates can land off-target mid-scroll.
+      await this.clickOnElement(startCtas[0]);
+      await this.expectElementToBeVisible(skippedAdventureCardSelector, false);
+      const lessonCards = await this.page.$$(topicLessonCardSelector);
+      expect(lessonCards.length).toBeGreaterThan(0);
+    }
+  }
+
+  /**
+   * Clicks the Play CTA of the active chapter and waits for the lesson player
+   * page to load.
+   */
+  async clickOnActiveChapterStartButton(): Promise<void> {
+    await this.clickOnElementWithSelector(topicLessonCardStartButtonSelector);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Verifies that a completed lesson is shown with the completed state on the
+   * redesigned topic page.
+   */
+  async expectCompletedLessonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(topicLessonCardCompletedClassSelector);
+  }
+
+  /**
+   * Verifies that a completed chapter is collapsed into a compact row with a
+   * Play Again action and a completed label.
+   */
+  async expectCompletedChapterToBeCollapsed(): Promise<void> {
+    await this.expectElementToBeVisible(
+      topicLessonCardCompletedCollapsedSelector
+    );
+    await this.expectElementToBeVisible(topicLessonCardPlayAgainButtonSelector);
+    await this.expectElementToBeVisible(topicLessonCardCompletedLabelSelector);
+  }
+
+  /**
+   * Verifies that after a completion the next chapter becomes the active
+   * lesson with its Play CTA visible.
+   */
+  async expectNextChapterToBeActive(): Promise<void> {
+    const lessonCards = await this.page.$$(topicLessonCardSelector);
+    expect(lessonCards.length).toBeGreaterThanOrEqual(2);
+    await this.expectElementToBeVisible(topicLessonCardStartButtonSelector);
+  }
+
+  /**
+   * Verifies that the timeline displays thematic Arc headers.
+   */
+  async expectArcTitlesToBeVisibleOnTimeline(): Promise<void> {
+    await this.expectElementToBeVisible(adventureTitleSelector);
+    const arcTitles = await this.page.$$eval(adventureTitleSelector, elements =>
+      elements.map(el => (el as HTMLElement).textContent?.trim())
+    );
+    expect(arcTitles.length).toBeGreaterThan(0);
+  }
+
+  /**
+   * Verifies that the active chapter card shows its Play CTA and at least the
+   * given number of secondary action buttons.
+   * @param {number} minSecondaryActionCount - The minimum number of secondary
+   *   action buttons expected on the card.
+   */
+  async expectActiveChapterCardToShowStartAndSecondaryActions(
+    minSecondaryActionCount: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(topicLessonCardSelector);
+    await this.expectElementToBeVisible(topicLessonCardStartButtonSelector);
+    const secondaryButtons = await this.page.$$(
+      topicLessonCardSecondaryButtonSelector
+    );
+    expect(secondaryButtons.length).toBeGreaterThanOrEqual(
+      minSecondaryActionCount
+    );
+  }
+
+  /**
+   * Verifies that the lesson language selector with its text and voiceover
+   * dropdowns is visible on the chapter card.
+   */
+  async expectLessonLanguageSelectorToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(topicLessonLanguageSelector);
+    const hasTextDropdown = await this.isElementVisible(
+      topicTextLanguageSelector
+    );
+    const hasVoiceoverDropdown = await this.isElementVisible(
+      topicVoiceoverLanguageSelector
+    );
+    expect(hasTextDropdown || hasVoiceoverDropdown).toBe(true);
+  }
+
+  /**
+   * Verifies that a default text language is selected in the lesson language
+   * selector when it is present.
+   */
+  async expectDefaultTextLanguageToBeSelected(): Promise<void> {
+    const hasLanguageSelector = await this.isElementVisible(
+      topicLessonLanguageSelector
+    );
+    if (hasLanguageSelector) {
+      const selectedLanguage = await this.page.$eval(
+        topicTextLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      expect(selectedLanguage).toBeTruthy();
+    }
+  }
+
+  /**
+   * Verifies that the fallback info icon tooltip is shown when the lesson is
+   * not available in the preferred language. On touch (mobile) viewports the
+   * tooltip is shown after a long-press instead of a hover.
+   */
+  async expectFallbackInfoTooltipToBeShown(): Promise<void> {
+    const hasFallbackIcon = await this.isElementVisible(
+      lessonFallbackInfoIconSelector
+    );
+
+    if (hasFallbackIcon) {
+      await this.expectElementToBeVisible(lessonFallbackInfoIconSelector);
+      if (this.isViewportAtMobileWidth()) {
+        await this.longPressOnElementWithSelector(
+          lessonFallbackInfoIconSelector
+        );
+      } else {
+        await this.page.hover(lessonFallbackInfoIconSelector);
+      }
+      await this.page.waitForSelector('div.mat-tooltip', {visible: true});
+      const tooltipText = await this.page.$eval(
+        'div.mat-tooltip',
+        el => el.textContent?.trim() || ''
+      );
+      expect(tooltipText).toBeTruthy();
+    }
+  }
+
+  /**
+   * Verifies that the session fallback language matches the language selected
+   * in the lesson text language selector.
+   */
+  async expectSessionLanguageToMatchSelectedLanguage(): Promise<void> {
+    const hasLanguageSelector = await this.isElementVisible(
+      topicLessonLanguageSelector
+    );
+    if (hasLanguageSelector) {
+      const initialLanguage = await this.page.$eval(
+        topicTextLanguageSelector,
+        (el: Element) => (el as HTMLSelectElement).value
+      );
+      const storedLanguage = await this.page.evaluate((storageKey: string) => {
+        const stored = window.sessionStorage.getItem(storageKey);
+        if (stored) {
+          const parsed = JSON.parse(stored) as {textLanguageCode?: string};
+          return parsed.textLanguageCode || '';
+        }
+        return '';
+      }, topicSessionFallbackLanguageStorageKey);
+      if (storedLanguage) {
+        expect(storedLanguage).toBe(initialLanguage);
+      }
+    }
+  }
+
+  /**
+   * Clears any session fallback language persisted for the topic page.
+   */
+  async clearSessionLanguage(): Promise<void> {
+    await this.page.evaluate(
+      (storageKey: string) => window.sessionStorage.removeItem(storageKey),
+      topicSessionFallbackLanguageStorageKey
+    );
+  }
+
+  /**
+   * Verifies that the fallback info icon is visible on the lesson card.
+   */
+  async expectFallbackInfoIconToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(lessonFallbackInfoIconSelector);
+  }
+
+  /**
+   * Verifies that the selected lesson text language matches the given code.
+   * @param {string} expectedLanguageCode - The expected language code.
+   */
+  async expectSelectedTextLanguageToBe(
+    expectedLanguageCode: string
+  ): Promise<void> {
+    const selectedLanguage = await this.page.$eval(
+      topicTextLanguageSelector,
+      (el: Element) => (el as HTMLSelectElement).value
+    );
+    expect(selectedLanguage).toBe(expectedLanguageCode);
+  }
+
+  /**
+   * Selects the given language in the lesson text language selector.
+   * @param {string} languageCode - The language code to select.
+   */
+  async selectLessonTextLanguage(languageCode: string): Promise<void> {
+    await this.select(topicTextLanguageSelector, languageCode);
+    await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Persists the given site, text, and voiceover language codes to the browser
+   * and reloads the topic page. The cached site language and the session
+   * fallback language are written directly so that the language waterfall
+   * re-evaluates deterministically after the reload.
+   * @param {string} siteLanguageCode - The language code to cache as the site
+   *   language.
+   * @param {string} textLanguageCode - The text language to persist in the
+   *   session.
+   * @param {string} voiceoverLanguageCode - The voiceover language to persist
+   *   in the session.
+   */
+  async setSessionLanguageAndReload(
+    siteLanguageCode: string,
+    textLanguageCode: string,
+    voiceoverLanguageCode: string
+  ): Promise<void> {
+    await this.page.evaluate(
+      (
+        storageKey: string,
+        siteLang: string,
+        textCode: string,
+        voiceoverCode: string
+      ) => {
+        window.localStorage.setItem('lang', siteLang);
+        window.sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            textLanguageCode: textCode,
+            voiceoverLanguageCode: voiceoverCode,
+          })
+        );
+      },
+      topicSessionFallbackLanguageStorageKey,
+      siteLanguageCode,
+      textLanguageCode,
+      voiceoverLanguageCode
+    );
+    await this.page.reload();
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
+  }
+
+  /**
+   * Verifies that the lesson text language is (re)selected to the given code
+   * after the language waterfall settles.
+   * @param {string} expectedLanguageCode - The expected language code.
+   */
+  async expectTextLanguageToBeSelected(
+    expectedLanguageCode: string
+  ): Promise<void> {
+    // Poll for the re-selected value and then re-check after a short settle
+    // period, since the language can be (re)applied asynchronously on load.
+    await this.page.waitForFunction(
+      (selector: string, expectedCode: string) => {
+        const element = document.querySelector(
+          selector
+        ) as HTMLSelectElement | null;
+        return element?.value === expectedCode;
+      },
+      {},
+      topicTextLanguageSelector,
+      expectedLanguageCode
+    );
+    await this.page.waitForTimeout(1500);
+    const selectedLanguage = await this.page.$eval(
+      topicTextLanguageSelector,
+      (el: Element) => (el as HTMLSelectElement).value
+    );
+    expect(selectedLanguage).toBe(expectedLanguageCode);
+  }
+
+  /**
+   * Persists a session fallback language that the lesson no longer offers.
+   * @param {string} languageCode - The unavailable language code to persist.
+   */
+  async setSavedSessionLanguageToUnavailable(
+    languageCode: string
+  ): Promise<void> {
+    await this.page.evaluate(
+      (storageKey: string, textCode: string) => {
+        window.sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            textLanguageCode: textCode,
+            voiceoverLanguageCode: null,
+          })
+        );
+      },
+      topicSessionFallbackLanguageStorageKey,
+      languageCode
+    );
+  }
+
+  /**
+   * Reloads the topic page and waits for it to be fully loaded.
+   */
+  async reloadTopicPage(): Promise<void> {
+    await this.page.reload();
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
+  }
+
+  /**
+   * Verifies that the lesson voiceover dropdown is disabled (or enabled) as
+   * expected.
+   * @param {boolean} isDisabled - Whether the dropdown should be disabled.
+   */
+  async expectVoiceoverLanguageDropdownToBeDisabled(
+    isDisabled: boolean
+  ): Promise<void> {
+    const voiceoverDisabled = await this.page.$eval(
+      topicVoiceoverLanguageSelector,
+      (el: Element) => (el as HTMLSelectElement).disabled
+    );
+    expect(voiceoverDisabled).toBe(isDisabled);
+  }
+
+  /**
+   * Verifies that the selected lesson voiceover language matches the given
+   * code.
+   * @param {string} expectedLanguageCode - The expected voiceover language
+   *   code.
+   */
+  async expectSelectedVoiceoverLanguageToBe(
+    expectedLanguageCode: string
+  ): Promise<void> {
+    const selectedVoiceoverLanguage = await this.page.$eval(
+      topicVoiceoverLanguageSelector,
+      (el: Element) => (el as HTMLSelectElement).value
+    );
+    expect(selectedVoiceoverLanguage).toBe(expectedLanguageCode);
+  }
+
+  /**
+   * Starts the active chapter and verifies that the lesson player URL contains
+   * the selected text and voiceover language codes.
+   * @param {string} textLanguageCode - The expected text language code.
+   * @param {string} voiceoverLanguageCode - The expected voiceover language
+   *   code.
+   */
+  async startActiveChapterAndExpectLanguageParamsInStartUrl(
+    textLanguageCode: string,
+    voiceoverLanguageCode: string
+  ): Promise<void> {
+    const urlBeforeStart = this.page.url();
+    expect(urlBeforeStart).toContain('/learn/math/fractions');
+
+    await this.clickOnElementWithSelector(topicLessonCardStartButtonSelector);
+    await this.waitForPageToFullyLoad();
+
+    const startUrl = this.page.url();
+    expect(startUrl).not.toBe(urlBeforeStart);
+    expect(startUrl).toContain(
+      `initialContentLanguageCode=${textLanguageCode}`
+    );
+    expect(startUrl).toContain(
+      `initialVoiceoverLanguageCode=${voiceoverLanguageCode}`
+    );
+
+    // The lesson player has loaded and renders the first card.
+    await this.expectElementToBeVisible(conversationSkinCardsContainerSelector);
   }
 }
 

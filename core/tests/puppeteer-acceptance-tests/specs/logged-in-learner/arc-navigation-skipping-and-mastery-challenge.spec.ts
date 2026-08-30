@@ -36,25 +36,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const BASE_URL = testConstants.URLs.BaseURL;
-
-const redesignedContainerSelector =
-  '.e2e-test-redesigned-topic-viewer-container';
-const adventureNavigationSelector = '.e2e-test-adventure-navigation';
-const adventureTitleSelector = '.e2e-test-adventure-title';
-const adventureGroupSelector = '.e2e-test-adventure-group';
-const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
-const arcSkipProceedSelector = '.e2e-test-arc-skip-confirmation-proceed';
-const arcSkipCancelSelector = '.e2e-test-arc-skip-confirmation-cancel';
-const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
-const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
-const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
-const skippedAdventureStartCtaSelector =
-  '.e2e-test-skipped-adventure-start-cta';
-const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
-const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
-const masteryChallengeButtonSelector = '.e2e-test-mastery-challenge-button';
-const lessonCardSelector = '.e2e-test-lesson-card';
 
 describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -144,9 +125,6 @@ describe('Logged-in Learner', function () {
       fourthExplorationId as string
     );
 
-    // Split the story into two Adventures so that the Adventure (arc) features
-    // (navigation dock, skip confirmation modal, skipped-adventure cards)
-    // render for the learner on the redesigned topic page.
     await curriculumAdmin.splitIntoAdventure('Introduction to Fractions');
 
     await curriculumAdmin.saveStoryDraft();
@@ -161,15 +139,8 @@ describe('Logged-in Learner', function () {
   it(
     'should navigate to topic page and display adventure navigation dock',
     async function () {
-      await loggedInLearner.goto(`${BASE_URL}/learn/math/fractions`);
-      await loggedInLearner.waitForPageToFullyLoad();
-
-      await loggedInLearner.expectElementToBeVisible(
-        redesignedContainerSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        adventureNavigationSelector
-      );
+      await loggedInLearner.openTopicPage('math', 'fractions');
+      await loggedInLearner.expectAdventureNavigationDockToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -177,12 +148,8 @@ describe('Logged-in Learner', function () {
   it(
     'should display adventure groups with titles in the timeline',
     async function () {
-      await loggedInLearner.expectElementToBeVisible(adventureTitleSelector);
-
-      const adventureGroups = await loggedInLearner.page.$$(
-        adventureGroupSelector
-      );
-      expect(adventureGroups.length).toBeGreaterThan(0);
+      await loggedInLearner.expectAdventureTitlesToBeVisible();
+      await loggedInLearner.expectAdventureCountToBeGreaterThanZero();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -190,23 +157,7 @@ describe('Logged-in Learner', function () {
   it(
     'should show skip confirmation modal when clicking a later arc node',
     async function () {
-      const circleBadges = await loggedInLearner.page.$$(
-        `${adventureNavigationSelector} topic-adventure-circle-badge`
-      );
-
-      if (circleBadges.length >= 3) {
-        await circleBadges[2].click();
-
-        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
-        await loggedInLearner.expectElementToBeVisible(arcSkipCancelSelector);
-        await loggedInLearner.expectElementToBeVisible(arcSkipProceedSelector);
-
-        await loggedInLearner.clickOnElementWithSelector(arcSkipCancelSelector);
-        await loggedInLearner.expectElementToBeVisible(
-          arcSkipModalSelector,
-          false
-        );
-      }
+      await loggedInLearner.clickDockBadgeAndExpectSkipModalToShowThenCancel(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -214,39 +165,7 @@ describe('Logged-in Learner', function () {
   it(
     'should skip to later arc and show skipped adventure cards',
     async function () {
-      const circleBadges = await loggedInLearner.page.$$(
-        `${adventureNavigationSelector} topic-adventure-circle-badge`
-      );
-
-      if (circleBadges.length >= 3) {
-        await circleBadges[2].click();
-
-        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
-        await loggedInLearner.clickOnElementWithSelector(
-          arcSkipProceedSelector
-        );
-
-        await loggedInLearner.page.waitForTimeout(1000);
-
-        const skippedCards = await loggedInLearner.page.$$(
-          skippedAdventureCardSelector
-        );
-        expect(skippedCards.length).toBeGreaterThan(0);
-
-        await loggedInLearner.expectElementToBeVisible(
-          skippedAdventureBadgeSelector
-        );
-        await loggedInLearner.expectTextContentToContain(
-          skippedAdventureBadgeSelector,
-          'SKIPPED'
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          skippedAdventureMessageSelector
-        );
-        await loggedInLearner.expectElementToBeVisible(
-          skippedAdventureStartCtaSelector
-        );
-      }
+      await loggedInLearner.skipToLaterArcAndExpectSkippedAdventureCards(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -254,64 +173,7 @@ describe('Logged-in Learner', function () {
   it(
     'should navigate to a later arc milestone with smooth scrolling and no page reload',
     async function () {
-      const circleBadges = await loggedInLearner.page.$$(
-        `${adventureNavigationSelector} topic-adventure-circle-badge`
-      );
-
-      if (circleBadges.length >= 3) {
-        // Start from the top of the page and record the browser's navigation
-        // time origin. If the page reloaded during dock navigation, the time
-        // origin would change, which is how we verify there is no reload.
-        await loggedInLearner.page.evaluate(() => {
-          window.scrollTo(0, 0);
-        });
-        await loggedInLearner.page.waitForTimeout(300);
-        const timeOriginBeforeNavigation = await loggedInLearner.page.evaluate(
-          () => performance.timeOrigin
-        );
-        const urlBeforeNavigation = loggedInLearner.page.url();
-        const scrollYBeforeNavigation = await loggedInLearner.page.evaluate(
-          () => window.scrollY
-        );
-
-        // Use the stabilized click helper instead of a raw Puppeteer click:
-        // on mobile the navigation dock can scroll while the page is
-        // smooth-scrolling, so a raw click's coordinates can land off-target.
-        await loggedInLearner.clickOnElement(circleBadges[2]);
-
-        await loggedInLearner.expectElementToBeVisible(arcSkipModalSelector);
-        await loggedInLearner.clickOnElementWithSelector(
-          arcSkipProceedSelector
-        );
-
-        // The dock scrolls to the selected milestone with a 300 ms delay before
-        // a smooth scroll, so give the smooth scroll time to finish.
-        await loggedInLearner.page.waitForTimeout(2500);
-
-        expect(loggedInLearner.page.url()).toBe(urlBeforeNavigation);
-        const timeOriginAfterNavigation = await loggedInLearner.page.evaluate(
-          () => performance.timeOrigin
-        );
-        expect(timeOriginAfterNavigation).toBe(timeOriginBeforeNavigation);
-
-        // The page must have scrolled down to the selected milestone (the
-        // lesson whose badge was clicked, which is the third lesson).
-        const scrollYAfterNavigation = await loggedInLearner.page.evaluate(
-          () => window.scrollY
-        );
-        expect(scrollYAfterNavigation).toBeGreaterThan(
-          scrollYBeforeNavigation + 100
-        );
-
-        const selectedLessonTop = await loggedInLearner.page.evaluate(() => {
-          const element = document.getElementById('lesson-3');
-          return element ? element.getBoundingClientRect().top : null;
-        });
-        expect(selectedLessonTop).not.toBeNull();
-        expect(selectedLessonTop as number).toBeLessThan(
-          await loggedInLearner.page.evaluate(() => window.innerHeight * 0.6)
-        );
-      }
+      await loggedInLearner.navigateToLaterArcMilestoneAndExpectNoPageReload(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -319,24 +181,7 @@ describe('Logged-in Learner', function () {
   it(
     'should expand a skipped adventure when clicking its Start CTA',
     async function () {
-      const startCtas = await loggedInLearner.page.$$(
-        skippedAdventureStartCtaSelector
-      );
-
-      if (startCtas.length > 0) {
-        // Use the stabilized click helper instead of a raw Puppeteer click:
-        // the page is still smooth-scrolling toward the previously selected
-        // arc, and a raw click's coordinates can land off-target mid-scroll.
-        await loggedInLearner.clickOnElement(startCtas[0]);
-
-        await loggedInLearner.expectElementToBeVisible(
-          skippedAdventureCardSelector,
-          false
-        );
-
-        const lessonCards = await loggedInLearner.page.$$(lessonCardSelector);
-        expect(lessonCards.length).toBeGreaterThan(0);
-      }
+      await loggedInLearner.expandSkippedAdventureByClickingStartCta();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -344,21 +189,10 @@ describe('Logged-in Learner', function () {
   it(
     'should display Mastery Challenge card at the end of the story path',
     async function () {
-      await loggedInLearner.page.evaluate(() => {
-        document
-          .querySelector('.e2e-test-mastery-challenge-card')
-          ?.scrollIntoView({behavior: 'smooth'});
-      });
-
-      await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeCardSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeTitleSelector
-      );
-      await loggedInLearner.expectElementToBeVisible(
-        masteryChallengeButtonSelector
-      );
+      await loggedInLearner.scrollMasteryChallengeCardIntoView();
+      await loggedInLearner.expectMasteryChallengeCardToBeVisible();
+      await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
+      await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -366,27 +200,7 @@ describe('Logged-in Learner', function () {
   it(
     'should not navigate away when clicking the locked Mastery Challenge button',
     async function () {
-      const isUnlocked = await loggedInLearner.page.evaluate(() => {
-        const btn = document.querySelector(
-          '.e2e-test-mastery-challenge-button'
-        ) as HTMLButtonElement;
-        return (
-          !btn?.disabled &&
-          !btn?.classList.contains('mastery-challenge-button-locked')
-        );
-      });
-
-      if (!isUnlocked) {
-        const urlBeforeClick = loggedInLearner.page.url();
-
-        await loggedInLearner.clickOnElementWithSelector(
-          masteryChallengeButtonSelector
-        );
-
-        await loggedInLearner.page.waitForTimeout(500);
-
-        expect(loggedInLearner.page.url()).toBe(urlBeforeClick);
-      }
+      await loggedInLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
