@@ -55,7 +55,6 @@ describe('ErrorPageComponent', () => {
   });
 
   afterEach(() => {
-    // Clean up sessionStorage after each test.
     windowRef.nativeWindow.sessionStorage.clear();
   });
 
@@ -110,4 +109,99 @@ describe('ErrorPageComponent', () => {
 
     expect(component.customErrorMessage).toBeNull();
   }));
+
+  describe('focus indicator for links', () => {
+    const getContainer = (): HTMLElement =>
+      fixture.nativeElement.querySelector('.oppia-wide-panel-content');
+
+    const createMockLink = (): HTMLAnchorElement => {
+      const link = document.createElement('a');
+      link.href = '/';
+      link.textContent = 'home page';
+      return link;
+    };
+
+    it('should attach focus and blur listeners to links that already exist', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+      expect(link.style.outlineOffset).toBe('2px');
+    }));
+
+    it('should not show outline when focus is triggered by mouse', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const mousedownEvent = new MouseEvent('mousedown');
+      window.dispatchEvent(mousedownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('');
+    }));
+
+    it('should remove outline styles on blur', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+
+      link.dispatchEvent(new Event('blur'));
+      expect(link.style.outline).toBe('');
+      expect(link.style.outlineOffset).toBe('');
+    }));
+
+    it('should attach listeners to links injected later via MutationObserver', async () => {
+      fixture.detectChanges();
+      const container = getContainer();
+
+      component.ngAfterViewInit();
+
+      const link = createMockLink();
+      container.appendChild(link);
+
+      // Wait for the real MutationObserver callback to fire (runs as a
+      // genuine browser microtask, which fakeAsync cannot reliably flush).
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+    });
+
+    it('should do nothing if the container element is not found', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      container.remove();
+
+      expect(() => {
+        component.ngAfterViewInit();
+        tick();
+      }).not.toThrow();
+    }));
+  });
 });
