@@ -18,9 +18,9 @@
 }
 
 .feedback-wrapper {
-  position: relative;
-  padding-left: 20px;
   box-sizing: border-box;
+  padding-left: 20px;
+  position: relative;
 }
 
 .feedback-wrapper .conversation-skin-oppia-avatar {
@@ -35,9 +35,9 @@
 
 .conversation-skin-oppia-feedback-container {
   background-color: rgba(224,242,241,1);
-  border-radius: 0;
-  margin-top: 10px;
+  border-radius: 0; 
   margin-bottom: 20px;
+  margin-top: 10px;
   width: 70%;
 }
 

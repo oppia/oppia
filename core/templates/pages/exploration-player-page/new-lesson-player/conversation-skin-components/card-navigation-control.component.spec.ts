@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,39 +25,28 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {UrlService} from '../../../../services/contextual/url.service';
-import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
-import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationModeService} from '../../services/exploration-mode.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {UrlService} from 'services/contextual/url.service';
+import {PageContextService} from 'services/page-context.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {
   HelpCardEventResponse,
   PlayerPositionService,
 } from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {CardNavigationControlComponent} from './card-navigation-control.component';
-import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
-import {SchemaFormSubmittedService} from '../../../../services/schema-form-submitted.service';
-import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
-import {ConversationFlowService} from '../../services/conversation-flow.service';
-import {Interaction} from '../../../../domain/exploration/interaction.model';
 
-describe('Progress nav component', () => {
+describe('Card navigation control component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
   let componentInstance: CardNavigationControlComponent;
 
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
-  let conversationFlowService: ConversationFlowService;
-  let explorationModeService: ExplorationModeService;
-  let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
-  let schemaFormSubmittedService: SchemaFormSubmittedService;
-  let contentTranslationManagerService: ContentTranslationManagerService;
+  let pageContextService: PageContextService;
+  let conversationFlowService: ConversationFlowService;
+
   let mockDisplayedCard = new StateCard('', '', '', {} as Interaction, [], '');
   let mockDisplayedCard2 = new StateCard(
     'state',
@@ -71,20 +60,13 @@ describe('Progress nav component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [CardNavigationControlComponent, MockTranslatePipe],
+      declarations: [CardNavigationControlComponent],
       providers: [
-        ExplorationEngineService,
-        ExplorationModeService,
-        ConversationFlowService,
-        FocusManagerService,
         PlayerPositionService,
         PlayerTranscriptService,
         UrlService,
-        SchemaFormSubmittedService,
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService,
-        },
+        PageContextService,
+        ConversationFlowService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -95,146 +77,98 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    explorationModeService = TestBed.inject(ExplorationModeService);
-    conversationFlowService = TestBed.inject(ConversationFlowService);
-    focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
-    contentTranslationManagerService = TestBed.inject(
-      ContentTranslationManagerService
-    );
-
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
+    pageContextService = TestBed.inject(PageContextService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
   });
 
   afterEach(() => {
     componentInstance.ngOnDestroy();
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize when on a lesson page outside an embed', fakeAsync(() => {
     let isIframed = true;
     let mockOnHelpCardAvailableEventEmitter =
       new EventEmitter<HelpCardEventResponse>();
-    let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(urlService, 'getPathname').and.returnValue(
       'http://localhost:8181/lesson/wZiXFx1iV5bz'
     );
-    spyOn(componentInstance.submit, 'emit');
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      false
+    );
     spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
       mockOnHelpCardAvailableEventEmitter
     );
-    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOnProperty(
-      schemaFormSubmittedService,
-      'onSubmittedSchemaBasedForm'
-    ).and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
     componentInstance.ngOnInit();
     mockOnHelpCardAvailableEventEmitter.emit({
       hasContinueButton: true,
     } as HelpCardEventResponse);
-    mockSchemaFormSubmittedEventEmitter.emit();
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
-    expect(componentInstance.helpCardHasContinueButton).toBe(true);
-    expect(componentInstance.submit.emit).toHaveBeenCalled();
+    expect(componentInstance.navigationThroughCardHistoryIsEnabled).toBe(true);
     expect(componentInstance.progressTrackerIsVisible).toBe(true);
+    expect(componentInstance.helpCardHasContinueButton).toBe(true);
   }));
 
-  it('should update displayed card info', fakeAsync(() => {
-    let displayedCardIndex = 0;
-
-    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(
-      displayedCardIndex
+  it('should not show the progress tracker when embedded', fakeAsync(() => {
+    spyOn(urlService, 'isIframed').and.returnValue(true);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/embed/lesson/wZiXFx1iV5bz'
     );
-    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(focusManagerService, 'setFocusWithoutScroll');
-
-    componentInstance.displayedCard = mockDisplayedCard;
-    spyOn(mockDisplayedCard, 'getInteractionId').and.returnValue('Continue');
-
-    componentInstance.updateDisplayedCardInfo();
-    tick();
-
-    expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
-    expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
-    expect(componentInstance.helpCardHasContinueButton).toBe(false);
-    expect(componentInstance.interactionIsInline).toEqual(
-      mockDisplayedCard.isInteractionInline()
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      false
     );
-    expect(componentInstance.interactionCustomizationArgs).toEqual(
-      mockDisplayedCard.getInteractionCustomizationArgs()
+    spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
+      new EventEmitter<HelpCardEventResponse>()
     );
-  }));
-
-  it('should respond to state card content updates', fakeAsync(() => {
-    let mockOnStateCardContentUpdate = new EventEmitter<void>();
-    spyOn(componentInstance, 'updateDisplayedCardInfo');
-    spyOnProperty(
-      contentTranslationManagerService,
-      'onStateCardContentUpdate'
-    ).and.returnValue(mockOnStateCardContentUpdate);
 
     componentInstance.ngOnInit();
     tick();
-    expect(componentInstance.updateDisplayedCardInfo).not.toHaveBeenCalled();
 
-    mockOnStateCardContentUpdate.emit();
-    tick();
-
-    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
+    expect(componentInstance.progressTrackerIsVisible).toBe(false);
   }));
 
-  it('should tell if continue button should be shown', () => {
-    componentInstance.conceptCardIsBeingShown = true;
+  it('should not show the progress tracker outside of the lesson page', fakeAsync(() => {
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/create/wZiXFx1iV5bz'
+    );
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      false
+    );
+    spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
+      new EventEmitter<HelpCardEventResponse>()
+    );
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBe(true);
+    componentInstance.ngOnInit();
+    tick();
 
-    componentInstance.conceptCardIsBeingShown = false;
-    componentInstance.interactionIsInline = false;
+    expect(componentInstance.progressTrackerIsVisible).toBe(false);
+  }));
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBe(false);
-  });
+  it('should disable navigation through card history in the diagnostic test player', fakeAsync(() => {
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/diagnostic-test-player'
+    );
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      true
+    );
+    spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
+      new EventEmitter<HelpCardEventResponse>()
+    );
 
-  it('should be able to skip the question', () => {
-    spyOn(componentInstance.skipQuestion, 'emit');
+    componentInstance.ngOnInit();
+    tick();
 
-    componentInstance.skipCurrentQuestion();
+    expect(componentInstance.navigationThroughCardHistoryIsEnabled).toBe(false);
+  }));
 
-    expect(componentInstance.skipQuestion.emit).toHaveBeenCalled();
-  });
-
-  it('should tell if interaction have submit nav button', () => {
-    componentInstance.interactionId = 'ImageClickInput';
-
-    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBe(false);
-
-    componentInstance.interactionId = 'not_valid';
-
-    expect(() => {
-      componentInstance.doesInteractionHaveNavSubmitButton();
-    }).toThrowError();
-  });
-
-  it('should call moveForwardByOneCard on conversationFlowService', () => {
-    spyOn(conversationFlowService, 'moveForwardByOneCard');
-    componentInstance.moveForwardByOneCard();
-    expect(conversationFlowService.moveForwardByOneCard).toHaveBeenCalled();
-  });
-  it('should call moveBackByOneCard on conversationFlowService', () => {
-    spyOn(conversationFlowService, 'moveBackByOneCard');
-    componentInstance.moveBackByOneCard();
-    expect(conversationFlowService.moveBackByOneCard).toHaveBeenCalled();
-  });
-
-  it('should update displayed card info when view updates', () => {
+  it('should update displayed card info when the displayed card changes', () => {
     spyOn(componentInstance, 'updateDisplayedCardInfo');
     componentInstance.lastDisplayedCard = mockDisplayedCard2;
     componentInstance.displayedCard = mockDisplayedCard;
@@ -245,11 +179,47 @@ describe('Progress nav component', () => {
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   });
 
-  it('should show the upcoming card when continue button is clicked', () => {
-    spyOn(conversationFlowService, 'showUpcomingCard');
+  it('should not update displayed card info when the displayed card is unchanged', () => {
+    spyOn(componentInstance, 'updateDisplayedCardInfo');
+    componentInstance.lastDisplayedCard = mockDisplayedCard;
+    componentInstance.displayedCard = mockDisplayedCard;
 
-    componentInstance.onClickContinueButton();
+    componentInstance.ngOnChanges();
 
-    expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
+    expect(componentInstance.updateDisplayedCardInfo).not.toHaveBeenCalled();
+  });
+
+  it('should mark hasPrevious false and hasNext true on the first card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+
+    componentInstance.updateDisplayedCardInfo();
+
+    expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
+    expect(playerTranscriptService.isLastCard).toHaveBeenCalledWith(0);
+    expect(componentInstance.hasPrevious).toBe(false);
+    expect(componentInstance.hasNext).toBe(true);
+  });
+
+  it('should mark hasPrevious true and hasNext false on the last card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+
+    componentInstance.updateDisplayedCardInfo();
+
+    expect(componentInstance.hasPrevious).toBe(true);
+    expect(componentInstance.hasNext).toBe(false);
+  });
+
+  it('should call moveForwardByOneCard on conversationFlowService', () => {
+    spyOn(conversationFlowService, 'moveForwardByOneCard');
+    componentInstance.moveForwardByOneCard();
+    expect(conversationFlowService.moveForwardByOneCard).toHaveBeenCalled();
+  });
+
+  it('should call moveBackByOneCard on conversationFlowService', () => {
+    spyOn(conversationFlowService, 'moveBackByOneCard');
+    componentInstance.moveBackByOneCard();
+    expect(conversationFlowService.moveBackByOneCard).toHaveBeenCalled();
   });
 });
