@@ -30,11 +30,13 @@ import {CertificateAssessmentConversationSkinComponent} from './certificate-asse
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
 import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
 import {TranslateModule} from '@ngx-translate/core';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     MatBottomSheetModule,
+    InteractionExtensionsModule,
     SharedComponentsModule,
     CertificateOfferingSharedModule,
     RouterModule.forChild([
