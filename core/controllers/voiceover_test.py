@@ -21,7 +21,6 @@ import uuid
 
 from core import constants, feature_flag_list, feconf
 from core.domain import (
-    beam_job_services,
     cloud_task_domain,
     exp_domain,
     exp_fetchers,

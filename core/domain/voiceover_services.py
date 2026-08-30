@@ -44,7 +44,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Set, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -100,9 +100,9 @@ def save_language_accent_code_to_beam_job_run_model(
 
 def get_language_accent_code_to_beam_job_run_status() -> Dict[str, str]:
     """Returns the Beam job state for each language-accent code."""
-    language_accent_code_to_beam_job_run_models = (
-        gae_models.LanguageAccentCodeToBeamJobRunModel.query().fetch()
-    )
+    language_accent_code_to_beam_job_run_models: Sequence[
+        gae_models.LanguageAccentCodeToBeamJobRunModel
+    ] = gae_models.LanguageAccentCodeToBeamJobRunModel.query().fetch()
     language_accent_code_to_status: Dict[str, str] = {}
     completed_models_to_delete = []
 

@@ -280,7 +280,7 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(component.getBeamJobStateIcon('en-US')).toBe('error');
     expect(component.getBeamJobStateTooltip('en-US')).toBe(
-      'Voiceover synthesis job: FAILED'
+      'Please re-add the language accent code to the system to trigger a new voiceover synthesis job.'
     );
     expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe(null);
   });
