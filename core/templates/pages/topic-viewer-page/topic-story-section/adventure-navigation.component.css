@@ -22,10 +22,10 @@
   flex: 1 1 0;
   flex-wrap: nowrap;
   gap: 10px;
-  margin: 24px 0 12px;
+  margin: 8px 0 4px;
   min-width: 0;
   overflow-x: auto;
-  padding-bottom: 0;
+  padding-bottom: 4px;
   position: relative;
 }
 
