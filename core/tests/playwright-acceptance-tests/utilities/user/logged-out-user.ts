@@ -29,7 +29,6 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
-const splashPageUrl = testConstants.URLs.splash;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
@@ -3088,12 +3087,10 @@ export class LoggedOutUser extends BaseUser {
    * The "Add to Play Later" button should not be visible for logged-out users.
    */
   async expectCannotAddExplorationToPlayLater(): Promise<void> {
-    const isButtonVisible =
-      (await this.page.$(playLaterButton)) !== null;
+    const isButtonVisible = (await this.page.$(playLaterButton)) !== null;
     expect(isButtonVisible).toBe(false);
   }
 }
-
 
 export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
   return new LoggedOutUser(page);

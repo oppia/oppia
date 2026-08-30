@@ -59,13 +59,10 @@ test.describe('Logged-out User', function () {
     await loggedOutUser.expectToBeOnLoginPage();
   });
 
-  test(
-    'should not be able to visit the topics and skills dashboard page.',
-    async function () {
-      await loggedOutUser.navigateToTopicsAndSkillsDashboardPage(false);
-      await loggedOutUser.expectToBeOnLoginPage();
-    }
-  );
+  test('should not be able to visit the topics and skills dashboard page.', async function () {
+    await loggedOutUser.navigateToTopicsAndSkillsDashboardPage(false);
+    await loggedOutUser.expectToBeOnLoginPage();
+  });
 
   test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
