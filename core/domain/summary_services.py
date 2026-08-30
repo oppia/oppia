@@ -846,6 +846,10 @@ def get_library_groups(
                 == constants.ACTIVITY_STATUS_PUBLIC
             )
             .filter(
+                collection_models.CollectionSummaryModel.deleted  # pylint: disable=singleton-comparison
+                == False
+            )
+            .filter(
                 datastore_services.any_of(
                     *[
                         collection_models.CollectionSummaryModel.category == cat

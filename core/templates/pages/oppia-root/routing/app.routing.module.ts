@@ -510,15 +510,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH
-      .ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/blog-home-page/blog-home-page.module').then(
-        m => m.BlogHomePageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE
       .ROUTE,
     pathMatch: 'full',

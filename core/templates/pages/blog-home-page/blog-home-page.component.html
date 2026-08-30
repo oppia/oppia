@@ -1,7 +1,7 @@
 <div class="oppia-blog-home-page d-flex justify-content-center">
   <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card">
     <div class="d-flex" [ngClass]="{'flex-column-reverse': isSmallScreenViewActive()}">
-      <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
+      <div *ngIf="!showBlogPostCardsLoadingScreen"
            class="oppia-blog-post-card-container"
            [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <div>

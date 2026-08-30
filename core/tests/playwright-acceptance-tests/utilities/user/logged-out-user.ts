@@ -94,6 +94,7 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const stateConversationContent = '.e2e-test-conversation-content';
 
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const mobileLessonCardTitleSelector = '.mobile-exploration-title';
 const fractionInputSelector = '.e2e-test-fraction-input';
 const floatFormInput = '.e2e-test-float-form-input';
 const wrongInputErrorContainerSelector = '.oppia-form-error-container';
@@ -2303,8 +2304,15 @@ export class LoggedOutUser extends BaseUser {
    */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
-      await this.expectElementToBeVisible(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      // The desktop card renders its title with the
+      // 'e2e-test-exploration-tile-title' class, while the mobile card uses the
+      // 'mobile-exploration-title' class. Pick the selector matching the
+      // current viewport so this helper works on both desktop and mobile.
+      const lessonTitleSelector = this.isViewportAtMobileWidth()
+        ? mobileLessonCardTitleSelector
+        : lessonCardTitleSelector;
+      await this.expectElementToBeVisible(lessonTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonTitleSelector);
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
           this.page.evaluate(el => el.textContent.trim(), result)
@@ -2337,7 +2345,7 @@ export class LoggedOutUser extends BaseUser {
           return fn(element);
         },
         {
-          selector: lessonCardTitleSelector,
+          selector: lessonTitleSelector,
           index: lessonIndex,
           clickableFn: isElementClickable.toString(),
         }
@@ -2350,11 +2358,11 @@ export class LoggedOutUser extends BaseUser {
           ] as HTMLElement;
           element.click();
         },
-        {selector: lessonCardTitleSelector, index: lessonIndex}
+        {selector: lessonTitleSelector, index: lessonIndex}
       );
       await this.waitForStaticAssetsToLoad();
 
-      await this.expectElementToBeVisible(lessonCardTitleSelector, false);
+      await this.expectElementToBeVisible(lessonTitleSelector, false);
       showMessage(`Lesson "${lessonTitle}" opened from search results.`);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));

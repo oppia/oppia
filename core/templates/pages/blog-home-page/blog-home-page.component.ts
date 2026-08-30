@@ -45,7 +45,6 @@ export class BlogHomePageComponent implements OnInit {
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE!: number;
   lastPostOnPageNum!: number;
   totalBlogPosts!: number;
-  noResultsFound!: boolean;
   oppiaAvatarImgUrl!: string;
   showBlogPostCardsLoadingScreen: boolean = false;
   blogPostSummaries: BlogPostSummary[] = [];
@@ -105,18 +104,13 @@ export class BlogHomePageComponent implements OnInit {
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
-          if (data.numOfPublishedBlogPosts) {
-            this.totalBlogPosts = data.numOfPublishedBlogPosts;
-            this.noResultsFound = false;
-            this.blogPostSummaries = data.blogPostSummaryDicts;
-            this.blogPostSummariesToShow = this.blogPostSummaries;
-            this.calculateLastPostOnPageNum(
-              this.page,
-              this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-            );
-          } else {
-            this.noResultsFound = true;
-          }
+          this.totalBlogPosts = data.numOfPublishedBlogPosts;
+          this.blogPostSummaries = data.blogPostSummaryDicts;
+          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.calculateLastPostOnPageNum(
+            this.page,
+            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+          );
           this.loaderService.hideLoadingScreen();
         },
         errorResponse => {

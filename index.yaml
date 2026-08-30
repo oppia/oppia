@@ -734,6 +734,7 @@ indexes:
 - kind: CollectionSummaryModel
   properties:
   - name: category
+  - name: deleted
   - name: language_code
   - name: status
   - name: collection_model_last_updated

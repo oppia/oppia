@@ -7741,24 +7741,6 @@ export default {
         }
       ]
     },
-    "BLOG_HOMEPAGE_SEARCH": {
-      "ROUTE": "blog",
-      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        }
-      ]
-    },
     "BLOG_AUTHOR_PROFILE_PAGE": {
       "ROUTE": "blog/author/:author_username",
       "TITLE": "I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE",

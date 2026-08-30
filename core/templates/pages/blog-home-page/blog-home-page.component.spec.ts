@@ -205,7 +205,6 @@ describe('Blog home page component', () => {
         blogHomePageBackendApiService,
         'fetchBlogHomePageDataAsync'
       ).and.returnValue(Promise.resolve(blogHomePageDataObject));
-      expect(component.noResultsFound).toBeUndefined();
 
       component.loadInitialBlogHomePageData();
 
@@ -214,7 +213,8 @@ describe('Blog home page component', () => {
       ).toHaveBeenCalledWith('0');
 
       tick();
-      expect(component.noResultsFound).toBe(true);
+      expect(component.totalBlogPosts).toBe(0);
+      expect(component.blogPostSummaries).toEqual([]);
 
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
@@ -235,7 +235,6 @@ describe('Blog home page component', () => {
 
       tick();
       expect(component.totalBlogPosts).toBe(1);
-      expect(component.noResultsFound).toBe(false);
       expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
       expect(component.blogPostSummariesToShow).toEqual([
         blogPostSummaryObject,
