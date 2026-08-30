@@ -22,10 +22,10 @@
   flex: 1 1 0;
   flex-wrap: nowrap;
   gap: 10px;
-  margin: 8px 0 4px;
+  margin: 24px 0 12px;
   min-width: 0;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 0;
   position: relative;
 }
 
@@ -153,7 +153,6 @@
     margin-top: 0;
     padding: 0 14px;
     padding-top: 0;
-    position: static;
   }
 
   .adventure-navigation-wrapper--overflow::before,

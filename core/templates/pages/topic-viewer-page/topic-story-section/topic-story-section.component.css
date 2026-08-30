@@ -468,6 +468,10 @@ topic-mastery-challenge-card {
 }
 
 @media (max-width: 768px) {
+  .adventure-navigation-sticky-wrapper {
+    position: static;
+  }
+
   .story-callout-row {
     align-items: flex-start;
     gap: 16px;
