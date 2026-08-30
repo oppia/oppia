@@ -73,6 +73,13 @@ class BasePlatformParameterConfigModel(base_models.VersionedModel):
         """BasePlatformParameterConfigModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
 
 class PlatformParameterModel(base_models.VersionedModel):
     """A class that represents a named dynamic platform parameter.
@@ -171,6 +178,13 @@ class BaseFeatureFlagConfigModel(base_models.BaseModel):
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """BaseFeatureFlagConfigModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
 
 class FeatureFlagConfigModel(base_models.BaseModel):
