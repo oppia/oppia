@@ -5610,6 +5610,17 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Caches the given site language code in localStorage so that the app
+   * bootstraps with it as the preferred language on the next page load.
+   * @param {string} siteLanguageCode - The language code to cache.
+   */
+  async setSiteLanguageInLocalStorage(siteLanguageCode: string): Promise<void> {
+    await this.page.evaluate((langCode: string) => {
+      window.localStorage.setItem('lang', langCode);
+    }, siteLanguageCode);
+  }
+
+  /**
    * Verifies that the fallback info icon is visible on the lesson card.
    */
   async expectFallbackInfoIconToBeVisible(): Promise<void> {
@@ -5637,49 +5648,6 @@ export class LoggedInUser extends BaseUser {
   async selectLessonTextLanguage(languageCode: string): Promise<void> {
     await this.select(topicTextLanguageSelector, languageCode);
     await this.page.waitForTimeout(500);
-  }
-
-  /**
-   * Persists the given site, text, and voiceover language codes to the browser
-   * and reloads the topic page. The cached site language and the session
-   * fallback language are written directly so that the language waterfall
-   * re-evaluates deterministically after the reload.
-   * @param {string} siteLanguageCode - The language code to cache as the site
-   *   language.
-   * @param {string} textLanguageCode - The text language to persist in the
-   *   session.
-   * @param {string} voiceoverLanguageCode - The voiceover language to persist
-   *   in the session.
-   */
-  async setSessionLanguageAndReload(
-    siteLanguageCode: string,
-    textLanguageCode: string,
-    voiceoverLanguageCode: string
-  ): Promise<void> {
-    await this.page.evaluate(
-      (
-        storageKey: string,
-        siteLang: string,
-        textCode: string,
-        voiceoverCode: string
-      ) => {
-        window.localStorage.setItem('lang', siteLang);
-        window.sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            textLanguageCode: textCode,
-            voiceoverLanguageCode: voiceoverCode,
-          })
-        );
-      },
-      topicSessionFallbackLanguageStorageKey,
-      siteLanguageCode,
-      textLanguageCode,
-      voiceoverLanguageCode
-    );
-    await this.page.reload();
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(topicViewerContainerSelector);
   }
 
   /**

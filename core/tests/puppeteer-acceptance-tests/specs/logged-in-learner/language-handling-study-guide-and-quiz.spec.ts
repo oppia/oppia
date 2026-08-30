@@ -248,10 +248,17 @@ describe('Logged-in Learner', function () {
       // Empty out any session fallback language left over from earlier tests.
       await loggedInLearner.clearSessionLanguage();
 
-      // Switch the site language to Portuguese. The lesson offers only English
-      // and Hindi, so Portuguese is unavailable and the waterfall falls back to
-      // English (the default lesson language).
-      await loggedInLearner.changeSiteLanguage('pt-br');
+      // Cache Portuguese as the site language before the topic page loads. No
+      // server-side preferred language is stored for this learner, so the page
+      // bootstraps directly with Portuguese as the preferred language (from the
+      // cached local storage) and no later i18n re-application occurs. The
+      // lessons offer only English and Hindi, so Portuguese is unavailable and
+      // the waterfall falls back to English (the default lesson language).
+      await loggedInLearner.setSiteLanguageInLocalStorage('pt-br');
+
+      // The lesson is not available in the preferred (site) language, so the
+      // fallback info icon is shown.
+      await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectFallbackInfoIconToBeVisible();
       await loggedInLearner.expectSelectedTextLanguageToBe('en');
 
@@ -259,10 +266,15 @@ describe('Logged-in Learner', function () {
       // the waterfall should recall for the next lessons instead of English.
       await loggedInLearner.selectLessonTextLanguage('hi');
 
-      await loggedInLearner.setSessionLanguageAndReload('pt-br', 'hi', 'hi-IN');
+      // Reload the page. The session fallback language survives the reload
+      // because no server-side site language preference is stored for this
+      // learner, so the story section never observes an i18n language change
+      // (which would clear the session) before the lesson card initializes.
+      await loggedInLearner.reloadTopicPage();
 
       // The session fallback (Hindi) is still available, so it is re-selected
-      // over English even though the site language (Portuguese) is unavailable.
+      // over English even though the preferred (site) language (Portuguese) is
+      // unavailable.
       await loggedInLearner.expectTextLanguageToBeSelected('hi');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -135,7 +135,6 @@ class FeatureNames(enum.Enum):
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
@@ -156,6 +155,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
