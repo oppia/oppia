@@ -27,11 +27,12 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {PageContextService} from 'services/page-context.service';
 import {ContinueRulesService} from './continue-rules.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './continue-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-continue',
   templateUrl: './continue-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./continue-interaction.component.css'],
 })
 export class OppiaInteractiveContinue implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

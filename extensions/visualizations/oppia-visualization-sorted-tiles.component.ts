@@ -28,6 +28,7 @@ import './oppia-visualization-sorted-tiles.component.css';
 @Component({
   selector: 'oppia-visualization-sorted-tiles',
   templateUrl: './oppia-visualization-sorted-tiles.component.html',
+  styleUrls: ['./oppia-visualization-sorted-tiles.component.css'],
 })
 export class VisualizationSortedTilesComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

@@ -4,13 +4,13 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-oppia-share-lesson-modal .oppia-share-lesson-modal-header {
+.oppia-share-lesson-modal-header {
   align-items: center;
   display: flex;
   justify-content: space-between;
 }
 
-oppia-share-lesson-modal .oppia-share-lesson-modal-title {
+.oppia-share-lesson-modal-title {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
   font-size: 1.25em;
@@ -22,26 +22,26 @@ textarea::-webkit-scrollbar {
   display: none;
 }
 
-oppia-share-lesson-modal .modal-body {
+.modal-body {
   display: flex;
   flex-direction: column;
   padding: 24px;
 }
 
-oppia-share-lesson-modal .oppia-share-lesson-modal-footer {
+.oppia-share-lesson-modal-footer {
   align-items: center;
   display: flex;
   justify-content: space-between;
   padding: 16px 20px;
 }
 
-oppia-share-lesson-modal .cancel-button {
+.cancel-button {
   border: 1px solid #00645c;
   color: #00645c;
   font-weight: 700;
 }
 
-oppia-share-lesson-modal .lesson-attribution-text {
+.lesson-attribution-text {
   color: #00645c;
   cursor: pointer;
   font-size: 20px;
@@ -49,13 +49,13 @@ oppia-share-lesson-modal .lesson-attribution-text {
   text-decoration: underline;
 }
 
-oppia-share-lesson-modal .share-icon-container svg {
+.share-icon-container svg {
   cursor: pointer;
   margin-bottom: 40px;
   margin-right: 12px;
 }
 
-oppia-share-lesson-modal .share-modal-btn {
+.share-modal-btn {
   border: 1px solid #205d86;
   border-radius: 4px;
   color: #205d86;
@@ -66,13 +66,13 @@ oppia-share-lesson-modal .share-modal-btn {
   width: 210px;
 }
 
-oppia-share-lesson-modal .share-modal-btn .button-content {
+.share-modal-btn .button-content {
   align-items: center;
   display: flex;
   justify-content: space-between;
 }
 
-oppia-share-lesson-modal .success-message {
+.success-message {
   border-radius: 4px;
   color: white;
   height: 40px;
@@ -80,7 +80,7 @@ oppia-share-lesson-modal .success-message {
   width: 200px;
 }
 
-oppia-share-lesson-modal .success-message p {
+.success-message p {
   align-items: center;
   background-color: #323232;
   display: flex;
@@ -88,13 +88,13 @@ oppia-share-lesson-modal .success-message p {
   padding: 12px 16px;
 }
 
-oppia-share-lesson-modal .copy-modal-body {
+.copy-modal-body {
   align-items: center;
   display: flex;
   justify-content: center;
 }
 
-oppia-share-lesson-modal .cc-attribution-header {
+.cc-attribution-header {
   color: #0d48a1;
   font-family: "Roboto", sans-serif;
   font-size: 20px;
@@ -103,11 +103,11 @@ oppia-share-lesson-modal .cc-attribution-header {
   text-align: center;
 }
 
-oppia-share-lesson-modal .cc-attribution a:hover {
+.cc-attribution a:hover {
   text-decoration: none;
 }
 
-oppia-share-lesson-modal .cc-attribution-input {
+.cc-attribution-input {
   background-color: #ddd;
   border: 1px solid #0d48a1;
   border-radius: 4px;
@@ -115,7 +115,7 @@ oppia-share-lesson-modal .cc-attribution-input {
   padding: 10px;
 }
 
-oppia-share-lesson-modal .copy-cc-btn {
+.copy-cc-btn {
   border: 1px solid #205d86;
   border-radius: 4px;
   font-size: 17px;
@@ -124,7 +124,7 @@ oppia-share-lesson-modal .copy-cc-btn {
   width: 49%;
 }
 
-oppia-share-lesson-modal .copy-cc-btn .button-content {
+.copy-cc-btn .button-content {
   align-items: center;
   color: #205d86;
   display: flex;
@@ -132,34 +132,34 @@ oppia-share-lesson-modal .copy-cc-btn .button-content {
   justify-content: space-between;
 }
 
-oppia-share-lesson-modal .cc-attribution-text {
+.cc-attribution-text {
   display: flex;
   flex-direction: column;
 }
 
 @media (max-width: 480px) {
-  oppia-share-lesson-modal .oppia-share-lesson-modal-footer {
+  .oppia-share-lesson-modal-footer {
     justify-content: center;
   }
 
-  oppia-share-lesson-modal .lesson-attribution-text {
+  .lesson-attribution-text {
     font-size: 15px;
   }
 
-  oppia-share-lesson-modal .share-modal-btn {
+  .share-modal-btn {
     margin-bottom: 10px;
     margin-right: 0;
   }
 
-  oppia-share-lesson-modal .copy-modal-body-btn {
+  .copy-modal-body-btn {
     flex-direction: column;
   }
 
-  oppia-share-lesson-modal .cc-attribution-input {
+  .cc-attribution-input {
     width: 100%;
   }
 
-  oppia-share-lesson-modal .copy-cc-btn {
+  .copy-cc-btn {
     width: 100%;
   }
 }
