@@ -464,14 +464,11 @@ topic-mastery-challenge-card {
 .adventure-navigation-sticky-wrapper {
   position: -webkit-sticky;
   position: sticky;
+  top: 56px;
   z-index: 30;
 }
 
 @media (max-width: 768px) {
-  .adventure-navigation-sticky-wrapper {
-    position: static;
-  }
-
   .story-callout-row {
     align-items: flex-start;
     gap: 16px;

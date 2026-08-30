@@ -3234,7 +3234,7 @@ describe('TopicStorySectionComponent', () => {
     ).nativeElement;
     expect(navigationElement).not.toBeNull();
     expect(navigationElement.isInTopicEditorPreview).toBeTruthy();
-    expect(stickyWrapper.style.top).toBe('0px');
+    expect(stickyWrapper.style.top).toBe('126px');
   });
 
   it('should not forward the topic editor preview flag by default', () => {
