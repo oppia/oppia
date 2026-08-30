@@ -60,10 +60,8 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlagWithRetries(
-      'redesigned_topic_viewer_page'
-    );
-    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');

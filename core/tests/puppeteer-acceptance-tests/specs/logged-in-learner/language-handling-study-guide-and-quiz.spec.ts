@@ -72,11 +72,9 @@ describe('Logged-in Learner', function () {
     );
     await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
-    await releaseCoordinator.enableFeatureFlagWithRetries(
-      'redesigned_topic_viewer_page'
-    );
-    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
-    await releaseCoordinator.enableFeatureFlagWithRetries(
+    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
 
@@ -156,7 +154,7 @@ describe('Logged-in Learner', function () {
 
     await curriculumAdmin.saveStoryDraft();
 
-    await releaseCoordinator.enableFeatureFlagWithRetries(
+    await releaseCoordinator.enableFeatureFlag(
       'serial_chapter_launch_curriculum_admin_view'
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
