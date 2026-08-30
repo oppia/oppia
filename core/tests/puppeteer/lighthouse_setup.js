@@ -123,6 +123,7 @@ var roleOptionLabels = {
   ADMIN: 'curriculum admin',
   COLLECTION_EDITOR: 'collection editor',
   RELEASE_COORDINATOR: 'release coordinator',
+  VOICEOVER_ADMIN: 'voiceover admin',
 };
 
 const login = async function (browser, page) {
@@ -776,7 +777,7 @@ const main = async function () {
   await getExplorationEditorUrl(browser, page);
 
   await setRole(browser, page, 'COLLECTION_EDITOR');
-
+  await setRole(browser, page, 'VOICEOVER_ADMIN');
   await setRole(browser, page, 'ADMIN');
   await setRole(browser, page, 'RELEASE_COORDINATOR');
   await getTopicEditorUrl(browser, page);
