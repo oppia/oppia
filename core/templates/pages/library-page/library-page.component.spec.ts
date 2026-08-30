@@ -517,11 +517,11 @@ describe('Library Page Component', () => {
       // Correct container's height should be toggled.
       expect(
         componentInstance.mobileLibraryGroupsProperties[0].inCollapsedState
-      ).toBeFalse();
+      ).toBe(false);
       // Other container's height should remain unchanged.
       expect(
         componentInstance.mobileLibraryGroupsProperties[1].inCollapsedState
-      ).toBeFalse();
+      ).toBe(false);
       expect(buttonTextToggleSpy).toHaveBeenCalledWith(0);
     }
   );
@@ -802,13 +802,13 @@ describe('Library Page Component', () => {
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
 
     componentInstance.currentCardIndex = 2;
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       true
     );
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
   });
 
   it('should record analytics when classroom card is clicked', () => {
@@ -922,14 +922,14 @@ describe('Library Page Component', () => {
 
     componentInstance.scroll(ind, isLeftScroll);
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeTrue();
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(true);
 
     for (let i = 0; i <= 5; i++) {
       currentTime += 160;
       tick(160);
     }
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeFalse();
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(false);
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
 
