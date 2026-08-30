@@ -108,7 +108,10 @@
                       type="button"
                       [disabled]="!hasPracticeQuestions"
                       (click)="onPracticeButtonClick()">
-                <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">edit</i>
+                <img class="topic-lesson-card-btn-icon"
+                     [src]="getStaticImageUrl('/icons/practice-pencil-icon.svg')"
+                     alt=""
+                     aria-hidden="true">
                 {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
               </button>
             </span>

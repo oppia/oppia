@@ -382,7 +382,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Fractions', [createLessonCard(1, 'not_started')]),
     ];
 
-    expect(component.getPracticeTitle(0)).toBe('Fractions Review & Test');
+    expect(component.getPracticeTitle(0)).toBe('Adventure 1 Review & Test');
     expect(component.getPracticeTitle(1)).toBe('Adventure 2 Review & Test');
   });
 
@@ -875,8 +875,16 @@ describe('TopicStorySectionComponent', () => {
     expect(component.getPracticeDescription(0)).toBe(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT'
     );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT',
+      {adventureNumber: 1, nextAdventureNumber: 2}
+    );
     expect(component.getPracticeDescription(1)).toBe(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
+      {adventureNumber: 2}
     );
   });
 
@@ -889,6 +897,10 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.getPracticeDescription(2)).toBe(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL'
+    );
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
+      {adventureNumber: 3}
     );
   });
 

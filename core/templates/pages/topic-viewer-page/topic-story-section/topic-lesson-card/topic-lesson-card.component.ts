@@ -423,4 +423,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       FALLBACK_THUMBNAIL_IMAGE_PATH
     );
   }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 }

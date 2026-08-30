@@ -297,9 +297,9 @@
 .topic-lesson-card-secondary-button {
   align-items: center;
   background: #edf7f5;
-  border: 2px solid #0b776d;
+  border: 2px solid #00645c;
   border-radius: 4px;
-  color: #0b776d;
+  color: #00645c;
   display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
@@ -313,20 +313,14 @@
 
 .topic-lesson-card-secondary-button:disabled {
   background: #f3f4f6;
-  border-color: #d1d5db;
+  border-color: #9ca3af;
   color: #9ca3af;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-.topic-lesson-card-practice-button {
-  background: #fff;
-  border: 2px solid #00645c;
-  color: #00645c;
-}
-
 .topic-lesson-card-practice-button:disabled {
-  background: #fff;
+  background: #f3f4f6;
   border-color: #9ca3af;
   color: #9ca3af;
 }
@@ -350,6 +344,12 @@
 .topic-lesson-card-btn-icon {
   font-size: 16px;
   line-height: 1;
+}
+
+img.topic-lesson-card-btn-icon {
+  height: 16px;
+  object-fit: contain;
+  width: 16px;
 }
 
 .topic-lesson-card-actions {

@@ -977,27 +977,20 @@ export class TopicStorySectionComponent
   }
 
   getPracticeTitle(adventureIndex: number): string {
-    const title =
-      adventureIndex < this.visibleAdventureGroups.length
-        ? this.visibleAdventureGroups[adventureIndex].adventureTitle
-        : `Adventure ${adventureIndex + 1}`;
-    return `${title} Review & Test`;
+    return `Adventure ${adventureIndex + 1} Review & Test`;
   }
 
   getPracticeDescription(adventureIndex: number): string {
-    const adventureTitle =
-      adventureIndex < this.visibleAdventureGroups.length
-        ? this.visibleAdventureGroups[adventureIndex].adventureTitle
-        : `Adventure ${adventureIndex + 1}`;
+    const adventureNumber = adventureIndex + 1;
     if (adventureIndex < this.visibleAdventureGroups.length - 1) {
       return this.translateService.instant(
         'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT',
-        {adventureTitle}
+        {adventureNumber, nextAdventureNumber: adventureNumber + 1}
       );
     }
     return this.translateService.instant(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
-      {adventureTitle}
+      {adventureNumber}
     );
   }
 
