@@ -76,8 +76,7 @@ class TestSuitesByTypeDict(TypedDict):
 
     acceptance: List[GenericTestSuiteDict]
     acceptance_playwright: List[GenericTestSuiteDict]
-    lighthouse_performance: List[LighthouseTestSuiteDict]
-    lighthouse_accessibility: List[LighthouseTestSuiteDict]
+    lighthouse: List[LighthouseTestSuiteDict]
 
 
 class CITestSuitesDict(TypedDict):
@@ -92,8 +91,7 @@ class CITestSuitesToRunDict(TypedDict):
 
     acceptance: CITestSuitesDict
     acceptance_playwright: CITestSuitesDict
-    lighthouse_performance: CITestSuitesDict
-    lighthouse_accessibility: CITestSuitesDict
+    lighthouse: CITestSuitesDict
 
 
 class RootFilesConfigDict(TypedDict):
@@ -119,9 +117,15 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'test-modules-mappings'
 )
 
-LIGHTHOUSE_PAGES_PER_SHARD: Final = 17
-LIGHTHOUSE_ACCESSIBILITY_MODULE: Final = '.lighthouserc-accessibility.js'
-LIGHTHOUSE_PERFORMANCE_MODULE: Final = '.lighthouserc-performance.js'
+LIGHTHOUSE_PAGES_PER_SHARD: Final = 12
+LIGHTHOUSE_MODULES: Final = (
+    '.lighthouserc.js',
+    '.lighthouserc-desktop.js',
+    '.lighthouserc-base.js',
+)
+# The primary Lighthouse module is used as the module identifier for the
+# Lighthouse test suites.
+LIGHTHOUSE_MODULE: Final = '.lighthouserc.js'
 
 
 def create_ci_test_suites_dict(
@@ -141,8 +145,7 @@ def create_ci_test_suites_dict(
 def create_ci_test_suites_to_run_dict(
     acceptance: Optional[CITestSuitesDict] = None,
     acceptance_playwright: Optional[CITestSuitesDict] = None,
-    lighthouse_performance: Optional[CITestSuitesDict] = None,
-    lighthouse_accessibility: Optional[CITestSuitesDict] = None,
+    lighthouse: Optional[CITestSuitesDict] = None,
 ) -> CITestSuitesToRunDict:
     """Creates a CITestSuitesToRunDict with the given parameters.
 
@@ -150,10 +153,7 @@ def create_ci_test_suites_to_run_dict(
         acceptance: dict | None. The acceptance test suites to run in the CI.
         acceptance_playwright: dict | None. The Playwright acceptance test
             suites to run in the CI.
-        lighthouse_performance: dict | None. The lighthouse performance test
-            suites to run in the CI.
-        lighthouse_accessibility: dict | None. The lighthouse accessibility
-            test suites to run in the CI.
+        lighthouse: dict | None. The lighthouse test suites to run in the CI.
 
     Returns:
         dict. The CITestSuitesToRunDict with the given parameters.
@@ -162,10 +162,7 @@ def create_ci_test_suites_to_run_dict(
         'acceptance': acceptance or create_ci_test_suites_dict(),
         'acceptance_playwright': acceptance_playwright
         or create_ci_test_suites_dict(),
-        'lighthouse_performance': lighthouse_performance
-        or create_ci_test_suites_dict(),
-        'lighthouse_accessibility': lighthouse_accessibility
-        or create_ci_test_suites_dict(),
+        'lighthouse': lighthouse or create_ci_test_suites_dict(),
     }
 
 
@@ -259,10 +256,7 @@ def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run_output = {
         'acceptance': test_suites_to_run['acceptance'],
         'acceptance_playwright': test_suites_to_run['acceptance_playwright'],
-        'lighthouse_performance': test_suites_to_run['lighthouse_performance'],
-        'lighthouse_accessibility': test_suites_to_run[
-            'lighthouse_accessibility'
-        ],
+        'lighthouse': test_suites_to_run['lighthouse'],
     }
     print(
         'Test Suites to Run: ', json.dumps(test_suites_to_run_output, indent=4)
@@ -355,22 +349,14 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_accessibility_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_ACCESSIBILITY_MODULE, get_lighthouse_pages_from_config()
-        )
-    )
-    lighthouse_performance_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_PERFORMANCE_MODULE, get_lighthouse_pages_from_config()
-        )
+    lighthouse_test_suites = partition_lighthouse_pages_into_test_suites(
+        LIGHTHOUSE_MODULE, get_lighthouse_pages_from_config()
     )
 
     return {
         'acceptance': acceptance_test_suites,
         'acceptance_playwright': acceptance_playwright_suites,
-        'lighthouse_accessibility': lighthouse_accessibility_test_suites,
-        'lighthouse_performance': lighthouse_performance_test_suites,
+        'lighthouse': lighthouse_test_suites,
     }
 
 
@@ -384,11 +370,8 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
         acceptance_playwright=create_ci_test_suites_dict(
             all_test_suites_by_type['acceptance_playwright']
         ),
-        lighthouse_performance=create_ci_test_suites_dict(
-            all_test_suites_by_type['lighthouse_performance']
-        ),
-        lighthouse_accessibility=create_ci_test_suites_dict(
-            all_test_suites_by_type['lighthouse_accessibility']
+        lighthouse=create_ci_test_suites_dict(
+            all_test_suites_by_type['lighthouse']
         ),
     )
     output_test_suites_to_run_to_github_workflow(test_suites_to_run)
@@ -548,21 +531,21 @@ def get_test_suites_affected_by_root_file(
 
 
 def get_affected_lighthouse_pages(
-    modified_root_files: Set[str], lighthouse_module: str
+    modified_root_files: Set[str], lighthouse_modules: Sequence[str]
 ) -> List[LighthousePageDict]:
     """Gets the affected Lighthouse pages by a list of modified root files.
 
     Args:
         modified_root_files: set(str). The set of modified root files.
-        lighthouse_module: str. The Lighthouse module.
+        lighthouse_modules: list(str). The Lighthouse modules.
 
     Returns:
         list(dict). The affected Lighthouse pages sorted by name.
     """
     lighthouse_pages = get_lighthouse_pages_from_config()
-    # If the Lighthouse module is in the modified root files, then all
+    # If any of the Lighthouse modules is in the modified root files, then all
     # Lighthouse pages should be run.
-    if lighthouse_module in modified_root_files:
+    if modified_root_files.intersection(set(lighthouse_modules)):
         return lighthouse_pages
     affected_lighthouse_pages: List[LighthousePageDict] = []
     for modified_root_file in modified_root_files:
@@ -626,22 +609,9 @@ def get_ci_test_suites_to_run(
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_accessibility_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_ACCESSIBILITY_MODULE,
-            get_affected_lighthouse_pages(
-                modified_root_files, LIGHTHOUSE_ACCESSIBILITY_MODULE
-            ),
-        )
-    )
-
-    lighthouse_performance_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_PERFORMANCE_MODULE,
-            get_affected_lighthouse_pages(
-                modified_root_files, LIGHTHOUSE_PERFORMANCE_MODULE
-            ),
-        )
+    lighthouse_test_suites = partition_lighthouse_pages_into_test_suites(
+        LIGHTHOUSE_MODULE,
+        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_MODULES),
     )
 
     return create_ci_test_suites_to_run_dict(
@@ -649,12 +619,7 @@ def get_ci_test_suites_to_run(
         acceptance_playwright=create_ci_test_suites_dict(
             acceptance_playwright_test_suites
         ),
-        lighthouse_accessibility=create_ci_test_suites_dict(
-            lighthouse_accessibility_test_suites
-        ),
-        lighthouse_performance=create_ci_test_suites_dict(
-            lighthouse_performance_test_suites
-        ),
+        lighthouse=create_ci_test_suites_dict(lighthouse_test_suites),
     )
 
 

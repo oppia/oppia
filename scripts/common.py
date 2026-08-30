@@ -55,6 +55,16 @@ NODE_VERSION = '16.13.0'
 # isolated from NODE_VERSION so existing frontend tooling remains unchanged.
 PLAYWRIGHT_NODE_VERSION = '20.11.1'
 
+# Dedicated Node version for Lighthouse tests. This is intentionally isolated
+# from NODE_VERSION so existing frontend tooling remains unchanged, because
+# Lighthouse 12+ requires Node 18.20 or newer. It matches
+# PLAYWRIGHT_NODE_VERSION so that the same Node 20 toolchain already installed
+# for the Playwright acceptance tests can be reused. This Node version is also
+# used to run the repo-wide `yarn install` (see install_third_party_libs.py),
+# so that the engines requirement of Lighthouse is satisfied at install time
+# without an --ignore-engines flag.
+LIGHTHOUSE_NODE_VERSION = PLAYWRIGHT_NODE_VERSION
+
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
@@ -94,6 +104,9 @@ GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PLAYWRIGHT_NODE_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'node-%s' % PLAYWRIGHT_NODE_VERSION
+)
+LIGHTHOUSE_NODE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'node-%s' % LIGHTHOUSE_NODE_VERSION
 )
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
@@ -212,6 +225,7 @@ NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 # Binaries for running Playwright with a newer Node runtime only.
 PLAYWRIGHT_NPM_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npm')
 PLAYWRIGHT_NPX_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npx')
+LIGHTHOUSE_NODE_BIN_PATH = os.path.join(LIGHTHOUSE_NODE_PATH, 'bin', 'node')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join(

@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script performs lighthouse checks and creates lighthouse reports.
-Any callers must pass in a flag, either --accessibility or --performance.
-"""
+"""This script performs lighthouse checks and creates lighthouse reports."""
 
 from __future__ import annotations
 
@@ -30,15 +28,11 @@ from scripts import build, common, servers
 
 from typing import Final, Iterator, List, Optional
 
-LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
-LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
-LIGHTHOUSE_CONFIG_FILENAMES: Final = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js',
-}
+LIGHTHOUSE_CONFIG_FILENAME: Final = '.lighthouserc.js'
+LIGHTHOUSE_DESKTOP_CONFIG_FILENAME: Final = '.lighthouserc-desktop.js'
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml',
@@ -53,13 +47,6 @@ Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
 Note that the root folder MUST be named 'oppia'.
 """
-)
-
-_PARSER.add_argument(
-    '--mode',
-    help='Sets the mode for the lighthouse tests',
-    required=True,
-    choices=['accessibility', 'performance'],
 )
 
 _PARSER.add_argument(
@@ -93,7 +80,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
     )
-    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    bash_command = [common.LIGHTHOUSE_NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
         bash_command.append('-record')
@@ -169,50 +156,158 @@ def get_entity(line: str) -> tuple[str, str] | None:
     return None
 
 
-def run_lighthouse_checks(lighthouse_mode: str) -> None:
-    """Runs the Lighthouse checks through the Lighthouse config.
+def _get_lighthouse_environment() -> dict[str, str]:
+    """Returns an environment with the Lighthouse node runtime on PATH.
 
-    Args:
-        lighthouse_mode: str. Represents whether the lighthouse checks are in
-            accessibility mode or performance mode.
+    LHCI spawns the Lighthouse child process using the `node` binary that is
+    found on PATH (see node_modules/@lhci/cli/src/collect/node-runner.js).
+    common.py prepends the Node 16 binary to PATH at import time, but
+    Lighthouse 12 requires Node 18.20 or newer and uses JSON import
+    attributes that Node 16 cannot parse. Prepending the Lighthouse node
+    runtime to PATH for the LHCI subprocess ensures that the child process
+    also runs on the Lighthouse node.
     """
+    env = os.environ.copy()
+    env['PATH'] = os.pathsep.join(
+        [os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH), env['PATH']]
+    )
+    # The heap limit is set through NODE_OPTIONS, not as a command-line flag.
+    # A flag placed after the LHCI script path is consumed by LHCI instead of
+    # Node, so the limit would never be applied. NODE_OPTIONS is picked up by
+    # Node itself and propagated to all child Node processes (e.g. the
+    # Lighthouse subprocesses spawned by LHCI). See:
+    # https://stackoverflow.com/a/59572966
+    env['NODE_OPTIONS'] = '--max-old-space-size=4096'
+    return env
+
+
+# Upstream issue: https://github.com/GoogleChrome/lighthouse/issues/17180
+def _patch_lighthouse_target_manager() -> None:
+    """Patches lighthouse target-manager.js to handle Target.getTargetInfo
+    'Not allowed' errors from cross-origin iframes (e.g. Stripe, YouTube on
+    the donate page). Without this patch, Chrome's headless CDP rejects
+    Target.getTargetInfo for cross-origin targets and Lighthouse crashes.
+    """
+    target_manager_path = os.path.join(
+        'node_modules',
+        'lighthouse',
+        'core',
+        'gather',
+        'driver',
+        'target-manager.js',
+    )
+    if not os.path.isfile(target_manager_path):
+        raise RuntimeError(
+            'Could not find Lighthouse target-manager.js at %s to apply '
+            'the cross-origin CDP patch. A Lighthouse upgrade may have moved '
+            'or renamed this file; update the patch in this script.'
+            % target_manager_path
+        )
+    with open(target_manager_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    # Only patch if not already applied.
+    if '/Not allowed/' not in content:
+        patched_content = content.replace(
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;',
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;\n'
+            '      // Chrome may reject Target.getTargetInfo for '
+            'cross-origin targets.\n'
+            '      if (/Not allowed/.test(err.message)) return;',
+        )
+        if patched_content == content:
+            raise RuntimeError(
+                'Could not apply the cross-origin CDP patch to '
+                'target-manager.js: the expected upstream source line was '
+                'not found. A Lighthouse upgrade may have changed it; '
+                'update the patch in this script.'
+            )
+        with open(target_manager_path, 'w', encoding='utf-8') as f:
+            f.write(patched_content)
+        print(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.'
+        )
+
+
+def _run_lighthouse_checks_for_config(config_filename: str) -> None:
+    """Runs the Lighthouse checks through the given Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    # The max-old-space-size is a quick fix for node running out of heap memory
-    # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
-        common.NODE_BIN_PATH,
+        common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
-        '--max-old-space-size=4096',
+        '--config=%s' % config_filename,
     ]
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_lighthouse_environment(),
     )
     stdout, stderr = process.communicate()
 
-    print('OUTPUT:')
     # Standard output is in bytes, we need to decode the line to
     # print it.
     print(stdout.decode('utf-8'))
-    if process.returncode == 0:
-        pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
-        all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
-        print(
-            '\033[1m%s out of %s lighthouse checks run, see '
-            'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
-            'for more information.\033[0m' % (pages_count, all_pages_count)
+    # LHCI writes all assertion results to stderr (both pass/fail/warn),
+    # so always print it.
+    stderr_decoded = stderr.decode('utf-8')
+    if stderr_decoded:
+        # Filter out warn-level assertion results from CI output. Only
+        # error-level failures should be visible.
+        filtered = ''.join(
+            line
+            for line in stderr_decoded.splitlines(keepends=True)
+            if '\u26a0\ufe0f' not in line
         )
-        print('Lighthouse checks completed successfully.')
-    else:
+        if filtered:
+            print(filtered)
+    if process.returncode != 0:
         print('Return code: %s' % process.returncode)
-        print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
+
+
+def _get_form_factor_label(config_filename: str) -> str:
+    """Returns a human-readable form factor label for the given config."""
+    if 'desktop' in config_filename:
+        return 'DESKTOP'
+    return 'MOBILE'
+
+
+def run_lighthouse_checks() -> None:
+    """Runs the Lighthouse checks through the Lighthouse configs."""
+    _patch_lighthouse_target_manager()
+    for config_filename in (
+        LIGHTHOUSE_CONFIG_FILENAME,
+        LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
+    ):
+        form_factor = _get_form_factor_label(config_filename)
+        pages = os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(',')
+        separator = '=' * 70
+        print(
+            '\n\033[1;36m%s\n'
+            '  LIGHTHOUSE %s CHECKS (%d pages)\n'
+            '%s\033[0m' % (separator, form_factor, len(pages), separator)
+        )
+        print('Config: %s\n' % config_filename)
+        _run_lighthouse_checks_for_config(config_filename)
+        print('\033[1;32m%s checks passed.\033[0m\n' % form_factor)
+
+    pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
+    all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
+    separator = '=' * 70
+    print(
+        '\n\033[1;36m%s\n'
+        '  LIGHTHOUSE SUMMARY\n'
+        '%s\033[0m' % (separator, separator)
+    )
+    print(
+        '\033[1m%s out of %s lighthouse pages run (mobile + desktop), see '
+        'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
+        'for more information.\033[0m' % (pages_count, all_pages_count)
+    )
+    print('Lighthouse checks completed successfully.')
 
 
 def get_lighthouse_pages_config() -> dict[str, str]:
@@ -250,7 +345,7 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        injected_url = url.replace(
+        injected_url = injected_url.replace(
             '{{%s}}' % entity_name, entities[entity_name]
         )
     return injected_url
@@ -330,13 +425,6 @@ def main(args: Optional[List[str]] = None) -> None:
     # Verify if Chrome is installed.
     common.setup_chrome_bin_env_variable()
 
-    if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
-        lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
-        server_mode = SERVER_MODE_DEV
-    else:
-        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
-        server_mode = SERVER_MODE_PROD
-
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
 
@@ -346,50 +434,35 @@ def main(args: Optional[List[str]] = None) -> None:
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)
             )
 
-        if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-            if parsed_args.skip_build:
-                print(
-                    'Building files in development mode for setup skipping '
-                    'clean build.'
-                )
-                common.modify_constants(prod_env=False, emulator_mode=True)
-                common.write_hashes_json_file({})
-                servers.run_ng_compilation()
-            else:
-                print('Building files in development mode for setup.')
-                build.main(args=[])
-                servers.run_ng_compilation()
-
-            with managed_lighthouse_appserver(SERVER_MODE_DEV):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-
-            if parsed_args.skip_build:
-                print('Restoring production constants for Lighthouse checks.')
-                common.modify_constants(prod_env=True, emulator_mode=True)
-            else:
-                # Builds ng.
-                print('Building files in production mode.')
-                build.main(args=['--prod_env'])
+        if parsed_args.skip_build:
+            print(
+                'Building files in development mode for setup skipping '
+                'clean build.'
+            )
+            common.modify_constants(prod_env=False, emulator_mode=True)
+            common.write_hashes_json_file({})
+            servers.run_ng_compilation()
         else:
-            # Accessibility mode skip ng build.
+            print('Building files in development mode for setup.')
             build.main(args=[])
             servers.run_ng_compilation()
 
-            with managed_lighthouse_appserver(server_mode):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-                set_lighthouse_url_environment_variables(
-                    parsed_args.pages, entities
-                )
-                run_lighthouse_checks(lighthouse_mode)
-            return
+        with managed_lighthouse_appserver(SERVER_MODE_DEV):
+            entities = run_lighthouse_puppeteer_script(
+                parsed_args.record_screen
+            )
+
+        if parsed_args.skip_build:
+            print('Restoring production constants for Lighthouse checks.')
+            common.modify_constants(prod_env=True, emulator_mode=True)
+        else:
+            # Builds ng.
+            print('Building files in production mode.')
+            build.main(args=['--prod_env'])
 
         set_lighthouse_url_environment_variables(parsed_args.pages, entities)
-        with managed_lighthouse_appserver(server_mode):
-            run_lighthouse_checks(lighthouse_mode)
+        with managed_lighthouse_appserver(SERVER_MODE_PROD):
+            run_lighthouse_checks()
 
 
 if __name__ == '__main__':  # pragma: no cover
