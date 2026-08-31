@@ -1077,9 +1077,6 @@ describe('Learner dashboard page', () => {
 
     it('should set active section to my suggestions when my suggestions tab is active', fakeAsync(() => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         EnableCertificateAssessment: {
           isEnabled: false,
         },
@@ -1408,9 +1405,6 @@ describe('Learner dashboard page', () => {
         EnableCertificateAssessment: {
           isEnabled: false,
         },
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: true,
         },
@@ -1450,9 +1444,6 @@ describe('Learner dashboard page', () => {
 
     it('should keep the current tab when my suggestions is disabled', () => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         EnableCertificateAssessment: {
           isEnabled: false,
         },

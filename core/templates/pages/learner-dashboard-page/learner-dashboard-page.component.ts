@@ -274,7 +274,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
             LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
         }
         if (
-          this.isShowRedesignedLearnerDashboardActive() &&
           this.isNewExplorationEditorFeedbackTabEnabled() &&
           this.urlService.getUrlParams().active_tab === 'my-suggestions'
         ) {
