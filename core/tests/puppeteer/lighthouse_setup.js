@@ -41,6 +41,8 @@ var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
 var learnerGroupId = 'Learner group not loaded';
 var technicalFeedbackReportId = 'Technical feedback report not loaded';
+var certificateId = 'Certificate not loaded';
+var attemptId = 'Attempt not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -548,6 +550,21 @@ const generateDataForClassroom = async function (browser, page) {
     await addThumbnailToTopic(page, 'Subtraction');
     await addThumbnailToTopic(page, 'Multiplication');
     await addThumbnailToTopic(page, 'Division');
+
+    // Capture the seeded certificate offering and the attempt started for the
+    // admin so that the certificate pages render real content.
+    certificateId = await page.evaluate(async () => {
+      const response = await fetch('/certificate_assessment_offering_handler');
+      const data = await response.json();
+      return data.certificate_offerings.length > 0
+        ? data.certificate_offerings[0].id
+        : null;
+    });
+    attemptId = await page.evaluate(async () => {
+      const response = await fetch('/certificate_assessment_attempts_handler');
+      const data = await response.json();
+      return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -808,6 +825,12 @@ const main = async function () {
   await generateDataForBlogPosts(browser, page);
   await enableFeatureFlag(browser, page, 'story_editor_arcs');
   await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
+  await enableFeatureFlag(
+    browser,
+    page,
+    'technical_feedback_dashboard_enabled'
+  );
+  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
 
   fs.writeFileSync(
     'core/tests/puppeteer/.env',
@@ -817,7 +840,9 @@ const main = async function () {
       `skill_id=${skillId}\n` +
       `blog_post_url_fragment=${blogUrlFragment}\n` +
       `learner_group_id=${learnerGroupId}\n` +
-      `technical_feedback_report_id=${technicalFeedbackReportId}\n`
+      `technical_feedback_report_id=${technicalFeedbackReportId}\n` +
+      `certificate_id=${certificateId}\n` +
+      `attempt_id=${attemptId}\n`
   );
 
   await process.stdout.write(
@@ -829,6 +854,8 @@ const main = async function () {
       `http://localhost:8181/blog/${blogUrlFragment}`,
       `http://localhost:8181/learner-group/${learnerGroupId}`,
       `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`,
+      `http://localhost:8181/certificate-assessment/${certificateId}`,
+      `http://localhost:8181/certificate-assessment-result/${attemptId}`,
     ].join('\n')
   );
   if (record) {

@@ -168,7 +168,7 @@
     "page_module": "core/templates/pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module.ts"
   },
   "certificate-offering-available": {
-    "url": "http://localhost:8181/learn/staging/certificate-offering-available",
+    "url": "http://localhost:8181/learn/math/certificate-offering-available",
     "page_module": "core/templates/pages/certificate-offering-available-page/certificate-offering-available-page.module.ts"
   },
   "contributor-admin-dashboard": {

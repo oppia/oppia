@@ -155,6 +155,8 @@ def get_entity(line: str) -> tuple[str, str] | None:
             'technical_feedback_report_id',
             5,
         ),
+        '/certificate-assessment-result/': ('attempt_id', 4),
+        '/certificate-assessment/': ('certificate_id', 4),
     }
     for url_pattern, (
         entity_name,
