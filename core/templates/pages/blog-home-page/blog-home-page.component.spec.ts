@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
-import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
