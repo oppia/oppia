@@ -36,8 +36,8 @@ jobs:
         run: |
           SHA=$(git ls-remote https://github.com/oppia/oppia.git refs/heads/develop | awk '{print $1}')
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-  e2e_and_acceptance_coverage:
-    name: Verify all e2e/acceptance tests are included
+  acceptance_coverage:
+    name: Verify all acceptance tests are included
     needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
@@ -52,14 +52,14 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-      - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
+      - name: Check that all acceptance test files are captured in core/tests/ci-test-suite-configs
 
         run: python -m scripts.check_tests_are_captured_in_ci
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "The e2e/acceptance coverage test failed on the upstream develop branch."
+          message: "The acceptance coverage test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_test_suites_to_run:
     name: Compute which tests to run
@@ -99,8 +99,7 @@ jobs:
     name: Build the app, and store build files as an artifact
     needs: [check_test_suites_to_run, setup_merge_sha]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
+    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
@@ -111,106 +110,6 @@ jobs:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
-  e2e_test:
-    needs: [check_test_suites_to_run, build, setup_merge_sha]
-    runs-on: ubuntu-22.04
-    if: ${{ 
-        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 
-        && github.event_name != 'merge_group'
-      }}
-    strategy:
-      fail-fast: ${{ github.event_name == 'merge_group' }}
-      matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites }}
-    name: E2E (${{ matrix.suite.name }})
-    steps:
-      - name: Check for broken suites
-        id: check_skip
-        # TODO(#22448): Remove once all suites are fixed.
-        run: |
-          broken_suites=("contributorDashboard" "contributorAdminDashboard" "explorationTranslationTab" "fileUploadFeatures")
-          for suite in "${broken_suites[@]}"; do
-            if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
-              echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
-              echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
-              break
-            fi
-          done
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-        with:
-          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-      - name: Generate build files
-        uses: ./.github/actions/generate-build-files
-      - name: Install Chrome
-        uses: ./.github/actions/install-chrome
-      - name: Install ffmpeg for wdio videos
-        run: |
-          sudo apt-get update
-          sudo apt install ffmpeg
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        # Replace slashes in the filename with hyphens.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run E2E Test ${{ matrix.suite.name }}
-        # TODO(#22448): Remove once all suites are fixed.
-        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
-        run: >
-          set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-          python -m scripts.run_e2e_tests --skip_install
-          --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
-          | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload E2E test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
-        run: >
-          set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-          python -m scripts.run_e2e_tests --skip_install
-          --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
-          | tee e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload E2E retry test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading webdriverio-video as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: webdriverio-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/webdriverio-video
-      - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: webdriverio-screenshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/webdriverio-screenshots
-      - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/build
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "An E2E test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
     needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
@@ -337,52 +236,18 @@ jobs:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
 
-  lighthouse_accessibility_test:
-    needs: [check_test_suites_to_run]
-    if: ${{
-        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0
-        && github.event_name != 'merge_group'
-      }}
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: ${{ github.event_name == 'merge_group' }}
-      matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.suites }}
-    name: Lighthouse a11y (shard ${{ matrix.suite.name }})
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-        with:
-          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-      - name: Install Chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: ./.github/actions/install-chrome
-      - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
-        shell: bash
-        timeout-minutes: 45
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "A Lighthouse test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  lighthouse_performance_test:
+  lighthouse_test:
     needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{
-        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0
         && github.event_name != 'merge_group'
       }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.suites }}
-    name: Lighthouse perf (shard ${{ matrix.suite.name }})
+        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.suites }}
+    name: Lighthouse tests (shard ${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -401,9 +266,9 @@ jobs:
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
+      - name: Run Lighthouse checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        run: python -m scripts.run_lighthouse_tests --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
         timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
@@ -415,19 +280,17 @@ jobs:
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "A Lighthouse performance test failed on the upstream develop branch."
+          message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_workflow_statuses:
-    # This job is needed because we cannot make each e2e/acceptance/lighthouse
+    # This job is needed because we cannot make each acceptance/lighthouse
     # task a "required" check via GitHub, since different tasks may execute
     # depending on which files are modified in the PR.
     name: Check that all necessary tests pass
     needs:
       - check_test_suites_to_run
-      - e2e_test
       - acceptance_test
-      - lighthouse_accessibility_test
-      - lighthouse_performance_test
+      - lighthouse_test
       - setup_merge_sha
     if: always()
     runs-on: ubuntu-22.04
@@ -453,7 +316,7 @@ jobs:
           }}
         run: |
           echo ""
-          echo "NOTE TO DEVELOPERS: This CI check is failing because another e2e/acceptance/lighthouse full-stack test workflow has failed. Please see that other workflow for the relevant logs to investigate. When all full-stack workflows pass, this CI check will automatically pass."
+          echo "NOTE TO DEVELOPERS: This CI check is failing because another acceptance/lighthouse full-stack test workflow has failed. Please see that other workflow for the relevant logs to investigate. When all full-stack workflows pass, this CI check will automatically pass."
           echo ""
           echo "If all other full-stack workflows have passed and this is the only failure, please file an issue on our issue tracker and link to this log. Thanks!"
           echo ""

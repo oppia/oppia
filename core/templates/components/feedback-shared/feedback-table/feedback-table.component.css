@@ -56,6 +56,37 @@
   width: 100px;
 }
 
+.oppia-feedback-table-col-lesson-title {
+  width: 160px;
+}
+
+
+.oppia-my-suggestions-notification-summary {
+  align-items: center;
+  color: #00645c;
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.oppia-my-suggestions-unread {
+  align-items: center;
+  background: #a53417;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  min-height: 18px;
+  min-width: 18px;
+  padding: 3px 6px;
+}
+
 .oppia-feedback-table-desc {
   display: -webkit-box;
   -webkit-line-clamp: 2;
