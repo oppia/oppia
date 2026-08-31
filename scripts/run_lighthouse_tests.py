@@ -151,6 +151,10 @@ def get_entity(line: str) -> tuple[str, str] | None:
         'skill_editor': ('skill_id', 4),
         '/blog/': ('blog_post_url_fragment', 4),
         '/learner-group/': ('learner_group_id', 4),
+        '/technical-feedback-dashboard/': (
+            'technical_feedback_report_id',
+            5,
+        ),
     }
     for url_pattern, (
         entity_name,

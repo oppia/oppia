@@ -40,6 +40,7 @@ var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
 var learnerGroupId = 'Learner group not loaded';
+var technicalFeedbackReportId = 'Technical feedback report not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -125,6 +126,7 @@ var roleOptionLabels = {
   COLLECTION_EDITOR: 'collection editor',
   FULL_USER: 'full user',
   RELEASE_COORDINATOR: 'release coordinator',
+  TECH_TEAM_LEAD: 'tech team lead',
   VOICEOVER_ADMIN: 'voiceover admin',
 };
 
@@ -500,6 +502,16 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
       const data = await response.json();
       return data.learner_groups_list[0].id;
     });
+
+    // Capture the seeded technical feedback report id from the
+    // technical-external dashboard summaries.
+    technicalFeedbackReportId = await page.evaluate(async () => {
+      const response = await fetch(
+        '/platform-feedback/technical/tech-external'
+      );
+      const data = await response.json();
+      return data.summaries.length > 0 ? data.summaries[0].id : null;
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -786,6 +798,7 @@ const main = async function () {
   await setRole(browser, page, 'ADMIN');
   await setRole(browser, page, 'RELEASE_COORDINATOR');
   await setRole(browser, page, 'FULL_USER');
+  await setRole(browser, page, 'TECH_TEAM_LEAD');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
@@ -803,7 +816,8 @@ const main = async function () {
       `topic_id=${topicId}\n` +
       `skill_id=${skillId}\n` +
       `blog_post_url_fragment=${blogUrlFragment}\n` +
-      `learner_group_id=${learnerGroupId}\n`
+      `learner_group_id=${learnerGroupId}\n` +
+      `technical_feedback_report_id=${technicalFeedbackReportId}\n`
   );
 
   await process.stdout.write(
@@ -814,6 +828,7 @@ const main = async function () {
       skillEditorUrl,
       `http://localhost:8181/blog/${blogUrlFragment}`,
       `http://localhost:8181/learner-group/${learnerGroupId}`,
+      `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`,
     ].join('\n')
   );
   if (record) {

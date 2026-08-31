@@ -38,6 +38,7 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
+    general_feedback_services,
     learner_group_fetchers,
     learner_group_services,
     opportunity_services,
@@ -1332,6 +1333,31 @@ class AdminHandler(
                 ['%s:1' % topic_id_1],
                 [story_id],
             )
+            # Seed a site report routed to the technical-external dashboard so
+            # that the technical feedback dashboard and detail pages render
+            # real content during lighthouse runs.
+            existing_summaries, _, _ = (
+                general_feedback_services.get_platform_feedback_summaries(
+                    dashboard=feconf.DESTINATION_TECHNICAL,
+                    dashboard_id=(feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM),
+                    status_filter=None,
+                )
+            )
+            if not existing_summaries:
+                general_feedback_services.create_platform_report(
+                    feedback_text=(
+                        'A dummy technical feedback report for lighthouse '
+                        'runs.'
+                    ),
+                    source=feconf.SOURCE_APP,
+                    page_url=('https://www.oppia.org/explore/learn-something'),
+                    category=None,
+                    lesson_metadata=None,
+                    session_info=None,
+                    screenshot_filename=None,
+                    screenshot_entity_id=None,
+                    include_technical_logs=False,
+                )
         else:
             raise Exception('Cannot load new structures data in production.')
 

@@ -244,7 +244,7 @@
     "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
   },
   "technical-feedback-detail": {
-    "url": "http://localhost:8181/technical-feedback-dashboard/test-team/1",
+    "url": "http://localhost:8181/technical-feedback-dashboard/tech-external/{{technical_feedback_report_id}}",
     "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
   },
   "voiceover-admin": {
