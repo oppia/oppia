@@ -35,8 +35,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import fs_services
 from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
