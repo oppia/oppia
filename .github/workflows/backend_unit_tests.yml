@@ -85,6 +85,13 @@ jobs:
 
         id: run_backend_test_shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        env:
+          # Treat deprecation warnings from our own code as errors, per
+          # https://docs.python.org/3/whatsnew/3.9.html#you-should-check-for-deprecationwarning-in-your-code
+          # Scoped to our own module namespaces so warnings raised by
+          # third-party/vendored code (e.g. third_party/python_libs) don't
+          # fail the build.
+          PYTHONWARNINGS: "error::DeprecationWarning:core,error::DeprecationWarning:scripts,error::DeprecationWarning:extensions"
         run: python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ steps.run_backend_test_shard.outputs.WORKFLOW_STATUS == 'failure' && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
