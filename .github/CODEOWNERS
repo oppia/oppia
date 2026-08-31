@@ -73,7 +73,6 @@
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
-/angular-template-style-url-replacer.webpack-loader.js @oppia/lace-frontend-reviewers
 /angular.json @oppia/lace-frontend-reviewers
 /src @oppia/lace-frontend-reviewers
 
@@ -137,6 +136,7 @@
 /core/domain/opportunity*.py @oppia/contributor-experience-team
 /core/domain/translation*.py @oppia/contributor-experience-team
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
+/core/templates/domain/contributor_dashboard/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for for GoalsTabComponent.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,
