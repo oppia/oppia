@@ -33,10 +33,12 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TopicEditorRoutingService} from './services/topic-editor-routing.service';
 import {TopicEditorStateService} from './services/topic-editor-state.service';
+import './topic-editor-page.component.css';
 
 @Component({
   selector: 'oppia-topic-editor-page',
   templateUrl: './topic-editor-page.component.html',
+  styleUrls: ['./topic-editor-page.component.css'],
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
   topic: Topic | null = null;

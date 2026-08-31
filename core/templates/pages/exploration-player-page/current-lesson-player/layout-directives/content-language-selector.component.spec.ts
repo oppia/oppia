@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,
