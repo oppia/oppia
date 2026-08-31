@@ -233,7 +233,7 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, 2100000);
 
-  it('should search for an exploration using its translated title', async function () {
+  it('should cover LO.4: search for an exploration using its translated title', async function () {
     await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
     await loggedOutUser.navigateToCommunityLibraryPage();
     await loggedOutUser.searchForLessonInSearchBar(EXPLORATION_TITLE);
@@ -241,7 +241,7 @@ describe('Logged-out User', function () {
     await loggedOutUser.expectLessonTileToShow(HINDI_TITLE, HINDI_OBJECTIVE);
   });
 
-  it('should view information about the lesson', async function () {
+  it('should cover LO.4: view information about the lesson', async function () {
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
     );
@@ -251,13 +251,13 @@ describe('Logged-out User', function () {
     await loggedOutUser.closeLessonInfoModal();
   });
 
-  it('should refer to a concept card', async function () {
+  it('should cover LO.4: refer to a concept card', async function () {
     await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
       HINDI_SKILL_EXPLANATION
     );
   });
 
-  it('should view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
+  it('should cover LO.4: view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
     await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
