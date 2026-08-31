@@ -44,6 +44,14 @@ export class TopicHeaderComponent implements OnInit {
 
   constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
+  get capitalizedClassroomName(): string {
+    return this.capitalize(this.classroomName ?? '');
+  }
+
+  get capitalizedClassroomUrlFragment(): string {
+    return this.capitalize(this.classroomUrlFragment);
+  }
+
   ngOnInit(): void {
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
@@ -62,6 +70,11 @@ export class TopicHeaderComponent implements OnInit {
           this.classroomName
         ).name;
     }
+  }
+
+  private capitalize(value: string): string {
+    const trimmed = value.trim();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {

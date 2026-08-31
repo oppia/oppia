@@ -5,7 +5,7 @@
     <button class="adventure-navigation-arrow adventure-navigation-arrow--left"
             *ngIf="showLeftArrow"
             (click)="scrollLeft()"
-            aria-label="Scroll left"
+            [attr.aria-label]="'I18N_TOPIC_VIEWER_SCROLL_LEFT' | translate"
             type="button">
       <i class="material-icons">chevron_left</i>
     </button>
@@ -19,15 +19,15 @@
            [ngStyle]="{'border-color': adventureGroup.accentColor}">
         <topic-adventure-circle-badge *ngFor="let lesson of adventureGroup.lessons"
                                       [label]="lesson.lessonNumber.toString()"
-                                      [iconName]="getLessonBadgeIconName(lesson.isCompleted)"
+                                      [iconName]="''"
                                       [size]="'sm'"
                                       [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : (lesson.isCompleted ? '#e7f6e9' : '#fff')"
-                                      [borderColor]="lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor"
-                            [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : (lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor)"
+                                      [borderColor]="adventureGroup.accentColor"
+                                      [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onLessonClick(lesson.lessonNumber, adventureIdx)"
-                                      [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
-                                      title="Go to lesson {{ lesson.lessonNumber }}"
+                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
+                                      [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onLessonClick(lesson.lessonNumber, adventureIdx)"
@@ -35,15 +35,15 @@
         </topic-adventure-circle-badge>
 
         <topic-adventure-circle-badge *ngIf="adventureGroup.showPractice"
-                            [iconName]="getPracticeBadgeIconName(adventureGroup.isPracticeCompleted)"
+                                      [iconName]="getPracticeBadgeIconName()"
                                       [size]="'sm'"
                                       [backgroundColor]="adventureGroup.isPracticeCompleted ? '#e7f6e9' : '#fff'"
-                                      [borderColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
-                                      [textColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
+                                      [borderColor]="adventureGroup.accentColor"
+                                      [textColor]="adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onPracticeClick(adventureGroup.arcId)"
-                                      [attr.aria-label]="'Go to practice'"
-                                      title="Go to practice"
+                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
+                                      [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onPracticeClick(adventureGroup.arcId)"
@@ -57,7 +57,15 @@
                                       [size]="'sm'"
                                       [backgroundColor]="'#fff7e8'"
                                       [borderColor]="'#f5a623'"
-                                      [textColor]="'#f5a623'">
+                                      [textColor]="'#f5a623'"
+                                      [class.adventure-navigation-clickable]="true"
+                                      (click)="onMasteryClick()"
+                                      [attr.aria-label]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                      [attr.title]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                      role="button"
+                                      tabindex="0"
+                                      (keydown.enter)="onMasteryClick()"
+                                      (keydown.space)="onMasteryClick(); $event.preventDefault()">
         </topic-adventure-circle-badge>
       </div>
     </div>
@@ -65,7 +73,7 @@
     <button class="adventure-navigation-arrow adventure-navigation-arrow--right"
             *ngIf="showRightArrow"
             (click)="scrollRight()"
-            aria-label="Scroll right"
+            [attr.aria-label]="'I18N_TOPIC_VIEWER_SCROLL_RIGHT' | translate"
             type="button">
       <i class="material-icons">chevron_right</i>
     </button>
