@@ -321,4 +321,11 @@ describe('Card interaction controls component', () => {
 
     expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
   });
+
+  it('should return continue button customization args', () => {
+    const mockArgs = {buttonText: {value: 'Continue'}};
+    componentInstance.interactionCustomizationArgs =
+      mockArgs as ContinueCustomizationArgs;
+    expect(componentInstance.continueButtonCustomizationArgs).toEqual(mockArgs);
+  });
 });

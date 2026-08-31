@@ -58,6 +58,7 @@ describe('MathEquationInputInteractive', () => {
     asciimath() {
       return asciiDummyValue;
     }
+    activate(): void {}
 
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {

@@ -1877,4 +1877,80 @@ describe('Conversation flow service', () => {
       expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
     });
   });
+
+  it('should use content focus label when refreshInteraction is false and next card is null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(3);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(focusManagerService, 'generateFocusLabel');
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: Function
+    ) => {
+      successCallback(
+        null,
+        false,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(focusManagerService.generateFocusLabel).not.toHaveBeenCalled();
+    expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
+  }));
 });

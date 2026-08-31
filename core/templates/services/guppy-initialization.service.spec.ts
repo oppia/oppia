@@ -88,4 +88,23 @@ describe('GuppyInitializationService', () => {
     guppyInitializationService.setShowOSK(false);
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
   });
+
+  it('should activate the most recent guppy instance', function () {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
+
+    const activateSpy = spyOn(MockGuppy.prototype, 'activate');
+    guppyInitializationService.activate();
+
+    expect(activateSpy).toHaveBeenCalled();
+  });
+
+  it('should do nothing when activate is called with no guppy instances', function () {
+    expect(() => {
+      guppyInitializationService.activate();
+    }).not.toThrowError();
+  });
 });
