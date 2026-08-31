@@ -120,10 +120,10 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'login',
         'contact',
         'donate',
-    ],
-    '2': [
         'get-started',
         'teach',
+    ],
+    '2': [
         'thanks',
         'volunteer',
         'contributor-dashboard',

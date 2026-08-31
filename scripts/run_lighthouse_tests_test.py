@@ -212,37 +212,35 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 },
             )
 
-    def test_get_lighthouse_entities_skips_setup_for_static_pages(self) -> None:
+    def test_get_lighthouse_entities_skips_setup_for_shard_one(self) -> None:
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
             lambda *unused_args: {'topic_id': '4'},
             called=False,
         )
-        with self.lighthouse_pages_json_filepath_swap:
-            with self.print_swap, swap_run_puppeteer_script:
-                entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
-                    'splash, about'
-                )
+        with self.print_swap, swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                1
+            )
         self.assertEqual(entities, {})
         self.assertIn(
-            'Running pages have no entity placeholders; skipping lighthouse '
+            'Shard 1 audits only static public pages; skipping lighthouse '
             'data setup and login.',
             self.print_arr,
         )
 
-    def test_get_lighthouse_entities_runs_setup_for_entity_pages(self) -> None:
+    def test_get_lighthouse_entities_runs_setup_for_later_shards(self) -> None:
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
             lambda record: {'topic_id': '4'},
             expected_args=((True,),),
         )
-        with self.lighthouse_pages_json_filepath_with_entities_swap:
-            with swap_run_puppeteer_script:
-                entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
-                    'topic-editor', record=True
-                )
+        with swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                2, record=True
+            )
         self.assertEqual(entities, {'topic_id': '4'})
 
     def test_get_resolvable_lighthouse_all_urls_skips_unresolvable(
@@ -762,7 +760,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-                                run_lighthouse_tests.main(args=[])
+                                run_lighthouse_tests.main(args=['--shard', '1'])
                                 expected_all_lighthouse_urls = ','.join(
                                     [
                                         'http://localhost:8181/',
@@ -780,7 +778,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
-            'Running pages have no entity placeholders; skipping lighthouse '
+            'Shard 1 audits only static public pages; skipping lighthouse '
             'data setup and login.',
             self.print_arr,
         )
@@ -825,7 +823,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
                                 run_lighthouse_tests.main(
-                                    args=['--pages', 'splash, about']
+                                    args=[
+                                        '--shard',
+                                        '1',
+                                        '--pages',
+                                        'splash, about',
+                                    ]
                                 )
                                 expected_all_lighthouse_urls = ','.join(
                                     [
@@ -854,7 +857,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
-            'Running pages have no entity placeholders; skipping lighthouse '
+            'Shard 1 audits only static public pages; skipping lighthouse '
             'data setup and login.',
             self.print_arr,
         )
@@ -912,7 +915,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with self.swap_redis_server, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
                                 run_lighthouse_tests.main(
-                                    args=['--skip_build', '--pages', 'splash']
+                                    args=[
+                                        '--skip_build',
+                                        '--shard',
+                                        '1',
+                                        '--pages',
+                                        'splash',
+                                    ]
                                 )
 
         self.assertIn(
@@ -924,7 +933,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
         self.assertIn(
-            'Running pages have no entity placeholders; skipping lighthouse '
+            'Shard 1 audits only static public pages; skipping lighthouse '
             'data setup and login.',
             self.print_arr,
         )

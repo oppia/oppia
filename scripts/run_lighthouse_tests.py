@@ -67,6 +67,16 @@ _PARSER.add_argument(
     action='store_true',
 )
 
+_PARSER.add_argument(
+    '--shard',
+    help=(
+        'The one-based index of the Lighthouse shard being run. Shard 1 '
+        'audits the static and public pages, so its setup is skipped.'
+    ),
+    type=int,
+    default=0,
+)
+
 
 def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
@@ -135,37 +145,29 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
 
 
 def _get_lighthouse_entities(
-    pages: Optional[str], record: bool = False
+    shard: int, record: bool = False
 ) -> dict[str, str]:
     """Runs the puppeteer setup script and returns the entity IDs it collects.
 
-    Entity IDs are only needed when a page's URL contains a ``{{...}}``
-    placeholder. A shard that only audits static or public pages (which have no
-    placeholders) can skip the heavy login and data-seeding setup entirely, so
-    no entities are collected and login is never performed for those shards.
+    Shard 1 audits only static and public marketing pages, which render without
+    any seeded database data, roles or feature flags, so its heavy login and
+    data-seeding setup can be skipped entirely. All later shards audit
+    data-dependent pages and must run the setup.
 
     Args:
-        pages: str|None. Comma-separated page names to run, or None to run all
-            configured pages.
+        shard: int. The one-based index of the Lighthouse shard being run.
+            When 0, no shard identity was provided and the setup runs to be
+            safe.
         record: bool. Whether to record the puppeteer setup via the screen
             recorder.
 
     Returns:
         dict(str, str). The collected entity IDs, or an empty dict when the
-        running pages need none.
+        running shard is the static shard 1.
     """
-    pages_config: dict[str, str] = get_lighthouse_pages_config()
-    pages_to_run = (
-        [page.strip() for page in pages.split(',')]
-        if pages
-        else list(pages_config.keys())
-    )
-    needs_entities = any(
-        re.findall(ENTITY_MATCHER, pages_config[page]) for page in pages_to_run
-    )
-    if not needs_entities:
+    if shard == 1:
         print(
-            'Running pages have no entity placeholders; skipping lighthouse '
+            'Shard 1 audits only static public pages; skipping lighthouse '
             'data setup and login.'
         )
         return {}
@@ -531,7 +533,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
         with managed_lighthouse_appserver(SERVER_MODE_DEV):
             entities = _get_lighthouse_entities(
-                parsed_args.pages, parsed_args.record_screen
+                parsed_args.shard, parsed_args.record_screen
             )
 
         if parsed_args.skip_build:

@@ -118,6 +118,10 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
 )
 
 LIGHTHOUSE_PAGES_PER_SHARD: Final = 12
+# The first shard holds the static and public pages, which skip the login and
+# data-seeding setup and are therefore much faster to audit. It can hold more
+# pages than the later shards without skewing the overall CI wall-clock time.
+LIGHTHOUSE_PAGES_IN_FIRST_SHARD: Final = 14
 LIGHTHOUSE_MODULES: Final = (
     '.lighthouserc.js',
     '.lighthouserc-desktop.js',
@@ -318,21 +322,48 @@ def partition_lighthouse_pages_into_test_suites(
     """
     lighthouse_test_suites: List[LighthouseTestSuiteDict] = []
     current_lighthouse_test_suite: LighthouseTestSuiteDict | None = None
-    for i, page in enumerate(lighthouse_pages):
-        if i % LIGHTHOUSE_PAGES_PER_SHARD == 0:
-            if current_lighthouse_test_suite:
-                lighthouse_test_suites.append(current_lighthouse_test_suite)
+    pages_in_current_shard = 0
+    shard_index = 1
+    for page in lighthouse_pages:
+        if current_lighthouse_test_suite is None:
             current_lighthouse_test_suite = {
-                'name': '%s' % (str(i // LIGHTHOUSE_PAGES_PER_SHARD + 1)),
+                'name': '1',
                 'module': lighthouse_module,
                 'environment': 'python',
                 'pages_to_run': [],
             }
-        assert current_lighthouse_test_suite is not None
+        elif pages_in_current_shard >= _lighthouse_pages_per_shard(shard_index):
+            lighthouse_test_suites.append(current_lighthouse_test_suite)
+            shard_index += 1
+            current_lighthouse_test_suite = {
+                'name': '%s' % shard_index,
+                'module': lighthouse_module,
+                'environment': 'python',
+                'pages_to_run': [],
+            }
+            pages_in_current_shard = 0
         current_lighthouse_test_suite['pages_to_run'].append(page['name'])
+        pages_in_current_shard += 1
     if current_lighthouse_test_suite:
         lighthouse_test_suites.append(current_lighthouse_test_suite)
     return lighthouse_test_suites
+
+
+def _lighthouse_pages_per_shard(shard_index: int) -> int:
+    """Returns the number of pages that the given shard can hold.
+
+    The first shard audits the static and public pages, which skip the heavy
+    login and data-seeding setup, so it can hold more pages than the rest.
+
+    Args:
+        shard_index: int. The one-based index of the shard.
+
+    Returns:
+        int. The maximum number of pages the shard can hold.
+    """
+    if shard_index == 1:
+        return LIGHTHOUSE_PAGES_IN_FIRST_SHARD
+    return LIGHTHOUSE_PAGES_PER_SHARD
 
 
 def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
