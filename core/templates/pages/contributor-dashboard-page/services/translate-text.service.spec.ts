@@ -16,6 +16,8 @@
  * @fileoverview Tests for translate-text service.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

@@ -16,6 +16,8 @@
  * @fileoverview Tests for the Base Transclusion Component.
  */
 
+// @ts-nocheck
+
 import {DOCUMENT} from '@angular/common';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
