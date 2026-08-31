@@ -32,13 +32,13 @@ const ROLES = testConstants.Roles;
 describe('Logged-in User', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let releaseCoordinator: ReleaseCoordinator;
-  let curriculumAdmin: ExplorationEditor;
+  let explorationEditor: ExplorationEditor & LoggedInUser;
   let expId: string;
 
   beforeAll(async function () {
-    curriculumAdmin = await UserFactory.createNewUser(
+    explorationEditor = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculumAdmin@example.com',
+      'explorationEditor@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
     releaseCoordinator = await UserFactory.createNewUser(
@@ -56,12 +56,11 @@ describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag('new_lesson_player');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
-    expId = await curriculumAdmin.createAndPublishExplorationWithCards(
+    expId = await explorationEditor.createAndPublishExplorationWithCards(
       'What are the Place Values',
       'Algebra',
       2
     );
-    await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInLearner = await UserFactory.createNewUser(
       'learner',
@@ -120,11 +119,187 @@ describe('Logged-in User', function () {
 
     // Navigate to My Suggestions Tab
     await loggedInLearner.navigateToMySuggestionsTab();
+    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
+    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
+    await loggedInLearner.verifyMySuggestionsFeedbackList();
+
+    await loggedInLearner.expectMySuggestionsFeedbackEntry(
+      'This fraction model is awesome, but can we get more marble examples?',
+      'Submitted',
+      'What are the Place Values'
+    );
 
     await loggedInLearner.expectScreenshotToMatch(
       'mySuggestionsTabAfterSubmittingFeedback',
       __dirname
     );
+
+    await loggedInLearner.clickOnFeedbackListEntryWithDescription(
+      'This fraction model is awesome, but can we get more marble examples?'
+    );
+
+    // Hide dynamic date/time values before taking the screenshot to
+    // prevent them from causing snapshot differences between test runs.
+    await loggedInLearner.removeMySuggestionsDynamicElements();
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterClickingFeedbackListEntry',
+      __dirname
+    );
+
+    await loggedInLearner.verifyMySuggestionsFeedbackDetailView(false);
+    await loggedInLearner.expectMySuggestionsFeedbackDetail(
+      'Submitted',
+      'This fraction model is awesome, but can we get more marble examples?',
+      'You sent this while going through  this lesson , around the "Introduction" part of the lesson.'
+    );
+
+    // Click on the highlighted "this lesson" part of the text.
+    await loggedInLearner.clickOnMySuggestionsFeedbackLessonContextLink(expId);
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterClickingFeedbackLessonContextLink',
+      __dirname
+    );
+
+    await loggedInLearner.navigateToMySuggestionsTab();
+    await loggedInLearner.clickOnFeedbackListEntryWithDescription(
+      'This fraction model is awesome, but can we get more marble examples?'
+    );
+    await loggedInLearner.verifyMySuggestionsFeedbackDetailView(false);
+
+    await loggedInLearner.goBackToMySuggestionsTabList();
+
+    // The Lessons Team views their submission panel, reads the feedback, and marks it as Not Actionable.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.openExplorationInExplorationEditor(
+      'What are the Place Values'
+    );
+    await explorationEditor.navigateToFeedbackTab();
+
+    await explorationEditor.expectScreenshotToMatch(
+      'explorationEditorFeedbackTab',
+      __dirname
+    );
+
+    await explorationEditor.clickOnFeedbackListEntryWithDescription(
+      'This fraction model is awesome, but can we get more marble examples?'
+    );
+
+    await explorationEditor.expectScreenshotToMatch(
+      'explorationEditorFeedbackTabAfterClickingFeedbackListEntry',
+      __dirname
+    );
+
+    await explorationEditor.selectStatusOnFeedbackTab('Not Actionable');
+    await explorationEditor.expectScreenshotToMatch(
+      'explorationEditorFeedbackTabAfterSelectingNotActionable',
+      __dirname
+    );
+
+    // Log back as Learner and navigate back to My Suggestions Tab.
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectMySuggestionsTabTotalNotification(false);
+    await loggedInLearner.navigateToMySuggestionsTab();
+    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
+    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
+    await loggedInLearner.verifyMySuggestionsFeedbackList();
+
+    await loggedInLearner.expectMySuggestionsFeedbackEntry(
+      'This fraction model is awesome, but can we get more marble examples?',
+      'Reviewed by Team',
+      'What are the Place Values'
+    );
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterExplorationEditorNotActionable',
+      __dirname
+    );
+
+    // Submit another Lesson feedback and lesson creators reads it and marks it as Fixed.
+    await loggedInLearner.playLesson(expId);
+    await loggedInLearner.toggleOptionsSidebar();
+    await loggedInLearner.clickLessonFeedbackButton(true);
+    await loggedInLearner.submitFeedbackInTextArea(
+      'This Lesson seems too short, can we make it longer?'
+    );
+    await loggedInLearner.clickButtonInModal(
+      'Send Feedback to the Lessons Team',
+      'confirm'
+    );
+
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.openExplorationInExplorationEditor(
+      'What are the Place Values'
+    );
+    await explorationEditor.navigateToFeedbackTab();
+    await explorationEditor.clickOnFeedbackListEntryWithDescription(
+      'This Lesson seems too short, can we make it longer?'
+    );
+    await explorationEditor.selectStatusOnFeedbackTab('Fixed');
+
+    // As Learner navigate back to My Suggestions Tab.
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectMySuggestionsTabTotalNotification(true, '1');
+    await loggedInLearner.navigateToMySuggestionsTab();
+    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
+    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
+    await loggedInLearner.verifyMySuggestionsFeedbackList();
+
+    await loggedInLearner.expectMySuggestionsFeedbackEntry(
+      'This Lesson seems too short, can we make it longer?',
+      'Lesson updated',
+      'What are the Place Values',
+      '1',
+      'A creator fixed an error you reported. Thank you for helping make Oppia better for everyone!'
+    );
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterExplorationEditorFixed',
+      __dirname
+    );
+
+    await loggedInLearner.clickOnFeedbackListEntryWithDescription(
+      'This Lesson seems too short, can we make it longer?'
+    );
+    await loggedInLearner.verifyMySuggestionsFeedbackDetailView(true);
+    await loggedInLearner.expectMySuggestionsFeedbackDetail(
+      'Lesson updated',
+      'This Lesson seems too short, can we make it longer?',
+      'You sent this while going through  this lesson , around the "Introduction" part of the lesson.'
+    );
+
+    await loggedInLearner.expectToolTipTextToBe(
+      'e2e-test-my-suggestions-details-status-value',
+      'A creator fixed this error! Thank you for helping make Oppia better for everyone.'
+    );
+
+    // Add a follow up note.
+    await loggedInLearner.clickOnAddAFollowUpNote();
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterAddingFollowUpNote',
+      __dirname
+    );
+    await loggedInLearner.expectFeedbackModalSubHeaderToBe(
+      "A creator marked this as fixed. Let them know if it's resolved, or add anything else you'd like them to know."
+    );
+    await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
+      "E.g. Thanks, that fixed it! or it's still happening on question 3."
+    );
+
+    await loggedInLearner.submitFeedbackInTextArea(
+      'This Question answer is still wrong, please recheck, Thanks.'
+    );
+    await loggedInLearner.clickButtonInModal('Add a follow-up note', 'confirm');
+    await loggedInLearner.expectToastMessage(
+      'Your follow-up note has been sent successfully.'
+    );
+
+    await loggedInLearner.goBackToMySuggestionsTabList();
+    // await loggedInLearner.expectMySuggestionsFeedbackEntry(
+
+    // )
   });
 
   // it('should report a bug in a lesson.', async function () {

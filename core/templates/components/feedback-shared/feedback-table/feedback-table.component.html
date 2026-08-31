@@ -1,4 +1,4 @@
-<div *ngIf="feedbackSummaries.length > 0" class="oppia-feedback-table-container">
+<div *ngIf="feedbackSummaries.length > 0" class="oppia-feedback-table-container e2e-test-feedback-table">
 
   <div class="oppia-feedback-table-scroll">
     <table class="w-100">
@@ -33,37 +33,37 @@
             class="oppia-feedback-table-row"
             (click)="rowClick.emit(feedback.id)">
 
-          <td class="oppia-feedback-table-td oppia-feedback-table-col-status">
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-status e2e-test-feedback-table-status">
             <oppia-feedback-chip [value]="feedback.status"
                                  [type]="'status'">
             </oppia-feedback-chip>
           </td>
 
-          <td class="oppia-feedback-table-td oppia-feedback-table-col-desc">
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-desc e2e-test-feedback-table-description">
             <span class="oppia-feedback-table-desc">
               {{ getFeedbackDescription(feedback) }}
             </span>
             <span *ngIf="feedbackCardConfig.showNotificationSummary && getNotificationSummary(feedback) as notificationSummary"
-                  class="oppia-my-suggestions-notification-summary">
+                  class="oppia-my-suggestions-notification-summary e2e-test-my-suggestions-notification-summary">
               {{ notificationSummary }}
-              <span class="oppia-my-suggestions-unread">
+              <span class="oppia-my-suggestions-unread e2e-test-my-suggestions-unread">
                 {{ getUnreadResponseCount(feedback) }}
               </span>
             </span>
           </td>
 
-          <td class="oppia-feedback-table-td oppia-feedback-table-col-source">
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-source e2e-test-my-suggestions-source">
             {{ getSourceLabel(feedback.source) }}
           </td>
 
           <td *ngIf="feedbackCardConfig.showLesson"
-              class="oppia-feedback-table-td oppia-feedback-table-col-lesson-title">
+              class="oppia-feedback-table-td oppia-feedback-table-col-lesson-title e2e-test-my-suggestions-lesson-title">
             {{ getLessonTitle(feedback) }}
           </td>
 
           <td *ngIf="feedbackCardConfig.showCategory"
               class="oppia-feedback-table-td oppia-feedback-table-col-category">
-            <span class="oppia-feedback-table-chip-category">
+            <span class="oppia-feedback-table-chip-category e2e-test-my-suggestions-category">
               <oppia-feedback-chip [value]="getFeedbackCategory(feedback)"
                                    [type]="'category'">
               </oppia-feedback-chip>

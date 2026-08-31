@@ -370,6 +370,58 @@ const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const availableChapters = '.e2e-test-available-chapters';
 const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
 const chapterSelector = '.e2e-test-chapter-title';
+
+// Web User Feedback.
+const feedbackFilterBar = '.e2e-test-feedback-filter-bar';
+const feedbackFilterStatus = '.e2e-test-feedback-filter-status-select';
+const feedbackFilterTechnicalTeam =
+  '.e2e-test-feedback-filter-technical-team-select';
+const feedbackFilterCreatorFeedbackType =
+  '.e2e-test-feedback-filter-creator-feedback-type-select';
+const feedbackFilterSearchInput = '.e2e-test-feedback-filter-search-input';
+const feedbackFilterFromDateInput = '.e2e-test-feedback-filter-from-date-input';
+const feedbackFilterToDateInput = '.e2e-test-feedback-filter-to-date-input';
+const feedbackFilterApplyButton = '.e2e-test-feedback-filter-apply';
+const feedbackFilterClearButton = '.e2e-test-feedback-filter-clear';
+const feedbackTableDiv = '.e2e-test-feedback-table';
+const feedbackTableStatus = '.e2e-test-feedback-table-status';
+const feedbackTableDescription = '.e2e-test-feedback-table-description';
+const feedbackTableMySuggestionsNotificationSummary =
+  '.e2e-test-my-suggestions-notification-summary';
+const feedbackTableMySuggestionsUnread = '.e2e-test-my-suggestions-unread';
+const feedbackTableMySuggestionsSource = '.e2e-test-my-suggestions-source';
+const feedbackTableMySuggestionsLessonTitle =
+  '.e2e-test-my-suggestions-lesson-title';
+const feedbackTableMySuggestionsCategory = '.e2e-test-my-suggestions-category';
+// My suggestions tab detail view selectors.
+const mySuggestionsTabTotalUnreadCount =
+  '.e2e-test-my-suggestions-total-unread-count';
+const mySuggestionsTabBackButton = '.e2e-test-my-suggestions-back-button';
+const mySuggestionsTabFollowUpButton =
+  '.e2e-test-my-suggestions-follow-up-button';
+const mySuggestionsTabLessonContext = '.e2e-test-my-suggestions-lesson-context';
+const mySuggestionsTabExpLink = '.e2e-test-my-suggestions-exp-link';
+const mySuggestionsTabDetailStatusLabel =
+  '.e2e-test-my-suggestions-details-status-label';
+const mySuggestionsTabDetailStatusValue =
+  '.e2e-test-my-suggestions-details-status-value';
+const mySuggestionsTabDetailSubmittedOnLabel =
+  '.e2e-test-my-suggestions-details-submitted-on-label';
+const mySuggestionsTabDetailSubmittedOnValue =
+  '.e2e-test-my-suggestions-details-submitted-on-value';
+const mySuggestionsTabLearnerThreadHeader =
+  '.e2e-test-my-suggestions-learner-thread-header';
+const mySuggestionsTabLearnerThreadDate =
+  '.e2e-test-my-suggestions-learner-thread-date';
+const mySuggestionsTabLearnerThreadText =
+  '.e2e-test-my-suggestions-learner-thread-text';
+const mySuggestionsTabCreatorThreadHeader =
+  '.e2e-test-my-suggestions-creator-thread-header';
+const mySuggestionsTabCreatorThreadDate =
+  '.e2e-test-my-suggestions-creator-thread-date';
+const mySuggestionsTabCreatorThreadText =
+  '.e2e-test-my-suggestions-creators-response-text';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -4625,6 +4677,217 @@ export class LoggedInUser extends BaseUser {
   async navigateToMySuggestionsTab(): Promise<void> {
     await this.navigateToLearnerDashboard();
     await this.clickOnElementWithSelector(tabSelectorMap['My_Suggestions']);
+  }
+
+  async expectElementValue(
+    selector: string,
+    expectedValue: string
+  ): Promise<void> {
+    const actualValue = await this.page.$eval(
+      selector,
+      (element: HTMLInputElement | HTMLSelectElement) => element.value
+    );
+
+    expect(actualValue).toBe(expectedValue);
+  }
+
+  async verifyDefaultMySuggestionsTabFilter(): Promise<void> {
+    await this.expectElementValue(feedbackFilterStatus, 'all');
+    await this.expectElementValue(feedbackFilterSearchInput, '');
+    await this.expectElementValue(feedbackFilterFromDateInput, '');
+    await this.expectElementValue(feedbackFilterToDateInput, '');
+  }
+
+  async verifyMySuggestionsFeedbackFilterRowContents(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackFilterBar, true);
+    await this.expectElementToBeVisible(feedbackFilterStatus, true);
+    await this.expectElementToBeVisible(feedbackFilterSearchInput, true);
+    await this.expectElementToBeVisible(feedbackFilterFromDateInput, true);
+    await this.expectElementToBeVisible(feedbackFilterToDateInput, true);
+    await this.expectElementToBeVisible(feedbackFilterApplyButton, true);
+    await this.expectElementToBeVisible(feedbackFilterClearButton, true);
+  }
+
+  async verifyMySuggestionsFeedbackList(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTableDiv, true);
+    await this.expectElementToBeVisible(feedbackTableStatus, true);
+    await this.expectElementToBeVisible(feedbackTableDescription, true);
+    await this.expectElementToBeVisible(feedbackTableMySuggestionsSource, true);
+    await this.expectElementToBeVisible(
+      feedbackTableMySuggestionsLessonTitle,
+      true
+    );
+  }
+
+  async expectMySuggestionsTabTotalNotification(
+    shouldBeVisible: boolean,
+    expectedNotificationNo?: string
+  ): Promise<void> {
+    if (shouldBeVisible && expectedNotificationNo) {
+      await this.expectElementToBeVisible(
+        mySuggestionsTabTotalUnreadCount,
+        true
+      );
+      await this.expectTextContentToBe(
+        mySuggestionsTabTotalUnreadCount,
+        expectedNotificationNo
+      );
+    } else {
+      // No notification.
+      await this.expectElementToBeVisible(
+        mySuggestionsTabTotalUnreadCount,
+        false
+      );
+    }
+  }
+
+  async expectMySuggestionsFeedbackEntry(
+    expectedDescription: string,
+    expectedStatus: string,
+    expectedLessonTitle: string,
+    expectedNotificationNo?: string,
+    expectedNotificationText?: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      feedbackTableDescription,
+      expectedDescription
+    );
+    await this.expectTextContentToBe(feedbackTableStatus, expectedStatus);
+    await this.expectTextContentToBe(
+      feedbackTableMySuggestionsLessonTitle,
+      expectedLessonTitle
+    );
+    if (expectedNotificationNo !== undefined) {
+      await this.expectTextContentToBe(
+        feedbackTableMySuggestionsUnread,
+        expectedNotificationNo
+      );
+    }
+
+    if (expectedNotificationText !== undefined) {
+      await this.expectTextContentToBe(
+        feedbackTableMySuggestionsNotificationSummary,
+        expectedNotificationText
+      );
+    }
+  }
+
+  async clickOnFeedbackListEntryWithDescription(
+    givenDescription: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTableDescription, true);
+    await this.expectTextContentToBe(
+      feedbackTableDescription,
+      givenDescription
+    );
+    await this.clickOnElementWithSelector(feedbackTableDescription);
+  }
+
+  async removeMySuggestionsDynamicElements(): Promise<void> {
+    const selectors = [
+      mySuggestionsTabDetailSubmittedOnValue,
+      mySuggestionsTabLearnerThreadDate,
+      mySuggestionsTabCreatorThreadDate,
+    ];
+
+    await this.page.evaluate((selectors: string[]) => {
+      selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(element => {
+          (element as HTMLElement).style.setProperty(
+            'display',
+            'none',
+            'important'
+          );
+        });
+      });
+    }, selectors);
+  }
+
+  async verifyMySuggestionsFeedbackDetailView(
+    followUpNoteClickable: boolean
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      mySuggestionsTabBackButton,
+      'Back to my suggestions'
+    );
+    await this.expectTextContentToBe(
+      mySuggestionsTabFollowUpButton,
+      'Add a follow-up note'
+    );
+    await this.expectElementToBeClickable(
+      mySuggestionsTabFollowUpButton,
+      followUpNoteClickable
+    );
+    await this.expectElementToBeVisible(mySuggestionsTabLessonContext, true);
+    await this.expectElementToBeVisible(mySuggestionsTabExpLink, true);
+    await this.expectTextContentToBe(
+      mySuggestionsTabDetailStatusLabel,
+      'Status:'
+    );
+    await this.expectElementToBeVisible(
+      mySuggestionsTabDetailStatusValue,
+      true
+    );
+    await this.expectTextContentToBe(
+      mySuggestionsTabDetailSubmittedOnLabel,
+      'Submitted on:'
+    );
+    await this.expectElementToBeVisible(
+      mySuggestionsTabDetailSubmittedOnValue,
+      true
+    );
+    await this.expectTextContentToBe(
+      mySuggestionsTabLearnerThreadHeader,
+      'Your feedback'
+    );
+    await this.expectElementToBeVisible(
+      mySuggestionsTabLearnerThreadText,
+      true
+    );
+  }
+
+  async expectMySuggestionsFeedbackDetail(
+    expectedStatus: string,
+    expectedFeedback: string,
+    expectedLessonContext: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      mySuggestionsTabDetailStatusValue,
+      expectedStatus
+    );
+
+    await this.expectTextContentToBe(
+      mySuggestionsTabLearnerThreadText,
+      expectedFeedback
+    );
+
+    await this.expectTextContentToBe(
+      mySuggestionsTabLessonContext,
+      expectedLessonContext
+    );
+  }
+
+  async clickOnMySuggestionsFeedbackLessonContextLink(
+    expId: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(mySuggestionsTabExpLink, 'this lesson');
+    await this.clickOnElementWithSelector(mySuggestionsTabExpLink);
+    await this.expectPageURLToContain('lesson/' + expId);
+  }
+
+  async goBackToMySuggestionsTabList(): Promise<void> {
+    await this.clickOnElementWithSelector(mySuggestionsTabBackButton);
+    showMessage('Navigated back to My Suggestions tab list.');
+    await this.verifyMySuggestionsFeedbackFilterRowContents();
+    await this.verifyMySuggestionsFeedbackList();
+  }
+
+  async clickOnAddAFollowUpNote(): Promise<void> {
+    await this.clickOnElementWithSelector(mySuggestionsTabFollowUpButton);
+    await this.expectModalTitleToBe('Add a follow-up note');
+    await this.waitForNetworkIdle();
   }
 }
 

@@ -226,7 +226,7 @@
                           type="button"
                           [disabled]="statusOption === feedback.status"
                           [attr.aria-pressed]="statusOption === feedback.status"
-                          class="btn btn-primary oppia-feedback-detail-status-button"
+                          class="btn btn-primary oppia-feedback-detail-status-button e2e-test-feedback-detail-status-button"
                           (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
                   </button>

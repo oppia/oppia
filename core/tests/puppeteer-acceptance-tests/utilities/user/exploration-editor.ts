@@ -552,6 +552,9 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
+// New Exploration editor feedback tab selectors
+const feedbackDetailStatusButton = '.e2e-test-feedback-detail-status-button';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Truncates a card name the same way the frontend graph visualization does.
@@ -8750,6 +8753,23 @@ export class ExplorationEditor extends BaseUser {
       emptyCreatorDashboardMessageSelector,
       expectedText
     );
+  }
+
+  async selectStatusOnFeedbackTab(status: string): Promise<void> {
+    const statusButtons = await this.page.$$(feedbackDetailStatusButton);
+
+    for (const button of statusButtons) {
+      const buttonText = await button.evaluate(element =>
+        element.textContent?.trim()
+      );
+
+      if (buttonText === status) {
+        await button.click();
+        return;
+      }
+    }
+
+    throw new Error(`Status button "${status}" was not found.`);
   }
 }
 
