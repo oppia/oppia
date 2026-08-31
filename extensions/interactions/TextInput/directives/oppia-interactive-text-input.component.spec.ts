@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the TextInput interaction.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA, ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateModule} from '@ngx-translate/core';

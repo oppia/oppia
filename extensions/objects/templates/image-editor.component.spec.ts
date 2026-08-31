@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the image editor.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

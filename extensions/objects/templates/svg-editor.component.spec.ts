@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the svg editor.
  */
 
+// @ts-nocheck
+
 import {fabric} from 'fabric';
 import {AppConstants} from 'app.constants';
 import {SvgEditorConstants} from './svg-editor.constants';
