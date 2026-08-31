@@ -148,9 +148,9 @@ export class AdventureNavigationComponent
   }
 
   isActiveLesson(lessonNumber: number): boolean {
-    // Badge is colored when it's the currently selected lesson in navbar.
+    // Badge is colored only when it is the currently selected lesson.
     if (this.activeLessonNumber === null) {
-      return lessonNumber === 1;
+      return false;
     }
     return lessonNumber === this.activeLessonNumber;
   }

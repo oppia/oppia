@@ -499,6 +499,8 @@ export class TopicStorySectionComponent
   ): void {
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activePracticeArcId = '';
 
     if (adventureIndex !== -1) {
       this._expandedAdventureIndices.add(adventureIndex);
@@ -536,6 +538,8 @@ export class TopicStorySectionComponent
     }
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activePracticeArcId = '';
 
     if (startUrl) {
       this.windowRef.nativeWindow.location.assign(startUrl);
@@ -645,6 +649,8 @@ export class TopicStorySectionComponent
 
   onNavigationPracticeSelected(arcId: string): void {
     this.activePracticeArcId = arcId;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activeLessonNumber = null;
     setTimeout(() => {
       this.scrollToElementById('practice-card-' + arcId);
     }, 300);

@@ -1574,11 +1574,13 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
+    component.activePracticeArcId = 'arc_2';
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
+    expect(component.activePracticeArcId).toBe('');
 
     tick(300);
   }));
@@ -2732,9 +2734,11 @@ describe('TopicStorySectionComponent', () => {
     );
     practiceElement.id = 'practice-card-1';
 
+    component.activeLessonNumber = 1;
     component.onNavigationPracticeSelected('1');
 
     expect(component.activePracticeArcId).toBe('1');
+    expect(component.activeLessonNumber).toBeNull();
     tick(300);
   }));
 

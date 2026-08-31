@@ -64,10 +64,10 @@ describe('AdventureNavigationComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should mark first lesson as active when no explicit active lesson exists', () => {
+  it('should not mark any lesson as active when no explicit active lesson exists', () => {
     component.activeLessonNumber = null;
 
-    expect(component.isActiveLesson(1)).toBe(true);
+    expect(component.isActiveLesson(1)).toBe(false);
     expect(component.isActiveLesson(2)).toBe(false);
   });
 
