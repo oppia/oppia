@@ -17,8 +17,12 @@
  * skills, and for the "Content Type" filter that selects between them. Both
  * only exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS is on.
  *
- * TS.1 Filter opportunities by content type.
- * TS.2 Translate exploration metadata, and translate a skill.
+ * TS.1 Filter opportunities by Entity Type.
+ * TS.2 Translate exploration metadata.
+ * TS.2 Translate a skill.
+ * TS.2 View the translation I submitted.
+ *
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -150,7 +154,7 @@ describe('Translation Submitter', function () {
     );
   }, 2100000);
 
-  it('should be able to filter the opportunity list by content type', async function () {
+  it('should Filter opportunities by Entity Type', async function () {
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -224,7 +228,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectContentTypeFilterToBeVisible(false);
   });
 
-  it('should be able to translate exploration metadata', async function () {
+  it('should Translate exploration metadata', async function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
@@ -275,7 +279,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.closeTranslateTextModal();
   });
 
-  it('should be able to translate a skill', async function () {
+  it('should Translate a skill', async function () {
     await translationSubmitter.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
@@ -316,7 +320,7 @@ describe('Translation Submitter', function () {
     );
   });
 
-  it('should list the submitted metadata and skill translations', async function () {
+  it('should View the translation I submitted', async function () {
     // The contributions list is filtered by the Content Type selector, which
     // the previous test left on "Skills". The selector is only shown on the
     // "Translate Text" tab, so it is reset here before switching across,

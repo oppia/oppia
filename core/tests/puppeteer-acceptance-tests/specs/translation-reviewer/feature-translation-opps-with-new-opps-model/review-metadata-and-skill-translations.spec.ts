@@ -17,8 +17,13 @@
  * translations, and for the "Content Type" filter on the review tab. Both only
  * exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS is on.
  *
- * TR.1 Filter the review list by content type.
- * TR.2 Review metadata translations and skill translations.
+ * TR.1 Filter opportunities by Entity Type.
+ * TR.2 Review exploration metadata translations.
+ * TR.2 Review skill translations.
+ * TR.2 Accept a translation.
+ * TR.2 Reject a translation.
+ *
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -199,7 +204,7 @@ describe('Translation Reviewer', function () {
     );
   }, 2100000);
 
-  it('should list both content types on the review tab', async function () {
+  it('should Filter opportunities by Entity Type', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
     await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
@@ -218,7 +223,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should list skill suggestions without an opportunity card', async function () {
+  it('should Filter opportunities by Entity Type for skills', async function () {
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
@@ -232,7 +237,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to open a skill from the mixed list', async function () {
+  it('should Review skill translations', async function () {
     // Reaching a skill's suggestions through its opportunity card is a
     // different path from the skills filter above, which skips the card, so
     // both are covered.
@@ -247,7 +252,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to accept and reject a skill translation', async function () {
+  it('should Accept a translation and Reject a translation', async function () {
     // The skill has two pending suggestions. Opening the first row means one
     // suggestion still follows it, which is what makes the labels below
     // deterministic rather than dependent on how the list is sorted.
@@ -279,7 +284,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to review a metadata translation', async function () {
+  it('should Review exploration metadata translations', async function () {
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.LESSONS
     );

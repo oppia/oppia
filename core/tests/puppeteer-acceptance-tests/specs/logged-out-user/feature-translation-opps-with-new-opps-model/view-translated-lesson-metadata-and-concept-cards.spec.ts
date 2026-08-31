@@ -18,7 +18,12 @@
  * Both only exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
  * is on.
  *
- * LO.4 See translated lesson metadata and translated concept cards.
+ * CL.2 Search for an exploration using its translated title.
+ * LO.4 View information about the lesson.
+ * LO.4 Refer to a concept card.
+ * LO.4 View translated lesson metadata and concept cards in the player.
+ *
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -228,7 +233,7 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, 2100000);
 
-  it('should show the translated lesson title and objective in the community library', async function () {
+  it('should search for an exploration using its translated title', async function () {
     await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
     await loggedOutUser.navigateToCommunityLibraryPage();
     await loggedOutUser.searchForLessonInSearchBar(EXPLORATION_TITLE);
@@ -236,7 +241,7 @@ describe('Logged-out User', function () {
     await loggedOutUser.expectLessonTileToShow(HINDI_TITLE, HINDI_OBJECTIVE);
   });
 
-  it('should show the translated lesson title in the lesson information card', async function () {
+  it('should view information about the lesson', async function () {
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
     );
@@ -246,13 +251,13 @@ describe('Logged-out User', function () {
     await loggedOutUser.closeLessonInfoModal();
   });
 
-  it('should show the translated explanation on a concept card', async function () {
+  it('should refer to a concept card', async function () {
     await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
       HINDI_SKILL_EXPLANATION
     );
   });
 
-  it('should fall back to English on a concept card with no translation', async function () {
+  it('should view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
     await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
