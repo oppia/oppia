@@ -50,7 +50,7 @@ import {TranslateTextService} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
-// @ts-ignore
+// @ts-ignore This throws "Type null is not assignable to type". We need to suppress this error because we are testing the null case.
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
@@ -226,15 +226,18 @@ describe('Translation Modal Component', () => {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
-      // This throws "Argument of type 'null' is not assignable to parameter of
-      // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations. This is because the component is not
-      // strictly typed yet.
-      // @ts-ignore
-      null,
-      null,
+      null as never,
+      null as never,
       new ElementRef({offsetHeight: 200}),
-      null
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never
     );
     getUserContributionRightsDataAsyncSpy = spyOn(
       userService,

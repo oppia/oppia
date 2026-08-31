@@ -32,6 +32,8 @@ import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 
 import './collection-player-page.component.css';
 
@@ -42,12 +44,12 @@ export interface IconParametersArray {
   thumbnailBgColor: string;
 }
 
-export interface CollectionSummary {
+export interface FetchCollectionSummariesResponse {
   is_admin: boolean;
-  summaries: string[];
+  summaries: CollectionSummaryBackendDict[];
   user_email: string;
   is_topic_manager: boolean;
-  username: boolean;
+  username: string;
 }
 
 export interface CollectionHandler {
@@ -73,7 +75,7 @@ export interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   collection!: Collection;
-  collectionPlaythrough;
+  collectionPlaythrough?: CollectionPlaythrough;
   currentExplorationId!: string;
   summaryToPreview!: LearnerExplorationSummaryBackendDict;
   pathSvgParameters!: string;
@@ -89,12 +91,12 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_LEFT_PX!: number;
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
-  nextExplorationId!: string;
-  collectionSummary;
+  nextExplorationId!: string | null;
+  collectionSummary!: CollectionSummaryBackendDict;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
   activeHighlightedIconIndex: number = -1;
-  elementToScrollTo: string;
+  elementToScrollTo: string = '';
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -131,23 +133,35 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       this.alertsService.addWarning(
         'There was an error loading the collection.'
       );
+      throw new Error(
+        'Collection node not found for exploration: ' + explorationId
+      );
     }
     return collectionNode;
   }
 
   getNextRecommendedCollectionNodes(): CollectionNode {
-    return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getNextExplorationId()
-    );
+    const nextExplorationId =
+      this.collectionPlaythrough?.getNextExplorationId();
+    if (!nextExplorationId) {
+      throw new Error('No next exploration ID available');
+    }
+    return this.getCollectionNodeForExplorationId(nextExplorationId);
   }
 
   getCompletedExplorationNodes(): CollectionNode {
-    return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getCompletedExplorationIds()
-    );
+    const completedIds =
+      this.collectionPlaythrough?.getCompletedExplorationIds();
+    if (!completedIds || completedIds.length === 0) {
+      throw new Error('No completed exploration IDs available');
+    }
+    return this.getCollectionNodeForExplorationId(completedIds[0]);
   }
 
   getNonRecommendedCollectionNodeCount(): number {
+    if (!this.collectionPlaythrough) {
+      return 0;
+    }
     return (
       this.collection.getCollectionNodeCount() -
       (this.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
@@ -158,10 +172,13 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   updateExplorationPreview(explorationId: string): void {
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
-    this.summaryToPreview =
+    const explorationSummary =
       this.getCollectionNodeForExplorationId(
         explorationId
       ).getExplorationSummaryObject();
+    if (explorationSummary) {
+      this.summaryToPreview = explorationSummary;
+    }
     if (this.collection) {
       let nodes = this.collection.getCollectionNodes();
       for (let i = 0; i < nodes.length; i++) {
@@ -221,14 +238,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   generatePathIconParameters(): IconParametersArray[] {
     let collectionNodes = this.collection.getCollectionNodes();
     let iconParametersArray = [];
+    const firstSummary = collectionNodes[0]?.getExplorationSummaryObject();
+    if (!firstSummary) {
+      return [];
+    }
     iconParametersArray.push({
-      thumbnailIconUrl: collectionNodes[0]
-        .getExplorationSummaryObject()
-        .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+      thumbnailIconUrl: firstSummary.thumbnail_icon_url.replace(
+        'subjects',
+        'inverted_subjects'
+      ),
       left: '225px',
       top: '35px',
-      thumbnailBgColor:
-        collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color,
+      thumbnailBgColor: firstSummary.thumbnail_bg_color,
     });
 
     // Here x and y represent the co-ordinates for the icons in the
@@ -250,15 +271,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         x = this.ICON_X_MIDDLE_PX;
         y += this.ICON_Y_INCREMENT_PX;
       }
-      iconParametersArray.push({
-        thumbnailIconUrl: collectionNodes[i]
-          .getExplorationSummaryObject()
-          .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
-        left: x + 'px',
-        top: y + 'px',
-        thumbnailBgColor:
-          collectionNodes[i].getExplorationSummaryObject().thumbnail_bg_color,
-      });
+      const nodeSummary = collectionNodes[i]?.getExplorationSummaryObject();
+      if (nodeSummary) {
+        iconParametersArray.push({
+          thumbnailIconUrl: nodeSummary.thumbnail_icon_url.replace(
+            'subjects',
+            'inverted_subjects'
+          ),
+          left: x + 'px',
+          top: y + 'px',
+          thumbnailBgColor: nodeSummary.thumbnail_bg_color,
+        });
+      }
     }
     return iconParametersArray;
   }
@@ -275,12 +299,15 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     } else if ((index + 1) % 4 === 0) {
       return '-55px';
     }
+    return '0px';
   }
 
   scrollToLocation(el: string): void {
     this.elementToScrollTo = el;
     const element = document.getElementById(el);
-    element.scrollIntoView({behavior: 'smooth'});
+    if (element) {
+      element.scrollIntoView({behavior: 'smooth'});
+    }
   }
 
   closeOnClickingOutside(): void {
@@ -303,20 +330,21 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   }
 
   async fetchSummaryAsync(collectionId: string): Promise<void> {
-    let summary = null;
     this.collectionPlayerBackendApiService
       .fetchCollectionSummariesAsync(collectionId)
-      .then(collectionSummary => {
-        summary = collectionSummary;
-        if (summary) {
-          this.collectionSummary = summary.summaries[0];
+      .then(response => {
+        if (response && response.summaries && response.summaries.length > 0) {
+          this.collectionSummary = response.summaries[0];
         }
       });
   }
 
-  updateCollection(collection: Collection): void {
+  updateCollection(collection: Collection | null): void {
+    if (collection === null) {
+      return;
+    }
     this.collection = collection;
-    if (this.collection !== null && this.collection.getCollectionNodeCount()) {
+    if (this.collection.getCollectionNodeCount()) {
       this.generatePathParameters();
     }
   }
@@ -341,7 +369,6 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.collection = null;
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.explorationCardIsShown = false;
     // The pathIconParameters is an array containing the co-ordinates,

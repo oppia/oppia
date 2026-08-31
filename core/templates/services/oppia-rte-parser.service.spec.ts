@@ -129,10 +129,7 @@ describe('RTE parser service', () => {
     ];
     testCases.forEach(testCase => {
       let node = rteParserService.constructFromRteString(testCase.rteString);
-      expect(compareRteNodeToObject(node, testCase.representation)).toBe(
-        true,
-        testCase.rteString
-      );
+      expect(compareRteNodeToObject(node, testCase.representation)).toBe(true);
     });
   });
 

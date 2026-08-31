@@ -1085,6 +1085,12 @@ describe('RTE display component', () => {
     expect(component.shouldHighlightContent()).toBeFalse();
   });
 
+  it('should return null when getting element matching class and text content with undefined classname', () => {
+    expect(
+      component.getElementMatchingClassAndTextContent(undefined)
+    ).toBeNull();
+  });
+
   it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
     const mockNode = new OppiaRteNode('oppia-noninteractive-image');
     // Override the readonly selector property to simulate an unknown

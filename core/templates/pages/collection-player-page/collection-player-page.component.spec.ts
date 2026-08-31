@@ -38,6 +38,7 @@ import {
   Collection,
   CollectionBackendDict,
 } from 'domain/collection/collection.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -374,7 +375,7 @@ describe('Collection player page component', () => {
       tick();
       let res = component.isCompletedExploration('123');
 
-      expect(res).toBeFalse();
+      expect(res).toBe(false);
     })
   );
 
@@ -398,7 +399,7 @@ describe('Collection player page component', () => {
       component.collectionPlaythrough = undefined;
       let res = component.isCompletedExploration('123');
 
-      expect(res).toBeFalse();
+      expect(res).toBe(false);
     })
   );
 
@@ -576,7 +577,9 @@ describe('Collection player page component', () => {
     () => {
       component.collection = sampleCollection;
 
-      component.getCollectionNodeForExplorationId('invalidId');
+      expect(() => {
+        component.getCollectionNodeForExplorationId('invalidId');
+      }).toThrowError('Collection node not found for exploration: invalidId');
 
       expect(alertsSpy).toHaveBeenCalledWith(
         'There was an error loading the collection.'
@@ -674,7 +677,7 @@ describe('Collection player page component', () => {
         'mobile-path-anchor-0'
       );
       expect(component.updateExplorationPreview).toHaveBeenCalledWith('exp_id');
-      expect(component.explorationCardIsShown).toBeTrue();
+      expect(component.explorationCardIsShown).toBe(true);
 
       fixture.detectChanges();
 
@@ -686,8 +689,89 @@ describe('Collection player page component', () => {
 
       expect(component.closeOnClickingOutside).toHaveBeenCalled();
       expect(component.scrollToLocation).toHaveBeenCalled();
-      expect(component.explorationCardIsShown).toBeFalse();
+      expect(component.explorationCardIsShown).toBe(false);
       expect(component.activeHighlightedIconIndex).toBe(-1);
     })
   );
+
+  it('should throw error if next exploration ID is not available', () => {
+    component.collectionPlaythrough = CollectionPlaythrough.create(null, []);
+    expect(() => {
+      component.getNextRecommendedCollectionNodes();
+    }).toThrowError('No next exploration ID available');
+  });
+
+  it('should throw error if completed exploration IDs are not available', () => {
+    component.collectionPlaythrough = CollectionPlaythrough.create(null, []);
+    expect(() => {
+      component.getCompletedExplorationNodes();
+    }).toThrowError('No completed exploration IDs available');
+  });
+
+  it('should return 0 for non recommended collection node count if playthrough is undefined', () => {
+    component.collectionPlaythrough =
+      undefined as unknown as CollectionPlaythrough;
+    expect(component.getNonRecommendedCollectionNodeCount()).toEqual(0);
+  });
+
+  it('should return empty icon parameters if first summary is missing', () => {
+    component.collection = Collection.create({
+      id: 'collectionId',
+      title: 'title',
+      objective: 'objective',
+      category: 'category',
+      version: 1,
+      nodes: [],
+      language_code: null,
+      schema_version: null,
+      tags: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2'],
+      },
+    } as unknown as CollectionBackendDict);
+    expect(component.generatePathIconParameters()).toEqual([]);
+  });
+
+  it('should return 0px for getExplorationTitlePosition for index 2.5', () => {
+    expect(component.getExplorationTitlePosition(2.5)).toEqual('0px');
+  });
+
+  it('should set collection summary correctly', fakeAsync(() => {
+    const summaryDict = {
+      category: 'category',
+      community_owned: false,
+      last_updated_msec: 1000,
+      id: 'collectionId',
+      created_on: 1000,
+      language_code: 'en',
+      objective: 'objective',
+      status: 'public',
+      thumbnail_bg_color: 'bg_color',
+      thumbnail_icon_url: 'icon_url',
+      title: 'title',
+    };
+    (
+      collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.resolve({
+        is_admin: false,
+        is_topic_manager: false,
+        summaries: [summaryDict],
+        user_email: 'tester@example.com',
+        username: 'username',
+      })
+    );
+    component.fetchSummaryAsync('collectionId');
+    tick();
+    expect(component.collectionSummary).toEqual(
+      summaryDict as CollectionSummaryBackendDict
+    );
+  }));
+
+  it('should return early in updateCollection if collection is null', () => {
+    component.collection = sampleCollection;
+    component.updateCollection(null);
+    expect(component.collection).toEqual(sampleCollection);
+  });
 });

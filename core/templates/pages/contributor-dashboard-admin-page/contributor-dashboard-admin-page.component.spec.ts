@@ -760,4 +760,10 @@ describe('ContributorDashboardAdminPageComponent', () => {
     expect(component.contributionReviewersDataFetched).toBe(false);
     expect(component.contributionReviewersResult).toEqual({});
   });
+
+  it('should return false for isValid if filterCriterion is unknown', () => {
+    component.refreshFormData();
+    component.formData.viewContributionReviewers.filterCriterion = 'UNKNOWN';
+    expect(component.formData.viewContributionReviewers.isValid()).toBe(false);
+  });
 });
