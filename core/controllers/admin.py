@@ -2418,13 +2418,13 @@ class AdminHandler(
             skill = skill_fetchers.get_skill_by_id(skill_id)
             skill_by_name[skill.description] = skill
         for description, difficulty in desired_difficulties.items():
-            skill = skill_by_name.get(description)
-            if skill is None:
+            matched_skill = skill_by_name.get(description)
+            if matched_skill is None:
                 continue
             existing_difficulties = {
                 question_skill_link.skill_difficulty
                 for question_skill_link in question_services.get_question_skill_links_of_skill(
-                    skill.id, skill.description
+                    matched_skill.id, matched_skill.description
                 )
             }
             if difficulty in existing_difficulties:
@@ -2433,11 +2433,11 @@ class AdminHandler(
             question = self._create_dummy_question(
                 question_id,
                 'Certificate %s question' % description,
-                [skill.id],
+                [matched_skill.id],
             )
             question_services.add_question(self.user_id, question)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id, skill.id, difficulty
+                self.user_id, question_id, matched_skill.id, difficulty
             )
 
     def _generate_dummy_topics(

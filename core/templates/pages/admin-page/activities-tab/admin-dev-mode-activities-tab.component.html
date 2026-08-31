@@ -187,7 +187,9 @@
         <select id="label-target-classroom-selection" class="form-select"
                 (change)="selectedClassroomId=$event.target.value">
           <option *ngFor="let classroom of classroomList"
-                  [value]="classroom.classroomId">{{classroom.name}}</option>
+                  [value]="classroom.classroomId">
+            {{classroom.name}}
+          </option>
         </select>
 
         <button type="button"
