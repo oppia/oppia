@@ -108,6 +108,7 @@ describe('MathEquationInputInteractive', () => {
     windowRef = TestBed.inject(WindowRef);
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    spyOn(guppyInitializationService, 'activate').and.stub();
     mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(InteractiveMathEquationInput);
