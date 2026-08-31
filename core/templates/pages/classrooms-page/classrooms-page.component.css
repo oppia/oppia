@@ -1,0 +1,248 @@
+.classroom-admin-banner a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.breadcrumbs-container .classrooms-breadcrumbs {
+  color: #00645c;
+  width: 884px;
+}
+
+.breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs {
+  display: none;
+}
+
+.classrooms-breadcrumbs .mobile-breadcrumbs a,
+.classrooms-breadcrumbs .desktop-breadcrumbs a,
+.classrooms-breadcrumbs .mobile-breadcrumbs span,
+.classrooms-breadcrumbs .desktop-breadcrumbs span {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs i,
+.breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs i {
+  font-size: 13px;
+}
+
+.classrooms-main-content .classroom-tile-container {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: start;
+  width: 884px;
+}
+
+.classrooms-main-content .description-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  width: 884px;
+}
+
+.classrooms-main-content .description-container .classrooms-description {
+  color: #3c3c3c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+  max-width: 801px;
+}
+
+.classrooms-page-content {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  width: 884px;
+}
+
+.classrooms-page-content .classrooms-heading {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 68px;
+  margin: 28px 0;
+}
+
+.classrooms-page-content .classrooms-main-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: start;
+  width: 100%;
+}
+
+.oppia-classrooms-page-container {
+  align-items: start;
+  background-color: #eef5fb;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  justify-content: center;
+  position: relative;
+  width: 100vw;
+}
+
+.oppia-classrooms-page-container .classroom-admin-banner {
+  align-items: center;
+  background-color: #015f9c ;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  position: absolute;
+  top: 0;
+  width: 100vw;
+}
+
+.oppia-classrooms-page-container .breadcrumbs-container {
+  align-items: start;
+  display: flex;
+  justify-content: center;
+  margin-top: 42px;
+  width: 100%;
+}
+
+.oppia-classrooms-page-container .classrooms-page-content-container {
+  align-items: start;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.oppia-classrooms-search-container {
+  align-items: center;
+  background-color: #d7d7d7;
+  display: flex;
+  flex-direction: column;
+  height: 140px;
+  justify-content: center;
+  margin-top: 52px;
+  padding: 10px 0;
+  width: 100vw;
+}
+
+.oppia-classrooms-search-container .oppia-classrooms-search-section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.oppia-classrooms-search-container .oppia-classrooms-search-section .search-box-text-container {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.oppia-classrooms-search-container .search-box-text-container .classrooms-page-search-heading {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.oppia-classrooms-search-container .search-box-text-container .classrooms-page-search-subheading {
+  color: #0a665f;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+  .classrooms-main-content .classroom-tile-container {
+    justify-content: center;
+    width: fit-content;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs,
+  .classrooms-main-content .description-container {
+    width: 90vw;
+  }
+
+  .oppia-classrooms-page-container .breadcrumbs-container {
+    margin-top: 26px;
+  }
+
+  .classrooms-main-content .description-container .classrooms-description {
+    max-width: 801px;
+  }
+
+  .classrooms-page-content {
+    margin-top: 0;
+    width: 90vw;
+  }
+
+  .classrooms-page-content .classrooms-heading {
+    font-size: 30px;
+    margin-top: 0;
+  }
+
+  .oppia-classrooms-search-container {
+    height: 220px;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
+    display: none;
+  }
+
+  .oppia-classrooms-search-container .oppia-classrooms-search-section .search-box-text-container {
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .classrooms-main-content {
+    gap: 22px;
+  }
+
+  .classrooms-main-content .description-container .classrooms-description {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    left: 4px;
+    letter-spacing: -0.02em;
+    line-height: 20px;
+    padding-left: 0;
+    position: relative;
+  }
+
+  .classrooms-main-content .description-container {
+    width: 330px;
+  }
+
+  .classrooms-page-content .classrooms-heading {
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+}

@@ -18,20 +18,27 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {RouterModule} from '@angular/router';
+import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
-import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
+import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    MatBottomSheetModule,
+    InteractionExtensionsModule,
     SharedComponentsModule,
+    CertificateOfferingSharedModule,
     RouterModule.forChild([
       {
         path: '',
@@ -43,12 +50,9 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
         component: CertificateAssessmentPlayerPageRootComponent,
         canActivate: [CertificateAssessmentPlayerPageAuthGuard],
       },
-      {
-        path: 'result/:attempt_id',
-        component: CertificateAssessmentPlayerPageRootComponent,
-        canActivate: [CertificateAssessmentPlayerPageAuthGuard],
-      },
     ]),
+    TranslateModule,
+    CertificateAssessmentTitledBackgroundBannerModule,
   ],
   declarations: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -56,7 +60,6 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
   ],
   entryComponents: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -64,7 +67,6 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
   ],
 })
 export class CertificateAssessmentPlayerPageModule {}

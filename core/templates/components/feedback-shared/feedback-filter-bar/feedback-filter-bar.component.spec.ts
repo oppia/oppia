@@ -21,6 +21,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FeedbackFilterBarComponent} from './feedback-filter-bar.component';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
+  CreatorFeedbackType,
   FeedbackStatus,
   TechnicalTeamType,
 } from '../../../domain/feedback/feedback.model';
@@ -41,8 +42,15 @@ describe('FeedbackFilterBarComponent', () => {
 
     component.config = {
       showTeamFilter: true,
+      showCreatorFeedbackTypeFilter: false,
       showDateRangeFilter: true,
       showSearchBar: true,
+      statusOptions: [
+        FeedbackStatus.COMPLIMENT,
+        FeedbackStatus.FIXED,
+        FeedbackStatus.NOT_ACTIONABLE,
+        FeedbackStatus.OPEN,
+      ],
     };
     spyOn(component.filterChange, 'emit');
 
@@ -59,12 +67,34 @@ describe('FeedbackFilterBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should initialize the selected status to the first configured status option', () => {
+    const freshFixture = TestBed.createComponent(FeedbackFilterBarComponent);
+    const freshComponent = freshFixture.componentInstance;
+    freshComponent.config = {
+      showTeamFilter: true,
+      showCreatorFeedbackTypeFilter: false,
+      showDateRangeFilter: true,
+      showSearchBar: true,
+      statusOptions: [
+        FeedbackStatus.COMPLIMENT,
+        FeedbackStatus.FIXED,
+        FeedbackStatus.NOT_ACTIONABLE,
+        FeedbackStatus.OPEN,
+      ],
+    };
+
+    freshFixture.detectChanges();
+
+    expect(freshComponent.selectedStatus).toEqual(FeedbackStatus.COMPLIMENT);
+  });
+
   it('should apply filters for the filters selected', () => {
     component.applyFilters();
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: 'test',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
       dateRange: {
         start: new Date('2021-01-01'),
         end: new Date('2021-01-02'),
@@ -72,10 +102,10 @@ describe('FeedbackFilterBarComponent', () => {
     });
   });
 
-  it('should clearall the selected filters', () => {
+  it('should clear all the selected filters', () => {
     component.clearAllFilters();
     expect(component.searchText).toEqual('');
-    expect(component.selectedStatus).toEqual(FeedbackStatus.OPEN);
+    expect(component.selectedStatus).toEqual(FeedbackStatus.COMPLIMENT);
     expect(component.selectedTechnicalTeam).toEqual(
       TechnicalTeamType.TECH_EXTERNAL
     );
@@ -83,8 +113,9 @@ describe('FeedbackFilterBarComponent', () => {
     expect(component.toDate).toEqual('');
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: '',
-      status: FeedbackStatus.OPEN,
+      status: FeedbackStatus.COMPLIMENT,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
       dateRange: {
         start: null,
         end: null,

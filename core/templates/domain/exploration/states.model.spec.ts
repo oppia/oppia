@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the States.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';

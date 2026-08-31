@@ -59,7 +59,32 @@ class LessonFeedbackDict(TypedDict):
     """Dict representation of a LessonFeedback domain object."""
 
     id: str
-    author_id: Optional[str]
+    feedback_text: str
+    status: str
+    lesson_metadata: LessonMetadataDict
+    parent_feedback_id: Optional[str]
+    response_list: List[LessonFeedbackResponseDict]
+    unread_response_count: int
+    created_on_msecs: float
+
+
+class LessonFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a LessonFeedback."""
+
+    id: str
+    feedback_text_preview: str
+    latest_response_preview: str
+    status: str
+    source: str
+    lesson_title: str
+    unread_response_count: int
+    last_updated_msecs: float
+
+
+class LearnerLessonFeedbackDetailDict(TypedDict):
+    """Learner-facing dict representation of a LessonFeedback."""
+
+    id: str
     feedback_text: str
     status: str
     lesson_metadata: LessonMetadataDict
@@ -123,13 +148,31 @@ class PlatformFeedbackSummaryDict(TypedDict):
     category: Optional[str]
 
 
-class PlatformFeedbackListRequestDict(TypedDict):
-    """Normalized payload for PlatformFeedbackListHandler GET."""
+class GeneralFeedbackListRequestDict(TypedDict):
+    """Normalized payload for LessonFeedbackListHandler and PlatformFeedbackListHandler GET."""
 
-    status: str
+    status: Optional[str]
     cursor: Optional[str]
     date_from_msecs: Optional[float]
     date_to_msecs: Optional[float]
+
+
+class LessonFeedbackUpdatePayloadDict(TypedDict):
+    """Normalized payload for LessonFeedbackDetailHandler POST."""
+
+    status: str
+    reply_text: Optional[str]
+
+
+class FeedbackStatusCountsDict(TypedDict):
+    """Per-status counts of lesson feedback and platform reports.
+
+    Each inner dict maps every status in feconf.STATUS_CHOICES to the number
+    of non-deleted entries with that status, plus a 'total' key.
+    """
+
+    lesson_feedback_counts: Dict[str, int]
+    platform_report_counts: Dict[str, int]
 
 
 class LessonFeedback:
@@ -154,6 +197,7 @@ class LessonFeedback:
             responded_on (responded_by is stored internally and never exported).
         unread_response_count: int. Total number of creator responses that have not yet been marked as read by the learner.
         created_on_msecs: float. Creation timestamp in milliseconds.
+        last_updated_msecs: float. Last update timestamp in milliseconds.
     """
 
     def __init__(
@@ -166,6 +210,7 @@ class LessonFeedback:
         response_list: List[LessonFeedbackResponseDict],
         unread_response_count: int,
         created_on_msecs: float,
+        last_updated_msecs: float,
         parent_feedback_id: Optional[str] = None,
     ) -> None:
         self.id = feedback_id
@@ -176,6 +221,7 @@ class LessonFeedback:
         self.parent_feedback_id = parent_feedback_id
         self.response_list = response_list
         self.unread_response_count = unread_response_count
+        self.last_updated_msecs = last_updated_msecs
         self.created_on_msecs = created_on_msecs
 
     def to_dict(self) -> LessonFeedbackDict:
@@ -186,7 +232,61 @@ class LessonFeedback:
         """
         return {
             'id': self.id,
-            'author_id': self.author_id,
+            'feedback_text': self.feedback_text,
+            'status': self.status,
+            'lesson_metadata': self.lesson_metadata,
+            'parent_feedback_id': self.parent_feedback_id,
+            'response_list': self.response_list,
+            'unread_response_count': self.unread_response_count,
+            'created_on_msecs': self.created_on_msecs,
+        }
+
+    def to_summary_dict(
+        self, lesson_title: Optional[str]
+    ) -> LessonFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Args:
+            lesson_title: Optional[str]. The title of the exploration this
+                feedback was submitted on, resolved by the caller via a
+                batched lookup (see get_learner_feedback_summaries). None
+                if the exploration could not be found (e.g. deleted).
+
+        Returns:
+            LessonFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        feedback_text_preview = self.feedback_text
+        if len(feedback_text_preview) > 100:
+            feedback_text_preview = feedback_text_preview[:97] + '...'
+        latest_response_preview = ''
+        if self.response_list:
+            latest_response_text = self.response_list[-1]['response_text']
+            latest_response_preview = latest_response_text
+            if len(latest_response_preview) > 100:
+                latest_response_preview = '%s...' % (
+                    latest_response_preview[:97]
+                )
+        return {
+            'id': self.id,
+            'feedback_text_preview': feedback_text_preview,
+            'latest_response_preview': latest_response_preview,
+            'status': self.status,
+            'source': feconf.SOURCE_LESSON,
+            'lesson_title': lesson_title or 'Lesson not found',
+            'unread_response_count': self.unread_response_count,
+            'last_updated_msecs': self.last_updated_msecs,
+        }
+
+    def to_learner_dict(self) -> LearnerLessonFeedbackDetailDict:
+        """Returns the learner-facing dict representation of this feedback.
+
+        Returns:
+            LearnerLessonFeedbackDetailDict. A dict representation that omits
+            internal author fields.
+        """
+        return {
+            'id': self.id,
             'feedback_text': self.feedback_text,
             'status': self.status,
             'lesson_metadata': self.lesson_metadata,

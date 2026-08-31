@@ -534,3 +534,29 @@ def update_machine_translation_policy(
 
     model.update_timestamps()
     model.put()
+
+
+def get_up_to_date_translation(
+    entity_translation: translation_domain.EntityTranslation,
+    content_id: str,
+) -> Optional[str]:
+    """Returns the translation of the given content ID, if it is usable.
+
+    Args:
+        entity_translation: EntityTranslation. The entity's translations.
+        content_id: str. The content ID to look up.
+
+    Returns:
+        str or None. The translated value, or None when there is no translation
+        or the translation is stale.
+    """
+    translated_content = entity_translation.translations.get(content_id)
+    # A translation that needs an update is stale because the English content
+    # changed after it was accepted, so it is not shown.
+    if (
+        translated_content is not None
+        and not translated_content.needs_update
+        and isinstance(translated_content.content_value, str)
+    ):
+        return translated_content.content_value
+    return None

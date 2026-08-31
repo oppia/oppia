@@ -73,7 +73,6 @@
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
-/angular-template-style-url-replacer.webpack-loader.js @oppia/lace-frontend-reviewers
 /angular.json @oppia/lace-frontend-reviewers
 /src @oppia/lace-frontend-reviewers
 
@@ -263,7 +262,6 @@
 
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
-/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
 /core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
@@ -623,6 +621,8 @@
 /core/templates/services/oppia-rte-parser.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-local-storage*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.css @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
 /core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
@@ -683,18 +683,7 @@
 
 
 # Classrooms Pages.
-/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.html @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page-auth.guard.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page-auth.guard.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page.component.html @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page.component.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page.component.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page.module.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page-root.component.html @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page-root.component.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/classrooms-page/classrooms-page-root.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.html @oppia/lace-frontend-reviewers
@@ -711,6 +700,7 @@
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 /core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
 /core/templates/pages/certificate-assessment-player-page @oppia/lace-frontend-reviewers
+/core/templates/pages/certificate-assessment-result-page/ @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
@@ -753,15 +743,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
-/core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
-/core/tests/webdriverio/ @oppia/dev-workflow-reviewers
-/core/tests/wdio.conf.js @oppia/dev-workflow-reviewers
-/extensions/interactions/*/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/interactions/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/rich_text_components/*/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/rich_text_components/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/objects/webdriverio.js @oppia/dev-workflow-reviewers
 /scripts/backend_test_shards.json @oppia/dev-workflow-reviewers
 /.github/actions @oppia/dev-workflow-reviewers
 
