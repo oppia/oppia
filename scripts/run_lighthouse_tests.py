@@ -41,6 +41,8 @@ LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
 
+ENTITY_MATCHER: Final = r'\{\{(.*?)\}\}'
+
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
@@ -130,6 +132,44 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)
         sys.exit(1)
+
+
+def _get_lighthouse_entities(
+    pages: Optional[str], record: bool = False
+) -> dict[str, str]:
+    """Runs the puppeteer setup script and returns the entity IDs it collects.
+
+    Entity IDs are only needed when a page's URL contains a ``{{...}}``
+    placeholder. A shard that only audits static or public pages (which have no
+    placeholders) can skip the heavy login and data-seeding setup entirely, so
+    no entities are collected and login is never performed for those shards.
+
+    Args:
+        pages: str|None. Comma-separated page names to run, or None to run all
+            configured pages.
+        record: bool. Whether to record the puppeteer setup via the screen
+            recorder.
+
+    Returns:
+        dict(str, str). The collected entity IDs, or an empty dict when the
+        running pages need none.
+    """
+    pages_config: dict[str, str] = get_lighthouse_pages_config()
+    pages_to_run = (
+        [page.strip() for page in pages.split(',')]
+        if pages
+        else list(pages_config.keys())
+    )
+    needs_entities = any(
+        re.findall(ENTITY_MATCHER, pages_config[page]) for page in pages_to_run
+    )
+    if not needs_entities:
+        print(
+            'Running pages have no entity placeholders; skipping lighthouse '
+            'data setup and login.'
+        )
+        return {}
+    return run_lighthouse_puppeteer_script(record)
 
 
 def get_entity(line: str) -> tuple[str, str] | None:
@@ -351,9 +391,8 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         ValueError. The entity referenced in the URL is not found in the
             entities.
     """
-    entity_matcher = r'\{\{(.*?)\}\}'
     injected_url = url
-    for match in re.findall(entity_matcher, url):
+    for match in re.findall(ENTITY_MATCHER, url):
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
@@ -384,6 +423,34 @@ def get_lighthouse_urls_to_run(
     return lighthouse_urls_to_run
 
 
+def _get_resolvable_lighthouse_all_urls(
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
+) -> List[str]:
+    """Gets the URLs across all configured pages whose entities can be
+    resolved.
+
+    Pages whose URLs reference an entity not present in ``entities`` cannot be
+    audited by the current shard (a static-page shard skips the data setup, so
+    it has no entity IDs to inject), so they are omitted from the summary list.
+
+    Args:
+        pages: list(str). The pages to resolve.
+        entities: dict(str, str). The available entities to inject.
+        pages_config: dict(str, str). The configuration for the pages.
+
+    Returns:
+        list(str). The resolvable URLs across the given pages.
+    """
+    resolvable_urls: List[str] = []
+    for page in pages:
+        url = pages_config[page]
+        unresolved_entities = re.findall(ENTITY_MATCHER, url)
+        if any(entity not in entities for entity in unresolved_entities):
+            continue
+        resolvable_urls.append(inject_entities_into_url(url, entities))
+    return resolvable_urls
+
+
 def set_lighthouse_url_environment_variables(
     pages: Optional[str], entities: dict[str, str]
 ) -> None:
@@ -397,7 +464,9 @@ def set_lighthouse_url_environment_variables(
     """
     pages_config: dict[str, str] = get_lighthouse_pages_config()
     all_pages = list(pages_config.keys())
-    all_urls = get_lighthouse_urls_to_run(all_pages, entities, pages_config)
+    all_urls = _get_resolvable_lighthouse_all_urls(
+        all_pages, entities, pages_config
+    )
     os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(all_urls)
 
     pages_to_run = (
@@ -461,8 +530,8 @@ def main(args: Optional[List[str]] = None) -> None:
             servers.run_ng_compilation()
 
         with managed_lighthouse_appserver(SERVER_MODE_DEV):
-            entities = run_lighthouse_puppeteer_script(
-                parsed_args.record_screen
+            entities = _get_lighthouse_entities(
+                parsed_args.pages, parsed_args.record_screen
             )
 
         if parsed_args.skip_build:

@@ -131,10 +131,34 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages.json',
         )
+        # A config with one URL that references an entity, used to exercise the
+        # data-setup path where the puppeteer script must run.
+        with open(
+            'dummy-lighthouse-pages-with-entities.json', 'w', encoding='utf-8'
+        ) as f:
+            f.write(
+                json.dumps(
+                    {
+                        'about': {'url': 'http://localhost:8181/about'},
+                        'topic-editor': {
+                            'url': (
+                                'http://localhost:8181/'
+                                'topic_editor/{{topic_id}}'
+                            )
+                        },
+                    }
+                )
+            )
+        self.lighthouse_pages_json_filepath_with_entities_swap = self.swap(
+            run_lighthouse_tests,
+            'LIGHTHOUSE_PAGES_JSON_FILEPATH',
+            'dummy-lighthouse-pages-with-entities.json',
+        )
 
     def tearDown(self) -> None:
         super().tearDown()
         os.remove('dummy-lighthouse-pages.json')
+        os.remove('dummy-lighthouse-pages-with-entities.json')
 
     def test_inject_entities_into_url_with_valid_entity(self) -> None:
         entities = {'topic_id': '4'}
@@ -187,6 +211,51 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     'contact': 'http://localhost:8181/contact',
                 },
             )
+
+    def test_get_lighthouse_entities_skips_setup_for_static_pages(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda *unused_args: {'topic_id': '4'},
+            called=False,
+        )
+        with self.lighthouse_pages_json_filepath_swap:
+            with self.print_swap, swap_run_puppeteer_script:
+                entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                    'splash, about'
+                )
+        self.assertEqual(entities, {})
+        self.assertIn(
+            'Running pages have no entity placeholders; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
+        )
+
+    def test_get_lighthouse_entities_runs_setup_for_entity_pages(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda record: {'topic_id': '4'},
+            expected_args=((True,),),
+        )
+        with self.lighthouse_pages_json_filepath_with_entities_swap:
+            with swap_run_puppeteer_script:
+                entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                    'topic-editor', record=True
+                )
+        self.assertEqual(entities, {'topic_id': '4'})
+
+    def test_get_resolvable_lighthouse_all_urls_skips_unresolvable(
+        self,
+    ) -> None:
+        pages_config = {
+            'about': 'http://localhost:8181/about',
+            'topic-editor': 'http://localhost:8181/topic_editor/{{topic_id}}',
+        }
+        all_urls = run_lighthouse_tests._get_resolvable_lighthouse_all_urls(  # pylint: disable=protected-access
+            list(pages_config.keys()), {}, pages_config
+        )
+        self.assertEqual(all_urls, ['http://localhost:8181/about'])
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
@@ -711,6 +780,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
+            'Running pages have no entity placeholders; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
+        )
+        self.assertNotIn(
             'Puppeteer script completed successfully.', self.print_arr
         )
 
@@ -780,7 +854,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
+            'Running pages have no entity placeholders; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
         )
 
     def test_run_lighthouse_tests_with_skip_build(self) -> None:
@@ -848,7 +924,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
         self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
+            'Running pages have no entity placeholders; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
         )
 
     def test_main_function_calls_puppeteer_record(self) -> None:
@@ -862,7 +940,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_run_puppeteer_script(*unused_args: str) -> dict[str, str]:
             return {
-                'exploration_id': '4',
+                'topic_id': '4',
             }
 
         # Set up pseudo-chrome path env variable.
@@ -927,9 +1005,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
                             with swap_run_puppeteer_script:
-                                with self.lighthouse_pages_json_filepath_swap:
+                                with (
+                                    self.lighthouse_pages_json_filepath_with_entities_swap
+                                ):
                                     run_lighthouse_tests.main(
-                                        args=['--skip_build', '--record_screen']
+                                        args=[
+                                            '--skip_build',
+                                            '--record_screen',
+                                        ]
                                     )
 
     def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(
