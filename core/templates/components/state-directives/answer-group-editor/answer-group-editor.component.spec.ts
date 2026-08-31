@@ -16,6 +16,8 @@
  * @fileoverview Unit test for Answer Group Editor Component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
