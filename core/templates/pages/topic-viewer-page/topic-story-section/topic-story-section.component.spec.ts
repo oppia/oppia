@@ -4060,15 +4060,32 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
+    component.activePracticeArcId = 'arc_1';
     component.onLessonStartClick({
       lessonNumber: 1,
       startUrl: '',
     });
 
     expect(component.activeLessonNumber).toBe(1);
+    expect(component.activePracticeArcId).toBe('');
 
     tick(300);
   }));
+
+  it('should not confirm arc skip nor show a modal when all earlier adventures are completed', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'completed')]),
+    ];
+
+    component.activePracticeArcId = 'arc_2';
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+    expect(component.activeLessonNumber).toBe(2);
+    expect(component.navigatedLessonNumber).toBe(2);
+    expect(component.activePracticeArcId).toBe('');
+  });
 
   it('should open the modal from navigation even when mastery is unlocked', () => {
     component.isMasteryUnlocked = true;
