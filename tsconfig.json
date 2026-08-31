@@ -50,8 +50,8 @@
       "actions/*": ["extensions/actions/*"],
       "answer_summarizers/*": ["extensions/answer_summarizers/*"],
       "ckeditor_plugins/*": ["extensions/ckeditor_plugins/*"],
-      "issues/*": ["extensions/issues/*"]
-      
+      "issues/*": ["extensions/issues/*"],
+      "assets/hashes.json": ["assets/hashes.json"]
     }
   },
   "files": [
