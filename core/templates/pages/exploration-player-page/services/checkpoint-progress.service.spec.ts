@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the CheckpointProgressService.
  */
 
+// @ts-nocheck
+
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

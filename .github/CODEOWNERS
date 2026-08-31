@@ -73,7 +73,6 @@
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
-/angular-template-style-url-replacer.webpack-loader.js @oppia/lace-frontend-reviewers
 /angular.json @oppia/lace-frontend-reviewers
 /src @oppia/lace-frontend-reviewers
 
@@ -741,14 +740,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
-/core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
-/core/tests/wdio.conf.js @oppia/dev-workflow-reviewers
-/extensions/interactions/*/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/interactions/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/rich_text_components/*/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/rich_text_components/webdriverio.js @oppia/dev-workflow-reviewers
-/extensions/objects/webdriverio.js @oppia/dev-workflow-reviewers
 /scripts/backend_test_shards.json @oppia/dev-workflow-reviewers
 /.github/actions @oppia/dev-workflow-reviewers
 
