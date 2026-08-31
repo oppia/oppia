@@ -181,7 +181,10 @@
         | translate
         }}
       </button>
-      <button class="btn btn-success" (click)="submit()">
+      <button class="btn btn-success"
+              type="button"
+              [disabled]="isSubmittingFeedback"
+              (click)="submit()">
         {{
         'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT'
         | translate

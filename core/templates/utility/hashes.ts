@@ -17,12 +17,7 @@
  * process.
  */
 
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// Webpack absolute import is just "hashes.json".
-// AoT version is "assets/hashes.json".
-// TODO(#16309): Fix relative imports.
-import resourceHashes from '../../../assets/hashes.json';
+import resourceHashes from 'assets/hashes.json';
 
 export default {
   _hashes: resourceHashes as Record<string, string>,
