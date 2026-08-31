@@ -91,8 +91,15 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.selectReportIssueChip(
       'confusing or incorrect answer'
     );
+    await loggedOutLearner.expectReportIssueChipToBeSelected(
+      'confusing or incorrect answer',
+      true
+    );
     await loggedOutLearner.selectReportIssueChip('other');
-
+    await loggedOutLearner.expectReportIssueChipToBeSelected(
+      'confusing or incorrect answer',
+      false
+    );
     // In the screenshot, only one chip is selected.
     await loggedOutLearner.expectScreenshotToMatch(
       'reportALessonModal',

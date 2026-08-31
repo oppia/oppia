@@ -6409,6 +6409,10 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
   }
 
+  /**
+   * Selects a report issue chip in feedback Modal.
+   * @param {string} chipName - The name of the chip to select.
+   */
   async selectReportIssueChip(chipName: string): Promise<void> {
     switch (chipName) {
       case 'typo':
@@ -6430,6 +6434,45 @@ export class LoggedOutUser extends BaseUser {
       default:
         throw new Error('Invalid chip name: ' + chipName);
     }
+  }
+
+  /**
+   * Checks if a report issue chip is selected in feedback Modal.
+   * @param {string} chipName - The name of the chip to check.
+   * @param {boolean} shouldBeSelected - Whether the chip should be selected or not.
+   */
+  async expectReportIssueChipToBeSelected(
+    chipName: string,
+    shouldBeSelected: boolean
+  ): Promise<void> {
+    let chipSelector: string;
+
+    switch (chipName) {
+      case 'typo':
+        chipSelector = reportIssueTypoChipSelector;
+        break;
+      case 'confusing or incorrect answer':
+        chipSelector = reportIssueConfusingOrIncorrectChipSelector;
+        break;
+      case 'broken layout':
+        chipSelector = reportIssueBrokenLayoutChipSelector;
+        break;
+      case 'other':
+        chipSelector = reportIssueOtherChipSelector;
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, expected: boolean) => {
+        const element = document.querySelector(selector);
+        return element?.classList.contains('selected') === expected;
+      },
+      {},
+      chipSelector,
+      shouldBeSelected
+    );
   }
 
   /**
@@ -6602,7 +6645,7 @@ export class LoggedOutUser extends BaseUser {
    * Clears the feedback text area.
    */
   async clearFeedbackTextArea(): Promise<void> {
-    return this.clearAllTextFrom(feedbackModaltextarea);
+    return await this.clearAllTextFrom(feedbackModaltextarea);
   }
 
   /**

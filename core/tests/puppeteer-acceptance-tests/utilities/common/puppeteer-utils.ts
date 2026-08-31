@@ -2371,7 +2371,7 @@ export class BaseUser {
 
     await this.page.waitForSelector(toastMessageSelector, {
       hidden: true,
-      timeout: 20000,
+      timeout: 10000,
     });
     const autoDismissTimeInMilliseconds = Date.now() - startTimeInMilliseconds;
     if (
