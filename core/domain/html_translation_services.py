@@ -65,6 +65,8 @@ _ENCODED_HTML_ATTRS = {
 # Regex to identify all Oppia non-interactive components in the HTML.
 _OPPIA_COMPONENT_TAG_REGEX = re.compile(r'^oppia-noninteractive-')
 
+_OPPIA_NONINTERACTIVE_TABS_TAG_NAME = 'oppia-noninteractive-tabs'
+
 # Temporary data attributes injected into the HTML to track extracted strings.
 # This allows the post-processing engine to know exactly which Oppia component
 # and which specific attribute the translated text belongs to so it can be restored.
@@ -110,6 +112,10 @@ def preprocess_html_for_translation(source_html: str) -> str:
     Note: <a> tags are intentionally left untouched. The modern cloud translators natively
     translates anchor text while preserving the href attribute byte-for-byte
     when using textType="html".
+
+    Example:
+        Input: '<p>Click <a href="https://example.com">here</a> for an <oppia-noninteractive-image alt-with-value="&amp;quot;A red car&amp;quot;"></oppia-noninteractive-image></p>'
+        Output: '<p>Click <a href="https://example.com">here</a> for an <span data-temp-comp-id="0" data-temp-attr-name="alt-with-value">"A red car"</span><oppia-noninteractive-image data-temp-comp-id="0" translate="no"></oppia-noninteractive-image></p>'
 
     Args:
         source_html: str. The raw HTML string to pre-process.
@@ -171,7 +177,7 @@ def preprocess_html_for_translation(source_html: str) -> str:
                     del tag[attr_name]
 
         # Unpack tabs JSON into individual temp elements.
-        if tag_name == 'oppia-noninteractive-tabs':
+        if tag_name == _OPPIA_NONINTERACTIVE_TABS_TAG_NAME:
             tabs_raw = tag.get('tab_contents-with-value')
             if tabs_raw is not None:
                 try:
@@ -225,6 +231,7 @@ def postprocess_translated_html(translated_html: str) -> str:
     2. Restores plain text values directly to the component attribute.
     3. Re-encodes inner HTML and restores it to the component attribute.
     4. Reconstructs the tabs JSON from individual temp elements.
+       (e.g., {"title": "Hint", "content": "<p>text</p>"} from temp spans/divs).
     5. Removes all temporary elements and helper data attributes.
     6. Strips any remaining translate="no" via regex.
     7. Runs the result through html_cleaner.clean() for final sanitization.

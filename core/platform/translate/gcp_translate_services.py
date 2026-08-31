@@ -94,7 +94,7 @@ class GcpTranslationService(base_translate_services.BaseTranslationService):
                     timeout=self.REQUEST_TIMEOUT_SEC,
                 )
 
-                if response.status_code == 200:
+                if response.status_code == requests.codes.ok:
                     response_json = response.json()
                     return str(
                         response_json['data']['translations'][0][
@@ -103,7 +103,10 @@ class GcpTranslationService(base_translate_services.BaseTranslationService):
                     )
 
                 # Transient failure processing (Rate Limits / Server Outage).
-                if response.status_code in [429, 503]:
+                if response.status_code in [
+                    requests.codes.too_many_requests,
+                    requests.codes.service_unavailable,
+                ]:
                     logging.warning(
                         'GCP Translation API returned status %s. '
                         'Retrying in %s seconds...',

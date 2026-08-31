@@ -56,7 +56,16 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         result = html_translation_services.preprocess_html_for_translation(
             source
         )
-        self.assertEqual(result.count('translate="no"'), 4)
+        expected_result = (
+            '<oppia-noninteractive-math math_content-with-value="x²" translate="no">'
+            '</oppia-noninteractive-math>'
+            '<oppia-noninteractive-video translate="no" video_id-with-value="abc123">'
+            '</oppia-noninteractive-video>'
+            '<oppia-noninteractive-skillreview skill_id-with-value="abc" translate="no">'
+            '</oppia-noninteractive-skillreview>'
+            '<oppia-noninteractive-math translate="no"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(result, expected_result)
 
     def test_process_html_with_translatable_text_attributes_extracts_and_restores_values(
         self,
@@ -87,6 +96,14 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.preprocess_html_for_translation(
             source
         )
+        expected_protected = (
+            '<span data-temp-comp-id="0" data-temp-attr-name="alt-with-value">A red car</span>'
+            '<span data-temp-comp-id="0" data-temp-attr-name="caption-with-value">Figure 1</span>'
+            '<oppia-noninteractive-image filepath-with-value="img.png" data-temp-comp-id="0" translate="no">'
+            '</oppia-noninteractive-image>'
+        )
+        self.assertEqual(protected, expected_protected)
+
         restored = html_translation_services.postprocess_translated_html(
             protected
         )
@@ -104,7 +121,13 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.preprocess_html_for_translation(
             source
         )
-        self.assertIn('data-temp-is-encoded="true"', protected)
+        expected_protected = (
+            '<span data-temp-comp-id="0" data-temp-attr-name="heading-with-value">Show</span>'
+            '<div data-temp-comp-id="0" data-temp-attr-name="content-with-value" data-temp-is-encoded="true"><p>Step 1</p></div>'
+            '<oppia-noninteractive-collapsible data-temp-comp-id="0" translate="no">'
+            '</oppia-noninteractive-collapsible>'
+        )
+        self.assertEqual(protected, expected_protected)
 
         restored = html_translation_services.postprocess_translated_html(
             protected
@@ -124,6 +147,14 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.preprocess_html_for_translation(
             source
         )
+        expected_protected = (
+            '<span data-temp-comp-id="0" data-temp-attr-name="question-with-value">Q1</span>'
+            '<div data-temp-comp-id="0" data-temp-attr-name="answer-with-value" data-temp-is-encoded="true"><p>A1</p></div>'
+            '<oppia-noninteractive-workedexample data-temp-comp-id="0" translate="no">'
+            '</oppia-noninteractive-workedexample>'
+        )
+        self.assertEqual(protected, expected_protected)
+
         restored = html_translation_services.postprocess_translated_html(
             protected
         )
@@ -146,9 +177,14 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.preprocess_html_for_translation(
             source
         )
-        self.assertIn('tab-title-0', protected)
-        self.assertIn('tab-content-0', protected)
-        self.assertIn('tab-title-1', protected)
+        expected_protected = (
+            '<span data-temp-comp-id="0" data-temp-attr-name="tab-title-0">Hint</span>'
+            '<div data-temp-comp-id="0" data-temp-attr-name="tab-content-0" data-temp-is-encoded="true"><p>Try</p></div>'
+            '<span data-temp-comp-id="0" data-temp-attr-name="tab-title-1">Hint 2</span>'
+            '<oppia-noninteractive-tabs data-temp-tab-count="2" data-temp-comp-id="0" translate="no">'
+            '</oppia-noninteractive-tabs>'
+        )
+        self.assertEqual(protected, expected_protected)
 
         restored = html_translation_services.postprocess_translated_html(
             protected

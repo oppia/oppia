@@ -81,6 +81,8 @@ class MachineTranslationGenerateHandler(
         except Exception as e:
             raise self.InternalErrorException(str(e))
 
+        # generate_and_cache_translation returns None only if there's no provider
+        # mapped for the target language or the mapped provider class doesn't exist.
         if translation_result is None:
             raise self.InvalidInputException(
                 'No active translation provider is configured for %s.'

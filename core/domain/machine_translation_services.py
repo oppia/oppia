@@ -26,6 +26,7 @@ from core.constants import constants
 from core.domain import (
     email_manager,
     html_translation_services,
+    translation_domain,
     translation_services,
 )
 from core.platform import models
@@ -163,6 +164,8 @@ class TranslationProviderRegistry:
         return self._providers.get(provider_id)
 
 
+TRANSLATION_SOURCE_CACHE = 'cached'
+
 _PROVIDER_REGISTRY = TranslationProviderRegistry()
 
 
@@ -190,7 +193,13 @@ def generate_and_cache_translation(
     )
 
     if cached_model is not None and cached_model.source_text == source_text:
-        return (cached_model.translated_text, 'cached')
+        cached_translation = translation_domain.MachineTranslation(
+            cached_model.source_language_code,
+            cached_model.target_language_code,
+            cached_model.source_text,
+            cached_model.translated_text,
+        )
+        return (cached_translation.translated_text, TRANSLATION_SOURCE_CACHE)
 
     provider_id = _PROVIDER_REGISTRY.get_provider_id(target_language_code)
     if not provider_id:

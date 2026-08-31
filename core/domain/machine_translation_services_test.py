@@ -145,7 +145,10 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
                     'en', 'hi', 'Hello'
                 )
             )
-            self.assertEqual(result, ('नमस्ते', 'cached'))
+            self.assertEqual(
+                result,
+                ('नमस्ते', machine_translation_services.TRANSLATION_SOURCE_CACHE),
+            )
 
     def test_ignores_cache_on_hash_collision(self) -> None:
         collision_model = translation_models.AutoTranslationCacheModel(
