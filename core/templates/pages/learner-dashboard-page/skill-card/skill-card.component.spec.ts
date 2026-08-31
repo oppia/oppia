@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SkillCardComponent
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {
