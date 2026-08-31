@@ -25,6 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {UrlService} from 'services/contextual/url.service';
@@ -36,6 +37,12 @@ import {
 } from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {CardNavigationControlComponent} from './card-navigation-control.component';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('Card navigation control component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
@@ -67,6 +74,10 @@ describe('Card navigation control component', () => {
         UrlService,
         PageContextService,
         ConversationFlowService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

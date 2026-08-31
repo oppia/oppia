@@ -25,6 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {UrlService} from 'services/contextual/url.service';
@@ -63,7 +64,7 @@ describe('Card interaction controls component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, TranslateModule.forRoot()],
       declarations: [CardInteractionControlsComponent],
       providers: [
         ExplorationModeService,
