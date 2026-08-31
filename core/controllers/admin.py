@@ -38,6 +38,8 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
+    learner_group_fetchers,
+    learner_group_services,
     opportunity_services,
 )
 from core.domain import platform_parameter_domain as parameter_domain
@@ -1316,6 +1318,19 @@ class AdminHandler(
             # page renders real content during lighthouse runs.
             voiceover_services.save_language_accent_support(
                 {'en': {'en-US': True}}
+            )
+            # Seed a learner group with the current user as its facilitator so
+            # that the learner group creator, editor and viewer pages render
+            # real content during lighthouse runs.
+            learner_group_id = learner_group_fetchers.get_new_learner_group_id()
+            learner_group_services.create_learner_group(
+                learner_group_id,
+                'Dummy learner group',
+                'A dummy learner group created for lighthouse runs.',
+                [self.user_id],
+                [],
+                ['%s:1' % topic_id_1],
+                [story_id],
             )
         else:
             raise Exception('Cannot load new structures data in production.')

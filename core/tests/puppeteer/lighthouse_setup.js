@@ -39,6 +39,7 @@ var topicId = 'Topic editor not loaded';
 var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
+var learnerGroupId = 'Learner group not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -122,6 +123,7 @@ var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 var roleOptionLabels = {
   ADMIN: 'curriculum admin',
   COLLECTION_EDITOR: 'collection editor',
+  FULL_USER: 'full user',
   RELEASE_COORDINATOR: 'release coordinator',
   VOICEOVER_ADMIN: 'voiceover admin',
 };
@@ -490,6 +492,14 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
           : '';
       });
     } while (statusMessage !== successMessage);
+
+    // Capture the seeded learner group id from the facilitator dashboard,
+    // which lists the groups the admin is a facilitator of.
+    learnerGroupId = await page.evaluate(async () => {
+      const response = await fetch('/facilitator_dashboard_handler');
+      const data = await response.json();
+      return data.learner_groups_list[0].id;
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -628,7 +638,7 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   }
 };
 
-const enableStoryEditorArcsFeature = async function (browser, page) {
+const enableFeatureFlag = async function (browser, page, featureName) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/release-coordinator', {
@@ -637,12 +647,10 @@ const enableStoryEditorArcsFeature = async function (browser, page) {
     await page.waitForSelector(featuresTab);
     await page.click(featuresTab);
 
-    // Locate the story editor arcs feature flag card. The practice session,
-    // node practice session, and end of arc test pages are only accessible
-    // when this feature is enabled.
+    // Locate the feature flag card and force-enable it for all users.
     await page.waitForSelector(featureFlagDiv);
     const featureFlags = await page.$$(featureFlagDiv);
-    let storyEditorArcsFlag = null;
+    let targetFeatureFlag = null;
     for (let i = 0; i < featureFlags.length; i++) {
       const featureFlagNameElement = await featureFlags[i].$(
         featureFlagNameSelector
@@ -651,33 +659,30 @@ const enableStoryEditorArcsFeature = async function (browser, page) {
         element => element.textContent.trim(),
         featureFlagNameElement
       );
-      if (featureFlagName === 'story_editor_arcs') {
-        storyEditorArcsFlag = featureFlags[i];
+      if (featureFlagName === featureName) {
+        targetFeatureFlag = featureFlags[i];
         break;
       }
     }
-    if (!storyEditorArcsFlag) {
-      throw new Error('Feature flag story_editor_arcs was not found.');
+    if (!targetFeatureFlag) {
+      throw new Error(`Feature flag ${featureName} was not found.`);
     }
 
-    // Force-enable the feature for all users.
-    await storyEditorArcsFlag.waitForSelector(featureFlagValueSelector);
-    const valueSelectorElement = await storyEditorArcsFlag.$(
+    await targetFeatureFlag.waitForSelector(featureFlagValueSelector);
+    const valueSelectorElement = await targetFeatureFlag.$(
       featureFlagValueSelector
     );
     await valueSelectorElement.select('0: true');
 
-    await storyEditorArcsFlag.waitForSelector(
+    await targetFeatureFlag.waitForSelector(
       `${featureFlagSaveButton}:not([disabled])`,
       {visible: true}
     );
-    const saveButtonElement = await storyEditorArcsFlag.$(
-      featureFlagSaveButton
-    );
+    const saveButtonElement = await targetFeatureFlag.$(featureFlagSaveButton);
     await saveButtonElement.click();
 
     // Wait for the feature flag configuration to be saved.
-    await storyEditorArcsFlag.waitForSelector(
+    await targetFeatureFlag.waitForSelector(
       `${featureFlagSaveButton}[disabled]`,
       {visible: true}
     );
@@ -780,6 +785,7 @@ const main = async function () {
   await setRole(browser, page, 'VOICEOVER_ADMIN');
   await setRole(browser, page, 'ADMIN');
   await setRole(browser, page, 'RELEASE_COORDINATOR');
+  await setRole(browser, page, 'FULL_USER');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
@@ -787,7 +793,8 @@ const main = async function () {
   await generateDataForClassroom(browser, page);
   await enableDiagnosticTestForMathClassroom(browser, page);
   await generateDataForBlogPosts(browser, page);
-  await enableStoryEditorArcsFeature(browser, page);
+  await enableFeatureFlag(browser, page, 'story_editor_arcs');
+  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
 
   fs.writeFileSync(
     'core/tests/puppeteer/.env',
@@ -795,7 +802,8 @@ const main = async function () {
       `story_id=${storyId}\n` +
       `topic_id=${topicId}\n` +
       `skill_id=${skillId}\n` +
-      `blog_post_url_fragment=${blogUrlFragment}\n`
+      `blog_post_url_fragment=${blogUrlFragment}\n` +
+      `learner_group_id=${learnerGroupId}\n`
   );
 
   await process.stdout.write(
@@ -805,6 +813,7 @@ const main = async function () {
       storyEditorUrl,
       skillEditorUrl,
       `http://localhost:8181/blog/${blogUrlFragment}`,
+      `http://localhost:8181/learner-group/${learnerGroupId}`,
     ].join('\n')
   );
   if (record) {

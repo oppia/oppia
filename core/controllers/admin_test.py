@@ -30,6 +30,8 @@ from core.domain import (
     exp_domain,
     exp_services,
     fs_services,
+    learner_group_fetchers,
+    learner_group_services,
     opportunity_services,
     platform_parameter_domain,
     platform_parameter_list,
@@ -770,6 +772,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             voiceover_services.get_all_language_accent_codes_for_voiceovers(),
             {'en': {'en-US': True}},
         )
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_facilitator(
+                self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+            )
+        )
+        self.assertEqual(len(learner_groups), 1)
+        self.assertEqual(learner_groups[0].title, 'Dummy learner group')
+        self.assertEqual(learner_groups[0].story_ids, [story_id])
         self.logout()
 
     @test_utils.enable_feature_flags(

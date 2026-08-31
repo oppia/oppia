@@ -144,16 +144,20 @@ def get_entity(line: str) -> tuple[str, str] | None:
     """
     url_parts = line.split('/')
     print('Parsing entity ID in line: %s' % line)
-    if 'create' in line:
-        return 'exploration_id', url_parts[4]
-    elif 'topic_editor' in line:
-        return 'topic_id', url_parts[4]
-    elif 'story_editor' in line:
-        return 'story_id', url_parts[4]
-    elif 'skill_editor' in line:
-        return 'skill_id', url_parts[4]
-    elif '/blog/' in line:
-        return 'blog_post_url_fragment', url_parts[4]
+    url_patterns_to_entity_names = {
+        'create': ('exploration_id', 4),
+        'topic_editor': ('topic_id', 4),
+        'story_editor': ('story_id', 4),
+        'skill_editor': ('skill_id', 4),
+        '/blog/': ('blog_post_url_fragment', 4),
+        '/learner-group/': ('learner_group_id', 4),
+    }
+    for url_pattern, (
+        entity_name,
+        entity_id_index,
+    ) in url_patterns_to_entity_names.items():
+        if url_pattern in line:
+            return entity_name, url_parts[entity_id_index]
 
     return None
 
