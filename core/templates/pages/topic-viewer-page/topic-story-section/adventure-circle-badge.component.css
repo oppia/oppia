@@ -34,6 +34,13 @@
   font-size: 22px;
 }
 
+.adventure-circle-badge-icon-image {
+  display: block;
+  height: 60%;
+  object-fit: contain;
+  width: 60%;
+}
+
 @media (max-width: 768px) {
   .adventure-circle-badge {
     flex-basis: 44px;

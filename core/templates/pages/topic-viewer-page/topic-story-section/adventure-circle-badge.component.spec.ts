@@ -39,6 +39,7 @@ describe('AdventureCircleBadgeComponent', () => {
   it('should initialize with default input values', () => {
     expect(component.label).toBe('');
     expect(component.iconName).toBe('');
+    expect(component.iconImageUrl).toBe('');
     expect(component.backgroundColor).toBe('#fff');
     expect(component.borderColor).toBe('#7f8c8d');
     expect(component.textColor).toBe('#334155');
@@ -110,5 +111,18 @@ describe('AdventureCircleBadgeComponent', () => {
 
     expect(component.hasIcon).toBeFalse();
     expect(component.getAriaLabel()).toBe('1');
+  });
+
+  it('should use the icon image url when an icon image is provided', () => {
+    component.iconImageUrl = '/assets/images/icons/practice_pencil.svg';
+
+    expect(component.hasIcon).toBeTrue();
+    expect(component.hasIconImage).toBeTrue();
+  });
+
+  it('should not use an icon image when none is provided', () => {
+    component.iconImageUrl = '';
+
+    expect(component.hasIconImage).toBeFalse();
   });
 });

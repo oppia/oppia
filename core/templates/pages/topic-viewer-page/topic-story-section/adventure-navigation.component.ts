@@ -58,6 +58,8 @@ export class AdventureNavigationComponent
 {
   @Input() adventureGroups: AdventureNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
+  // The arc whose practice card is currently selected in the navbar.
+  @Input() activePracticeArcId: string = '';
   // True when this component is rendered inside the topic editor's preview
   // tab, where the fixed editor header bar adds height to the header stack.
   @Input() isInTopicEditorPreview: boolean = false;
@@ -162,6 +164,12 @@ export class AdventureNavigationComponent
 
   onPracticeClick(arcId: string): void {
     this.practiceSelected.emit(arcId);
+  }
+
+  isActivePractice(arcId: string): boolean {
+    return (
+      this.activePracticeArcId !== '' && this.activePracticeArcId === arcId
+    );
   }
 
   getPracticeBadgeIconName(): string {

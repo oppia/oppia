@@ -119,6 +119,19 @@ describe('AdventureNavigationComponent', () => {
     expect(component.getPracticeBadgeIconName()).toBe('edit');
   });
 
+  it('should mark matching practice arc as active when one is provided', () => {
+    component.activePracticeArcId = 'arc-2';
+
+    expect(component.isActivePractice('arc-2')).toBe(true);
+    expect(component.isActivePractice('arc-1')).toBe(false);
+  });
+
+  it('should report no active practice when none is provided', () => {
+    component.activePracticeArcId = '';
+
+    expect(component.isActivePractice('arc-1')).toBe(false);
+  });
+
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {
     component.scrollWrapper = createScrollWrapper(500, 200, 0);
 

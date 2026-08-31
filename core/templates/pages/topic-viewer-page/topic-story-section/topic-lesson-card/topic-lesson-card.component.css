@@ -352,6 +352,13 @@ img.topic-lesson-card-btn-icon {
   width: 16px;
 }
 
+.topic-lesson-card-start-button .topic-lesson-card-btn-icon {
+  font-size: 24px;
+  height: 24px;
+  line-height: 1;
+  width: 24px;
+}
+
 .topic-lesson-card-actions {
   align-items: flex-end;
   display: flex;

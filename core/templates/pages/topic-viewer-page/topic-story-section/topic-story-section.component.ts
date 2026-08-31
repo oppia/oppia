@@ -151,6 +151,7 @@ export class TopicStorySectionComponent
   comingSoonAdventureGroups: AdventureGroupData[] = [];
   adventureNavigationGroups: AdventureNavigationGroupData[] = [];
   activeLessonNumber: number | null = null;
+  activePracticeArcId: string = '';
   practiceCard: PracticeCardData = {
     practiceTitle: '',
     practiceDescription: '',
@@ -206,18 +207,8 @@ export class TopicStorySectionComponent
     const lessonNumber = selection.lessonNumber;
     const adventureIndex = selection.adventureIndex;
 
-    if (adventureIndex !== -1 && this.shouldConfirmArcSkip(adventureIndex)) {
-      this.pendingNavigationLessonNumber = lessonNumber;
-      this.pendingNavigationAdventureIndex = adventureIndex;
-      this.pendingStartUrl = '';
-      this.pendingArcSkipTargetLabel = this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
-        {adventureNumber: adventureIndex + 1}
-      );
-      this.openArcSkipConfirmationModal();
-      return;
-    }
-
+    // Clicking a lesson circle in the navbar should only scroll to that
+    // lesson's card. Any confirmation is handled when starting the lesson.
     this.selectLessonFromNavigation(lessonNumber, adventureIndex);
   }
 
@@ -653,6 +644,7 @@ export class TopicStorySectionComponent
   }
 
   onNavigationPracticeSelected(arcId: string): void {
+    this.activePracticeArcId = arcId;
     setTimeout(() => {
       this.scrollToElementById('practice-card-' + arcId);
     }, 300);

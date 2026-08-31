@@ -27,6 +27,7 @@ import './adventure-circle-badge.component.css';
 export class AdventureCircleBadgeComponent {
   @Input() label: string = '';
   @Input() iconName: string = '';
+  @Input() iconImageUrl: string = '';
   @Input() backgroundColor: string = '#fff';
   @Input() borderColor: string = '#7f8c8d';
   @Input() textColor: string = '#334155';
@@ -40,7 +41,11 @@ export class AdventureCircleBadgeComponent {
   }
 
   get hasIcon(): boolean {
-    return this.iconName !== '';
+    return this.iconName !== '' || this.iconImageUrl !== '';
+  }
+
+  get hasIconImage(): boolean {
+    return this.iconImageUrl !== '';
   }
 
   getAriaLabel(): string {

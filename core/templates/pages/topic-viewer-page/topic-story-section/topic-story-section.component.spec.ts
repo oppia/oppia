@@ -1418,7 +1418,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
       ArcSkipConfirmationModalComponent,
@@ -1446,7 +1446,11 @@ describe('TopicStorySectionComponent', () => {
       componentInstance: {},
     } as NgbModalRef;
     ngbModal.open.and.returnValue(mockModalRef);
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     component.onArcSkipConfirmationCancel();
 
@@ -1459,7 +1463,11 @@ describe('TopicStorySectionComponent', () => {
       componentInstance: {},
     } as NgbModalRef;
     ngbModal.open.and.returnValue(mockModalRef);
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     component.onArcSkipConfirmationProceed();
 
@@ -1526,6 +1534,55 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
+  it('should only scroll and not open the arc skip modal when a lesson circle is clicked in the navbar', fakeAsync(() => {
+    windowDimensionsService.getWidth.and.returnValue(1024);
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+    expect(component.activeLessonNumber).toBe(2);
+    expect(component.navigatedLessonNumber).toBe(2);
+
+    tick(300);
+  }));
+
   it('should persist un-skipping when a skipped adventure is expanded', () => {
     component.skippedAdventureIndices = new Set([0]);
 
@@ -1544,7 +1601,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
     ];
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
       ArcSkipConfirmationModalComponent,
@@ -1569,7 +1626,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
     ];
 
-    component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
+    component.onLessonStartClick({lessonNumber: 3, startUrl: ''});
 
     (translateService.instant as jasmine.Spy).calls.reset();
 
@@ -1594,7 +1651,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 4', [createLessonCard(4, 'not_started')]),
     ];
 
-    component.onNavigationLessonSelected({lessonNumber: 4, adventureIndex: 3});
+    component.onLessonStartClick({lessonNumber: 4, startUrl: ''});
 
     (translateService.instant as jasmine.Spy).calls.reset();
 
@@ -1618,7 +1675,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
     ];
 
-    component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
+    component.onLessonStartClick({lessonNumber: 3, startUrl: ''});
 
     expect(component.getArcSkipConfirmationMessage()).toBe(
       'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
@@ -1639,7 +1696,7 @@ describe('TopicStorySectionComponent', () => {
       createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
     ];
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
     expect(ngbModal.open).toHaveBeenCalledWith(
       ArcSkipConfirmationModalComponent,
       {
@@ -2676,11 +2733,15 @@ describe('TopicStorySectionComponent', () => {
     practiceElement.id = 'practice-card-1';
 
     component.onNavigationPracticeSelected('1');
+
+    expect(component.activePracticeArcId).toBe('1');
     tick(300);
   }));
 
   it('should handle onNavigationPracticeSelected when element is not found', fakeAsync(() => {
     component.onNavigationPracticeSelected('999');
+
+    expect(component.activePracticeArcId).toBe('999');
     tick(300);
   }));
 
@@ -2752,7 +2813,7 @@ describe('TopicStorySectionComponent', () => {
     } as NgbModalRef;
     ngbModal.open.and.returnValue(rejectModalRef);
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
       ArcSkipConfirmationModalComponent,
@@ -3540,7 +3601,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(bottomSheet.open).toHaveBeenCalledWith(
       ArcSkipConfirmationModalComponent,
@@ -3654,7 +3715,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     dismissCallback('confirm');
 
@@ -3717,7 +3778,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     dismissCallback('cancel');
 
@@ -4246,10 +4307,7 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({
-      lessonNumber: 2,
-      adventureIndex: 1,
-    });
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
     Reflect.set(component, 'pendingStartUrl', '/explore/exp_2');
 
     component.onArcSkipConfirmationProceed();
@@ -4297,10 +4355,7 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({
-      lessonNumber: 2,
-      adventureIndex: 1,
-    });
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     component.onArcSkipConfirmationProceed();
 
@@ -4347,10 +4402,7 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({
-      lessonNumber: 2,
-      adventureIndex: 1,
-    });
+    component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     component.onArcSkipConfirmationProceed();
 

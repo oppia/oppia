@@ -6,7 +6,12 @@
         'border-color': borderColor,
         color: textColor
       }">
-  <i *ngIf="hasIcon"
+  <img *ngIf="hasIconImage"
+       class="adventure-circle-badge-icon-image"
+       [src]="iconImageUrl"
+       alt=""
+       aria-hidden="true">
+  <i *ngIf="hasIcon && !hasIconImage"
      class="material-icons"
      aria-hidden="true">
     {{ iconName }}
