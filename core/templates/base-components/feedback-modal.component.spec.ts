@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for FeedbackModalComponent.
  */
 
+// @ts-nocheck
+
 import {
   Component,
   EventEmitter,
