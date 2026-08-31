@@ -40,6 +40,8 @@ import {
 } from '../../services/player-position.service';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {CardInteractionControlsComponent} from './card-interaction-controls.component';
+import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('Card interaction controls component', () => {
   let fixture: ComponentFixture<CardInteractionControlsComponent>;
@@ -323,7 +325,11 @@ describe('Card interaction controls component', () => {
   });
 
   it('should return continue button customization args', () => {
-    const mockArgs = {buttonText: {value: 'Continue'}};
+    const mockArgs = {
+      buttonText: {
+        value: new SubtitledUnicode('Continue', 'ca_buttonText_0'),
+      },
+    };
     componentInstance.interactionCustomizationArgs =
       mockArgs as ContinueCustomizationArgs;
     expect(componentInstance.continueButtonCustomizationArgs).toEqual(mockArgs);
