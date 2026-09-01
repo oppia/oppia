@@ -28,11 +28,7 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {of} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {
-  CertificateAssessmentAttemptData,
-  CertificateAssessmentQuestionData,
-} from 'domain/certificate-assessment/certificate-assessment.model';
+import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {StateBackendDict} from 'domain/state/state.model';
@@ -147,19 +143,14 @@ const stateDataFor = (
   inapplicable_skill_misconception_ids: [],
 });
 
-const questionResponse = (
-  questionId: string
-): CertificateAssessmentQuestionData => {
+const stateForQuestion = (questionId: string): StateBackendDict => {
   const interactionId =
     questionId === 'q1'
       ? 'MultipleChoiceInput'
       : questionId === 'q2'
         ? 'ItemSelectionInput'
         : 'TextInput';
-  return CertificateAssessmentQuestionData.createFromBackendDict({
-    question_id: questionId,
-    question_state_data: stateDataFor(interactionId),
-  });
+  return stateDataFor(interactionId);
 };
 
 const makeAttempt = (
@@ -170,6 +161,7 @@ const makeAttempt = (
     questions: ids.map(questionId => ({
       question_id: questionId,
       question_version: 1,
+      question_state_data: stateForQuestion(questionId),
     })),
   });
 
@@ -192,7 +184,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
   let modalSpy: jasmine.SpyObj<NgbModal>;
   let dimsSpy: jasmine.SpyObj<WindowDimensionsService>;
-  let apiSpy: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
   let registrySpy: jasmine.SpyObj<InteractionRulesRegistryService>;
   let classificationSpy: jasmine.SpyObj<AnswerClassificationService>;
   let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
@@ -209,12 +200,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     modalSpy.open.and.returnValue(modalRef());
     dimsSpy = jasmine.createSpyObj('WindowDimensionsService', ['getWidth']);
     dimsSpy.getWidth.and.returnValue(800);
-    apiSpy = jasmine.createSpyObj('Api', [
-      'getCertificateAssessmentQuestionAsync',
-    ]);
-    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      (_a: string, qId: string) => Promise.resolve(questionResponse(qId))
-    );
     registrySpy = jasmine.createSpyObj('Registry', [
       'getRulesServiceByInteractionId',
     ]);
@@ -263,10 +248,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         {provide: MatBottomSheet, useValue: bottomSheetSpy},
         {provide: NgbModal, useValue: modalSpy},
         {provide: WindowDimensionsService, useValue: dimsSpy},
-        {
-          provide: CertificateAssessmentOfferingBackendApiService,
-          useValue: apiSpy,
-        },
         {provide: InteractionRulesRegistryService, useValue: registrySpy},
         {provide: AnswerClassificationService, useValue: classificationSpy},
         {provide: ExplorationHtmlFormatterService, useValue: formatterSpy},
@@ -290,16 +271,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   const load = (): void => {
     fixture.detectChanges();
     flushMicrotasks();
-    component.nextQuestion();
-    flushMicrotasks();
-    component.nextQuestion();
-    flushMicrotasks();
   };
 
-  const loadQ1 = (): void => {
-    fixture.detectChanges();
-    flushMicrotasks();
-  };
+  const loadQ1 = load;
 
   const triggerTimeExpiry = (): void => {
     component.isTimeExpired = true;
@@ -327,7 +301,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     await setup(null);
     fixture.detectChanges();
     expect(component.questions.length).toBe(0);
-    expect(apiSpy.getCertificateAssessmentQuestionAsync).not.toHaveBeenCalled();
   });
 
   it('should register and clear its onSubmit callback on destroy', fakeAsync(() => {
@@ -342,105 +315,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
   }));
 
-  it('should not load when attempt question index is out of range', fakeAsync(() => {
-    loadQ1();
-    (
-      component as unknown as {loadQuestion: (index: number) => void}
-    ).loadQuestion(99);
-    flushMicrotasks();
-    expect(component.questions.length).toBe(1);
-  }));
-
-  it('should not fire second request for in-flight index', fakeAsync(() => {
-    let resolve!: (v: CertificateAssessmentQuestionData) => void;
-    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      new Promise(r => {
-        resolve = r;
-      })
-    );
-    loadQ1();
-    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
-      1
-    );
-    expect(component.isLoadingQuestion).toBe(true);
-    (
-      component as unknown as {loadQuestion: (index: number) => void}
-    ).loadQuestion(0);
-    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
-      1
-    );
-    resolve(questionResponse('q1'));
-    flushMicrotasks();
-    expect(component.isLoadingQuestion).toBe(false);
-  }));
-
-  it('should store questions at correct index for sparse loading', fakeAsync(() => {
-    const deferreds: ((v: CertificateAssessmentQuestionData) => void)[] = [];
-    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      () =>
-        new Promise(r => {
-          deferreds.push(r);
-        })
-    );
-    loadQ1();
-    component.nextQuestion();
-    flushMicrotasks();
-    deferreds[1](questionResponse('q2'));
-    flushMicrotasks();
-    expect(component.questions[1]).toBeDefined();
-    expect(component.questions[0]).toBeUndefined();
-    deferreds[0](questionResponse('q1'));
-    flushMicrotasks();
-    expect(component.questions[0]).toBeDefined();
-  }));
-
-  it('should set loadError on failure and clear on success', fakeAsync(() => {
-    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.reject(new Error('err'))
-    );
-    loadQ1();
-    expect(component.loadError).toBe(true);
-    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.resolve(questionResponse('q1'))
-    );
-    (
-      component as unknown as {loadQuestion: (index: number) => void}
-    ).loadQuestion(0);
-    flushMicrotasks();
-    expect(component.loadError).toBe(false);
-  }));
-
-  it('should retry loading the current question after a failure', fakeAsync(() => {
-    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.reject(new Error('err'))
-    );
-    loadQ1();
-    expect(component.loadError).toBe(true);
-    apiSpy.getCertificateAssessmentQuestionAsync.and.returnValue(
-      Promise.resolve(questionResponse('q1'))
-    );
-
-    component.retryLoadQuestion();
-    flushMicrotasks();
-
-    expect(component.loadError).toBe(false);
-    expect(component.currentQuestion).not.toBeNull();
-    expect(apiSpy.getCertificateAssessmentQuestionAsync).toHaveBeenCalledTimes(
-      2
-    );
-  }));
-
-  it('should not reload already loaded question', fakeAsync(() => {
-    load();
-    const count = apiSpy.getCertificateAssessmentQuestionAsync.calls.count();
-    (
-      component as unknown as {loadQuestion: (index: number) => void}
-    ).loadQuestion(0);
-    expect(apiSpy.getCertificateAssessmentQuestionAsync.calls.count()).toBe(
-      count
-    );
-  }));
-
   it('should advance to next question', () => {
     component.nextQuestion();
     expect(component.currentQuestionIndex).toBe(1);
@@ -448,6 +322,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should not advance past last question', fakeAsync(() => {
     load();
+    component.currentQuestionIndex = 2;
     component.nextQuestion();
     expect(component.currentQuestionIndex).toBe(2);
   }));
@@ -507,12 +382,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should return null when no questions loaded', () => {
     expect(component.getCurrentQuestion()).toBeNull();
   });
-
-  it('should return null when question at index not loaded', fakeAsync(() => {
-    loadQ1();
-    component.currentQuestionIndex = 1;
-    expect(component.getCurrentQuestion()).toBeNull();
-  }));
 
   it('should return question at current index', fakeAsync(() => {
     load();
@@ -744,28 +613,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestionIndex).toBe(2);
   }));
 
-  it('should return to the correct question when an intermediate question failed to load', fakeAsync(() => {
-    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      (_attemptId: string, questionId: string) => {
-        if (questionId === 'q2') {
-          return Promise.reject(new Error('load failed'));
-        }
-        return Promise.resolve(questionResponse(questionId));
-      }
-    );
-    load();
-    spyOn(component.assessmentSubmitted, 'emit');
-    const ref = modalRef();
-    modalSpy.open.and.returnValue(ref);
-    component.answers.q1 = 1;
-    component.submitAssessment();
-    flushMicrotasks();
-    // Only q3 is loaded but unanswered, and its index within this.questions
-    // must be preserved even though it is first in the filtered list.
-    expect(ref.componentInstance.unansweredQuestionCount).toBe(1);
-    expect(component.currentQuestionIndex).toBe(2);
-  }));
-
   it('should emit answers when submit anyway is confirmed', fakeAsync(() => {
     load();
     spyOn(component.assessmentSubmitted, 'emit');
@@ -843,26 +690,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       {question_id: 'q1', is_correct: true, selected_answer: '1'},
       {question_id: 'q2', is_correct: true, selected_answer: '["a","b","d"]'},
       {question_id: 'q3', is_correct: true, selected_answer: 'circle'},
-    ]);
-  }));
-
-  it('should skip unloaded questions when submitting', fakeAsync(() => {
-    apiSpy.getCertificateAssessmentQuestionAsync.and.callFake(
-      (_attemptId: string, questionId: string) => {
-        if (questionId === 'q2') {
-          return Promise.reject(new Error('load failed'));
-        }
-        return Promise.resolve(questionResponse(questionId));
-      }
-    );
-    load();
-    spyOn(component.assessmentSubmitted, 'emit');
-    component.answers.q1 = 1;
-    component.answers.q3 = 'circle';
-    component.submitAssessment();
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
-      {question_id: 'q1', is_correct: false, selected_answer: '1'},
-      {question_id: 'q3', is_correct: false, selected_answer: 'circle'},
     ]);
   }));
 

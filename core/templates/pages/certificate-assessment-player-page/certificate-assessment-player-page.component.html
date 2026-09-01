@@ -2,26 +2,16 @@
                                 [buttonText]="bannerButtonI18nKey"
                                 [buttonRoute]="classroomUrlFragment ? ['/learn', classroomUrlFragment, 'certificate-offering-available'] : ['/learn']">
 </oppia-titled-background-banner>
-<div *ngIf="isLoadingQuestion" class="text-center py-3 text-muted">
-  <mat-spinner class="mx-auto mb-2" diameter="32"></mat-spinner>
+<div *ngIf="currentQuestion">
+  <oppia-certificate-assessment-conversation-skin #conversationSkin
+                                                  [currentQuestion]="currentQuestion"
+                                                  [currentQuestionIndex]="currentQuestionIndex"
+                                                  [totalQuestions]="totalQuestionCount"
+                                                  [progressPercentage]="progressPercentage"
+                                                  [isLastQuestion]="isLastQuestion"
+                                                  [interactionHtml]="getInteractionHtml()"
+                                                  (previousQuestion)="previousQuestion()"
+                                                  (nextQuestion)="nextQuestion()"
+                                                  (submitAssessment)="submitAssessment()">
+  </oppia-certificate-assessment-conversation-skin>
 </div>
-<div *ngIf="loadError" class="text-center py-3 text-danger">
-  <p>Failed to load the question. Please try again later.</p>
-  <button type="button"
-          class="btn certificate-assessment-primary-button"
-          (click)="retryLoadQuestion()">
-    Retry
-  </button>
-</div>
-<oppia-certificate-assessment-conversation-skin #conversationSkin
-                                                *ngIf="!isLoadingQuestion && currentQuestion"
-                                                [currentQuestion]="currentQuestion"
-                                                [currentQuestionIndex]="currentQuestionIndex"
-                                                [totalQuestions]="totalQuestionCount"
-                                                [progressPercentage]="progressPercentage"
-                                                [isLastQuestion]="isLastQuestion"
-                                                [interactionHtml]="getInteractionHtml()"
-                                                (previousQuestion)="previousQuestion()"
-                                                (nextQuestion)="nextQuestion()"
-                                                (submitAssessment)="submitAssessment()">
-</oppia-certificate-assessment-conversation-skin>
