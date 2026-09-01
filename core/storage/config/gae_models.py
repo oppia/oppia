@@ -65,9 +65,6 @@ class BasePlatformParameterConfigModel(base_models.VersionedModel):
         id: str. Unique name of the platform parameter.
     """
 
-    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
-
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """BasePlatformParameterConfigModel is not related to users."""
