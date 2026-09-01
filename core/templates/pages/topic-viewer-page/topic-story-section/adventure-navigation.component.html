@@ -23,7 +23,8 @@
          (scroll)="onScroll()">
       <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx">
         <div class="adventure-navigation-group-pill"
-             [ngStyle]="{'border-color': adventureGroup.accentColor, 'grid-column': '1 / ' + (adventureGroup.lessons.length + (adventureGroup.showPractice ? 1 : 0) + 1)}"></div>
+             [ngStyle]="{'border-color': adventureGroup.accentColor, 'grid-column': '1 / ' + (adventureGroup.lessons.length + (adventureGroup.showPractice ? 1 : 0) + 1)}">
+        </div>
 
         <topic-adventure-circle-badge *ngFor="let lesson of adventureGroup.lessons; index as i"
                                       [label]="lesson.lessonNumber.toString()"

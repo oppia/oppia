@@ -194,7 +194,23 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onPlayAgainClick(): void {
-    this.onStartButtonClick();
+    if (!this.startUrl || this.isComingSoonLesson) {
+      return;
+    }
+
+    const resolvedUrl = this.selectedTextLanguageCode
+      ? this.getLessonStartUrlWithLanguageSelection(
+          this.selectedTextLanguageCode,
+          this.selectedVoiceoverLanguageCode
+        )
+      : this.startUrl;
+
+    const separator = resolvedUrl.includes('?') ? '&' : '?';
+    const restartUrl = `${resolvedUrl}${separator}restart=1`;
+    this.startLessonClick.emit({
+      lessonNumber: this.lessonNumber,
+      startUrl: restartUrl,
+    });
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {

@@ -778,15 +778,68 @@ describe('TopicLessonCardComponent', () => {
     expect(component.navigateTo).not.toHaveBeenCalled();
   });
 
-  it('should start the lesson again without toggling expansion on play again click', () => {
-    spyOn(component, 'onStartButtonClick');
+  it('should start the lesson again from the beginning on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
+    component.lessonNumber = 3;
+    component.selectedTextLanguageCode = null;
     component.isExpanded = true;
 
     component.onPlayAgainClick();
 
-    expect(component.onStartButtonClick).toHaveBeenCalled();
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl: '/explore/123?restart=1',
+    });
     expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should append restart param to an existing query string on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123?node_id=x&lang=en';
+    component.selectedTextLanguageCode = null;
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl: '/explore/123?node_id=x&lang=en&restart=1',
+    });
+  });
+
+  it('should append restart param to the language-selected url on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.selectedTextLanguageCode = 'fr';
+    component.selectedVoiceoverLanguageCode = 'fr';
+    component.lessonNumber = 3;
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl:
+        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr&restart=1',
+    });
+  });
+
+  it('should not start the lesson again when startUrl is empty on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '';
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
+  });
+
+  it('should not start the lesson again for a coming soon lesson on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.lessonProgressStatus = 'coming_soon';
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
   });
 
   it('should auto-expand when navigatedLessonNumber matches lessonNumber', () => {
