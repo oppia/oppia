@@ -17,7 +17,7 @@
 }
 
 .adventure-navigation-wrapper {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex: 1 1 0;
   flex-wrap: nowrap;
@@ -103,7 +103,7 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  margin: 4px 0 12px;
+  margin: 12px 0 0;
   text-align: center;
 }
 
@@ -114,12 +114,62 @@
 
 .adventure-navigation-group {
   align-items: center;
+  column-gap: 10px;
+  display: inline-grid;
+  flex: 0 0 auto;
+  grid-template-rows: minmax(60px, auto) auto;
+  justify-items: center;
+  padding: 0 14px;
+  position: relative;
+  row-gap: 10px;
+}
+
+.adventure-navigation-group-pill {
+  align-self: stretch;
   border: 2.5px solid;
   border-radius: 30px;
+  box-sizing: border-box;
+  grid-row: 1;
+  justify-self: stretch;
+  margin: 0 -14px;
+  pointer-events: none;
+}
+
+.adventure-navigation-progress-dot {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #c9c9c9;
+  border-radius: 50%;
   display: inline-flex;
-  flex: 0 0 auto;
-  gap: 10px;
-  padding: 8px 14px;
+  height: 16px;
+  justify-content: center;
+  position: relative;
+  width: 16px;
+  z-index: 1;
+}
+
+.adventure-navigation-progress-dot--completed {
+  background: #27a844;
+}
+
+.adventure-navigation-progress-dot .material-icons {
+  color: #fff;
+  font-size: 12px;
+}
+
+.adventure-navigation-progress-dot:not(.adventure-navigation-progress-dot--first)::before {
+  background: #c9c9c9;
+  content: '';
+  height: 2px;
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+}
+
+.adventure-navigation-progress-dot--line-completed::before {
+  background: #27a844;
 }
 
 .adventure-navigation-mastery {
@@ -134,7 +184,8 @@
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;
-  padding: 8px 14px;
+  min-height: 60px;
+  padding: 0 14px;
   position: relative;
 }
 
@@ -166,12 +217,18 @@
   }
 
   .adventure-navigation-group {
-    gap: 8px;
-    padding: 6px 12px;
+    column-gap: 8px;
+    grid-template-rows: minmax(48px, auto) auto;
+    padding: 0 12px;
+  }
+
+  .adventure-navigation-group-pill {
+    margin: 0 -12px;
   }
 
   .adventure-navigation-mastery-group {
-    padding: 6px 12px;
+    min-height: 48px;
+    padding: 0 12px;
   }
 
   .adventure-navigation-arrow {
@@ -186,7 +243,20 @@
 
   .adventure-navigation-hint {
     font-size: 13px;
-    margin: 4px 0 10px;
+    margin: 8px 0 0;
+  }
+
+  .adventure-navigation-progress-dot {
+    height: 14px;
+    width: 14px;
+  }
+
+  .adventure-navigation-progress-dot .material-icons {
+    font-size: 10px;
+  }
+
+  .adventure-navigation-progress-dot:not(.adventure-navigation-progress-dot--first)::before {
+    width: 30px;
   }
 }
 
@@ -209,12 +279,18 @@
   }
 
   .adventure-navigation-group {
-    gap: 6px;
-    padding: 5px 10px;
+    column-gap: 6px;
+    grid-template-rows: minmax(44px, auto) auto;
+    padding: 0 10px;
+  }
+
+  .adventure-navigation-group-pill {
+    margin: 0 -10px;
   }
 
   .adventure-navigation-mastery-group {
-    padding: 5px 10px;
+    min-height: 44px;
+    padding: 0 10px;
   }
 
   .adventure-navigation-arrow {
@@ -229,7 +305,20 @@
 
   .adventure-navigation-hint {
     font-size: 12px;
-    margin: 2px 0 8px;
+    margin: 6px 0 0;
+  }
+
+  .adventure-navigation-progress-dot {
+    height: 12px;
+    width: 12px;
+  }
+
+  .adventure-navigation-progress-dot .material-icons {
+    font-size: 9px;
+  }
+
+  .adventure-navigation-progress-dot:not(.adventure-navigation-progress-dot--first)::before {
+    width: 28px;
   }
 
   .adventure-navigation-hint-arrow {

@@ -871,6 +871,7 @@ export class TopicStorySectionComponent
     this.restoreMasteredAdventures();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
+    this.expandAdventureForActiveLesson();
     this.maybeShowAdventureMasteredModal();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
@@ -1077,6 +1078,40 @@ export class TopicStorySectionComponent
     return this.availableLessonCards.length > 0
       ? this.availableLessonCards[0].lessonNumber
       : null;
+  }
+
+  // Expands the adventure that contains the currently active (next) lesson so
+  // that when the learner returns after completing a lesson and a new lesson
+  // becomes active, its chapter is already expanded rather than collapsed.
+  private expandAdventureForActiveLesson(): void {
+    if (this.activeLessonNumber === null) {
+      return;
+    }
+
+    const activeLesson = this.lessonCards.find(
+      lesson => lesson.lessonNumber === this.activeLessonNumber
+    );
+    if (
+      !activeLesson ||
+      activeLesson.isComingSoon ||
+      (activeLesson.lessonProgressStatus !== 'in_progress' &&
+        activeLesson.lessonProgressStatus !== 'not_started')
+    ) {
+      return;
+    }
+
+    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
+      group.lessonCards.some(
+        card => card.lessonNumber === this.activeLessonNumber
+      )
+    );
+    if (
+      adventureIndex === -1 ||
+      this.skippedAdventureIndices.has(adventureIndex)
+    ) {
+      return;
+    }
+    this._expandedAdventureIndices.add(adventureIndex);
   }
 
   private updateVisibleSections(): void {

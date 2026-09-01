@@ -2052,6 +2052,55 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isAdventureExpanded(0)).toBe(true);
   });
 
+  it('should auto-expand the next adventure after the current lesson is completed', () => {
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node title 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
+    );
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node title 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1', 'Node title 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    storySummary.isNodeCompleted.and.callFake(
+      (title: string) => title === 'Node title 1'
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    // Simulate the learner returning with the completed adventure expanded.
+    Reflect.set(component, '_expandedAdventureIndices', new Set([0]));
+
+    component.ngOnInit();
+
+    expect(component.activeLessonNumber).toBe(2);
+    expect(component.isAdventureExpanded(1)).toBe(true);
+  });
+
   it('should report that missing or empty adventures have incomplete lessons', () => {
     component.visibleAdventureGroups = [
       createAdventureGroup('Empty Adventure', []),

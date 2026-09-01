@@ -176,6 +176,11 @@ export class AdventureNavigationComponent
     return 'edit';
   }
 
+  isLastLessonCompleted(adventureGroup: AdventureNavigationGroup): boolean {
+    const lessons = adventureGroup.lessons;
+    return lessons.length > 0 && lessons[lessons.length - 1].isCompleted;
+  }
+
   onMasteryClick(): void {
     this.masteryChallengeClicked.emit();
   }
