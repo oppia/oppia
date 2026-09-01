@@ -301,7 +301,9 @@ describe('Card interaction controls component', () => {
     componentInstance.interactionIsInline = true;
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
-    spyOn(mockDisplayedCard, 'getLastOppiaResponse').and.returnValue({});
+    spyOn(mockDisplayedCard, 'getLastOppiaResponse').and.returnValue(
+      '<p>Some response</p>'
+    );
 
     expect(componentInstance.shouldContinueButtonBeShown()).toBe(true);
   });
@@ -311,7 +313,7 @@ describe('Card interaction controls component', () => {
     componentInstance.interactionIsInline = true;
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
-    spyOn(mockDisplayedCard, 'getLastOppiaResponse').and.returnValue({});
+    spyOn(mockDisplayedCard, 'getLastOppiaResponse').and.returnValue('');
 
     expect(componentInstance.shouldContinueButtonBeShown()).toBe(false);
   });
