@@ -219,20 +219,24 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
             needed, otherwise None.
         """
         thread, messages, has_been_migrated = thread_and_migration_status
-        if not self._is_exploration_thread(thread):
-            return None
-        if has_been_migrated:
+        if (
+            self._get_thread_skip_reason(thread, messages, has_been_migrated)
+            is not None
+        ):
             return None
         return self._create_lesson_feedback_model(thread, messages)
 
     def _get_thread_skip_reason(
         self,
         thread: feedback_models.GeneralFeedbackThreadModel,
+        messages: List[feedback_models.GeneralFeedbackMessageModel],
         has_been_migrated: bool,
     ) -> Optional[str]:
         """Returns the skip reason for a thread, or None if it can migrate."""
         if not self._is_exploration_thread(thread):
             return 'Not an exploration thread'
+        if not messages:
+            return 'No messages'
         if has_been_migrated:
             return 'Already migrated'
         return None
@@ -257,8 +261,10 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         ],
     ) -> Optional[job_run_result.JobRunResult]:
         """Creates a JobRunResult for a skipped legacy thread."""
-        thread, unused_messages, has_been_migrated = thread_and_migration_status
-        skip_reason = self._get_thread_skip_reason(thread, has_been_migrated)
+        thread, messages, has_been_migrated = thread_and_migration_status
+        skip_reason = self._get_thread_skip_reason(
+            thread, messages, has_been_migrated
+        )
         if skip_reason is None:
             return None
         return job_run_result.JobRunResult.as_stdout(

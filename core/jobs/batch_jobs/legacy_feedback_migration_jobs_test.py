@@ -432,3 +432,24 @@ class AuditLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
         self.assertIsNone(
             general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
         )
+
+    def test_job_skips_thread_without_messages(self) -> None:
+        thread = self.create_legacy_feedback_thread(self.THREAD_ID)
+        self.put_multi([thread])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Skipped legacy feedback thread: '
+                        f'legacy_thread_id={self.THREAD_ID}, '
+                        'reason=No messages'
+                    )
+                ),
+            ]
+        )
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+        self.assertIsNone(
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
