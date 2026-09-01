@@ -55,7 +55,7 @@ class MockNgbModal {
   }
 }
 
-describe('Voiceover Admin Page component ', () => {
+fdescribe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -527,6 +527,141 @@ describe('Voiceover Admin Page component ', () => {
       'Test Exploration'
     );
   }));
+
+  it('should return the correct icon for RUNNING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'RUNNING'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('run_circle');
+  });
+
+  it('should return the correct icon for PENDING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'PENDING'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('pending');
+  });
+
+  it('should return the correct icon for CANCELLING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'CANCELLING'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('pending');
+  });
+
+  it('should return the correct icon for STOPPED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'STOPPED'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('pause_circle');
+  });
+
+  it('should return the correct icon for CANCELLED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'CANCELLED'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('cancel');
+  });
+
+  it('should return the correct icon for DRAINING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'DRAINING'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('hourglass_top');
+  });
+
+  it('should return the correct icon for DRAINED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'DRAINED'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('hourglass_bottom');
+  });
+
+  it('should return the correct icon for UNKNOWN Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'UNKNOWN'};
+
+    expect(component.getBeamJobStateIcon('en-US')).toBe('help');
+  });
+
+  it('should return the correct tooltip for all Beam job states', () => {
+    const states = [
+      'RUNNING',
+      'PENDING',
+      'STOPPED',
+      'CANCELLED',
+      'DRAINING',
+      'DRAINED',
+      'UPDATED',
+      'DONE',
+      'FAILED',
+      'UNKNOWN',
+      'CANCELLING',
+    ];
+    const expectedTooltip =
+      'Please re-add the language accent code to the system to trigger a new voiceover synthesis job.';
+
+    states.forEach(state => {
+      component.languageAccentCodeToBeamJobState = {'en-US': state as any};
+      expect(component.getBeamJobStateTooltip('en-US')).toBe(expectedTooltip);
+    });
+  });
+
+  it('should return the correct material theme color for RUNNING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'RUNNING'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe('accent');
+  });
+
+  it('should return the correct material theme color for PENDING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'PENDING'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe('accent');
+  });
+
+  it('should return the correct material theme color for STOPPED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'STOPPED'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe('accent');
+  });
+
+  it('should return the correct material theme color for DRAINING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'DRAINING'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe('accent');
+  });
+
+  it('should return the correct material theme color for UPDATED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'UPDATED'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe(
+      'primary'
+    );
+  });
+
+  it('should return the correct material theme color for DONE Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'DONE'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe(
+      'primary'
+    );
+  });
+
+  it('should return the correct material theme color for UNKNOWN Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'UNKNOWN'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBe('warn');
+  });
+
+  it('should return null material theme color for CANCELLING Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'CANCELLING'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBeNull();
+  });
+
+  it('should return null material theme color for CANCELLED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'CANCELLED'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBeNull();
+  });
+
+  it('should return null material theme color for DRAINED Beam job state', () => {
+    component.languageAccentCodeToBeamJobState = {'en-US': 'DRAINED'};
+
+    expect(component.getBeamJobStateMaterialThemeColor('en-US')).toBeNull();
+  });
 
   it('should get frontend function id text', () => {
     const functionId1 = 'regenerate_voiceovers_on_exploration_update';

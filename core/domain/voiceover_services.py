@@ -48,7 +48,6 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models, exp_models, voiceover_models
     from mypy_imports import (
         beam_job_models,
         exp_models,
