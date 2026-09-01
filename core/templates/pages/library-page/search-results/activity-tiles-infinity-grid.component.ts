@@ -22,10 +22,12 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LoaderService} from 'services/loader.service';
 import {SearchService} from 'services/search.service';
+import './activity-tiles-infinity-grid.component.css';
 
 @Component({
   selector: 'oppia-activity-tiles-infinity-grid',
   templateUrl: './activity-tiles-infinity-grid.component.html',
+  styleUrls: ['./activity-tiles-infinity-grid.component.css'],
 })
 export class ActivityTilesInfinityGridComponent {
   // This property is initialized using Angular lifecycle hooks
