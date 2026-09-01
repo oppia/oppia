@@ -21,6 +21,19 @@ import analyticsConstants from 'analytics-constants';
 
 initializeGoogleAnalytics();
 
+/**
+ * Loads an analytics script from googletagmanager.com by creating a script
+ * element and appending it to the document head. This is done at runtime so
+ * that the analytics scripts are fetched only when the corresponding analytics
+ * IDs are configured, which keeps the served HTML free of hard-coded IDs.
+ */
+function loadAnalyticsScript(url: string): void {
+  const scriptElement = document.createElement('script');
+  scriptElement.async = true;
+  scriptElement.src = url;
+  document.head.appendChild(scriptElement);
+}
+
 export function initializeGoogleAnalytics() {
   if (!analyticsConstants.CAN_SEND_ANALYTICS_EVENTS) {
     // Mock gtag function will prevent sending analytics to google.
@@ -37,6 +50,10 @@ export function initializeGoogleAnalytics() {
     if (analyticsConstants.GA_ANALYTICS_ID) {
       // The following is for gtag.js. Reference doc:
       // https://developers.google.com/analytics/devguides/collection/gtagjs
+      loadAnalyticsScript(
+        'https://www.googletagmanager.com/gtag/js?id=' +
+        analyticsConstants.GA_ANALYTICS_ID
+      );
       gtag('set', 'linker', {
         'domains': [analyticsConstants.SITE_NAME_FOR_ANALYTICS]
       });
@@ -53,6 +70,10 @@ export function initializeGoogleAnalytics() {
         'gtm.start': new Date().getTime(),
         event: 'gtm.js'
       });
+      loadAnalyticsScript(
+        'https://www.googletagmanager.com/gtm.js?id=' +
+        analyticsConstants.GTM_ANALYTICS_ID
+      );
     }
   }
 }
