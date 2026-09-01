@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core import feconf
 from core.domain import exp_domain, rights_manager
 from core.jobs import job_test_utils
@@ -25,7 +27,6 @@ from core.jobs.batch_jobs import translation_opportunity_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
-from unittest import mock
 
 (exp_models, opportunity_models, translation_models) = (
     models.Registry.import_models(
@@ -171,23 +172,16 @@ class BackfillTranslationMissingReasonsJobTests(
         )
 
     def test_missing_exploration_model_yields_err(self) -> None:
-        process_func = (
-            translation_opportunity_migration_jobs.BackfillTranslationMissingReasonsJob._backfill_missing_reasons
+        self.exp_model.delete(
+            self.author_id, 'Delete exploration', force_deletion=True
         )
-
-        result = process_func(
-            (
-                'exp_1',
-                {
-                    'exp': [],
-                    'translations': [self.translation_model],
-                    'trans_opp_models': [self.opp_model],
-                    'exp_opp_summary_models': [self.summary_model],
-                },
-            )
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr='BACKFILL_TRANSLATION_MISSING_REASONS ERROR: "Missing ExplorationModel": 1'
+                )
+            ]
         )
-        self.assertTrue(result.is_err())
-        self.assertEqual(result.unwrap_err(), 'Missing ExplorationModel')
 
     @mock.patch(
         'core.domain.exp_domain.Exploration.get_all_contents_which_need_translations'
