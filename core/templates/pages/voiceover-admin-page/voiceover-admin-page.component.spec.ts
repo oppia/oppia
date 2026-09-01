@@ -55,7 +55,7 @@ class MockNgbModal {
   }
 }
 
-fdescribe('Voiceover Admin Page component ', () => {
+describe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -594,7 +594,7 @@ fdescribe('Voiceover Admin Page component ', () => {
       'Please re-add the language accent code to the system to trigger a new voiceover synthesis job.';
 
     states.forEach(state => {
-      component.languageAccentCodeToBeamJobState = {'en-US': state as any};
+      component.languageAccentCodeToBeamJobState = {'en-US': state};
       expect(component.getBeamJobStateTooltip('en-US')).toBe(expectedTooltip);
     });
   });
