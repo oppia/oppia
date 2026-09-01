@@ -23,20 +23,21 @@ import {LoggedInUser} from './logged-in-user';
 const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 
-const tabSelectionDropdownMobileSelector =
-  '.e2e-test-tab-selection-dropdown';
-const addContributorButtonSelector =
-  '.e2e-test-add-contributor-button';
+const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
+const addContributorButtonSelector = '.e2e-test-add-contributor-button';
 const usernameInputBoxSelector = 'input.username-input-box';
 const addRightsSubmitButtonSelector = '.e2e-test-add-rights-button';
-const languageSelectorDropdownModalSelector = 'select.e2e-test-language-selector';
-const languageSelectorAddButtonSelector = '.e2e-test-language-selector-add-button';
+const languageSelectorDropdownModalSelector =
+  'select.e2e-test-language-selector';
+const languageSelectorAddButtonSelector =
+  '.e2e-test-language-selector-add-button';
 const closeButtonSelector = '.e2e-test-close-button';
 const languageFilterSelector = '.e2e-test-language-selector';
 const contributorCountSelector = '.e2e-test-contributor-count';
 const lastActivityDateFilterSelector = '.e2e-test-last-date-picker-input';
 const statsRowItemSelector = '.e2e-test-stats-list-item';
-const removeLanguageButtonSelector = '.e2e-test-selected-language-container button';
+const removeLanguageButtonSelector =
+  '.e2e-test-selected-language-container button';
 
 export class TranslationCoordinator extends LoggedInUser {
   /**
@@ -60,9 +61,7 @@ export class TranslationCoordinator extends LoggedInUser {
     if (this.isViewportAtMobileWidth()) {
       const modifiedName = tabName.replace(/s$/, '');
       await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
-      await this.clickOnElementWithSelector(
-        tabSelectionDropdownMobileSelector
-      );
+      await this.clickOnElementWithSelector(tabSelectionDropdownMobileSelector);
       await this.clickOnElementWithText(modifiedName);
     } else {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(/ /g, '-');
