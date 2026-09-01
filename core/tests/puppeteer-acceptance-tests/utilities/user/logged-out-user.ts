@@ -6672,6 +6672,7 @@ export class LoggedOutUser extends BaseUser {
   async openReportASiteIssueModalFromGlobalFooter(
     isUserLoggedIn: boolean
   ): Promise<void> {
+    await this.scrollToBottomOfPage();
     await this.expectElementToBeVisible(reportWebsiteIssueLink, true);
     await this.clickOnElementWithSelector(reportWebsiteIssueLink);
     await this.expectModalTitleToBe('Report a Website Issue');
