@@ -25,6 +25,7 @@ from core.jobs.batch_jobs import translation_opportunity_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
+from unittest import mock
 
 (exp_models, opportunity_models, translation_models) = (
     models.Registry.import_models(
@@ -168,3 +169,47 @@ class BackfillTranslationMissingReasonsJobTests(
         self.assertEqual(
             migrated_summary.translation_missing_reasons, {'hi': ['new']}
         )
+
+    def test_missing_exploration_model_yields_err(self) -> None:
+        process_func = (
+            translation_opportunity_migration_jobs.BackfillTranslationMissingReasonsJob._backfill_missing_reasons
+        )
+
+        result = process_func(
+            (
+                'exp_1',
+                {
+                    'exp': [],
+                    'translations': [self.translation_model],
+                    'trans_opp_models': [self.opp_model],
+                    'exp_opp_summary_models': [self.summary_model],
+                },
+            )
+        )
+        self.assertTrue(result.is_err())
+        self.assertEqual(result.unwrap_err(), 'Missing ExplorationModel')
+
+    @mock.patch(
+        'core.domain.exp_domain.Exploration.get_all_contents_which_need_translations'
+    )
+    def test_job_migrates_models_with_no_missing_translations(
+        self, mock_get_all_contents
+    ) -> None:
+        mock_get_all_contents.return_value = {}
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='BACKFILL_TRANSLATION_MISSING_REASONS SUCCESS: 1'
+                )
+            ]
+        )
+
+        migrated_opp = opportunity_models.TranslationOpportunityModel.get(
+            'exploration.exp_1'
+        )
+        self.assertEqual(migrated_opp.translation_missing_reasons, {})
+
+        migrated_summary = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get('exp_1')
+        )
+        self.assertEqual(migrated_summary.translation_missing_reasons, {})
