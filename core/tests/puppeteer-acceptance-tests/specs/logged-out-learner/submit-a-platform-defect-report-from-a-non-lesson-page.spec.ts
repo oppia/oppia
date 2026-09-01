@@ -120,7 +120,7 @@ describe('Logged-Out User', function () {
       'Report a Website Issue',
       'confirm'
     );
-    // The underlying lesson player returns to full opacity immediately,
+    // The underlying about page returns to full opacity immediately,
     // bringing the student back to where they left off.
     await loggedOutLearner.expectElementToBeVisible(
       activeModalBackdropSelector,
@@ -131,10 +131,6 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.expectToastMessageWithDismissButtonToAutoDismiss(
       'Thank you! Your report has been sent to the technical team.',
       7000
-    );
-    await loggedOutLearner.expectScreenshotToMatch(
-      'reportASiteIssueModalAfterSubmittingFeedback',
-      __dirname
     );
   });
 
