@@ -27,16 +27,16 @@
           </oppia-assessment-introduction-card>
 
           <oppia-assessment-instruction-panel *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS"
-                                               [certificateTitle]="certificateOffering.title"
-                                               [totalQuestions]="certificateOffering.totalQuestions"
-                                               (back)="showIntro()"
-                                               (startAssessment)="startAssessment()">
+                                              [certificateTitle]="certificateOffering.title"
+                                              [totalQuestions]="certificateOffering.totalQuestions"
+                                              (back)="showIntro()"
+                                              (startAssessment)="startAssessment()">
           </oppia-assessment-instruction-panel>
 
           <certificate-assessment-player-page *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
-                                               [attempt]="attempt"
-                                               [classroomUrlFragment]="classroomUrlFragment"
-                                               (assessmentSubmitted)="onAssessmentSubmitted($event)">
+                                              [attempt]="attempt"
+                                              [classroomUrlFragment]="classroomUrlFragment"
+                                              (assessmentSubmitted)="onAssessmentSubmitted($event)">
           </certificate-assessment-player-page>
         </div>
       </div>
