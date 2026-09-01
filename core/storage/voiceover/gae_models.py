@@ -329,25 +329,12 @@ class LanguageAccentCodeToBeamJobRunModel(base_models.BaseModel):
             },
         )
 
-    @staticmethod
-    def generate_id(language_accent_code: str) -> str:
-        """Generates the ID for a language-accent Beam job run model.
-
-        Args:
-            language_accent_code: str. The language-accent code for the Beam
-                job run.
-
-        Returns:
-            str. The language-accent code used as the model ID.
-        """
-        return language_accent_code
-
     @classmethod
     def get_model(
         cls, language_accent_code: str
     ) -> LanguageAccentCodeToBeamJobRunModel:
         """Gets the Beam job run model for a language-accent code."""
-        return cls.get_by_id(cls.generate_id(language_accent_code))
+        return cls.get_by_id(language_accent_code)
 
     @classmethod
     def create_new(
@@ -355,7 +342,7 @@ class LanguageAccentCodeToBeamJobRunModel(base_models.BaseModel):
     ) -> LanguageAccentCodeToBeamJobRunModel:
         """Creates a model for a language-accent Beam job run."""
         return cls(
-            id=cls.generate_id(language_accent_code),
+            id=language_accent_code,
             language_accent_code=language_accent_code,
             beam_job_run_id=beam_job_run_id,
         )
