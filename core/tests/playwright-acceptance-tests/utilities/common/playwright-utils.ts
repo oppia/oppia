@@ -697,7 +697,7 @@ export class BaseUser {
       let errorMessage = `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}.`;
       if (runningInCI) {
         errorMessage +=
-          '\r\nBaselines cannot be generated in CI — this run only compares against existing ones.' +
+          '\r\nWithout a baseline snapshot, the CI run cannot complete.' +
           ' Run the update-snapshots workflow to generate baselines for both dev and prod.' +
           ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
       } else {
@@ -739,10 +739,10 @@ export class BaseUser {
           ' screenshot(s) and the new one(s). To download it, go to "Summary" of the CI job of the PR and find the "Artifacts" section.';
       }
       errorMessage +=
-        '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference' +
-        ' percentage across multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshot(s),' +
-        ' either run the update-snapshots workflow in CI (covers both dev and prod), or run locally with --update_snapshots' +
-        ' for dev-only baselines. See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
+        '\r\nIf the changes to the UI are expected, please update the baseline screenshot(s).' +
+        '\r\nTo update the screenshot(s), either run the update-snapshots workflow in CI (covers both dev and prod),' +
+        ' or run locally with --update_snapshots for dev-only baselines.' +
+        ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
       throw new Error(errorMessage);
     }
   }
