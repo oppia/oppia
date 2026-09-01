@@ -16,51 +16,52 @@
  * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-
 import analyticsConstants from 'analytics-constants';
-
-initializeGoogleAnalytics();
 
 /**
  * Loads an analytics script from googletagmanager.com by creating a script
- * element and appending it to the document head. This is done at runtime so
- * that the analytics scripts are fetched only when the corresponding analytics
- * IDs are configured, which keeps the served HTML free of hard-coded IDs.
+ * element and appending it to the document head. The document is passed in so
+ * that the caller can inject the Angular-managed Document instance instead of
+ * relying on the global document, which keeps the function testable and safe
+ * for environments without a global document.
  */
-function loadAnalyticsScript(url: string): void {
-  const scriptElement = document.createElement('script');
+const loadAnalyticsScript = (url: string, documentObj: Document): void => {
+  const scriptElement = documentObj.createElement('script');
   scriptElement.async = true;
   scriptElement.src = url;
-  document.head.appendChild(scriptElement);
-}
+  documentObj.head.appendChild(scriptElement);
+};
 
-export function initializeGoogleAnalytics() {
+export const initializeGoogleAnalytics = (documentObj: Document): void => {
   if (!analyticsConstants.CAN_SEND_ANALYTICS_EVENTS) {
     // Mock gtag function will prevent sending analytics to google.
-    window.gtag = function() {}
+    // eslint-disable-next-line func-style
+    window.gtag = function () {};
     return;
   }
 
   if (analyticsConstants.SITE_NAME_FOR_ANALYTICS) {
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function(): void {
+    // eslint-disable-next-line func-style
+    window.gtag = function () {
       window.dataLayer.push(arguments);
-    }
+    };
 
     if (analyticsConstants.GA_ANALYTICS_ID) {
       // The following is for gtag.js. Reference doc:
       // https://developers.google.com/analytics/devguides/collection/gtagjs
       loadAnalyticsScript(
         'https://www.googletagmanager.com/gtag/js?id=' +
-        analyticsConstants.GA_ANALYTICS_ID
+          analyticsConstants.GA_ANALYTICS_ID,
+        documentObj
       );
       gtag('set', 'linker', {
-        'domains': [analyticsConstants.SITE_NAME_FOR_ANALYTICS]
+        domains: [analyticsConstants.SITE_NAME_FOR_ANALYTICS],
       });
       gtag('js', new Date());
       gtag('config', analyticsConstants.GA_ANALYTICS_ID, {
-        'anonymize_ip': true,
-        'forceSSL': true,
+        anonymize_ip: true,
+        forceSSL: true,
       });
     }
 
@@ -68,12 +69,13 @@ export function initializeGoogleAnalytics() {
       // The following is for Google Tag Manager (gtm.js).
       window.dataLayer.push({
         'gtm.start': new Date().getTime(),
-        event: 'gtm.js'
+        event: 'gtm.js',
       });
       loadAnalyticsScript(
         'https://www.googletagmanager.com/gtm.js?id=' +
-        analyticsConstants.GTM_ANALYTICS_ID
+          analyticsConstants.GTM_ANALYTICS_ID,
+        documentObj
       );
     }
   }
-}
+};

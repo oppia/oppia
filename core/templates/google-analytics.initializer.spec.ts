@@ -25,7 +25,7 @@ describe('Google analytics initializer', () => {
     // up a mock gtag function and should not append any analytics scripts.
     const headAppendChildSpy = spyOn(document.head, 'appendChild');
 
-    initializeGoogleAnalytics();
+    initializeGoogleAnalytics(document);
 
     expect(window.gtag).toBeDefined();
     expect(window.gtag).toEqual(jasmine.any(Function));
