@@ -325,6 +325,11 @@
   color: #9ca3af;
 }
 
+.topic-lesson-card-practice-button:disabled img.topic-lesson-card-btn-icon {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
 .topic-lesson-card-practice-button-wrapper {
   display: inline-flex;
 }

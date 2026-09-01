@@ -99,10 +99,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
-    // Expand the first lesson by default, or the navigated lesson.
+    // Expand the active (next) lesson, the navigated lesson, or the first
+    // lesson by default so that the next chapter is already expanded.
     this.isExpanded =
       !this.isComingSoonSectionCard &&
-      (this.navigatedLessonNumber === this.lessonNumber ||
+      (this.isActiveLesson ||
+        this.navigatedLessonNumber === this.lessonNumber ||
         (this.lessonNumber === 1 && this.lessonProgressStatus !== 'completed'));
     this.previousLessonProgressStatus = this.lessonProgressStatus;
   }
