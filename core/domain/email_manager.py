@@ -721,6 +721,7 @@ def _send_email(
             taskqueue_services.enqueue_task(
                 feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
             )
+            return
 
         email_models.SentEmailModel.create(
             recipient_id,
