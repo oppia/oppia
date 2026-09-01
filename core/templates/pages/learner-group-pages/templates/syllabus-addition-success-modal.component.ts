@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './syllabus-addition-success-modal.component.css';
 
 @Component({
   selector: 'oppia-syllabus-addition-success-modal',
   templateUrl: './syllabus-addition-success-modal.component.html',
+  styleUrls: ['./syllabus-addition-success-modal.component.css'],
 })
 export class SyllabusAdditionSuccessModalComponent extends ConfirmOrCancelModal {
   itemsAddedCount!: number;
