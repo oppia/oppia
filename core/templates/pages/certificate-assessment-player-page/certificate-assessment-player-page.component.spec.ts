@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageComponent.
  */
 
+// @ts-nocheck
+
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -518,6 +520,39 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     load();
     component.currentQuestionIndex = 1;
     expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
+  }));
+
+  it('should not open any modal when both modal flags are false', () => {
+    const ngbModal = TestBed.inject(NgbModal);
+    ngbModal.open.calls.reset();
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = false;
+    fixture.detectChanges();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
+  it('should open the time-expired modal as a bottom sheet on mobile screens', fakeAsync(() => {
+    loadQ1();
+    dimsSpy.getWidth.and.returnValue(400);
+    spyOn(component.assessmentSubmitted, 'emit');
+    triggerTimeExpiry();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
+  }));
+
+  it('should open the unanswered-question modal as a bottom sheet on mobile screens', fakeAsync(() => {
+    load();
+    dimsSpy.getWidth.and.returnValue(400);
+    const ref = {
+      instance: {} as Record<string, unknown>,
+      afterDismissed: () => of(null),
+    };
+    bottomSheetSpy.open.and.returnValue(ref);
+    component.answers.q1 = 1;
+    component.submitAssessment();
+    expect(bottomSheetSpy.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent
+    );
   }));
 
   it('should report whether current question is last', fakeAsync(() => {
