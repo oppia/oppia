@@ -187,7 +187,7 @@ class BackfillTranslationMissingReasonsJobTests(
         'core.domain.exp_domain.Exploration.get_all_contents_which_need_translations'
     )
     def test_job_migrates_models_with_no_missing_translations(
-        self, mock_get_all_contents
+        self, mock_get_all_contents: mock.Mock
     ) -> None:
         mock_get_all_contents.return_value = {}
         self.assert_job_output_is(
