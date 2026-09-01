@@ -6679,7 +6679,6 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(commonModalBodySelector);
     await this.expectElementToBeVisible(feedbackModaltextarea);
     if (!isUserLoggedIn) {
-      await this.scrollToCaptchaContainer();
       await this.expectElementToBeVisible(feedbackCaptchaContainer);
       await this.waitForTurnstileFrameToLoad();
     }
