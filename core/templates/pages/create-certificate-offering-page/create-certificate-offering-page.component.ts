@@ -132,8 +132,6 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
           topic_data: this.certificateAssessmentOffering.topicData,
           demonstrates: this.certificateAssessmentOffering.demonstrates,
           total_questions: this.certificateAssessmentOffering.totalQuestions,
-          time_limit_in_minutes:
-            this.certificateAssessmentOffering.timeLimitInMinutes,
           async_status:
             action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
               ? CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY

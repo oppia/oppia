@@ -42,36 +42,6 @@
 
       <div class="oppia-certificate-col-right">
         <div class="form-group"
-             [ngClass]="{'has-error': timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > MAX_TIME_LIMIT_IN_MINUTES}">
-          <label class="oppia-certificate-label" for="certificate-offering-time-limit">
-            Time Limit<span class="oppia-certificate-required">*</span>
-          </label>
-          <input id="certificate-offering-time-limit" name="certificateOfferingTimeLimit"
-                 class="oppia-certificate-input" type="number" required
-                 [attr.min]="MIN_TIME_LIMIT_IN_MINUTES"
-                 [attr.max]="MAX_TIME_LIMIT_IN_MINUTES"
-                 [(ngModel)]="timeLimitInMinutes"
-                 [disabled]="isLoadingClassrooms"
-                 placeholder="Enter time limit in minutes" aria-required="true">
-          <small class="form-text" [ngClass]="{
-              'text-muted': !getTimeLimitValidationError(),
-              'text-danger': getTimeLimitValidationError()
-            }">
-            <em>
-              <span *ngIf="!getTimeLimitValidationError()">
-                Time limit should be between {{MIN_TIME_LIMIT_IN_MINUTES}} and {{MAX_TIME_LIMIT_IN_MINUTES}} minutes.
-              </span>
-              <span *ngIf="getTimeLimitValidationError()">
-                {{ getTimeLimitValidationError() }}
-                <span *ngIf="timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > 0">
-                  Minutes entered: {{timeLimitInMinutes}}/{{MAX_TIME_LIMIT_IN_MINUTES}}
-                </span>
-              </span>
-            </em>
-          </small>
-        </div>
-
-        <div class="form-group"
           [ngClass]="{'has-error': totalQuestions !== null && totalQuestions !== undefined && totalQuestions > MAX_TOTAL_QUESTIONS}">
           <label class="oppia-certificate-label" for="certificate-offering-total-questions">
             Total Number of Questions<span class="oppia-certificate-required">*</span>

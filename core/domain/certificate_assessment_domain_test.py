@@ -42,7 +42,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             classroom_id='math_classroom_01',
             topic_ids=['topic_place_values', 'topic_addition'],
             total_questions=12,
-            time_limit_in_minutes=60,
             demonstrates=['Understanding of whole numbers'],
             async_status='Available',
             version=1,
@@ -59,7 +58,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             'classroom_id': 'math_classroom_01',
             'topic_ids': ['topic_place_values', 'topic_addition'],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': ['Understanding of whole numbers'],
             'async_status': 'Available',
             'version': 1,
@@ -78,7 +76,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             ['topic_place_values', 'topic_addition'],
         )
         self.assertEqual(offering.total_questions, 12)
-        self.assertEqual(offering.time_limit_in_minutes, 60)
         self.assertEqual(
             offering.demonstrates, ['Understanding of whole numbers']
         )
@@ -181,34 +178,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'total_questions must be at most 50'
-        ):
-            offering.validate()
-
-    def test_validate_rejects_invalid_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        offering.time_limit_in_minutes = 4
-
-        with self.assertRaisesRegex(
-            Exception,
-            'time_limit_in_minutes must be greater than or equal to 5',
-        ):
-            offering.validate()
-
-    def test_validate_rejects_non_integer_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        setattr(offering, 'time_limit_in_minutes', '60')
-
-        with self.assertRaisesRegex(
-            Exception, 'time_limit_in_minutes must be a positive integer'
-        ):
-            offering.validate()
-
-    def test_validate_rejects_too_long_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        offering.time_limit_in_minutes = 61
-
-        with self.assertRaisesRegex(
-            Exception, 'time_limit_in_minutes must be at most 60'
         ):
             offering.validate()
 

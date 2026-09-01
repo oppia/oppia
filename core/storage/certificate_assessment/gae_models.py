@@ -162,10 +162,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
     total_questions = datastore_services.IntegerProperty(
         required=True, indexed=False
     )
-    # Time limit for assessment completion.
-    time_limit_in_minutes = datastore_services.IntegerProperty(
-        required=True, indexed=False
-    )
     # Skills demonstrated by this certificate.
     demonstrates = datastore_services.StringProperty(
         repeated=True, indexed=True
@@ -197,7 +193,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
             'classroom_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_questions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_limit_in_minutes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'demonstrates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'async_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
@@ -278,7 +273,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
         classroom_id: str,
         topic_ids: List[str],
         total_questions: int,
-        time_limit_in_minutes: int,
         demonstrates: List[str],
         async_status: str,
     ) -> CertificateAssessmentOfferingModel:
@@ -290,7 +284,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
             classroom_id: str. Classroom associated with the certificate.
             topic_ids: list(str). Topic IDs covered in the assessment.
             total_questions: int. Number of questions in assessment.
-            time_limit_in_minutes: int. Assessment duration limit.
             demonstrates: list(str). What certificate demonstrates.
             async_status: str. Status of the certificate offering.
 
@@ -305,7 +298,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
             classroom_id=classroom_id,
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=async_status,
         )

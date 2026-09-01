@@ -47,7 +47,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     'math_classroom_01',
     {topic_place_values: 1},
     12,
-    60,
     ['Understanding of numbers'],
     'Available',
     1
@@ -170,7 +169,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
-    expect(component.remainingTimeInSeconds).toBe(3600);
     component.ngOnDestroy();
   }));
 
@@ -315,94 +313,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
-  // Arms a fully running countdown through the state service: registers
-  // the attempt (moving the learner to the questions stage) and applies
-  // the offering's one-hour time limit, which starts the interval.
-  const armCountdown = (): void => {
-    playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.configureForOffering(60);
-  };
-
-  it('should reset stale timing state only when a replacement attempt succeeds', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    spyOn(window, 'clearInterval').and.callThrough();
-    component.certificateId = 'cert-123';
-    armCountdown();
-    tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(component.isTimeExpired).toBeFalse();
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(window.clearInterval).toHaveBeenCalled();
-    expect(window.setInterval).toHaveBeenCalledTimes(2);
-    component.ngOnDestroy();
-  }));
-
-  it('should leave the existing time window untouched when starting a new attempt fails', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    component.certificateId = 'cert-123';
-    armCountdown();
-    tick(60000);
-    (
-      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
-    ).and.returnValue(Promise.reject('Error'));
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    // A failed start request must neither wipe nor extend the current
-    // window: resetting is reserved for successfully begun attempts.
-    expect(component.isTimeExpired).toBeFalse();
-    expect(playerStateService.getAttempt()).toEqual(mockAttempt);
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    component.ngOnDestroy();
-  }));
-
-  it('should not touch timing state on retry and reset only when the new attempt begins', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    spyOn(window, 'clearInterval').and.callThrough();
-    component.certificateId = 'cert-123';
-    armCountdown();
-    tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
-
-    component.onRetryAssessment();
-
-    // Retry is pure navigation: the learner goes back to the intro and
-    // the expired window lingers until a new attempt actually begins.
-    expect(component.currentStage).toBe(
-      CertificateAssessmentPlayerPageConstants.STAGE_INTRO
-    );
-    expect(component.showAssessmentInterruptCard).toBeFalse();
-    expect(component.isTimeExpired).toBeTrue();
-    expect(window.clearInterval).toHaveBeenCalledTimes(1);
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(component.isTimeExpired).toBeFalse();
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(window.setInterval).toHaveBeenCalledTimes(2);
-    component.ngOnDestroy();
-  }));
-
-  it('should clear the countdown timer on destroy', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    armCountdown();
-    expect(component.remainingTimeInSeconds).toBe(3600);
-
-    component.ngOnDestroy();
-    tick(2000);
-
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(component.isTimeExpired).toBeFalse();
-  }));
-
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
     component.onViewResults();
     flushMicrotasks();
@@ -482,44 +392,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
-  it('should not suppress navigation when the timer expires during a pending submission', fakeAsync(() => {
-    let resolveSubmit: (value: object) => void = () => {};
-    (
-      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
-    ).and.returnValue(
-      new Promise(resolve => {
-        resolveSubmit = resolve;
-      })
-    );
-    armCountdown();
-
-    const answers = [{question_id: 'question_1', is_correct: true}];
-    component.onAssessmentSubmitted(answers);
-    tick(3600000);
-    expect(component.isTimeExpired).toBeTrue();
-
-    component.onAssessmentSubmitted(answers);
-    expect(
-      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
-    ).toHaveBeenCalledTimes(1);
-
-    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
-    flushMicrotasks();
-
-    expect(router.navigate).toHaveBeenCalled();
-  }));
-
-  it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
-    playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
-    const answers = [{question_id: 'question_1', is_correct: true}];
-
-    component.onAssessmentSubmitted(answers);
-    flushMicrotasks();
-
-    expect(router.navigate).not.toHaveBeenCalled();
-  }));
-
   it('should not submit when there is no attempt', fakeAsync(() => {
     component.onAssessmentSubmitted([]);
     flushMicrotasks();
@@ -569,7 +441,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       })
     );
     playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
 
     component.onAssessmentSubmitted([
       {question_id: 'question_1', is_correct: true},
@@ -599,7 +470,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
     playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
 
     component.onAssessmentSubmitted([
       {question_id: 'question_1', is_correct: true},
@@ -613,15 +483,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
       'attempt-1234',
-    ]);
-  }));
-
-  it('should navigate to the learner dashboard when the assessment is ended', fakeAsync(() => {
-    component.onAssessmentEnded();
-    flushMicrotasks();
-
-    expect(router.navigate).toHaveBeenCalledWith([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
     ]);
   }));
 

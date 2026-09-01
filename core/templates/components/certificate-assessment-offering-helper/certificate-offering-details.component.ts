@@ -38,7 +38,6 @@ interface CertificateOfferingDetailsFormData {
   description: string;
   classroomId: string;
   classroomName: string;
-  timeLimitInMinutes: number;
   totalQuestions: number;
   demonstrates: string[];
 }
@@ -51,8 +50,6 @@ interface CertificateOfferingDetailsFormData {
 export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   readonly MAX_TITLE_LENGTH = 80;
   readonly MAX_DESCRIPTION_LENGTH = 500;
-  readonly MIN_TIME_LIMIT_IN_MINUTES = 5;
-  readonly MAX_TIME_LIMIT_IN_MINUTES = 60;
   readonly MIN_TOTAL_QUESTIONS = 3;
   readonly MAX_TOTAL_QUESTIONS = 50;
   readonly MAX_DEMONSTRATES_LENGTH = 200;
@@ -73,7 +70,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   classroomOptions: ClassroomSummaryDict[] = [];
   classroomLoadErrorMessage: string = '';
   isLoadingClassrooms: boolean = false;
-  timeLimitInMinutes: number | null = null;
   totalQuestions: number | null = null;
   demonstratesList: string[] = [''];
 
@@ -114,7 +110,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       this.title = this.initialValues.title;
       this.description = this.initialValues.description;
       this.classroomId = this.initialValues.classroomId;
-      this.timeLimitInMinutes = this.initialValues.timeLimitInMinutes;
       this.totalQuestions = this.initialValues.totalQuestions;
       this.demonstratesList = this.initialValues.demonstrates.length
         ? [...this.initialValues.demonstrates]
@@ -125,8 +120,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     this.title = this.certificateAssessmentOffering.title;
     this.description = this.certificateAssessmentOffering.description;
     this.classroomId = this.certificateAssessmentOffering.classroomId;
-    this.timeLimitInMinutes =
-      this.certificateAssessmentOffering.timeLimitInMinutes || null;
     this.totalQuestions =
       this.certificateAssessmentOffering.totalQuestions || null;
     this.demonstratesList = this.certificateAssessmentOffering.demonstrates
@@ -163,9 +156,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
         this.description.trim() &&
         this.description.length <= this.MAX_DESCRIPTION_LENGTH &&
         this.classroomId &&
-        this.timeLimitInMinutes &&
-        this.timeLimitInMinutes >= this.MIN_TIME_LIMIT_IN_MINUTES &&
-        this.timeLimitInMinutes <= this.MAX_TIME_LIMIT_IN_MINUTES &&
         this.totalQuestions &&
         this.totalQuestions >= this.MIN_TOTAL_QUESTIONS &&
         this.totalQuestions <= this.MAX_TOTAL_QUESTIONS &&
@@ -209,24 +199,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     return '';
   }
 
-  getTimeLimitValidationError(): string {
-    if (
-      this.timeLimitInMinutes !== null &&
-      this.timeLimitInMinutes !== undefined &&
-      this.timeLimitInMinutes < this.MIN_TIME_LIMIT_IN_MINUTES
-    ) {
-      return `Time limit should be at least ${this.MIN_TIME_LIMIT_IN_MINUTES} minutes.`;
-    }
-    if (
-      this.timeLimitInMinutes !== null &&
-      this.timeLimitInMinutes !== undefined &&
-      this.timeLimitInMinutes > this.MAX_TIME_LIMIT_IN_MINUTES
-    ) {
-      return `Time limit should be at most ${this.MAX_TIME_LIMIT_IN_MINUTES} minutes.`;
-    }
-    return '';
-  }
-
   getTotalQuestionsValidationError(): string {
     if (
       this.totalQuestions !== null &&
@@ -243,15 +215,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       return `Total number of questions should be at most ${this.MAX_TOTAL_QUESTIONS}.`;
     }
     return '';
-  }
-
-  isTimeLimitInvalid(): boolean {
-    return (
-      this.timeLimitInMinutes === null ||
-      this.timeLimitInMinutes === undefined ||
-      this.timeLimitInMinutes < this.MIN_TIME_LIMIT_IN_MINUTES ||
-      this.timeLimitInMinutes > this.MAX_TIME_LIMIT_IN_MINUTES
-    );
   }
 
   isTotalQuestionsInvalid(): boolean {
@@ -280,7 +243,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       description: this.description.trim(),
       classroomId: this.classroomId,
       classroomName: this.getSelectedClassroomName(),
-      timeLimitInMinutes: this.timeLimitInMinutes || 0,
       totalQuestions: this.totalQuestions || 0,
       demonstrates: normalizedDemonstrates,
     };
@@ -295,8 +257,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     this.certificateAssessmentOffering.title = formData.title;
     this.certificateAssessmentOffering.description = formData.description;
     this.certificateAssessmentOffering.classroomId = formData.classroomId;
-    this.certificateAssessmentOffering.timeLimitInMinutes =
-      formData.timeLimitInMinutes;
     this.certificateAssessmentOffering.totalQuestions = formData.totalQuestions;
     this.certificateAssessmentOffering.demonstrates = [
       ...formData.demonstrates,

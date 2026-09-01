@@ -44,10 +44,8 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -301,18 +299,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     flushMicrotasks();
   };
 
-  const triggerTimeExpiry = (): void => {
-    component.isTimeExpired = true;
-    component.ngOnChanges({
-      isTimeExpired: {
-        currentValue: true,
-        previousValue: false,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    });
-  };
-
   beforeEach(async () => {
     await setup();
   });
@@ -540,162 +526,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.getProgressPercentage()).toBe(Math.round((1 / 3) * 100));
     component.currentQuestionIndex = 2;
     expect(component.getProgressPercentage()).toBe(100);
-  }));
-
-  it('should open time-expired modal on desktop when time expires', fakeAsync(() => {
-    loadQ1();
-    spyOn(component.assessmentSubmitted, 'emit');
-    triggerTimeExpiry();
-    expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-  }));
-
-  it('should open time-expired modal as bottom sheet on mobile when time expires', fakeAsync(() => {
-    loadQ1();
-    dimsSpy.getWidth.and.returnValue(400);
-    spyOn(component.assessmentSubmitted, 'emit');
-    triggerTimeExpiry();
-    expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
-  }));
-
-  it('should auto-submit the current answers when time expires', fakeAsync(() => {
-    load();
-    spyOn(component.assessmentSubmitted, 'emit');
-    component.answers.q1 = 1;
-    component.answers.q2 = ['a', 'b', 'd'];
-    triggerTimeExpiry();
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalledWith([
-      {question_id: 'q1', is_correct: false, selected_answer: '1'},
-      {question_id: 'q2', is_correct: false, selected_answer: '["a","b","d"]'},
-      {question_id: 'q3', is_correct: false},
-    ]);
-  }));
-
-  it('should not handle time expiry more than once', fakeAsync(() => {
-    loadQ1();
-    spyOn(component.assessmentSubmitted, 'emit');
-    triggerTimeExpiry();
-    component.isTimeExpired = true;
-    component.ngOnInit();
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
-    expect(modalSpy.open).toHaveBeenCalledTimes(1);
-  }));
-
-  it('should not handle time expiry when the flag has not become true', fakeAsync(() => {
-    loadQ1();
-    component.ngOnChanges({});
-    expect(modalSpy.open).not.toHaveBeenCalled();
-  }));
-
-  it('should not handle time expiry again while the flag stays true', fakeAsync(() => {
-    loadQ1();
-    triggerTimeExpiry();
-    expect(modalSpy.open).toHaveBeenCalledTimes(1);
-
-    component.ngOnChanges({
-      isTimeExpired: {
-        currentValue: true,
-        previousValue: true,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    });
-    expect(modalSpy.open).toHaveBeenCalledTimes(1);
-  }));
-
-  it('should take no action when the desktop time-expired modal resolves without view-results', fakeAsync(() => {
-    loadQ1();
-    spyOn(component.viewResults, 'emit');
-    spyOn(component.assessmentEnded, 'emit');
-    modalSpy.open.and.returnValue(modalRef(false, null));
-    triggerTimeExpiry();
-    flushMicrotasks();
-
-    expect(component.viewResults.emit).not.toHaveBeenCalled();
-    expect(component.assessmentEnded.emit).not.toHaveBeenCalled();
-  }));
-
-  it('should handle time expiry on init when already expired', fakeAsync(() => {
-    loadQ1();
-    component.isTimeExpired = true;
-    spyOn(component.assessmentSubmitted, 'emit');
-    component.ngOnInit();
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
-    expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-  }));
-
-  it('should submit and emit view results when time expires and the modal closes with view-results', fakeAsync(() => {
-    loadQ1();
-    spyOn(component.assessmentSubmitted, 'emit');
-    spyOn(component.viewResults, 'emit');
-    modalSpy.open.and.returnValue(
-      modalRef(
-        false,
-        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-      )
-    );
-    triggerTimeExpiry();
-    flushMicrotasks();
-
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalled();
-    expect(component.viewResults.emit).toHaveBeenCalled();
-  }));
-
-  it('should emit assessment ended when the time-expired modal is dismissed', fakeAsync(() => {
-    loadQ1();
-    spyOn(component.assessmentEnded, 'emit');
-    spyOn(component.viewResults, 'emit');
-    modalSpy.open.and.returnValue(modalRef(true));
-    triggerTimeExpiry();
-    flushMicrotasks();
-
-    expect(component.viewResults.emit).not.toHaveBeenCalled();
-    expect(component.assessmentEnded.emit).toHaveBeenCalled();
-  }));
-
-  it('should emit view results when the time-expired bottom sheet is dismissed with view-results', fakeAsync(() => {
-    loadQ1();
-    dimsSpy.getWidth.and.returnValue(400);
-    spyOn(component.viewResults, 'emit');
-    spyOn(component.assessmentEnded, 'emit');
-    bottomSheetSpy.open.and.returnValue({
-      afterDismissed: () =>
-        of(CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT),
-    });
-    triggerTimeExpiry();
-    flushMicrotasks();
-
-    expect(component.viewResults.emit).toHaveBeenCalled();
-    expect(component.assessmentEnded.emit).not.toHaveBeenCalled();
-  }));
-
-  it('should emit assessment ended when the time-expired bottom sheet is dismissed', fakeAsync(() => {
-    loadQ1();
-    dimsSpy.getWidth.and.returnValue(400);
-    spyOn(component.assessmentEnded, 'emit');
-    spyOn(component.viewResults, 'emit');
-    bottomSheetSpy.open.and.returnValue({
-      afterDismissed: () => of(null),
-    });
-    triggerTimeExpiry();
-    flushMicrotasks();
-
-    expect(component.viewResults.emit).not.toHaveBeenCalled();
-    expect(component.assessmentEnded.emit).toHaveBeenCalled();
-  }));
-
-  it('should not open any modal when the flag is false', fakeAsync(() => {
-    loadQ1();
-    modalSpy.open.calls.reset();
-    component.ngOnInit();
-    expect(modalSpy.open).not.toHaveBeenCalled();
   }));
 
   it('should emit answers directly when all questions are answered', fakeAsync(() => {
