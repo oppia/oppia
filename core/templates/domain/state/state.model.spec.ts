@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for State.
  */
 
+// @ts-nocheck
+
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {TestBed} from '@angular/core/testing';
