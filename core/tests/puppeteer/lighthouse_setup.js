@@ -816,13 +816,11 @@ const main = async function () {
   await setRole(browser, page, 'RELEASE_COORDINATOR');
   await setRole(browser, page, 'FULL_USER');
   await setRole(browser, page, 'TECH_TEAM_LEAD');
-  await getTopicEditorUrl(browser, page);
-  await getStoryEditorUrl(browser, page);
-  await getSkillEditorUrl(browser, page);
-  await generateDataForTopicAndStoryPlayer(browser, page);
-  await generateDataForClassroom(browser, page);
-  await enableDiagnosticTestForMathClassroom(browser, page);
-  await generateDataForBlogPosts(browser, page);
+  // Feature flags must be enabled before the data-generation steps below,
+  // because those steps fetch the handlers that are gated by the flags (e.g.
+  // the learner group and technical feedback dashboard captures inside
+  // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
+  // disabled, so enabling them here avoids the captures failing.
   await enableFeatureFlag(browser, page, 'story_editor_arcs');
   await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
   await enableFeatureFlag(
@@ -831,6 +829,13 @@ const main = async function () {
     'technical_feedback_dashboard_enabled'
   );
   await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
+  await getTopicEditorUrl(browser, page);
+  await getStoryEditorUrl(browser, page);
+  await getSkillEditorUrl(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
+  await enableDiagnosticTestForMathClassroom(browser, page);
+  await generateDataForBlogPosts(browser, page);
 
   fs.writeFileSync(
     'core/tests/puppeteer/.env',
