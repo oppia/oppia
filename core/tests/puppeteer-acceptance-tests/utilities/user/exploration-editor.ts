@@ -8756,6 +8756,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async selectStatusOnFeedbackTab(status: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackDetailStatusButton, true);
     const statusButtons = await this.page.$$(feedbackDetailStatusButton);
 
     for (const button of statusButtons) {

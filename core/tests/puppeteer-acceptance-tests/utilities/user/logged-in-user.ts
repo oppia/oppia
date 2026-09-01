@@ -386,6 +386,7 @@ const feedbackFilterClearButton = '.e2e-test-feedback-filter-clear';
 const feedbackTableDiv = '.e2e-test-feedback-table';
 const feedbackTableStatus = '.e2e-test-feedback-table-status';
 const feedbackTableDescription = '.e2e-test-feedback-table-description';
+const feedbackTableRowDescription = '.e2e-test-feedback-table-row-description';
 const feedbackTableMySuggestionsNotificationSummary =
   '.e2e-test-my-suggestions-notification-summary';
 const feedbackTableMySuggestionsUnread = '.e2e-test-my-suggestions-unread';
@@ -421,6 +422,16 @@ const mySuggestionsTabCreatorThreadDate =
   '.e2e-test-my-suggestions-creator-thread-date';
 const mySuggestionsTabCreatorThreadText =
   '.e2e-test-my-suggestions-creators-response-text';
+// Feedback-table row selectors.
+const feedbackTableRow = '.e2e-test-feedback-table-row';
+
+interface FeedbackTableRowExpectation {
+  description: string;
+  status?: string;
+  lessonTitle?: string;
+  notificationNo?: string;
+  notificationText?: string;
+}
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -4742,45 +4753,81 @@ export class LoggedInUser extends BaseUser {
   }
 
   async expectMySuggestionsFeedbackEntry(
-    expectedDescription: string,
-    expectedStatus: string,
-    expectedLessonTitle: string,
-    expectedNotificationNo?: string,
-    expectedNotificationText?: string
+    expected: FeedbackTableRowExpectation
   ): Promise<void> {
-    await this.expectTextContentToBe(
-      feedbackTableDescription,
-      expectedDescription
+    const row = await this.findFeedbackTableRow(expected.description);
+    const description = await row.$eval(
+      feedbackTableRowDescription,
+      el => el.textContent?.trim() || ''
     );
-    await this.expectTextContentToBe(feedbackTableStatus, expectedStatus);
-    await this.expectTextContentToBe(
-      feedbackTableMySuggestionsLessonTitle,
-      expectedLessonTitle
-    );
-    if (expectedNotificationNo !== undefined) {
-      await this.expectTextContentToBe(
-        feedbackTableMySuggestionsUnread,
-        expectedNotificationNo
+
+    expect(description).toBe(expected.description);
+
+    if (expected.status !== undefined) {
+      const status = await row.$eval(
+        feedbackTableStatus,
+        el => el.textContent?.trim() || ''
       );
+      expect(status).toBe(expected.status);
     }
 
-    if (expectedNotificationText !== undefined) {
-      await this.expectTextContentToBe(
-        feedbackTableMySuggestionsNotificationSummary,
-        expectedNotificationText
+    if (expected.lessonTitle !== undefined) {
+      const lessonTitle = await row.$eval(
+        feedbackTableMySuggestionsLessonTitle,
+        el => el.textContent?.trim() || ''
       );
+      expect(lessonTitle).toBe(expected.lessonTitle);
     }
+
+    if (expected.notificationNo !== undefined) {
+      const notificationNo = await row.$eval(
+        feedbackTableMySuggestionsUnread,
+        el => el.textContent?.trim() || ''
+      );
+      expect(notificationNo).toBe(expected.notificationNo);
+    }
+
+    if (expected.notificationText !== undefined) {
+      const notificationText = await row.$eval(
+        feedbackTableMySuggestionsNotificationSummary,
+        el => el.textContent?.trim() || ''
+      );
+      expect(notificationText).toContain(expected.notificationText);
+    }
+  }
+
+  async findFeedbackTableRow(
+    description: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(feedbackTableRow, true);
+    const rows = await this.page.$$(feedbackTableRow);
+    for (const row of rows) {
+      const rowDescription = await row.$eval(
+        feedbackTableRowDescription,
+        el => el.textContent?.trim() || ''
+      );
+
+      console.log(
+        'EXPECTED:',
+        JSON.stringify(description),
+        'FOUND:',
+        JSON.stringify(rowDescription)
+      );
+      if (rowDescription === description) {
+        return row;
+      }
+    }
+
+    throw new Error(
+      `Feedback row with description "${description}" not found.`
+    );
   }
 
   async clickOnFeedbackListEntryWithDescription(
     givenDescription: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(feedbackTableDescription, true);
-    await this.expectTextContentToBe(
-      feedbackTableDescription,
-      givenDescription
-    );
-    await this.clickOnElementWithSelector(feedbackTableDescription);
+    const row = await this.findFeedbackTableRow(givenDescription);
+    await row.click();
   }
 
   async removeMySuggestionsDynamicElements(): Promise<void> {

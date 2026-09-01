@@ -219,17 +219,19 @@
                 <span class="oppia-feedback-detail-actions-label">Change status:</span>
                 <span *ngIf="feedbackDetailPageConfig.showResponse"
                       class="oppia-feedback-detail-status-note">
-                  Note: (Choosing Fixed status will also report the user)
+                  Note: Marking this report as "Fixed" will also report the user.
                 </span>
                 <div class="oppia-feedback-detail-actions-buttons">
-                  <button *ngFor="let statusOption of statusOptions"
-                          type="button"
-                          [disabled]="statusOption === feedback.status"
-                          [attr.aria-pressed]="statusOption === feedback.status"
-                          class="btn btn-primary oppia-feedback-detail-status-button e2e-test-feedback-detail-status-button"
-                          (click)="onStatusOptionClick(statusOption)">
+                  <ng-container *ngFor="let statusOption of statusOptions">
+                    <button *ngIf="shouldShowStatusOption(statusOption)"
+                            type="button"
+                            [disabled]="statusOption === feedback.status"
+                            [attr.aria-pressed]="statusOption === feedback.status"
+                            class="btn btn-primary oppia-feedback-detail-status-button e2e-test-feedback-detail-status-button"
+                            (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
-                  </button>
+                    </button>
+                  </ng-container>
                 </div>
               </section>
             </oppia-feedback-detail-section>

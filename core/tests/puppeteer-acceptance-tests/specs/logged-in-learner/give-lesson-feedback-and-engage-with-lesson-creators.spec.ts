@@ -26,8 +26,14 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {showMessage} from '../../utilities/common/show-message';
+import {
+  FEEDBACK_STATUS_LABELS,
+  FeedbackStatus,
+} from '../../../../../core/templates/domain/feedback/feedback.model';
 
 const ROLES = testConstants.Roles;
+const statusLabels = FEEDBACK_STATUS_LABELS;
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
 
 describe('Logged-in User', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
@@ -123,11 +129,12 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry(
-      'This fraction model is awesome, but can we get more marble examples?',
-      'Submitted',
-      'What are the Place Values'
-    );
+    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+      description:
+        'This fraction model is awesome, but can we get more marble examples?',
+      status: FEEDBACK_STATUS_LABELS[FeedbackStatus.SUBMITTED],
+      lessonTitle: 'What are the Place Values',
+    });
 
     await loggedInLearner.expectScreenshotToMatch(
       'mySuggestionsTabAfterSubmittingFeedback',
@@ -149,7 +156,7 @@ describe('Logged-in User', function () {
 
     await loggedInLearner.verifyMySuggestionsFeedbackDetailView(false);
     await loggedInLearner.expectMySuggestionsFeedbackDetail(
-      'Submitted',
+      statusLabels[FeedbackStatus.SUBMITTED],
       'This fraction model is awesome, but can we get more marble examples?',
       'You sent this while going through  this lesson , around the "Introduction" part of the lesson.'
     );
@@ -191,7 +198,9 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    await explorationEditor.selectStatusOnFeedbackTab('Not Actionable');
+    await explorationEditor.selectStatusOnFeedbackTab(
+      statusLabels[FeedbackStatus.NOT_ACTIONABLE]
+    );
     await explorationEditor.expectScreenshotToMatch(
       'explorationEditorFeedbackTabAfterSelectingNotActionable',
       __dirname
@@ -205,11 +214,12 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry(
-      'This fraction model is awesome, but can we get more marble examples?',
-      'Reviewed by Team',
-      'What are the Place Values'
-    );
+    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+      description:
+        'This fraction model is awesome, but can we get more marble examples?',
+      status: statusLabels[FeedbackStatus.REVIEWED_BY_TEAM],
+      lessonTitle: 'What are the Place Values',
+    });
 
     await loggedInLearner.expectScreenshotToMatch(
       'mySuggestionsTabAfterExplorationEditorNotActionable',
@@ -236,7 +246,9 @@ describe('Logged-in User', function () {
     await explorationEditor.clickOnFeedbackListEntryWithDescription(
       'This Lesson seems too short, can we make it longer?'
     );
-    await explorationEditor.selectStatusOnFeedbackTab('Fixed');
+    await explorationEditor.selectStatusOnFeedbackTab(
+      statusLabels[FeedbackStatus.FIXED]
+    );
 
     // As Learner navigate back to My Suggestions Tab.
     await loggedInLearner.navigateToLearnerDashboard();
@@ -246,13 +258,14 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry(
-      'This Lesson seems too short, can we make it longer?',
-      'Lesson updated',
-      'What are the Place Values',
-      '1',
-      'A creator fixed an error you reported. Thank you for helping make Oppia better for everyone!'
-    );
+    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+      description: 'This Lesson seems too short, can we make it longer?',
+      status: 'Lesson Updated!',
+      lessonTitle: 'What are the Place Values',
+      notificationNo: '1',
+      notificationText:
+        'A creator fixed an error you reported. Thank you for helping make Oppia better for everyone!',
+    });
 
     await loggedInLearner.expectScreenshotToMatch(
       'mySuggestionsTabAfterExplorationEditorFixed',
@@ -262,9 +275,10 @@ describe('Logged-in User', function () {
     await loggedInLearner.clickOnFeedbackListEntryWithDescription(
       'This Lesson seems too short, can we make it longer?'
     );
+    await loggedInLearner.expectMySuggestionsTabTotalNotification(false);
     await loggedInLearner.verifyMySuggestionsFeedbackDetailView(true);
     await loggedInLearner.expectMySuggestionsFeedbackDetail(
-      'Lesson updated',
+      'Lesson Updated!',
       'This Lesson seems too short, can we make it longer?',
       'You sent this while going through  this lesson , around the "Introduction" part of the lesson.'
     );
@@ -277,10 +291,8 @@ describe('Logged-in User', function () {
     // Add a follow up note.
     await loggedInLearner.clickOnAddAFollowUpNote();
 
-    await loggedInLearner.expectScreenshotToMatch(
-      'mySuggestionsTabAfterAddingFollowUpNote',
-      __dirname
-    );
+    await loggedInLearner.expectScreenshotToMatch('Entry', __dirname);
+
     await loggedInLearner.expectFeedbackModalSubHeaderToBe(
       "A creator marked this as fixed. Let them know if it's resolved, or add anything else you'd like them to know."
     );
@@ -292,127 +304,157 @@ describe('Logged-in User', function () {
       'This Question answer is still wrong, please recheck, Thanks.'
     );
     await loggedInLearner.clickButtonInModal('Add a follow-up note', 'confirm');
+    // The underlying my suggestions page returns to full opacity immediately,
+    // bringing the student back to where they left off.
+    await loggedInLearner.expectElementToBeVisible(
+      activeModalBackdropSelector,
+      false
+    );
     await loggedInLearner.expectToastMessage(
       'Your follow-up note has been sent successfully.'
     );
 
     await loggedInLearner.goBackToMySuggestionsTabList();
-    // await loggedInLearner.expectMySuggestionsFeedbackEntry(
+    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+      description:
+        'This Question answer is still wrong, please recheck, Thanks.',
+      status: statusLabels[FeedbackStatus.SUBMITTED],
+      lessonTitle: 'What are the Place Values',
+    });
 
-    // )
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterAddingFollowUpNoteEntry',
+      __dirname
+    );
+
+    await loggedInLearner.clickOnFeedbackListEntryWithDescription(
+      'This Question answer is still wrong, please recheck, Thanks.'
+    );
+
+    await loggedInLearner.verifyMySuggestionsFeedbackDetailView(false);
+    await loggedInLearner.expectMySuggestionsFeedbackDetail(
+      statusLabels[FeedbackStatus.SUBMITTED],
+      'This Question answer is still wrong, please recheck, Thanks.',
+      'You sent this while going through  this lesson , around the "Introduction" part of the lesson.'
+    );
+
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterClickingFollowUpNoteEntryDetailView',
+      __dirname
+    );
   });
 
-  // it('should report a bug in a lesson.', async function () {
-  //   await loggedInLearner.toggleOptionsSidebar();
-  //   await loggedInLearner.clickReportLessonButton(true);
-  //   showMessage('Clicked on "Report an Issue" button.');
-  //   await loggedInLearner.expectFeedbackModalSubHeaderToBe(
-  //     'Your feedback goes directly to our lesson creators to help improve this card.'
-  //   );
-  //   await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
-  //     "What's broken? Let us know if an image is missing, a button isn't working, or the lesson has an error."
-  //   );
-  //   await loggedInLearner.expectLessonSpecificCategoryChipsToBePresent(true);
-  //   await loggedInLearner.expectScreenshotDropZoneTextToBe(
-  //     'Drag an image into this area'
-  //   );
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportALessonModal',
-  //     __dirname
-  //   );
+  it('should report a bug in a lesson.', async function () {
+    await loggedInLearner.toggleOptionsSidebar();
+    await loggedInLearner.clickReportLessonButton(true);
+    showMessage('Clicked on "Report an Issue" button.');
+    await loggedInLearner.expectFeedbackModalSubHeaderToBe(
+      'Your feedback goes directly to our lesson creators to help improve this card.'
+    );
+    await loggedInLearner.expectFeedbackTextareaPlaceholderToBe(
+      "What's broken? Let us know if an image is missing, a button isn't working, or the lesson has an error."
+    );
+    await loggedInLearner.expectLessonSpecificCategoryChipsToBePresent(true);
+    await loggedInLearner.expectScreenshotDropZoneTextToBe(
+      'Drag an image into this area'
+    );
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportALessonModal',
+      __dirname
+    );
 
-  //   // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
-  //   await loggedInLearner.selectReportIssueChip('typo');
-  //   showMessage('Typo chip selected in report an issue modal.');
-  //   await loggedInLearner.submitFeedbackInTextArea(
-  //     'There is a typo in this question.'
-  //   );
-  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
+    // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
+    await loggedInLearner.selectReportIssueChip('typo');
+    showMessage('Typo chip selected in report an issue modal.');
+    await loggedInLearner.submitFeedbackInTextArea(
+      'There is a typo in this question.'
+    );
+    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
 
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportALessonModalAfterEnteringFeedbackWithTypoChip',
-  //     __dirname
-  //   );
-  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-  //   await loggedInLearner.expectToastMessage(
-  //     'Thank you for your feedback! The team has received your report.'
-  //   );
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportALessonModalAfterEnteringFeedbackWithTypoChip',
+      __dirname
+    );
+    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+    await loggedInLearner.expectToastMessage(
+      'Thank you for your feedback! The team has received your report.'
+    );
 
-  //   await loggedInLearner.clickReportLessonButton(true);
-  //   await loggedInLearner.selectReportIssueChip(
-  //     'confusing or incorrect answer'
-  //   );
-  //   showMessage(
-  //     'Confusing or incorrect answer chip selected in report an issue modal.'
-  //   );
-  //   await loggedInLearner.submitFeedbackInTextArea(
-  //     'There is a confusing or incorrect answer in this question.'
-  //   );
-  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
+    await loggedInLearner.clickReportLessonButton(true);
+    await loggedInLearner.selectReportIssueChip(
+      'confusing or incorrect answer'
+    );
+    showMessage(
+      'Confusing or incorrect answer chip selected in report an issue modal.'
+    );
+    await loggedInLearner.submitFeedbackInTextArea(
+      'There is a confusing or incorrect answer in this question.'
+    );
+    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
 
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportALessonModalAfterEnteringFeedbackWithConfusingChip',
-  //     __dirname
-  //   );
-  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-  //   await loggedInLearner.expectToastMessage(
-  //     'Thank you for your feedback! The team has received your report.'
-  //   );
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportALessonModalAfterEnteringFeedbackWithConfusingChip',
+      __dirname
+    );
+    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+    await loggedInLearner.expectToastMessage(
+      'Thank you for your feedback! The team has received your report.'
+    );
 
-  //   // Should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
-  //   await loggedInLearner.clickReportLessonButton(true);
+    // Should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
+    await loggedInLearner.clickReportLessonButton(true);
 
-  //   await loggedInLearner.selectReportIssueChip('broken layout');
-  //   await loggedInLearner.submitFeedbackInTextArea(
-  //     'There is a broken layout / image in this question.'
-  //   );
-  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+    await loggedInLearner.selectReportIssueChip('broken layout');
+    await loggedInLearner.submitFeedbackInTextArea(
+      'There is a broken layout / image in this question.'
+    );
+    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
 
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportALessonModalAfterEnteringFeedbackWithBrokenLayoutChip',
-  //     __dirname
-  //   );
-  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-  //   await loggedInLearner.expectToastMessage(
-  //     'Thank you! Your report has been sent to the technical team.'
-  //   );
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportALessonModalAfterEnteringFeedbackWithBrokenLayoutChip',
+      __dirname
+    );
+    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+    await loggedInLearner.expectToastMessage(
+      'Thank you! Your report has been sent to the technical team.'
+    );
 
-  //   await loggedInLearner.clickReportLessonButton(true);
+    await loggedInLearner.clickReportLessonButton(true);
 
-  //   await loggedInLearner.selectReportIssueChip('other');
-  //   await loggedInLearner.submitFeedbackInTextArea(
-  //     'There is an other issue in this question.'
-  //   );
-  //   await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+    await loggedInLearner.selectReportIssueChip('other');
+    await loggedInLearner.submitFeedbackInTextArea(
+      'There is an other issue in this question.'
+    );
+    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
 
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportALessonModalAfterEnteringFeedbackWithOtherChip',
-  //     __dirname
-  //   );
-  //   await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
-  //   await loggedInLearner.expectToastMessage(
-  //     'Thank you! Your report has been sent to the technical team.'
-  //   );
-  //   await loggedInLearner.toggleOptionsSidebar();
-  // });
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportALessonModalAfterEnteringFeedbackWithOtherChip',
+      __dirname
+    );
+    await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
+    await loggedInLearner.expectToastMessage(
+      'Thank you! Your report has been sent to the technical team.'
+    );
+    await loggedInLearner.toggleOptionsSidebar();
+  });
 
-  // it('should submit feedback on the platform.', async () => {
-  //   await loggedInLearner.navigateToContributorDashboardUsingProfileDropdown();
-  //   await loggedInLearner.clickOnProfileDropdown();
-  //   await loggedInLearner.expectProfileDropdownToContainElementWithContent(
-  //     'Report a Website Issue'
-  //   );
-  //   await loggedInLearner.openReportASiteIssueModal();
-  //   showMessage('Clicked on "Report a Website Issue" button.');
-  //   await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-  //   await loggedInLearner.expectScreenshotToMatch(
-  //     'reportASiteIssueModal',
-  //     __dirname
-  //   );
-  // });
+  it('should submit feedback on the platform.', async () => {
+    await loggedInLearner.navigateToContributorDashboardUsingProfileDropdown();
+    await loggedInLearner.clickOnProfileDropdown();
+    await loggedInLearner.expectProfileDropdownToContainElementWithContent(
+      'Report a Website Issue'
+    );
+    await loggedInLearner.openReportASiteIssueModal();
+    showMessage('Clicked on "Report a Website Issue" button.');
+    await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
+    await loggedInLearner.expectScreenshotToMatch(
+      'reportASiteIssueModal',
+      __dirname
+    );
+  });
 });

@@ -30,7 +30,7 @@
 
       <tbody>
         <tr *ngFor="let feedback of feedbackSummaries"
-            class="oppia-feedback-table-row"
+            class="oppia-feedback-table-row e2e-test-feedback-table-row"
             (click)="rowClick.emit(feedback.id)">
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-status e2e-test-feedback-table-status">
@@ -40,7 +40,7 @@
           </td>
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-desc e2e-test-feedback-table-description">
-            <span class="oppia-feedback-table-desc">
+            <span class="oppia-feedback-table-desc e2e-test-feedback-table-row-description">
               {{ getFeedbackDescription(feedback) }}
             </span>
             <span *ngIf="feedbackCardConfig.showNotificationSummary && getNotificationSummary(feedback) as notificationSummary"
