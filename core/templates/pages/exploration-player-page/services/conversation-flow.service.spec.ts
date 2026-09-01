@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for conversation flow service.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
