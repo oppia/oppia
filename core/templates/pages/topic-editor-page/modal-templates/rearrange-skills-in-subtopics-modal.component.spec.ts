@@ -82,6 +82,7 @@ class DragAndDropEventClass<T> {
       currentIndex: currentIndex,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     } as CdkDragDrop<T[], T[]>;
   }
 
@@ -252,6 +253,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
@@ -288,6 +290,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
@@ -324,6 +327,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
@@ -428,6 +432,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
@@ -549,6 +554,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {data: previousData[0]} as CdkDrag<ShortSkillSummary>,
       isPointerOverContainer: true,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     spyOn(topicUpdateService, 'moveSkillToSubtopic');

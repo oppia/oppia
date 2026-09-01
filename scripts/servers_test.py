@@ -923,7 +923,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
-            popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
+            popen_calls[0].program_args,
+            '%s build --configuration production' % common.NG_BIN_PATH,
         )
 
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
