@@ -698,10 +698,12 @@ export class BaseUser {
       if (runningInCI) {
         errorMessage +=
           '\r\nBaselines cannot be generated in CI — this run only compares against existing ones.' +
-          ' Run the update-snapshots workflow to generate baselines for both dev and prod.';
+          ' Run the update-snapshots workflow to generate baselines for both dev and prod.' +
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
       } else {
         errorMessage +=
-          '\r\nRun with --update_snapshots to generate it locally, then commit the new screenshot.';
+          '\r\nRun with --update_snapshots to generate it locally, then commit the new screenshot.' +
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
       }
       throw new Error(errorMessage);
     }
@@ -740,7 +742,7 @@ export class BaseUser {
         '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference' +
         ' percentage across multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshot(s),' +
         ' either run the update-snapshots workflow in CI (covers both dev and prod), or run locally with --update_snapshots' +
-        ' for dev-only baselines.';
+        ' for dev-only baselines. See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
       throw new Error(errorMessage);
     }
   }
