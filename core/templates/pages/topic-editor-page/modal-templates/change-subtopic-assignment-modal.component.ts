@@ -20,10 +20,12 @@ import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {Subtopic} from 'domain/topic/subtopic.model';
+import './change-subtopic-assignment-modal.component.css';
 
 @Component({
   selector: 'oppia-change-subtopic-assignment-modal',
   templateUrl: './change-subtopic-assignment-modal.component.html',
+  styleUrls: ['./change-subtopic-assignment-modal.component.css'],
 })
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal
