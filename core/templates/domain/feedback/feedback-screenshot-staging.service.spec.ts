@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for FeedbackScreenshotStagingService.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 

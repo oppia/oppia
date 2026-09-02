@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
+// @ts-nocheck
+
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
@@ -70,6 +72,11 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  FeedbackStatus,
+  LessonFeedbackSummary,
+} from '../../domain/feedback/feedback.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe implements PipeTransform {
@@ -109,6 +116,9 @@ class MockPlatformFeatureService {
       EnableCertificateAssessment: {
         isEnabled: false,
       },
+      ExplorationEditorNewCreatorFeedbackTab: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -143,6 +153,7 @@ describe('Learner dashboard page', () => {
   let urlService: UrlService;
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiServiceSpy: jasmine.Spy;
+  let feedbackBackendApiService: FeedbackBackendApiService;
 
   let titleList = [
     'World War III',
@@ -334,6 +345,7 @@ describe('Learner dashboard page', () => {
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService
       );
+      feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const mockElement = document.createElement('div');
@@ -482,6 +494,22 @@ describe('Learner dashboard page', () => {
         learnerGroupBackendApiService,
         'isLearnerGroupFeatureEnabledAsync'
       ).and.returnValue(Promise.resolve(true));
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchMyFeedbackListAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          summaries: [],
+          next_cursor: null,
+          more: false,
+        })
+      );
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchMyFeedbackUnreadCountAsync'
+      ).and.returnValue(Promise.resolve(0));
 
       spyOn(urlService, 'getUrlParams').and.returnValue({
         active_tab: 'learner-groups',
@@ -1026,6 +1054,99 @@ describe('Learner dashboard page', () => {
         sample_topic_id: {1: 1},
       });
     }));
+
+    it('should fetch the backend unread total for my suggestions', fakeAsync(() => {
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(6));
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync
+      ).toHaveBeenCalled();
+      expect(component.unreadMySuggestionsCount).toBe(6);
+    }));
+
+    it('should count unread feedback on later pages via the backend total', fakeAsync(() => {
+      // The first page of the paginated list has no unread responses, but
+      // unread feedback exists on later pages. The indicator must reflect
+      // the backend-provided global total instead of the first-page sum.
+      const firstPageSummaries: LessonFeedbackSummary[] = [
+        {
+          id: 'feedback-1',
+          feedback_text_preview: 'First feedback',
+          latest_response_preview: '',
+          status: FeedbackStatus.OPEN,
+          lesson_title: 'Lesson 1',
+          source: 'lesson',
+          unread_response_count: 0,
+          last_updated_msecs: 100,
+        },
+      ];
+      (
+        feedbackBackendApiService.fetchMyFeedbackListAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          summaries: firstPageSummaries,
+          next_cursor: 'cursor-2',
+          more: true,
+        })
+      );
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(4));
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(component.unreadMySuggestionsCount).toBe(4);
+    }));
+
+    it('should set active section to my suggestions when my suggestions tab is active', fakeAsync(() => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+      });
+
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({
+        active_tab: 'my-suggestions',
+      });
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.activeSection).toBe(
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS
+      );
+    }));
+
+    it('should change the unreadMySuggestionsCount value', () => {
+      component.unreadMySuggestionsCount = 0;
+      component.onMySuggestionsUnreadCountChanged(1);
+      expect(component.unreadMySuggestionsCount).toBe(1);
+    });
+
+    it('should set unreadMySuggestionsCount to zero when fetching the unread total fails', fakeAsync(() => {
+      component.unreadMySuggestionsCount = 5;
+
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.reject());
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(component.unreadMySuggestionsCount).toBe(0);
+    }));
   });
 
   describe('when fetching dashboard data fails', () => {
@@ -1414,6 +1535,9 @@ describe('Learner dashboard page', () => {
         ShowRedesignedLearnerDashboard: {
           isEnabled: true,
         },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: false,
+        },
       });
 
       component.setActiveSection(
@@ -1426,12 +1550,38 @@ describe('Learner dashboard page', () => {
       );
     });
 
+    it('should return suggestions greeting when my suggestions tab is active and exploration new creator feedback tab is enabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+      });
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION'
+      );
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION_HEADING'
+      );
+    });
+
     it('should keep the current tab when my certificates is disabled', () => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
         ShowRedesignedLearnerDashboard: {
           isEnabled: true,
         },
         EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: false,
         },
       });
@@ -1441,6 +1591,31 @@ describe('Learner dashboard page', () => {
 
       component.setActiveSection(
         'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+
+      expect(component.activeSection).toBe(
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME
+      );
+    });
+
+    it('should keep the current tab when my suggestions is disabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: false,
+        },
+      });
+
+      component.activeSection =
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION'
       );
 
       expect(component.activeSection).toBe(

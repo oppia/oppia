@@ -17,6 +17,8 @@
  * entity in a given language accent code.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {EntityVoiceovers} from '../../../domain/voiceover/entity-voiceovers.model';

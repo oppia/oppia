@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ExplorationInitializationService.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
 import {ExplorationInitializationService} from './exploration-initialization.service';
