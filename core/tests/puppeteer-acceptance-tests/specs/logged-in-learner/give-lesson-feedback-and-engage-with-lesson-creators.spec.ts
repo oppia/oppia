@@ -260,7 +260,7 @@ describe('Logged-in User', function () {
 
     await loggedInLearner.expectMySuggestionsFeedbackEntry({
       description: 'This Lesson seems too short, can we make it longer?',
-      status: 'Lesson Updated!',
+      status: statusLabels[FeedbackStatus.LESSON_UPDATED],
       lessonTitle: 'What are the Place Values',
       notificationNo: '1',
       notificationText:
