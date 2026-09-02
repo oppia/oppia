@@ -286,6 +286,7 @@
   "I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR": "You just started an assessment before this time. Please try again in <[remainingMinutes]> minute(s).",
   "I18N_CERTIFICATE_ASSESSMENT_DEMONSTRATES_HEADING": "What this certificate demonstrates",
   "I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON": "Exit",
+  "I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM": "Are you sure you want to leave? Your answers for this assessment will not be saved.",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_HEADING": "Don't give up! You can try again",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_PREFIX": "You didn't pass the",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_SUFFIX": "Review and practice the lessons, then try taking the assessment again.",

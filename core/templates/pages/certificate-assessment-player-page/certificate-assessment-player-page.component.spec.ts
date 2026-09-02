@@ -26,6 +26,8 @@ import {
   fakeAsync,
   flushMicrotasks,
 } from '@angular/core/testing';
+import {Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {of} from 'rxjs';
@@ -46,6 +48,7 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
@@ -188,11 +191,26 @@ const modalRef = (
     dismiss: () => {},
   }) as NgbModalRef;
 
+class MockWindowRef {
+  confirm = jasmine.createSpy('confirm').and.returnValue(true);
+
+  nativeWindow = {
+    confirm: (message: string): boolean => this.confirm(message),
+  } as Window;
+}
+
+class MockRouter {
+  navigate = jasmine.createSpy('navigate');
+}
+
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
   let fixture: ComponentFixture<CertificateAssessmentPlayerPageComponent>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
   let modalSpy: jasmine.SpyObj<NgbModal>;
+  let routerSpy: MockRouter;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
+  let windowRef: MockWindowRef;
   let dimsSpy: jasmine.SpyObj<WindowDimensionsService>;
   let apiSpy: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
   let registrySpy: jasmine.SpyObj<InteractionRulesRegistryService>;
@@ -209,6 +227,12 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     });
     modalSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalSpy.open.and.returnValue(modalRef());
+    routerSpy = new MockRouter();
+    translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+    translateServiceSpy.instant.and.returnValue(
+      'Are you sure you want to leave?'
+    );
+    windowRef = new MockWindowRef();
     dimsSpy = jasmine.createSpyObj('WindowDimensionsService', ['getWidth']);
     dimsSpy.getWidth.and.returnValue(800);
     apiSpy = jasmine.createSpyObj('Api', [
@@ -264,6 +288,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       providers: [
         {provide: MatBottomSheet, useValue: bottomSheetSpy},
         {provide: NgbModal, useValue: modalSpy},
+        {provide: Router, useValue: routerSpy},
+        {provide: TranslateService, useValue: translateServiceSpy},
+        {provide: WindowRef, useValue: windowRef},
         {provide: WindowDimensionsService, useValue: dimsSpy},
         {
           provide: CertificateAssessmentOfferingBackendApiService,
@@ -1035,4 +1062,31 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       'TextInput'
     );
   }));
+
+  it('should show confirm dialog and navigate when the learner confirms exit', () => {
+    component.classroomUrlFragment = 'math';
+    component.onExit();
+    expect(windowRef.confirm).toHaveBeenCalledWith(
+      'Are you sure you want to leave?'
+    );
+    expect(routerSpy.navigate).toHaveBeenCalledWith([
+      '/learn',
+      'math',
+      'certificate-offering-available',
+    ]);
+  });
+
+  it('should show confirm dialog and navigate to /learn when no classroom', () => {
+    component.onExit();
+    expect(windowRef.confirm).toHaveBeenCalled();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/learn']);
+  });
+
+  it('should not navigate when the learner cancels the exit confirm', () => {
+    windowRef.confirm.and.returnValue(false);
+    component.classroomUrlFragment = 'math';
+    component.onExit();
+    expect(windowRef.confirm).toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
 });

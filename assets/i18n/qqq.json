@@ -286,6 +286,7 @@
   "I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR": "Warning message shown when the learner tries to start a new certificate assessment attempt before the cooldown window after their previous attempt has elapsed. <[remainingMinutes]> is replaced with the whole number of minutes they must wait; it is always at least one.",
   "I18N_CERTIFICATE_ASSESSMENT_DEMONSTRATES_HEADING": "Heading displayed on the certificate introduction card that explains what knowledge and skills the certificate demonstrates.",
   "I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON": "Text displayed on the exit button in the certificate assessment header. Clicking the button exits the certificate assessment flow.",
+  "I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM": "Confirmation message shown when the learner clicks the exit button during the certificate assessment question player, warning them that their answers will not be saved.",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_HEADING": "Heading text shown when a learner does not pass the certificate assessment result card.",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_PREFIX": "Prefix text shown before the certificate name when the learner does not pass.",
   "I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_SUFFIX": "Supporting text shown below the certificate name when the learner does not pass.",
