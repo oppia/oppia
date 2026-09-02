@@ -58,7 +58,7 @@
             </span>
             <span class="oppia-my-suggestions-row-status e2e-test-my-suggestions-details-status-value"
                   [ngClass]="getStatusDetails(selectedFeedback.status).className"
-                  [attr.title]="getStatusDetails(selectedFeedback.status).tooltip">
+                  [ngbTooltip]="getStatusDetails(selectedFeedback.status).tooltip">
               {{ getStatusDetails(selectedFeedback.status).label }}
             </span>
           </div>

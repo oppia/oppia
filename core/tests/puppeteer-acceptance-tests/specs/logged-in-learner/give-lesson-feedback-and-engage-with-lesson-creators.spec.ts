@@ -284,7 +284,7 @@ describe('Logged-in User', function () {
     );
 
     await loggedInLearner.expectToolTipTextToBe(
-      'e2e-test-my-suggestions-details-status-value',
+      '.e2e-test-my-suggestions-details-status-value',
       'A creator fixed this error! Thank you for helping make Oppia better for everyone.'
     );
 
