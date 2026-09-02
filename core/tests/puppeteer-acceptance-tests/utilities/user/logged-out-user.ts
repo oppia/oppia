@@ -6698,18 +6698,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Cancels the photo upload.
-   */
-  async removeScreenshot(): Promise<void> {
-    await this.expectElementToBeVisible(cancelFeedbackUploadButtonSelector);
-    await this.clickOnElementWithSelector(cancelFeedbackUploadButtonSelector);
-    await this.expectElementToBeVisible(
-      cancelFeedbackUploadButtonSelector,
-      false
-    );
-  }
-
-  /**
    * Checks if the sub-header of the feedback modal matches the expected text.
    * @param expectedText - The expected text of the sub-header.
    */

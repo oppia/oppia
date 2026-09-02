@@ -4687,7 +4687,7 @@ export class LoggedInUser extends BaseUser {
 
   async navigateToMySuggestionsTab(): Promise<void> {
     await this.navigateToLearnerDashboard();
-    await this.clickOnElementWithSelector(tabSelectorMap['My_Suggestions']);
+    await this.clickOnElementWithSelector(tabSelectorMap.My_Suggestions);
   }
 
   async expectElementValue(
@@ -4696,7 +4696,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     const actualValue = await this.page.$eval(
       selector,
-      (element: HTMLInputElement | HTMLSelectElement) => element.value
+      element => (element as HTMLInputElement | HTMLSelectElement).value
     );
 
     expect(actualValue).toBe(expectedValue);
@@ -4807,12 +4807,6 @@ export class LoggedInUser extends BaseUser {
         el => el.textContent?.trim() || ''
       );
 
-      console.log(
-        'EXPECTED:',
-        JSON.stringify(description),
-        'FOUND:',
-        JSON.stringify(rowDescription)
-      );
       if (rowDescription === description) {
         return row;
       }

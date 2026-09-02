@@ -75,8 +75,7 @@ describe('Logged-in User', function () {
   }, 350000);
 
   afterAll(async function () {
-    await UserFactory.closeBrowserForUser(loggedInLearner);
-    await UserFactory.closeSuperAdminBrowser();
+    await UserFactory.closeAllBrowsers();
   });
 
   it('should submit open-ended feedback on a lesson and track creator responses on my dashboard.', async function () {
@@ -120,10 +119,9 @@ describe('Logged-in User', function () {
     await loggedInLearner.expectToastMessage(
       'Thank you! Your feedback has been sent to the lesson team.'
     );
-    await loggedInLearner.toggleOptionsSidebar();
     showMessage('Submitted Lesson feedback.');
 
-    // Navigate to My Suggestions Tab
+    // Navigate to My Suggestions Tab.
     await loggedInLearner.navigateToMySuggestionsTab();
     await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
@@ -444,7 +442,6 @@ describe('Logged-in User', function () {
     await loggedInLearner.expectToastMessage(
       'Thank you! Your report has been sent to the technical team.'
     );
-    await loggedInLearner.toggleOptionsSidebar();
   });
 
   it('should submit feedback on the platform.', async () => {
