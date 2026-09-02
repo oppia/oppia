@@ -733,11 +733,6 @@ export class BaseUser {
       });
     } catch (error) {
       let errorMessage = (error as Error).message;
-      if (runningInCI) {
-        errorMessage +=
-          '\r\nDownload the playwright-report artifact from the GitHub workflow run to check the difference between the old' +
-          ' screenshot(s) and the new one(s). To download it, go to "Summary" of the CI job of the PR and find the "Artifacts" section.';
-      }
       errorMessage +=
         '\r\nIf the changes to the UI are expected, please update the baseline screenshot(s).' +
         '\r\nTo update the screenshot(s), either run the update-snapshots workflow in CI (covers both dev and prod),' +

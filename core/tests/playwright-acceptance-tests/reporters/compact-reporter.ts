@@ -74,16 +74,17 @@ export default class CompactReporter implements Reporter {
       if (runningInCI) {
         // eslint-disable-next-line no-console
         console.log(
-          '\n    Download the oppia_full_stack_test_playwright_results artifact from this GitHub ' +
-            'Actions run, then drag trace.zip into https://trace.playwright.dev to view the ' +
-            'recorded trace, screenshots, and diff for this failure.\n'
+          '\n    Download the Playwright test results artifact for this job (find it under ' +
+            '"Summary" > "Artifacts" on the GitHub Actions run) to view screenshots, diffs, ' +
+            'and recordings, or drag trace.zip into https://trace.playwright.dev for the full ' +
+            'recorded trace.\n'
         );
       } else {
         // eslint-disable-next-line no-console
         console.log(
-          '\n    Drag trace.zip from oppia_full_stack_test_playwright_results into ' +
-            'https://trace.playwright.dev to view the recorded trace, screenshots, and diff ' +
-            'for this failure.\n'
+          '\n    See oppia_full_stack_test_playwright_results for screenshots, diffs, and ' +
+            'recordings, or drag trace.zip into https://trace.playwright.dev for the full ' +
+            'recorded trace.\n'
         );
       }
     }
