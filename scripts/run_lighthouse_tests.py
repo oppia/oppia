@@ -70,21 +70,44 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--shard',
     help=(
-        'The one-based index of the Lighthouse shard being run. Shard 1 '
-        'audits the static and public pages, so its setup is skipped.'
+        'The one-based index of the Lighthouse shard being run. Each shard '
+        'runs only the setup its pages need: shard 1 audits the static and '
+        'public pages so its setup is skipped, shard 2 audits the blog and '
+        'logged-in-user pages so only the blog setup runs, and the remaining '
+        'shards audit the data-dependent pages so all data setup except the '
+        'blog runs.'
     ),
     type=int,
     default=0,
 )
 
 
-def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
+def _get_puppeteer_setup_environment(shard: int) -> dict[str, str]:
+    """Returns an environment that tells the puppeteer setup which shard runs.
+
+    Args:
+        shard: int. The one-based index of the Lighthouse shard being run.
+
+    Returns:
+        dict(str, str). A copy of the current environment with the shard
+        variable set for the puppeteer setup script to read.
+    """
+    env = os.environ.copy()
+    env['LIGHTHOUSE_SHARD'] = str(shard)
+    return env
+
+
+def run_lighthouse_puppeteer_script(
+    record: bool = False, shard: int = 0
+) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
         record: bool. Set to True to record the LHCI puppeteer script
             via puppeteer-screen-recorder and False to not. Note that
             puppeteer-screen-recorder must be separately installed to record.
+        shard: int. The one-based index of the Lighthouse shard being run.
+            The script selects the per-shard setup that matches this shard.
 
     Returns:
         dict(str, str). The entities and their IDs that were collected.
@@ -105,7 +128,10 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Video Path:' + video_path)
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_puppeteer_setup_environment(shard),
     )
     stdout, stderr = process.communicate()
     if process.returncode == 0:
@@ -151,13 +177,14 @@ def _get_lighthouse_entities(
 
     Shard 1 audits only static and public marketing pages, which render without
     any seeded database data, roles or feature flags, so its heavy login and
-    data-seeding setup can be skipped entirely. All later shards audit
-    data-dependent pages and must run the setup.
+    data-seeding setup can be skipped entirely. Every other shard runs the
+    setup, and the puppeteer script picks the setup that its pages need based
+    on the shard.
 
     Args:
         shard: int. The one-based index of the Lighthouse shard being run.
-            When 0, no shard identity was provided and the setup runs to be
-            safe.
+            When 0, no shard identity was provided and the full setup runs to
+            be safe.
         record: bool. Whether to record the puppeteer setup via the screen
             recorder.
 
@@ -171,7 +198,7 @@ def _get_lighthouse_entities(
             'data setup and login.'
         )
         return {}
-    return run_lighthouse_puppeteer_script(record)
+    return run_lighthouse_puppeteer_script(record, shard)
 
 
 def get_entity(line: str) -> tuple[str, str] | None:

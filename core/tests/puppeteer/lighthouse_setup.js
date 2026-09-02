@@ -768,6 +768,72 @@ const addThumbnailToTopic = async function (page, topicName) {
   }
 };
 
+const setRoles = async function (browser, page) {
+  await setRole(browser, page, 'COLLECTION_EDITOR');
+  await setRole(browser, page, 'VOICEOVER_ADMIN');
+  await setRole(browser, page, 'ADMIN');
+  await setRole(browser, page, 'RELEASE_COORDINATOR');
+  await setRole(browser, page, 'FULL_USER');
+  await setRole(browser, page, 'TECH_TEAM_LEAD');
+};
+
+const runDataPagesSetup = async function (browser, page) {
+  await getExplorationEditorUrl(browser, page);
+  await setRoles(browser, page);
+
+  // Feature flags must be enabled before the data-generation steps below,
+  // because those steps fetch the handlers that are gated by the flags (e.g.
+  // the learner group and technical feedback dashboard captures inside
+  // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
+  // disabled, so enabling them here avoids the captures failing.
+  await enableFeatureFlag(browser, page, 'story_editor_arcs');
+  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
+  await enableFeatureFlag(
+    browser,
+    page,
+    'technical_feedback_dashboard_enabled'
+  );
+  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
+  await getTopicEditorUrl(browser, page);
+  await getStoryEditorUrl(browser, page);
+  await getSkillEditorUrl(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
+  await enableDiagnosticTestForMathClassroom(browser, page);
+};
+
+const runFullSetup = async function (browser, page) {
+  await login(browser, page);
+  await runDataPagesSetup(browser, page);
+  await generateDataForBlogPosts(browser, page);
+};
+
+const shard2Setup = async function (browser, page) {
+  await login(browser, page);
+  await setRoles(browser, page);
+  await generateDataForBlogPosts(browser, page);
+};
+
+const shard3Setup = async function (browser, page) {
+  await login(browser, page);
+  await runDataPagesSetup(browser, page);
+};
+
+const shard4Setup = async function (browser, page) {
+  await login(browser, page);
+  await runDataPagesSetup(browser, page);
+};
+
+const shard5Setup = async function (browser, page) {
+  await login(browser, page);
+  await runDataPagesSetup(browser, page);
+};
+
+const shard6Setup = async function (browser, page) {
+  await login(browser, page);
+  await runDataPagesSetup(browser, page);
+};
+
 const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
@@ -807,62 +873,68 @@ const main = async function () {
     await recorder.start(videoPath);
   }
 
-  await login(browser, page);
-  await getExplorationEditorUrl(browser, page);
+  const shard = Number(process.env.LIGHTHOUSE_SHARD || 0);
+  const shardSetupRunners = {
+    2: shard2Setup,
+    3: shard3Setup,
+    4: shard4Setup,
+    5: shard5Setup,
+    6: shard6Setup,
+  };
+  // Each shard runs only the setup its pages need. Shard 1 audits only static
+  // public pages, so the runner never invokes this script for it. An unset
+  // shard (0) keeps the previous full setup for local runs.
+  const runShardSetup = shardSetupRunners[shard] || runFullSetup;
+  var setupKind = 'full';
+  if (shard >= 3) {
+    setupKind = 'data';
+  } else if (shard === 2) {
+    setupKind = 'blog';
+  }
+  // Only record the entities and URLs produced by the steps the current shard
+  // ran, so that unresolvable URLs are not reported.
+  const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
+  const ranDataSetup = setupKind === 'full' || setupKind === 'data';
 
-  await setRole(browser, page, 'COLLECTION_EDITOR');
-  await setRole(browser, page, 'VOICEOVER_ADMIN');
-  await setRole(browser, page, 'ADMIN');
-  await setRole(browser, page, 'RELEASE_COORDINATOR');
-  await setRole(browser, page, 'FULL_USER');
-  await setRole(browser, page, 'TECH_TEAM_LEAD');
-  // Feature flags must be enabled before the data-generation steps below,
-  // because those steps fetch the handlers that are gated by the flags (e.g.
-  // the learner group and technical feedback dashboard captures inside
-  // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
-  // disabled, so enabling them here avoids the captures failing.
-  await enableFeatureFlag(browser, page, 'story_editor_arcs');
-  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
-  await enableFeatureFlag(
-    browser,
-    page,
-    'technical_feedback_dashboard_enabled'
-  );
-  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
-  await getTopicEditorUrl(browser, page);
-  await getStoryEditorUrl(browser, page);
-  await getSkillEditorUrl(browser, page);
-  await generateDataForTopicAndStoryPlayer(browser, page);
-  await generateDataForClassroom(browser, page);
-  await enableDiagnosticTestForMathClassroom(browser, page);
-  await generateDataForBlogPosts(browser, page);
+  await runShardSetup(browser, page);
 
-  fs.writeFileSync(
-    'core/tests/puppeteer/.env',
-    `exploration_id=${explorationId}\n` +
-      `story_id=${storyId}\n` +
-      `topic_id=${topicId}\n` +
-      `skill_id=${skillId}\n` +
-      `blog_post_url_fragment=${blogUrlFragment}\n` +
-      `learner_group_id=${learnerGroupId}\n` +
-      `technical_feedback_report_id=${technicalFeedbackReportId}\n` +
-      `certificate_id=${certificateId}\n` +
-      `attempt_id=${attemptId}\n`
-  );
+  var envEntries = [];
+  if (ranDataSetup) {
+    envEntries.push(`exploration_id=${explorationId}`);
+    envEntries.push(`story_id=${storyId}`);
+    envEntries.push(`topic_id=${topicId}`);
+    envEntries.push(`skill_id=${skillId}`);
+    envEntries.push(`learner_group_id=${learnerGroupId}`);
+    envEntries.push(
+      `technical_feedback_report_id=${technicalFeedbackReportId}`
+    );
+    envEntries.push(`certificate_id=${certificateId}`);
+    envEntries.push(`attempt_id=${attemptId}`);
+  }
+  if (ranBlogSetup) {
+    envEntries.push(`blog_post_url_fragment=${blogUrlFragment}`);
+  }
+  fs.writeFileSync('core/tests/puppeteer/.env', envEntries.join('\n'));
 
-  await process.stdout.write(
-    [
-      explorationEditorUrl,
-      topicEditorUrl,
-      storyEditorUrl,
-      skillEditorUrl,
-      `http://localhost:8181/blog/${blogUrlFragment}`,
-      `http://localhost:8181/learner-group/${learnerGroupId}`,
-      `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`,
-      `http://localhost:8181/certificate-assessment/${certificateId}`,
-      `http://localhost:8181/certificate-assessment-result/${attemptId}`,
-    ].join('\n')
-  );
+  var urls = [];
+  if (ranDataSetup) {
+    urls.push(explorationEditorUrl);
+    urls.push(topicEditorUrl);
+    urls.push(storyEditorUrl);
+    urls.push(skillEditorUrl);
+    urls.push(`http://localhost:8181/learner-group/${learnerGroupId}`);
+    urls.push(
+      `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`
+    );
+    urls.push(`http://localhost:8181/certificate-assessment/${certificateId}`);
+    urls.push(
+      `http://localhost:8181/certificate-assessment-result/${attemptId}`
+    );
+  }
+  if (ranBlogSetup) {
+    urls.push(`http://localhost:8181/blog/${blogUrlFragment}`);
+  }
+  await process.stdout.write(urls.join('\n'));
   if (record) {
     await recorder.stop();
   }

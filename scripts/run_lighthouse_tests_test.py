@@ -234,14 +234,27 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
-            lambda record: {'topic_id': '4'},
-            expected_args=((True,),),
+            lambda *unused_args: {'topic_id': '4'},
+            expected_args=((True, 2),),
         )
         with swap_run_puppeteer_script:
             entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
                 2, record=True
             )
         self.assertEqual(entities, {'topic_id': '4'})
+
+    def test_get_lighthouse_entities_passes_shard_to_setup(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda *unused_args: {},
+            expected_args=((False, 3),),
+        )
+        with swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                3
+            )
+        self.assertEqual(entities, {})
 
     def test_get_resolvable_lighthouse_all_urls_skips_unresolvable(
         self,
@@ -280,6 +293,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, swap_popen:
@@ -314,6 +334,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
@@ -352,6 +379,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, swap_popen, swap_isfile:
@@ -394,6 +428,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
@@ -966,7 +1007,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
             mock_run_puppeteer_script,
-            expected_args=((True,),),
+            expected_args=((True, 0),),
         )
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests,
