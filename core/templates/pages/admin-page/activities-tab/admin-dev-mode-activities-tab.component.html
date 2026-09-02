@@ -171,6 +171,32 @@
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container">
+      <h3>Generate dummy default classrooms (only curriculum admins)</h3>
+      <p>
+        Use this form to generate dummy default classrooms that contain no
+        topics, skills or questions.
+      </p>
+      <span class="row">
+        <label for="label-target-number-of-default-classrooms-to-generate" class="form-label">Number of default classrooms to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="numDummyDefaultClassroomsToGenerate"
+               placeholder="Default classrooms to generate" type="number" min="0"
+               id="label-target-number-of-default-classrooms-to-generate">
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text load-dummy-default-classroom"
+                (click)="generateNewDefaultClassrooms()"
+                [disabled]="!numDummyDefaultClassroomsToGenerate">
+          Generate Default Classrooms
+        </button>
+      </span>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
       <h3>Generate dummy topics (only curriculum admins)</h3>
       <p>
         Use this form to generate dummy topics, each with 1 skill and 3 questions

@@ -99,9 +99,9 @@
     "url": "http://localhost:8181/profile/username1",
     "page_module": "core/templates/pages/profile-page/profile-page.module.ts"
   },
-  "signup": {
-    "url": "http://localhost:8181/signup?return_url=%2F",
-    "page_module": "core/templates/pages/signup-page/signup-page.module.ts"
+  "contributor-admin-dashboard": {
+    "url": "http://localhost:8181/contributor-admin-dashboard",
+    "page_module": "core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.module.ts"
   },
   "topics-and-skills-dashboard": {
     "url": "http://localhost:8181/topics-and-skills-dashboard",
@@ -171,9 +171,9 @@
     "url": "http://localhost:8181/learn/math/certificate-offering-available",
     "page_module": "core/templates/pages/certificate-offering-available-page/certificate-offering-available-page.module.ts"
   },
-  "contributor-admin-dashboard": {
-    "url": "http://localhost:8181/contributor-admin-dashboard",
-    "page_module": "core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.module.ts"
+  "signup": {
+    "url": "http://localhost:8181/signup?return_url=%2F",
+    "page_module": "core/templates/pages/signup-page/signup-page.module.ts"
   },
   "create-certificate-offering": {
     "url": "http://localhost:8181/create-certificate-assessment-offering",

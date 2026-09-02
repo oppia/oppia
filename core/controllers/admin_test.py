@@ -973,6 +973,104 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_generate_dummy_default_classroom_data(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        # The generated classrooms are bare: they hold no topics and are
+        # published with an empty topic dependency map.
+        for classroom in classrooms:
+            self.assertEqual(classroom.topic_id_to_prerequisite_topic_ids, {})
+            self.assertTrue(classroom.is_published)
+        # The default classroom names and URL fragments use the requested
+        # scheme ('ScienceA' -> 'science-a', and so on).
+        math_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-a')
+        )
+        assert math_classroom is not None
+        self.assertEqual(math_classroom.name, 'ScienceA')
+        self.logout()
+
+    def test_generate_dummy_default_classroom_data_with_default_count(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {'action': 'generate_dummy_default_classroom'},
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 1)
+        self.logout()
+
+    def test_generate_dummy_default_classroom_data_is_idempotent(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': 3,
+                },
+                csrf_token=csrf_token,
+            )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        self.logout()
+
+    def test_generate_more_default_classrooms_than_supported_raises(
+        self,
+    ) -> None:
+        # A count whose final classroom index would need a suffix whose URL
+        # fragment length exceeds the 20-character classroom limit. 26**12
+        # classrooms are supported before suffixes grow past twelve letters,
+        # so requesting one more than that triggers the guard.
+        num_classrooms = 26**12 + 1
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': num_classrooms,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_default_classroom_data(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler',
+                {'action': 'generate_dummy_default_classroom'},
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
     def _create_dummy_classroom_for_topics_test(self) -> str:
         """Creates a single dummy math classroom and returns its ID."""
         classroom_id = classroom_config_services.get_new_classroom_id()

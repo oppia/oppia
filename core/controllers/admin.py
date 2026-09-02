@@ -269,6 +269,13 @@ class AdminHandler(
     # every generated topic URL fragment within this limit.
     _MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH = 20
 
+    # Maximum length, in characters, of a generated dummy default classroom
+    # URL fragment. Classroom URL fragments only allow lowercase words
+    # separated by hyphens and are capped at this length, so the disambiguating
+    # suffix letters must keep every generated classroom URL fragment within
+    # this limit.
+    _MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH = 20
+
     # Fixed base names and URL fragments for dummy topics. They are cycled
     # through (with an appended lowercase letter suffix) when a request asks to
     # generate topics that can fit into an existing classroom without name or
@@ -311,6 +318,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
+                        'generate_dummy_default_classroom',
                         'generate_dummy_topics',
                         'generate_dummy_chapters',
                         'generate_dummy_question_suggestions',
@@ -622,6 +630,15 @@ class AdminHandler(
                 if num_dummy_classrooms_to_generate is None:
                     num_dummy_classrooms_to_generate = 1
                 self._generate_dummy_classroom(num_dummy_classrooms_to_generate)
+            elif action == 'generate_dummy_default_classroom':
+                num_dummy_classrooms_to_generate = self.normalized_payload.get(
+                    'num_dummy_classrooms_to_generate'
+                )
+                if num_dummy_classrooms_to_generate is None:
+                    num_dummy_classrooms_to_generate = 1
+                self._generate_dummy_default_classroom(
+                    num_dummy_classrooms_to_generate
+                )
             elif action == 'generate_dummy_topics':
                 num_dummy_topics_to_generate = self.normalized_payload.get(
                     'num_dummy_topics_to_generate'
@@ -2342,6 +2359,139 @@ class AdminHandler(
 
         if index == 0:
             self._seed_dummy_certificate_assessment(classroom_1)
+
+    def _generate_dummy_default_classroom(self, num_classrooms: int) -> None:
+        """Generates and loads bare dummy classrooms that contain no topics,
+        skills, or questions.
+
+        These are meant to populate the classroom dashboard and classroom
+        pages during lighthouse runs without the heavy topic/skill/question
+        data created by _create_dummy_classroom. Each classroom is published
+        with an empty topic dependency map, so it shows up as a populated
+        classroom on the relevant routes.
+
+        The generation resumes from the first dummy default classroom that
+        does not already exist, so that clicking the button multiple times
+        keeps adding new classrooms rather than re-generating ones that were
+        already created.
+
+        Args:
+            num_classrooms: int. The number of bare dummy classrooms to create.
+
+        Raises:
+            Exception. Cannot generate dummy classroom in production.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.'
+                )
+            start_index = 0
+            while self._dummy_default_classroom_exists(start_index):
+                start_index += 1
+            last_index = start_index + num_classrooms - 1
+            last_suffix_length = len(
+                self._dummy_default_classroom_suffix_letters(last_index)
+            )
+            longest_url_fragment_length = (
+                len('science') + 1 + last_suffix_length
+            )
+            if (
+                longest_url_fragment_length
+                > self._MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH
+            ):
+                raise Exception(
+                    'Cannot generate more than %s dummy default classrooms at'
+                    ' once.' % num_classrooms
+                )
+            for i in range(start_index, start_index + num_classrooms):
+                self._create_dummy_default_classroom(i)
+        else:
+            raise Exception('Cannot generate dummy classroom in production.')
+
+    def _dummy_default_classroom_suffix_letters(self, index: int) -> str:
+        """Returns the lowercase column-style letters used to name a dummy
+        default classroom.
+
+        Index 0 maps to 'a', then progresses in spreadsheet column style
+        ('b', 'c', ..., 'z', 'aa', 'ab', ...) so that an arbitrary number of
+        classrooms can be created while keeping URL fragments valid (only
+        lowercase characters). The display name capitalizes these letters, so
+        index 0 renders as 'ScienceA', index 1 as 'ScienceB', and so on.
+
+        Args:
+            index: int. The zero-based index of the dummy default classroom.
+
+        Returns:
+            str. The lowercase spreadsheet-style letter suffix for the given
+            index.
+        """
+        result = ''
+        n = index + 1
+        while n > 0:
+            n, remainder = divmod(n - 1, 26)
+            result = chr(ord('a') + remainder) + result
+        return result
+
+    def _dummy_default_classroom_exists(self, index: int) -> bool:
+        """Returns whether a dummy default classroom with the given index
+        already exists.
+
+        Args:
+            index: int. The zero-based index of the dummy default classroom.
+
+        Returns:
+            bool. Whether a dummy default classroom with the given suffix
+            already exists in the database.
+        """
+        suffix_letters = self._dummy_default_classroom_suffix_letters(index)
+        url_fragment = 'science-%s' % suffix_letters
+        return (
+            classroom_config_services.get_classroom_by_url_fragment(
+                url_fragment
+            )
+            is not None
+        )
+
+    def _create_dummy_default_classroom(self, index: int) -> None:
+        """Creates and loads a single bare dummy classroom.
+
+        The classroom is created with an empty topic dependency map and no
+        topics, skills, or questions. If a classroom with the same URL
+        fragment already exists, it is skipped so that regenerating data does
+        not fail on name or URL fragment collisions.
+
+        Args:
+            index: int. The zero-based index of the classroom to create. It is
+                used to generate unique names and URL fragments.
+        """
+        assert self.user_id is not None
+        suffix_letters = self._dummy_default_classroom_suffix_letters(index)
+        classroom_name = 'Science%s' % suffix_letters.capitalize()
+        classroom_url_fragment = 'science-%s' % suffix_letters
+        if classroom_config_services.get_classroom_by_url_fragment(
+            classroom_url_fragment
+        ):
+            logging.info(
+                '[ADMIN] Dummy default classroom %s already exists; skipping.'
+                % classroom_url_fragment
+            )
+            return
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom_config_services.create_new_default_classroom(
+            classroom_id,
+            classroom_name,
+            classroom_url_fragment,
+            'user@email.com',
+        )
+        # The default classroom is created unpublished, so it is made public
+        # here to ensure it shows up as a populated classroom on the classroom
+        # dashboard and classroom routes during lighthouse runs.
+        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        classroom.is_published = True
+        classroom_config_services.update_classroom(classroom)
 
     def _seed_dummy_certificate_assessment(
         self, classroom: classroom_config_domain.Classroom

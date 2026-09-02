@@ -669,6 +669,53 @@ describe('Admin dev mode activities tab', () => {
     }));
   });
 
+  describe('.generateNewDefaultClassrooms', () => {
+    it('should generate default classroom data', waitForAsync(() => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyDefaultClassroomsAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+      component.numDummyDefaultClassroomsToGenerate = 3;
+
+      component.generateNewDefaultClassrooms();
+
+      expect(
+        adminBackendApiService.generateDummyDefaultClassroomsAsync
+      ).toHaveBeenCalledWith(3);
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy default classrooms generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message if default classroom data is not generated', waitForAsync(() => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyDefaultClassroomsAsync'
+      ).and.returnValue(
+        Promise.reject('Default classroom data not generated.')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateNewDefaultClassrooms();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Default classroom data not generated.'
+        );
+      });
+    }));
+  });
+
   describe('.generateNewTopics', () => {
     it('should generate topic data', waitForAsync(() => {
       spyOn(adminBackendApiService, 'generateDummyTopicsAsync').and.returnValue(

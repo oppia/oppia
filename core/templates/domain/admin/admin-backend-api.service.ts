@@ -708,6 +708,15 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyDefaultClassroomsAsync(
+    numberOfClassrooms: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_default_classroom',
+      num_dummy_classrooms_to_generate: numberOfClassrooms,
+    });
+  }
+
   async generateDummyTopicsAsync(
     numberOfTopics: number,
     classroomId: string

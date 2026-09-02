@@ -116,6 +116,14 @@ var featureFlagValueSelector = '.e2e-test-value-selector';
 var featureFlagSaveButton = '.e2e-test-save-button';
 var generateClassroomCountInput =
   '#label-target-number-of-classrooms-to-generate';
+var generateDefaultClassroomCountInput =
+  '#label-target-number-of-default-classrooms-to-generate';
+var generateDefaultClassroomButton = '.load-dummy-default-classroom';
+var generateExplorationsCountInput = '#label-target-explorations-to-generate';
+var generateExplorationsPublishInput = '#label-target-explorations-to-publish';
+var reloadExplorationButton = '.e2e-test-reload-exploration-button';
+var reloadExplorationRow = '.e2e-test-reload-exploration-row';
+var reloadExplorationTitle = '.e2e-test-reload-exploration-title';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
@@ -529,7 +537,11 @@ const generateDataForClassroom = async function (browser, page) {
     });
 
     await page.waitForSelector(generateClassroomButton);
-    await page.type(generateClassroomCountInput, '10');
+    // Only the first dummy math classroom is needed here: it backs the
+    // diagnostic test toggle, the topic thumbnails and the certificate
+    // offering/attempt captures below. The classroom routes get their
+    // additional populated classrooms from generateBareClassrooms.
+    await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
     const successMessage = 'Dummy new classroom generated successfully.';
@@ -565,6 +577,38 @@ const generateDataForClassroom = async function (browser, page) {
       const data = await response.json();
       return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
     });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateBareClassrooms = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    await page.waitForSelector(generateDefaultClassroomCountInput);
+    await page.type(generateDefaultClassroomCountInput, '10');
+    await page.waitForSelector(generateDefaultClassroomButton);
+    await page.click(generateDefaultClassroomButton);
+
+    const successMessage = 'Dummy default classrooms generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -616,6 +660,96 @@ const generateDataForBlogPosts = async function (browser, page) {
       window.location.pathname.startsWith('/blog/')
     );
     blogUrlFragment = new URL(await page.url()).pathname.split('/')[2];
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateDummyExplorations = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    await page.waitForSelector(generateExplorationsCountInput);
+    await page.type(generateExplorationsCountInput, '10');
+    await page.waitForSelector(generateExplorationsPublishInput);
+    await page.type(generateExplorationsPublishInput, '10');
+
+    // The generate button uses the shared .oppia-generate-exploration-text
+    // class across several cards, so it is targeted by its label text instead.
+    await page.waitForXPath(
+      "//*[contains(normalize-space(text()), 'Generate Explorations')]"
+    );
+    const [generateButton] = await page.$x(
+      "//*[contains(normalize-space(text()), 'Generate Explorations')]"
+    );
+    await generateButton.click();
+
+    const successMessage = 'Dummy explorations generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const reloadAllInteractionsExploration = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    // Locate the reload button for the all_interactions demo exploration so
+    // that the exploration editor, player and new lesson player pages have
+    // content exercising every interaction type to render.
+    await page.waitForSelector(reloadExplorationRow);
+    const reloadButtons = await page.$$(reloadExplorationButton);
+    for (let i = 0; i < reloadButtons.length; i++) {
+      const title = await page.evaluate(
+        (el, sel) =>
+          el
+            .closest(sel)
+            .querySelector(reloadExplorationTitle)
+            .textContent.trim(),
+        reloadButtons[i],
+        reloadExplorationRow
+      );
+      if (title === 'all_interactions') {
+        await reloadButtons[i].click();
+        break;
+      }
+    }
+
+    const successMessage = 'Data reloaded successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -800,6 +934,9 @@ const runDataPagesSetup = async function (browser, page) {
   await generateDataForTopicAndStoryPlayer(browser, page);
   await generateDataForClassroom(browser, page);
   await enableDiagnosticTestForMathClassroom(browser, page);
+  await generateDummyExplorations(browser, page);
+  await reloadAllInteractionsExploration(browser, page);
+  await generateBareClassrooms(browser, page);
 };
 
 const runFullSetup = async function (browser, page) {
@@ -811,6 +948,7 @@ const runFullSetup = async function (browser, page) {
 const shard2Setup = async function (browser, page) {
   await login(browser, page);
   await setRoles(browser, page);
+  await getExplorationEditorUrl(browser, page);
   await generateDataForBlogPosts(browser, page);
 };
 
@@ -821,17 +959,35 @@ const shard3Setup = async function (browser, page) {
 
 const shard4Setup = async function (browser, page) {
   await login(browser, page);
-  await runDataPagesSetup(browser, page);
+  await setRoles(browser, page);
+  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
+  await enableFeatureFlag(
+    browser,
+    page,
+    'technical_feedback_dashboard_enabled'
+  );
+  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
+  await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
+  await enableDiagnosticTestForMathClassroom(browser, page);
 };
 
 const shard5Setup = async function (browser, page) {
   await login(browser, page);
-  await runDataPagesSetup(browser, page);
+  await setRoles(browser, page);
+  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
+  await enableFeatureFlag(
+    browser,
+    page,
+    'technical_feedback_dashboard_enabled'
+  );
+  await getExplorationEditorUrl(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
 };
 
 const shard6Setup = async function (browser, page) {
   await login(browser, page);
-  await runDataPagesSetup(browser, page);
+  await setRoles(browser, page);
 };
 
 const main = async function () {
@@ -885,29 +1041,51 @@ const main = async function () {
   // public pages, so the runner never invokes this script for it. An unset
   // shard (0) keeps the previous full setup for local runs.
   const runShardSetup = shardSetupRunners[shard] || runFullSetup;
-  var setupKind = 'full';
-  if (shard >= 3) {
-    setupKind = 'data';
-  } else if (shard === 2) {
+  // Only record the entities and URL lines produced by the steps the current
+  // shard ran, so that unresolvable URLs are not reported. The flags below
+  // mirror the setup steps each shard function executes.
+  let setupKind = 'full';
+  if (shard === 2) {
     setupKind = 'blog';
+  } else if (shard === 3) {
+    setupKind = 'data';
+  } else if (shard === 4) {
+    setupKind = 'classroom';
+  } else if (shard === 5) {
+    setupKind = 'structures';
+  } else if (shard === 6) {
+    setupKind = 'roles';
   }
-  // Only record the entities and URLs produced by the steps the current shard
-  // ran, so that unresolvable URLs are not reported.
   const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
-  const ranDataSetup = setupKind === 'full' || setupKind === 'data';
+  const ranExplorationSetup =
+    setupKind === 'data' ||
+    setupKind === 'full' ||
+    setupKind === 'structures' ||
+    setupKind === 'blog';
+  const ranTopicStorySkillSetup = setupKind === 'data' || setupKind === 'full';
+  const ranStructuresSetup =
+    setupKind === 'data' || setupKind === 'full' || setupKind === 'structures';
+  const ranClassroomSetup =
+    setupKind === 'data' || setupKind === 'full' || setupKind === 'classroom';
 
   await runShardSetup(browser, page);
 
   var envEntries = [];
-  if (ranDataSetup) {
+  if (ranExplorationSetup) {
     envEntries.push(`exploration_id=${explorationId}`);
-    envEntries.push(`story_id=${storyId}`);
+  }
+  if (ranTopicStorySkillSetup) {
     envEntries.push(`topic_id=${topicId}`);
+    envEntries.push(`story_id=${storyId}`);
     envEntries.push(`skill_id=${skillId}`);
+  }
+  if (ranStructuresSetup) {
     envEntries.push(`learner_group_id=${learnerGroupId}`);
     envEntries.push(
       `technical_feedback_report_id=${technicalFeedbackReportId}`
     );
+  }
+  if (ranClassroomSetup) {
     envEntries.push(`certificate_id=${certificateId}`);
     envEntries.push(`attempt_id=${attemptId}`);
   }
@@ -917,19 +1095,25 @@ const main = async function () {
   fs.writeFileSync('core/tests/puppeteer/.env', envEntries.join('\n'));
 
   var urls = [];
-  if (ranDataSetup) {
-    urls.push(explorationEditorUrl);
+  if (ranTopicStorySkillSetup) {
     urls.push(topicEditorUrl);
     urls.push(storyEditorUrl);
     urls.push(skillEditorUrl);
+  }
+  if (ranStructuresSetup) {
     urls.push(`http://localhost:8181/learner-group/${learnerGroupId}`);
     urls.push(
       `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`
     );
+  }
+  if (ranClassroomSetup) {
     urls.push(`http://localhost:8181/certificate-assessment/${certificateId}`);
     urls.push(
       `http://localhost:8181/certificate-assessment-result/${attemptId}`
     );
+  }
+  if (ranExplorationSetup) {
+    urls.push(explorationEditorUrl);
   }
   if (ranBlogSetup) {
     urls.push(`http://localhost:8181/blog/${blogUrlFragment}`);
