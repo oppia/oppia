@@ -13,14 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test for the translated lesson metadata and
- * translated concept cards a learner sees once a translation is accepted.
- * Both only exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
- * is on.
+ * @fileoverview Acceptance test for the "Content Type" filter on the review tab.
+ * Only exists when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS is on.
  *
- * LO.4 View information about the lesson.
- * LO.4 Refer to a concept card.
- * LO.4 View translated lesson metadata and concept cards in the player.
+ * TR.1 Filter opportunities by Entity Type.
  *
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
  */
@@ -37,7 +33,6 @@ import {
   INTERACTION_TYPES,
 } from '../../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 import {TopicManager} from '../../../utilities/user/topic-manager';
 import {TranslationReviewer} from '../../../utilities/user/translation-reviewer';
@@ -48,9 +43,6 @@ const ROLES = testConstants.Roles;
 Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
-// Nothing is translated into Arabic here, so it is the language used to check
-// that an untranslated concept card falls back to English.
-const UNTRANSLATED_SITE_LANGUAGE_CODE = 'ar';
 
 const TOPIC_NAME = 'Fractions';
 const SUBTOPIC_NAME = 'Fraction Foundations';
@@ -59,43 +51,35 @@ const CHAPTER_NAME = 'Cutting the Pies';
 
 const EXPLORATION_TITLE = 'Fair Shares';
 const EXPLORATION_OBJECTIVE = 'Learn dividing a birthday cake into equal parts';
-const EXPLORATION_CARD_CONTENT = 'A birthday cake is cut into equal pieces.';
 
 const LESSON_SUBHEADING = `Exploration - ${TOPIC_NAME}`;
 const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 
 const CONTENT_TYPE_TITLE = 'title';
 const CONTENT_TYPE_OBJECTIVE = 'objective';
+const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
-
-// The skill's concept card explanation is built from its description by
-// createSkillForTopic, so the English text the fallback shows is known.
-const SKILL_EXPLANATION = `Review material text content for ${SKILL_NAME}.`;
 
 // A suggestion row truncates its heading at 30 characters, and the heading is
 // the translation itself, so any translation looked up by heading below is
 // kept under that limit.
 const HINDI_TITLE = 'पाई काटना';
-const HINDI_OBJECTIVE = 'केक को बराबर बाँटना सीखें';
+const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
+const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
+
+// The action button an opportunity card carries on the review tab. It opens
+// the card's own suggestions rather than a review, which is what "Review" on
+// each individual suggestion inside does.
+const OPPORTUNITY_ACTION_BUTTON_LABEL = 'Translations';
 
 const MAX_ITEMS_TO_SKIP = 15;
 
-// The lesson contributes a title and an objective and the skill contributes an
-// explanation, so no list here holds more than a handful of suggestions. The
-// bound only exists so a modal that stops closing fails instead of looping.
-const MAX_SUGGESTIONS_TO_ACCEPT = 6;
-
-describe('Logged-out User', function () {
-  let loggedOutUser: LoggedOutUser;
+describe('Translation Reviewer: filter opportunities by entity type', function () {
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
-  let curriculumAdm: CurriculumAdmin &
-    ExplorationEditor &
-    TopicManager &
-    LoggedInUser;
+  let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationId: string;
 
   beforeAll(async function () {
     translationReviewer = await UserFactory.createNewUser(
@@ -130,18 +114,15 @@ describe('Logged-out User', function () {
       SKILL_NAME
     );
 
-    // The concept card link is what makes the skill's explanation reachable
-    // from inside the lesson. It is added to the card content here because the
-    // skill it points at has to exist first.
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.updateCardContentWithConceptCard(
-      EXPLORATION_CARD_CONTENT
+    await curriculumAdm.updateCardContent(
+      'A birthday cake is cut into equal pieces.'
     );
     await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await curriculumAdm.saveExplorationDraft();
-    explorationId = await curriculumAdm.publishExplorationWithMetadata(
+    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
       EXPLORATION_TITLE,
       EXPLORATION_OBJECTIVE,
       'Mathematics'
@@ -155,8 +136,7 @@ describe('Logged-out User', function () {
       TOPIC_NAME
     );
 
-    // Submit Hindi translations for the lesson title, the lesson objective and
-    // the skill explanation.
+    // Submit the metadata and skill translations that this spec reviews.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -195,6 +175,14 @@ describe('Logged-out User', function () {
       SKILL_SUBHEADING
     );
     await translationSubmitter.skipToTranslationItemOfContentType(
+      CONTENT_TYPE_SKILL_DESCRIPTION,
+      MAX_ITEMS_TO_SKIP
+    );
+    await translationSubmitter.typeTextInTranslationInput(
+      HINDI_SKILL_DESCRIPTION
+    );
+    await translationSubmitter.saveTranslationAndMoveToNextItem();
+    await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_SKILL_EXPLANATION,
       MAX_ITEMS_TO_SKIP
     );
@@ -203,58 +191,38 @@ describe('Logged-out User', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
+  }, 2100000);
 
-    // Accept all three, since only an accepted translation reaches a learner.
+  it('should Filter opportunities by Entity Type', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
+    await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
 
-    await translationReviewer.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+    // The lesson and the skill are listed together, each carrying the action
+    // button that opens its own suggestions.
+    await translationReviewer.expectOpportunityActionButtonToBe(
       CHAPTER_NAME,
-      LESSON_SUBHEADING
+      LESSON_SUBHEADING,
+      OPPORTUNITY_ACTION_BUTTON_LABEL
     );
-    await translationReviewer.acceptAllSuggestionsInReviewModal(
-      'Suggestion accepted.',
-      MAX_SUGGESTIONS_TO_ACCEPT
+    await translationReviewer.expectOpportunityActionButtonToBe(
+      SKILL_NAME,
+      SKILL_SUBHEADING,
+      OPPORTUNITY_ACTION_BUTTON_LABEL
     );
+  });
 
+  it('should Filter opportunities by Entity Type for skills', async function () {
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
-    await translationReviewer.acceptAllSuggestionsInReviewModal(
-      'Suggestion accepted.',
-      MAX_SUGGESTIONS_TO_ACCEPT
-    );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, 2100000);
-
-  it('should cover LO.4: view information about the lesson', async function () {
-    await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
-    );
-
-    await loggedOutUser.openLessonInfoModal();
-    await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);
-    await loggedOutUser.closeLessonInfoModal();
-  });
-
-  it('should cover LO.4: refer to a concept card', async function () {
-    await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
-      HINDI_SKILL_EXPLANATION
-    );
-  });
-
-  it('should cover LO.4: view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
-    await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
-    await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
-    );
-
-    await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
-      SKILL_EXPLANATION
+    // The skills filter shows the suggestions straight away, so the control
+    // that returns from a lesson's suggestions to the lesson list is absent.
+    await translationReviewer.expectBackToLessonsControlToBeVisible(false);
+    await translationReviewer.expectOpportunityToBePresent(
+      HINDI_SKILL_DESCRIPTION,
+      SKILL_NAME
     );
   });
 

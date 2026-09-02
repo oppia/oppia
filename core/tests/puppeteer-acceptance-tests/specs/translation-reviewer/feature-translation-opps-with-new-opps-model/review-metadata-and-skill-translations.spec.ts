@@ -14,10 +14,8 @@
 
 /**
  * @fileoverview Acceptance test for reviewing exploration metadata and skill
- * translations, and for the "Content Type" filter on the review tab. Both only
- * exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS is on.
+ * translations. Only exists when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS is on.
  *
- * TR.1 Filter opportunities by Entity Type.
  * TR.2 Review exploration metadata translations.
  * TR.2 Review skill translations.
  * TR.2 Accept a translation.
@@ -73,11 +71,6 @@ const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों 
 const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
 
-// The action button an opportunity card carries on the review tab. It opens
-// the card's own suggestions rather than a review, which is what "Review" on
-// each individual suggestion inside does.
-const OPPORTUNITY_ACTION_BUTTON_LABEL = 'Translations';
-
 // The review modal walks through the suggestions that follow the row that was
 // opened, so it names the next one until the last is reached.
 const ACCEPT_AND_REVIEW_NEXT_LABEL = 'Accept and review next';
@@ -86,7 +79,7 @@ const REJECT_LABEL = 'Reject';
 
 const MAX_ITEMS_TO_SKIP = 15;
 
-describe('Translation Reviewer', function () {
+describe('Translation Reviewer: review translations', function () {
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -203,39 +196,6 @@ describe('Translation Reviewer', function () {
       'Submitted translation for review.'
     );
   }, 2100000);
-
-  it('should Filter opportunities by Entity Type', async function () {
-    await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await translationReviewer.filterContentByTopic(TOPIC_NAME);
-    await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
-
-    // The lesson and the skill are listed together, each carrying the action
-    // button that opens its own suggestions.
-    await translationReviewer.expectOpportunityActionButtonToBe(
-      CHAPTER_NAME,
-      LESSON_SUBHEADING,
-      OPPORTUNITY_ACTION_BUTTON_LABEL
-    );
-    await translationReviewer.expectOpportunityActionButtonToBe(
-      SKILL_NAME,
-      SKILL_SUBHEADING,
-      OPPORTUNITY_ACTION_BUTTON_LABEL
-    );
-  });
-
-  it('should Filter opportunities by Entity Type for skills', async function () {
-    await translationReviewer.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.SKILLS
-    );
-
-    // The skills filter shows the suggestions straight away, so the control
-    // that returns from a lesson's suggestions to the lesson list is absent.
-    await translationReviewer.expectBackToLessonsControlToBeVisible(false);
-    await translationReviewer.expectOpportunityToBePresent(
-      HINDI_SKILL_DESCRIPTION,
-      SKILL_NAME
-    );
-  });
 
   it('should Review skill translations', async function () {
     // Reaching a skill's suggestions through its opportunity card is a

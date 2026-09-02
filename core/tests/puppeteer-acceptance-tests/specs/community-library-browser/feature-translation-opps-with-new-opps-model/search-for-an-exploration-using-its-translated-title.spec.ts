@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test for the translated lesson metadata and
- * translated concept cards a learner sees once a translation is accepted.
- * Both only exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+ * @fileoverview Acceptance test for searching for an exploration using its
+ * translated title. Only exists when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
  * is on.
  *
- * LO.4 View information about the lesson.
- * LO.4 Refer to a concept card.
- * LO.4 View translated lesson metadata and concept cards in the player.
+ * CL.2 Search for an exploration using its translated title.
  *
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
  */
@@ -48,9 +45,7 @@ const ROLES = testConstants.Roles;
 Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
-// Nothing is translated into Arabic here, so it is the language used to check
-// that an untranslated concept card falls back to English.
-const UNTRANSLATED_SITE_LANGUAGE_CODE = 'ar';
+const HINDI_SITE_LANGUAGE_CODE = 'hi';
 
 const TOPIC_NAME = 'Fractions';
 const SUBTOPIC_NAME = 'Fraction Foundations';
@@ -68,10 +63,6 @@ const CONTENT_TYPE_TITLE = 'title';
 const CONTENT_TYPE_OBJECTIVE = 'objective';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
-// The skill's concept card explanation is built from its description by
-// createSkillForTopic, so the English text the fallback shows is known.
-const SKILL_EXPLANATION = `Review material text content for ${SKILL_NAME}.`;
-
 // A suggestion row truncates its heading at 30 characters, and the heading is
 // the translation itself, so any translation looked up by heading below is
 // kept under that limit.
@@ -86,7 +77,7 @@ const MAX_ITEMS_TO_SKIP = 15;
 // bound only exists so a modal that stops closing fails instead of looping.
 const MAX_SUGGESTIONS_TO_ACCEPT = 6;
 
-describe('Logged-out User', function () {
+describe('Community Library Browser: search for an exploration using its translated title', function () {
   let loggedOutUser: LoggedOutUser;
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
@@ -231,31 +222,12 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, 2100000);
 
-  it('should cover LO.4: view information about the lesson', async function () {
-    await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
-    );
+  it('should search for an exploration using its translated title', async function () {
+    await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
+    await loggedOutUser.navigateToCommunityLibraryPage();
+    await loggedOutUser.searchForLessonInSearchBar(EXPLORATION_TITLE);
 
-    await loggedOutUser.openLessonInfoModal();
-    await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);
-    await loggedOutUser.closeLessonInfoModal();
-  });
-
-  it('should cover LO.4: refer to a concept card', async function () {
-    await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
-      HINDI_SKILL_EXPLANATION
-    );
-  });
-
-  it('should cover LO.4: view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
-    await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
-    await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
-    );
-
-    await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
-      SKILL_EXPLANATION
-    );
+    await loggedOutUser.expectLessonTileToShow(HINDI_TITLE, HINDI_OBJECTIVE);
   });
 
   afterAll(async function () {
