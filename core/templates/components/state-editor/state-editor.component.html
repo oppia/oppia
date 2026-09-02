@@ -76,6 +76,7 @@
     </div>
     <div *ngIf="currentInteractionCanHaveSolution">
       <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
+                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                    (refreshWarnings)="sendRefreshWarnings()">
       </oppia-state-solution-editor>
     </div>
