@@ -58,6 +58,13 @@ class BackfillTranslationMissingReasonsJobTests(
         rights_manager.create_new_exploration_rights(
             self.EXP_1_ID, self.author_id
         )
+        default_state_dict = (
+            exp_domain.Exploration.create_default_exploration(self.EXP_1_ID)
+            .states[feconf.DEFAULT_INIT_STATE_NAME]
+            .to_dict()
+        )
+        default_state_dict['content']['html'] = '<p>Hello</p>'
+
         self.exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
@@ -70,15 +77,7 @@ class BackfillTranslationMissingReasonsJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: (
-                    exp_domain.Exploration.create_default_exploration(
-                        self.EXP_1_ID
-                    )
-                    .states[feconf.DEFAULT_INIT_STATE_NAME]
-                    .to_dict()
-                )
-            },
+            states={feconf.DEFAULT_INIT_STATE_NAME: default_state_dict},
         )
         commit_cmd = exp_domain.ExplorationChange(
             {
@@ -149,6 +148,13 @@ class BackfillTranslationMissingReasonsJobTests(
         self.assert_job_output_is([])
 
     def test_job_migrates_models(self) -> None:
+        translation_model = translation_models.EntityTranslationsModel.get(
+            'exploration.exp_1.1.hi'
+        )
+        translation_model.translations['content_0']['needs_update'] = True
+        translation_model.update_timestamps()
+        translation_model.put()
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
@@ -161,14 +167,14 @@ class BackfillTranslationMissingReasonsJobTests(
             'exploration.exp_1'
         )
         self.assertEqual(
-            migrated_opp.translation_missing_reasons, {'hi': ['new']}
+            migrated_opp.translation_missing_reasons, {'hi': ['update']}
         )
 
         migrated_summary = (
             opportunity_models.ExplorationOpportunitySummaryModel.get('exp_1')
         )
         self.assertEqual(
-            migrated_summary.translation_missing_reasons, {'hi': ['new']}
+            migrated_summary.translation_missing_reasons, {'hi': ['update']}
         )
 
     def test_missing_exploration_model_yields_err(self) -> None:
@@ -183,13 +189,7 @@ class BackfillTranslationMissingReasonsJobTests(
             ]
         )
 
-    @mock.patch(
-        'core.domain.exp_domain.Exploration.get_all_contents_which_need_translations'
-    )
-    def test_job_migrates_models_with_no_missing_translations(
-        self, mock_get_all_contents: mock.Mock
-    ) -> None:
-        mock_get_all_contents.return_value = {}
+    def test_job_migrates_models_with_no_missing_translations(self) -> None:
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(

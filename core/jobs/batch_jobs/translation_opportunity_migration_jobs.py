@@ -19,7 +19,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, exp_fetchers, translation_fetchers
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    translation_fetchers,
+    translation_services,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -112,24 +117,11 @@ class BackfillTranslationMissingReasonsJob(base_jobs.JobBase):
         )
 
         with datastore_services.get_ndb_context():
-            translation_missing_reasons = {}
-            for translation_model in translations:
-                lang_code = translation_model.language_code
-                reasons = set()
-                entity_translation = (
-                    translation_fetchers.get_entity_translation_from_model(
-                        translation_model
-                    )
+            translation_missing_reasons = (
+                translation_services.get_translation_missing_reasons(
+                    exp, new_translation_models=translations
                 )
-                pending_contents = exp.get_all_contents_which_need_translations(
-                    entity_translation, override_metadata_feature_flag=True
-                ).values()
-                for content in pending_contents:
-                    reasons.add(content.status.value)
-                if reasons:
-                    translation_missing_reasons[lang_code] = sorted(
-                        list(reasons)
-                    )
+            )
 
             updated_trans_opp_models = []
             for trans_opp_model in trans_opp_models:
