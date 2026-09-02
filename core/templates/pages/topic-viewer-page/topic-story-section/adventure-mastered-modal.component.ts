@@ -26,8 +26,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-import './adventure-mastered-modal.component.css';
-
 @Component({
   selector: 'adventure-mastered-modal',
   templateUrl: './adventure-mastered-modal.component.html',

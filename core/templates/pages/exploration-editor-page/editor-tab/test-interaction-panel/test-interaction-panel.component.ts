@@ -22,7 +22,6 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './test-interaction-panel.component.css';
 
 @Component({
   selector: 'oppia-test-interaction-panel',

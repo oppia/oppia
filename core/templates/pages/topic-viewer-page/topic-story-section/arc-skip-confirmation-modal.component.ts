@@ -26,8 +26,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-import './arc-skip-confirmation-modal.component.css';
-
 @Component({
   selector: 'arc-skip-confirmation-modal',
   templateUrl: './arc-skip-confirmation-modal.component.html',

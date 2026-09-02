@@ -25,7 +25,6 @@ import {
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CertificateOfferingResultAction,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
-import './post-certificate-offering-result-modal.component.css';
 
 @Component({
   selector: 'oppia-post-certificate-offering-result-modal',

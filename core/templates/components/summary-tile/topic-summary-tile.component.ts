@@ -22,7 +22,6 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import './topic-summary-tile.component.css';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,

@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import './progress-bar.component.css';
 
 @Component({
   selector: 'oppia-progress-bar',

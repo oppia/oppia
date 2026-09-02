@@ -32,7 +32,6 @@ import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssignSkillToTopicModalComponent} from '../modals/assign-skill-to-topic-modal.component';
 import {DeleteSkillModalComponent} from '../modals/delete-skill-modal.component';
-import './skills-list.component.css';
 import {
   TopicAssignmentsSummary,
   UnassignSkillFromTopicsModalComponent,

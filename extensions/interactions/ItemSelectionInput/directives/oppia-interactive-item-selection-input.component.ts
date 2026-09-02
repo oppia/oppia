@@ -32,8 +32,6 @@ import {PlayerTranscriptService} from 'pages/exploration-player-page/services/pl
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
-import '../static/item_selection_input.css';
-
 @Component({
   selector: 'oppia-interactive-item-selection-input',
   templateUrl: './item-selection-input-interaction.component.html',

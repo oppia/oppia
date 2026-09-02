@@ -22,7 +22,6 @@ import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-ass
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import './certificate-offering-available-page.component.css';
 
 export type CertificateAssessmentStatus = 'passed' | 'failed' | 'not_attempted';
 

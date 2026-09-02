@@ -28,7 +28,6 @@ import {HintsAndSolutionManagerService} from '../../../services/hints-and-soluti
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import './display-new-solution-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 @Component({

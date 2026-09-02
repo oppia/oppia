@@ -20,7 +20,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AssessmentResult} from 'domain/certificate-assessment/certificate-assessment.model';
-import './certificate-assessment-result-card.component.css';
 
 // The backend result response does not expose a pass/fail flag, so the pass
 // state is derived from the total score using an 80% threshold.

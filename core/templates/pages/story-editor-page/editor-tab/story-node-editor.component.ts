@@ -42,7 +42,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './story-node-editor.component.css';
 
 @Component({
   selector: 'oppia-story-node-editor',

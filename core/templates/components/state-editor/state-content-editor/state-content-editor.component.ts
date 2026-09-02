@@ -35,7 +35,6 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
-import './state-content-editor.component.css';
 
 interface HTMLSchema {
   type: string;

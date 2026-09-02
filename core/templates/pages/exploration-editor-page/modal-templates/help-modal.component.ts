@@ -20,7 +20,6 @@ import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import './help-modal.component.css';
 
 @Component({
   selector: 'oppia-help-modal',

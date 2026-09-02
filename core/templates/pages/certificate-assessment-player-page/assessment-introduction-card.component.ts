@@ -22,7 +22,6 @@ import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/c
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import './assessment-introduction-card.component.css';
 
 @Component({
   selector: 'oppia-assessment-introduction-card',

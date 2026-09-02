@@ -18,7 +18,6 @@
 
 import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './display-new-solution-interstitial-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 @Component({

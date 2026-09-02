@@ -20,7 +20,6 @@ import {Component, Optional} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {CertificateAssessmentPlayerPageConstants} from '../../pages/certificate-assessment-player-page/certificate-assessment-player-page.constants';
-import './time-expired-modal.component.css';
 
 @Component({
   selector: 'oppia-time-expired-modal',

@@ -30,7 +30,6 @@ import {TeachOppiaModalComponent} from '../templates/modal-templates/teach-oppia
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {ExternalSaveService} from 'services/external-save.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './unresolved-answers-overview.component.css';
 
 @Component({
   selector: 'oppia-unresolved-answers-overview',

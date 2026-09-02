@@ -27,8 +27,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './classroom-navigation-links.component.css';
-
 @Component({
   selector: 'oppia-classroom-navigation-links',
   templateUrl: './classroom-navigation-links.component.html',

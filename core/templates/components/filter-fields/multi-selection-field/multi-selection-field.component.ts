@@ -31,8 +31,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
-import './multi-selection-field.component.css';
-
 @Component({
   selector: 'oppia-multi-selection-field',
   templateUrl: './multi-selection-field.component.html',

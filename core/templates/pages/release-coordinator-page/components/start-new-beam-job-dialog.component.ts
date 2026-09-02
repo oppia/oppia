@@ -26,7 +26,6 @@ import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-pag
 import {AlertsService} from 'services/alerts.service';
 import {of} from 'rxjs';
 import {AppConstants} from 'app.constants';
-import './start-new-beam-job-dialog.component.css';
 
 @Component({
   selector: 'start-new-beam-job-dialog',

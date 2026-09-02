@@ -27,7 +27,6 @@ import {AppConstants} from 'app.constants';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
 import {StateDiffModalComponent} from './state-diff-modal.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './exploration-save-modal.component.css';
 
 @Component({
   selector: 'oppia-exploration-save-modal',
