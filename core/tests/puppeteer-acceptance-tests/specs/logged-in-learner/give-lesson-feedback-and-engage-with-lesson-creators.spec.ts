@@ -343,6 +343,7 @@ describe('Logged-in User', function () {
       'mySuggestionsTabAfterClickingFollowUpNoteEntryDetailView',
       __dirname
     );
+    await explorationEditor.closeBrowser();
   });
 
   it('should report a bug in a lesson.', async function () {
