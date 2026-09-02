@@ -21,17 +21,21 @@ import {
   TranslationReviewerBackendDict,
   QuestionSubmitterBackendDict,
   QuestionReviewerBackendDict,
-} from './services/contributor-dashboard-admin-stats-backend-api.service';
+  TranslationCoordinatorBackendDict,
+  QuestionCoordinatorBackendDict,
+} from '../../pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service';
 import {
   ContributorAttribute,
   FormatContributorAttributesService,
-} from './services/format-contributor-attributes.service';
+} from '../../pages/contributor-dashboard-admin-page/services/format-contributor-attributes.service';
 
 export type ContributorStats =
   | TranslationSubmitterStats
   | TranslationReviewerStats
   | QuestionSubmitterStats
-  | QuestionReviewerStats;
+  | QuestionReviewerStats
+  | TranslationCoordinatorStats
+  | QuestionCoordinatorStats;
 
 let formatContributorAttributesService: FormatContributorAttributesService =
   new FormatContributorAttributesService();
@@ -196,6 +200,61 @@ export class QuestionReviewerStats {
   ): ContributorAttribute[] {
     return formatContributorAttributesService.getQuestionReviewerContributorAttributes(
       contributorStats as QuestionReviewerStats
+    );
+  }
+}
+
+export class TranslationCoordinatorStats {
+  constructor(
+    public contributorName: string,
+    public languageCode: string,
+    public translatorsCount: number,
+    public reviewersCount: number,
+    public lastContributedInDays: number
+  ) {}
+
+  static createFromBackendDict(
+    languageDict: TranslationCoordinatorBackendDict,
+    activity: {translation_coordinator: string; last_activity_days: number}
+  ): TranslationCoordinatorStats {
+    return new TranslationCoordinatorStats(
+      activity.translation_coordinator,
+      languageDict.language_id,
+      languageDict.translators_count,
+      languageDict.reviewers_count,
+      activity.last_activity_days
+    );
+  }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getTranslationCoordinatorContributorAttributes(
+      contributorStats as TranslationCoordinatorStats
+    );
+  }
+}
+
+export class QuestionCoordinatorStats {
+  constructor(
+    public contributorName: string,
+    public lastContributedInDays: number
+  ) {}
+
+  static createFromBackendDict(
+    summaryDict: QuestionCoordinatorBackendDict
+  ): QuestionCoordinatorStats {
+    return new QuestionCoordinatorStats(
+      summaryDict.question_coordinator,
+      summaryDict.last_activity
+    );
+  }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getQuestionCoordinatorContributorAttributes(
+      contributorStats as QuestionCoordinatorStats
     );
   }
 }

@@ -36,10 +36,12 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
 import {SkillEditorStateService} from './services/skill-editor-state.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import './skill-editor-page.component.css';
 
 @Component({
   selector: 'oppia-skill-editor-page',
   templateUrl: './skill-editor-page.component.html',
+  styleUrls: ['./skill-editor-page.component.css'],
 })
 export class SkillEditorPageComponent implements OnInit {
   constructor(
