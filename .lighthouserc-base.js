@@ -26,6 +26,7 @@ const LIGHTHOUSE_URLS_TO_RUN = process.env.LIGHTHOUSE_URLS_TO_RUN
 
 const basePerformanceAssertions = {
   'errors-in-console': ['error', {minScore: 1}],
+  'uses-optimized-images': ['error', {minScore: 1}],
   'modern-image-formats': ['error', {maxLength: 0, strategy: 'pessimistic'}],
   'uses-passive-event-listeners': ['error', {minScore: 1}],
   deprecations: ['error', {minScore: 1}],
@@ -72,7 +73,6 @@ function buildPerformanceCatchAll(perfThresholds) {
         'error',
         {maxNumericValue: perfThresholds.cls},
       ],
-      'uses-optimized-images': ['error', {minScore: 1}],
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
       'server-response-time': ['off', {}],

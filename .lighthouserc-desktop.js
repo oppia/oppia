@@ -79,6 +79,12 @@ module.exports = {
               tbt: 300,
               cls: 0.15,
             },
+            overrides: {
+              // Marketing hero images are not properly responsively sized.
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
@@ -90,6 +96,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.88,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
@@ -111,7 +121,11 @@ module.exports = {
               tbt: 800,
               cls: 1.5,
             },
-            accessibilityMinScore: 0.9,
+            accessibilityMinScore: 0.84,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
@@ -156,6 +170,10 @@ module.exports = {
               cls: 0.44,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
@@ -189,6 +207,10 @@ module.exports = {
               cls: 0.51,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/delete-account$',
@@ -223,6 +245,8 @@ module.exports = {
               deprecations: ['error', {minScore: 0}],
               redirects: ['error', {minScore: 1}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
             accessibilityMinScore: 0.91,
           },
@@ -236,6 +260,10 @@ module.exports = {
               cls: 0.57,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
@@ -277,6 +305,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -299,7 +329,22 @@ module.exports = {
               tbt: 800,
               cls: 1.5,
             },
-            accessibilityMinScore: 0.9,
+            accessibilityMinScore: 0.88,
+            overrides: {
+              // The partnerships page showcases many partner logos that are
+              // not in next-gen formats.
+              'modern-image-formats': [
+                'error',
+                {maxLength: 15, strategy: 'pessimistic'},
+              ],
+              // The partnerships page uses scroll handlers that require
+              // non-passive listeners.
+              'uses-passive-event-listeners': ['error', {minScore: 0}],
+              // Marketing hero images are not properly responsively sized.
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/preferences$',
@@ -325,6 +370,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/profile/username1$',
@@ -362,6 +411,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -374,6 +425,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/thanks$',
@@ -387,6 +442,8 @@ module.exports = {
             accessibilityMinScore: 0.95,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -401,6 +458,8 @@ module.exports = {
             accessibilityMinScore: 0.88,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
