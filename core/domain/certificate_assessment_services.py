@@ -30,6 +30,7 @@ from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
     classroom_config_services,
+    question_domain,
     question_fetchers,
     question_services,
     skill_fetchers,
@@ -638,22 +639,24 @@ def start_certificate_assessment_attempt(
         )
         attempt = _attempt_model_to_domain(attempt_model)
         attempt.validate()
-        return (
-            attempt,
-            [
-                {
-                    'question_id': question_id,
-                    'question_version': version_data['question_versions'][
-                        question_id
-                    ],
-                    'question_state_data': _get_pinned_question_state_data(
-                        question_id,
-                        version_data['question_versions'][question_id],
-                    ),
-                }
-                for question_id, _ in selected_questions
-            ],
+        id_version_pairs = [
+            (question_id, version_data['question_versions'][question_id])
+            for question_id, _ in selected_questions
+        ]
+        questions = question_services.get_questions_by_ids_and_versions(
+            id_version_pairs
         )
+        pinned_questions = [
+            {
+                'question_id': question_id,
+                'question_version': version,
+                'question_state_data': _pin_question_state(question),
+            }
+            for (question_id, version), question in zip(
+                id_version_pairs, questions
+            )
+        ]
+        return (attempt, pinned_questions)
 
     offering = get_certificate_assessment_offering(certificate_id)
     validation_result = validate_certificate_assessment_offering(
@@ -697,8 +700,8 @@ def start_certificate_assessment_attempt(
     )
 
 
-def _get_pinned_question_state_data(
-    question_id: str, question_version: int
+def _pin_question_state(
+    question: question_domain.Question,
 ) -> state_domain.StateDict:
     """Returns pinned question state data with the solution and hints removed.
 
@@ -707,16 +710,12 @@ def _get_pinned_question_state_data(
     they cannot see the answer before submitting.
 
     Args:
-        question_id: str. The ID of the question.
-        question_version: int. The version of the question to pin.
+        question: Question. The question domain object to pin.
 
     Returns:
         dict. The question's state data with its interaction solution and
         hints removed.
     """
-    question = question_services.get_question_by_id_and_version(
-        question_id, question_version
-    )
     question_state_data = question.question_state_data.to_dict()
     # Do not leak the solution (including correct_answer) or hints to the
     # learner while the assessment is still in progress.

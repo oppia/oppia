@@ -368,7 +368,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             self.assertIn('content', question_state_data)
             self.assertIn('interaction', question_state_data)
 
-    def test_start_certificate_assessment_attempt_pins_question_data_without_solution_or_hints(
+    def test_start_attempt_strips_solution_and_hints(
         self,
     ) -> None:
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
