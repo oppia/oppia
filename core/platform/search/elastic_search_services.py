@@ -20,6 +20,8 @@ API.
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.domain import (
     platform_parameter_list,
@@ -143,6 +145,9 @@ def _fetch_response_from_elastic_search(
         _create_index(index_name)
         empty_list: List[str] = []
         return empty_list, None
+    except elasticsearch.exceptions.ElasticsearchException as e:
+        logging.exception('Failed to fetch response from Elasticsearch: %s' % e)
+        return [], None
 
     matched_search_docs = response['hits']['hits']
 

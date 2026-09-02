@@ -143,6 +143,29 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
+    def test_search_returns_empty_when_elasticsearch_raises_exception(
+        self,
+    ) -> None:
+        def mock_search_raises(
+            body: Dict[str, Any], index: str, from_: int, size: int
+        ) -> Dict[str, Any]:
+            meta = type('Meta', (), {'status': 503})()
+            body_dict = {
+                'status': 503,
+                'error': 'search_phase_execution_exception',
+            }
+            raise elasticsearch.exceptions.ApiError(
+                'search_phase_execution_exception', meta, body_dict
+            )
+
+        es_client = elastic_search_services.ES.get_client()
+        with self.swap(es_client, 'search', mock_search_raises):
+            result, new_offset = elastic_search_services.search(
+                '', 'index', [], [], offset=0, size=50
+            )
+            self.assertEqual(result, [])
+            self.assertIsNone(new_offset)
+
     def test_search_constructs_query_with_categories_and_languages(
         self,
     ) -> None:

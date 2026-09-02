@@ -329,6 +329,54 @@ describe('Library Page Component', () => {
     expect(windowDimensionsService.getWidth).toHaveBeenCalled();
   }));
 
+  it('should handle error and hide loader when fetchLibraryGroupDataAsync fails', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(translateService.onLangChange, 'subscribe');
+    spyOn(loggerService, 'error');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(
+      libraryPageBackendApiService,
+      'fetchLibraryGroupDataAsync'
+    ).and.returnValue(Promise.reject('Internal Server Error'));
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      libraryPageBackendApiService.fetchLibraryGroupDataAsync
+    ).toHaveBeenCalled();
+    expect(loggerService.error).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.activityList).toEqual([]);
+  }));
+
+  it('should handle error and hide loader when fetchLibraryIndexDataAsync fails', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(translateService.onLangChange, 'subscribe');
+    windowRef.nativeWindow.location.pathname = '/community-library';
+    fixture.detectChanges();
+    spyOn(
+      libraryPageBackendApiService,
+      'fetchLibraryIndexDataAsync'
+    ).and.returnValue(Promise.reject('Internal Server Error'));
+    spyOn(loggerService, 'error');
+    spyOn(loaderService, 'hideLoadingScreen');
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      libraryPageBackendApiService.fetchLibraryIndexDataAsync
+    ).toHaveBeenCalled();
+    expect(loggerService.error).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.libraryGroups).toEqual([]);
+  }));
+
   it('should initialize for non group pages', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');

@@ -426,74 +426,95 @@ export class LibraryPageComponent {
           }
           this.loaderService.hideLoadingScreen();
           this.initCarousels();
+        })
+        .catch(error => {
+          this.loggerService.error(
+            'Failed to load library group data: ' + error
+          );
+          this.activityList = [];
+          this.loaderService.hideLoadingScreen();
         });
     } else {
       this.libraryPageBackendApiService
         .fetchLibraryIndexDataAsync()
         .then(response => {
           this.libraryGroups = response.activity_summary_dicts_by_category;
-          this.userService.getUserInfoAsync().then(userInfo => {
-            this.activitiesOwned = {explorations: {}, collections: {}};
-            if (userInfo.isLoggedIn()) {
-              this.libraryPageBackendApiService
-                .fetchCreatorDashboardDataAsync()
-                .then(response => {
-                  this.libraryGroups.forEach(libraryGroup => {
-                    let activitySummaryDicts =
-                      libraryGroup.activity_summary_dicts;
+          this.userService
+            .getUserInfoAsync()
+            .then(userInfo => {
+              this.activitiesOwned = {explorations: {}, collections: {}};
+              if (userInfo.isLoggedIn()) {
+                this.libraryPageBackendApiService
+                  .fetchCreatorDashboardDataAsync()
+                  .then(response => {
+                    this.libraryGroups.forEach(libraryGroup => {
+                      let activitySummaryDicts =
+                        libraryGroup.activity_summary_dicts;
 
-                    let ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                    let ACTIVITY_TYPE_COLLECTION = 'collection';
+                      let ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                      let ACTIVITY_TYPE_COLLECTION = 'collection';
 
-                    activitySummaryDicts.forEach(activitySummaryDict => {
-                      if (
-                        activitySummaryDict.activity_type ===
-                        ACTIVITY_TYPE_EXPLORATION
-                      ) {
-                        this.activitiesOwned.explorations[
-                          activitySummaryDict.id
-                        ] = false;
-                      } else if (
-                        activitySummaryDict.activity_type ===
-                        ACTIVITY_TYPE_COLLECTION
-                      ) {
-                        this.activitiesOwned.collections[
-                          activitySummaryDict.id
-                        ] = false;
-                      } else {
-                        this.loggerService.error(
-                          'INVALID ACTIVITY TYPE: Activity' +
-                            '(id: ' +
-                            activitySummaryDict.id +
-                            ', name: ' +
-                            activitySummaryDict.title +
-                            ', type: ' +
-                            activitySummaryDict.activity_type +
-                            ') has an invalid activity type, which could ' +
-                            'not be recorded as an exploration or a ' +
-                            'collection.'
-                        );
-                      }
+                      activitySummaryDicts.forEach(activitySummaryDict => {
+                        if (
+                          activitySummaryDict.activity_type ===
+                          ACTIVITY_TYPE_EXPLORATION
+                        ) {
+                          this.activitiesOwned.explorations[
+                            activitySummaryDict.id
+                          ] = false;
+                        } else if (
+                          activitySummaryDict.activity_type ===
+                          ACTIVITY_TYPE_COLLECTION
+                        ) {
+                          this.activitiesOwned.collections[
+                            activitySummaryDict.id
+                          ] = false;
+                        } else {
+                          this.loggerService.error(
+                            'INVALID ACTIVITY TYPE: Activity' +
+                              '(id: ' +
+                              activitySummaryDict.id +
+                              ', name: ' +
+                              activitySummaryDict.title +
+                              ', type: ' +
+                              activitySummaryDict.activity_type +
+                              ') has an invalid activity type, which could ' +
+                              'not be recorded as an exploration or a ' +
+                              'collection.'
+                          );
+                        }
+                      });
+
+                      response.explorations_list.forEach(ownedExplorations => {
+                        this.activitiesOwned.explorations[ownedExplorations.id] =
+                          true;
+                      });
+
+                      response.collections_list.forEach(ownedCollections => {
+                        this.activitiesOwned.collections[ownedCollections.id] =
+                          true;
+                      });
                     });
-
-                    response.explorations_list.forEach(ownedExplorations => {
-                      this.activitiesOwned.explorations[ownedExplorations.id] =
-                        true;
-                    });
-
-                    response.collections_list.forEach(ownedCollections => {
-                      this.activitiesOwned.collections[ownedCollections.id] =
-                        true;
-                    });
+                    this.loaderService.hideLoadingScreen();
+                    this.initCarousels();
+                  })
+                  .catch(error => {
+                    this.loggerService.error(
+                      'Failed to load creator dashboard data: ' + error
+                    );
+                    this.loaderService.hideLoadingScreen();
+                    this.initCarousels();
                   });
-                  this.loaderService.hideLoadingScreen();
-                  this.initCarousels();
-                });
-            } else {
+              } else {
+                this.loaderService.hideLoadingScreen();
+                this.initCarousels();
+              }
+            })
+            .catch(error => {
+              this.loggerService.error('Failed to get user info: ' + error);
               this.loaderService.hideLoadingScreen();
               this.initCarousels();
-            }
-          });
+            });
 
           if (!this.preferredLanguageCodesLoaded) {
             this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
@@ -519,6 +540,13 @@ export class LibraryPageComponent {
               buttonText: 'See More',
             });
           }
+        })
+        .catch(error => {
+          this.loggerService.error(
+            'Failed to load library index data: ' + error
+          );
+          this.libraryGroups = [];
+          this.loaderService.hideLoadingScreen();
         });
     }
   }
