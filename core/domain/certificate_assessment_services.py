@@ -646,16 +646,19 @@ def start_certificate_assessment_attempt(
         questions = question_services.get_questions_by_ids_and_versions(
             id_version_pairs
         )
-        pinned_questions = [
-            {
-                'question_id': question_id,
-                'question_version': version,
-                'question_state_data': _pin_question_state(question),
-            }
-            for (question_id, version), question in zip(
-                id_version_pairs, questions
-            )
-        ]
+        pinned_questions = cast(
+            List[CertificateAssessmentQuestionDict],
+            [
+                {
+                    'question_id': question_id,
+                    'question_version': version,
+                    'question_state_data': _pin_question_state(question),
+                }
+                for (question_id, version), question in zip(
+                    id_version_pairs, questions
+                )
+            ],
+        )
         return (attempt, pinned_questions)
 
     offering = get_certificate_assessment_offering(certificate_id)
