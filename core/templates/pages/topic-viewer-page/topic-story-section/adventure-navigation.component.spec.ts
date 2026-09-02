@@ -119,6 +119,48 @@ describe('AdventureNavigationComponent', () => {
     expect(component.getPracticeBadgeIconName()).toBe('edit');
   });
 
+  it('should report the last lesson as completed when it is completed', () => {
+    const adventureGroup = {
+      lessons: [
+        {lessonNumber: 1, isCompleted: true},
+        {lessonNumber: 2, isCompleted: true},
+      ],
+      accentColor: '#000',
+      showPractice: true,
+      isPracticeCompleted: false,
+      arcId: '1',
+    };
+
+    expect(component.isLastLessonCompleted(adventureGroup)).toBe(true);
+  });
+
+  it('should report the last lesson as not completed when it is not completed', () => {
+    const adventureGroup = {
+      lessons: [
+        {lessonNumber: 1, isCompleted: true},
+        {lessonNumber: 2, isCompleted: false},
+      ],
+      accentColor: '#000',
+      showPractice: true,
+      isPracticeCompleted: false,
+      arcId: '1',
+    };
+
+    expect(component.isLastLessonCompleted(adventureGroup)).toBe(false);
+  });
+
+  it('should report no completed last lesson when the adventure group has no lessons', () => {
+    const adventureGroup = {
+      lessons: [],
+      accentColor: '#000',
+      showPractice: true,
+      isPracticeCompleted: false,
+      arcId: '1',
+    };
+
+    expect(component.isLastLessonCompleted(adventureGroup)).toBe(false);
+  });
+
   it('should mark matching practice arc as active when one is provided', () => {
     component.activePracticeArcId = 'arc-2';
 
