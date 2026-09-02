@@ -25,10 +25,12 @@ import {StoryEditorStateService} from 'pages/story-editor-page/services/story-ed
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import './create-new-story-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-story-modal',
   templateUrl: './create-new-story-modal.component.html',
+  styleUrls: ['./create-new-story-modal.component.css'],
 })
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   constructor(
