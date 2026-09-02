@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 from core import feconf
 from core.domain import exp_domain, rights_manager
 from core.jobs import job_test_utils

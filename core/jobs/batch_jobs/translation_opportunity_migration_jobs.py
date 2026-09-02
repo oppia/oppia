@@ -19,12 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import (
-    exp_domain,
-    exp_fetchers,
-    translation_fetchers,
-    translation_services,
-)
+from core.domain import exp_domain, exp_fetchers, translation_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
