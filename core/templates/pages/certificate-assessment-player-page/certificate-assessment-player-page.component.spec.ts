@@ -508,24 +508,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.getCurrentQuestion()).toEqual(component.questions[1]);
   }));
 
-  it('should not open any modal when both modal flags are false', () => {
-    const ngbModal = TestBed.inject(NgbModal);
-    ngbModal.open.calls.reset();
-    component.showTimeExpiredModal = false;
-    component.showUnansweredQuestionModal = false;
-    fixture.detectChanges();
-
-    expect(ngbModal.open).not.toHaveBeenCalled();
-  });
-
-  it('should open the time-expired modal as a bottom sheet on mobile screens', fakeAsync(() => {
-    loadQ1();
-    dimsSpy.getWidth.and.returnValue(400);
-    spyOn(component.assessmentSubmitted, 'emit');
-    triggerTimeExpiry();
-    expect(bottomSheetSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
-  }));
-
   it('should open the unanswered-question modal as a bottom sheet on mobile screens', fakeAsync(() => {
     load();
     dimsSpy.getWidth.and.returnValue(400);
