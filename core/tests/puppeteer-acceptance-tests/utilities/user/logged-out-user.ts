@@ -6410,6 +6410,10 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
   }
 
+  /**
+   * Selects a report issue chip in feedback Modal.
+   * @param {string} chipName - The name of the chip to select.
+   */
   async selectReportIssueChip(chipName: string): Promise<void> {
     switch (chipName) {
       case 'typo':
@@ -6431,6 +6435,45 @@ export class LoggedOutUser extends BaseUser {
       default:
         throw new Error('Invalid chip name: ' + chipName);
     }
+  }
+
+  /**
+   * Checks if a report issue chip is selected in feedback Modal.
+   * @param {string} chipName - The name of the chip to check.
+   * @param {boolean} shouldBeSelected - Whether the chip should be selected or not.
+   */
+  async expectReportIssueChipToBeSelected(
+    chipName: string,
+    shouldBeSelected: boolean
+  ): Promise<void> {
+    let chipSelector: string;
+
+    switch (chipName) {
+      case 'typo':
+        chipSelector = reportIssueTypoChipSelector;
+        break;
+      case 'confusing or incorrect answer':
+        chipSelector = reportIssueConfusingOrIncorrectChipSelector;
+        break;
+      case 'broken layout':
+        chipSelector = reportIssueBrokenLayoutChipSelector;
+        break;
+      case 'other':
+        chipSelector = reportIssueOtherChipSelector;
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, expected: boolean) => {
+        const element = document.querySelector(selector);
+        return element?.classList.contains('selected') === expected;
+      },
+      {},
+      chipSelector,
+      shouldBeSelected
+    );
   }
 
   /**
@@ -6599,8 +6642,11 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  clearFeedbackTextArea(): Promise<void> {
-    return this.clearAllTextFrom(feedbackModaltextarea);
+  /**
+   * Clears the feedback text area.
+   */
+  async clearFeedbackTextArea(): Promise<void> {
+    return await this.clearAllTextFrom(feedbackModaltextarea);
   }
 
   /**
@@ -6627,13 +6673,13 @@ export class LoggedOutUser extends BaseUser {
   async openReportASiteIssueModalFromGlobalFooter(
     isUserLoggedIn: boolean
   ): Promise<void> {
+    await this.scrollToBottomOfPage();
     await this.expectElementToBeVisible(reportWebsiteIssueLink, true);
     await this.clickOnElementWithSelector(reportWebsiteIssueLink);
     await this.expectModalTitleToBe('Report a Website Issue');
     await this.expectElementToBeVisible(commonModalBodySelector);
     await this.expectElementToBeVisible(feedbackModaltextarea);
     if (!isUserLoggedIn) {
-      await this.scrollToCaptchaContainer();
       await this.expectElementToBeVisible(feedbackCaptchaContainer);
       await this.waitForTurnstileFrameToLoad();
     }
@@ -6704,6 +6750,10 @@ export class LoggedOutUser extends BaseUser {
     await this.expectTextContentToContain(feedbackCharacterCount, '0 / 2500');
   }
 
+  /**
+   * Checks if the lesson specific category chips are present.
+   * @param shouldBePresent - Whether the lesson specific category chips should be present.
+   */
   async expectLessonSpecificCategoryChipsToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {
@@ -6713,6 +6763,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if the screenshot drop zone text matches the expected text.
+   * @param expectedText - The expected text.
+   */
   async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
     await this.expectElementToBeVisible(screenshotDropZoneSelector);
     await this.expectTextContentToContain(
@@ -6721,6 +6775,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if the feedback screenshot preview is present.
+   * @param shouldBePresent - Whether the feedback screenshot preview should be present.
+   */
   async expectFeedbackScreenshotPreviewToBePresent(
     shouldBePresent: boolean
   ): Promise<void> {

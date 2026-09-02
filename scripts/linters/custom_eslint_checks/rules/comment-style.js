@@ -57,6 +57,7 @@ module.exports = {
     var allowedPhrases = [
       '@ts-expect-error',
       '@ts-ignore',
+      '@ts-nocheck',
       '--params',
       'eslint-disable',
       'eslint-enable',

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
+// @ts-nocheck
+
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {

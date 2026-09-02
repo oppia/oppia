@@ -80,7 +80,6 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/tests/test-dependencies',
   'core/templates/tests',
   'core/templates/utility/hashes.ts',
-  'angular-template-style-url-replacer.webpack-loader.js',
   'core/tests/playwright-acceptance-tests',
 ];
 
@@ -113,8 +112,9 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
 };
 
 const LIGHTHOUSE_MODULES = [
-  '.lighthouserc-performance.js',
-  '.lighthouserc-accessibility.js',
+  '.lighthouserc.js',
+  '.lighthouserc-base.js',
+  '.lighthouserc-desktop.js',
 ];
 
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
@@ -475,8 +475,8 @@ const getDependenciesFromTypeScriptOrJavaScriptFile = (
   });
 
   // If the file ends with '.import.ts', we check if there is a mainpage file
-  // that corresponds to it and add it as a dependency since Webpack loads
-  // these.
+  // that corresponds to it and add it as a dependency since these are loaded
+  // as part of the build.
   if (file.endsWith('.import.ts')) {
     const mainPageFilePath = file.replace('.import.ts', '.mainpage.html');
     if (fs.existsSync(path.join(ROOT_DIRECTORY, mainPageFilePath))) {
