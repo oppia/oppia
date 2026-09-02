@@ -39,12 +39,12 @@ export default defineConfig({
   testDir: './specs',
   timeout: 300000,
   fullyParallel: false,
-  reporter: 'list',
+  reporter: [['./reporters/compact-reporter.ts']],
   use: {
     baseURL: 'http://localhost:8181',
     headless: process.env.HEADLESS !== 'false',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: 'off',
     video: 'on-first-retry',
   },
   snapshotPathTemplate:
