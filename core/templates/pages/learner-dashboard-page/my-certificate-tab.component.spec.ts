@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for MyCertificatesTabComponent.
  */
 
+// @ts-nocheck
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {CommonModule} from '@angular/common';

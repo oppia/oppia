@@ -38,10 +38,12 @@ import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {UrlService} from 'services/contextual/url.service';
 import {Story} from 'domain/story/story.model';
+import './story-editor-page.component.css';
 
 @Component({
   selector: 'oppia-story-editor-page',
   templateUrl: './story-editor-page.component.html',
+  styleUrls: ['./story-editor-page.component.css'],
 })
 export class StoryEditorPageComponent implements OnInit, OnDestroy {
   warningsAreShown!: boolean;
