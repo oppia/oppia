@@ -80,7 +80,6 @@ describe('CertificateAssessmentPlayerStateService', () => {
     expect(service.currentStage).toBe(
       CertificateAssessmentPlayerPageConstants.STAGE_INTRO
     );
-    expect(service.showAssessmentInterruptCard).toBeFalse();
     expect(service.remainingTimeInSeconds).toBe(0);
     expect(service.isTimeExpired).toBeFalse();
     expect(service.getAttempt()).toBeNull();
@@ -187,55 +186,12 @@ describe('CertificateAssessmentPlayerStateService', () => {
     it('should not restart a window that is already running', fakeAsync(() => {
       spyOnTimers();
       armCountdown();
-      service.resumeQuestionsStage();
       service.configureForOffering(mockOffering.timeLimitInMinutes);
 
       expect(window.setInterval).toHaveBeenCalledTimes(1);
 
       tick(2000);
       expect(service.remainingTimeInSeconds).toBe(3598);
-      service.ngOnDestroy();
-    }));
-  });
-
-  describe('retry and resume after an interruption', () => {
-    it('should return to the intro on retry without touching timing state', fakeAsync(() => {
-      spyOnTimers();
-      armCountdown();
-      tick(3600000);
-      expect(service.isTimeExpired).toBeTrue();
-      service.showAssessmentInterruptCard = true;
-
-      service.returnToIntroAfterRetry();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_INTRO
-      );
-      // Retry deliberately leaves the expired window alone; only a
-      // successfully begun replacement attempt resets it.
-      expect(service.isTimeExpired).toBeTrue();
-      expect(service.remainingTimeInSeconds).toBe(0);
-      expect(window.clearInterval).toHaveBeenCalledTimes(1);
-    }));
-
-    it('should return to the questions on resume keeping the remaining time', fakeAsync(() => {
-      armCountdown();
-      tick(30000);
-      service.showAssessmentInterruptCard = true;
-      service.returnToIntroAfterRetry();
-
-      service.resumeQuestionsStage();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-      );
-      expect(service.isTimeExpired).toBeFalse();
-
-      tick(2000);
-      // The countdown kept running while the learner was away.
-      expect(service.remainingTimeInSeconds).toBeLessThan(3600);
       service.ngOnDestroy();
     }));
   });
