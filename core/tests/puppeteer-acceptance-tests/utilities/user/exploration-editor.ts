@@ -6217,7 +6217,12 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (title === explorationName) {
-      await this.page.click(`a:has(.${explorationSummaryTileTitleSelector})`);
+      await this.page.evaluate(selector => {
+        const titleElement = document.querySelector(selector);
+        if (titleElement) {
+          titleElement.parentElement.click();
+        }
+      }, explorationSummaryTileTitleSelector);
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }
