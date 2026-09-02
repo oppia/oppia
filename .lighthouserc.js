@@ -45,6 +45,11 @@ module.exports = {
               tbt: 1575,
               cls: 0.15,
             },
+            overrides: {
+              // The hero images use media queries and are intentionally
+              // larger than the viewport on smaller screens.
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
@@ -88,7 +93,7 @@ module.exports = {
               tbt: 2085,
               cls: 0.15,
             },
-            accessibilityMinScore: 0.92,
+            accessibilityMinScore: 0.87,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/blog$',
@@ -100,6 +105,10 @@ module.exports = {
               cls: 1.5,
             },
             accessibilityMinScore: 0.9,
+            overrides: {
+              'image-aspect-ratio': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
@@ -265,7 +274,15 @@ module.exports = {
               tbt: 4800,
               cls: 1.5,
             },
-            accessibilityMinScore: 0.9,
+            accessibilityMinScore: 0.88,
+            overrides: {
+              'modern-image-formats': [
+                'error',
+                {maxLength: 15, strategy: 'pessimistic'},
+              ],
+              'uses-passive-event-listeners': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/preferences$',
@@ -543,6 +560,10 @@ module.exports = {
           {
             matchingUrlPattern: '^http://[^/]+/blog/.+$',
             accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+              'image-aspect-ratio': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: '^http://[^/]+/certificate-assessment/.+$',

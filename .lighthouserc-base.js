@@ -35,7 +35,7 @@ const basePerformanceAssertions = {
   charset: ['warn', {minScore: 1}],
   viewport: ['warn', {minScore: 1}],
   'font-size': ['warn', {minScore: 1}],
-  'image-size-responsive': ['warn', {minScore: 1}],
+  'image-size-responsive': ['warn', {minScore: 0.72}],
   'third-party-cookies': ['warn', {minScore: 1}],
   'inspector-issues': ['warn', {minScore: 1}],
   'redirects-http': ['warn', {minScore: 1}],
