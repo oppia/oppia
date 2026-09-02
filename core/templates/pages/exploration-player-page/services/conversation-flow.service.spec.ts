@@ -70,6 +70,7 @@ import {
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import {RefresherExplorationConfirmationModalService} from '../services/refresher-exploration-confirmation-modal.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
+import {ChapterProgressService} from './chapter-progress.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {UserService} from '../../../services/user.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
@@ -88,6 +89,7 @@ describe('Conversation flow service', () => {
   let cardAnimationService: CardAnimationService;
   let userService: UserService;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
+  let chapterProgressService: ChapterProgressService;
   let windowRef: WindowRef;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let focusManagerService: FocusManagerService;
@@ -174,6 +176,7 @@ describe('Conversation flow service', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     currentEngineService = TestBed.inject(CurrentEngineService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
+    chapterProgressService = TestBed.inject(ChapterProgressService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     pageContextService = TestBed.inject(PageContextService);
     userService = TestBed.inject(UserService);
@@ -1952,5 +1955,92 @@ describe('Conversation flow service', () => {
 
     expect(focusManagerService.generateFocusLabel).not.toHaveBeenCalled();
     expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
+  }));
+
+  it('should use content focus label when refreshInteraction is false, remainOnCurrentCard is true, and nextCard is not null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(3);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(focusManagerService, 'generateFocusLabel');
+    spyOn(cardAnimationService, 'scrollToBottom');
+    spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(learnerAnswerInfoService, 'initLearnerAnswerInfoService');
+    spyOn(explorationEngineService, 'getState').and.returnValue({
+      name: 'oldState',
+      cardIsCheckpoint: false,
+    });
+    const nextCard = createCard('NextState', 'TextInput');
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: Function
+    ) => {
+      successCallback(
+        nextCard,
+        false,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        false,
+        null,
+        ''
+      );
+      return false;
+    };
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      0
+    );
+    spyOn(statsReportingService, 'recordStateTransition');
+    spyOn(statsReportingService, 'recordStateCompleted');
+    spyOn(learnerParamsService, 'getAllParams');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(focusManagerService.generateFocusLabel).not.toHaveBeenCalled();
+    expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
+    expect(cardAnimationService.scrollToBottom).toHaveBeenCalled();
   }));
 });
