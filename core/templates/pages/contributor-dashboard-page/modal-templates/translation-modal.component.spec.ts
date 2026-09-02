@@ -58,6 +58,7 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UnicodeSchema} from 'services/schema-default-value.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -632,7 +633,17 @@ describe('Translation Modal Component', () => {
           successCallback()
       );
       component.ngOnInit();
+      component.activeWrittenTranslation = 'مرحبا بالجميع';
+
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
+      expect(component.getUnicodeSchema().ui_config?.languageDirection).toBe(
+        'rtl'
+      );
+      expect(
+        (component.getSetOfStringsSchema().items as UnicodeSchema).ui_config
+          ?.languageDirection
+      ).toBe('rtl');
+      expect(component.activeWrittenTranslationAsString).toBe('مرحبا بالجميع');
     }));
 
     it('should get the unicode schema', () => {
