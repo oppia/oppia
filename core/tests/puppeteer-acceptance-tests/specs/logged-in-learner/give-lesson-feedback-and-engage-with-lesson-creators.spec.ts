@@ -74,10 +74,10 @@ describe('Logged-in User', function () {
     );
   }, 350000);
 
-  // afterAll(async function () {
-  //   await UserFactory.closeBrowserForUser(loggedInLearner);
-  //   await UserFactory.closeSuperAdminBrowser();
-  // });
+  afterAll(async function () {
+    await UserFactory.closeBrowserForUser(loggedInLearner);
+    await UserFactory.closeSuperAdminBrowser();
+  });
 
   it('should submit open-ended feedback on a lesson and track creator responses on my dashboard.', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
@@ -291,7 +291,10 @@ describe('Logged-in User', function () {
     // Add a follow up note.
     await loggedInLearner.clickOnAddAFollowUpNote();
 
-    await loggedInLearner.expectScreenshotToMatch('Entry', __dirname);
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterClickingAddAFollowUpNoteModal',
+      __dirname
+    );
 
     await loggedInLearner.expectFeedbackModalSubHeaderToBe(
       "A creator marked this as fixed. Let them know if it's resolved, or add anything else you'd like them to know."
@@ -311,7 +314,7 @@ describe('Logged-in User', function () {
       false
     );
     await loggedInLearner.expectToastMessage(
-      'Your follow-up note has been sent successfully.'
+      'Your follow up note has been sent successfully'
     );
 
     await loggedInLearner.goBackToMySuggestionsTabList();
@@ -345,6 +348,7 @@ describe('Logged-in User', function () {
   });
 
   it('should report a bug in a lesson.', async function () {
+    await loggedInLearner.playLesson(expId);
     await loggedInLearner.toggleOptionsSidebar();
     await loggedInLearner.clickReportLessonButton(true);
     showMessage('Clicked on "Report an Issue" button.');
