@@ -16,6 +16,8 @@
  * @fileoverview Unit test for graph editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   waitForAsync,

@@ -44,6 +44,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import './subtopic-viewer-page.component.css';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
