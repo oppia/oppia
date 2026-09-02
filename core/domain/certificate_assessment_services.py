@@ -646,6 +646,9 @@ def start_certificate_assessment_attempt(
         questions = question_services.get_questions_by_ids_and_versions(
             id_version_pairs
         )
+        # Here we use cast because the list comprehension builds plain dicts
+        # which mypy infers as List[Dict[str, object]], while the function
+        # signature expects List[CertificateAssessmentQuestionDict].
         pinned_questions = cast(
             List[CertificateAssessmentQuestionDict],
             [
