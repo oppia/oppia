@@ -475,7 +475,11 @@ export class Contributor extends ExplorationEditor {
    * @param tabName - The name of the tab to switch to.
    */
   async switchToTabInContributionDashboard(
-    tabName: 'Translate Text' | 'My Contributions' | 'Submit Question'
+    tabName:
+      | 'Translate Text'
+      | 'My Contributions'
+      | 'Submit Question'
+      | 'Review Translations'
   ): Promise<void> {
     await this.page.waitForFunction(
       (selector: string, name: string) => {
