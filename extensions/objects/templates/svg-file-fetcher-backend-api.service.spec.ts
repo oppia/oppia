@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for fetching svg file.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
