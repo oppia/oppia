@@ -484,6 +484,17 @@ indexes:
   - name: deleted
   - name: created_on
 
+- kind: SkillOpportunityModel
+  properties:
+  - name: deleted
+  - name: topic_is_published
+    direction: desc
+  - name: is_incomplete
+    direction: desc
+  - name: question_count
+    direction: desc
+  - name: created_on
+
 - kind: SkillSnapshotMetadataModel
   properties:
   - name: committer_id
