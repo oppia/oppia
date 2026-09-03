@@ -19,11 +19,11 @@
  * VA.MA. Assign, unassign voiceover artists to an exploration
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import testConstants from '../../utilities/common/test-constants';
 
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
@@ -32,31 +32,37 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-// The backend 400 error is a known consequence of adding an invalid user ID.
-// By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
-// The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  new RegExp(
-    'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
-  ),
-  new RegExp('Sorry, we could not find the specified user.'),
-]);
+// TODO(#26974): Once ConsoleReporter is ported to Playwright, re-add the
+// suppression for the expected 400 from adding an invalid user ID as a
+// voiceover artist (see the Puppeteer version of this spec for reference).
+// The frontend toast message for this case is asserted directly below.
 
-describe('Voiceover Admin', function () {
+// ConsoleReporter.setConsoleErrorsToIgnore([
+//   new RegExp(
+//     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
+//   ),
+//   new RegExp('Sorry, we could not find the specified user.'),
+// ]);
+
+test.describe.configure({mode: 'serial'});
+
+test.describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
   let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
       'voiceover_admin@example.com',
+      browser,
       [ROLES.VOICEOVER_ADMIN]
     );
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -76,11 +82,12 @@ describe('Voiceover Admin', function () {
 
     await UserFactory.createNewUser(
       'voiceoverartist',
-      'voiceoverartist@example.com'
+      'voiceoverartist@example.com',
+      browser
     );
   });
 
-  it('should be able to add voiceover artist to an exploration', async function () {
+  test('should be able to add voiceover artist to an exploration', async function () {
     await voiceoverAdmin.navigateToExplorationEditor(explorationId);
     await voiceoverAdmin.dismissWelcomeModal();
     await voiceoverAdmin.navigateToExplorationSettingsTab();
@@ -110,14 +117,14 @@ describe('Voiceover Admin', function () {
     await voiceoverAdmin.expectVoiceoverArtistsListContains('voiceoverartist');
   });
 
-  it('should be able to remove voiceover artist from an exploration', async function () {
+  test('should be able to remove voiceover artist from an exploration', async function () {
     await voiceoverAdmin.removeVoiceoverArtist('voiceoverartist');
     await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
       'voiceoverartist'
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
