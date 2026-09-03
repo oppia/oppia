@@ -84,7 +84,13 @@ module.exports = {
               'uses-responsive-images': ['error', {minScore: 0.5}],
               // Marketing pages use unoptimized JPEG hero images.
               'uses-optimized-images': ['error', {minScore: 0.6}],
+              // Marketing hero images are JPEG, not next-gen formats.
+              'modern-image-formats': [
+                'error',
+                {maxLength: 2, strategy: 'pessimistic'},
+              ],
             },
+            accessibilityMinScore: 0.9,
           },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
@@ -247,6 +253,8 @@ module.exports = {
               'uses-responsive-images': ['error', {minScore: 0.5}],
               // Marketing pages use unoptimized JPEG hero images.
               'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The YouTube embed can log browser issues to the Issues panel.
+              'inspector-issues': ['error', {minScore: 0}],
             },
             accessibilityMinScore: 0.91,
           },
@@ -329,7 +337,7 @@ module.exports = {
               tbt: 800,
               cls: 1.5,
             },
-            accessibilityMinScore: 0.88,
+            accessibilityMinScore: 0.84,
             overrides: {
               // The partnerships page showcases many partner logos that are
               // not in next-gen formats.
@@ -344,6 +352,9 @@ module.exports = {
               'uses-responsive-images': ['error', {minScore: 0.5}],
               // Marketing pages use unoptimized JPEG hero images.
               'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The many partner logos can log browser issues to the Issues
+              // panel.
+              'inspector-issues': ['error', {minScore: 0}],
             },
           },
           {

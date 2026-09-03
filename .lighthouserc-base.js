@@ -32,13 +32,13 @@ const basePerformanceAssertions = {
   deprecations: ['error', {minScore: 1}],
   redirects: ['error', {minScore: 1}],
   'uses-responsive-images': ['error', {minScore: 0.8}],
-  charset: ['warn', {minScore: 1}],
-  viewport: ['warn', {minScore: 1}],
-  'font-size': ['warn', {minScore: 1}],
-  'image-size-responsive': ['warn', {minScore: 0.72}],
-  'third-party-cookies': ['warn', {minScore: 1}],
-  'inspector-issues': ['warn', {minScore: 1}],
-  'redirects-http': ['warn', {minScore: 1}],
+  charset: ['error', {minScore: 1}],
+  viewport: ['error', {minScore: 1}],
+  'font-size': ['error', {minScore: 1}],
+  'image-size-responsive': ['error', {minScore: 0.72}],
+  'third-party-cookies': ['error', {minScore: 1}],
+  'inspector-issues': ['error', {minScore: 1}],
+  'redirects-http': ['error', {minScore: 1}],
 };
 
 /**
@@ -133,7 +133,7 @@ function buildPageAssertions(
     ...basePerformanceAssertions,
     ...perfAssertions,
     'categories:accessibility': ['error', {minScore: accessibilityMinScore}],
-    'categories:seo': ['warn', {minScore: 1}],
+    'categories:seo': ['error', {minScore: 1}],
     ...overrides,
   };
 }

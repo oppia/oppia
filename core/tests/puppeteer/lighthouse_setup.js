@@ -52,6 +52,8 @@ var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
+var creationModalSelector = '.e2e-test-creation-modal';
+var createExplorationInModalSelector = '.e2e-test-create-exploration';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
 var stateEditSelector = '.e2e-test-state-edit-content';
 var saveContentButton = '.e2e-test-save-state-content';
@@ -296,12 +298,27 @@ const getExplorationEditorUrl = async function (browser, page) {
 
     await page.click(createButtonSelector);
 
-    // The exploration editor is a heavy page that can take a long time to
-    // load under loaded CI runners, so wait generously for the navigation to
-    // the created exploration's editor before interacting with it.
+    // The create button opens a creation modal when the user has the
+    // collection-creator role (as the CI admin does). In that case we need to
+    // pick the exploration option to reach the exploration editor, instead of
+    // navigating directly.
+    const isCreationModalVisible = await page
+      .waitForSelector(creationModalSelector, {visible: true, timeout: 10000})
+      .then(() => true)
+      .catch(() => false);
+
+    if (isCreationModalVisible) {
+      await page.waitForSelector(createExplorationInModalSelector, {
+        visible: true,
+      });
+      await page.click(createExplorationInModalSelector);
+    }
+
+    // Wait for the navigation to the created exploration's editor before
+    // interacting with it.
     await page.waitForFunction(
       urlFragment => document.URL.indexOf(urlFragment) !== -1,
-      {timeout: 60000},
+      {},
       '/create/'
     );
 
@@ -320,16 +337,10 @@ const getExplorationEditorUrl = async function (browser, page) {
         throw e;
       }
     }
-    await page.waitForSelector(stateEditSelector, {
-      visible: true,
-      timeout: 60000,
-    });
+    await page.waitForSelector(stateEditSelector, {visible: true});
     await page.click(stateEditSelector);
     await page.waitForTimeout(5000);
-    await page.waitForSelector(saveContentButton, {
-      visible: true,
-      timeout: 60000,
-    });
+    await page.waitForSelector(saveContentButton, {visible: true});
     await page.click(saveContentButton);
     await page.waitForTimeout(2000);
     await page.waitForSelector(addInteractionButton, {visible: true});
@@ -634,7 +645,7 @@ const generateBareClassrooms = async function (browser, page) {
     });
 
     await page.waitForSelector(generateDefaultClassroomCountInput);
-    await page.type(generateDefaultClassroomCountInput, '10');
+    await page.type(generateDefaultClassroomCountInput, '5');
     await page.waitForSelector(generateDefaultClassroomButton);
     await page.click(generateDefaultClassroomButton);
 
@@ -717,9 +728,9 @@ const generateDummyExplorations = async function (browser, page) {
     });
 
     await page.waitForSelector(generateExplorationsCountInput);
-    await page.type(generateExplorationsCountInput, '10');
+    await page.type(generateExplorationsCountInput, '5');
     await page.waitForSelector(generateExplorationsPublishInput);
-    await page.type(generateExplorationsPublishInput, '10');
+    await page.type(generateExplorationsPublishInput, '5');
 
     // The generate button uses the shared .oppia-generate-exploration-text
     // class across several cards, so it is targeted by its label text instead.
