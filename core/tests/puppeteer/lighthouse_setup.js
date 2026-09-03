@@ -293,7 +293,17 @@ const getExplorationEditorUrl = async function (browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createButtonSelector, {visible: true});
+
     await page.click(createButtonSelector);
+
+    // The exploration editor is a heavy page that can take a long time to
+    // load under loaded CI runners, so wait generously for the navigation to
+    // the created exploration's editor before interacting with it.
+    await page.waitForFunction(
+      urlFragment => document.URL.indexOf(urlFragment) !== -1,
+      {timeout: 60000},
+      '/create/'
+    );
 
     // The exploration creation flow may or may not show a welcome modal,
     // depending on prior state, so the dismissal is optional to avoid
@@ -301,7 +311,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     try {
       await page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        timeout: 30000,
       });
       await page.click(dismissWelcomeModalSelector);
       await page.waitForTimeout(3000);
@@ -310,10 +320,16 @@ const getExplorationEditorUrl = async function (browser, page) {
         throw e;
       }
     }
-    await page.waitForSelector(stateEditSelector, {visible: true});
+    await page.waitForSelector(stateEditSelector, {
+      visible: true,
+      timeout: 60000,
+    });
     await page.click(stateEditSelector);
     await page.waitForTimeout(5000);
-    await page.waitForSelector(saveContentButton, {visible: true});
+    await page.waitForSelector(saveContentButton, {
+      visible: true,
+      timeout: 60000,
+    });
     await page.click(saveContentButton);
     await page.waitForTimeout(2000);
     await page.waitForSelector(addInteractionButton, {visible: true});
