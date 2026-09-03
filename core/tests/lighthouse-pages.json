@@ -195,10 +195,6 @@
     "url": "http://localhost:8181/facilitator-dashboard",
     "page_module": "core/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.module.ts"
   },
-  "feedback-updates": {
-    "url": "http://localhost:8181/feedback-updates",
-    "page_module": "core/templates/pages/feedback-updates-page/feedback-updates-page.module.ts"
-  },
   "create-learner-group": {
     "url": "http://localhost:8181/create-learner-group",
     "page_module": "core/templates/pages/learner-group-pages/create-group/create-learner-group-page.module.ts"
