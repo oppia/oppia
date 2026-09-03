@@ -140,6 +140,20 @@ var roleOptionLabels = {
   VOICEOVER_ADMIN: 'voiceover admin',
 };
 
+// Wraps a setup step so it logs its name and elapsed time to stdout. This
+// surfaces each scaffolded piece of data (login, generated explorations,
+// generated classrooms, and so on) in the CI logs, which makes it easy to see
+// which step consumes the most time in a shard setup.
+const logStep = async function (name, step) {
+  // eslint-disable-next-line no-console
+  console.log(`[lighthouse-setup] ${name}...`);
+  const startTime = Date.now();
+  await step();
+  const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
+  // eslint-disable-next-line no-console
+  console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
+};
+
 const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -280,10 +294,22 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
-    await page.waitForSelector(dismissWelcomeModalSelector, {visible: true});
 
-    await page.click(dismissWelcomeModalSelector);
-    await page.waitForTimeout(3000);
+    // The exploration creation flow may or may not show a welcome modal,
+    // depending on prior state, so the dismissal is optional to avoid
+    // blocking the whole shard setup when the modal never appears.
+    try {
+      await page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await page.click(dismissWelcomeModalSelector);
+      await page.waitForTimeout(3000);
+    } catch (e) {
+      if (!(e instanceof puppeteer.errors.TimeoutError)) {
+        throw e;
+      }
+    }
     await page.waitForSelector(stateEditSelector, {visible: true});
     await page.click(stateEditSelector);
     await page.waitForTimeout(5000);
@@ -912,82 +938,124 @@ const setRoles = async function (browser, page) {
 };
 
 const runDataPagesSetup = async function (browser, page) {
-  await getExplorationEditorUrl(browser, page);
-  await setRoles(browser, page);
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  await logStep('assigning roles', () => setRoles(browser, page));
 
   // Feature flags must be enabled before the data-generation steps below,
   // because those steps fetch the handlers that are gated by the flags (e.g.
   // the learner group and technical feedback dashboard captures inside
   // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
   // disabled, so enabling them here avoids the captures failing.
-  await enableFeatureFlag(browser, page, 'story_editor_arcs');
-  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
-  await enableFeatureFlag(
-    browser,
-    page,
-    'technical_feedback_dashboard_enabled'
+  await logStep('enabling story_editor_arcs flag', () =>
+    enableFeatureFlag(browser, page, 'story_editor_arcs')
   );
-  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
-  await getTopicEditorUrl(browser, page);
-  await getStoryEditorUrl(browser, page);
-  await getSkillEditorUrl(browser, page);
-  await generateDataForTopicAndStoryPlayer(browser, page);
-  await generateDataForClassroom(browser, page);
-  await enableDiagnosticTestForMathClassroom(browser, page);
-  await generateDummyExplorations(browser, page);
-  await reloadAllInteractionsExploration(browser, page);
-  await generateBareClassrooms(browser, page);
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
+  );
+  await logStep('enabling technical_feedback flag', () =>
+    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
+  );
+  await logStep('enabling certificate_assessment flag', () =>
+    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
+  );
+  await logStep('topic editor URL setup', () =>
+    getTopicEditorUrl(browser, page)
+  );
+  await logStep('story editor URL setup', () =>
+    getStoryEditorUrl(browser, page)
+  );
+  await logStep('skill editor URL setup', () =>
+    getSkillEditorUrl(browser, page)
+  );
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  await logStep('enabling diagnostic test', () =>
+    enableDiagnosticTestForMathClassroom(browser, page)
+  );
+  await logStep('generating dummy explorations', () =>
+    generateDummyExplorations(browser, page)
+  );
+  await logStep('loading all-interactions exploration', () =>
+    reloadAllInteractionsExploration(browser, page)
+  );
+  await logStep('generating bare classrooms', () =>
+    generateBareClassrooms(browser, page)
+  );
 };
 
 const runFullSetup = async function (browser, page) {
-  await login(browser, page);
-  await runDataPagesSetup(browser, page);
-  await generateDataForBlogPosts(browser, page);
+  await logStep('logging in', () => login(browser, page));
+  await logStep('data pages setup', () => runDataPagesSetup(browser, page));
+  await logStep('generating blog posts', () =>
+    generateDataForBlogPosts(browser, page)
+  );
 };
 
 const shard2Setup = async function (browser, page) {
-  await login(browser, page);
-  await setRoles(browser, page);
-  await getExplorationEditorUrl(browser, page);
-  await generateDataForBlogPosts(browser, page);
+  await logStep('logging in', () => login(browser, page));
+  await logStep('assigning roles', () => setRoles(browser, page));
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  await logStep('generating blog posts', () =>
+    generateDataForBlogPosts(browser, page)
+  );
 };
 
 const shard3Setup = async function (browser, page) {
-  await login(browser, page);
-  await runDataPagesSetup(browser, page);
+  await logStep('logging in', () => login(browser, page));
+  await logStep('data pages setup', () => runDataPagesSetup(browser, page));
 };
 
 const shard4Setup = async function (browser, page) {
-  await login(browser, page);
-  await setRoles(browser, page);
-  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
-  await enableFeatureFlag(
-    browser,
-    page,
-    'technical_feedback_dashboard_enabled'
+  await logStep('logging in', () => login(browser, page));
+  await logStep('assigning roles', () => setRoles(browser, page));
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
   );
-  await enableFeatureFlag(browser, page, 'enable_certificate_assessment');
-  await generateDataForTopicAndStoryPlayer(browser, page);
-  await generateDataForClassroom(browser, page);
-  await enableDiagnosticTestForMathClassroom(browser, page);
+  await logStep('enabling technical_feedback flag', () =>
+    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
+  );
+  await logStep('enabling certificate_assessment flag', () =>
+    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
+  );
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  await logStep('enabling diagnostic test', () =>
+    enableDiagnosticTestForMathClassroom(browser, page)
+  );
 };
 
 const shard5Setup = async function (browser, page) {
-  await login(browser, page);
-  await setRoles(browser, page);
-  await enableFeatureFlag(browser, page, 'learner_groups_are_enabled');
-  await enableFeatureFlag(
-    browser,
-    page,
-    'technical_feedback_dashboard_enabled'
+  await logStep('logging in', () => login(browser, page));
+  await logStep('assigning roles', () => setRoles(browser, page));
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
   );
-  await getExplorationEditorUrl(browser, page);
-  await generateDataForTopicAndStoryPlayer(browser, page);
+  await logStep('enabling technical_feedback flag', () =>
+    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
+  );
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
 };
 
 const shard6Setup = async function (browser, page) {
-  await login(browser, page);
-  await setRoles(browser, page);
+  await logStep('logging in', () => login(browser, page));
+  await logStep('assigning roles', () => setRoles(browser, page));
 };
 
 const main = async function () {
