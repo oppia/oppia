@@ -34,10 +34,6 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   showLockedTooltip: boolean = false;
   private helperTooltipTimeoutId: number | null = null;
 
-  get displayTitle(): string {
-    return 'Mastery Challenge';
-  }
-
   constructor(private windowRef: WindowRef) {}
 
   ngOnDestroy(): void {

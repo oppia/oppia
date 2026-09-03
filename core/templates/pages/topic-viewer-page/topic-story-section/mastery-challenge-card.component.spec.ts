@@ -76,10 +76,6 @@ describe('MasteryChallengeCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should return the translated display title', () => {
-    expect(component.displayTitle).toBe('Mastery Challenge');
-  });
-
   it('should navigate when the unlocked button is clicked', () => {
     spyOn(component.buttonClicked, 'emit');
     spyOn(windowRef.nativeWindow.location, 'assign');

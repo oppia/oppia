@@ -173,7 +173,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onPracticeButtonClick(): void {
-    if (!this.hasPracticeQuestions) {
+    if (this.isComingSoonLesson || !this.hasPracticeQuestions) {
       return;
     }
     this.navigateTo(this.practiceUrl);

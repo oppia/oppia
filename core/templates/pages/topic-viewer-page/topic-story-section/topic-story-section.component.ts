@@ -240,11 +240,8 @@ export class TopicStorySectionComponent
     this.pendingArcSkipTargetLabel = '';
 
     if (adventureIndex !== -1) {
-      for (let i = 0; i < adventureIndex; i++) {
-        this.skippedAdventureIndices.add(i);
-      }
+      this.markSkippedAdventuresBefore(adventureIndex);
       this._expandedAdventureIndices.add(adventureIndex);
-      this.persistSkippedAdventures();
     }
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
@@ -924,39 +921,35 @@ export class TopicStorySectionComponent
     const lessonAvailability = await Promise.all(
       lessonCards.map(card => this.checkIfQuestionsExist(card.skillIds))
     );
-    const adventureAvailability = await Promise.all(
-      adventureGroups.map(group =>
-        this.checkIfQuestionsExist(this.getUniqueSkillIds(group.lessonCards))
-      )
-    );
-    const flatPracticeAvailability = await this.checkIfQuestionsExist(
-      this.getUniqueSkillIds(lessonCards)
-    );
 
     if (requestId !== this.practiceAvailabilityRequestId) {
       return;
     }
 
+    // The availability for each adventure and for the whole story is a union
+    // of its lessons' skill sets, so it can be derived from the per-lesson
+    // results without issuing redundant backend requests.
+    const availabilityByLessonNumber = new Map<number, boolean>();
     lessonCards.forEach((card, index) => {
       card.hasPracticeQuestions = lessonAvailability[index];
+      availabilityByLessonNumber.set(
+        card.lessonNumber,
+        lessonAvailability[index]
+      );
     });
-    adventureGroups.forEach((group, index) => {
-      group.hasPracticeQuestions = adventureAvailability[index];
+    adventureGroups.forEach(group => {
+      group.hasPracticeQuestions = group.lessonCards.some(
+        card => availabilityByLessonNumber.get(card.lessonNumber) === true
+      );
     });
-    this.practiceCard.hasPracticeQuestions = flatPracticeAvailability;
+    this.practiceCard.hasPracticeQuestions = lessonAvailability.some(
+      available => available
+    );
 
     this.visibleAdventureGroups = this.visibleAdventureGroups.map(group => {
       const updated = adventureGroups.find(g => g.arcId === group.arcId);
       return updated ? {...updated, lessonCards: group.lessonCards} : group;
     });
-  }
-
-  private getUniqueSkillIds(lessonCards: LessonCardData[]): string[] {
-    const skillIds = lessonCards.reduce(
-      (allSkillIds: string[], card) => allSkillIds.concat(card.skillIds),
-      []
-    );
-    return Array.from(new Set(skillIds));
   }
 
   private async checkIfQuestionsExist(skillIds: string[]): Promise<boolean> {

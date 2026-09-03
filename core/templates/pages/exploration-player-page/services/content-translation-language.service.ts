@@ -68,7 +68,10 @@ export class ContentTranslationLanguageService {
     // language that was selected before navigation.
     const urlParams = this.urlService.getUrlParams();
     if (
-      urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
+      Object.prototype.hasOwnProperty.call(
+        urlParams,
+        INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM
+      ) &&
       allContentLanguageCodesInExploration.includes(
         urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
       )
