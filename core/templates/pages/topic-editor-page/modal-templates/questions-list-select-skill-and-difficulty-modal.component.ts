@@ -24,6 +24,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {QuestionsListConstants} from 'components/question-directives/questions-list/questions-list.constants';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import './questions-list-select-skill-and-difficulty-modal.component.css';
 
 interface Summary {
   id: string;
@@ -34,6 +35,9 @@ interface Summary {
   selector: 'oppia-questions-list-select-skill-and-difficulty-modal',
   templateUrl:
     './questions-list-select-skill-and-difficulty-modal.component.html',
+  styleUrls: [
+    './questions-list-select-skill-and-difficulty-modal.component.css',
+  ],
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal
