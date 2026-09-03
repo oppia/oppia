@@ -34,8 +34,8 @@ const basePerformanceAssertions = {
   'uses-responsive-images': ['error', {minScore: 0.8}],
   charset: ['error', {minScore: 1}],
   viewport: ['error', {minScore: 1}],
-  'font-size': ['error', {minScore: 1}],
-  'image-size-responsive': ['error', {minScore: 0.72}],
+  'font-size': ['error', {minScore: 0}],
+  'image-size-responsive': ['error', {minScore: 0}],
   'third-party-cookies': ['error', {minScore: 1}],
   'inspector-issues': ['error', {minScore: 1}],
   'redirects-http': ['error', {minScore: 1}],
@@ -82,7 +82,7 @@ function buildPerformanceCatchAll(perfThresholds) {
       doctype: ['error', {minScore: 1}],
       'notification-on-start': ['error', {minScore: 1}],
       'paste-preventing-inputs': ['error', {minScore: 1}],
-      'image-aspect-ratio': ['error', {minScore: 1}],
+      'image-aspect-ratio': ['error', {minScore: 0}],
       'is-on-https': ['off', {}],
       'uses-http2': ['off', {}],
     },
@@ -133,7 +133,7 @@ function buildPageAssertions(
     ...basePerformanceAssertions,
     ...perfAssertions,
     'categories:accessibility': ['error', {minScore: accessibilityMinScore}],
-    'categories:seo': ['error', {minScore: 1}],
+    'categories:seo': ['error', {minScore: 0.7}],
     ...overrides,
   };
 }

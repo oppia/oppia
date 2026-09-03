@@ -139,6 +139,7 @@ var roleOptionLabels = {
   FULL_USER: 'full user',
   RELEASE_COORDINATOR: 'release coordinator',
   TECH_TEAM_LEAD: 'tech team lead',
+  TRANSLATION_ADMIN: 'translation admin',
   VOICEOVER_ADMIN: 'voiceover admin',
 };
 
@@ -955,20 +956,20 @@ const addThumbnailToTopic = async function (page, topicName) {
   }
 };
 
-const setRoles = async function (browser, page) {
-  await setRole(browser, page, 'COLLECTION_EDITOR');
-  await setRole(browser, page, 'VOICEOVER_ADMIN');
-  await setRole(browser, page, 'ADMIN');
-  await setRole(browser, page, 'RELEASE_COORDINATOR');
-  await setRole(browser, page, 'FULL_USER');
-  await setRole(browser, page, 'TECH_TEAM_LEAD');
+// Assigns the given roles, one at a time. Each assignment navigates to the
+// admin roles page and waits on several UI selectors, so only the roles a
+// shard's pages actually require are passed in to avoid wasting setup time.
+const setRoles = async function (browser, page, roles) {
+  for (let i = 0; i < roles.length; i++) {
+    await setRole(browser, page, roles[i]);
+  }
 };
 
-const runDataPagesSetup = async function (browser, page) {
+const runDataPagesSetup = async function (browser, page, roles) {
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
   );
-  await logStep('assigning roles', () => setRoles(browser, page));
+  await logStep('assigning roles', () => setRoles(browser, page, roles));
 
   // Feature flags must be enabled before the data-generation steps below,
   // because those steps fetch the handlers that are gated by the flags (e.g.
@@ -1018,7 +1019,17 @@ const runDataPagesSetup = async function (browser, page) {
 
 const runFullSetup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('data pages setup', () => runDataPagesSetup(browser, page));
+  await logStep('data pages setup', () =>
+    runDataPagesSetup(browser, page, [
+      'COLLECTION_EDITOR',
+      'VOICEOVER_ADMIN',
+      'ADMIN',
+      'RELEASE_COORDINATOR',
+      'FULL_USER',
+      'TECH_TEAM_LEAD',
+      'TRANSLATION_ADMIN',
+    ])
+  );
   await logStep('generating blog posts', () =>
     generateDataForBlogPosts(browser, page)
   );
@@ -1026,7 +1037,13 @@ const runFullSetup = async function (browser, page) {
 
 const shard2Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('assigning roles', () => setRoles(browser, page));
+  // Shard 2 audits the release-coordinator role-gated page and the
+  // contributor-admin-dashboard (translation admin) page, so only these two
+  // roles are assigned. Its data generation uses the admin activities tab,
+  // which the CI super-admin user can access without an additional role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['RELEASE_COORDINATOR', 'TRANSLATION_ADMIN'])
+  );
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
   );
@@ -1037,12 +1054,49 @@ const shard2Setup = async function (browser, page) {
 
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('data pages setup', () => runDataPagesSetup(browser, page));
+  // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
+  // (voiceover admin) role-gated pages, so only these two roles are assigned.
+  // Its other pages (classrooms, classroom, creator-dashboard,
+  // exploration-editor, exploration-player, new-lesson-player,
+  // community-library, pending-account-deletion) are public or login-only, so
+  // no topic/story/skill generation or feature flags are needed here.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN'])
+  );
+  // The exploration editor setup creates the exploration that backs the
+  // exploration-editor, exploration-player and new-lesson-player pages.
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  // The populated math classroom backs the /learn/math (classroom) page.
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  // Dummy explorations populate the creator-dashboard and community-library
+  // page listings, and the all-interactions exploration gives the player
+  // pages content for every interaction type.
+  await logStep('generating dummy explorations', () =>
+    generateDummyExplorations(browser, page)
+  );
+  await logStep('loading all-interactions exploration', () =>
+    reloadAllInteractionsExploration(browser, page)
+  );
+  // Bare classrooms populate the /learn (classrooms) listing page.
+  await logStep('generating bare classrooms', () =>
+    generateBareClassrooms(browser, page)
+  );
 };
 
 const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('assigning roles', () => setRoles(browser, page));
+  // Shard 4 enables feature flags via the release-coordinator page and
+  // toggles the diagnostic test on the classroom-admin page, so only the
+  // release coordinator and curriculum admin roles are assigned. Its data
+  // generation uses the admin activities tab, which the CI super-admin user
+  // can access without an additional role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
   await logStep('enabling learner_groups flag', () =>
     enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
   );
@@ -1065,7 +1119,12 @@ const shard4Setup = async function (browser, page) {
 
 const shard5Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('assigning roles', () => setRoles(browser, page));
+  // Shard 5 enables feature flags via the release-coordinator page and audits
+  // the topics-and-skills-dashboard (curriculum admin) page, so only the
+  // release coordinator and curriculum admin roles are assigned.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
   await logStep('enabling learner_groups flag', () =>
     enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
   );
@@ -1082,7 +1141,19 @@ const shard5Setup = async function (browser, page) {
 
 const shard6Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  await logStep('assigning roles', () => setRoles(browser, page));
+  // Shard 6 exists to audit the role-gated admin pages themselves, so all
+  // configurable roles are assigned here.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, [
+      'COLLECTION_EDITOR',
+      'VOICEOVER_ADMIN',
+      'ADMIN',
+      'RELEASE_COORDINATOR',
+      'FULL_USER',
+      'TECH_TEAM_LEAD',
+      'TRANSLATION_ADMIN',
+    ])
+  );
 };
 
 const main = async function () {
@@ -1143,7 +1214,9 @@ const main = async function () {
   if (shard === 2) {
     setupKind = 'blog';
   } else if (shard === 3) {
-    setupKind = 'data';
+    // Shard 3 only creates explorations and classrooms, so it does not emit
+    // topic/story/skill, learner-group, feedback or certificate entities.
+    setupKind = 'data-player';
   } else if (shard === 4) {
     setupKind = 'classroom';
   } else if (shard === 5) {
@@ -1154,6 +1227,7 @@ const main = async function () {
   const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
   const ranExplorationSetup =
     setupKind === 'data' ||
+    setupKind === 'data-player' ||
     setupKind === 'full' ||
     setupKind === 'structures' ||
     setupKind === 'blog';

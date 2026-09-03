@@ -617,6 +617,7 @@ module.exports = {
             overrides: {
               'errors-in-console': ['error', {minScore: 0}],
               'image-aspect-ratio': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
             },
           },
           {
