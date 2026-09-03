@@ -691,6 +691,164 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(drawnTexts).toContain('learners better understand the lessons.');
   });
 
+  it('should draw reviewer wording for reviewer-only certificates', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    component.suggestionType = 'translate_content';
+    component.createCertificate({
+      ...certificateData,
+      translated_word_count: 0,
+      reviewed_word_count: 300,
+    });
+
+    window.Image = originalImage;
+
+    const drawnTexts = fillTextCalls.map(call => call.text);
+    expect(
+      drawnTexts.some(text =>
+        text.includes("reviewing Oppia's basic maths, science,")
+      )
+    ).toBe(true);
+    expect(
+      drawnTexts.some(text =>
+        text.includes(
+          'financial literacy lessons submitted by translators in Hindi'
+        )
+      )
+    ).toBe(true);
+    expect(
+      drawnTexts.some(text => text.includes('words of reviewed content'))
+    ).toBe(true);
+  });
+
+  it('should draw combined wording for translator+reviewer certificates', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    component.suggestionType = 'translate_content';
+    component.createCertificate({
+      ...certificateData,
+      translated_word_count: 150,
+      reviewed_word_count: 150,
+    });
+
+    window.Image = originalImage;
+
+    const drawnTexts = fillTextCalls.map(call => call.text);
+    expect(
+      drawnTexts.some(text =>
+        text.includes("translating and reviewing Oppia's")
+      )
+    ).toBe(true);
+    expect(
+      drawnTexts.some(text =>
+        text.includes('financial literacy lessons in Hindi')
+      )
+    ).toBe(true);
+    expect(
+      drawnTexts.some(text =>
+        text.includes('words of translated and reviewed content')
+      )
+    ).toBe(true);
+  });
+
   it('should draw Translations Coordinator title below the signature', () => {
     const fillTextCalls: {text: string; x: number; y: number}[] = [];
     const mockCanvas = {
