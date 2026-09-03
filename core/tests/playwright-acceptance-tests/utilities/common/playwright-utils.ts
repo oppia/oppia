@@ -699,11 +699,11 @@ export class BaseUser {
         errorMessage +=
           '\r\nWithout a baseline snapshot, the CI run cannot complete.' +
           ' Run the update-snapshots workflow to generate baselines for both dev and prod.' +
-          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
       } else {
         errorMessage +=
           '\r\nRun with --update_snapshots to generate it locally, then commit the new screenshot.' +
-          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
       }
       throw new Error(errorMessage);
     }
@@ -737,7 +737,7 @@ export class BaseUser {
         '\r\nIf the changes to the UI are expected, please update the baseline screenshot(s).' +
         '\r\nTo update the screenshot(s), either run the update-snapshots workflow in CI (covers both dev and prod),' +
         ' or run locally with --update_snapshots for dev-only baselines.' +
-        ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests for details.';
+        ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
       throw new Error(errorMessage);
     }
   }

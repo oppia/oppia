@@ -74,7 +74,7 @@ export default class CompactReporter implements Reporter {
       if (runningInCI) {
         // eslint-disable-next-line no-console
         console.log(
-          '\n    Download the Playwright test results artifact for this job (find it under ' +
+          '\nDownload the Playwright test results artifact for this job (find it under ' +
             '"Summary" > "Artifacts" on the GitHub Actions run) to view screenshots, diffs, ' +
             'and recordings, or drag trace.zip into https://trace.playwright.dev for the full ' +
             'recorded trace.\n'
@@ -82,7 +82,7 @@ export default class CompactReporter implements Reporter {
       } else {
         // eslint-disable-next-line no-console
         console.log(
-          '\n    See oppia_full_stack_test_playwright_results for screenshots, diffs, and ' +
+          '\nSee oppia_full_stack_test_playwright_results for screenshots, diffs, and ' +
             'recordings, or drag trace.zip into https://trace.playwright.dev for the full ' +
             'recorded trace.\n'
         );
