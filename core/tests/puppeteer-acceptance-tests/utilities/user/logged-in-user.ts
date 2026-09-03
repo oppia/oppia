@@ -393,7 +393,7 @@ const feedbackTableMySuggestionsUnread = '.e2e-test-my-suggestions-unread';
 const feedbackTableMySuggestionsSource = '.e2e-test-my-suggestions-source';
 const feedbackTableMySuggestionsLessonTitle =
   '.e2e-test-my-suggestions-lesson-title';
-const feedbackTableMySuggestionsCategory = '.e2e-test-my-suggestions-category';
+const feedbackTableCategoryChip = '.e2e-test-my-suggestions-category';
 // My suggestions tab detail view selectors.
 const mySuggestionsTabTotalUnreadCount =
   '.e2e-test-my-suggestions-total-unread-count';
@@ -424,11 +424,81 @@ const mySuggestionsTabCreatorThreadText =
   '.e2e-test-my-suggestions-creators-response-text';
 // Feedback-table row selectors.
 const feedbackTableRow = '.e2e-test-feedback-table-row';
+// Feedback-detail-page selectors, used accross exploration feedback tab and
+// Technical feedback dashboard.
+const feedbackDetailPageCard = '.e2e-test-feedback-detail-card';
+const feedbackDetailPageBackBtn = '.e2e-test-feedback-detail-back-btn';
+const feedbackDetailPageTitleSelector = '.e2e-test-feedback-detail-title';
+const feedbackDetailPageStatusChipSelector =
+  '.e2e-test-feedback-detail-status-chip';
+const feedbackDetailPageCategoryChipSelector =
+  '.e2e-test-feedback-detail-category-chip';
+const feedbackDetailPageDetailsSection = '.e2e-test-feedback-details-section';
+const feedbackDetailPageLessonContextSection =
+  '.e2e-feedback-detail-lesson-context-section';
+const feedbackDetailPageSessionInfoSection =
+  '.e2e-test-feedback-detail-session-info-section';
+const feedbackDetailPageUserFeedbackSection =
+  '.e2e-test-feedback-detail-user-feedback-section';
+const feedbackDetailPageRepliesSection =
+  '.e2e-test-feedback-detail-replies-section';
+const feedbackDetailPageEmptyReplyText = '.e2e-test-feedback-response-empty';
+const feedbackDetailPageActionsSection =
+  '.e2e-test-feedback-detail-actions-section';
+const feedbackDetailPageActionLabel = '.e2e-test-feedback-detail-actions-label';
+const feedbackDetailPageActionReplyTextarea =
+  '.e2e-test-feedback-detail-reply-textarea';
+const feedbackDetailPageActionSubmitButton =
+  '.e2e-test-feedback-detail-send-btn';
+const feedbackDetailPageReportedLessonVersionLink =
+  '.e2e-test-feedback-detail-reported-lesson-version-link';
+const feedbackDetailPageReportedLessonStateEditorLink =
+  '.e2e-test-feedback-detail-reported-state-editor-link';
+const feedbackDetailPageSubmittedLabel =
+  '.e2e-test-feedback-detail-submitted-label';
+const feedbackDetailPageStatusLabel = '.e2e-test-feedback-detail-status-label';
+const feedbackDetailPageStatusValue = '.e2e-test-feedback-detail-status-value';
+const feedbackDetailPageCategoryLabel =
+  '.e2e-test-feedback-detail-category-label';
+const feedbackDetailPageCategoryValue =
+  '.e2e-test-feedback-detail-category-value';
+const feedbackDetailPageSourceLabel = '.e2e-test-feedback-detail-source-label';
+const feedbackDetailPageSourceValue = '.e2e-test-feedback-detail-source-value';
+const feedbackDetailPagePlatformLabel =
+  '.e2e-test-feedback-detail-platform-label';
+const feedbackDetailPagePlatformValue =
+  '.e2e-test-feedback-detail-platform-value';
+const feedbackDetailPagePageUrlLabel =
+  '.e2e-test-feedback-detail-page-url-label';
+const feedbackDetailPagePageUrlValue =
+  '.e2e-test-feedback-detail-page-url-value';
+const feedbackDetailPageExplorationLabel =
+  '.e2e-test-feedback-detail-exploration-label';
+const feedbackDetailPageExplorationValue =
+  '.e2e-test-feedback-detail-exploration-value';
+const feedbackDetailPageVersionLabel =
+  '.e2e-test-feedback-detail-version-label';
+const feedbackDetailPageVersionValue =
+  '.e2e-test-feedback-detail-version-value';
+const feedbackDetailPageStateNameLabel =
+  '.e2e-test-feedback-detail-state-name-label';
+const feedbackDetailPageStateNameValue =
+  '.e2e-test-feedback-detail-state-name-value';
+const feedbackDetailPageStateIndexLabel =
+  '.e2e-test-feedback-detail-state-index-label';
+const feedbackDetailPageStateIndexValue =
+  '.e2e-test-feedback-detail-state-index-value';
+const feedbackDetailPageLearnerAnswerlabel =
+  '.e2e-test-feedback-detail-learner-answer-label';
+const feedbackDetailPageLearnerAnswerValue =
+  '.e2e-test-feedback-detail-learner-answer-value';
+const feedbackDetailPageUserMessage = '.e2e-test-feedback-detail-user-message';
 
 interface FeedbackTableRowExpectation {
   description: string;
   status?: string;
   lessonTitle?: string;
+  categoryChip?: string;
   notificationNo?: string;
   notificationText?: string;
 }
@@ -4702,15 +4772,54 @@ export class LoggedInUser extends BaseUser {
     expect(actualValue).toBe(expectedValue);
   }
 
-  async verifyDefaultMySuggestionsTabFilter(): Promise<void> {
-    await this.expectElementValue(feedbackFilterStatus, 'all');
+  private async verifyDefaultFeedbackTabFilter(
+    expectedStatus: string,
+    additionalFilterSelector?: string,
+    expectedAdditionalFilterValue?: string
+  ): Promise<void> {
+    await this.expectElementValue(feedbackFilterStatus, expectedStatus);
+
+    if (additionalFilterSelector && expectedAdditionalFilterValue) {
+      await this.expectElementValue(
+        additionalFilterSelector,
+        expectedAdditionalFilterValue
+      );
+    }
+
     await this.expectElementValue(feedbackFilterSearchInput, '');
     await this.expectElementValue(feedbackFilterFromDateInput, '');
     await this.expectElementValue(feedbackFilterToDateInput, '');
   }
 
-  async verifyMySuggestionsFeedbackFilterRowContents(): Promise<void> {
+  async verifyDefaultMySuggestionsTabFilter(): Promise<void> {
+    await this.verifyDefaultFeedbackTabFilter('all');
+  }
+
+  async verifyDefaultNewExplorationFeedbackTabFilter(): Promise<void> {
+    await this.verifyDefaultFeedbackTabFilter(
+      'open',
+      feedbackFilterCreatorFeedbackType,
+      'feedback'
+    );
+  }
+
+  async verifyDefaultTechnicalFeedbackDashboardFilter(): Promise<void> {
+    await this.verifyDefaultFeedbackTabFilter(
+      'open',
+      feedbackFilterTechnicalTeam,
+      'leap'
+    );
+  }
+
+  private async verifyFeedbackFilterRowContents(
+    additionalFilterSelector?: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(feedbackFilterBar, true);
+
+    if (additionalFilterSelector) {
+      await this.expectElementToBeVisible(additionalFilterSelector, true);
+    }
+
     await this.expectElementToBeVisible(feedbackFilterStatus, true);
     await this.expectElementToBeVisible(feedbackFilterSearchInput, true);
     await this.expectElementToBeVisible(feedbackFilterFromDateInput, true);
@@ -4719,15 +4828,52 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(feedbackFilterClearButton, true);
   }
 
-  async verifyMySuggestionsFeedbackList(): Promise<void> {
+  async verifyMySuggestionsFeedbackFilterRowContents(): Promise<void> {
+    await this.verifyFeedbackFilterRowContents();
+  }
+
+  async verifyNewExplorationEditorFeedbacktabFilterRowContents(): Promise<void> {
+    await this.verifyFeedbackFilterRowContents(
+      feedbackFilterCreatorFeedbackType
+    );
+  }
+
+  async verifyTechnicalFeedbackDashboardFeedbackFilterRowContents(): Promise<void> {
+    await this.verifyFeedbackFilterRowContents(feedbackFilterTechnicalTeam);
+  }
+
+  private async verifyFeedbackList(
+    additionalSelectors: string[] = []
+  ): Promise<void> {
     await this.expectElementToBeVisible(feedbackTableDiv, true);
     await this.expectElementToBeVisible(feedbackTableStatus, true);
     await this.expectElementToBeVisible(feedbackTableDescription, true);
     await this.expectElementToBeVisible(feedbackTableMySuggestionsSource, true);
-    await this.expectElementToBeVisible(
-      feedbackTableMySuggestionsLessonTitle,
-      true
-    );
+
+    for (const selector of additionalSelectors) {
+      await this.expectElementToBeVisible(selector, true);
+    }
+  }
+
+  async verifyMySuggestionsFeedbackList(): Promise<void> {
+    await this.verifyFeedbackList([feedbackTableMySuggestionsLessonTitle]);
+  }
+
+  async verifyNewExplorationEditorFeedbackList(
+    feedbackType: string
+  ): Promise<void> {
+    if (feedbackType === 'feedback') {
+      await this.verifyFeedbackList([feedbackTableMySuggestionsLessonTitle]);
+    } else {
+      await this.verifyFeedbackList([
+        feedbackTableMySuggestionsLessonTitle,
+        feedbackTableCategoryChip,
+      ]);
+    }
+  }
+
+  async verifyTechnicalFeedbackDashboardFeedbackList(): Promise<void> {
+    await this.verifyFeedbackList([feedbackTableCategoryChip]);
   }
 
   async expectMySuggestionsTabTotalNotification(
@@ -4752,7 +4898,7 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  async expectMySuggestionsFeedbackEntry(
+  async expectFeedbackTableEntry(
     expected: FeedbackTableRowExpectation
   ): Promise<void> {
     const row = await this.findFeedbackTableRow(expected.description);
@@ -4777,6 +4923,14 @@ export class LoggedInUser extends BaseUser {
         el => el.textContent?.trim() || ''
       );
       expect(lessonTitle).toBe(expected.lessonTitle);
+    }
+
+    if (expected.categoryChip !== undefined) {
+      const categoryChip = await row.$eval(
+        feedbackTableCategoryChip,
+        el => el.textContent?.trim() || ''
+      );
+      expect(categoryChip).toBe(expected.categoryChip);
     }
 
     if (expected.notificationNo !== undefined) {
@@ -4844,6 +4998,261 @@ export class LoggedInUser extends BaseUser {
         });
       });
     }, selectors);
+  }
+
+  async verifyExplorationFeedbackDetailView(
+    feedbackType: 'feedback' | 'report',
+    statusValue: string,
+    categoryValue?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackDetailPageCard, true);
+    await this.expectTextContentToBe(
+      feedbackDetailPageTitleSelector,
+      'Feedback Detail'
+    );
+    await this.expectElementToBeVisible(feedbackDetailPageBackBtn, true);
+    await this.expectTextContentToBe(
+      feedbackDetailPageStatusChipSelector,
+      statusValue
+    );
+    if (feedbackType == 'report' && categoryValue) {
+      await this.expectTextContentToBe(
+        feedbackDetailPageCategoryChipSelector,
+        categoryValue
+      );
+    }
+  }
+
+  async verifyFeedbackDetailPageDetailsSection(
+    statusValue: string,
+    sourceValue: string,
+    platformValue: string,
+    categoryValue?: string,
+    pageUrlValue?: string
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      feedbackDetailPageDetailsSection,
+      'Details'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageSubmittedLabel,
+      'Submitted'
+    );
+    await this.expectTextContentToBe(feedbackDetailPageStatusLabel, 'Status');
+    await this.expectTextContentToBe(
+      feedbackDetailPageStatusValue,
+      statusValue
+    );
+    await this.expectTextContentToBe(feedbackDetailPageSourceLabel, 'Source');
+    await this.expectTextContentToBe(
+      feedbackDetailPageSourceValue,
+      sourceValue
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPagePlatformLabel,
+      'Platform'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPagePlatformValue,
+      platformValue
+    );
+    if (categoryValue) {
+      await this.expectTextContentToBe(
+        feedbackDetailPageCategoryLabel,
+        'Category'
+      );
+      await this.expectTextContentToBe(
+        feedbackDetailPageCategoryValue,
+        categoryValue
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        feedbackDetailPageCategoryLabel,
+        false
+      );
+    }
+    if (pageUrlValue) {
+      await this.expectTextContentToBe(
+        feedbackDetailPagePageUrlLabel,
+        'Page URL'
+      );
+      await this.expectTextContentToBe(
+        feedbackDetailPagePageUrlValue,
+        pageUrlValue
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        feedbackDetailPagePageUrlLabel,
+        false
+      );
+    }
+  }
+
+  async verifyFeedbackDetailPageLessonContextSection(
+    expId: string,
+    version: string,
+    stateName: string,
+    stateIndex: string,
+    learnerAnswer: string
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      feedbackDetailPageLessonContextSection,
+      'Lesson Context'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageExplorationLabel,
+      'Exploration'
+    );
+    await this.expectTextContentToBe(feedbackDetailPageExplorationValue, expId);
+    await this.expectTextContentToBe(feedbackDetailPageVersionLabel, 'Version');
+    await this.expectTextContentToBe(feedbackDetailPageVersionValue, version);
+    await this.expectTextContentToBe(feedbackDetailPageStateNameLabel, 'State');
+    await this.expectTextContentToBe(
+      feedbackDetailPageStateNameValue,
+      stateName
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageStateIndexLabel,
+      'State Index'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageStateIndexValue,
+      stateIndex
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageLearnerAnswerlabel,
+      'Learner answer'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageLearnerAnswerValue,
+      learnerAnswer
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageReportedLessonVersionLink,
+      'Open reported lesson version'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageReportedLessonStateEditorLink,
+      'Open current state in editor'
+    );
+  }
+
+  async clickReportedLessonVersionLink(
+    expId: string,
+    version: string
+  ): Promise<void> {
+    const reportedLessonPage = await this.clickLinkAnchorToNewTab(
+      'Open reported lesson version',
+      'http://localhost:8181/explore/' + expId + '?v=' + version,
+      false
+    );
+
+    if (!reportedLessonPage) {
+      throw new Error('Reported lesson version page not found.');
+    }
+
+    await reportedLessonPage.bringToFront();
+    showMessage('Switched to reportedLessonPage');
+    await this.expectPageURLToContain(
+      'lesson/' + expId + '?v=' + version,
+      reportedLessonPage
+    );
+
+    await reportedLessonPage.close();
+
+    await this.page.bringToFront();
+  }
+
+  async clickReportedLessonStateEditorLink(
+    expId: string,
+    stateName: string
+  ): Promise<void> {
+    const stateEditorPage = await this.clickLinkAnchorToNewTab(
+      'Open current state in editor',
+      'http://localhost:8181/create/' + expId + '#/gui/' + stateName,
+      false
+    );
+
+    if (!stateEditorPage) {
+      throw new Error('State editor page not found.');
+    }
+
+    await stateEditorPage.bringToFront();
+    await this.waitForNetworkIdle();
+
+    showMessage('Switched to stateEditorPage');
+    await this.clickOnElementWithSelector('.e2e-test-main-tab');
+
+    await this.expectPageURLToContain(
+      'create/' + expId + '/#/gui/' + stateName,
+      stateEditorPage
+    );
+
+    await stateEditorPage.close();
+
+    await this.page.bringToFront();
+  }
+
+  async selectCreatorFeedbackType(feedbackType: string): Promise<void> {
+    await this.select(feedbackFilterCreatorFeedbackType, feedbackType);
+    await this.expectElementValue(feedbackFilterCreatorFeedbackType, 'report');
+  }
+
+  async verifyFeedbackDetailPageUserFeedbackSection(
+    userMessage: string
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      feedbackDetailPageUserFeedbackSection,
+      "User's Feedback Message"
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailPageUserMessage,
+      userMessage
+    );
+  }
+
+  async verifyFeedbackDetailPageRepliesSection(
+    hasReply: boolean
+  ): Promise<void> {
+    if (hasReply) {
+      await this.expectTextContentToContain(
+        feedbackDetailPageRepliesSection,
+        'Replies'
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        feedbackDetailPageRepliesSection,
+        false
+      );
+      await this.expectTextContentToBe(
+        feedbackDetailPageEmptyReplyText,
+        'No replies yet.'
+      );
+    }
+  }
+
+  async clickFeedbackDetailBackButton(): Promise<void> {
+    await this.expectElementToBeClickable(feedbackDetailPageBackBtn, true);
+    await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
+  }
+
+  async verifyFeedbackDetailPageActionsSection(): Promise<void> {
+    await this.expectTextContentToBe(
+      feedbackDetailPageActionsSection,
+      'Actions'
+    );
+    await this.expectTextContentToContain(
+      feedbackDetailPageActionLabel,
+      'Reply to reporter'
+    );
+    await this.expectElementPlaceholderToBe(
+      feedbackDetailPageActionReplyTextarea,
+      'Write a reply the reporter will see...'
+    );
+    await this.expectElementToBeClickable(
+      feedbackDetailPageActionSubmitButton,
+      false
+    );
   }
 
   async verifyMySuggestionsFeedbackDetailView(

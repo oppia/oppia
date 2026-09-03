@@ -1,7 +1,10 @@
 <ng-container *ngIf="shouldShowNewCreatorFeedbackTab(); else legacyFeedbackTab">
   <ng-container *ngIf="selectedCreatorFeedbackId === null; else creatorFeedbackDetailView">
     <mat-card class="oppia-new-editor-card e2e-test-exploration-feedback-card">
-      <h2 tabindex="0">Exploration Feedback</h2>
+      <h2 class="e2e-test-exploration-feedback-title"
+          tabindex="0">
+          Exploration Feedback
+      </h2>
 
       <oppia-feedback-filter-bar [config]="creatorFeedbackFilterConfig"
                                 (filterChange)="onCreatorFeedbackFilterChange($event)">

@@ -1,23 +1,25 @@
 <ng-container *ngIf="feedbackDetailResponse as feedback; else loadingState">
-  <div class="oppia-feedback-detail-card">
+  <div class="oppia-feedback-detail-card e2e-test-feedback-detail-card">
 
     <header class="oppia-feedback-detail-topbar">
       <div class="oppia-feedback-detail-topbar-start">
         <button type="button"
-                class="btn btn-secondary btn-sm oppia-feedback-detail-back-btn"
+                class="btn btn-secondary btn-sm oppia-feedback-detail-back-btn e2e-test-feedback-detail-back-btn"
                 aria-label="Back to feedback dashboard"
                 (click)="goBack.emit()">
           <i class="fas fa-angle-left" aria-hidden="true"></i>
         </button>
-        <h2 class="oppia-feedback-detail-title">
+        <h2 class="oppia-feedback-detail-title e2e-test-feedback-detail-title">
           Feedback Detail
         </h2>
       </div>
       <div class="oppia-feedback-detail-topbar-end">
-        <oppia-feedback-chip [value]="feedback.status"
+        <oppia-feedback-chip class="e2e-test-feedback-detail-status-chip"
+                             [value]="feedback.status"
                              [type]="'status'">
         </oppia-feedback-chip>
         <oppia-feedback-chip *ngIf="getFeedbackCategory(feedback)"
+                             class="e2e-test-feedback-detail-category-chip"
                              [value]="getFeedbackCategory(feedback)"
                              [type]="'category'">
         </oppia-feedback-chip>
@@ -29,35 +31,36 @@
 
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="Details"
+                                         class="e2e-test-feedback-details-section"
                                          [isCollapsible]="true"
                                          iconClass="fas fa-info-circle">
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Submitted</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-submitted-label">Submitted</span>
               <span class="oppia-feedback-detail-field-value">{{ formatDate(feedback.created_on_msecs) }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Status</span>
-              <span class="oppia-feedback-detail-field-value">{{ statusLabels[feedback.status] }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-status-label">Status</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-status-value">{{ statusLabels[feedback.status] }}</span>
             </div>
             <div class="oppia-feedback-detail-field" *ngIf="getFeedbackCategory(feedback) as category">
-              <span class="oppia-feedback-detail-field-label">Category</span>
-              <span class="oppia-feedback-detail-field-value">{{ categoryLabels[category] }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-category-label">Category</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-category-value">{{ categoryLabels[category] }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Source</span>
-              <span class="oppia-feedback-detail-field-value">{{ getFeedbackSourceLabel(feedback) }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-source-label">Source</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-source-value">{{ getFeedbackSourceLabel(feedback) }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Platform</span>
-              <span class="oppia-feedback-detail-field-value">{{ getFeedbackPlatformLabel(feedback) }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-platform-label">Platform</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-platform-value">{{ getFeedbackPlatformLabel(feedback) }}</span>
             </div>
             <div *ngIf="getParentFeedbackUrl(feedback) as parentFeedbackUrl"
                  class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-parent-url-label">
                 Parent Feedback URL
               </span>
 
-              <span class="oppia-feedback-detail-field-value">
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-parent-url-value">
                 <a
                    class="oppia-feedback-detail-link"
                    [href]="parentFeedbackUrl">
@@ -66,11 +69,11 @@
               </span>
             </div>
             <div class="oppia-feedback-detail-field" *ngIf="getFeedbackPageUrl(feedback) as pageUrl">
-              <span class="oppia-feedback-detail-field-label">Page URL</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-page-url-label">Page URL</span>
               <a [href]="pageUrl"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="oppia-feedback-detail-field-value oppia-feedback-detail-link">
+                 class="oppia-feedback-detail-field-value e2e-test-feedback-detail-page-url-value oppia-feedback-detail-link">
                 {{ pageUrl }}
               </a>
             </div>
@@ -87,47 +90,50 @@
 
           <oppia-feedback-detail-section *ngIf="feedback.lesson_metadata as lessonMetadata"
                                          heading="Lesson Context"
+                                         class="e2e-feedback-detail-lesson-context-section"
                                          [isCollapsible]="true"
                                          iconClass="fas fa-map-marker-alt">
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Exploration</span>
-              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.exploration_id }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-exploration-label">Exploration</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-exploration-value">{{ lessonMetadata.exploration_id }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">Version</span>
-              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.exploration_version }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-version-label">Version</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-version-value">{{ lessonMetadata.exploration_version }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">State</span>
-              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.state_name }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-state-name-label">State</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-state-name-value">{{ lessonMetadata.state_name }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
-              <span class="oppia-feedback-detail-field-label">State index</span>
-              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.state_index }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-state-index-label">State Index</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-state-index-value">{{ lessonMetadata.state_index }}</span>
             </div>
             <div class="oppia-feedback-detail-field" *ngIf="lessonMetadata.learner_current_answer">
-              <span class="oppia-feedback-detail-field-label">Learner answer</span>
-              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.learner_current_answer }}</span>
+              <span class="oppia-feedback-detail-field-label e2e-test-feedback-detail-learner-answer-label">Learner answer</span>
+              <span class="oppia-feedback-detail-field-value e2e-test-feedback-detail-learner-answer-value">{{ lessonMetadata.learner_current_answer }}</span>
             </div>
             <div class="oppia-feedback-detail-link-row">
               <a *ngIf="getReportedLessonUrl()"
                  [href]="getReportedLessonUrl()"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button e2e-test-feedback-detail-reported-lesson-version-link">
                 Open reported lesson version
               </a>
               <a *ngIf="getReportedStateEditorUrl()"
                  [href]="getReportedStateEditorUrl()"
                  target="_blank" rel="noopener noreferrer"
-                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button e2e-test-feedback-detail-reported-state-editor-link">
                 Open current state in editor
               </a>
             </div>
           </oppia-feedback-detail-section>
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showSessionInfo"
-                                         heading="Session Information" iconClass="fas fa-file-alt" [isCollapsible]="true">
+                                         heading="Session Information"
+                                         class="e2e-test-feedback-detail-session-info-section"
+                                         iconClass="fas fa-file-alt" [isCollapsible]="true">
             <ng-container *ngIf="sessionInfo as logs; else noSessionInfo">
               <div class="oppia-feedback-detail-log-block">
                 <div class="oppia-feedback-detail-log-heading">Environment</div>
@@ -153,18 +159,21 @@
         </div>
 
         <div class="oppia-feedback-detail-col">
-          <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
-            <div class="oppia-feedback-detail-message-text">{{ getFeedbackMessage() }}</div>
+          <oppia-feedback-detail-section heading="User's Feedback Message"
+                                         class="e2e-test-feedback-detail-user-feedback-section"
+                                         iconClass="fas fa-comment">
+            <div class="oppia-feedback-detail-message-text e2e-test-feedback-detail-user-message">{{ getFeedbackMessage() }}</div>
           </oppia-feedback-detail-section>
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
                                          heading="Replies"
+                                          class="e2e-test-feedback-detail-replies-section"
                                          [isCollapsible]="true"
                                          iconClass="fas fa-comments"
                                          class="oppia-feedback-detail-replies-bar">
             <ng-container *ngIf="getFeedbackResponses(feedback) as responses">
               <div *ngIf="responses.length === 0"
-                   class="oppia-feedback-response-empty">
+                   class="oppia-feedback-response-empty e2e-test-feedback-response-empty">
                 No replies yet.
               </div>
 
@@ -191,15 +200,16 @@
 
           <div class="oppia-feedback-detail-actions-bar">
             <oppia-feedback-detail-section heading="Actions"
+                                           class="e2e-test-feedback-detail-actions-section"
                                            [isCollapsible]="true"
                                            iconClass="fas fa-cogs">
               <section *ngIf="feedbackDetailPageConfig.showResponse"
                        class="oppia-feedback-detail-reply-row">
-                <label class="oppia-feedback-detail-actions-label" for="reply-textarea">
+                <label class="oppia-feedback-detail-actions-label e2e-test-feedback-detail-actions-label" for="reply-textarea">
                   Reply to reporter
                 </label>
                 <textarea id="reply-textarea"
-                          class="oppia-feedback-detail-reply-textarea"
+                          class="oppia-feedback-detail-reply-textarea e2e-test-feedback-detail-reply-textarea"
                           [(ngModel)]="replyText"
                           [disabled]="isSendingReply"
                           rows="2"
@@ -207,7 +217,7 @@
                 </textarea>
                 <div class="oppia-feedback-detail-reply-send-row">
                   <button type="button"
-                          class="btn btn-success oppia-feedback-detail-button"
+                          class="btn btn-success oppia-feedback-detail-button e2e-test-feedback-detail-send-btn"
                           [disabled]="!replyText.trim() || isSendingReply"
                           (click)="onReplySend()">
                     <span *ngIf="!isSendingReply">Send</span>

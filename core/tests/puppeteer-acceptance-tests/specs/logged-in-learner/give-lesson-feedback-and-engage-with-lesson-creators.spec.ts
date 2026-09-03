@@ -127,7 +127,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+    await loggedInLearner.expectFeedbackTableEntry({
       description:
         'This fraction model is awesome, but can we get more marble examples?',
       status: FEEDBACK_STATUS_LABELS[FeedbackStatus.SUBMITTED],
@@ -212,7 +212,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+    await loggedInLearner.expectFeedbackTableEntry({
       description:
         'This fraction model is awesome, but can we get more marble examples?',
       status: statusLabels[FeedbackStatus.REVIEWED_BY_TEAM],
@@ -256,7 +256,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
     await loggedInLearner.verifyMySuggestionsFeedbackList();
 
-    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+    await loggedInLearner.expectFeedbackTableEntry({
       description: 'This Lesson seems too short, can we make it longer?',
       status: statusLabels[FeedbackStatus.LESSON_UPDATED],
       lessonTitle: 'What are the Place Values',
@@ -316,7 +316,7 @@ describe('Logged-in User', function () {
     );
 
     await loggedInLearner.goBackToMySuggestionsTabList();
-    await loggedInLearner.expectMySuggestionsFeedbackEntry({
+    await loggedInLearner.expectFeedbackTableEntry({
       description:
         'This Question answer is still wrong, please recheck, Thanks.',
       status: statusLabels[FeedbackStatus.SUBMITTED],

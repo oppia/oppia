@@ -267,7 +267,8 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
-
+const explorationFeedbackTabTitleSelector =
+  '.e2e-test-exploration-feedback-title';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
@@ -2914,6 +2915,14 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  async expectNewExplorationFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+    await this.expectTextContentToBe(
+      explorationFeedbackTabTitleSelector,
+      'Exploration Feedback'
+    );
   }
 
   /**
