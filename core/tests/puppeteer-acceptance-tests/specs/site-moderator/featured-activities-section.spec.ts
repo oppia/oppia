@@ -73,10 +73,11 @@ describe('Site Moderator', function () {
 
     // Use invalid exploration ID.
     await siteModerator.featureActivity('ABC0101', 1);
-    await siteModerator.expectToastWarningMessageToBe(
+    await siteModerator.expectErrorModalToBeVisible();
+    await siteModerator.expectErrorModalMessageToBe(
       'These Exploration IDs do not exist: ABC0101'
     );
-    await siteModerator.closeToastWarningMessage();
+    await siteModerator.closeErrorModal();
     // Once we check that activity can't be added, it's data is still there.
     // Thus, we are removing it.
     await siteModerator.unfeatureActivityAtIndex(2);

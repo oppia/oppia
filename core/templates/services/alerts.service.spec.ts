@@ -36,6 +36,16 @@ describe('Alerts Service', function () {
       expect(alertsService.warnings.length).toBe(1);
     });
 
+    it('should emit warning message when a warning is added', () => {
+      let emittedWarning = '';
+      alertsService.onWarningAdded.subscribe((warning: string) => {
+        emittedWarning = warning;
+      });
+
+      alertsService.addWarning('Test Warning');
+      expect(emittedWarning).toBe('Test Warning');
+    });
+
     it('should add a fatal warning', () => {
       expect(alertsService.warnings.length).toBe(0);
       expect(() => {

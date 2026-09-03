@@ -1,0 +1,36 @@
+.oppia-error-modal-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.oppia-error-details-toggle-link {
+  align-items: center;
+  background: none;
+  border: none;
+  color: #0844aa;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.oppia-error-details-toggle-link:hover {
+  color: #3f2c76;
+}
+
+.oppia-error-details-toggle-link:focus {
+  outline: none;
+}
+
+.oppia-error-details-arrow {
+  margin-right: 5px;
+}
+
+.oppia-error-success-message {
+  padding: 20px 0;
+  text-align: center;
+}
+
+.oppia-error-description-label {
+  font-weight: normal;
+}
