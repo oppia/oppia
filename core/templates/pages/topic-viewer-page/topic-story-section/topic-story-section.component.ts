@@ -30,35 +30,26 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
-import {AppConstants} from 'app.constants';
-import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import {StoryDomainConstants} from 'domain/story/story-domain.constants';
-import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
+import {TopicStorySectionBackendDataService} from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LocalStorageService} from 'services/local-storage.service';
 
-import constants from 'assets/constants';
 import './topic-story-section.component.css';
 import {MasteryChallengeLockedModalComponent} from './mastery-challenge-locked-modal.component';
 
 import {ModuleMasteredModalComponent} from './module-mastered-modal.component';
 import {ModuleSkipConfirmationModalComponent} from './module-skip-confirmation-modal.component';
 import {ModuleNavigationLessonSelection} from './module-navigation.component';
-import {LessonProgressStatus} from './topic-lesson-card/topic-lesson-card.component';
+import {
+  LessonCardData,
+  ModuleGroupData,
+} from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 
-const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
-const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
-const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';
 const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
 const ARC_ID_QUERY_PARAM = 'arc_id';
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -66,37 +57,6 @@ const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
 const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
 const DEFAULT_PRACTICE_ACCENT_COLOR = '#0b776d';
 const COMING_SOON_ACCENT_COLOR = '#6b7280';
-
-interface LessonCardData {
-  lessonNumber: number;
-  lessonTitle: string;
-  lessonDescription: string;
-  thumbnailUrl: string;
-  startUrl: string;
-  practiceUrl: string;
-  skillIds: string[];
-  hasPracticeQuestions: boolean;
-  nodeId: string;
-  lessonProgressStatus: LessonProgressStatus;
-  isComingSoon: boolean;
-  isPublished: boolean;
-  isNewLabelVisible: boolean;
-  availableTextLanguageCodes: string[];
-  availableVoiceoverLanguageCodes: string[];
-  availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
-}
-
-interface ModuleGroupData {
-  moduleTitle: string;
-  moduleDescription: string;
-  lessonCards: LessonCardData[];
-  accentColor: string;
-  iconBg: string;
-  headerBackgroundColor: string;
-  headerBorderColor: string;
-  arcId: string;
-  hasPracticeQuestions: boolean;
-}
 
 interface PracticeCardData {
   practiceTitle: string;
@@ -397,29 +357,12 @@ export class TopicStorySectionComponent
       'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
       {
         count: skippedModuleNumbers.length,
-        moduleNumbers: this.joinModuleNumbers(skippedModuleNumbers),
+        moduleNumbers:
+          this.topicStorySectionBackendDataService.joinModuleNumbers(
+            skippedModuleNumbers
+          ),
         messageFormat: true,
       }
-    );
-  }
-
-  private joinModuleNumbers(numbers: number[]): string {
-    if (numbers.length === 1) {
-      return String(numbers[0]);
-    }
-    const andConjunction = this.translateService.instant(
-      'I18N_TOPIC_VIEWER_LIST_AND'
-    );
-    if (numbers.length === 2) {
-      return numbers.join(andConjunction);
-    }
-    const commaAndConjunction = this.translateService.instant(
-      'I18N_TOPIC_VIEWER_LIST_COMMA_AND'
-    );
-    return (
-      numbers.slice(0, -1).join(', ') +
-      commaAndConjunction +
-      numbers[numbers.length - 1]
     );
   }
 
@@ -675,13 +618,10 @@ export class TopicStorySectionComponent
   }
 
   constructor(
-    private assetsBackendApiService: AssetsBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
-    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
-    private questionBackendApiService: QuestionBackendApiService,
+    private topicStorySectionBackendDataService: TopicStorySectionBackendDataService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private localStorageService: LocalStorageService,
@@ -721,8 +661,12 @@ export class TopicStorySectionComponent
   }
 
   onAvatarImageError(): void {
-    if (this.oppiaAvatarImageUrl !== this.getFallbackAvatarImageUrl()) {
-      this.oppiaAvatarImageUrl = this.getFallbackAvatarImageUrl();
+    if (
+      this.oppiaAvatarImageUrl !==
+      this.topicStorySectionBackendDataService.getFallbackAvatarImageUrl()
+    ) {
+      this.oppiaAvatarImageUrl =
+        this.topicStorySectionBackendDataService.getFallbackAvatarImageUrl();
     }
   }
 
@@ -739,69 +683,14 @@ export class TopicStorySectionComponent
       card => card.lessonProgressStatus === 'completed'
     ).length;
     const totalCount = moduleGroup.lessonCards.length;
-    return this.translateService.instant(
-      'I18N_TOPIC_VIEWER_MODULE_COMPLETION_TEXT',
-      {completedCount, totalCount}
+    return this.topicStorySectionBackendDataService.getModuleCompletionText(
+      completedCount,
+      totalCount
     );
   }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
-  private getLessonProgressStatus(node: StoryNode): LessonProgressStatus {
-    if (this.isChapterDisplayedAsComingSoon(node) || !node.getExplorationId()) {
-      return 'coming_soon';
-    }
-
-    const nodeTitle = node.getTitle();
-    if (this.storySummary.isNodeCompleted(nodeTitle)) {
-      return 'completed';
-    }
-
-    const visitedChapterTitles = this.storySummary.getVisitedChapterTitles();
-    if (visitedChapterTitles && visitedChapterTitles.includes(nodeTitle)) {
-      return 'in_progress';
-    }
-
-    return 'not_started';
-  }
-
-  private buildModuleGroups(allNodes: StoryNode[]): ModuleGroupData[] {
-    const arcs = this.storySummary.getArcs();
-    if (!arcs || arcs.length === 0) {
-      return [];
-    }
-
-    const nodeIndexMap = new Map<string, number>();
-    allNodes.forEach((node, index) => {
-      nodeIndexMap.set(node.getId(), index);
-    });
-
-    return arcs.map((arc, moduleIndex) => {
-      const moduleLessonCards: LessonCardData[] = [];
-      const paletteColor = this.getModulePaletteColor(moduleIndex);
-      arc.node_ids.forEach(nodeId => {
-        const nodeIndex = nodeIndexMap.get(nodeId);
-        if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
-          moduleLessonCards.push(this.lessonCards[nodeIndex]);
-        }
-      });
-      // The backend maps an arc to its 1-based position among the topic's
-      // story arcs, so pass the position rather than a parsed arc id.
-      const arcId = String(moduleIndex + 1);
-      return {
-        moduleTitle: arc.title,
-        moduleDescription: arc.description,
-        lessonCards: moduleLessonCards,
-        accentColor: paletteColor.rowAccent,
-        iconBg: paletteColor.iconBg,
-        headerBackgroundColor: paletteColor.headerBg,
-        headerBorderColor: paletteColor.headerBorder,
-        arcId,
-        hasPracticeQuestions: false,
-      };
-    });
   }
 
   private populateFromInputs(): void {
@@ -814,46 +703,32 @@ export class TopicStorySectionComponent
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
     }
 
-    this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
-    this.studyGuideUrl = this.getStudyGuideUrl();
+    this.oppiaAvatarImageUrl =
+      this.topicStorySectionBackendDataService.getPrimaryAvatarImageUrl();
+    this.studyGuideUrl =
+      this.topicStorySectionBackendDataService.getStudyGuideUrl(
+        this.classroomUrlFragment,
+        this.topicUrlFragment
+      );
 
     this.storyTitle = this.storySummary.getTitle();
     this.storyDescription = this.storySummary.getDescription() || '';
     this.lessonCount = this.storySummary.getNodeTitles().length;
     const allNodes = this.storySummary.getAllNodes();
-    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
-      const lessonProgressStatus = this.getLessonProgressStatus(node);
-      const nodeNumber = node.getId().split('_').pop() || '';
+    this.lessonCards =
+      this.topicStorySectionBackendDataService.buildLessonCards(
+        allNodes,
+        this.storySummary,
+        this.classroomUrlFragment,
+        this.topicUrlFragment
+      );
 
-      return {
-        lessonNumber: index + 1,
-        lessonTitle: node.getTitle(),
-        lessonDescription: node.getDescription(),
-        thumbnailUrl: this.getLessonThumbnailUrl(node),
-        startUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonStartUrl(node),
-        practiceUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonPracticeUrl(nodeNumber),
-        skillIds: node.getAcquiredSkillIds(),
-        hasPracticeQuestions: false,
-        nodeId: node.getId(),
-        lessonProgressStatus,
-        isComingSoon: lessonProgressStatus === 'coming_soon',
-        isPublished: this.isChapterPublished(node),
-        isNewLabelVisible: this.isNewChapterLabelVisible(node),
-        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-        availableVoiceoverLanguageCodes:
-          node.getAvailableVoiceoverLanguageCodes(),
-        availableVoiceoverLanguageAccentDescriptions:
-          node.getAvailableVoiceoverLanguageAccentDescriptions(),
-      };
-    });
-
-    this.moduleGroups = this.buildModuleGroups(allNodes);
+    this.moduleGroups =
+      this.topicStorySectionBackendDataService.buildModuleGroups(
+        allNodes,
+        this.storySummary,
+        this.lessonCards
+      );
     this.restoreSkippedModules();
     this.restoreMasteredModules();
     this.updateVisibleSections();
@@ -875,32 +750,18 @@ export class TopicStorySectionComponent
     return {
       practiceTitle: this.getPracticeTitle(0),
       practiceDescription: this.getPracticeDescription(0),
-      thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
+      thumbnailUrl:
+        this.topicStorySectionBackendDataService.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
       practiceUrl: firstArcId
         ? this.getEndOfArcUrl(firstArcId)
-        : this.getGeneralPracticeUrl(),
+        : this.topicStorySectionBackendDataService.getGeneralPracticeUrl(
+            this.practiceSubtopicIds,
+            this.classroomUrlFragment,
+            this.topicUrlFragment
+          ),
       hasPracticeQuestions: false,
     };
-  }
-
-  private getGeneralPracticeUrl(): string {
-    if (
-      !this.classroomUrlFragment ||
-      !this.topicUrlFragment ||
-      this.practiceSubtopicIds.length === 0
-    ) {
-      return '#';
-    }
-
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        stringified_subtopic_ids: JSON.stringify(this.practiceSubtopicIds),
-      }
-    );
   }
 
   private async loadPracticeQuestionAvailability(): Promise<void> {
@@ -909,7 +770,11 @@ export class TopicStorySectionComponent
     const moduleGroups = this.moduleGroups;
 
     const lessonAvailability = await Promise.all(
-      lessonCards.map(card => this.checkIfQuestionsExist(card.skillIds))
+      lessonCards.map(card =>
+        this.topicStorySectionBackendDataService.checkIfQuestionsExist(
+          card.skillIds
+        )
+      )
     );
 
     if (requestId !== this.practiceAvailabilityRequestId) {
@@ -942,105 +807,40 @@ export class TopicStorySectionComponent
     });
   }
 
-  private async checkIfQuestionsExist(skillIds: string[]): Promise<boolean> {
-    if (!skillIds || skillIds.length === 0) {
-      return false;
-    }
-
-    try {
-      const questionCount =
-        await this.questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
-          skillIds
-        );
-      return questionCount > 0;
-    } catch {
-      return false;
-    }
-  }
-
   getPracticeTitle(moduleIndex: number): string {
-    return `Module ${moduleIndex + 1} Review & Test`;
+    return this.topicStorySectionBackendDataService.getPracticeTitle(
+      moduleIndex
+    );
   }
 
   getPracticeDescription(moduleIndex: number): string {
-    const moduleNumber = moduleIndex + 1;
-    if (moduleIndex < this.visibleModuleGroups.length - 1) {
-      return this.translateService.instant(
-        'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT',
-        {moduleNumber, nextModuleNumber: moduleNumber + 1}
-      );
-    }
-    return this.translateService.instant(
-      'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
-      {moduleNumber}
+    return this.topicStorySectionBackendDataService.getPracticeDescription(
+      moduleIndex,
+      moduleIndex >= this.visibleModuleGroups.length - 1
     );
   }
 
   getLessonPracticeUrl(nodeId: string): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.LESSON_PRACTICE_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        node_id: nodeId,
-      }
+    return this.topicStorySectionBackendDataService.getLessonPracticeUrl(
+      nodeId,
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
   }
 
   getEndOfArcUrl(arcId: string): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.END_OF_ARC_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        arc_id: arcId,
-      }
+    return this.topicStorySectionBackendDataService.getEndOfArcUrl(
+      arcId,
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
   }
 
   private getMasteryChallengeUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.MASTERY_CHALLENGE_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-      }
+    return this.topicStorySectionBackendDataService.getMasteryChallengeUrl(
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
-  }
-
-  private getLessonThumbnailUrl(node: StoryNode): string {
-    const thumbnailFilename = node.getThumbnailFilename();
-    const storyId = this.storySummary.getId();
-    if (thumbnailFilename) {
-      if (!storyId) {
-        return this.getFallbackLessonThumbnailUrl();
-      }
-      return this.assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.STORY,
-        storyId,
-        thumbnailFilename
-      );
-    }
-    return this.getFallbackLessonThumbnailUrl();
-  }
-
-  private getModulePaletteColor(moduleIndex: number): {
-    headerBg: string;
-    headerBorder: string;
-    iconBg: string;
-    rowAccent: string;
-  } {
-    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
-    return palette[moduleIndex % palette.length];
   }
 
   private getActiveLessonNumber(): number | null {
@@ -1224,132 +1024,5 @@ export class TopicStorySectionComponent
     }
 
     return match[0];
-  }
-
-  private isChapterReadyToPublish(node: StoryNode): boolean {
-    try {
-      return (
-        this.hasStoryNodeStatus(
-          node,
-          constants.STORY_NODE_STATUS_READY_TO_PUBLISH
-        ) || this.hasStoryNodeStatus(node, 'Ready To Publish')
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private isChapterPublished(node: StoryNode): boolean {
-    try {
-      return (
-        this.hasStoryNodeStatus(node, constants.STORY_NODE_STATUS_PUBLISHED) ||
-        this.hasStoryNodeStatus(node, 'Published')
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private hasStoryNodeStatus(node: StoryNode, expectedStatus: string): boolean {
-    const status = node.getStatus();
-    if (!status) {
-      return false;
-    }
-
-    return (
-      this.normalizeStoryNodeStatus(status) ===
-      this.normalizeStoryNodeStatus(expectedStatus)
-    );
-  }
-
-  private normalizeStoryNodeStatus(status: string): string {
-    return status.trim().toLowerCase().replace(/\s+/g, ' ');
-  }
-
-  private isChapterDisplayedAsComingSoon(node: StoryNode): boolean {
-    if (this.isChapterReadyToPublish(node)) {
-      return true;
-    }
-
-    return !node.getExplorationId();
-  }
-
-  private isNewChapterLabelVisible(node: StoryNode): boolean {
-    if (this.isChapterDisplayedAsComingSoon(node)) {
-      return false;
-    }
-
-    try {
-      return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
-        node,
-        this.storySummary
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private getLessonStartUrl(node: StoryNode): string {
-    const explorationId = node.getExplorationId();
-    if (
-      !explorationId ||
-      !this.classroomUrlFragment ||
-      !this.topicUrlFragment
-    ) {
-      return '#';
-    }
-
-    let lessonUrl = this.urlInterpolationService.interpolateUrl(
-      '/explore/<exp_id>',
-      {exp_id: explorationId}
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'topic_url_fragment',
-      this.topicUrlFragment
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'classroom_url_fragment',
-      this.classroomUrlFragment
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'story_url_fragment',
-      this.storySummary.getUrlFragment()
-    );
-    lessonUrl = this.urlService.addField(lessonUrl, 'node_id', node.getId());
-    return lessonUrl;
-  }
-
-  private getStudyGuideUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE.replace(
-      '<classroom_url_fragment>',
-      encodeURIComponent(this.classroomUrlFragment)
-    ).replace(
-      '<topic_url_fragment>',
-      encodeURIComponent(this.topicUrlFragment)
-    );
-  }
-
-  private getPrimaryAvatarImageUrl(): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      PRIMARY_AVATAR_IMAGE_PATH
-    );
-  }
-
-  private getFallbackAvatarImageUrl(): string {
-    return this.urlInterpolationService.getStaticCopyrightedImageUrl(
-      FALLBACK_AVATAR_IMAGE_PATH
-    );
-  }
-
-  private getFallbackLessonThumbnailUrl(): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      FALLBACK_LESSON_THUMBNAIL_PATH
-    );
   }
 }

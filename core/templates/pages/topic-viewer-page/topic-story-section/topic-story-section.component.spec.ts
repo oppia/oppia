@@ -5056,28 +5056,4 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.isModuleSkipped(0)).toBe(false);
   });
-
-  it('should return single number as string', () => {
-    const result = (
-      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
-    ).call(component, [1]);
-    expect(result).toBe('1');
-  });
-
-  it('should join two numbers with AND conjunction', () => {
-    const result = (
-      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
-    ).call(component, [1, 2]);
-    expect(result).toContain('1');
-    expect(result).toContain('2');
-  });
-
-  it('should join three numbers with comma AND conjunction', () => {
-    const result = (
-      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
-    ).call(component, [1, 2, 3]);
-    expect(result).toContain('1');
-    expect(result).toContain('2');
-    expect(result).toContain('3');
-  });
 });
