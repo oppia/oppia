@@ -293,6 +293,8 @@ export class CertificateAssessmentPlayerPageComponent
       this.translateService.instant('I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM')
     );
     if (shouldLeave) {
+      // Only navigate when the learner confirms; otherwise they stay on
+      // the current question so they can keep working.
       this.router.navigate(exitRoute);
     }
   }

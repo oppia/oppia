@@ -70,7 +70,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   private pendingSubmission: Promise<void> = Promise.resolve();
   // Set once the learner's answers have been saved, so the beforeunload
   // guard stops warning once there is nothing left to lose.
-  private isAttemptSubmitted = false;
+  private attemptIsSubmitted = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -107,7 +107,7 @@ export class CertificateAssessmentPlayerPageRootComponent
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     this.preventPageUnloadEventService.addListener(() => {
-      return this.attempt !== null && !this.isAttemptSubmitted;
+      return this.attempt !== null && !this.attemptIsSubmitted;
     });
     await this.loadCertificateOffering();
     if (currentRoute === 'session' && !this.hasError) {
@@ -231,7 +231,7 @@ export class CertificateAssessmentPlayerPageRootComponent
           attemptId,
           answers
         );
-        this.isAttemptSubmitted = true;
+        this.attemptIsSubmitted = true;
         if (submittedBeforeExpiry) {
           await this.navigateToResultPage();
         }
