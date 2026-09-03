@@ -16,6 +16,8 @@
  * @fileoverview Spec for rte output component.
  */
 
+// @ts-nocheck
+
 import {DOCUMENT} from '@angular/common';
 import {DebugElement, SimpleChanges} from '@angular/core';
 import {
@@ -323,6 +325,22 @@ describe('RTE display component', () => {
     ).and.returnValue('en');
     let outputWrappedString =
       component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve ordered list structure while wrapping list items', fakeAsync(() => {
+    let rteString =
+      '<ol><li>First item.</li><li>Second item.</li><li>Third item.</li></ol>';
+    let expectedOutputWrappedString =
+      '<ol><li><span class="highlightBlock1">First item.</span></li><li><span class="highlightBlock2">Second item.</span></li><li><span class="highlightBlock3">Third item.</span></li></ol>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 

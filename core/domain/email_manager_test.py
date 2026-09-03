@@ -1887,6 +1887,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             response_list=[],
             unread_response_count=0,
             created_on_msecs=0,
+            last_updated_msecs=0,
         )
 
     def _get_platform_feedback(
@@ -9823,3 +9824,31 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
             enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+
+    def test_failed_send_mail_does_not_create_sent_email_model(self) -> None:
+        """Test that a failed send does not create a SentEmailModel record."""
+
+        class SimulatedEmailFailure(Exception):
+            """Exception for simulating email failure."""
+
+            pass
+
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
+            raise SimulatedEmailFailure()
+
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
+
+        models_before = len(email_models.SentEmailModel.query().fetch())
+
+        with send_mail_swap:
+            email_manager._send_email(  # pylint: disable=protected-access
+                self.user_a_id,
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP,
+                'Subject',
+                'Body',
+                'sender@example.com',
+            )
+
+        models_after = len(email_models.SentEmailModel.query().fetch())
+        self.assertEqual(models_before, models_after)

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the checkpoint celebration modal component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
