@@ -47,8 +47,8 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
-import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
-import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
+import {ModuleMasteredModalComponent} from './module-mastered-modal.component';
+import {ModuleSkipConfirmationModalComponent} from './module-skip-confirmation-modal.component';
 import {MasteryChallengeLockedModalComponent} from './mastery-challenge-locked-modal.component';
 
 class MockTranslateService {
@@ -130,13 +130,13 @@ describe('TopicStorySectionComponent', () => {
       0
     );
     localStorageService = jasmine.createSpyObj('LocalStorageService', [
-      'getSkippedAdventures',
-      'updateSkippedAdventures',
-      'getMasteredAdventures',
-      'updateMasteredAdventures',
+      'getSkippedModules',
+      'updateSkippedModules',
+      'getMasteredModules',
+      'updateMasteredModules',
     ]);
-    localStorageService.getSkippedAdventures.and.returnValue([]);
-    localStorageService.getMasteredAdventures.and.returnValue([]);
+    localStorageService.getSkippedModules.and.returnValue([]);
+    localStorageService.getMasteredModules.and.returnValue([]);
     platformFeatureService = {
       status: {
         SerialChapterLaunchLearnerView: {
@@ -362,12 +362,12 @@ describe('TopicStorySectionComponent', () => {
     availableVoiceoverLanguageAccentDescriptions: {},
   });
 
-  const createAdventureGroup = (
-    adventureTitle: string,
+  const createModuleGroup = (
+    moduleTitle: string,
     lessonCards: ReturnType<typeof createLessonCard>[]
   ) => ({
-    adventureTitle: adventureTitle,
-    adventureDescription: '',
+    moduleTitle: moduleTitle,
+    moduleDescription: '',
     lessonCards: lessonCards,
     accentColor: '#27a844',
     iconBg: '',
@@ -378,12 +378,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should include review and test in the practice title', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Fractions', [createLessonCard(1, 'not_started')]),
+    component.visibleModuleGroups = [
+      createModuleGroup('Fractions', [createLessonCard(1, 'not_started')]),
     ];
 
-    expect(component.getPracticeTitle(0)).toBe('Adventure 1 Review & Test');
-    expect(component.getPracticeTitle(1)).toBe('Adventure 2 Review & Test');
+    expect(component.getPracticeTitle(0)).toBe('Module 1 Review & Test');
+    expect(component.getPracticeTitle(1)).toBe('Module 2 Review & Test');
   });
 
   it('should set study guide url on init', () => {
@@ -401,7 +401,7 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should build adventure groups when story has arcs', () => {
+  it('should build module groups when story has arcs', () => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -421,14 +421,14 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Adventure 1',
-        description: 'First adventure',
+        title: 'Module 1',
+        description: 'First module',
         node_ids: ['node_1'],
       },
       {
         id: 'arc_2',
-        title: 'Adventure 2',
-        description: 'Second adventure',
+        title: 'Module 2',
+        description: 'Second module',
         node_ids: ['node_2'],
       },
     ];
@@ -443,17 +443,17 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.adventureGroups.length).toBe(2);
-    expect(component.adventureGroups[0].adventureTitle).toBe('Adventure 1');
-    expect(component.adventureGroups[0].arcId).toBe('1');
-    expect(component.adventureGroups[0].lessonCards.length).toBe(1);
-    expect(component.adventureGroups[0].lessonCards[0].lessonTitle).toContain(
+    expect(component.moduleGroups.length).toBe(2);
+    expect(component.moduleGroups[0].moduleTitle).toBe('Module 1');
+    expect(component.moduleGroups[0].arcId).toBe('1');
+    expect(component.moduleGroups[0].lessonCards.length).toBe(1);
+    expect(component.moduleGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
-    expect(component.adventureGroups[1].adventureTitle).toBe('Adventure 2');
-    expect(component.adventureGroups[1].arcId).toBe('2');
-    expect(component.adventureGroups[1].lessonCards.length).toBe(1);
-    expect(component.adventureGroups[1].lessonCards[0].lessonTitle).toContain(
+    expect(component.moduleGroups[1].moduleTitle).toBe('Module 2');
+    expect(component.moduleGroups[1].arcId).toBe('2');
+    expect(component.moduleGroups[1].lessonCards.length).toBe(1);
+    expect(component.moduleGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
     );
   });
@@ -547,7 +547,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].lessonProgressStatus).toBe('in_progress');
   });
 
-  it('should show adventure-end-test card when lesson cards exist and practice is enabled', () => {
+  it('should show module-end-test card when lesson cards exist and practice is enabled', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -735,8 +735,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -773,8 +773,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'default_arc',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -795,7 +795,7 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should enable lesson and adventure practice when questions exist', async () => {
+  it('should enable lesson and module practice when questions exist', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -813,8 +813,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -825,7 +825,7 @@ describe('TopicStorySectionComponent', () => {
     await component.practiceAvailabilityPending;
 
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(true);
-    expect(component.adventureGroups[0].hasPracticeQuestions).toBe(true);
+    expect(component.moduleGroups[0].hasPracticeQuestions).toBe(true);
   });
 
   it('should keep practice disabled when the question check fails', async () => {
@@ -846,8 +846,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -857,19 +857,19 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
-    expect(component.adventureGroups[0].hasPracticeQuestions).toBe(false);
+    expect(component.moduleGroups[0].hasPracticeQuestions).toBe(false);
   });
 
-  it('should return correct practice title for each adventure index', () => {
-    expect(component.getPracticeTitle(0)).toBe('Adventure 1 Review & Test');
-    expect(component.getPracticeTitle(1)).toBe('Adventure 2 Review & Test');
-    expect(component.getPracticeTitle(2)).toBe('Adventure 3 Review & Test');
+  it('should return correct practice title for each module index', () => {
+    expect(component.getPracticeTitle(0)).toBe('Module 1 Review & Test');
+    expect(component.getPracticeTitle(1)).toBe('Module 2 Review & Test');
+    expect(component.getPracticeTitle(2)).toBe('Module 3 Review & Test');
   });
 
-  it('should return correct practice description with unlock message for non-last adventures', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return correct practice description with unlock message for non-last modules', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
 
     expect(component.getPracticeDescription(0)).toBe(
@@ -877,22 +877,22 @@ describe('TopicStorySectionComponent', () => {
     );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_WITH_NEXT',
-      {adventureNumber: 1, nextAdventureNumber: 2}
+      {moduleNumber: 1, nextModuleNumber: 2}
     );
     expect(component.getPracticeDescription(1)).toBe(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
-      {adventureNumber: 2}
+      {moduleNumber: 2}
     );
   });
 
-  it('should return correct practice description without unlock for last adventure', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
-      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+  it('should return correct practice description without unlock for last module', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
+      createModuleGroup('Module 3', [createLessonCard(3, 'not_started')]),
     ];
 
     expect(component.getPracticeDescription(2)).toBe(
@@ -900,7 +900,7 @@ describe('TopicStorySectionComponent', () => {
     );
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_TOPIC_VIEWER_PRACTICE_DESCRIPTION_FINAL',
-      {adventureNumber: 3}
+      {moduleNumber: 3}
     );
   });
 
@@ -951,14 +951,14 @@ describe('TopicStorySectionComponent', () => {
     expect(component.studyGuideUrl).toBe('unchanged-value');
   });
 
-  it('should toggle adventure expansion state', () => {
-    expect(component.isAdventureExpanded(0)).toBe(false);
+  it('should toggle module expansion state', () => {
+    expect(component.isModuleExpanded(0)).toBe(false);
 
-    component.toggleAdventure(0);
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    component.toggleModule(0);
+    expect(component.isModuleExpanded(0)).toBe(true);
 
-    component.toggleAdventure(0);
-    expect(component.isAdventureExpanded(0)).toBe(false);
+    component.toggleModule(0);
+    expect(component.isModuleExpanded(0)).toBe(false);
   });
 
   it('should ignore arc node ids not present in all nodes', () => {
@@ -973,8 +973,8 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Adventure 1',
-        description: 'First adventure',
+        title: 'Module 1',
+        description: 'First module',
         node_ids: ['missing_node_id'],
       },
     ];
@@ -989,8 +989,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.adventureGroups.length).toBe(1);
-    expect(component.adventureGroups[0].lessonCards).toEqual([]);
+    expect(component.moduleGroups.length).toBe(1);
+    expect(component.moduleGroups[0].lessonCards).toEqual([]);
   });
 
   it('should return # as startUrl when exploration id is null', () => {
@@ -1018,11 +1018,11 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].startUrl).toBe('#');
   });
 
-  it('should return empty string for getAdventureCompletionText with invalid index', () => {
-    expect(component.getAdventureCompletionText(999)).toBe('');
+  it('should return empty string for getModuleCompletionText with invalid index', () => {
+    expect(component.getModuleCompletionText(999)).toBe('');
   });
 
-  it('should return correct adventure completion text', () => {
+  it('should return correct module completion text', () => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -1045,8 +1045,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2'],
         },
       ]
@@ -1062,8 +1062,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.getAdventureCompletionText(0)).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_COMPLETION_TEXT'
+    expect(component.getModuleCompletionText(0)).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_COMPLETION_TEXT'
     );
   });
 
@@ -1144,7 +1144,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].isNewLabelVisible).toBe(true);
   });
 
-  it('should return empty adventure groups when arcs are empty', async () => {
+  it('should return empty module groups when arcs are empty', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
       'Desc',
@@ -1163,8 +1163,8 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     await fixture.whenStable();
 
-    expect(component.adventureGroups).toEqual([]);
-    expect(component.visibleAdventureGroups).toEqual([]);
+    expect(component.moduleGroups).toEqual([]);
+    expect(component.visibleModuleGroups).toEqual([]);
   });
 
   it('should select first lesson as active when all lessons are completed', () => {
@@ -1237,7 +1237,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].startUrl).toBe('#');
   });
 
-  it('should handle adventure navigation lesson selected', fakeAsync(() => {
+  it('should handle module navigation lesson selected', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -1260,8 +1260,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2'],
         },
       ]
@@ -1271,17 +1271,17 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 0});
+    component.onNavigationLessonSelected({lessonNumber: 2, moduleIndex: 0});
 
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(true);
 
     tick(400);
   }));
 
-  it('should restore skipped adventures from localStorage on init', () => {
-    localStorageService.getSkippedAdventures.and.returnValue([0]);
+  it('should restore skipped modules from localStorage on init', () => {
+    localStorageService.getSkippedModules.and.returnValue([0]);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -1305,14 +1305,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -1322,17 +1322,17 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(localStorageService.getSkippedAdventures).toHaveBeenCalledWith(
+    expect(localStorageService.getSkippedModules).toHaveBeenCalledWith(
       'story_id_1'
     );
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(component.isAdventureSkipped(1)).toBe(false);
-    expect(component.isAdventureExpanded(0)).toBe(false);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(component.isModuleSkipped(1)).toBe(false);
+    expect(component.isModuleExpanded(0)).toBe(false);
+    expect(component.isModuleExpanded(1)).toBe(true);
   });
 
-  it('should auto-expand first adventure when all adventures are skipped', () => {
-    localStorageService.getSkippedAdventures.and.returnValue([0, 1]);
+  it('should auto-expand first module when all modules are skipped', () => {
+    localStorageService.getSkippedModules.and.returnValue([0, 1]);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -1356,14 +1356,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -1373,12 +1373,12 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(component.isAdventureSkipped(1)).toBe(true);
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(component.isModuleSkipped(1)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(true);
   });
 
-  it('should persist skipped adventures when proceeding with skip confirmation', fakeAsync(() => {
+  it('should persist skipped modules when proceeding with skip confirmation', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -1401,14 +1401,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -1421,18 +1421,18 @@ describe('TopicStorySectionComponent', () => {
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      ArcSkipConfirmationModalComponent,
+      ModuleSkipConfirmationModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'oppia-arc-skip-confirmation-modal',
+        windowClass: 'oppia-module-skip-confirmation-modal',
       }
     );
-    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.updateSkippedModules).not.toHaveBeenCalled();
 
-    component.onArcSkipConfirmationProceed();
+    component.onModuleSkipConfirmationProceed();
 
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(localStorageService.updateSkippedModules).toHaveBeenCalledWith(
       'story_id_1',
       [0]
     );
@@ -1446,13 +1446,13 @@ describe('TopicStorySectionComponent', () => {
       componentInstance: {},
     } as NgbModalRef;
     ngbModal.open.and.returnValue(mockModalRef);
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
-    component.onArcSkipConfirmationCancel();
+    component.onModuleSkipConfirmationCancel();
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -1463,19 +1463,19 @@ describe('TopicStorySectionComponent', () => {
       componentInstance: {},
     } as NgbModalRef;
     ngbModal.open.and.returnValue(mockModalRef);
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
-    component.onArcSkipConfirmationProceed();
+    component.onModuleSkipConfirmationProceed();
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
-    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+  it('should not show skip confirmation when all earlier modules are completed', fakeAsync(() => {
+    localStorageService.getMasteredModules.and.returnValue(['1']);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -1499,14 +1499,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -1521,15 +1521,15 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventureCompleted(0)).toBe(true);
-    expect(component.isAdventureCompleted(1)).toBe(false);
+    expect(component.isModuleCompleted(0)).toBe(true);
+    expect(component.isModuleCompleted(1)).toBe(false);
 
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onNavigationLessonSelected({lessonNumber: 2, moduleIndex: 1});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleExpanded(1)).toBe(true);
 
     tick(300);
   }));
@@ -1557,14 +1557,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -1575,7 +1575,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     component.activePracticeArcId = 'arc_2';
-    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    component.onNavigationLessonSelected({lessonNumber: 2, moduleIndex: 1});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
@@ -1585,175 +1585,175 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should persist un-skipping when a skipped adventure is expanded', () => {
-    component.skippedAdventureIndices = new Set([0]);
+  it('should persist un-skipping when a skipped module is expanded', () => {
+    component.skippedModuleIndices = new Set([0]);
 
-    component.toggleAdventure(0);
+    component.toggleModule(0);
 
-    expect(component.isAdventureSkipped(0)).toBe(false);
-    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+    expect(component.isModuleSkipped(0)).toBe(false);
+    expect(localStorageService.updateSkippedModules).toHaveBeenCalledWith(
       'story_id_1',
       []
     );
   });
 
-  it('should build singular skip confirmation message for one skipped adventure', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should build singular skip confirmation message for one skipped module', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
 
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      ArcSkipConfirmationModalComponent,
+      ModuleSkipConfirmationModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'oppia-arc-skip-confirmation-modal',
+        windowClass: 'oppia-module-skip-confirmation-modal',
       }
     );
-    expect(component.getArcSkipConfirmationMessage()).toBe(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    expect(component.getModuleSkipConfirmationMessage()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
-      {count: 1, adventureNumbers: '1', messageFormat: true}
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
+      {count: 1, moduleNumbers: '1', messageFormat: true}
     );
   });
 
-  it('should build plural skip confirmation message for two skipped adventures', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
-      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+  it('should build plural skip confirmation message for two skipped modules', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
+      createModuleGroup('Module 3', [createLessonCard(3, 'not_started')]),
     ];
 
     component.onLessonStartClick({lessonNumber: 3, startUrl: ''});
 
     (translateService.instant as jasmine.Spy).calls.reset();
 
-    expect(component.getArcSkipConfirmationMessage()).toBe(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    expect(component.getModuleSkipConfirmationMessage()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
       {
         count: 2,
-        adventureNumbers: '1I18N_TOPIC_VIEWER_LIST_AND2',
+        moduleNumbers: '1I18N_TOPIC_VIEWER_LIST_AND2',
         messageFormat: true,
       }
     );
   });
 
-  it('should build comma-separated skip confirmation message for three skipped adventures', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
-      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
-      createAdventureGroup('Adventure 4', [createLessonCard(4, 'not_started')]),
+  it('should build comma-separated skip confirmation message for three skipped modules', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
+      createModuleGroup('Module 3', [createLessonCard(3, 'not_started')]),
+      createModuleGroup('Module 4', [createLessonCard(4, 'not_started')]),
     ];
 
     component.onLessonStartClick({lessonNumber: 4, startUrl: ''});
 
     (translateService.instant as jasmine.Spy).calls.reset();
 
-    expect(component.getArcSkipConfirmationMessage()).toBe(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    expect(component.getModuleSkipConfirmationMessage()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
       {
         count: 3,
-        adventureNumbers: '1, 2I18N_TOPIC_VIEWER_LIST_COMMA_AND3',
+        moduleNumbers: '1, 2I18N_TOPIC_VIEWER_LIST_COMMA_AND3',
         messageFormat: true,
       }
     );
   });
 
-  it('should exclude completed adventures from the skip confirmation message', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
-      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+  it('should exclude completed modules from the skip confirmation message', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
+      createModuleGroup('Module 3', [createLessonCard(3, 'not_started')]),
     ];
 
     component.onLessonStartClick({lessonNumber: 3, startUrl: ''});
 
-    expect(component.getArcSkipConfirmationMessage()).toBe(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE'
+    expect(component.getModuleSkipConfirmationMessage()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
-      {count: 1, adventureNumbers: '2', messageFormat: true}
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
+      {count: 1, moduleNumbers: '2', messageFormat: true}
     );
   });
 
   it('should return empty skip confirmation message when there is no pending navigation', () => {
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
-  it('should return empty skip confirmation message when no earlier adventures are skipped', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return empty skip confirmation message when no earlier modules are skipped', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
 
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
     expect(ngbModal.open).toHaveBeenCalledWith(
-      ArcSkipConfirmationModalComponent,
+      ModuleSkipConfirmationModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'oppia-arc-skip-confirmation-modal',
+        windowClass: 'oppia-module-skip-confirmation-modal',
       }
     );
 
-    component.visibleAdventureGroups[0].lessonCards[0].lessonProgressStatus =
+    component.visibleModuleGroups[0].lessonCards[0].lessonProgressStatus =
       'completed';
 
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
-  it('should return Start label for a skipped adventure that was never started', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+  it('should return Start label for a skipped module that was never started', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
     ];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+    expect(component.getSkippedModuleButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_START_BUTTON'
     );
   });
 
-  it('should return Resume label for a skipped adventure that was started', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'in_progress')]),
+  it('should return Resume label for a skipped module that was started', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'in_progress')]),
     ];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON'
+    expect(component.getSkippedModuleButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_RESUME_BUTTON'
     );
   });
 
-  it('should return Start label when the adventure group is missing', () => {
-    component.visibleAdventureGroups = [];
+  it('should return Start label when the module group is missing', () => {
+    component.visibleModuleGroups = [];
 
-    expect(component.getSkippedAdventureButtonLabel(0)).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+    expect(component.getSkippedModuleButtonLabel(0)).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_START_BUTTON'
     );
   });
 
-  it('should not persist or restore skipped adventures when story id is missing', () => {
+  it('should not persist or restore skipped modules when story id is missing', () => {
     (component.storySummary.getId as jasmine.Spy).and.returnValue('');
-    localStorageService.getSkippedAdventures.calls.reset();
-    localStorageService.updateSkippedAdventures.calls.reset();
+    localStorageService.getSkippedModules.calls.reset();
+    localStorageService.updateSkippedModules.calls.reset();
 
-    component.skippedAdventureIndices = new Set([0]);
-    component.toggleAdventure(0);
+    component.skippedModuleIndices = new Set([0]);
+    component.toggleModule(0);
 
-    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.updateSkippedModules).not.toHaveBeenCalled();
 
     component.ngOnInit();
 
-    expect(localStorageService.getSkippedAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.getSkippedModules).not.toHaveBeenCalled();
   });
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -1801,7 +1801,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.activeLessonNumber).toBeNull();
   });
 
-  it('should handle adventure groups with palette color cycling', () => {
+  it('should handle module groups with palette color cycling', () => {
     const storyNodeSpies = [];
     const nodeIds = [];
     for (let i = 0; i < 16; i++) {
@@ -1833,8 +1833,8 @@ describe('TopicStorySectionComponent', () => {
 
     const arcs = nodeIds.map((nodeId, i) => ({
       id: `arc_${i}`,
-      title: `Adventure ${i}`,
-      description: `Adventure ${i} desc`,
+      title: `Module ${i}`,
+      description: `Module ${i} desc`,
       node_ids: [nodeId],
     }));
 
@@ -1848,30 +1848,30 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.adventureGroups.length).toBe(16);
-    expect(component.adventureGroups[0].accentColor).toBe('#27a844');
-    expect(component.adventureGroups[14].accentColor).toBe('#2e7d32');
-    expect(component.adventureGroups[15].accentColor).toBe('#27a844');
+    expect(component.moduleGroups.length).toBe(16);
+    expect(component.moduleGroups[0].accentColor).toBe('#27a844');
+    expect(component.moduleGroups[14].accentColor).toBe('#2e7d32');
+    expect(component.moduleGroups[15].accentColor).toBe('#27a844');
   });
 
-  it('should not expand any adventure when no adventure groups exist', () => {
+  it('should not expand any module when no module groups exist', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
 
-    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(component.isModuleExpanded(0)).toBe(false);
   });
 
-  it('should show an adventure end test card when the adventure has lessons', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+  it('should show an module end test card when the module has lessons', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
     ];
-    expect(component.shouldShowAdventureEndTestCard(0)).toBe(true);
+    expect(component.shouldShowModuleEndTestCard(0)).toBe(true);
 
-    component.visibleAdventureGroups[0].lessonCards = [];
-    expect(component.shouldShowAdventureEndTestCard(0)).toBe(false);
+    component.visibleModuleGroups[0].lessonCards = [];
+    expect(component.shouldShowModuleEndTestCard(0)).toBe(false);
   });
 
   it('should report story as completed only when all available lessons are completed', () => {
@@ -1918,7 +1918,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isStoryCompleted()).toBe(false);
   });
 
-  it('should not report an adventure as completed before its test is completed', () => {
+  it('should not report an module as completed before its test is completed', () => {
     const baseLesson = {
       lessonTitle: 'Lesson',
       lessonDescription: '',
@@ -1937,10 +1937,10 @@ describe('TopicStorySectionComponent', () => {
       availableVoiceoverLanguageAccentDescriptions: {},
     };
 
-    component.visibleAdventureGroups = [
+    component.visibleModuleGroups = [
       {
-        adventureTitle: 'Adventure 1',
-        adventureDescription: '',
+        moduleTitle: 'Module 1',
+        moduleDescription: '',
         lessonCards: [],
         accentColor: '#27a844',
         iconBg: '',
@@ -1950,8 +1950,8 @@ describe('TopicStorySectionComponent', () => {
         hasPracticeQuestions: false,
       },
       {
-        adventureTitle: 'Adventure 2',
-        adventureDescription: '',
+        moduleTitle: 'Module 2',
+        moduleDescription: '',
         lessonCards: [
           {...baseLesson, lessonNumber: 1},
           {...baseLesson, lessonNumber: 2},
@@ -1964,8 +1964,8 @@ describe('TopicStorySectionComponent', () => {
         hasPracticeQuestions: false,
       },
       {
-        adventureTitle: 'Adventure 3',
-        adventureDescription: '',
+        moduleTitle: 'Module 3',
+        moduleDescription: '',
         lessonCards: [
           {...baseLesson, lessonNumber: 3},
           {
@@ -1983,14 +1983,14 @@ describe('TopicStorySectionComponent', () => {
       },
     ];
 
-    expect(component.isAdventureCompleted(0)).toBe(false);
-    expect(component.isAdventureCompleted(1)).toBe(false);
-    expect(component.isAdventureCompleted(2)).toBe(false);
-    expect(component.isAdventureCompleted(99)).toBe(false);
+    expect(component.isModuleCompleted(0)).toBe(false);
+    expect(component.isModuleCompleted(1)).toBe(false);
+    expect(component.isModuleCompleted(2)).toBe(false);
+    expect(component.isModuleCompleted(99)).toBe(false);
   });
 
-  it('should collapse an adventure only when its lessons and test are completed', () => {
-    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+  it('should collapse an module only when its lessons and test are completed', () => {
+    localStorageService.getMasteredModules.and.returnValue(['1']);
     const storyNodeSpy = createStoryNodeSpy(
       'Completed Node',
       'Desc',
@@ -2004,8 +2004,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2017,11 +2017,11 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventureCompleted(0)).toBe(true);
-    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(component.isModuleCompleted(0)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(false);
   });
 
-  it('should expand an adventure when only its lessons are completed', () => {
+  it('should expand an module when only its lessons are completed', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Completed Node',
       'Desc',
@@ -2035,8 +2035,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2048,11 +2048,11 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventureCompleted(0)).toBe(false);
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isModuleCompleted(0)).toBe(false);
+    expect(component.isModuleExpanded(0)).toBe(true);
   });
 
-  it('should auto-expand the next adventure after the current lesson is completed', () => {
+  it('should auto-expand the next module after the current lesson is completed', () => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node title 1',
       'Desc 1',
@@ -2074,14 +2074,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -2092,25 +2092,23 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
-    // Simulate the learner returning with the completed adventure expanded.
-    Reflect.set(component, '_expandedAdventureIndices', new Set([0]));
+    // Simulate the learner returning with the completed module expanded.
+    Reflect.set(component, '_expandedModuleIndices', new Set([0]));
 
     component.ngOnInit();
 
     expect(component.activeLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleExpanded(1)).toBe(true);
   });
 
-  it('should report that missing or empty adventures have incomplete lessons', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Empty Adventure', []),
-    ];
+  it('should report that missing or empty modules have incomplete lessons', () => {
+    component.visibleModuleGroups = [createModuleGroup('Empty Module', [])];
 
     expect(component.areAllLessonsCompleted(0)).toBeFalsy();
     expect(component.areAllLessonsCompleted(1)).toBeFalsy();
   });
 
-  it('should handle buildAdventureGroups when arcs is null', async () => {
+  it('should handle buildModuleGroups when arcs is null', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
       'Desc',
@@ -2129,7 +2127,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     await fixture.whenStable();
 
-    expect(component.adventureGroups).toEqual([]);
+    expect(component.moduleGroups).toEqual([]);
   });
 
   it('should sync on storyTitle ngOnChanges input update', () => {
@@ -2253,7 +2251,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
   });
 
-  it('should populate adventureNavigationGroups with lesson numbers and accent colors', async () => {
+  it('should populate moduleNavigationGroups with lesson numbers and accent colors', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
       'Desc',
@@ -2271,8 +2269,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2283,21 +2281,19 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     await fixture.whenStable();
 
-    expect(component.adventureNavigationGroups.length).toBe(1);
-    expect(component.adventureNavigationGroups[0].lessons).toEqual([
+    expect(component.moduleNavigationGroups.length).toBe(1);
+    expect(component.moduleNavigationGroups[0].lessons).toEqual([
       {
         lessonNumber: 1,
         isCompleted: false,
       },
     ]);
-    expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
-    expect(component.adventureNavigationGroups[0].showPractice).toBe(true);
-    expect(component.adventureNavigationGroups[0].isPracticeCompleted).toBe(
-      false
-    );
+    expect(component.moduleNavigationGroups[0].accentColor).toBe('#27a844');
+    expect(component.moduleNavigationGroups[0].showPractice).toBe(true);
+    expect(component.moduleNavigationGroups[0].isPracticeCompleted).toBe(false);
   });
 
-  it('should mark completed lessons in adventureNavigationGroups', async () => {
+  it('should mark completed lessons in moduleNavigationGroups', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Completed Node',
       'Desc',
@@ -2315,8 +2311,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2330,7 +2326,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     await fixture.whenStable();
 
-    expect(component.adventureNavigationGroups[0].lessons).toEqual([
+    expect(component.moduleNavigationGroups[0].lessons).toEqual([
       {
         lessonNumber: 1,
         isCompleted: true,
@@ -2338,7 +2334,7 @@ describe('TopicStorySectionComponent', () => {
     ]);
   });
 
-  it('should exclude non-published lessons from adventure navigation groups', () => {
+  it('should exclude non-published lessons from module navigation groups', () => {
     const publishedNodeSpy = createStoryNodeSpy(
       'Published Node',
       'Desc',
@@ -2367,14 +2363,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -2384,7 +2380,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.adventureNavigationGroups).toEqual([
+    expect(component.moduleNavigationGroups).toEqual([
       {
         lessons: [{lessonNumber: 1, isCompleted: false}],
         accentColor: '#27a844',
@@ -2395,7 +2391,7 @@ describe('TopicStorySectionComponent', () => {
     ]);
   });
 
-  it('should handle onNavigationLessonSelected when lesson is not in any adventure', fakeAsync(() => {
+  it('should handle onNavigationLessonSelected when lesson is not in any module', fakeAsync(() => {
     component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
@@ -2404,7 +2400,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({
       lessonNumber: 999,
-      adventureIndex: 0,
+      moduleIndex: 0,
     });
 
     expect(component.activeLessonNumber).toBe(999);
@@ -2574,7 +2570,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
   });
 
-  it('should show adventure mastered modal when returning from completed arc test', fakeAsync(() => {
+  it('should show module mastered modal when returning from completed arc test', fakeAsync(() => {
     const createNode = (nodeId: string, title: string) => {
       const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
         'getTitle',
@@ -2614,14 +2610,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_4'],
         },
       ]
@@ -2644,20 +2640,17 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    expect(component.masteredAdventureIndex).toBe(0);
-    expect(component.getAdventureMasteredTitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE'
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
+    expect(component.masteredModuleIndex).toBe(0);
+    expect(component.getModuleMasteredTitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_NUMBER_TITLE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE',
-      {adventureNumber: 1}
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_NUMBER_TITLE',
+      {moduleNumber: 1}
     );
   }));
 
@@ -2700,8 +2693,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
         },
       ]
@@ -2724,29 +2717,26 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    expect(component.masteredAdventureIndex).toBe(0);
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
+    expect(component.masteredModuleIndex).toBe(0);
   }));
 
-  it('should collapse mastered adventure when continuing from mastered modal', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should collapse mastered module when continuing from mastered modal', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    component.masteredAdventureIndex = 0;
-    component.toggleAdventure(0);
+    component.masteredModuleIndex = 0;
+    component.toggleModule(0);
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
-    expect(component.masteredAdventureIndex).toBeNull();
-    expect(component.isAdventureExpanded(0)).toBe(false);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.masteredModuleIndex).toBeNull();
+    expect(component.isModuleExpanded(0)).toBe(false);
+    expect(component.isModuleExpanded(1)).toBe(true);
     expect(component.activeLessonNumber).toBe(2);
   });
 
@@ -2766,8 +2756,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2798,30 +2788,30 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should handle onAdventureMasteredContinue when masteredAdventureIndex is null', () => {
-    component.masteredAdventureIndex = null;
+  it('should handle onModuleMasteredContinue when masteredModuleIndex is null', () => {
+    component.masteredModuleIndex = null;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
-    expect(component.masteredAdventureIndex).toBeNull();
+    expect(component.masteredModuleIndex).toBeNull();
   });
 
-  it('should handle onAdventureMasteredContinue when mastered the last adventure', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+  it('should handle onModuleMasteredContinue when mastered the last module', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
-    expect(component.masteredAdventureIndex).toBeNull();
-    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(component.masteredModuleIndex).toBeNull();
+    expect(component.isModuleExpanded(0)).toBe(false);
     expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
       true
     );
   });
 
-  it('should call onArcSkipConfirmationCancel when arc skip modal is rejected', fakeAsync(() => {
+  it('should call onModuleSkipConfirmationCancel when arc skip modal is rejected', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -2843,14 +2833,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -2869,22 +2859,20 @@ describe('TopicStorySectionComponent', () => {
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      ArcSkipConfirmationModalComponent,
+      ModuleSkipConfirmationModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'oppia-arc-skip-confirmation-modal',
+        windowClass: 'oppia-module-skip-confirmation-modal',
       }
     );
 
     tick();
 
     expect(Reflect.get(component, 'pendingNavigationLessonNumber')).toBeNull();
-    expect(
-      Reflect.get(component, 'pendingNavigationAdventureIndex')
-    ).toBeNull();
+    expect(Reflect.get(component, 'pendingNavigationModuleIndex')).toBeNull();
   }));
 
-  it('should call onAdventureMasteredContinue when mastered modal is resolved', fakeAsync(() => {
+  it('should call onModuleMasteredContinue when mastered modal is resolved', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -2900,8 +2888,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2931,14 +2919,11 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    expect(component.masteredAdventureIndex).toBeNull();
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
+    expect(component.masteredModuleIndex).toBeNull();
     expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
       true
     );
@@ -2960,8 +2945,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -2991,13 +2976,10 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
 
     tick(1);
   }));
@@ -3023,49 +3005,49 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].isPublished).toBe(false);
   });
 
-  it('should return default mastered modal text when no adventure is mastered', () => {
-    expect(component.getAdventureMasteredTitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE'
+  it('should return default mastered modal text when no module is mastered', () => {
+    expect(component.getModuleMasteredTitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_TITLE'
     );
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_MOMENTUM_SUBTITLE'
     );
   });
 
-  it('should show the unlocked adventure in the mastered modal subtitle', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should show the unlocked module in the mastered modal subtitle', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_UNLOCKED_SUBTITLE'
     );
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE',
-      {adventureNumber: 2}
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_UNLOCKED_SUBTITLE',
+      {moduleNumber: 2}
     );
   });
 
-  it('should show the all-adventures-mastered text in the mastered modal subtitle', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+  it('should show the all-modules-mastered text in the mastered modal subtitle', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_ALL_COMPLETE_SUBTITLE'
     );
   });
 
-  it('should return false from isAdventurePracticeCompleted when the adventure group is missing', () => {
-    component.visibleAdventureGroups = [];
+  it('should return false from isModulePracticeCompleted when the module group is missing', () => {
+    component.visibleModuleGroups = [];
 
-    expect(component.isAdventurePracticeCompleted(0)).toBe(false);
+    expect(component.isModulePracticeCompleted(0)).toBe(false);
   });
 
-  it('should report practice completion for a mastered adventure arc', fakeAsync(() => {
+  it('should report practice completion for a mastered module arc', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3083,8 +3065,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3108,14 +3090,11 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    expect(component.isAdventurePracticeCompleted(0)).toBe(true);
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
+    expect(component.isModulePracticeCompleted(0)).toBe(true);
   }));
 
   it('should not show the mastered modal when arc_id does not start with a digit', fakeAsync(() => {
@@ -3136,8 +3115,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3182,8 +3161,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3210,7 +3189,7 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should not show the mastered modal when arc_id does not match any adventure', fakeAsync(() => {
+  it('should not show the mastered modal when arc_id does not match any module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3228,8 +3207,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3296,14 +3275,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_4'],
         },
       ]
@@ -3326,15 +3305,12 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
     component.ngOnChanges({
       storySummary: new SimpleChange(
@@ -3348,15 +3324,15 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).toHaveBeenCalledTimes(1);
   }));
 
-  it('should forward the topic editor preview flag to the adventure navigation', () => {
+  it('should forward the topic editor preview flag to the module navigation', () => {
     component.isInTopicEditorPreview = true;
     fixture.detectChanges();
 
     const navigationElement = fixture.debugElement.query(
-      By.css('topic-adventure-navigation')
+      By.css('topic-module-navigation')
     ).nativeElement;
     const stickyWrapper = fixture.debugElement.query(
-      By.css('.adventure-navigation-sticky-wrapper')
+      By.css('.module-navigation-sticky-wrapper')
     ).nativeElement;
     expect(navigationElement).not.toBeNull();
     expect(navigationElement.isInTopicEditorPreview).toBeTruthy();
@@ -3368,17 +3344,17 @@ describe('TopicStorySectionComponent', () => {
     fixture.detectChanges();
 
     const navigationElement = fixture.debugElement.query(
-      By.css('topic-adventure-navigation')
+      By.css('topic-module-navigation')
     ).nativeElement;
     const stickyWrapper = fixture.debugElement.query(
-      By.css('.adventure-navigation-sticky-wrapper')
+      By.css('.module-navigation-sticky-wrapper')
     ).nativeElement;
     expect(navigationElement).not.toBeNull();
     expect(navigationElement.isInTopicEditorPreview).toBeFalsy();
     expect(stickyWrapper.style.top).toBe('56px');
   });
 
-  it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
+  it('should handle module navigation practice selected when element not found', fakeAsync(() => {
     component.onNavigationPracticeSelected('1');
     tick(300);
   }));
@@ -3386,7 +3362,7 @@ describe('TopicStorySectionComponent', () => {
   it('should scroll to lesson element when found by ViewChildren', fakeAsync(() => {
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: 0,
+      moduleIndex: 0,
     });
     tick(300);
   }));
@@ -3396,8 +3372,8 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should restore mastered adventures from localStorage on init', () => {
-    localStorageService.getMasteredAdventures.and.returnValue(['1']);
+  it('should restore mastered modules from localStorage on init', () => {
+    localStorageService.getMasteredModules.and.returnValue(['1']);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -3420,14 +3396,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -3437,14 +3413,14 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(localStorageService.getMasteredAdventures).toHaveBeenCalledWith(
+    expect(localStorageService.getMasteredModules).toHaveBeenCalledWith(
       'story_id_1'
     );
-    expect(component.isAdventurePracticeCompleted(0)).toBe(true);
-    expect(component.isAdventurePracticeCompleted(1)).toBe(false);
+    expect(component.isModulePracticeCompleted(0)).toBe(true);
+    expect(component.isModulePracticeCompleted(1)).toBe(false);
   });
 
-  it('should persist mastered adventures when returning from arc test', fakeAsync(() => {
+  it('should persist mastered modules when returning from arc test', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3468,14 +3444,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -3498,21 +3474,18 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'oppia-adventure-mastered-modal',
-      }
-    );
-    expect(localStorageService.updateMasteredAdventures).toHaveBeenCalledWith(
+    expect(ngbModal.open).toHaveBeenCalledWith(ModuleMasteredModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-module-mastered-modal',
+    });
+    expect(localStorageService.updateMasteredModules).toHaveBeenCalledWith(
       'story_id_1',
       ['1']
     );
   }));
 
-  it('should retain mastered adventures across page reload from localStorage', () => {
-    localStorageService.getMasteredAdventures.and.returnValue(['1', '2']);
+  it('should retain mastered modules across page reload from localStorage', () => {
+    localStorageService.getMasteredModules.and.returnValue(['1', '2']);
 
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -3542,20 +3515,20 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
         {
           id: 'arc_3',
-          title: 'Adventure 3',
-          description: 'Third adventure',
+          title: 'Module 3',
+          description: 'Third module',
           node_ids: ['node_3'],
         },
       ]
@@ -3565,12 +3538,12 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventurePracticeCompleted(0)).toBe(true);
-    expect(component.isAdventurePracticeCompleted(1)).toBe(true);
-    expect(component.isAdventurePracticeCompleted(2)).toBe(false);
+    expect(component.isModulePracticeCompleted(0)).toBe(true);
+    expect(component.isModulePracticeCompleted(1)).toBe(true);
+    expect(component.isModulePracticeCompleted(2)).toBe(false);
   });
 
-  it('should not persist or restore mastered adventures when story id is missing', () => {
+  it('should not persist or restore mastered modules when story id is missing', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3585,8 +3558,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3600,13 +3573,13 @@ describe('TopicStorySectionComponent', () => {
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
       return fieldName === 'arc_mastered' ? ['true'] : ['1'];
     });
-    localStorageService.getMasteredAdventures.calls.reset();
-    localStorageService.updateMasteredAdventures.calls.reset();
+    localStorageService.getMasteredModules.calls.reset();
+    localStorageService.updateMasteredModules.calls.reset();
 
     component.ngOnInit();
 
-    expect(localStorageService.getMasteredAdventures).not.toHaveBeenCalled();
-    expect(localStorageService.updateMasteredAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.getMasteredModules).not.toHaveBeenCalled();
+    expect(localStorageService.updateMasteredModules).not.toHaveBeenCalled();
   });
 
   it('should open arc skip confirmation as bottom sheet on mobile', fakeAsync(() => {
@@ -3637,14 +3610,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -3657,7 +3630,7 @@ describe('TopicStorySectionComponent', () => {
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(bottomSheet.open).toHaveBeenCalledWith(
-      ArcSkipConfirmationModalComponent,
+      ModuleSkipConfirmationModalComponent,
       jasmine.objectContaining({data: jasmine.any(Object)})
     );
     expect(ngbModal.open).not.toHaveBeenCalled();
@@ -3665,7 +3638,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should open adventure mastered modal as bottom sheet on mobile', fakeAsync(() => {
+  it('should open module mastered modal as bottom sheet on mobile', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
     const mockBottomSheetRef = {
       afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
@@ -3687,8 +3660,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3712,13 +3685,13 @@ describe('TopicStorySectionComponent', () => {
     tick();
 
     expect(bottomSheet.open).toHaveBeenCalledWith(
-      AdventureMasteredModalComponent,
+      ModuleMasteredModalComponent,
       jasmine.objectContaining({data: jasmine.any(Object)})
     );
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should call onArcSkipConfirmationProceed when bottom sheet confirms', fakeAsync(() => {
+  it('should call onModuleSkipConfirmationProceed when bottom sheet confirms', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
     let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
@@ -3751,14 +3724,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -3772,8 +3745,8 @@ describe('TopicStorySectionComponent', () => {
 
     dismissCallback('confirm');
 
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(localStorageService.updateSkippedModules).toHaveBeenCalledWith(
       'story_id_1',
       [0]
     );
@@ -3781,7 +3754,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should call onArcSkipConfirmationCancel when bottom sheet is dismissed', fakeAsync(() => {
+  it('should call onModuleSkipConfirmationCancel when bottom sheet is dismissed', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
     let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
@@ -3814,14 +3787,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -3835,12 +3808,12 @@ describe('TopicStorySectionComponent', () => {
 
     dismissCallback('cancel');
 
-    expect(component.isAdventureSkipped(0)).toBe(false);
+    expect(component.isModuleSkipped(0)).toBe(false);
 
     tick(300);
   }));
 
-  it('should call onAdventureMasteredContinue when mastered bottom sheet confirms', fakeAsync(() => {
+  it('should call onModuleMasteredContinue when mastered bottom sheet confirms', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
     let dismissCallback: (result: string) => void = () => {};
     const mockBottomSheetRef = {
@@ -3867,8 +3840,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3893,8 +3866,8 @@ describe('TopicStorySectionComponent', () => {
 
     dismissCallback('confirm');
 
-    expect(component.masteredAdventureIndex).toBeNull();
-    expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
+    expect(component.masteredModuleIndex).toBeNull();
+    expect(Reflect.get(component, 'moduleMasteredModalRef')).toBeNull();
   }));
 
   it('should clear mastered modal ref when mastered bottom sheet is dismissed', fakeAsync(() => {
@@ -3924,8 +3897,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -3950,10 +3923,10 @@ describe('TopicStorySectionComponent', () => {
 
     dismissCallback('cancel');
 
-    expect(Reflect.get(component, 'adventureMasteredModalRef')).toBeNull();
+    expect(Reflect.get(component, 'moduleMasteredModalRef')).toBeNull();
   }));
 
-  it('should set active lesson and navigate to startUrl when lesson is in the current adventure', fakeAsync(() => {
+  it('should set active lesson and navigate to startUrl when lesson is in the current module', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3975,8 +3948,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1', 'node_2'],
         },
       ]
@@ -3997,7 +3970,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should expand adventure group when lesson belongs to an adventure', fakeAsync(() => {
+  it('should expand module group when lesson belongs to an module', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -4012,8 +3985,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4023,19 +3996,19 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(true);
 
     component.onLessonStartClick({
       lessonNumber: 1,
       startUrl: '/explore/exp_1',
     });
 
-    expect(component.isAdventureExpanded(0)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(true);
 
     tick(300);
   }));
 
-  it('should open arc skip confirmation modal when lesson is in a later adventure and earlier ones are incomplete', fakeAsync(() => {
+  it('should open arc skip confirmation modal when lesson is in a later module and earlier ones are incomplete', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(1024);
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -4058,14 +4031,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4098,8 +4071,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4121,10 +4094,10 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should not confirm arc skip nor show a modal when all earlier adventures are completed', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'completed')]),
+  it('should not confirm arc skip nor show a modal when all earlier modules are completed', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'completed')]),
     ];
 
     component.activePracticeArcId = 'arc_2';
@@ -4255,8 +4228,8 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
-  it('should return empty string for getAdventureCompletionText with invalid index', () => {
-    expect(component.getAdventureCompletionText(999)).toBe('');
+  it('should return empty string for getModuleCompletionText with invalid index', () => {
+    expect(component.getModuleCompletionText(999)).toBe('');
   });
 
   it('should not include practice questions for lessons with no skill ids', async () => {
@@ -4274,8 +4247,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4285,7 +4258,7 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
-    expect(component.adventureGroups[0].hasPracticeQuestions).toBe(false);
+    expect(component.moduleGroups[0].hasPracticeQuestions).toBe(false);
   });
 
   it('should handle practice availability with stale request id', async () => {
@@ -4306,8 +4279,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4333,7 +4306,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isPracticeCardVisible).toBe(true);
   });
 
-  it('should return default accent colors for adventure groups', () => {
+  it('should return default accent colors for module groups', () => {
     expect(component.defaultFallbackAccentColor).toBe('#00645c');
     expect(component.defaultPracticeBgColor).toBe('#ecf7f6');
     expect(component.defaultPracticeAccentColor).toBe('#0b776d');
@@ -4361,14 +4334,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4380,7 +4353,7 @@ describe('TopicStorySectionComponent', () => {
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
     Reflect.set(component, 'pendingStartUrl', '/explore/exp_2');
 
-    component.onArcSkipConfirmationProceed();
+    component.onModuleSkipConfirmationProceed();
 
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
       '/explore/exp_2'
@@ -4409,14 +4382,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4427,7 +4400,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
-    component.onArcSkipConfirmationProceed();
+    component.onModuleSkipConfirmationProceed();
 
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalledWith(
       '/explore/exp_2'
@@ -4435,7 +4408,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should expand the target adventure and mark earlier ones skipped', fakeAsync(() => {
+  it('should expand the target module and mark earlier ones skipped', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -4456,14 +4429,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4474,10 +4447,10 @@ describe('TopicStorySectionComponent', () => {
 
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
-    component.onArcSkipConfirmationProceed();
+    component.onModuleSkipConfirmationProceed();
 
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(component.isModuleExpanded(1)).toBe(true);
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
     tick(300);
@@ -4505,14 +4478,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4548,7 +4521,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should navigate directly when lesson is in current adventure', fakeAsync(() => {
+  it('should navigate directly when lesson is in current module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -4562,8 +4535,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4585,29 +4558,29 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should not change lesson numbers when next adventure has empty lessonCards', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', []),
+  it('should not change lesson numbers when next module has empty lessonCards', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', []),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
-    expect(component.isAdventureExpanded(0)).toBe(false);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(false);
+    expect(component.isModuleExpanded(1)).toBe(true);
     expect(component.activeLessonNumber).toBeNull();
     expect(component.navigatedLessonNumber).toBeNull();
-    expect(component.masteredAdventureIndex).toBeNull();
+    expect(component.masteredModuleIndex).toBeNull();
   });
 
   it('should set hasHandledArcMasteredQueryParams to true', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
     expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
       true
@@ -4615,65 +4588,65 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should set navigatedLessonNumber on continue', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [
         createLessonCard(2, 'not_started'),
         createLessonCard(3, 'not_started'),
       ]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
     expect(component.navigatedLessonNumber).toBe(2);
   });
 
-  it('should return all complete subtitle when no more adventures exist', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+  it('should return all complete subtitle when no more modules exist', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_ALL_COMPLETE_SUBTITLE'
     );
   });
 
-  it('should return unlocked subtitle when next adventure exists', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return unlocked subtitle when next module exists', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_UNLOCKED_SUBTITLE'
     );
   });
 
-  it('should return momentum subtitle when masteredAdventureIndex is null', () => {
-    component.masteredAdventureIndex = null;
+  it('should return momentum subtitle when masteredModuleIndex is null', () => {
+    component.masteredModuleIndex = null;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_MOMENTUM_SUBTITLE'
     );
   });
 
-  it('should return empty string when pendingAdventureIndex is null', () => {
-    Reflect.set(component, 'pendingNavigationAdventureIndex', null);
+  it('should return empty string when pendingModuleIndex is null', () => {
+    Reflect.set(component, 'pendingNavigationModuleIndex', null);
 
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
-  it('should return empty string when all earlier adventures are completed', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return empty string when all earlier modules are completed', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    Reflect.set(component, 'pendingNavigationAdventureIndex', 1);
+    Reflect.set(component, 'pendingNavigationModuleIndex', 1);
 
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
   it('should handle fetchTotalQuestionCount failure gracefully', async () => {
@@ -4694,8 +4667,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4707,10 +4680,10 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
   });
 
-  it('should not expand any adventure when adventureIndex is -1', fakeAsync(() => {
+  it('should not expand any module when moduleIndex is -1', fakeAsync(() => {
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: -1,
+      moduleIndex: -1,
     });
 
     expect(component.activeLessonNumber).toBe(1);
@@ -4730,10 +4703,10 @@ describe('TopicStorySectionComponent', () => {
     expect(component.practiceCard).toBeDefined();
   });
 
-  it('should not expand any adventure when adventureIndex is -1', fakeAsync(() => {
+  it('should not expand any module when moduleIndex is -1', fakeAsync(() => {
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: -1,
+      moduleIndex: -1,
     });
 
     expect(component.activeLessonNumber).toBe(1);
@@ -4759,8 +4732,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4772,76 +4745,76 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(false);
   });
 
-  it('should return empty string when pendingAdventureIndex is null', () => {
-    Reflect.set(component, 'pendingNavigationAdventureIndex', null);
+  it('should return empty string when pendingModuleIndex is null', () => {
+    Reflect.set(component, 'pendingNavigationModuleIndex', null);
 
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
-  it('should return empty string when all earlier adventures are completed', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return empty string when all earlier modules are completed', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    Reflect.set(component, 'pendingNavigationAdventureIndex', 1);
+    Reflect.set(component, 'pendingNavigationModuleIndex', 1);
 
-    expect(component.getArcSkipConfirmationMessage()).toBe('');
+    expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
-  it('should return all complete subtitle when no more adventures exist', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+  it('should return all complete subtitle when no more modules exist', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_ALL_COMPLETE_SUBTITLE'
     );
   });
 
-  it('should return unlocked subtitle when next adventure exists', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should return unlocked subtitle when next module exists', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_UNLOCKED_SUBTITLE'
     );
   });
 
-  it('should return momentum subtitle when masteredAdventureIndex is null', () => {
-    component.masteredAdventureIndex = null;
+  it('should return momentum subtitle when masteredModuleIndex is null', () => {
+    component.masteredModuleIndex = null;
 
-    expect(component.getAdventureMasteredSubtitle()).toBe(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+    expect(component.getModuleMasteredSubtitle()).toBe(
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_MOMENTUM_SUBTITLE'
     );
   });
 
-  it('should not change lesson numbers when next adventure has empty lessonCards', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', []),
+  it('should not change lesson numbers when next module has empty lessonCards', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', []),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
-    expect(component.isAdventureExpanded(0)).toBe(false);
-    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.isModuleExpanded(0)).toBe(false);
+    expect(component.isModuleExpanded(1)).toBe(true);
     expect(component.activeLessonNumber).toBeNull();
     expect(component.navigatedLessonNumber).toBeNull();
-    expect(component.masteredAdventureIndex).toBeNull();
+    expect(component.masteredModuleIndex).toBeNull();
   });
 
   it('should set hasHandledArcMasteredQueryParams to true', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
     expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
       true
@@ -4849,21 +4822,21 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should set navigatedLessonNumber on continue', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [
         createLessonCard(2, 'not_started'),
         createLessonCard(3, 'not_started'),
       ]),
     ];
-    component.masteredAdventureIndex = 0;
+    component.masteredModuleIndex = 0;
 
-    component.onAdventureMasteredContinue();
+    component.onModuleMasteredContinue();
 
     expect(component.navigatedLessonNumber).toBe(2);
   });
 
-  it('should navigate directly when lesson is in current adventure', fakeAsync(() => {
+  it('should navigate directly when lesson is in current module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -4877,8 +4850,8 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
       ]
@@ -4922,14 +4895,14 @@ describe('TopicStorySectionComponent', () => {
       [
         {
           id: 'arc_1',
-          title: 'Adventure 1',
-          description: 'First adventure',
+          title: 'Module 1',
+          description: 'First module',
           node_ids: ['node_1'],
         },
         {
           id: 'arc_2',
-          title: 'Adventure 2',
-          description: 'Second adventure',
+          title: 'Module 2',
+          description: 'Second module',
           node_ids: ['node_2'],
         },
       ]
@@ -4992,25 +4965,25 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: -1,
+      moduleIndex: -1,
     });
     tick(300);
 
     document.body.removeChild(el);
   }));
 
-  it('should handle scrollToElement with adventure navigation present', fakeAsync(() => {
+  it('should handle scrollToElement with module navigation present', fakeAsync(() => {
     const lessonEl = document.createElement('div');
     lessonEl.id = 'lesson-1';
     document.body.appendChild(lessonEl);
 
     const navEl = document.createElement('div');
-    navEl.className = 'adventure-navigation-container';
+    navEl.className = 'module-navigation-container';
     document.body.appendChild(navEl);
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: -1,
+      moduleIndex: -1,
     });
     tick(300);
 
@@ -5025,75 +4998,75 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
-      adventureIndex: -1,
+      moduleIndex: -1,
     });
     tick(300);
 
     document.body.removeChild(el);
   }));
 
-  it('should mark earlier incomplete adventures as skipped', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should mark earlier incomplete modules as skipped', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
 
     (
-      Reflect.get(component, 'markSkippedAdventuresBefore') as (
+      Reflect.get(component, 'markSkippedModulesBefore') as (
         idx: number
       ) => void
     ).call(component, 1);
 
-    expect(component.isAdventureSkipped(0)).toBe(true);
-    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalled();
+    expect(component.isModuleSkipped(0)).toBe(true);
+    expect(localStorageService.updateSkippedModules).toHaveBeenCalled();
   });
 
-  it('should return early when targetAdventureIndex is 0', () => {
+  it('should return early when targetModuleIndex is 0', () => {
     (
-      Reflect.get(component, 'markSkippedAdventuresBefore') as (
+      Reflect.get(component, 'markSkippedModulesBefore') as (
         idx: number
       ) => void
     ).call(component, 0);
 
-    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.updateSkippedModules).not.toHaveBeenCalled();
   });
 
-  it('should return early when targetAdventureIndex is negative', () => {
+  it('should return early when targetModuleIndex is negative', () => {
     (
-      Reflect.get(component, 'markSkippedAdventuresBefore') as (
+      Reflect.get(component, 'markSkippedModulesBefore') as (
         idx: number
       ) => void
     ).call(component, -1);
 
-    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+    expect(localStorageService.updateSkippedModules).not.toHaveBeenCalled();
   });
 
-  it('should not mark adventures that are already completed', () => {
-    component.visibleAdventureGroups = [
-      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
-      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+  it('should not mark modules that are already completed', () => {
+    component.visibleModuleGroups = [
+      createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
+      createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    Reflect.set(component, 'completedAdventurePracticeArcIds', new Set(['1']));
+    Reflect.set(component, 'completedModulePracticeArcIds', new Set(['1']));
 
     (
-      Reflect.get(component, 'markSkippedAdventuresBefore') as (
+      Reflect.get(component, 'markSkippedModulesBefore') as (
         idx: number
       ) => void
     ).call(component, 1);
 
-    expect(component.isAdventureSkipped(0)).toBe(false);
+    expect(component.isModuleSkipped(0)).toBe(false);
   });
 
   it('should return single number as string', () => {
     const result = (
-      Reflect.get(component, 'joinAdventureNumbers') as (n: number[]) => string
+      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
     ).call(component, [1]);
     expect(result).toBe('1');
   });
 
   it('should join two numbers with AND conjunction', () => {
     const result = (
-      Reflect.get(component, 'joinAdventureNumbers') as (n: number[]) => string
+      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
     ).call(component, [1, 2]);
     expect(result).toContain('1');
     expect(result).toContain('2');
@@ -5101,7 +5074,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should join three numbers with comma AND conjunction', () => {
     const result = (
-      Reflect.get(component, 'joinAdventureNumbers') as (n: number[]) => string
+      Reflect.get(component, 'joinModuleNumbers') as (n: number[]) => string
     ).call(component, [1, 2, 3]);
     expect(result).toContain('1');
     expect(result).toContain('2');

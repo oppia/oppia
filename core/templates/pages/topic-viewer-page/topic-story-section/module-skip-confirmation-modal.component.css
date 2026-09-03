@@ -1,4 +1,4 @@
-.arc-skip-confirmation-modal {
+.module-skip-confirmation-modal {
   background: #fff;
   border-radius: 10px;
   box-sizing: border-box;
@@ -11,13 +11,13 @@
   width: 100%;
 }
 
-.arc-skip-confirmation-icon-wrap {
+.module-skip-confirmation-icon-wrap {
   margin: 0 auto 12px;
   position: relative;
   width: fit-content;
 }
 
-.arc-skip-confirmation-icon-circle {
+.module-skip-confirmation-icon-circle {
   align-items: center;
   background: #f0efff;
   border-radius: 50%;
@@ -28,11 +28,11 @@
   width: 96px;
 }
 
-.arc-skip-confirmation-icon-circle .material-icons {
+.module-skip-confirmation-icon-circle .material-icons {
   font-size: 50px;
 }
 
-.arc-skip-confirmation-icon-ray {
+.module-skip-confirmation-icon-ray {
   background: #7a6cd8;
   border-radius: 8px;
   display: block;
@@ -42,24 +42,24 @@
   width: 20px;
 }
 
-.arc-skip-confirmation-icon-ray-one {
+.module-skip-confirmation-icon-ray-one {
   top: 11px;
   transform: rotate(-18deg);
 }
 
-.arc-skip-confirmation-icon-ray-two {
+.module-skip-confirmation-icon-ray-two {
   right: -11px;
   top: 25px;
   transform: rotate(6deg);
 }
 
-.arc-skip-confirmation-icon-ray-three {
+.module-skip-confirmation-icon-ray-three {
   right: -8px;
   top: 40px;
   transform: rotate(30deg);
 }
 
-.arc-skip-confirmation-title {
+.module-skip-confirmation-title {
   color: #222f42;
   font-family: Roboto, Arial, sans-serif;
   font-size: 32px;
@@ -69,7 +69,7 @@
   text-align: center;
 }
 
-.arc-skip-confirmation-message {
+.module-skip-confirmation-message {
   color: #4e596b;
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
@@ -79,7 +79,7 @@
   text-align: center;
 }
 
-.arc-skip-confirmation-divider {
+.module-skip-confirmation-divider {
   background: #e6e9ef;
   height: 1px;
   margin: 16px auto 14px;
@@ -87,14 +87,14 @@
   width: 100%;
 }
 
-.arc-skip-confirmation-actions {
+.module-skip-confirmation-actions {
   display: flex;
   gap: 20px;
   justify-content: center;
 }
 
-.arc-skip-confirmation-cancel,
-.arc-skip-confirmation-proceed {
+.module-skip-confirmation-cancel,
+.module-skip-confirmation-proceed {
   border-radius: 5px;
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
@@ -104,86 +104,86 @@
   padding: 10px 16px;
 }
 
-.arc-skip-confirmation-cancel {
+.module-skip-confirmation-cancel {
   background: #fff;
   border: 2px solid #727d90;
   color: #2f3d4d;
 }
 
-.arc-skip-confirmation-proceed {
+.module-skip-confirmation-proceed {
   background: #00645c;
   border: 2px solid #00645c;
   color: #fff;
 }
 
-.arc-skip-confirmation-cancel:focus-visible,
-.arc-skip-confirmation-proceed:focus-visible {
+.module-skip-confirmation-cancel:focus-visible,
+.module-skip-confirmation-proceed:focus-visible {
   outline: 2px solid #00645c;
   outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
-  .arc-skip-confirmation-modal {
+  .module-skip-confirmation-modal {
     border-radius: 10px;
     min-height: 0;
     padding: 16px 14px 14px;
     width: 100%;
   }
 
-  .arc-skip-confirmation-icon-wrap {
+  .module-skip-confirmation-icon-wrap {
     margin-bottom: 12px;
   }
 
-  .arc-skip-confirmation-icon-circle {
+  .module-skip-confirmation-icon-circle {
     height: 84px;
     width: 84px;
   }
 
-  .arc-skip-confirmation-icon-circle .material-icons {
+  .module-skip-confirmation-icon-circle .material-icons {
     font-size: 44px;
   }
 
-  .arc-skip-confirmation-icon-ray {
+  .module-skip-confirmation-icon-ray {
     height: 4px;
     width: 16px;
   }
 
-  .arc-skip-confirmation-icon-ray-one {
+  .module-skip-confirmation-icon-ray-one {
     right: -4px;
     top: 10px;
   }
 
-  .arc-skip-confirmation-icon-ray-two {
+  .module-skip-confirmation-icon-ray-two {
     right: -8px;
     top: 20px;
   }
 
-  .arc-skip-confirmation-icon-ray-three {
+  .module-skip-confirmation-icon-ray-three {
     right: -5px;
     top: 31px;
   }
 
-  .arc-skip-confirmation-title {
+  .module-skip-confirmation-title {
     font-size: 28px;
     margin-bottom: 10px;
   }
 
-  .arc-skip-confirmation-message {
+  .module-skip-confirmation-message {
     font-size: 14px;
     max-width: 100%;
   }
 
-  .arc-skip-confirmation-divider {
+  .module-skip-confirmation-divider {
     margin: 18px 0 14px;
   }
 
-  .arc-skip-confirmation-actions {
+  .module-skip-confirmation-actions {
     flex-direction: column;
     gap: 8px;
   }
 
-  .arc-skip-confirmation-cancel,
-  .arc-skip-confirmation-proceed {
+  .module-skip-confirmation-cancel,
+  .module-skip-confirmation-proceed {
     border-radius: 5px;
     font-size: 14px;
     min-width: 0;

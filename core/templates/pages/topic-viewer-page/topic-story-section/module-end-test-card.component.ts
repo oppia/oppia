@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Adventure end test card component used in the redesigned topic viewer story section.
+ * @fileoverview Module end test card component used in the redesigned topic viewer story section.
  */
 
 import {
@@ -26,16 +26,16 @@ import {
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './adventure-end-test-card.component.css';
+import './module-end-test-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 
 @Component({
-  selector: 'topic-adventure-end-test-card',
-  templateUrl: './adventure-end-test-card.component.html',
-  styleUrls: ['./adventure-end-test-card.component.css'],
+  selector: 'topic-module-end-test-card',
+  templateUrl: './module-end-test-card.component.html',
+  styleUrls: ['./module-end-test-card.component.css'],
 })
-export class AdventureEndTestCardComponent implements OnInit, OnChanges {
+export class ModuleEndTestCardComponent implements OnInit, OnChanges {
   @Input() practiceTitle: string = '';
   @Input() practiceDescription: string = '';
   @Input() thumbnailUrl: string = '';

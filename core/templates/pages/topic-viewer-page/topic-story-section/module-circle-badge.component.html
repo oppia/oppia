@@ -7,7 +7,7 @@
         color: textColor
       }">
   <img *ngIf="hasIconImage"
-       class="adventure-circle-badge-icon-image"
+       class="module-circle-badge-icon-image"
        [src]="iconImageUrl"
        alt=""
        aria-hidden="true">
@@ -16,7 +16,7 @@
      aria-hidden="true">
     {{ iconName }}
   </i>
-  <span *ngIf="!hasIcon" class="adventure-circle-badge-label">
+  <span *ngIf="!hasIcon" class="module-circle-badge-label">
     {{ label }}
   </span>
 </span>

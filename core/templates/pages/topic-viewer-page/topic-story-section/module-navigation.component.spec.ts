@@ -13,7 +13,7 @@
 // limitations under the License.
 // @ts-nocheck
 /**
- * @fileoverview Unit tests for AdventureNavigationComponent.
+ * @fileoverview Unit tests for ModuleNavigationComponent.
  */
 
 import {ElementRef, NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
@@ -27,8 +27,8 @@ import {
 import {CommonModule} from '@angular/common';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
-import {AdventureNavigationComponent} from './adventure-navigation.component';
-import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
+import {ModuleNavigationComponent} from './module-navigation.component';
+import {ModuleCircleBadgeComponent} from './module-circle-badge.component';
 
 const createScrollWrapper = (
   scrollWidth: number,
@@ -42,21 +42,18 @@ const createScrollWrapper = (
   return {nativeElement};
 };
 
-describe('AdventureNavigationComponent', () => {
-  let component: AdventureNavigationComponent;
-  let fixture: ComponentFixture<AdventureNavigationComponent>;
+describe('ModuleNavigationComponent', () => {
+  let component: ModuleNavigationComponent;
+  let fixture: ComponentFixture<ModuleNavigationComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AdventureNavigationComponent,
-        AdventureCircleBadgeComponent,
-      ],
+      declarations: [ModuleNavigationComponent, ModuleCircleBadgeComponent],
       imports: [CommonModule, MockTranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdventureNavigationComponent);
+    fixture = TestBed.createComponent(ModuleNavigationComponent);
     component = fixture.componentInstance;
   }));
 
@@ -79,7 +76,7 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should show lesson number as label for each lesson badge', () => {
-    component.adventureGroups = [
+    component.moduleGroups = [
       {
         lessons: [
           {lessonNumber: 1, isCompleted: true},
@@ -92,8 +89,8 @@ describe('AdventureNavigationComponent', () => {
       },
     ];
 
-    expect(component.adventureGroups[0].lessons[0].lessonNumber).toBe(1);
-    expect(component.adventureGroups[0].lessons[1].lessonNumber).toBe(2);
+    expect(component.moduleGroups[0].lessons[0].lessonNumber).toBe(1);
+    expect(component.moduleGroups[0].lessons[1].lessonNumber).toBe(2);
   });
 
   it('should emit lessonSelected event when onLessonClick is called', () => {
@@ -103,7 +100,7 @@ describe('AdventureNavigationComponent', () => {
 
     expect(component.lessonSelected.emit).toHaveBeenCalledWith({
       lessonNumber: 5,
-      adventureIndex: 2,
+      moduleIndex: 2,
     });
   });
 
@@ -120,7 +117,7 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should report the last lesson as completed when it is completed', () => {
-    const adventureGroup = {
+    const moduleGroup = {
       lessons: [
         {lessonNumber: 1, isCompleted: true},
         {lessonNumber: 2, isCompleted: true},
@@ -131,11 +128,11 @@ describe('AdventureNavigationComponent', () => {
       arcId: '1',
     };
 
-    expect(component.isLastLessonCompleted(adventureGroup)).toBe(true);
+    expect(component.isLastLessonCompleted(moduleGroup)).toBe(true);
   });
 
   it('should report the last lesson as not completed when it is not completed', () => {
-    const adventureGroup = {
+    const moduleGroup = {
       lessons: [
         {lessonNumber: 1, isCompleted: true},
         {lessonNumber: 2, isCompleted: false},
@@ -146,11 +143,11 @@ describe('AdventureNavigationComponent', () => {
       arcId: '1',
     };
 
-    expect(component.isLastLessonCompleted(adventureGroup)).toBe(false);
+    expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
   });
 
-  it('should report no completed last lesson when the adventure group has no lessons', () => {
-    const adventureGroup = {
+  it('should report no completed last lesson when the module group has no lessons', () => {
+    const moduleGroup = {
       lessons: [],
       accentColor: '#000',
       showPractice: true,
@@ -158,7 +155,7 @@ describe('AdventureNavigationComponent', () => {
       arcId: '1',
     };
 
-    expect(component.isLastLessonCompleted(adventureGroup)).toBe(false);
+    expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
   });
 
   it('should mark matching practice arc as active when one is provided', () => {
@@ -258,11 +255,11 @@ describe('AdventureNavigationComponent', () => {
     expect(component.showLeftArrow).toBe(false);
   }));
 
-  it('should schedule arrow updates on ngOnChanges when adventureGroups change', fakeAsync(() => {
+  it('should schedule arrow updates on ngOnChanges when moduleGroups change', fakeAsync(() => {
     component.scrollWrapper = createScrollWrapper(500, 200, 100);
 
     component.ngOnChanges({
-      adventureGroups: new SimpleChange(
+      moduleGroups: new SimpleChange(
         [],
         [
           {
@@ -283,7 +280,7 @@ describe('AdventureNavigationComponent', () => {
     expect(component.showRightArrow).toBe(true);
   }));
 
-  it('should not schedule arrow updates on ngOnChanges when adventureGroups do not change', fakeAsync(() => {
+  it('should not schedule arrow updates on ngOnChanges when moduleGroups do not change', fakeAsync(() => {
     component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.showLeftArrow = false;

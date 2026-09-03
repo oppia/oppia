@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdventureMasteredModalComponent.
+ * @fileoverview Unit tests for ModuleMasteredModalComponent.
  */
 
 import {TestBed, waitForAsync} from '@angular/core/testing';
@@ -25,10 +25,10 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
+import {ModuleMasteredModalComponent} from './module-mastered-modal.component';
 
-describe('AdventureMasteredModalComponent', () => {
-  let component: AdventureMasteredModalComponent;
+describe('ModuleMasteredModalComponent', () => {
+  let component: ModuleMasteredModalComponent;
   let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
 
   beforeEach(waitForAsync(() => {
@@ -38,33 +38,33 @@ describe('AdventureMasteredModalComponent', () => {
     ]);
 
     TestBed.configureTestingModule({
-      declarations: [AdventureMasteredModalComponent, MockTranslatePipe],
+      declarations: [ModuleMasteredModalComponent, MockTranslatePipe],
       providers: [{provide: NgbActiveModal, useValue: ngbActiveModal}],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+    const fixture = TestBed.createComponent(ModuleMasteredModalComponent);
     component = fixture.componentInstance;
-    component.title = 'Adventure 1 mastered';
-    component.message = 'You have completed all lessons in this adventure';
+    component.title = 'Module 1 mastered';
+    component.message = 'You have completed all lessons in this module';
   });
 
   it('should render the title, message and continue button', () => {
-    const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
-    fixture.componentInstance.title = 'Adventure 1 mastered';
+    const fixture = TestBed.createComponent(ModuleMasteredModalComponent);
+    fixture.componentInstance.title = 'Module 1 mastered';
     fixture.componentInstance.message =
-      'You have completed all lessons in this adventure';
+      'You have completed all lessons in this module';
     fixture.detectChanges();
 
     expect(
-      fixture.nativeElement.querySelector('.adventure-mastered-title')
+      fixture.nativeElement.querySelector('.module-mastered-title')
     ).toBeTruthy();
     expect(
-      fixture.nativeElement.querySelector('.adventure-mastered-message')
+      fixture.nativeElement.querySelector('.module-mastered-message')
     ).toBeTruthy();
     expect(
-      fixture.nativeElement.querySelector('.adventure-mastered-continue')
+      fixture.nativeElement.querySelector('.module-mastered-continue')
     ).toBeTruthy();
   });
 
@@ -82,7 +82,7 @@ describe('AdventureMasteredModalComponent', () => {
 
   describe('when opened as MatBottomSheet', () => {
     let bottomSheetRef: jasmine.SpyObj<
-      MatBottomSheetRef<AdventureMasteredModalComponent>
+      MatBottomSheetRef<ModuleMasteredModalComponent>
     >;
 
     beforeEach(waitForAsync(() => {
@@ -90,14 +90,14 @@ describe('AdventureMasteredModalComponent', () => {
 
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
-        declarations: [AdventureMasteredModalComponent, MockTranslatePipe],
+        declarations: [ModuleMasteredModalComponent, MockTranslatePipe],
         providers: [
           {provide: NgbActiveModal, useValue: ngbActiveModal},
           {provide: MatBottomSheetRef, useValue: bottomSheetRef},
           {
             provide: MAT_BOTTOM_SHEET_DATA,
             useValue: {
-              title: 'Adventure 1 mastered',
+              title: 'Module 1 mastered',
               message: 'You have completed all lessons',
             },
           },
@@ -106,12 +106,12 @@ describe('AdventureMasteredModalComponent', () => {
     }));
 
     beforeEach(() => {
-      const fixture = TestBed.createComponent(AdventureMasteredModalComponent);
+      const fixture = TestBed.createComponent(ModuleMasteredModalComponent);
       component = fixture.componentInstance;
     });
 
     it('should read data from MAT_BOTTOM_SHEET_DATA', () => {
-      expect(component.title).toBe('Adventure 1 mastered');
+      expect(component.title).toBe('Module 1 mastered');
       expect(component.message).toBe('You have completed all lessons');
     });
 

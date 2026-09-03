@@ -1,0 +1,36 @@
+<section class="module-skip-confirmation-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="module-skip-confirmation-title"
+         tabindex="-1">
+  <div class="module-skip-confirmation-icon-wrap" aria-hidden="true">
+    <div class="module-skip-confirmation-icon-circle">
+      <i class="material-icons">fast_forward</i>
+    </div>
+    <span class="module-skip-confirmation-icon-ray module-skip-confirmation-icon-ray-one"></span>
+    <span class="module-skip-confirmation-icon-ray module-skip-confirmation-icon-ray-two"></span>
+    <span class="module-skip-confirmation-icon-ray module-skip-confirmation-icon-ray-three"></span>
+  </div>
+
+  <h3 id="module-skip-confirmation-title" class="module-skip-confirmation-title">
+    {{ 'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_TITLE' | translate: {moduleLabel: moduleLabel} }}
+  </h3>
+  <p class="module-skip-confirmation-message">
+    {{ confirmationMessage }}
+  </p>
+
+  <div class="module-skip-confirmation-divider" aria-hidden="true"></div>
+
+  <div class="module-skip-confirmation-actions">
+    <button type="button"
+            class="module-skip-confirmation-cancel"
+            (click)="cancel()">
+      {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
+    </button>
+    <button type="button"
+            class="module-skip-confirmation-proceed"
+            (click)="confirm()">
+      {{ 'I18N_MODAL_CONTINUE_BUTTON' | translate }}
+    </button>
+  </div>
+</section>

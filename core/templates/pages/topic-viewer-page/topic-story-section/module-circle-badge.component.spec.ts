@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdventureCircleBadgeComponent.
+ * @fileoverview Unit tests for ModuleCircleBadgeComponent.
  */
 
 import {TestBed, waitForAsync} from '@angular/core/testing';
 
-import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
+import {ModuleCircleBadgeComponent} from './module-circle-badge.component';
 
-describe('AdventureCircleBadgeComponent', () => {
-  let component: AdventureCircleBadgeComponent;
+describe('ModuleCircleBadgeComponent', () => {
+  let component: ModuleCircleBadgeComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AdventureCircleBadgeComponent],
+      declarations: [ModuleCircleBadgeComponent],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
+    const fixture = TestBed.createComponent(ModuleCircleBadgeComponent);
     component = fixture.componentInstance;
   }));
 
@@ -51,11 +51,11 @@ describe('AdventureCircleBadgeComponent', () => {
 
   it('should update circleClass when size changes', () => {
     component.size = 'md';
-    expect(component.circleClass).toBe('adventure-circle-badge');
+    expect(component.circleClass).toBe('module-circle-badge');
 
     component.size = 'sm';
     expect(component.circleClass).toBe(
-      'adventure-circle-badge adventure-circle-badge--sm'
+      'module-circle-badge module-circle-badge--sm'
     );
   });
 

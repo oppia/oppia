@@ -12,21 +12,21 @@
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
       <div class="topic-lesson-card-title-row" [class.collapsed]="!isExpanded">
-        <topic-adventure-circle-badge *ngIf="!isExpanded && isCompletedLesson"
+        <topic-module-circle-badge *ngIf="!isExpanded && isCompletedLesson"
                                       [label]="lessonNumber.toString()"
                                       [iconName]="'check'"
                                       [size]="'sm'"
                                       [backgroundColor]="'#fff'"
                                       [borderColor]="'#40a84f'"
                                       [textColor]="'#40a84f'">
-        </topic-adventure-circle-badge>
-        <topic-adventure-circle-badge *ngIf="isExpanded || !isCompletedLesson"
+        </topic-module-circle-badge>
+        <topic-module-circle-badge *ngIf="isExpanded || !isCompletedLesson"
                                       [label]="lessonNumber.toString()"
                                       [size]="'sm'"
-                                      [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
-                                      [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
+                                      [backgroundColor]="isExpanded ? moduleAccentColor : '#fff'"
+                                      [borderColor]="isExpanded ? moduleAccentColor : '#d1d5db'"
                                       [textColor]="isExpanded ? '#fff' : '#6b7280'">
-        </topic-adventure-circle-badge>
+        </topic-module-circle-badge>
         <div class="topic-lesson-card-header">
           <div class="topic-lesson-card-title-with-labels">
             <h3 class="topic-lesson-card-title"

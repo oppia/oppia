@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdventureEndTestCardComponent.
+ * @fileoverview Unit tests for ModuleEndTestCardComponent.
  */
 
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 
-import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
+import {ModuleEndTestCardComponent} from './module-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -33,9 +33,9 @@ class MockWindowRef {
   };
 }
 
-describe('AdventureEndTestCardComponent', () => {
-  let component: AdventureEndTestCardComponent;
-  let fixture: ComponentFixture<AdventureEndTestCardComponent>;
+describe('ModuleEndTestCardComponent', () => {
+  let component: ModuleEndTestCardComponent;
+  let fixture: ComponentFixture<ModuleEndTestCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
 
@@ -46,7 +46,7 @@ describe('AdventureEndTestCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [AdventureEndTestCardComponent, MockTranslatePipe],
+      declarations: [ModuleEndTestCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
@@ -60,7 +60,7 @@ describe('AdventureEndTestCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdventureEndTestCardComponent);
+    fixture = TestBed.createComponent(ModuleEndTestCardComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
@@ -115,7 +115,7 @@ describe('AdventureEndTestCardComponent', () => {
     component.thumbnailUrl = '/assets/broken-thumbnail.png';
     fixture.detectChanges();
     const thumbnail = fixture.debugElement.query(
-      By.css('.adventure-end-test-card-image')
+      By.css('.module-end-test-card-image')
     );
 
     thumbnail.nativeElement.dispatchEvent(new Event('error'));
@@ -132,7 +132,7 @@ describe('AdventureEndTestCardComponent', () => {
     expect(component.isThumbnailVisible).toBeFalse();
     expect(
       thumbnail.nativeElement.classList.contains(
-        'adventure-end-test-card-image-hidden'
+        'module-end-test-card-image-hidden'
       )
     ).toBeTrue();
   });
