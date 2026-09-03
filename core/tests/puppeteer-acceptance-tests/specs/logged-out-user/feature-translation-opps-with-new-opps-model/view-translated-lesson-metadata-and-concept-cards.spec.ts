@@ -48,6 +48,7 @@ const ROLES = testConstants.Roles;
 Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
+const HINDI_SITE_LANGUAGE_CODE = 'hi';
 // Nothing is translated into Arabic here, so it is the language used to check
 // that an untranslated concept card falls back to English.
 const UNTRANSLATED_SITE_LANGUAGE_CODE = 'ar';
@@ -229,6 +230,7 @@ describe('Logged-out User', function () {
     );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
+    await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
   }, 2100000);
 
   it('should cover LO.4: view information about the lesson', async function () {

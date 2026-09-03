@@ -195,6 +195,12 @@ describe('Translation Reviewer: review translations', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
+
+    await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await translationReviewer.switchToTabInContributionDashboard(
+      'Review Translations'
+    );
+    await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
   }, 2100000);
 
   it('should Review skill translations', async function () {

@@ -1,0 +1,9 @@
+2026-09-02T15:58:38.4270000Z Requested labels: ubuntu-22.04
+2026-09-02T15:58:38.4270000Z Job defined at: oppia/oppia/.github/workflows/full_stack_tests.yml@refs/pull/27135/merge
+2026-09-02T15:58:38.4270000Z Waiting for a runner to pick up this job...
+2026-09-02T15:58:38.4220000Z Evaluating lighthouse_test.if
+2026-09-02T15:58:38.4220000Z Evaluating: (success() && (((fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0) && (github.event_name != 'merge_group'))))
+2026-09-02T15:58:38.4220000Z Expanded: (true && ((3 > 0) && ('pull_request' != 'merge_group')))
+2026-09-02T15:58:38.4220000Z Result: true
+2026-09-02T17:58:46.9090000Z Job is about to start running on the hosted runner: GitHub Actions 1001975586
+2026-09-02T17:58:46.9080000Z Job is waiting for a hosted runner to come online.
