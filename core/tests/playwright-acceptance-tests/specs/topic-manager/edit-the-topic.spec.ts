@@ -1,7 +1,26 @@
-import { test} from '@playwright/test';
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for topic manager to edit a topic.
+ */
+
+import { test } from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import { UserFactory } from '../../utilities/common/user-factory';
 import { TopicManager } from '../../utilities/user/topic-manager';
+import { CurriculumAdmin } from '../../utilities/user/curriculum-admin';
 
 const ROLES = testConstants.Roles;
 
@@ -9,8 +28,7 @@ test.describe.configure({ timeout: 4800000 });
 
 test.describe('Topic Manager', () => {
   let topicManager: TopicManager;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let curriculumAdmin: any;
+  let curriculumAdmin: CurriculumAdmin;
 
   test.beforeAll(async ({ browser }, testInfo) => {
     testInfo.setTimeout(4800000);
@@ -19,7 +37,10 @@ test.describe('Topic Manager', () => {
     const warmupPage = await warmupContext.newPage();
     try {
       await warmupPage.goto('http://localhost:8181', { timeout: 120000 });
-      await warmupPage.waitForSelector('.e2e-test-oppia-cookie-banner-accept-button', { state: 'visible', timeout: 120000 });
+      await warmupPage.waitForSelector(
+        '.e2e-test-oppia-cookie-banner-accept-button',
+        { state: 'visible', timeout: 120000 }
+      );
     } catch (e) {
       // Warmup encountered an issue; proceed anyway.
     } finally {
@@ -27,28 +48,55 @@ test.describe('Topic Manager', () => {
       await warmupContext.close();
     }
 
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm', 'curriculum_adm@example.com', browser, [ROLES.CURRICULUM_ADMIN]
+    curriculumAdmin = (await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_adm@example.com',
+      browser,
+      [ROLES.CURRICULUM_ADMIN]
+    )) as CurriculumAdmin;
+
+    const explorationId =
+      await curriculumAdmin.createAndPublishExplorationWithCards(
+        'Solving problems without a calculator',
+        'Mathematics',
+        2,
+        true
+      );
+
+    // Note: This function automatically creates the 'Addition' skill, subtopic, and 3 questions.
+    await curriculumAdmin.createAndPublishTopic(
+      'Arithmetic Operations',
+      'Addition',
+      'Addition'
+    );
+    await curriculumAdmin.addStoryToTopic(
+      'The Broken Calculator',
+      'the-broken-calculator',
+      'Arithmetic Operations'
+    );
+    await curriculumAdmin.addChapter(
+      'Solving problems without a calculator',
+      explorationId
+    );
+    await curriculumAdmin.createAndPublishClassroom(
+      'Maths',
+      'maths',
+      'Arithmetic Operations'
+    );
+    await curriculumAdmin.createTopic('Whole Numbers', 'whole-numbers');
+
+    await curriculumAdmin.createSkillForTopic(
+      'Subtraction',
+      'Arithmetic Operations',
+      false
+    );
+    await curriculumAdmin.createSkillForTopic(
+      'Word Problems',
+      'Arithmetic Operations',
+      false
     );
 
-    const explorationId = await curriculumAdmin.createAndPublishExplorationWithCards(
-  'Solving problems without a calculator',
-  'Mathematics',
-  2,
-  true
-);
-    
-    // Note: This function automatically creates the 'Addition' skill, subtopic, and 3 questions.
-    await curriculumAdmin.createAndPublishTopic('Arithmetic Operations', 'Addition', 'Addition');
-    await curriculumAdmin.addStoryToTopic('The Broken Calculator', 'the-broken-calculator', 'Arithmetic Operations');
-    await curriculumAdmin.addChapter('Solving problems without a calculator', explorationId);
-    await curriculumAdmin.createAndPublishClassroom('Maths', 'maths', 'Arithmetic Operations');
-    await curriculumAdmin.createTopic('Whole Numbers', 'whole-numbers');
-    
-    await curriculumAdmin.createSkillForTopic('Subtraction', 'Arithmetic Operations', false);
-    await curriculumAdmin.createSkillForTopic('Word Problems', 'Arithmetic Operations', false);
-
-    // Create the remaining 7 questions here (making the total 10). 
+    // Create the remaining 7 questions here (making the total 10).
     // Doing this before logging in the Topic Manager prevents the Topic Manager tab from idling out.
     await curriculumAdmin.createQuestionsForSkill('Addition', 7);
 
@@ -56,13 +104,13 @@ test.describe('Topic Manager', () => {
     await curriculumAdmin.page.waitForTimeout(5000);
 
     // Create topic manager after all questions are done.
-    topicManager = await UserFactory.createNewUser(
-      'topicManager', 
-      'topic_manager@example.com', 
-      browser, 
-      [ROLES.TOPIC_MANAGER], 
+    topicManager = (await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      browser,
+      [ROLES.TOPIC_MANAGER],
       'Arithmetic Operations'
-    );
+    )) as TopicManager;
   });
 
   test('should be able to edit the topic', async () => {
@@ -87,16 +135,17 @@ test.describe('Topic Manager', () => {
     // Enable practice tab.
     await topicManager.navigateToTopicAndSkillsDashboardPage();
     await topicManager.openTopicEditor('AO 101');
-    
+
     await topicManager.togglePracticeTabCheckbox();
     await topicManager.expectSaveChangesButtonInTopicEditorToBe('enabled');
     await topicManager.saveTopicDraft('AO 101');
     await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
-  if (process.env.MOBILE !== 'true') {
+    if (process.env.MOBILE !== 'true') {
       await topicManager.navigateToTopicPreviewTab();
       await topicManager.expectTopicPreviewToHaveTitleAndDescription(
-        'AO 101', 'Arithmetic Operations (New): This is the new topic description.'
+        'AO 101',
+        'Arithmetic Operations (New): This is the new topic description.'
       );
       await topicManager.navigateToTabInPreview('Practice');
       await topicManager.verifyTopicManagerTabTitle('Master Skills for AO 101');
