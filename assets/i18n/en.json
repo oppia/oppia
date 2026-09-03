@@ -1737,7 +1737,7 @@
   "I18N_TOPIC_VIEWER_LIST_COMMA_AND": ", and ",
   "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_BUTTON": "Mastery Challenge",
   "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_DESCRIPTION": "Test your knowledge with a challenge that covers everything you have learned in this topic.",
-  "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_MODAL_VIEW_BUTTON": "View Mastery Challenge",
+  "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_MODAL_VIEW_BUTTON": "Unlock Mastery Challenge",
   "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL": "Go to Mastery Challenge",
   "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_DESCRIPTION": "Finish all chapters in order to unlock the Mastery Challenge and prove your mastery of this topic.",
   "I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_TITLE": "Complete all chapters to unlock",
