@@ -1,9 +1,0 @@
-2026-09-02T15:58:39.6620000Z Evaluating acceptance_test.if
-2026-09-02T15:58:39.6620000Z Evaluating: (success() && ((fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0)))
-2026-09-02T15:58:39.6620000Z Expanded: (true && (152 > 0))
-2026-09-02T15:58:39.6620000Z Result: true
-2026-09-02T15:58:40.0940000Z Requested labels: ubuntu-22.04
-2026-09-02T15:58:40.0940000Z Job defined at: oppia/oppia/.github/workflows/full_stack_tests.yml@refs/pull/27135/merge
-2026-09-02T15:58:40.0940000Z Waiting for a runner to pick up this job...
-2026-09-02T19:17:49.9930000Z Job is waiting for a hosted runner to come online.
-2026-09-02T19:17:49.9930000Z Job is about to start running on the hosted runner: GitHub Actions 1001975873

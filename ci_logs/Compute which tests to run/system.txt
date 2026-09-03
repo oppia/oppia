@@ -1,9 +1,0 @@
-2026-09-02T14:42:38.8840000Z Evaluating check_test_suites_to_run.if
-2026-09-02T14:42:38.8840000Z Evaluating: (success() && (!(((((github.event_name == 'merge_group') && (github.event.action == 'destroyed'))) || (((github.event_name == 'pull_request') && (github.event.action == 'closed')))))))
-2026-09-02T14:42:38.8840000Z Expanded: (true && !((('pull_request' == 'merge_group') && (github.event.action == 'destroyed')) || (('pull_request' == 'pull_request') && ('synchronize' == 'closed'))))
-2026-09-02T14:42:38.8840000Z Result: true
-2026-09-02T14:42:38.8910000Z Requested labels: ubuntu-22.04
-2026-09-02T14:42:38.8910000Z Job defined at: oppia/oppia/.github/workflows/full_stack_tests.yml@refs/pull/27135/merge
-2026-09-02T14:42:38.8910000Z Waiting for a runner to pick up this job...
-2026-09-02T14:53:13.5220000Z Job is waiting for a hosted runner to come online.
-2026-09-02T14:53:13.5230000Z Job is about to start running on the hosted runner: GitHub Actions 1001974835
