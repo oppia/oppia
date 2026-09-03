@@ -273,8 +273,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     flushMicrotasks();
   };
 
-  const loadQ1 = load;
-
   const triggerTimeExpiry = (): void => {
     component.isTimeExpired = true;
     component.ngOnChanges({
@@ -304,7 +302,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   });
 
   it('should register and clear its onSubmit callback on destroy', fakeAsync(() => {
-    loadQ1();
+    load();
     const registeredFn =
       currentInteractionServiceSpy.setOnSubmitFn.calls.mostRecent().args[0];
     expect(typeof registeredFn).toBe('function');
@@ -340,7 +338,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should recompute derived fields on first load', fakeAsync(() => {
     expect(component.currentQuestion).toBeNull();
-    loadQ1();
+    load();
     expect(component.currentQuestion).toEqual(component.questions[0]);
     expect(component.totalQuestionCount).toBe(3);
     expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
@@ -412,7 +410,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should open time-expired modal on desktop when time expires', fakeAsync(() => {
-    loadQ1();
+    load();
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
     expect(modalSpy.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
@@ -423,7 +421,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should open time-expired modal as bottom sheet on mobile when time expires', fakeAsync(() => {
-    loadQ1();
+    load();
     dimsSpy.getWidth.and.returnValue(400);
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
@@ -444,7 +442,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should not handle time expiry more than once', fakeAsync(() => {
-    loadQ1();
+    load();
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
     component.isTimeExpired = true;
@@ -454,13 +452,13 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should not handle time expiry when the flag has not become true', fakeAsync(() => {
-    loadQ1();
+    load();
     component.ngOnChanges({});
     expect(modalSpy.open).not.toHaveBeenCalled();
   }));
 
   it('should not handle time expiry again while the flag stays true', fakeAsync(() => {
-    loadQ1();
+    load();
     triggerTimeExpiry();
     expect(modalSpy.open).toHaveBeenCalledTimes(1);
 
@@ -476,7 +474,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should take no action when the desktop time-expired modal resolves without view-results', fakeAsync(() => {
-    loadQ1();
+    load();
     spyOn(component.viewResults, 'emit');
     spyOn(component.assessmentEnded, 'emit');
     modalSpy.open.and.returnValue(modalRef(false, null));
@@ -488,7 +486,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should handle time expiry on init when already expired', fakeAsync(() => {
-    loadQ1();
+    load();
     component.isTimeExpired = true;
     spyOn(component.assessmentSubmitted, 'emit');
     component.ngOnInit();
@@ -501,7 +499,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should submit and emit view results when time expires and the modal closes with view-results', fakeAsync(() => {
-    loadQ1();
+    load();
     spyOn(component.assessmentSubmitted, 'emit');
     spyOn(component.viewResults, 'emit');
     modalSpy.open.and.returnValue(
@@ -518,7 +516,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should emit assessment ended when the time-expired modal is dismissed', fakeAsync(() => {
-    loadQ1();
+    load();
     spyOn(component.assessmentEnded, 'emit');
     spyOn(component.viewResults, 'emit');
     modalSpy.open.and.returnValue(modalRef(true));
@@ -530,7 +528,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should emit view results when the time-expired bottom sheet is dismissed with view-results', fakeAsync(() => {
-    loadQ1();
+    load();
     dimsSpy.getWidth.and.returnValue(400);
     spyOn(component.viewResults, 'emit');
     spyOn(component.assessmentEnded, 'emit');
@@ -546,7 +544,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should emit assessment ended when the time-expired bottom sheet is dismissed', fakeAsync(() => {
-    loadQ1();
+    load();
     dimsSpy.getWidth.and.returnValue(400);
     spyOn(component.assessmentEnded, 'emit');
     spyOn(component.viewResults, 'emit');
@@ -561,7 +559,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   }));
 
   it('should not open any modal when the flag is false', fakeAsync(() => {
-    loadQ1();
+    load();
     modalSpy.open.calls.reset();
     component.ngOnInit();
     expect(modalSpy.open).not.toHaveBeenCalled();
