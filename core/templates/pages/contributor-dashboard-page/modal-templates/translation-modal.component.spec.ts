@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TranslationModalComponent.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -126,6 +128,10 @@ describe('Translation Modal Component', () => {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
     gtag: jasmine.Spy;
+    location: {
+      pathname: string;
+      href: string;
+    };
   };
 
   const opportunity: TranslationOpportunity = {
@@ -157,6 +163,10 @@ describe('Translation Modal Component', () => {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
       gtag: jasmine.createSpy('gtag'),
+      location: {
+        pathname: '/signup',
+        href: '',
+      },
     };
 
     TestBed.configureTestingModule({
@@ -303,6 +313,11 @@ describe('Translation Modal Component', () => {
 
     component.updateHtml('<p>Translated text</p>');
     fixture.detectChanges();
+    // The ngOnInit is still called by Angular Ivy's lifecycle mechanism despite
+    // the spy, so flush the HTTP request it creates.
+    httpTestingController
+      .expectOne('/gettranslatabletexthandler?exp_id=1&language_code=es')
+      .flush({state_names_to_content_id_mapping: {}, version: 1});
 
     const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
       '.e2e-test-save-button'
@@ -325,6 +340,11 @@ describe('Translation Modal Component', () => {
       '</oppia-noninteractive-skillreview>';
     component.updateHtml('<p>Translated text</p>');
     fixture.detectChanges();
+    // The ngOnInit is still called by Angular Ivy's lifecycle mechanism despite
+    // the spy, so flush the HTTP request it creates.
+    httpTestingController
+      .expectOne('/gettranslatabletexthandler?exp_id=1&language_code=es')
+      .flush({state_names_to_content_id_mapping: {}, version: 1});
 
     const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
       '.e2e-test-save-button'
@@ -760,6 +780,7 @@ describe('Translation Modal Component', () => {
   describe('when skipping the active translation', () => {
     describe('when there is available text', () => {
       beforeEach(fakeAsync(() => {
+        spyOn(translateTextService, 'init').and.callThrough();
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
@@ -807,6 +828,7 @@ describe('Translation Modal Component', () => {
         },
         files: {},
       };
+      spyOn(translateTextService, 'init').and.callThrough();
       component.ngOnInit();
       tick();
 

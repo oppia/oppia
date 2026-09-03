@@ -29,7 +29,7 @@ import types
 
 from core.tests import test_utils
 
-from typing import Final, List, Optional, Tuple, Type
+from typing import Dict, Final, List, Optional, Tuple, Type
 
 from . import (
     clean,
@@ -117,11 +117,22 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False,
         }
         self.print_arr: List[str] = []
+        self.all_cmd_tokens: List[List[str]] = []
+        self.all_envs: List[Optional[Dict[str, str]]] = []
 
         def mock_check_call(
-            unused_cmd_tokens: List[str], **_kwargs: str
+            unused_cmd_tokens: List[str],
+            env: Optional[Dict[str, str]] = None,
+            **_kwargs: str,
         ) -> Ret:
             self.check_function_calls['check_call_is_called'] = True
+            # The mock records every command that install_third_party_libs
+            # runs. Tests that only care about the yarn install command still
+            # receive all other commands here (e.g. the pre-commit hook setup
+            # and git-clang-format), so these records are unused by those
+            # tests and are looked up via self.all_cmd_tokens.index().
+            self.all_cmd_tokens.append(unused_cmd_tokens)
+            self.all_envs.append(env)
             return Ret(0, (b'', b''))
 
         def mock_check_call_error(*args: str) -> None:
@@ -258,6 +269,24 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                                 install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        yarn_install_command = ['yarn', 'install', '--pure-lockfile']
+        self.assertIn(yarn_install_command, self.all_cmd_tokens)
+        yarn_install_index = self.all_cmd_tokens.index(yarn_install_command)
+        self.assertNotIn(
+            '--ignore-engines', self.all_cmd_tokens[yarn_install_index]
+        )
+        yarn_install_env = self.all_envs[yarn_install_index]
+        self.assertIsNotNone(yarn_install_env)
+        assert yarn_install_env is not None
+        expected_node_20_bin_path = os.path.join(
+            common.LIGHTHOUSE_NODE_PATH, 'bin'
+        )
+        self.assertTrue(
+            yarn_install_env['PATH'].startswith(
+                '%s%s' % (expected_node_20_bin_path, os.pathsep)
+            )
+        )
 
     def test_clean_pyc_files_removes_pyc_files(self) -> None:
         check_file_removals = {'root/file1.js': False, 'root/file2.pyc': False}

@@ -264,6 +264,13 @@ describe('Current Interaction Service', () => {
 
     expect(currentInteractionService.showNoResponseError()).toBe(true);
   });
+  it('should return false for no response error when no card is displayed', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      undefined
+    );
+
+    expect(currentInteractionService.showNoResponseError()).toBe(false);
+  });
   it('should update answer validity using updateAnswerIsValid', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
       displayedCard
@@ -289,5 +296,13 @@ describe('Current Interaction Service', () => {
     expect(currentInteractionService.showInvalidResponseError()).toBe(true);
     expect(currentInteractionService.showInvalidResponseError()).toBe(false);
     expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return false for invalid response error when no card is displayed', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      undefined
+    );
+
+    expect(currentInteractionService.showInvalidResponseError()).toBe(false);
   });
 });

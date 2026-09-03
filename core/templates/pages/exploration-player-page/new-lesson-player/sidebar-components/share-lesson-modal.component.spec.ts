@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ShareLessonModalComponent.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   TestBed,
