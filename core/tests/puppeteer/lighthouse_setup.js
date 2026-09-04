@@ -618,18 +618,29 @@ const generateDataForClassroom = async function (browser, page) {
     await addThumbnailToTopic(page, 'Division');
 
     // Capture the seeded certificate offering and the attempt started for the
-    // admin so that the certificate pages render real content.
+    // admin so that the certificate pages render real content. Shards that do
+    // not enable the certificate flag (or that run before the certificate data
+    // is seeded) receive a non-JSON response, so the parse failures are caught
+    // and treated as "no certificate data" instead of failing the setup.
     certificateId = await page.evaluate(async () => {
       const response = await fetch('/certificate_assessment_offering_handler');
-      const data = await response.json();
-      return data.certificate_offerings.length > 0
-        ? data.certificate_offerings[0].id
-        : null;
+      try {
+        const data = await response.json();
+        return data.certificate_offerings.length > 0
+          ? data.certificate_offerings[0].id
+          : null;
+      } catch (error) {
+        return null;
+      }
     });
     attemptId = await page.evaluate(async () => {
       const response = await fetch('/certificate_assessment_attempts_handler');
-      const data = await response.json();
-      return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
+      try {
+        const data = await response.json();
+        return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
+      } catch (error) {
+        return null;
+      }
     });
   } catch (e) {
     // eslint-disable-next-line no-console
