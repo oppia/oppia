@@ -1098,11 +1098,50 @@ const shard3Setup = async function (browser, page) {
 
 const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
-  // Shard 4 enables feature flags via the release-coordinator page and
-  // toggles the diagnostic test on the classroom-admin page, so only the
-  // release coordinator and curriculum admin roles are assigned. Its data
-  // generation uses the admin activities tab, which the CI super-admin user
-  // can access without an additional role.
+  // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
+  // topic/story/skill editors, and the classroom-admin page used to toggle the
+  // diagnostic test, so only the curriculum admin and release coordinator
+  // roles are assigned. Its data generation uses the admin activities tab,
+  // which the CI super-admin user can access without an additional role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
+  );
+  // The structures step seeds the staging topic (dummy-topic-one), its story
+  // and subtopic, plus the learner group and technical feedback report. The
+  // staging topic backs the topic/story/practice/subtopic pages.
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  // The topic, story and skill editor pages need real entity ids, which are
+  // captured by creating each entity through its editor UI.
+  await logStep('creating topic editor', () =>
+    getTopicEditorUrl(browser, page)
+  );
+  await logStep('creating story editor', () =>
+    getStoryEditorUrl(browser, page)
+  );
+  await logStep('creating skill editor', () =>
+    getSkillEditorUrl(browser, page)
+  );
+  // The math classroom backs the diagnostic test player page, which needs the
+  // diagnostic test to be enabled on the classroom-admin page.
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  await logStep('enabling diagnostic test', () =>
+    enableDiagnosticTestForMathClassroom(browser, page)
+  );
+};
+
+const shard5Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 5 audits the learner-group, technical-feedback and certificate
+  // pages, so the release coordinator enables their feature flags while the
+  // curriculum admin role covers the certificate dashboard. Only these two
+  // roles are assigned.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
@@ -1115,36 +1154,17 @@ const shard4Setup = async function (browser, page) {
   await logStep('enabling certificate_assessment flag', () =>
     enableFeatureFlag(browser, page, 'enable_certificate_assessment')
   );
+  // The structures step seeds a learner group (the admin is its facilitator)
+  // and a technical feedback report, which back the learner group and
+  // technical feedback pages. It also seeds the staging topic, which is unused
+  // by this shard but is created atomically by the same handler.
   await logStep('generating topic and story data', () =>
     generateDataForTopicAndStoryPlayer(browser, page)
   );
+  // The classroom step seeds the certificate offering and attempt that back
+  // the certificate pages.
   await logStep('generating math classroom', () =>
     generateDataForClassroom(browser, page)
-  );
-  await logStep('enabling diagnostic test', () =>
-    enableDiagnosticTestForMathClassroom(browser, page)
-  );
-};
-
-const shard5Setup = async function (browser, page) {
-  await logStep('logging in', () => login(browser, page));
-  // Shard 5 enables feature flags via the release-coordinator page and audits
-  // the topics-and-skills-dashboard (curriculum admin) page, so only the
-  // release coordinator and curriculum admin roles are assigned.
-  await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
-  );
-  await logStep('enabling learner_groups flag', () =>
-    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
-  );
-  await logStep('enabling technical_feedback flag', () =>
-    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
-  );
-  await logStep('exploration editor setup', () =>
-    getExplorationEditorUrl(browser, page)
-  );
-  await logStep('generating topic and story data', () =>
-    generateDataForTopicAndStoryPlayer(browser, page)
   );
 };
 
@@ -1219,32 +1239,34 @@ const main = async function () {
   // Only record the entities and URL lines produced by the steps the current
   // shard ran, so that unresolvable URLs are not reported. The flags below
   // mirror the setup steps each shard function executes.
-  let setupKind = 'full';
-  if (shard === 2) {
-    setupKind = 'blog';
-  } else if (shard === 3) {
-    // Shard 3 only creates explorations and classrooms, so it does not emit
-    // topic/story/skill, learner-group, feedback or certificate entities.
-    setupKind = 'data-player';
-  } else if (shard === 4) {
-    setupKind = 'classroom';
-  } else if (shard === 5) {
-    setupKind = 'structures';
-  } else if (shard === 6) {
-    setupKind = 'roles';
-  }
+  const setupKind =
+    shard === 2
+      ? 'blog'
+      : shard === 3
+        ? 'data-player'
+        : shard === 4
+          ? 'editors'
+          : shard === 5
+            ? 'certificates'
+            : shard === 6
+              ? 'roles'
+              : 'full';
   const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
   const ranExplorationSetup =
     setupKind === 'data' ||
     setupKind === 'data-player' ||
     setupKind === 'full' ||
-    setupKind === 'structures' ||
     setupKind === 'blog';
-  const ranTopicStorySkillSetup = setupKind === 'data' || setupKind === 'full';
+  const ranTopicStorySkillSetup =
+    setupKind === 'data' || setupKind === 'full' || setupKind === 'editors';
   const ranStructuresSetup =
-    setupKind === 'data' || setupKind === 'full' || setupKind === 'structures';
+    setupKind === 'data' ||
+    setupKind === 'full' ||
+    setupKind === 'certificates';
   const ranClassroomSetup =
-    setupKind === 'data' || setupKind === 'full' || setupKind === 'classroom';
+    setupKind === 'data' ||
+    setupKind === 'full' ||
+    setupKind === 'certificates';
 
   await runShardSetup(browser, page);
 
@@ -1266,6 +1288,7 @@ const main = async function () {
   if (ranClassroomSetup) {
     envEntries.push(`certificate_id=${certificateId}`);
     envEntries.push(`attempt_id=${attemptId}`);
+    envEntries.push(`certificate_offering_id=${certificateId}`);
   }
   if (ranBlogSetup) {
     envEntries.push(`blog_post_url_fragment=${blogUrlFragment}`);
@@ -1288,6 +1311,9 @@ const main = async function () {
     urls.push(`http://localhost:8181/certificate-assessment/${certificateId}`);
     urls.push(
       `http://localhost:8181/certificate-assessment-result/${attemptId}`
+    );
+    urls.push(
+      `http://localhost:8181/edit-certificate-assessment-offering/${certificateId}`
     );
   }
   if (ranExplorationSetup) {

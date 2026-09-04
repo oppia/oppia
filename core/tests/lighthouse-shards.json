@@ -42,33 +42,33 @@
     "voiceover-admin"
   ],
   "4": [
-    "learner-dashboard",
-    "certificate-assessment-player",
-    "certificate-assessment-result",
-    "certificate-creator-dashboard",
-    "certificate-offering-available",
-    "signup",
-    "create-certificate-offering",
-    "diagnostic-test-player",
-    "edit-certificate-offering",
-    "end-of-arc-test",
-    "facilitator-dashboard"
-  ],
-  "5": [
     "topics-and-skills-dashboard",
     "topic-viewer",
     "story-viewer",
     "topic-editor",
     "skill-editor",
     "story-editor",
+    "learner-dashboard",
+    "diagnostic-test-player",
+    "practice-session",
+    "subtopic-viewer",
+    "mastery-challenge",
+    "node-practice-session",
+    "end-of-arc-test"
+  ],
+  "5": [
+    "facilitator-dashboard",
     "create-learner-group",
     "edit-learner-group",
     "learner-group-viewer",
-    "mastery-challenge",
-    "node-practice-session",
-    "practice-session",
-    "subtopic-viewer",
     "technical-feedback-dashboard",
-    "technical-feedback-detail"
+    "technical-feedback-detail",
+    "certificate-assessment-player",
+    "certificate-assessment-result",
+    "certificate-creator-dashboard",
+    "certificate-offering-available",
+    "signup",
+    "create-certificate-offering",
+    "edit-certificate-offering"
   ]
 }

@@ -226,6 +226,10 @@ def get_entity(line: str) -> tuple[str, str] | None:
         ),
         '/certificate-assessment-result/': ('attempt_id', 4),
         '/certificate-assessment/': ('certificate_id', 4),
+        '/edit-certificate-assessment-offering/': (
+            'certificate_offering_id',
+            4,
+        ),
     }
     for url_pattern, (
         entity_name,
