@@ -44,6 +44,9 @@ import {TimeExpiredModalComponent} from 'components/certificate-assessment-offer
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {TranslateService} from '@ngx-translate/core';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -258,6 +261,23 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         {
           provide: FocusManagerService,
           useValue: jasmine.createSpyObj('Focus', ['generateFocusLabel']),
+        },
+        {
+          provide: AlertsService,
+          useValue: jasmine.createSpyObj('AlertsService', [
+            'addWarning',
+            'addInfoMessage',
+          ]),
+        },
+        {
+          provide: InternetConnectivityService,
+          useValue: jasmine.createSpyObj('InternetConnectivityService', [
+            'isOnline',
+          ]),
+        },
+        {
+          provide: TranslateService,
+          useValue: jasmine.createSpyObj('TranslateService', ['instant']),
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
