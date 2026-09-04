@@ -52,6 +52,9 @@ import {
   UnansweredQuestionModalComponent,
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import './certificate-assessment-player-page.component.css';
 
@@ -92,7 +95,10 @@ export class CertificateAssessmentPlayerPageComponent
 
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
+    private alertsService: AlertsService,
+    private internetConnectivityService: InternetConnectivityService,
     @Optional() private ngbModal: NgbModal,
+    private translateService: TranslateService,
     private windowDimensionsService: WindowDimensionsService,
     private answerClassificationService: AnswerClassificationService,
     private currentInteractionService: CurrentInteractionService,
@@ -304,6 +310,14 @@ export class CertificateAssessmentPlayerPageComponent
   }
 
   submitAssessment(): void {
+    if (!this.internetConnectivityService.isOnline()) {
+      this.alertsService.addWarning(
+        this.translateService.instant(
+          'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_NETWORK_WARNING'
+        )
+      );
+      return;
+    }
     const answers = this.collectAnswers();
     const unansweredQuestionIndexes = this.questions
       .map((question, index) => ({question, index}))

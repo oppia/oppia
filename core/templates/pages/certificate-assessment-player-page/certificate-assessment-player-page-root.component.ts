@@ -31,6 +31,7 @@ import {AlertsService} from 'services/alerts.service';
 import {PageHeadService} from 'services/page-head.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 @Component({
@@ -74,6 +75,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
     private router: Router,
     protected translateService: TranslateService
@@ -232,11 +234,19 @@ export class CertificateAssessmentPlayerPageRootComponent
           await this.navigateToResultPage();
         }
       } catch {
-        this.alertsService.addWarning(
-          this.translateService.instant(
-            'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
-          )
-        );
+        if (!this.internetConnectivityService.isOnline()) {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_NETWORK_WARNING'
+            )
+          );
+        } else {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+            )
+          );
+        }
       } finally {
         this.isSubmissionInProgress = false;
       }
