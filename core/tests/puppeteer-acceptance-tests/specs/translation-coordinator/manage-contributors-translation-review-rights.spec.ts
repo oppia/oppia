@@ -158,6 +158,13 @@ describe('Translation Coordinator', function () {
       'Translation Reviewers'
     );
 
+    // Wait for the background Language row to settle (async fetch to complete)
+    // before opening the modal and taking a screenshot.
+    await translationCoordinator.expectTextContentToContain(
+      '.e2e-test-language-selector-selected',
+      'English'
+    );
+
     // Add translation rights.
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
@@ -195,6 +202,14 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
+
+    // Wait for the background Language row to settle (async fetch to complete)
+    // before opening the modal and taking a screenshot.
+    await translationCoordinator.expectTextContentToContain(
+      '.e2e-test-language-selector-selected',
+      'English'
+    );
+
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
       'translationReviewer1'
