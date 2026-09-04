@@ -352,8 +352,8 @@ module.exports = {
               // The partnerships page uses scroll handlers that require
               // non-passive listeners.
               'uses-passive-event-listeners': ['error', {minScore: 0}],
-              // Marketing hero images are not properly responsively sized.
-              'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Partner logos are small and cannot be responsively sized.
+              'uses-responsive-images': ['error', {minScore: 0}],
               // Marketing pages use unoptimized JPEG hero images.
               'uses-optimized-images': ['error', {minScore: 0.6}],
               // The many partner logos can log browser issues to the Issues

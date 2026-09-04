@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import builtins
+import io
 import json
 import os
 import subprocess
@@ -271,17 +272,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
             returncode = 0
+            stdout = io.BytesIO(
+                b'https://oppia.org/create/4\n'
+                + b'https://oppia.org/topic_editor/4\n'
+                + b'https://oppia.org/story_editor/4\n'
+                + b'https://oppia.org/skill_editor/4\n'
+            )
+            stderr = io.BytesIO(b'Task output.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'Task output.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -312,17 +312,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
             returncode = 1
+            stdout = io.BytesIO(b'https://oppia.org/create/4\n')
+            stderr = io.BytesIO(b'ABC error.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'ABC error.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -356,17 +350,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 0
+            stdout = io.BytesIO(
+                b'https://oppia.org/create/4\n'
+                + b'https://oppia.org/topic_editor/4\n'
+                + b'https://oppia.org/story_editor/4\n'
+                + b'https://oppia.org/skill_editor/4\n'
+            )
+            stderr = io.BytesIO(b'Task output.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'Task output.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -405,17 +398,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_fails_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 1
+            stdout = io.BytesIO(b'https://oppia.org/create/4\n')
+            stderr = io.BytesIO(b'ABC error.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'ABC error.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -1088,11 +1075,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     **unused_kwargs: object,
                 ) -> None:
                     self.returncode = 0
+                    self.stdout = io.BytesIO(b'topic:123\n')
+                    self.stderr = io.BytesIO(b'')
 
-                def communicate(  # pylint: disable=missing-docstring
-                    self,
-                ) -> tuple[bytes, bytes]:
-                    return (b'topic:123\n', b'')
+                def wait(self) -> None:  # pylint: disable=missing-docstring
+                    pass
 
             with (
                 self.swap(os, 'getcwd', lambda: tmp_working_dir),

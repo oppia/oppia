@@ -22,11 +22,12 @@ import os
 import re
 import subprocess
 import sys
+import threading
 
 from core.constants import constants
 from scripts import build, common, servers
 
-from typing import Final, Iterator, List, Optional
+from typing import IO, Final, Iterator, List, Optional
 
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
@@ -97,6 +98,17 @@ def _get_puppeteer_setup_environment(shard: int) -> dict[str, str]:
     return env
 
 
+def _drain_pipe(stream: IO[bytes], output_lines: list[bytes]) -> None:
+    """Reads every line from a subprocess pipe into output_lines.
+
+    Args:
+        stream: IO(byte). A buffered binary pipe from the subprocess.
+        output_lines: list(bytes). The list that the lines are appended to.
+    """
+    for line in iter(stream.readline, b''):
+        output_lines.append(line)
+
+
 def run_lighthouse_puppeteer_script(
     record: bool = False, shard: int = 0
 ) -> dict[str, str]:
@@ -133,9 +145,28 @@ def run_lighthouse_puppeteer_script(
         stderr=subprocess.PIPE,
         env=_get_puppeteer_setup_environment(shard),
     )
-    stdout, stderr = process.communicate()
+
+    # Stream the puppeteer output line by line as it arrives so that the
+    # "[lighthouse-setup]" progress markers are visible live. Buffering the
+    # output until the process finished hid which setup step was stuck when a
+    # step (for example the login, which first navigates the slow /admin page)
+    # took a long time; streaming surfaces the exact step as soon as it
+    # produces output. stderr is drained from a background thread so that the
+    # pipe cannot fill up and block the puppeteer script.
+    stdout_lines: list[bytes] = []
+    stderr_lines: list[bytes] = []
+    stderr_thread = threading.Thread(
+        target=_drain_pipe, args=(process.stderr, stderr_lines)
+    )
+    stderr_thread.start()
+    for line in iter(process.stdout.readline, b''):
+        stdout_lines.append(line)
+        sys.stdout.write(line.decode('utf-8'))
+        sys.stdout.flush()
+    process.wait()
+    stderr_thread.join()
+
     if process.returncode == 0:
-        print(stdout)
         # The entities are collected from the standard output of the
         # puppeteer script. Each entity is a dictionary with the entity
         # name as the key and the entity ID as the value. An entity
@@ -143,7 +174,7 @@ def run_lighthouse_puppeteer_script(
         # or skill. The entity ID is the unique identifier for the entity
         # that will be used to inject into the URLs for the Lighthouse checks.
         entities: dict[str, str] = {}
-        for line in stdout.split(b'\n'):
+        for line in stdout_lines:
             # Standard output is in bytes, we need to decode the line to
             # print it.
             entity = get_entity(line.decode('utf-8'))
@@ -159,11 +190,13 @@ def run_lighthouse_puppeteer_script(
         print('OUTPUT:')
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        print(stdout.decode('utf-8'))
+        for line in stdout_lines:
+            print(line.decode('utf-8'))
         print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
-        print(stderr.decode('utf-8'))
+        for line in stderr_lines:
+            print(line.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)

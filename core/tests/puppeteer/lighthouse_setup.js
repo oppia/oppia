@@ -77,6 +77,7 @@ var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
 var topicUploadButton = '.e2e-test-photo-upload-input';
+var imageUploadLabel = '.e2e-test-image-upload-label';
 var topicPhotoSubmit = 'button.e2e-test-photo-upload-submit';
 var thumbnailContainer = '.e2e-test-thumbnail-container';
 var confirmTopicCreationButton = '.e2e-test-confirm-topic-creation-button';
@@ -160,15 +161,32 @@ const logStep = async function (name, step) {
 const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    // networkidle0 can wait forever on the heavy /admin page when its
+    // background requests keep a connection open (seen as a local hang), so
+    // allow up to two connections and cap the wait to surface a hard error
+    // instead of spinning silently.
+    await page.goto(ADMIN_URL, {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
 
     let cookies = await page.cookies();
     if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
-      await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
-      await page.click(cookieBannerAcceptButton);
+      // The consent banner may not render in every run (it can be dismissed
+      // or not yet hydrated), so its acknowledgement is best-effort: try to
+      // accept it but continue even if it does not appear in time.
+      try {
+        await page.waitForSelector(cookieBannerAcceptButton, {
+          visible: true,
+          timeout: 5000,
+        });
+        await page.click(cookieBannerAcceptButton);
+      } catch (error) {
+        // Best-effort: login proceeds without the banner acknowledgement.
+      }
     }
 
     let usernameInputElement = null;
@@ -182,7 +200,10 @@ const login = async function (browser, page) {
     }
 
     if (usernameInputElement === null) {
-      await page.waitForSelector(navbarToggle);
+      // The first load against a fresh datastore can be slow while the
+      // appserver warms up, so allow more than the default 30s for the
+      // post-login navigation.
+      await page.waitForSelector(navbarToggle, {timeout: 60000});
       return;
     }
 
@@ -195,10 +216,16 @@ const login = async function (browser, page) {
         document.querySelector(selector).blur();
       }, usernameInput),
     ]);
+    await page.waitForSelector(agreeToTermsCheckBox, {visible: true});
     await page.click(agreeToTermsCheckBox);
-    await page.waitForSelector(registerUser);
+    // The first registration against a fresh datastore can be slow while the
+    // appserver warms up, so allow more than the default 30s for the register
+    // button to become enabled.
+    await page.waitForSelector(registerUser, {timeout: 60000});
     await page.click(registerUser);
-    await page.waitForSelector(navbarToggle);
+    // The first registration against a fresh datastore can be slow while the
+    // appserver warms up, so allow more than the default 30s for the redirect.
+    await page.waitForSelector(navbarToggle, {timeout: 60000});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Login Failed');
@@ -777,14 +804,26 @@ const generateDummyExplorations = async function (browser, page) {
 const reloadAllInteractionsExploration = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
+    // Like the login navigation, the admin activities tab can keep a
+    // background connection open, so avoid networkidle0 which can wait
+    // forever; allow up to two connections and cap the wait.
     await page.goto('http://localhost:8181/admin#/activities', {
-      waitUntil: networkIdle,
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
+
+    // The reload button is guarded by a native confirm dialog. Without a
+    // dialog handler the page can block indefinitely waiting for it to be
+    // answered, so accept any dialog that appears before clicking.
+    page.on('dialog', async dialog => {
+      await dialog.accept();
     });
 
     // Locate the reload button for the all_interactions demo exploration so
     // that the exploration editor, player and new lesson player pages have
-    // content exercising every interaction type to render.
-    await page.waitForSelector(reloadExplorationRow);
+    // content exercising every interaction type to render. Cap the wait so a
+    // slow render of the activity rows fails loudly instead of hanging.
+    await page.waitForSelector(reloadExplorationRow, {timeout: 60000});
     const reloadButtons = await page.$$(reloadExplorationButton);
     for (let i = 0; i < reloadButtons.length; i++) {
       const title = await page.evaluate(
@@ -802,7 +841,13 @@ const reloadAllInteractionsExploration = async function (browser, page) {
 
     const successMessage = 'Data reloaded successfully.';
     let statusMessage;
+    let tries = 0;
     do {
+      if (tries++ > 120) {
+        throw new Error(
+          'Timed out waiting for the all_interactions exploration reload.'
+        );
+      }
       await new Promise(r => setTimeout(r, 1000));
       statusMessage = await page.evaluate(() => {
         const statusMessageElement = document.querySelector(
@@ -935,7 +980,10 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(topicThumbnailResetButton);
     await page.click(topicThumbnailResetButton);
 
-    await page.waitForSelector(topicUploadButton, {visible: true});
+    // The file input is always in the DOM but CSS-hidden. Wait for the
+    // visible upload label as a sync point, then use the hidden input
+    // directly (uploadFile works on hidden elements via CDP).
+    await page.waitForSelector(imageUploadLabel, {visible: true});
 
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
@@ -1064,13 +1112,21 @@ const shard2Setup = async function (browser, page) {
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
-  // (voiceover admin) role-gated pages, so only these two roles are assigned.
+  // (voiceover admin) role-gated pages, so these roles are assigned.
+  // Note that RELEASE_COORDINATOR is also assigned because the feature flags
+  // tab for the new lesson player below lives on the release-coordinator page.
   // Its other pages (classrooms, classroom, creator-dashboard,
   // exploration-editor, exploration-player, new-lesson-player,
   // community-library, pending-account-deletion) are public or login-only, so
-  // no topic/story/skill generation or feature flags are needed here.
+  // no topic/story/skill generation is needed here.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN'])
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  // The /lesson/<exploration_id> (new lesson player) page renders only when
+  // its feature flag is enabled, so enable it for the audits. With the flag
+  // on, /explore/<exploration_id> navigates to the same player client-side.
+  await logStep('enabling new lesson player flag', () =>
+    enableFeatureFlag(browser, page, 'new_lesson_player')
   );
   // The exploration editor setup creates the exploration that backs the
   // exploration-editor, exploration-player and new-lesson-player pages.
