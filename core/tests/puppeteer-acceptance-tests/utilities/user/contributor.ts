@@ -475,11 +475,7 @@ export class Contributor extends ExplorationEditor {
    * @param tabName - The name of the tab to switch to.
    */
   async switchToTabInContributionDashboard(
-    tabName:
-      | 'Translate Text'
-      | 'My Contributions'
-      | 'Submit Question'
-      | 'Review Translations'
+    tabName: 'Translate Text' | 'My Contributions' | 'Submit Question'
   ): Promise<void> {
     await this.page.waitForFunction(
       (selector: string, name: string) => {
@@ -506,12 +502,19 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Tab ${tabName} not found.`);
     }
 
-    // Click on the tab using evaluate to bypass the sticky mobile navbar which blocks native clicks.
-    await this.page.evaluate(el => {
-      if (el instanceof HTMLElement) {
-        el.click();
-      }
-    }, tabElement);
+    // The tab is a list item and its click handler sits on the link inside it,
+    // so the link is what has to be clicked.
+    const tabLink = await tabElement.$('a');
+    if (!tabLink) {
+      throw new Error(`Tab ${tabName} has no link to click.`);
+    }
+
+    // The click is dispatched on the link rather than made natively because
+    // Puppeteer re-centres a target before dispatching a mouse event, which at
+    // mobile width parks the tab under the sticky navigation bar and delivers
+    // the click to the bar instead.
+    await this.waitForElementToStabilize(tabLink);
+    await tabLink.evaluate(el => (el as HTMLElement).click());
 
     // Verify tab is active.
     if (tabName !== 'My Contributions') {

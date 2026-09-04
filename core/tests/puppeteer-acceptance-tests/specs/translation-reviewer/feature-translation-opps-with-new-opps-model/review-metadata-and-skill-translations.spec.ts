@@ -196,11 +196,11 @@ describe('Translation Reviewer: review translations', function () {
       'Submitted translation for review.'
     );
 
+    // "Review Translations" is not a dashboard tab, it is the side navigation
+    // item a reviewer already lands on when translations are their only review
+    // right, so the dashboard opens on the list this spec reviews from.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await translationReviewer.switchToTabInContributionDashboard(
-      'Review Translations'
-    );
-    await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
+    await translationReviewer.filterContentByTopic(TOPIC_NAME);
   }, 2100000);
 
   it('should Review skill translations', async function () {
