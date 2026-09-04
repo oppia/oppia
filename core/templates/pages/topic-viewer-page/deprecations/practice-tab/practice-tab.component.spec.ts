@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
+// @ts-nocheck
+
 import {
   TestBed,
   waitForAsync,

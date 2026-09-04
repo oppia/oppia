@@ -19,11 +19,12 @@
 import {Component} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import './thanks-page.component.css';
 
 @Component({
   selector: 'thanks-page',
   templateUrl: './thanks-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./thanks-page.component.css'],
 })
 export class ThanksPageComponent {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
