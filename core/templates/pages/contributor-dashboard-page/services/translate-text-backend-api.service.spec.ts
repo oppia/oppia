@@ -32,6 +32,7 @@ import {
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import AppConstants from 'assets/constants';
 
 class MockPlatformFeatureService {
   get status() {
@@ -348,6 +349,7 @@ describe('TranslateTextBackendApiService', () => {
             'नमस्ते',
             [],
             'html',
+            AppConstants.ENTITY_TYPE.EXPLORATION,
             true,
             'gcp',
             false
@@ -387,6 +389,7 @@ describe('TranslateTextBackendApiService', () => {
             'नमस्ते (edited)',
             [],
             'html',
+            AppConstants.ENTITY_TYPE.EXPLORATION,
             true,
             'gcp',
             true
