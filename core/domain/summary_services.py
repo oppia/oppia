@@ -927,8 +927,6 @@ def get_library_groups(
             )
         )
 
-        summary_dicts = summary_dicts[:8]
-
         if not summary_dicts:
             continue
 
