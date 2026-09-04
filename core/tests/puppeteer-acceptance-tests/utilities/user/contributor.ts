@@ -506,9 +506,12 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Tab ${tabName} not found.`);
     }
 
-    // Click on the tab.
-    await this.waitForElementToBeClickable(tabElement);
-    await tabElement.click();
+    // Click on the tab using evaluate to bypass the sticky mobile navbar which blocks native clicks.
+    await this.page.evaluate(el => {
+      if (el instanceof HTMLElement) {
+        el.click();
+      }
+    }, tabElement);
 
     // Verify tab is active.
     if (tabName !== 'My Contributions') {
