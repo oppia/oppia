@@ -32,7 +32,7 @@ import {
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
-import AppConstants from 'assets/constants';
+import {AppConstants} from 'app.constants';
 
 class MockPlatformFeatureService {
   get status() {
