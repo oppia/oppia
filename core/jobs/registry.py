@@ -54,6 +54,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     collection_info_jobs,
     contributor_admin_stats_jobs,
     delete_duplicate_content_ids_jobs,
+    deprecated_interactions_audit_jobs,
     dummy_jobs,
     email_deletion_jobs,
     exp_end_state_normalization_jobs,
