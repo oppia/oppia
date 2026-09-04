@@ -165,6 +165,10 @@ describe('Translation Coordinator', function () {
       'English'
     );
 
+    await translationCoordinator.expectElementToBeVisible(
+      '.e2e-test-stats-table'
+    );
+
     // Add translation rights.
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
