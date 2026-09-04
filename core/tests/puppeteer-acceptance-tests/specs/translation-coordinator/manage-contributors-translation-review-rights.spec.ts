@@ -166,7 +166,7 @@ describe('Translation Coordinator', function () {
     );
 
     await translationCoordinator.expectElementToBeVisible(
-      '.e2e-test-stats-table'
+      '.e2e-test-no-data-message'
     );
 
     // Add translation rights.
