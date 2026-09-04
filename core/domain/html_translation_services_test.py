@@ -97,8 +97,8 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             source
         )
         expected_protected = (
-            '<span data-temp-comp-id="0" data-temp-attr-name="alt-with-value">A red car</span>'
-            '<span data-temp-comp-id="0" data-temp-attr-name="caption-with-value">Figure 1</span>'
+            '<span data-temp-attr-name="alt-with-value" data-temp-comp-id="0">A red car</span>'
+            '<span data-temp-attr-name="caption-with-value" data-temp-comp-id="0">Figure 1</span>'
             '<oppia-noninteractive-image filepath-with-value="img.png" data-temp-comp-id="0" translate="no">'
             '</oppia-noninteractive-image>'
         )
@@ -122,8 +122,8 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             source
         )
         expected_protected = (
-            '<span data-temp-comp-id="0" data-temp-attr-name="heading-with-value">Show</span>'
-            '<div data-temp-comp-id="0" data-temp-attr-name="content-with-value" data-temp-is-encoded="true"><p>Step 1</p></div>'
+            '<span data-temp-attr-name="heading-with-value" data-temp-comp-id="0">Show</span>'
+            '<div data-temp-attr-name="content-with-value" data-temp-comp-id="0" data-temp-is-encoded="true"><p>Step 1</p></div>'
             '<oppia-noninteractive-collapsible data-temp-comp-id="0" translate="no">'
             '</oppia-noninteractive-collapsible>'
         )
@@ -148,8 +148,8 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             source
         )
         expected_protected = (
-            '<span data-temp-comp-id="0" data-temp-attr-name="question-with-value">Q1</span>'
-            '<div data-temp-comp-id="0" data-temp-attr-name="answer-with-value" data-temp-is-encoded="true"><p>A1</p></div>'
+            '<span data-temp-attr-name="question-with-value" data-temp-comp-id="0">Q1</span>'
+            '<div data-temp-attr-name="answer-with-value" data-temp-comp-id="0" data-temp-is-encoded="true"><p>A1</p></div>'
             '<oppia-noninteractive-workedexample data-temp-comp-id="0" translate="no">'
             '</oppia-noninteractive-workedexample>'
         )
@@ -178,10 +178,10 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             source
         )
         expected_protected = (
-            '<span data-temp-comp-id="0" data-temp-attr-name="tab-title-0">Hint</span>'
-            '<div data-temp-comp-id="0" data-temp-attr-name="tab-content-0" data-temp-is-encoded="true"><p>Try</p></div>'
-            '<span data-temp-comp-id="0" data-temp-attr-name="tab-title-1">Hint 2</span>'
-            '<oppia-noninteractive-tabs data-temp-tab-count="2" data-temp-comp-id="0" translate="no">'
+            '<span data-temp-attr-name="tab-title-0" data-temp-comp-id="0">Hint</span>'
+            '<div data-temp-attr-name="tab-content-0" data-temp-comp-id="0" data-temp-is-encoded="true"><p>Try</p></div>'
+            '<span data-temp-attr-name="tab-title-1" data-temp-comp-id="0">Hint 2</span>'
+            '<oppia-noninteractive-tabs data-temp-comp-id="0" data-temp-tab-count="2" translate="no">'
             '</oppia-noninteractive-tabs>'
         )
         self.assertEqual(protected, expected_protected)

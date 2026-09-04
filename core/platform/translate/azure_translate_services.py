@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import http
 import logging
 import time
 
@@ -83,14 +84,14 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
                     timeout=self.REQUEST_TIMEOUT_SEC,
                 )
 
-                if response.status_code == requests.codes.ok:
+                if response.status_code == http.HTTPStatus.OK:
                     response_json = response.json()
                     return str(response_json[0]['translations'][0]['text'])
 
                 # Transient failure processing (Rate Limits / Server Outage).
                 if response.status_code in [
-                    requests.codes.too_many_requests,
-                    requests.codes.service_unavailable,
+                    http.HTTPStatus.TOO_MANY_REQUESTS,
+                    http.HTTPStatus.SERVICE_UNAVAILABLE,
                 ]:
                     logging.warning(
                         'Azure API returned status %s. Retrying in %s seconds...',
