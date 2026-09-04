@@ -1,0 +1,99 @@
+* { box-sizing: border-box; }
+
+.assessment-unavailable-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 16px;
+  position: fixed;
+  z-index: 1000;
+}
+
+.assessment-unavailable-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  max-width: 640px;
+  padding: 48px 56px;
+  text-align: center;
+  width: 100%;
+}
+
+.assessment-unavailable-title {
+  color: #2d2d2d;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 20px;
+}
+
+.assessment-unavailable-message {
+  color: #334e68;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.assessment-unavailable-note {
+  align-items: flex-start;
+  background: #d9eaf7;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  margin: 20px 0 8px;
+  padding: 14px 18px;
+  text-align: left;
+}
+
+.assessment-unavailable-note-icon {
+  align-items: center;
+  background: #6d93b8;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex: none;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 700;
+  height: 22px;
+  justify-content: center;
+  margin-top: 2px;
+  width: 22px;
+}
+
+.assessment-unavailable-note-text {
+  color: #334e68;
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.assessment-unavailable-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.assessment-unavailable-action-button {
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  min-width: 140px;
+  padding: 8px 20px;
+}
+
+.btn-primary.assessment-unavailable-action-button {
+  background: #0d6259;
+  border: 1px solid #0d6259;
+  color: #fff;
+}
+
+.btn-primary.assessment-unavailable-action-button:hover {
+  background: #0a4f48;
+}

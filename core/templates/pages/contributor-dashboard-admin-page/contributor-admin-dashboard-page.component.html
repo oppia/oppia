@@ -53,12 +53,22 @@
               Question<br>Reviewers
             </a>
           </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_COORDINATOR}" *ngIf="isTranslationCoordinator">
+            <a class="dashboard-tabs-text e2e-test-translation-coordinators-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_COORDINATOR)">
+              Translation<br>Coordinators
+            </a>
+          </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}" *ngIf="isQuestionCoordinator">
+            <a class="dashboard-tabs-text e2e-test-question-coordinators-tab" (click)="setActiveTab(TAB_NAME_QUESTION_COORDINATOR)">
+              Question<br>Coordinators
+            </a>
+          </li>
         </ul>
       </div>
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
-            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
               + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
             </button>
           </div>
@@ -122,7 +132,7 @@
       </div>
       <div class="filter-container">
         <div class="add-rights-button-container">
-          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
             + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
           </button>
         </div>

@@ -49,17 +49,42 @@
         </p>
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
-        <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
-        <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
-            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
+        <ng-container *ngIf="!isNewCreatorFeedbackTabEnabled()">
+          <p class="stat-description"
+            [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate">
+          </p>
+          <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
+              [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+              [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalOpenFeedback }}
-        </h2>
-        <h2 class="stat-value-without-rating"
-            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
-          {{ dashboardStats.totalOpenFeedback }}
-        </h2>
+          </h2>
+          <h2 class="stat-value-without-rating"
+              [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+              [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+            {{ dashboardStats.totalOpenFeedback }}
+          </h2>
+        </ng-container>
+        <div *ngIf="isNewCreatorFeedbackTabEnabled()"
+             class="oppia-feedback-status-breakdown">
+          <p class="stat-description"
+            [innerHTML]="'I18N_DASHBOARD_STATS_FEEDBACK' | translate">
+          </p>
+          <span>
+            {{ feedbackStatusCounts?.open || 0 }} Open
+          </span>
+          <span>
+            {{ feedbackStatusCounts?.fixed || 0 }} Fixed
+          </span>
+          <span>
+            {{ feedbackStatusCounts?.compliment || 0 }} Compliments
+          </span>
+          <span>
+            {{ feedbackStatusCounts?.not_actionable || 0 }} Not Actionable
+          </span>
+          <span>
+            {{ feedbackStatusCounts?.total || 0 }} Total
+          </span>
+        </div>
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
@@ -465,7 +490,7 @@
     margin-left: -5px;
   }
   .oppia-mat-card {
-    align-items: baseline;
+    align-items: stretch;
     display: flex;
   }
   .oppia-create-question {
@@ -955,5 +980,12 @@
     .mat-card {
      width: fit-content;
     }
+  }
+
+  .oppia-feedback-status-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
   }
 </style>

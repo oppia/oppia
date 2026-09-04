@@ -15,16 +15,15 @@ runs:
         key: ${{ runner.os }}-build-files-${{ inputs.prod-env != 'false' && 'prod' || 'dev' }}-${{ github.sha }}
         path: |
           /home/runner/work/oppia/oppia/build
-          /home/runner/work/oppia/oppia/webpack_bundles
           /home/runner/work/oppia/oppia/app.yaml
           /home/runner/work/oppia/oppia/assets/hashes.json
           /home/runner/work/oppia/oppia/dist
           /home/runner/work/oppia/oppia/third_party/generated
-    - name: Build Webpack (prod)
+    - name: Build (prod)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env != 'false'
       run: python -m scripts.build --prod_env
       shell: bash
-    - name: Build Webpack (dev)
+    - name: Build (dev)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env == 'false'
       run: python -c "from scripts import build; build.build_js_files(dev_mode=True)"
       shell: bash
