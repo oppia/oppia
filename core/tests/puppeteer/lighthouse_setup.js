@@ -788,13 +788,11 @@ const reloadAllInteractionsExploration = async function (browser, page) {
     const reloadButtons = await page.$$(reloadExplorationButton);
     for (let i = 0; i < reloadButtons.length; i++) {
       const title = await page.evaluate(
-        (el, sel) =>
-          el
-            .closest(sel)
-            .querySelector(reloadExplorationTitle)
-            .textContent.trim(),
+        (el, sel, titleSelector) =>
+          el.closest(sel).querySelector(titleSelector).textContent.trim(),
         reloadButtons[i],
-        reloadExplorationRow
+        reloadExplorationRow,
+        reloadExplorationTitle
       );
       if (title === 'all_interactions') {
         await reloadButtons[i].click();
