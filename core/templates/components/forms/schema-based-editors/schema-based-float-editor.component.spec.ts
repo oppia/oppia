@@ -88,6 +88,7 @@ describe('Schema based float editor component', function () {
   it('should set component properties on initialization', fakeAsync(() => {
     component.uiConfig = {
       checkRequireNonnegativeInput: true,
+      checkAllowExponentialNotation: false,
     };
     component.ngOnInit();
     tick(50);
@@ -99,6 +100,7 @@ describe('Schema based float editor component', function () {
     expect(component.localValue).toBe(0.0);
     expect(component.localStringValue).toBe('');
     expect(component.checkRequireNonnegativeInputValue).toBe(true);
+    expect(component.checkAllowExponentialNotationValue).toBe(false);
     expect(component.minValue).toBe(0);
 
     tick();
@@ -110,6 +112,14 @@ describe('Schema based float editor component', function () {
 
     expect(component.localValue).toBe(13);
     expect(component.onChange).toEqual(mockFunction);
+  }));
+
+  it('should allow exponential notation by default when uiConfig is missing', fakeAsync(() => {
+    component.ngOnInit();
+    tick(50);
+
+    expect(component.checkRequireNonnegativeInputValue).toBe(false);
+    expect(component.checkAllowExponentialNotationValue).toBe(true);
   }));
 
   it('should call input focus when user selects the input field', () => {
@@ -201,7 +211,10 @@ describe('Schema based float editor component', function () {
   }));
 
   it('should validate value', () => {
-    component.uiConfig = {checkRequireNonnegativeInput: false};
+    component.uiConfig = {
+      checkRequireNonnegativeInput: false,
+      checkAllowExponentialNotation: true,
+    };
 
     expect(component.validate(new FormControl(null))).toEqual({
       error: 'invalid',
@@ -242,6 +255,7 @@ describe('Schema based float editor component', function () {
     expect(component.localValue).toEqual(-12);
     expect(component.errorStringI18nKey).toEqual(null);
 
+    component.checkAllowExponentialNotationValue = true;
     component.localStringValue = '-12e1';
     component.parseInput();
     expect(component.localValue).toEqual(-120);
