@@ -493,6 +493,9 @@ const feedbackDetailPageLearnerAnswerlabel =
 const feedbackDetailPageLearnerAnswerValue =
   '.e2e-test-feedback-detail-learner-answer-value';
 const feedbackDetailPageUserMessage = '.e2e-test-feedback-detail-user-message';
+const feedbackdetailScreensshotPreview =
+  '.e2e-test-feedback-detail-screenshot-preview';
+const feedbackdetailScreensshotBtn = '.e2e-test-feedback-detail-screenshot-btn';
 
 interface FeedbackTableRowExpectation {
   description: string;
@@ -5088,6 +5091,18 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  async clickApplyButton(): Promise<void> {
+    await this.expectElementToBeClickable(feedbackFilterApplyButton, true);
+    await this.clickOnElementWithSelector(feedbackFilterApplyButton);
+    showMessage('Clicked Apply button in the Feedback Filter options');
+  }
+
+  async clickClearButton(): Promise<void> {
+    await this.expectElementToBeClickable(feedbackFilterClearButton, true);
+    await this.clickOnElementWithSelector(feedbackFilterClearButton);
+    showMessage('Clicked Clear button in the Feedback Filter options');
+  }
+
   async verifyFeedbackDetailPageLessonContextSection(
     expId: string,
     version: string,
@@ -5137,6 +5152,15 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  async verifyFeedbackDetailScreenshotSection(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackdetailScreensshotPreview, true);
+    await this.expectElementToBeClickable(feedbackdetailScreensshotBtn, true);
+    await this.expectTextContentToBe(
+      feedbackdetailScreensshotBtn,
+      'Open screenshot in new tab'
+    );
+  }
+
   async clickReportedLessonVersionLink(
     expId: string,
     version: string
@@ -5159,8 +5183,8 @@ export class LoggedInUser extends BaseUser {
     );
 
     await reportedLessonPage.close();
-
     await this.page.bringToFront();
+    showMessage('switched back to default page');
   }
 
   async clickReportedLessonStateEditorLink(
@@ -5178,24 +5202,27 @@ export class LoggedInUser extends BaseUser {
     }
 
     await stateEditorPage.bringToFront();
-    await this.waitForNetworkIdle();
+    await stateEditorPage.waitForNetworkIdle();
 
-    showMessage('Switched to stateEditorPage');
-    await this.clickOnElementWithSelector('.e2e-test-main-tab');
+    showMessage('Switched to stateEditorPage' + stateEditorPage.url());
 
     await this.expectPageURLToContain(
-      'create/' + expId + '/#/gui/' + stateName,
+      'create/' + expId + '#/gui/' + stateName,
       stateEditorPage
     );
 
     await stateEditorPage.close();
-
     await this.page.bringToFront();
+    showMessage('switched back to default page');
   }
 
   async selectCreatorFeedbackType(feedbackType: string): Promise<void> {
     await this.select(feedbackFilterCreatorFeedbackType, feedbackType);
-    await this.expectElementValue(feedbackFilterCreatorFeedbackType, 'report');
+
+    await this.expectElementValue(
+      feedbackFilterCreatorFeedbackType,
+      feedbackType
+    );
   }
 
   async verifyFeedbackDetailPageUserFeedbackSection(
@@ -5224,9 +5251,9 @@ export class LoggedInUser extends BaseUser {
         feedbackDetailPageRepliesSection,
         false
       );
-      await this.expectTextContentToBe(
+      await this.expectElementToBeVisible(
         feedbackDetailPageEmptyReplyText,
-        'No replies yet.'
+        false
       );
     }
   }
@@ -5236,23 +5263,37 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
   }
 
-  async verifyFeedbackDetailPageActionsSection(): Promise<void> {
-    await this.expectTextContentToBe(
+  async verifyFeedbackDetailPageActionsSection(
+    shouldShowReplyOptions: boolean
+  ): Promise<void> {
+    await this.expectTextContentToContain(
       feedbackDetailPageActionsSection,
       'Actions'
     );
-    await this.expectTextContentToContain(
-      feedbackDetailPageActionLabel,
-      'Reply to reporter'
-    );
-    await this.expectElementPlaceholderToBe(
-      feedbackDetailPageActionReplyTextarea,
-      'Write a reply the reporter will see...'
-    );
-    await this.expectElementToBeClickable(
-      feedbackDetailPageActionSubmitButton,
-      false
-    );
+    if (shouldShowReplyOptions) {
+      await this.expectTextContentToBe(
+        feedbackDetailPageActionLabel,
+        'Reply to reporter'
+      );
+      await this.expectElementPlaceholderToBe(
+        feedbackDetailPageActionReplyTextarea,
+        'Write a reply the reporter will see...'
+      );
+      await this.expectElementToBeClickable(
+        feedbackDetailPageActionSubmitButton,
+        false
+      );
+    } else {
+      await this.expectElementToBeVisible(feedbackDetailPageActionLabel, false);
+      await this.expectElementToBeVisible(
+        feedbackDetailPageActionReplyTextarea,
+        false
+      );
+      await this.expectElementToBeVisible(
+        feedbackDetailPageActionSubmitButton,
+        false
+      );
+    }
   }
 
   async verifyMySuggestionsFeedbackDetailView(

@@ -199,7 +199,7 @@ describe('Logged-in User', function () {
       'Question 2 is confusing.'
     );
     await lessonCreator.verifyFeedbackDetailPageRepliesSection(false);
-    await lessonCreator.verifyFeedbackDetailPageActionsSection();
+    await lessonCreator.verifyFeedbackDetailPageActionsSection(true);
 
     await lessonCreator.clickFeedbackDetailBackButton();
     await lessonCreator.expectScreenshotToMatch(
@@ -207,9 +207,56 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    await lessonCreator.selectCreatorFeedbackType('Report');
+    await lessonCreator.selectCreatorFeedbackType('report');
+    await lessonCreator.clickApplyButton();
+    await lessonCreator.expectScreenshotToMatch(
+      'reportFeedbackList',
+      __dirname
+    );
     await lessonCreator.clickOnFeedbackListEntryWithDescription(
       'There is a typo in the question text.'
+    );
+
+    await lessonCreator.expectScreenshotToMatch(
+      'reportEntryDetailedView',
+      __dirname
+    );
+    await lessonCreator.verifyExplorationFeedbackDetailView(
+      'report',
+      'Open',
+      'Typo'
+    );
+    await lessonCreator.verifyFeedbackDetailPageDetailsSection(
+      statusLabels[FeedbackStatus.OPEN],
+      'Lesson',
+      'Web',
+      'typo',
+      expId
+    );
+    await lessonCreator.verifyFeedbackDetailPageLessonContextSection(
+      expId,
+      '4',
+      'Introduction',
+      '0',
+      '1'
+    );
+
+    await lessonCreator.verifyFeedbackDetailScreenshotSection();
+
+    await lessonCreator.verifyFeedbackDetailPageUserFeedbackSection(
+      'There is a typo in the question text.'
+    );
+    await lessonCreator.verifyFeedbackDetailPageRepliesSection(false);
+  });
+
+  it('should be able to change the status of feedbacks', async function () {
+    await lessonCreator.clickClearButton();
+    await lessonCreator.clickApplyButton();
+
+    showMessage('Back to Default Feedback List');
+
+    await lessonCreator.clickOnFeedbackListEntryWithDescription(
+      'Question 2 is confusing.'
     );
   });
 
