@@ -455,9 +455,8 @@ const contributorIconPrefix = `${contributorsContainerSelector} .contributor-`;
 const devModeLabelSelector = '.e2e-test-dev-mode';
 
 // Home Page Selectors.
-const homePageHeadingSelector = 
-  '.oppia-splash-page .e2e-test-home-page-title';
-const browseLessonButtonSelector = 
+const homePageHeadingSelector = '.oppia-splash-page .e2e-test-home-page-title';
+const browseLessonButtonSelector =
   '.oppia-splash-page .e2e-test-explore-lessons-btn';
 const audioSliderSelector = 'oppia-audio-slider mat-slider';
 

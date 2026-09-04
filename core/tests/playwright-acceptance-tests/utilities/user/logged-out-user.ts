@@ -194,9 +194,8 @@ const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
 
 // Home Page Selectors.
-const homePageHeadingSelector = 
-  '.oppia-splash-page .e2e-test-home-page-title';
-const browseLessonButtonSelector = 
+const homePageHeadingSelector = '.oppia-splash-page .e2e-test-home-page-title';
+const browseLessonButtonSelector =
   '.oppia-splash-page .e2e-test-explore-lessons-btn';
 
 // Topic page.
