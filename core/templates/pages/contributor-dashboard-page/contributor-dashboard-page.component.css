@@ -273,6 +273,7 @@ button.oppia-autofocus:focus {
     position: static;
   }
   .oppia-opportunities-tabs {
+    padding-bottom: 10px;
     position: relative;
   }
   .oppia-opportunities-tabs-explanation {
@@ -280,9 +281,6 @@ button.oppia-autofocus:focus {
   }
   .oppia-opportunities-tabs-explanation-before {
     font-size: 20px;
-  }
-  .oppia-opportunities-tabs {
-    padding-bottom: 10px;
   }
   .oppia-user-and-rights {
     border-bottom: 1px solid rgba(151, 151, 151, 0.5);

@@ -212,7 +212,10 @@ export class ContentTranslationManagerService {
   }
 
   preloadConceptCards(languageCode: string): void {
-    if (!this.audioPreloaderService.exploration) {
+    if (
+      !this.audioPreloaderService.exploration ||
+      !this.audioPreloaderService.exploration.states
+    ) {
       return;
     }
     const skillIds: string[] = [];
