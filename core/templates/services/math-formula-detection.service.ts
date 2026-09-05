@@ -33,11 +33,16 @@ export class MathFormulaDetectionService {
       return htmlString.some(s => this.isFormulaAsText(s));
     }
 
-    if (!htmlString || htmlString.includes('oppia-noninteractive-math')) {
+    if (!htmlString) {
       return false;
     }
 
-    const textWithNewlines = htmlString
+    const stringWithoutMathComponents = htmlString.replace(
+      /<oppia-noninteractive-math[\s\S]*?<\/oppia-noninteractive-math>/gi,
+      ''
+    );
+
+    const textWithNewlines = stringWithoutMathComponents
       .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
       .replace(/<br\s*[\/]?>/gi, '\n')
       .replace(/<[^>]*>/g, '')

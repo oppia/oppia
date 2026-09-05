@@ -57,6 +57,7 @@ import {ConfirmTranslationExitModalComponent} from 'components/translation-sugge
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 enum ExpansionTabType {
   CONTENT,
@@ -182,6 +183,7 @@ describe('Translation Modal Component', () => {
         WrapTextWithEllipsisPipe,
         ConfirmTranslationExitModalComponent,
         ConfirmFormulaAsTextModalComponent,
+        MockTranslatePipe,
       ],
       providers: [
         NgbActiveModal,
@@ -1339,6 +1341,8 @@ describe('Translation Modal Component', () => {
             TranslationModalComponent,
             WrapTextWithEllipsisPipe,
             ConfirmTranslationExitModalComponent,
+            ConfirmFormulaAsTextModalComponent,
+            MockTranslatePipe,
           ],
           providers: [
             NgbActiveModal,

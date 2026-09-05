@@ -57,6 +57,7 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 import './translation-modal.component.css';
 
@@ -104,7 +105,7 @@ export interface ModifyTranslationOpportunity {
   subheading: string;
   textToTranslate: string;
   currentContentTranslation: TranslatedContent;
-  interactionId?: string | null;
+  interactionId?: InteractionSpecsKey | null;
 }
 export interface HTMLSchema {
   type: string;
@@ -202,7 +203,7 @@ export class TranslationModalComponent {
     private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
-    private translationLanguageService: TranslationLanguageService,
+    private readonly translationLanguageService: TranslationLanguageService,
     private mathFormulaDetectionService: MathFormulaDetectionService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -428,12 +429,12 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId,
+      interactionId as InteractionSpecsKey,
       this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
-      interactionId
+      interactionId as InteractionSpecsKey
     );
     this.updateTranslationErrors();
   }
@@ -542,7 +543,7 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null,
+    interactionId?: InteractionSpecsKey | null,
     contentId?: string | null
   ): string {
     if (!contentType) {
@@ -586,7 +587,7 @@ export class TranslationModalComponent {
 
   getRuleDescription(
     ruleType?: string | null,
-    interactionId?: string | null
+    interactionId?: InteractionSpecsKey | null
   ): string {
     if (!ruleType || !interactionId) {
       return '';

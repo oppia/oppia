@@ -103,16 +103,11 @@
            [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
         <div *ngIf="!mathWarningIsMinimized">
           <i class="fas fa-exclamation-triangle mr-1"></i>
-          <span>
-            <strong>Warning:</strong>
-            Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using<br class="d-none d-md-inline">
-            the <strong>Math Formula (x²)</strong>
-            tool from the editor toolbar above.
-          </span>
+          <span [innerHTML]="'I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION' | translate"></span>
         </div>
         <div *ngIf="mathWarningIsMinimized">
           <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
-          <span>&nbsp;Math expression warning</span>
+          <span [innerHTML]="'I18N_WARNING_MATH_EXPRESSION_MINIMIZED' | translate"></span>
         </div>
         <i class="fas"
            [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"

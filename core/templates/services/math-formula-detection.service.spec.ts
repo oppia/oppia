@@ -53,6 +53,12 @@ describe('Math Formula Detection Service', () => {
       expect(mathFormulaDetectionService.isFormulaAsText(mathHtml)).toBeFalse();
     });
 
+    it('should return true when there is a plain text formula alongside a math component', () => {
+      const mathHtml =
+        '<oppia-noninteractive-math></oppia-noninteractive-math> <p>3 + 6 = 9</p>';
+      expect(mathFormulaDetectionService.isFormulaAsText(mathHtml)).toBeTrue();
+    });
+
     it('should return true when formula is inside an array of strings', () => {
       expect(
         mathFormulaDetectionService.isFormulaAsText([

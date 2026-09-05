@@ -21,6 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmFormulaAsTextModalComponent} from './confirm-formula-as-text-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('Confirm Formula As Text Modal Component with NgbActiveModal', () => {
   let component: ConfirmFormulaAsTextModalComponent;
@@ -29,7 +30,7 @@ describe('Confirm Formula As Text Modal Component with NgbActiveModal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmFormulaAsTextModalComponent],
+      declarations: [ConfirmFormulaAsTextModalComponent, MockTranslatePipe],
       providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -74,7 +75,7 @@ describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () =>
       subscribe: () => {},
     });
     TestBed.configureTestingModule({
-      declarations: [ConfirmFormulaAsTextModalComponent],
+      declarations: [ConfirmFormulaAsTextModalComponent, MockTranslatePipe],
       providers: [
         {provide: MatBottomSheetRef, useValue: bottomSheetRef},
         {provide: NgbActiveModal, useValue: null},

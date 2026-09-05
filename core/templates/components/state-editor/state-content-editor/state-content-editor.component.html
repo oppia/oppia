@@ -64,15 +64,11 @@
        [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
     <div *ngIf="!mathWarningIsMinimized">
       <i class="fas fa-exclamation-triangle mr-1"></i>
-      <span>
-        This content contains plain-text math expressions. Consider using<br class="d-none d-md-inline">
-        the <strong>Math Formula (x²)</strong>
-        component to ensure correct rendering across all languages.
-      </span>
+      <span [innerHTML]="'I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION' | translate"></span>
     </div>
     <div *ngIf="mathWarningIsMinimized">
       <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
-      <span>&nbsp;Math expression warning</span>
+      <span [innerHTML]="'I18N_WARNING_MATH_EXPRESSION_MINIMIZED' | translate"></span>
     </div>
     <i class="fas"
        [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"
