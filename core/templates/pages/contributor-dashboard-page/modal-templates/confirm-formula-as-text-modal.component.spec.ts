@@ -22,7 +22,7 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmFormulaAsTextModalComponent} from './confirm-formula-as-text-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 
 describe('Confirm Formula As Text Modal Component with NgbActiveModal', () => {
   let component: ConfirmFormulaAsTextModalComponent;
@@ -72,9 +72,9 @@ describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () =>
       'dismiss',
       'keydownEvents',
     ]);
-    bottomSheetRef.keydownEvents.and.returnValue({
-      subscribe: () => new Subscription(),
-    });
+    bottomSheetRef.keydownEvents.and.returnValue(
+      new Subject<KeyboardEvent>().asObservable()
+    );
     TestBed.configureTestingModule({
       declarations: [ConfirmFormulaAsTextModalComponent, MockTranslatePipe],
       providers: [
