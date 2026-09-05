@@ -94,8 +94,8 @@ def test_python_version() -> None:
         Exception. The Python version does not match the expected prefix.
     """
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.10.16':
-        print('Please use Python 3.10.16. Exiting...')
+    if running_python_version != '3.12.13':
+        print('Please use Python 3.12.13. Exiting...')
         raise Exception('No suitable python version found.')
 
 

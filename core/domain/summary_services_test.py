@@ -272,8 +272,9 @@ class ExplorationDisplayableSummariesTest(
             'translated_metadata_fields': [],
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
-        self.assertDictContainsSubset(
-            expected_summary, displayable_summaries[0]
+        self.assertEqual(
+            displayable_summaries[0],
+            displayable_summaries[0] | expected_summary,
         )
 
     def test_get_displayable_exp_summary_dicts_matching_ids_with_invalid_exp_id(
@@ -535,13 +536,14 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         }
 
         self.assertEqual(len(library_groups), 1)
-        self.assertDictContainsSubset(expected_group, library_groups[0])
+        self.assertEqual(library_groups[0], library_groups[0] | expected_group)
         self.assertEqual(len(library_groups[0]['activity_summary_dicts']), 1)
         actual_exploration_summary_dict = library_groups[0][
             'activity_summary_dicts'
         ][0]
-        self.assertDictContainsSubset(
-            expected_exploration_summary_dict, (actual_exploration_summary_dict)
+        self.assertEqual(
+            actual_exploration_summary_dict,
+            actual_exploration_summary_dict | expected_exploration_summary_dict,
         )
 
 
@@ -605,8 +607,10 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            featured_activity_summaries[0],
+            featured_activity_summaries[0]
+            | {
                 'status': 'public',
                 'thumbnail_bg_color': '#cc4b00',
                 'community_owned': False,
@@ -620,7 +624,6 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
                 'num_views': 0,
                 'objective': 'An objective',
             },
-            featured_activity_summaries[0],
         )
 
     def test_language_code_filter(self) -> None:
@@ -642,12 +645,13 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            featured_activity_summaries[0],
+            featured_activity_summaries[0]
+            | {
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
             },
-            featured_activity_summaries[0],
         )
 
         featured_activity_summaries = (
@@ -656,12 +660,13 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            featured_activity_summaries[0],
+            featured_activity_summaries[0]
+            | {
                 'language_code': self.LANGUAGE_CODE_ES,
                 'id': self.EXP_ID_1,
             },
-            featured_activity_summaries[0],
         )
 
         featured_activity_summaries = (
@@ -670,19 +675,21 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(featured_activity_summaries), 2)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            featured_activity_summaries[0],
+            featured_activity_summaries[0]
+            | {
                 'language_code': self.LANGUAGE_CODE_ES,
                 'id': self.EXP_ID_1,
             },
-            featured_activity_summaries[0],
         )
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            featured_activity_summaries[1],
+            featured_activity_summaries[1]
+            | {
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
             },
-            featured_activity_summaries[1],
         )
 
         featured_activity_summaries = (
@@ -1024,8 +1031,9 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             'objective': 'An objective',
         }
 
-        self.assertDictContainsSubset(
-            expected_summary, top_rated_exploration_summaries[0]
+        self.assertEqual(
+            top_rated_exploration_summaries[0],
+            top_rated_exploration_summaries[0] | expected_summary,
         )
 
         expected_ordering = [
@@ -1073,8 +1081,9 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             'num_views': 0,
             'objective': 'An objective',
         }
-        self.assertDictContainsSubset(
-            expected_summary, top_rated_exploration_summaries[0]
+        self.assertEqual(
+            top_rated_exploration_summaries[0],
+            top_rated_exploration_summaries[0] | expected_summary,
         )
 
         expected_ordering = [self.EXP_ID_2]
@@ -1189,14 +1198,17 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'objective': 'An objective',
         }
 
-        self.assertDictContainsSubset(
-            test_summary_3, recently_published_exploration_summaries[0]
+        self.assertEqual(
+            recently_published_exploration_summaries[0],
+            recently_published_exploration_summaries[0] | test_summary_3,
         )
-        self.assertDictContainsSubset(
-            test_summary_1, recently_published_exploration_summaries[1]
+        self.assertEqual(
+            recently_published_exploration_summaries[1],
+            recently_published_exploration_summaries[1] | test_summary_1,
         )
-        self.assertDictContainsSubset(
-            test_summary_2, recently_published_exploration_summaries[2]
+        self.assertEqual(
+            recently_published_exploration_summaries[2],
+            recently_published_exploration_summaries[2] | test_summary_2,
         )
 
         # Test that editing an exploration does not change its
@@ -1225,8 +1237,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.assertEqual(
             recently_published_exploration_summaries[1]['title'], 'New title'
         )
-        self.assertDictContainsSubset(
-            test_summary_3, recently_published_exploration_summaries[0]
+        self.assertEqual(
+            recently_published_exploration_summaries[0],
+            recently_published_exploration_summaries[0] | test_summary_3,
         )
 
     def test_get_recently_published_exp_summary_dicts_with_display_in_language_code(

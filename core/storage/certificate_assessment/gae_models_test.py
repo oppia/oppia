@@ -285,7 +285,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_retrieve_lifecycle(self) -> None:
-        started_at = datetime.datetime.utcnow()
+        started_at = utils.get_current_utc_datetime()
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
             certificate_id='cert_abc123',
@@ -342,7 +342,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data=self._get_sample_attempt_data(),
             version_data=self._get_sample_version_data(),
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -382,7 +382,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
                 attempt_index=1,
                 attempt_data=self._get_sample_attempt_data(),
                 version_data=self._get_sample_version_data(),
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )
@@ -425,7 +425,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
                     'question_versions': {'question_id_1': 1},
                     'question_topic_links': {'question_id_1': ['topic_id_101']},
                 },
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )
@@ -470,7 +470,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
                     'question_versions': {'question_id_1': 1},
                     'question_topic_links': {'question_id_1': ['topic_id_101']},
                 },
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )
@@ -520,7 +520,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
                     'question_versions': {'question_id_1': 1},
                     'question_topic_links': {'question_id_1': ['topic_id_101']},
                 },
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )

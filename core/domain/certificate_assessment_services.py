@@ -591,7 +591,8 @@ def start_certificate_assessment_attempt(
                 )
             )
             remaining_cooldown = cooldown - (
-                datetime.datetime.utcnow() - most_recent_attempt.started_at
+                utils.get_current_utc_datetime()
+                - most_recent_attempt.started_at
             )
             if remaining_cooldown > datetime.timedelta(seconds=0):
                 # Round up so the reported wait never lapses before the actual
@@ -619,7 +620,7 @@ def start_certificate_assessment_attempt(
                 ],
                 version_data,
             ),
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -827,7 +828,7 @@ def submit_certificate_assessment_attempt(
             if question_versions
             else 0.0
         )
-        attempt_model.finished_at = datetime.datetime.utcnow()
+        attempt_model.finished_at = utils.get_current_utc_datetime()
         attempt_model.is_submitted = True
         attempt = _attempt_model_to_domain(attempt_model)
         attempt.validate()

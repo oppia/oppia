@@ -35,7 +35,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
+from core import feconf, utils
 from core.domain import fs_services
 from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
@@ -80,11 +80,13 @@ class PrepareWebFeedbackRetentionTestJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             if model.status == feconf.STATUS_CHOICES_OPEN:
                 model.created_on = (
-                    datetime.datetime.utcnow() - datetime.timedelta(days=366)
+                    utils.get_current_utc_datetime()
+                    - datetime.timedelta(days=366)
                 )
             else:
                 model.created_on = (
-                    datetime.datetime.utcnow() - datetime.timedelta(days=181)
+                    utils.get_current_utc_datetime()
+                    - datetime.timedelta(days=181)
                 )
 
         return model
@@ -96,8 +98,8 @@ class PrepareWebFeedbackRetentionTestJob(base_jobs.JobBase):
         """Makes platform feedback eligible for cleanup."""
 
         with datastore_services.get_ndb_context():
-            model.created_on = datetime.datetime.utcnow() - datetime.timedelta(
-                days=91
+            model.created_on = (
+                utils.get_current_utc_datetime() - datetime.timedelta(days=91)
             )
 
         return model

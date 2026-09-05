@@ -196,7 +196,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_external_script_call() -> None:
             pass
 
-        def mock_mkdir(unused_path: str) -> None:
+        def mock_mkdir(unused_path: str, unused_mode: int = 0o777) -> None:
             pass
 
         def mock_copytree(unused_src: str, unused_dst: str) -> None:
@@ -532,12 +532,12 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro']
         )
-        self.version_info_py310_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=10, micro=16)
+        self.version_info_py3_12_13_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=12, micro=13)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py310_swap:
+        with self.version_info_py3_12_13_swap:
             install_third_party_libs.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(

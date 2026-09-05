@@ -559,7 +559,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'next_subtopic_dict': expected_next_subtopic_dict,
             'prev_subtopic_dict': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
@@ -599,7 +599,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'next_subtopic_dict': expected_next_subtopic_dict,
             'prev_subtopic_dict': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
@@ -639,7 +639,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'next_subtopic_dict': None,
             'prev_subtopic_dict': expected_prev_subtopic_dict,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_get_for_last_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
@@ -672,7 +672,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'next_subtopic_dict': None,
             'prev_subtopic_dict': expected_prev_subtopic_dict,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_cannot_get_with_unpublished_topic(self) -> None:
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
