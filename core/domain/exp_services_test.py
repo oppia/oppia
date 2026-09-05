@@ -705,6 +705,16 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exp_services.delete_explorations(self.owner_id, [])
         self.process_and_flush_pending_tasks()
 
+    def test_delete_explorations_regenerates_contributor_stats(self) -> None:
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
     def test_soft_deletion_of_multiple_explorations(self) -> None:
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
