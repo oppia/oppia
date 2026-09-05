@@ -493,7 +493,7 @@ def managed_ng_build(
     """
     compiler_args = [common.NG_BIN_PATH, 'build']
     if use_prod_env:
-        compiler_args.append('--prod')
+        compiler_args.append('--configuration production')
     if watch_mode:
         compiler_args.append('--watch')
     if source_maps:

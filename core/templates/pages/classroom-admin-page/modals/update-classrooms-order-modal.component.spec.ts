@@ -58,9 +58,11 @@ describe('UpdateClassroomsOrderModalComponent', () => {
       {classroom_id: '3', classroom_name: 'History', classroom_index: 2},
     ];
 
-    const dropEvent = {previousIndex: 0, currentIndex: 2} as CdkDragDrop<
-      classroomDisplayInfo[]
-    >;
+    const dropEvent = {
+      previousIndex: 0,
+      currentIndex: 2,
+      dropPoint: {x: 0, y: 0},
+    } as CdkDragDrop<classroomDisplayInfo[]>;
     component.drop(dropEvent);
 
     expect(component.classroomIdToClassroomNameIndex).toEqual([

@@ -109,6 +109,7 @@ describe('Drag and drop sort input interactive component', () => {
         currentIndex: currentIndex,
         isPointerOverContainer: true,
         distance: {x: 0, y: 0},
+        dropPoint: {x: 0, y: 0},
       } as CdkDragDrop<T[], T[]>;
     }
 
