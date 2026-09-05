@@ -35,7 +35,6 @@ from core.domain import (
     question_services,
     rights_domain,
     rights_manager,
-    search_services,
     state_domain,
     stats_domain,
     stats_services,
@@ -751,7 +750,6 @@ class ExplorationModeratorRightsHandler(
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
-        search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
         # Send an email to the all owners of the exploration notifying them

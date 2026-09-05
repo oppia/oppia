@@ -50,7 +50,6 @@ from core.domain import (
     recommendations_services,
     rights_manager,
     role_services,
-    search_services,
     skill_domain,
     skill_fetchers,
     skill_services,
@@ -269,7 +268,6 @@ class AdminHandler(
                         'reload_collection',
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
-                        'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -283,9 +281,6 @@ class AdminHandler(
                         'rollback_exploration_to_safe_state',
                     ],
                 },
-                # TODO(#13331): Remove default_value when it is confirmed that,
-                # for clearing the search indices of exploration & collection
-                # 'action' field must be provided in the payload.
                 'default_value': None,
             },
             'exploration_id': {
@@ -547,10 +542,6 @@ class AdminHandler(
                         ' action is generate_dummy_blog_post.'
                     )
                 self._load_dummy_blog_post(blog_post_title)
-            elif action == 'clear_search_index':
-                search_services.clear_collection_search_index()
-                search_services.clear_exploration_search_index()
-                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':

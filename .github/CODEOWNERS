@@ -247,7 +247,6 @@
 /core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
-/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
@@ -417,11 +416,8 @@
 # Library page.
 /core/controllers/library*.py @oppia/lace-backend-reviewers
 /core/domain/recommendations*.py @oppia/lace-backend-reviewers
-/core/domain/search_services*.py @oppia/lace-backend-reviewers
 /core/templates/pages/library-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/construct-translation-ids.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Navigation bar project.

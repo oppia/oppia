@@ -30,13 +30,13 @@ from core.domain import (
     exp_services,
     rights_domain,
     rights_manager,
-    search_services,
     stats_services,
     translation_domain,
     translation_fetchers,
     user_domain,
     user_services,
 )
+from core.platform import models
 
 from typing import (
     Callable,
@@ -52,7 +52,17 @@ from typing import (
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        collection_models,
+        datastore_services,
+        exp_models,
+        translation_models,
+    )
+
+(collection_models, exp_models) = models.Registry.import_models(
+    [models.Names.COLLECTION, models.Names.EXPLORATION]
+)
+datastore_services = models.Registry.import_datastore_services()
 
 
 class DisplayableCollectionSummaryDict(TypedDict):
@@ -389,40 +399,6 @@ def get_displayable_collection_summary_dicts_matching_ids(
     for collection_summary in collection_summaries_with_none:
         collection_summaries.append(collection_summary)
     return _get_displayable_collection_summary_dicts(collection_summaries)
-
-
-def get_exp_metadata_dicts_matching_query(
-    query_string: str,
-    search_offset: Optional[int],
-    user: user_domain.UserActionsInfo,
-) -> Tuple[List[exp_domain.ExplorationSummaryMetadataDict], Optional[int]]:
-    """Given a query string and a search offset, returns a list of exploration
-    metadata dicts that satisfy the search query.
-
-    Args:
-        query_string: str. The search query for which the search is to be
-            performed.
-        search_offset: int or None. The offset location to start the search
-            from. If None, the returned values are from the beginning
-            of the results list.
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-
-    Returns:
-        2-tuple of (exploration_list, new_search_offset). Where:
-            - exploration_list list(dict). A list of metadata dicts for
-                explorations matching the query.
-            - new_search_offset (int). New search offset location.
-    """
-    exp_ids, new_search_offset = (
-        exp_services.get_exploration_ids_matching_query(
-            query_string, [], [], offset=search_offset
-        )
-    )
-
-    exploration_list = get_exploration_metadata_dicts(exp_ids, user)
-
-    return exploration_list, new_search_offset
 
 
 def get_exploration_metadata_dicts(
@@ -858,75 +834,98 @@ def get_library_groups(
             - full_results_url: str. The URL to the corresponding "full results"
                 page.
     """
-    # Collect all collection ids so that the summary details can be retrieved
-    # with a single get_multi() call.
-    all_collection_ids = []
-    header_id_to_collection_ids = {}
-    for group in _LIBRARY_INDEX_GROUPS:
-        collection_ids = search_services.search_collections(
-            '', group['search_categories'], language_codes, 8
-        )[0]
-        header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
-        all_collection_ids += collection_ids
-
-    collection_summaries = [
-        summary
-        for summary in collection_services.get_collection_summaries_matching_ids(
-            all_collection_ids
-        )
-        if summary is not None
-    ]
-    collection_summary_dicts = {
-        summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_collection_summary_dicts(
-            collection_summaries
-        )
-    }
-
-    # Collect all exp ids so that the summary details can be retrieved with a
-    # single get_multi() call.
-    all_exp_ids = []
-    header_to_exp_ids = {}
-    for group in _LIBRARY_INDEX_GROUPS:
-        exp_ids = search_services.search_explorations(
-            '', group['search_categories'], language_codes, 8
-        )[0]
-        header_to_exp_ids[group['header_i18n_id']] = exp_ids
-        all_exp_ids += exp_ids
-
-    exp_summaries = [
-        summary
-        for summary in exp_fetchers.get_exploration_summaries_matching_ids(
-            all_exp_ids
-        )
-        if summary is not None
-    ]
-
-    exp_summary_dicts = {
-        summary_dict['id']: summary_dict
-        for summary_dict in get_displayable_exp_summary_dicts(
-            exp_summaries, display_in_language_code=display_in_language_code
-        )
-    }
-
     results: List[LibraryGroupDict] = []
     for group in _LIBRARY_INDEX_GROUPS:
-        summary_dicts: Sequence[DisplayableSummaryDictsType] = []
-        collection_ids_to_display = header_id_to_collection_ids[
-            group['header_i18n_id']
-        ]
-        summary_dicts = [
-            collection_summary_dicts[collection_id]
-            for collection_id in collection_ids_to_display
-            if collection_id in collection_summary_dicts
-        ]
+        summary_dicts: List[DisplayableSummaryDictsType] = []
 
-        exp_ids_to_display = header_to_exp_ids[group['header_i18n_id']]
-        summary_dicts += [
-            exp_summary_dicts[exp_id]
-            for exp_id in exp_ids_to_display
-            if exp_id in exp_summary_dicts
+        # Query collections from the datastore by category and language.
+        collection_query = (
+            collection_models.CollectionSummaryModel.query()
+            .filter(
+                collection_models.CollectionSummaryModel.status
+                == constants.ACTIVITY_STATUS_PUBLIC
+            )
+            .filter(
+                collection_models.CollectionSummaryModel.deleted  # pylint: disable=singleton-comparison
+                == False
+            )
+            .filter(
+                datastore_services.any_of(
+                    *[
+                        collection_models.CollectionSummaryModel.category == cat
+                        for cat in group['search_categories']
+                    ]
+                )
+            )
+        )
+        if language_codes:
+            collection_query = collection_query.filter(
+                datastore_services.any_of(
+                    *[
+                        collection_models.CollectionSummaryModel.language_code
+                        == lc
+                        for lc in language_codes
+                    ]
+                )
+            )
+        collection_models_result: Sequence[
+            collection_models.CollectionSummaryModel
+        ] = collection_query.order(
+            -collection_models.CollectionSummaryModel.collection_model_last_updated
+        ).fetch(
+            8
+        )
+        collection_summaries = [
+            collection_services.get_collection_summary_from_model(m)
+            for m in collection_models_result
         ]
+        summary_dicts.extend(
+            _get_displayable_collection_summary_dicts(collection_summaries)
+        )
+
+        # Query explorations from the datastore by category and language.
+        exp_query = (
+            exp_models.ExpSummaryModel.query()
+            .filter(
+                exp_models.ExpSummaryModel.status
+                == constants.ACTIVITY_STATUS_PUBLIC
+            )
+            .filter(
+                exp_models.ExpSummaryModel.deleted  # pylint: disable=singleton-comparison
+                == False
+            )
+            .filter(
+                datastore_services.any_of(
+                    *[
+                        exp_models.ExpSummaryModel.category == cat
+                        for cat in group['search_categories']
+                    ]
+                )
+            )
+        )
+        if language_codes:
+            exp_query = exp_query.filter(
+                datastore_services.any_of(
+                    *[
+                        exp_models.ExpSummaryModel.language_code == lc
+                        for lc in language_codes
+                    ]
+                )
+            )
+        exp_models_result: Sequence[exp_models.ExpSummaryModel] = (
+            exp_query.order(
+                -exp_models.ExpSummaryModel.scaled_average_rating
+            ).fetch(8)
+        )
+        exp_summaries = [
+            exp_fetchers.get_exploration_summary_from_model(m)
+            for m in exp_models_result
+        ]
+        summary_dicts.extend(
+            get_displayable_exp_summary_dicts(
+                exp_summaries, display_in_language_code=display_in_language_code
+            )
+        )
 
         if not summary_dicts:
             continue

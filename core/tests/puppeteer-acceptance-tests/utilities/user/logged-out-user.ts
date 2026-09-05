@@ -315,12 +315,6 @@ const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
-const searchInputSelector = '.e2e-test-search-input';
-const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
-const unselectedFilterOptionsSelector = '.e2e-test-deselected';
-const selectedFilterOptionsSelector = '.e2e-test-selected';
-const languageFilterDropdownToggler =
-  '.oppia-search-bar-dropdown-toggle-button';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
@@ -412,13 +406,8 @@ const watchAVideoButtonInThanksForSubscribe =
 const readOurBlogButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
-const noBlogPostsFoundSelector = '.e2e-no-blog-posts-found';
 const blogTagContainerSelector = '.e2e-test-blog-tag-container';
 const blogPostTagSelector = '.e2e-test-blog-post-tag';
-const blogSearchInputSelector = '.e2e-test-search-input';
-const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
-const blogTagFilterSelector = '.e2e-test-tag-filter-component';
-const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const blogPaginationSelector = '.e2e-test-pagination';
 const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
 const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
@@ -428,7 +417,6 @@ const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
-const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
 const blogPostListSelector = '.e2e-test-blog-post-list';
 const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
 const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
@@ -1048,27 +1036,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check whether any blog posts are found.
-   * @returns {Promise<boolean>} A promise that resolves to a boolean
-   * indicating whether any blog posts are found.
-   */
-  async checkIfBlogPostsAreFound(): Promise<boolean> {
-    const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
-    if (noPostsElement) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Function to verify that the each blog post has a tag
    * associated with it
    */
   async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
     const allPostsHaveTags = await this.page.$$eval(
       blogTagContainerSelector,
       (posts, tagSelector) =>
@@ -1089,106 +1060,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to filter blog posts by a keyword
-   */
-  async filterBlogPostsByKeyword(keyword: string): Promise<void> {
-    await this.page.waitForSelector(blogSearchInputSelector, {
-      visible: true,
-    });
-    await this.typeInInputField(blogSearchInputSelector, keyword);
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
-
-    const url = new URL(this.page.url());
-    const queryParam = url.searchParams.get('q');
-
-    if (queryParam !== keyword) {
-      throw new Error(
-        `Query Parameter doesn't match. Expected ${keyword}, but found ${queryParam}`
-      );
-    }
-  }
-
-  /**
-   * Function to verify that the filtered blog posts contain the keyword
-   */
-  async expectBlogSearchResultsToContain(text: string): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
-    await this.expectElementToBeVisible(blogPostContentSelector);
-    const contentFound = await this.page.$$eval(
-      `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
-      (elements, searchText) =>
-        elements.some(el =>
-          el.textContent
-            ?.toLowerCase()
-            .includes((searchText as string).toLowerCase())
-        ),
-      text
-    );
-
-    if (!contentFound) {
-      throw new Error(`No results found containing "${text}"`);
-    }
-  }
-
-  /**
-   * Function to filter blog posts by a tag
-   */
-  async filterBlogPostsByTag(tagName: string): Promise<void> {
-    await this.page.waitForSelector(blogTagFilterSelector, {
-      visible: true,
-    });
-    await this.typeInInputField(
-      '.e2e-test-tag-filter-selection-input',
-      tagName
-    );
-    await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
-    await this.page.waitForSelector(blogTagFilterDropdownSelector, {
-      hidden: true,
-    });
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
-
-    const url = new URL(this.page.url());
-    const queryParam = url.searchParams.get('tags');
-
-    if (queryParam !== `("${tagName}")`) {
-      throw new Error(
-        `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
-      );
-    }
-  }
-
-  /**
-   * Function to verify that the filtered blog posts contain the tag
-   */
-  async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
-    await this.expectElementToBeVisible(blogPostTagSelector);
-    const tagFound = await this.page.$$eval(
-      blogPostTagSelector,
-      (elements, expectedTag) =>
-        elements.some(el => el.textContent?.trim() === expectedTag),
-      tagName
-    );
-
-    if (!tagFound) {
-      throw new Error(`No results found with tag "${tagName}"`);
-    }
-  }
-
-  /**
    * Function to check whether the pagination controls are visible
    */
   async expectBlogPaginationControlsVisible(): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
     try {
       await this.page.waitForSelector(blogPaginationSelector, {
         visible: true,
@@ -4127,149 +4001,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.page.waitForSelector(searchInputSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
-  }
-
-  /**
-   * Filters lessons by multiple categories.
-   * @param {string[]} categoryNames - The names of the categories to filter by.
-   */
-  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
-    await this.page.waitForSelector(categoryFilterDropdownToggler, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
-    await this.waitForStaticAssetsToLoad();
-
-    await this.page.waitForSelector(unselectedFilterOptionsSelector);
-    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
-    let foundMatch = false;
-
-    for (const option of filterOptions) {
-      const optionText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        option
-      );
-
-      if (categoryNames.includes(optionText.trim())) {
-        foundMatch = true;
-        await this.waitForElementToBeClickable(option);
-        await option.click();
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for categories: ${categoryNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    await this.page.waitForFunction(
-      (categoryNames: string[]) => {
-        // Check if URL contains all the categories. Added %22 to remove false positives.
-        return categoryNames.every(category =>
-          window.location.href.includes(`%22${category}%22`)
-        );
-      },
-      {},
-      categoryNames
-    );
-  }
-
-  /**
-   * Filters lessons by multiple languages and deselect the already selected English language.
-   * @param {string[]} languageNames - The names of the languages to filter by.
-   * @param {string} languageToDeselect - The name of the language to deselect.
-   */
-  async filterLessonsByLanguage(
-    languageNames: string[],
-    languageToDeselect: string = 'English'
-  ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.waitForPageToFullyLoad();
-    }
-    await this.page.waitForSelector(languageFilterDropdownToggler);
-    const languageFilterDropdownTogglerElement = await this.page.$(
-      languageFilterDropdownToggler
-    );
-    await languageFilterDropdownTogglerElement?.click();
-    await this.waitForStaticAssetsToLoad();
-
-    await this.page.waitForSelector(selectedFilterOptionsSelector);
-    const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
-    for (const element of selectedElements) {
-      const elementText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        element
-      );
-      // Deselecting the selected language before choosing new filters.
-      if (elementText === languageToDeselect) {
-        await element.click();
-      }
-    }
-
-    await this.page.waitForSelector(unselectedFilterOptionsSelector);
-    const deselectedLanguages = await this.page.$$(
-      unselectedFilterOptionsSelector
-    );
-    let foundMatch = false;
-    let englishMatchCount = 0;
-
-    for (const language of deselectedLanguages) {
-      const languageText = await this.page.evaluate(
-        el => el.textContent,
-        language
-      );
-      const trimmedLanguageText = languageText.trim();
-
-      if (trimmedLanguageText === 'English') {
-        englishMatchCount += 1;
-        if (englishMatchCount < 2) {
-          continue;
-        }
-      }
-
-      if (languageNames.includes(trimmedLanguageText)) {
-        foundMatch = true;
-        await this.waitForElementToBeClickable(language);
-        await language.click();
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for languages: ${languageNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    const buttonTextContent =
-      languageNames.length === 1
-        ? languageNames[0]
-        : `${languageNames.length} Languages`;
-    await this.expectTextContentToBe(
-      languageFilterDropdownToggler,
-      buttonTextContent
-    );
-  }
-
-  /**
    * Checks if the search results contain a specific result.
    * @param {string[]} searchResultsExpected - The search result to check for.
    * @param {boolean} present - Whether the search results should be present or not.
@@ -5007,9 +4738,17 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+    const lessonCardTitleSelectorAccordingToViewport =
+      this.isViewportAtMobileWidth()
+        ? explorationTitleSelector
+        : lessonCardTitleSelector;
     try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      await this.page.waitForSelector(
+        lessonCardTitleSelectorAccordingToViewport
+      );
+      const searchResultsElements = await this.page.$$(
+        lessonCardTitleSelectorAccordingToViewport
+      );
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
           this.page.evaluate(el => el.textContent.trim(), result)
@@ -5029,7 +4768,10 @@ export class LoggedOutUser extends BaseUser {
       await searchResultsElements[lessonIndex].click();
       await this.waitForStaticAssetsToLoad();
 
-      await this.page.waitForSelector(lessonCardTitleSelector, {hidden: true});
+      await this.page.waitForSelector(
+        lessonCardTitleSelectorAccordingToViewport,
+        {hidden: true}
+      );
       showMessage(`Lesson "${lessonTitle}" opened from search results.`);
     } catch (error) {
       const newError = new Error(
@@ -6097,16 +5839,8 @@ export class LoggedOutUser extends BaseUser {
     // Determine the expected element to be focused.
     let expectedFocusedElement: puppeteer.ElementHandle | null = null;
     switch (shortcut) {
-      case '/':
-        expectedFocusedElement = await this.page.$(searchInputSelector);
-        break;
       case 's':
         expectedFocusedElement = await this.page.$(mainContentSelector);
-        break;
-      case 'c':
-        expectedFocusedElement = await this.page.$(
-          categoryFilterDropdownToggler
-        );
         break;
       case 'j':
         expectedFocusedElement = await this.page.$(
@@ -7774,18 +7508,6 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementContentToBe(
       blogWelcomeHeadingSelector,
-      expectedText
-    );
-  }
-
-  /**
-   * Expects the "no blog posts" message to be visible.
-   */
-  async expectNoBlogPostsMessageToBeVisible(
-    expectedText: string
-  ): Promise<void> {
-    await this.expectElementContentToBe(
-      blogNoResultsFoundSelector,
       expectedText
     );
   }

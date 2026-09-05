@@ -35,8 +35,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         'email_footer',
         'email_sender_name',
         'enable_admin_notifications_for_reviewer_shortage',
-        'es_cloud_id',
-        'es_username',
         'high_bounce_rate_task_minimum_exploration_starts',
         'high_bounce_rate_task_state_bounce_rate_creation_threshold',  # pylint: disable=line-too-long
         'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',  # pylint: disable=line-too-long

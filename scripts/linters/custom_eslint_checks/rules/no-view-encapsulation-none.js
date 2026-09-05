@@ -43,7 +43,6 @@ var LEGACY_ALLOWLIST = [
   'core/templates/pages/about-page/partnerships-section/partnerships-section.component.ts',
   'core/templates/pages/blog-author-profile-page/blog-author-profile-page.component.ts',
   'core/templates/pages/blog-home-page/blog-home-page.component.ts',
-  'core/templates/pages/blog-home-page/tag-filter/tag-filter.component.ts',
   'core/templates/pages/blog-post-page/blog-post-page.component.ts',
   'core/templates/pages/contributor-dashboard-admin-page/contributor-admin-dashboard-page.component.ts',
   'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.ts',

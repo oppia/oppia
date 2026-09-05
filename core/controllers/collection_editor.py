@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import base64
-
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -27,7 +25,6 @@ from core.domain import (
     collection_domain,
     collection_services,
     rights_manager,
-    search_services,
     summary_services,
 )
 
@@ -300,7 +297,6 @@ class CollectionUnpublishHandler(
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
-        search_services.delete_collections_from_search_index([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False
@@ -321,58 +317,4 @@ class CollectionUnpublishHandler(
                 ),
             }
         )
-        self.render_json(self.values)
-
-
-class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of ExplorationMetadataSearchHandler's
-    normalized_payload dictionary.
-    """
-
-    q: str
-    offset: Optional[int]
-
-
-class ExplorationMetadataSearchHandler(
-    base.BaseHandler[
-        Dict[str, str], ExplorationMetadataSearchHandlerNormalizedRequestDict
-    ]
-):
-    """Provides data for exploration search."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'q': {'schema': {'type': 'basestring'}},
-            'offset': {'schema': {'type': 'int'}, 'default_value': None},
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        # The query is encoded into base64 string in the frontend, and b64decode
-        # accepts base64 bytes, thus we need to encode the base64 string to
-        # base64 bytes, then decode them to just bytes and then decode those
-        # back to string.
-        assert self.normalized_request is not None
-        q = self.normalized_request['q'].encode('utf-8')
-        query_string = base64.b64decode(q).decode('utf-8')
-
-        search_offset = self.normalized_request.get('offset')
-
-        collection_node_metadata_list, new_search_offset = (
-            summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_offset, self.user
-            )
-        )
-
-        self.values.update(
-            {
-                'collection_node_metadata_list': collection_node_metadata_list,
-                'search_cursor': new_search_offset,
-            }
-        )
-
         self.render_json(self.values)

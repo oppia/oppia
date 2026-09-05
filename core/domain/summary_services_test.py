@@ -37,9 +37,16 @@ from core.domain import (
     translation_services,
     user_services,
 )
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import collection_models
+
+(collection_models,) = models.Registry.import_models([models.Names.COLLECTION])
 
 
 class ExplorationDisplayableSummariesTest(
@@ -543,6 +550,45 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             expected_exploration_summary_dict, (actual_exploration_summary_dict)
         )
+
+    def test_get_library_groups_excludes_deleted_collections(self) -> None:
+        """A public collection in a group category should be returned by
+        get_library_groups(), but a soft-deleted collection should not.
+        """
+        collection = self.save_new_valid_collection(
+            'collection_id',
+            self.owner_id,
+            title='Mathematics Collection',
+            category='Algebra',
+            objective='A collection introducing basic Algebra.',
+        )
+        self.publish_collection(self.owner_id, collection.id)
+
+        library_groups = summary_services.get_library_groups([])
+        self.assertEqual(len(library_groups), 1)
+        collection_id_present = any(
+            summary_dict['id'] == collection.id
+            for summary_dict in library_groups[0]['activity_summary_dicts']
+        )
+        self.assertTrue(collection_id_present)
+
+        # Soft-delete the collection summary and verify it is excluded from the
+        # library groups.
+        collection_summary_model = collection_models.CollectionSummaryModel.get(
+            collection.id
+        )
+        collection_summary_model.deleted = (
+            True  # pylint: disable=singleton-comparison
+        )
+        collection_summary_model.update_timestamps()
+        collection_summary_model.put()
+
+        library_groups = summary_services.get_library_groups([])
+        collection_id_present = any(
+            summary_dict['id'] == collection.id
+            for summary_dict in library_groups[0]['activity_summary_dicts']
+        )
+        self.assertFalse(collection_id_present)
 
 
 class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
@@ -1528,22 +1574,6 @@ class CollectionNodeMetadataDictsTest(
                 'objective': 'An objective 4',
                 'title': 'Exploration 4 Bob title',
             },
-        ]
-        self.assertEqual(expected_metadata_dicts, metadata_dicts)
-
-    def test_exp_metadata_dicts_matching_query(self) -> None:
-        metadata_dicts, _ = (
-            summary_services.get_exp_metadata_dicts_matching_query(
-                'Exploration 1', None, self.albert
-            )
-        )
-
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID1,
-                'objective': 'An objective 1',
-                'title': 'Exploration 1 Albert title',
-            }
         ]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 

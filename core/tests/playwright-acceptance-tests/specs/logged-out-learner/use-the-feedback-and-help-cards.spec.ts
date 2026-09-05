@@ -39,6 +39,7 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Logged-Out Learner', function () {
   let explorationEditor: ExplorationEditor;
+  let explorationId: string;
   let loggedOutLearner: LoggedOutUser;
 
   test.beforeAll(async function ({browser}) {
@@ -110,7 +111,7 @@ test.describe('Logged-Out Learner', function () {
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'What are the Place Values?',
       'Learn basic Mathematics including Place Values',
       'Mathematics'
@@ -119,13 +120,7 @@ test.describe('Logged-Out Learner', function () {
 
   test('should be able to see the first card', async function () {
     // Navigate to Lesson Player.
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    await loggedOutLearner.searchForLessonInSearchBar(
-      'What are the Place Values?'
-    );
-    await loggedOutLearner.playLessonFromSearchResults(
-      'What are the Place Values?'
-    );
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
     await loggedOutLearner.expectCardContentToMatch(
       'Welcome, to the Place Values Exploration.'
     );

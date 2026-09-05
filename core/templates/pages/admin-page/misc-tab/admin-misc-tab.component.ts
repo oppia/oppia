@@ -79,29 +79,6 @@ export class AdminMiscTabComponent implements OnInit {
       });
   }
 
-  clearSearchIndex(): void {
-    if (
-      this.adminTaskManagerService.isTaskRunning() ||
-      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
-    ) {
-      return;
-    }
-
-    this.setStatusMessage.emit('Clearing search index...');
-
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.clearSearchIndexAsync().then(
-      () => {
-        this.setStatusMessage.emit('Index successfully cleared.');
-        this.adminTaskManagerService.finishTask();
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-        this.adminTaskManagerService.finishTask();
-      }
-    );
-  }
-
   regenerateOpportunitiesRelatedToTopic(): void {
     if (
       this.adminTaskManagerService.isTaskRunning() ||
