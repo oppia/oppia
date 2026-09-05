@@ -1729,6 +1729,7 @@ describe('New Conversation skin component', () => {
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
       spyOn(loaderService, 'hideLoadingScreen');
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(urlService, 'getUrlParams').and.returnValue({});
       spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
         explorationEngineService
       );

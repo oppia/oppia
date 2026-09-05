@@ -62,11 +62,31 @@ export class ContentTranslationLanguageService {
     this.languageOptions = [];
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
 
+    // The "initialContentLanguageCode" url parameter (set by the topic
+    // viewer's Play button) takes the highest priority regardless of which
+    // lesson player is active, so that the lesson content loads in the text
+    // language that was selected before navigation.
+    const urlParams = this.urlService.getUrlParams();
+    if (
+      Object.prototype.hasOwnProperty.call(
+        urlParams,
+        INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM
+      ) &&
+      allContentLanguageCodesInExploration.includes(
+        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+      )
+    ) {
+      this.setCurrentContentLanguageCode(
+        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+      );
+    }
+
     if (this.isNewLessonPlayerEnabled()) {
       // Set the content language that is chosen initially.
       // Use the following priority (highest to lowest):
-      // 1. Preferred site language.
-      // 2. Otherwise, the exploration language code.
+      // 1. The URL parameter "initialContentLanguageCode" (set above).
+      // 2. Preferred site language.
+      // 3. Otherwise, the exploration language code.
 
       const preferredSiteLanguage =
         this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
@@ -87,21 +107,9 @@ export class ContentTranslationLanguageService {
     } else {
       // Set the content language that is chosen initially.
       // Use the following priority (highest to lowest):
-      // 1. The URL parameter "initialContentLanguageCode".
+      // 1. The URL parameter "initialContentLanguageCode" (set above).
       // 2. Preferred content languages.
       // 3. Otherwise, the exploration language code.
-
-      const urlParams = this.urlService.getUrlParams();
-      if (
-        urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
-        allContentLanguageCodesInExploration.includes(
-          urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
-        )
-      ) {
-        this.setCurrentContentLanguageCode(
-          urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
-        );
-      }
 
       if (
         !this.currentContentLanguageCode &&

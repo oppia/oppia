@@ -61,12 +61,12 @@ describe('Edit Arc Modal Component', () => {
       fixture = TestBed.createComponent(EditArcModalComponent);
       component = fixture.componentInstance;
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      component.arcTitle = 'Adventure 2';
+      component.arcTitle = 'Module 2';
       component.arcDescription = 'Basics of fractions';
     });
 
     it('should initialize fields from inputs', () => {
-      expect(component.arcTitle).toBe('Adventure 2');
+      expect(component.arcTitle).toBe('Module 2');
       expect(component.arcDescription).toBe('Basics of fractions');
     });
 
@@ -84,19 +84,19 @@ describe('Edit Arc Modal Component', () => {
 
       component.save();
 
-      expect(component.errorMessage).toBe('Adventure title cannot be empty.');
+      expect(component.errorMessage).toBe('Module title cannot be empty.');
       expect(closeSpy).not.toHaveBeenCalled();
     });
 
     it('should close modal with trimmed values', () => {
       const closeSpy = spyOn(ngbActiveModal, 'close');
-      component.arcTitle = '  Adventure 3  ';
+      component.arcTitle = '  Module 3  ';
       component.arcDescription = '  Intro to decimals  ';
 
       component.save();
 
       expect(closeSpy).toHaveBeenCalledWith({
-        title: 'Adventure 3',
+        title: 'Module 3',
         description: 'Intro to decimals',
       });
     });
@@ -118,7 +118,7 @@ describe('Edit Arc Modal Component', () => {
       fixture = TestBed.createComponent(EditArcModalComponent);
       component = fixture.componentInstance;
       bottomSheetRef = TestBed.inject(MatBottomSheetRef);
-      component.arcTitle = 'Adventure 2';
+      component.arcTitle = 'Module 2';
       component.arcDescription = 'Basics of fractions';
     });
 
@@ -136,19 +136,19 @@ describe('Edit Arc Modal Component', () => {
 
       component.save();
 
-      expect(component.errorMessage).toBe('Adventure title cannot be empty.');
+      expect(component.errorMessage).toBe('Module title cannot be empty.');
       expect(dismissSpy).not.toHaveBeenCalled();
     });
 
     it('should dismiss bottom sheet with trimmed values on save', () => {
       const dismissSpy = spyOn(bottomSheetRef, 'dismiss');
-      component.arcTitle = '  Adventure 3  ';
+      component.arcTitle = '  Module 3  ';
       component.arcDescription = '  Intro to decimals  ';
 
       component.save();
 
       expect(dismissSpy).toHaveBeenCalledWith({
-        title: 'Adventure 3',
+        title: 'Module 3',
         description: 'Intro to decimals',
       });
     });

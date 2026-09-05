@@ -844,7 +844,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should open edit arc modal and update title and description', fakeAsync(() => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', 'Old description', [
+      ArcModel.createNew('arc_1', 'Module 1', 'Old description', [
         'node_2',
         'node_3',
       ])
@@ -855,7 +855,7 @@ describe('Story Editor Component having three story nodes', () => {
         arcDescription: '',
       },
       result: Promise.resolve({
-        title: 'Adventure 1 updated',
+        title: 'Module 1 updated',
         description: 'New description',
       }),
     } as NgbModalRef);
@@ -887,10 +887,10 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should merge current arc into previous arc on removeArcBoundary', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
     );
     component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Adventure 2', '', ['node_3'])
+      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
     );
     const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
     const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
@@ -907,10 +907,10 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should merge second arc into first when removing boundary from first arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
     );
     component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Adventure 2', '', ['node_3'])
+      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
     );
     const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
     const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
@@ -927,7 +927,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should place split chapter in new arc only', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', [
+      ArcModel.createNew('arc_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
@@ -944,7 +944,7 @@ describe('Story Editor Component having three story nodes', () => {
     const dateNowSpy = spyOn(Date, 'now');
     dateNowSpy.and.returnValues(1234567890, 1234567890, 1234567891);
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1234567890', 'Adventure 1', '', [
+      ArcModel.createNew('arc_1234567890', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
@@ -969,7 +969,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should move multiple nodes to a new arc when splitting at a middle index', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', [
+      ArcModel.createNew('arc_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
@@ -999,7 +999,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should not update arc when edit arc modal is dismissed', fakeAsync(() => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', 'Old description', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', 'Old description', ['node_2'])
     );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
@@ -1076,10 +1076,10 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return true when previous and current nodes are in the same arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
     );
     component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Adventure 2', '', ['node_3'])
+      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
@@ -1088,10 +1088,10 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return false when previous and current nodes are in different arcs', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1'])
     );
     component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Adventure 2', '', ['node_2', 'node_3'])
+      ArcModel.createNew('arc_2', 'Module 2', '', ['node_2', 'node_3'])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
@@ -1162,7 +1162,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should throw error from getArcForNode when arc index is invalid', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
     spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
 
@@ -1171,18 +1171,18 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return the arc for a valid node from getArcForNode', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
 
     const result = component.getArcForNode('node_2');
 
     expect(result.getId()).toBe('arc_1');
-    expect(result.getTitle()).toBe('Adventure 1');
+    expect(result.getTitle()).toBe('Module 1');
   });
 
   it('should throw error from getArcSequenceNumber when arc index is invalid', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
     spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
 
@@ -1193,7 +1193,7 @@ describe('Story Editor Component having three story nodes', () => {
     const createArcSpy = spyOn(storyUpdateService, 'createArc');
 
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', [
+      ArcModel.createNew('arc_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
@@ -1240,7 +1240,7 @@ describe('Story Editor Component having three story nodes', () => {
       arcs: [
         {
           id: 'arc_only',
-          title: 'Only Adventure',
+          title: 'Only Module',
           description: '',
           node_ids: ['node_1'],
         },
@@ -1286,7 +1286,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return the arc id for a node', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
 
     expect(component.getArcIdForNode('node_2')).toBe('arc_1');
@@ -1324,7 +1324,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should get sequence number for a node in an arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
 
     expect(component.getArcSequenceNumber('node_2')).toBe(1);
@@ -1332,7 +1332,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should update arc description but not title in edit arc modal', fakeAsync(() => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure title', 'Original description', [
+      ArcModel.createNew('arc_1', 'Module title', 'Original description', [
         'node_2',
       ])
     );
@@ -1342,7 +1342,7 @@ describe('Story Editor Component having three story nodes', () => {
         arcDescription: '',
       },
       result: Promise.resolve({
-        title: 'Adventure title',
+        title: 'Module title',
         description: 'Updated description',
       }),
     } as NgbModalRef);
@@ -1356,7 +1356,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return early from splitIntoArc when split index is first node in arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', [
+      ArcModel.createNew('arc_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
@@ -1510,7 +1510,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should throw error from getArcColorForNode when arc index is invalid', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
     spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
 
@@ -1519,7 +1519,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return a color from the palette in getArcColorForNode', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
 
     const color = component.getArcColorForNode('node_2');
@@ -1528,7 +1528,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should call editArc via onEditArcClick when node has an arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
     spyOn(component, 'editArc');
 
@@ -1539,7 +1539,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should call removeArcBoundary via onRemoveArcClick when node has an arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
     );
     spyOn(component, 'removeArcBoundary');
 
@@ -1550,7 +1550,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return true from isFirstArc when node belongs to the first arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
     );
 
     expect(component.isFirstArc('node_1')).toBe(true);
@@ -1558,10 +1558,10 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should return false from isFirstArc when node belongs to a later arc', () => {
     component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Adventure 1', '', ['node_1'])
+      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1'])
     );
     component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Adventure 2', '', ['node_2'])
+      ArcModel.createNew('arc_2', 'Module 2', '', ['node_2'])
     );
 
     expect(component.isFirstArc('node_2')).toBe(false);

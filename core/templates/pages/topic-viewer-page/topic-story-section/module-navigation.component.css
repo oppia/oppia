@@ -1,0 +1,327 @@
+.module-navigation-container {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 -24px;
+  opacity: 1;
+  padding: 0 24px;
+}
+
+.module-navigation-scroll-area {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.module-navigation-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 24px 0 12px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.module-navigation-wrapper--centered {
+  justify-content: center;
+}
+
+.module-navigation-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.module-navigation-wrapper--overflow::before,
+.module-navigation-wrapper--overflow::after {
+  bottom: 4px;
+  content: '';
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 22px;
+  z-index: 3;
+}
+
+.module-navigation-wrapper--overflow::before {
+  background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  left: 0;
+}
+
+.module-navigation-wrapper--overflow::after {
+  background: linear-gradient(to left, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  right: 0;
+}
+
+.module-navigation-arrow {
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 34px;
+  height: 40px;
+  justify-content: center;
+  outline: none;
+  padding: 0;
+  width: 34px;
+  z-index: 2;
+}
+
+.module-navigation-arrow:hover {
+  color: #000;
+}
+
+.module-navigation-arrow:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
+
+.module-navigation-arrow--left {
+  order: -1;
+}
+
+.module-navigation-arrow--right {
+  order: 1;
+}
+
+.module-navigation-arrow .material-icons {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.module-navigation-hint {
+  color: #3730a3;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+.module-navigation-hint-arrow {
+  display: inline-block;
+  margin: 0 4px;
+}
+
+.module-navigation-group {
+  align-items: center;
+  column-gap: 10px;
+  display: inline-grid;
+  flex: 0 0 auto;
+  grid-template-rows: minmax(60px, auto) auto;
+  justify-items: center;
+  padding: 0 14px;
+  position: relative;
+  row-gap: 10px;
+}
+
+.module-navigation-group-pill {
+  align-self: stretch;
+  border: 2.5px solid;
+  border-radius: 30px;
+  box-sizing: border-box;
+  grid-row: 1;
+  justify-self: stretch;
+  margin: 0 -14px;
+  pointer-events: none;
+}
+
+.module-navigation-progress-dot {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #c9c9c9;
+  border-radius: 50%;
+  display: inline-flex;
+  height: 16px;
+  justify-content: center;
+  position: relative;
+  width: 16px;
+  z-index: 1;
+}
+
+.module-navigation-progress-dot--completed {
+  background: #27a844;
+}
+
+.module-navigation-progress-dot .material-icons {
+  color: #fff;
+  font-size: 12px;
+}
+
+.module-navigation-progress-dot:not(.module-navigation-progress-dot--first)::before {
+  background: #c9c9c9;
+  content: '';
+  height: 2px;
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+}
+
+.module-navigation-progress-dot--line-completed::before {
+  background: #27a844;
+}
+
+.module-navigation-mastery {
+  flex: 0 0 auto;
+}
+
+.module-navigation-mastery-group {
+  align-items: center;
+  border: 2.5px solid #f5a623;
+  border-radius: 36px;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-height: 60px;
+  padding: 0 14px;
+  position: relative;
+}
+
+.module-navigation-clickable {
+  cursor: pointer;
+}
+
+.module-navigation-clickable:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .module-navigation-container {
+    margin: 0;
+    margin-top: 0;
+    padding: 0 14px;
+    padding-top: 0;
+  }
+
+  .module-navigation-wrapper--overflow::before,
+  .module-navigation-wrapper--overflow::after {
+    display: block;
+  }
+
+  .module-navigation-wrapper {
+    gap: 8px;
+    margin: 6px 0 4px;
+  }
+
+  .module-navigation-group {
+    column-gap: 8px;
+    grid-template-rows: minmax(48px, auto) auto;
+    padding: 0 12px;
+  }
+
+  .module-navigation-group-pill {
+    margin: 0 -12px;
+  }
+
+  .module-navigation-mastery-group {
+    min-height: 48px;
+    padding: 0 12px;
+  }
+
+  .module-navigation-arrow {
+    flex: 0 0 28px;
+    height: 36px;
+    width: 28px;
+  }
+
+  .module-navigation-arrow .material-icons {
+    font-size: 32px;
+  }
+
+  .module-navigation-hint {
+    font-size: 13px;
+    margin: 8px 0 0;
+  }
+
+  .module-navigation-progress-dot {
+    height: 14px;
+    width: 14px;
+  }
+
+  .module-navigation-progress-dot .material-icons {
+    font-size: 10px;
+  }
+
+  .module-navigation-progress-dot:not(.module-navigation-progress-dot--first)::before {
+    width: 30px;
+  }
+}
+
+@media (max-width: 450px) {
+  .module-navigation-container {
+    margin: 0;
+    margin-top: 0;
+    padding: 0 12px;
+    padding-top: 0;
+  }
+
+  .module-navigation-wrapper--overflow::before,
+  .module-navigation-wrapper--overflow::after {
+    width: 18px;
+  }
+
+  .module-navigation-wrapper {
+    gap: 6px;
+    margin: 4px 0 2px;
+  }
+
+  .module-navigation-group {
+    column-gap: 6px;
+    grid-template-rows: minmax(44px, auto) auto;
+    padding: 0 10px;
+  }
+
+  .module-navigation-group-pill {
+    margin: 0 -10px;
+  }
+
+  .module-navigation-mastery-group {
+    min-height: 44px;
+    padding: 0 10px;
+  }
+
+  .module-navigation-arrow {
+    flex: 0 0 24px;
+    height: 32px;
+    width: 24px;
+  }
+
+  .module-navigation-arrow .material-icons {
+    font-size: 28px;
+  }
+
+  .module-navigation-hint {
+    font-size: 12px;
+    margin: 6px 0 0;
+  }
+
+  .module-navigation-progress-dot {
+    height: 12px;
+    width: 12px;
+  }
+
+  .module-navigation-progress-dot .material-icons {
+    font-size: 9px;
+  }
+
+  .module-navigation-progress-dot:not(.module-navigation-progress-dot--first)::before {
+    width: 28px;
+  }
+
+  .module-navigation-hint-arrow {
+    margin: 0 2px;
+  }
+}

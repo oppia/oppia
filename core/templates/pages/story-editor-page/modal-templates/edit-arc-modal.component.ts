@@ -46,7 +46,7 @@ export class EditArcModalComponent {
   save(): void {
     const trimmedTitle = this.arcTitle.trim();
     if (!trimmedTitle) {
-      this.errorMessage = 'Adventure title cannot be empty.';
+      this.errorMessage = 'Module title cannot be empty.';
       return;
     }
     if (this.bottomSheetRef) {

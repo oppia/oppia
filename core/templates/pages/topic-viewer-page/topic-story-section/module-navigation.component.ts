@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Top adventure navigation bar shown above story arcs.
+ * @fileoverview Top module navigation bar shown above story arcs.
  */
 
 import {
@@ -30,9 +30,9 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import './adventure-navigation.component.css';
+import './module-navigation.component.css';
 
-interface AdventureNavigationGroup {
+interface ModuleNavigationGroup {
   lessons: {
     lessonNumber: number;
     isCompleted: boolean;
@@ -43,27 +43,30 @@ interface AdventureNavigationGroup {
   arcId: string;
 }
 
-export interface AdventureNavigationLessonSelection {
+export interface ModuleNavigationLessonSelection {
   lessonNumber: number;
-  adventureIndex: number;
+  moduleIndex: number;
 }
 
 @Component({
-  selector: 'topic-adventure-navigation',
-  templateUrl: './adventure-navigation.component.html',
-  styleUrls: ['./adventure-navigation.component.css'],
+  selector: 'topic-module-navigation',
+  templateUrl: './module-navigation.component.html',
+  styleUrls: ['./module-navigation.component.css'],
 })
-export class AdventureNavigationComponent
+export class ModuleNavigationComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  @Input() adventureGroups: AdventureNavigationGroup[] = [];
+  @Input() moduleGroups: ModuleNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
+  // The arc whose practice card is currently selected in the navbar.
+  @Input() activePracticeArcId: string = '';
   // True when this component is rendered inside the topic editor's preview
   // tab, where the fixed editor header bar adds height to the header stack.
   @Input() isInTopicEditorPreview: boolean = false;
   @Output() lessonSelected =
-    new EventEmitter<AdventureNavigationLessonSelection>();
+    new EventEmitter<ModuleNavigationLessonSelection>();
   @Output() practiceSelected = new EventEmitter<string>();
+  @Output() masteryChallengeClicked = new EventEmitter<void>();
 
   @ViewChild('scrollWrapper') scrollWrapper!: ElementRef<HTMLElement>;
 
@@ -73,6 +76,8 @@ export class AdventureNavigationComponent
 
   private scrollCheckTimeouts: ReturnType<typeof setTimeout>[] = [];
 
+  constructor() {}
+
   ngAfterViewInit(): void {
     // Defer checks to allow DOM to fully render.
     this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 50));
@@ -81,8 +86,8 @@ export class AdventureNavigationComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.adventureGroups) {
-      // When adventureGroups changes, schedule arrow updates.
+    if (changes.moduleGroups) {
+      // When moduleGroups changes, schedule arrow updates.
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 100));
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 300));
     }
@@ -143,17 +148,17 @@ export class AdventureNavigationComponent
   }
 
   isActiveLesson(lessonNumber: number): boolean {
-    // Badge is colored when it's the currently selected lesson in navbar.
+    // Badge is colored only when it is the currently selected lesson.
     if (this.activeLessonNumber === null) {
-      return lessonNumber === 1;
+      return false;
     }
     return lessonNumber === this.activeLessonNumber;
   }
 
-  onLessonClick(lessonNumber: number, adventureIndex: number): void {
+  onLessonClick(lessonNumber: number, moduleIndex: number): void {
     this.lessonSelected.emit({
       lessonNumber,
-      adventureIndex,
+      moduleIndex,
     });
   }
 
@@ -161,11 +166,22 @@ export class AdventureNavigationComponent
     this.practiceSelected.emit(arcId);
   }
 
-  getLessonBadgeIconName(isCompleted: boolean): string {
-    return isCompleted ? 'check' : '';
+  isActivePractice(arcId: string): boolean {
+    return (
+      this.activePracticeArcId !== '' && this.activePracticeArcId === arcId
+    );
   }
 
-  getPracticeBadgeIconName(isPracticeCompleted: boolean): string {
-    return isPracticeCompleted ? 'check' : 'edit';
+  getPracticeBadgeIconName(): string {
+    return 'edit';
+  }
+
+  isLastLessonCompleted(moduleGroup: ModuleNavigationGroup): boolean {
+    const lessons = moduleGroup.lessons;
+    return lessons.length > 0 && lessons[lessons.length - 1].isCompleted;
+  }
+
+  onMasteryClick(): void {
+    this.masteryChallengeClicked.emit();
   }
 }

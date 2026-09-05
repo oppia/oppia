@@ -1,0 +1,47 @@
+<div class="module-end-test-card"
+     [ngStyle]="{'background-color': cardBackgroundColor}"
+     [attr.aria-label]="practiceTitle || ('I18N_TOPIC_VIEWER_MODULE_END_TEST_ARIA_LABEL' | translate)">
+  <div class="module-end-test-card-thumbnail">
+    <img class="module-end-test-card-image"
+         [class.module-end-test-card-image-hidden]="!isThumbnailVisible"
+         [src]="resolvedThumbnailUrl"
+         (error)="onThumbnailError()"
+         alt="{{ getThumbnailAltText() }}">
+  </div>
+
+  <div class="module-end-test-card-content">
+    <div class="module-end-test-card-header-row">
+      <topic-module-circle-badge class="module-end-test-card-badge"
+                                 [iconImageUrl]="isPracticeCompleted ? '' : '/assets/images/icons/practice_pencil.svg'"
+                                 [iconName]="isPracticeCompleted ? 'check' : ''"
+                                 [size]="'sm'"
+                                 [backgroundColor]="isPracticeCompleted ? '#e7f6e9' : cardAccentColor"
+                                 [borderColor]="isPracticeCompleted ? '#40a84f' : cardAccentColor"
+                                 [textColor]="isPracticeCompleted ? '#40a84f' : cardAccentColor">
+      </topic-module-circle-badge>
+
+      <div class="module-end-test-card-copy">
+        <div class="module-end-test-card-title-row">
+          <h3 class="module-end-test-card-title">{{ practiceTitle }}</h3>
+        </div>
+
+        <p class="module-end-test-card-description">{{ getResolvedDescription() }}</p>
+      </div>
+
+      <div class="module-end-test-card-actions">
+        <span class="module-end-test-card-practice-button-wrapper"
+              [matTooltip]="'I18N_TOPIC_VIEWER_MODULE_PRACTICE_TOOLTIP' | translate"
+              [matTooltipDisabled]="hasPracticeQuestions"
+              [attr.tabindex]="hasPracticeQuestions ? undefined : 0">
+          <button class="module-end-test-card-practice-button"
+                  type="button"
+                  [disabled]="!hasPracticeQuestions"
+                  (click)="onPracticeButtonClick()">
+            <i class="material-icons" aria-hidden="true">description</i>
+            {{ 'I18N_TOPIC_VIEWER_PRACTICE_TEST_BUTTON' | translate }}
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

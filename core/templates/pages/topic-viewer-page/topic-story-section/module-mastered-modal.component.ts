@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Modal that celebrates the learner after they complete all
- * lessons of an adventure.
+ * lessons of a module.
  */
 
 import {Component, Inject, Input, Optional} from '@angular/core';
@@ -26,14 +26,14 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-import './adventure-mastered-modal.component.css';
+import './module-mastered-modal.component.css';
 
 @Component({
-  selector: 'adventure-mastered-modal',
-  templateUrl: './adventure-mastered-modal.component.html',
-  styleUrls: ['./adventure-mastered-modal.component.css'],
+  selector: 'module-mastered-modal',
+  templateUrl: './module-mastered-modal.component.html',
+  styleUrls: ['./module-mastered-modal.component.css'],
 })
-export class AdventureMasteredModalComponent extends ConfirmOrCancelModal {
+export class ModuleMasteredModalComponent extends ConfirmOrCancelModal {
   @Input() title!: string;
   @Input() message!: string;
 

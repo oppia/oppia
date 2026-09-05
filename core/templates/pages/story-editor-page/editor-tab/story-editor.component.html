@@ -211,7 +211,9 @@
                             <span class="arc-boundary-flag-badge"
                                   [style.background-color]="getArcColorForNode(node.getId()).iconBg"
                                   aria-hidden="true">
-                              <i class="fa fa-book"></i>
+                              <img src="/assets/images/icons/menu-book.svg"
+                                   alt=""
+                                   class="arc-boundary-flag-badge-img">
                             </span>
                             <span class="arc-boundary-title">
                               {{ getArcForNode(node.getId()).getTitle() }}
@@ -228,13 +230,13 @@
                           <button type="button" class="btn btn-sm arc-edit-button"
                                   (click)="onEditArcClick(node.getId());$event.stopPropagation()">
                             <i class="fas fa-pen" aria-hidden="true"></i>
-                            Edit Adventure
+                            Edit Module
                           </button>
                           <button type="button" class="btn btn-sm arc-remove-button"
                                   *ngIf="!isFirstArc(node.getId())"
                                   (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
                             <i class="far fa-trash-alt" aria-hidden="true"></i>
-                            Remove Adventure Boundary
+                            Remove Module Boundary
                           </button>
                         </div>
                       </div>
@@ -246,7 +248,7 @@
                         <button type="button" class="btn btn-sm split-into-arc-button"
                                 (click)="splitIntoArc(idx);$event.stopPropagation()">
                           <i class="fas fa-cut"></i>
-                          Split Into Adventure
+                          Split Into Module
                         </button>
                         <div class="split-line"></div>
                       </div>
@@ -456,7 +458,9 @@
                           <div class="arc-header-left">
                             <span class="arc-flag-badge"
                                   [style.background-color]="getArcColorForNode(node.getId()).iconBg">
-                              <i class="fa fa-book" aria-hidden="true"></i>
+                              <img src="/assets/images/icons/menu-book.svg"
+                                   alt=""
+                                   class="arc-flag-badge-img">
                             </span>
                             <div class="arc-header-text">
                               <span class="arc-header-title">
@@ -474,12 +478,12 @@
                           <div class="arc-header-actions">
                             <button type="button" class="arc-action-btn arc-edit-btn"
                                     (click)="onEditArcClick(node.getId());$event.stopPropagation()">
-                              <i class="fas fa-pen" aria-hidden="true"></i> Edit Adventure
+                              <i class="fas fa-pen" aria-hidden="true"></i> Edit Module
                             </button>
                             <button type="button" class="arc-action-btn arc-remove-btn"
                                     *ngIf="!isFirstArc(node.getId())"
                                     (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
-                              <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Adventure Boundary
+                              <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Module Boundary
                             </button>
                           </div>
                         </div>
@@ -492,7 +496,7 @@
                           <div class="arc-split-line"></div>
                           <button type="button" class="arc-split-btn"
                                   (click)="splitIntoArc(idx);$event.stopPropagation()">
-                            <i class="fas fa-cut" aria-hidden="true"></i> Split Into Adventure
+                            <i class="fas fa-cut" aria-hidden="true"></i> Split Into Module
                           </button>
                           <div class="arc-split-line"></div>
                         </div>

@@ -26,12 +26,13 @@ import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-sto
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
 import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
-import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end-test-card.component';
-import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
-import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
+import {ModuleEndTestCardComponent} from './topic-story-section/module-end-test-card.component';
+import {ModuleCircleBadgeComponent} from './topic-story-section/module-circle-badge.component';
+import {ModuleNavigationComponent} from './topic-story-section/module-navigation.component';
 import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
-import {ArcSkipConfirmationModalComponent} from './topic-story-section/arc-skip-confirmation-modal.component';
-import {AdventureMasteredModalComponent} from './topic-story-section/adventure-mastered-modal.component';
+import {MasteryChallengeLockedModalComponent} from './topic-story-section/mastery-challenge-locked-modal.component';
+import {ModuleSkipConfirmationModalComponent} from './topic-story-section/module-skip-confirmation-modal.component';
+import {ModuleMasteredModalComponent} from './topic-story-section/module-mastered-modal.component';
 import {TopicHeaderComponent} from './topic-header/topic-header.component';
 import {TopicViewerContentComponent} from './topic-viewer-content/topic-viewer-content.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
@@ -52,12 +53,13 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    AdventureEndTestCardComponent,
-    AdventureCircleBadgeComponent,
-    AdventureNavigationComponent,
+    ModuleEndTestCardComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
     MasteryChallengeCardComponent,
-    ArcSkipConfirmationModalComponent,
-    AdventureMasteredModalComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
     TopicHeaderComponent,
     TopicViewerContentComponent,
   ],
@@ -66,13 +68,14 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
-    AdventureEndTestCardComponent,
+    ModuleEndTestCardComponent,
     LanguageSelectorComponent,
-    AdventureCircleBadgeComponent,
-    AdventureNavigationComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
     MasteryChallengeCardComponent,
-    ArcSkipConfirmationModalComponent,
-    AdventureMasteredModalComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
     TopicHeaderComponent,
     TopicViewerContentComponent,
   ],
@@ -82,10 +85,13 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    AdventureEndTestCardComponent,
-    AdventureCircleBadgeComponent,
-    AdventureNavigationComponent,
+    ModuleEndTestCardComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
     MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
     TopicHeaderComponent,
     TopicViewerContentComponent,
   ],

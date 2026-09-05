@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdventureCircleBadgeComponent.
+ * @fileoverview Unit tests for ModuleCircleBadgeComponent.
  */
 
 import {TestBed, waitForAsync} from '@angular/core/testing';
 
-import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
+import {ModuleCircleBadgeComponent} from './module-circle-badge.component';
 
-describe('AdventureCircleBadgeComponent', () => {
-  let component: AdventureCircleBadgeComponent;
+describe('ModuleCircleBadgeComponent', () => {
+  let component: ModuleCircleBadgeComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AdventureCircleBadgeComponent],
+      declarations: [ModuleCircleBadgeComponent],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
+    const fixture = TestBed.createComponent(ModuleCircleBadgeComponent);
     component = fixture.componentInstance;
   }));
 
@@ -39,6 +39,7 @@ describe('AdventureCircleBadgeComponent', () => {
   it('should initialize with default input values', () => {
     expect(component.label).toBe('');
     expect(component.iconName).toBe('');
+    expect(component.iconImageUrl).toBe('');
     expect(component.backgroundColor).toBe('#fff');
     expect(component.borderColor).toBe('#7f8c8d');
     expect(component.textColor).toBe('#334155');
@@ -50,11 +51,11 @@ describe('AdventureCircleBadgeComponent', () => {
 
   it('should update circleClass when size changes', () => {
     component.size = 'md';
-    expect(component.circleClass).toBe('adventure-circle-badge');
+    expect(component.circleClass).toBe('module-circle-badge');
 
     component.size = 'sm';
     expect(component.circleClass).toBe(
-      'adventure-circle-badge adventure-circle-badge--sm'
+      'module-circle-badge module-circle-badge--sm'
     );
   });
 
@@ -110,5 +111,18 @@ describe('AdventureCircleBadgeComponent', () => {
 
     expect(component.hasIcon).toBeFalse();
     expect(component.getAriaLabel()).toBe('1');
+  });
+
+  it('should use the icon image url when an icon image is provided', () => {
+    component.iconImageUrl = '/assets/images/icons/practice_pencil.svg';
+
+    expect(component.hasIcon).toBeTrue();
+    expect(component.hasIconImage).toBeTrue();
+  });
+
+  it('should not use an icon image when none is provided', () => {
+    component.iconImageUrl = '';
+
+    expect(component.hasIconImage).toBeFalse();
   });
 });
