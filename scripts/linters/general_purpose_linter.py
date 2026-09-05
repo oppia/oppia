@@ -319,6 +319,24 @@ BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexpDict] = [
             'jobs/',
         ),
     },
+    {
+        'regexp': re.compile(r'\bSERVER_CAN_SEND_EMAILS\b'),
+        'message': (
+            'Direct access to SERVER_CAN_SEND_EMAILS is restricted to '
+            'email_services.py. Upstream code should use '
+            'email_services.is_email_sending_allowed() or '
+            'email_services.send_mail().'
+        ),
+        'excluded_files': (
+            'core/domain/email_services.py',
+            'core/domain/platform_parameter_list.py',
+            'core/domain/platform_parameter_registry.py',
+            'scripts/pre_commit_hook.py',
+            '_test.py',
+            'test_utils.py',
+        ),
+        'excluded_dirs': (),
+    },
 ]
 
 BAD_PATTERNS_MAP: Dict[str, List[BadPatternRegexpDict]] = {
