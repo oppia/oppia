@@ -1,4 +1,4 @@
-<section class="arc-skip-confirmation-modal"
+<section class="arc-skip-confirmation-modal e2e-test-arc-skip-confirmation-modal"
          role="dialog"
          aria-modal="true"
          aria-labelledby="arc-skip-confirmation-title"
@@ -30,12 +30,12 @@
 
   <div class="arc-skip-confirmation-actions">
     <button type="button"
-            class="arc-skip-confirmation-cancel"
+            class="arc-skip-confirmation-cancel e2e-test-arc-skip-confirmation-cancel"
             (click)="cancel()">
       {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
     </button>
     <button type="button"
-            class="arc-skip-confirmation-proceed"
+            class="arc-skip-confirmation-proceed e2e-test-arc-skip-confirmation-proceed"
             (click)="confirm()">
       {{ 'I18N_MODAL_CONTINUE_BUTTON' | translate }}
     </button>

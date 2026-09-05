@@ -1,4 +1,4 @@
-<div class="adventure-end-test-card"
+<div class="adventure-end-test-card e2e-test-adventure-end-test-card"
      [ngStyle]="{'background-color': cardBackgroundColor}"
      [attr.aria-label]="practiceTitle || 'Adventure end test card'">
   <div class="adventure-end-test-card-thumbnail">
@@ -20,14 +20,14 @@
 
       <div class="adventure-end-test-card-copy">
         <div class="adventure-end-test-card-title-row">
-          <h3 class="adventure-end-test-card-title">{{ practiceTitle }}</h3>
+          <h3 class="adventure-end-test-card-title e2e-test-adventure-end-test-card-title">{{ practiceTitle }}</h3>
         </div>
 
         <p class="adventure-end-test-card-description">{{ getResolvedDescription() }}</p>
       </div>
 
       <div class="adventure-end-test-card-actions">
-        <button class="adventure-end-test-card-practice-button"
+        <button class="adventure-end-test-card-practice-button e2e-test-adventure-end-test-card-practice-button"
                 type="button"
                 [disabled]="!practiceUrl"
                 (click)="navigateTo(practiceUrl)">

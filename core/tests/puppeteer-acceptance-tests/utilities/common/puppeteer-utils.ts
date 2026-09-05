@@ -2116,6 +2116,51 @@ export class BaseUser {
   }
 
   /**
+   * Performs a long-press on the element matching the given selector. On touch
+   * devices Angular Material tooltips are shown after a long-press instead of
+   * a hover, because the `mouseenter` listener is not bound there. This helper
+   * dispatches touch events through the Chrome DevTools Protocol, holding the
+   * touch for longer than Material's `LONGPRESS_DELAY` (500 ms).
+   *
+   * The element is scrolled into view before the touch is dispatched: the
+   * touch coordinates are resolved relative to the layout viewport, so an
+   * element that is below the fold would not receive the touch even though it
+   * counts as "visible" for Puppeteer's selector checks.
+   * @param {string} selector - The selector of the element to long-press.
+   */
+  async longPressOnElementWithSelector(selector: string): Promise<void> {
+    const element = await this.page.waitForSelector(selector, {visible: true});
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    // Puppeteer 13 no longer exposes ElementHandle#scrollIntoViewIfNeeded, so
+    // scroll through the native DOM API. 'nearest' scrolls the minimum amount
+    // needed to bring the element fully into view.
+    await element.evaluate(el => {
+      el.scrollIntoView({block: 'nearest', inline: 'nearest'});
+    });
+    const boundingBox = await element.boundingBox();
+    if (!boundingBox) {
+      throw new Error(`Element has no bounding box for selector: ${selector}`);
+    }
+    const x = boundingBox.x + boundingBox.width / 2;
+    const y = boundingBox.y + boundingBox.height / 2;
+
+    const client = await this.page.client();
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{x, y}],
+    });
+    // LONGPRESS_DELAY in Material is 500 ms; wait slightly longer so the
+    // tooltip is shown before lifting the finger.
+    await this.page.waitForTimeout(600);
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchEnd',
+      touchPoints: [],
+    });
+  }
+
+  /**
    * Waits until the click function is attached to the given selector.
    * @param {string} selector - The selector of the element.
    */

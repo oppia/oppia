@@ -998,6 +998,25 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isExpanded).toBeTrue();
   });
 
+  it('should expand the active lesson so its actions are visible', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not expand the active lesson when it is completed', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+    component.lessonProgressStatus = 'completed';
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
   it('should not expand first lesson by default when it is completed', () => {
     component.lessonNumber = 1;
     component.lessonProgressStatus = 'completed';
