@@ -555,4 +555,26 @@ describe('Translation opportunities component', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
     ).toHaveBeenCalled();
   });
+
+  it('should load opportunities count async', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(5));
+
+    let resolvedCount = null;
+    component.loadOpportunitiesCountAsync().then(count => {
+      resolvedCount = count;
+    });
+
+    tick();
+
+    expect(
+      contributionOpportunitiesService.getTranslationOpportunitiesCountAsync
+    ).toHaveBeenCalledWith('en', undefined);
+    expect(resolvedCount).toEqual(5);
+  }));
 });
