@@ -23,16 +23,13 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick,
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardIdsBackendApiService} from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {GoalsTabComponent} from './goals-tab.component';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
@@ -48,21 +45,10 @@ import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.componen
 import {By} from '@angular/platform-browser';
 import {of} from 'rxjs';
 
-class MockRemoveActivityNgbModalRef {
-  componentInstance = {
-    sectionNameI18nId: null,
-    subsectionName: null,
-    activityId: null,
-    activityTitle: null,
-  };
-}
-
 describe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
-  let urlInterpolationService: UrlInterpolationService;
-  let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let matDialogSpy: jasmine.SpyObj<MatDialog>;
@@ -96,7 +82,6 @@ describe('Goals tab Component', () => {
       providers: [
         LearnerDashboardActivityBackendApiService,
         LearnerDashboardIdsBackendApiService,
-        UrlInterpolationService,
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -125,8 +110,6 @@ describe('Goals tab Component', () => {
     learnerDashboardActivityBackendApiService = TestBed.inject(
       LearnerDashboardActivityBackendApiService
     );
-    ngbModal = TestBed.inject(NgbModal);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
@@ -300,10 +283,7 @@ describe('Goals tab Component', () => {
     ];
     component.untrackedTopics = {};
     component.learntToPartiallyLearntTopics = [];
-    component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
-    component.topicIdsInCompletedGoals = [];
-    component.topicIdsInCurrentGoals = [];
     component.activityType = 'learntopic';
 
     sampleTopic = LearnerTopicSummary.createFromBackendDict(
@@ -329,164 +309,7 @@ describe('Goals tab Component', () => {
     expect(component.windowIsNarrow).toBeFalse();
   });
 
-  it('should check where the topicId belongs to current goal', () => {
-    component.topicIdsInCurrentGoals = ['1', '2', '3'];
-
-    let topicBelongsTo = component.getTopicClassification('1');
-    fixture.detectChanges();
-
-    expect(topicBelongsTo).toEqual(0);
-  });
-
-  it('should check where the topicId belongs to completed goal', () => {
-    component.topicIdsInCompletedGoals = ['1', '2', '3'];
-
-    let topicBelongsTo = component.getTopicClassification('1');
-    fixture.detectChanges();
-
-    expect(topicBelongsTo).toEqual(1);
-  });
-
-  it('should check if the topicName belongs to learntToPartiallyLearntTopics', () => {
-    component.learntToPartiallyLearntTopics = ['topic', 'topic2', 'topic3'];
-
-    let topicBelongsTo =
-      component.doesTopicBelongToLearntToPartiallyLearntTopics('topic');
-    fixture.detectChanges();
-
-    expect(topicBelongsTo).toEqual(true);
-  });
-
-  it('should toggle story', () => {
-    component.currentGoalsStoryIsShown = [true];
-
-    component.toggleStory(0);
-    fixture.detectChanges();
-
-    expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
-  });
-
-  it('should call preventDefault when checkbox is clicked', () => {
-    component.editGoalsTopicClassification = [0];
-    fixture.detectChanges();
-
-    const checkbox = fixture.debugElement.query(
-      By.css('.e2e-test-remove-topic-from-current-goals-button')
-    );
-    if (!checkbox) {
-      throw new Error('Unable to find the checkbox event');
-    }
-
-    const addToLearnerGoalsSpy = spyOn(
-      component,
-      'addToLearnerGoals'
-    ).and.callThrough();
-
-    checkbox.triggerEventHandler('click', {preventDefault: () => {}} as Event);
-    fixture.detectChanges();
-
-    expect(addToLearnerGoalsSpy).toHaveBeenCalled();
-  });
-
-  it('should add topic to learner goals if not already present', fakeAsync(() => {
-    component.topicIdsInCurrentGoals.length = 0;
-    component.topicIdsInCompletedGoals = ['1', '2'];
-    const learnerGoalsSpy = spyOn(
-      learnerDashboardActivityBackendApiService,
-      'addToLearnerGoals'
-    ).and.returnValue(Promise.resolve(true));
-    tick();
-    component.untrackedTopics = {math: [component.editGoals[0]]};
-    component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
-    fixture.detectChanges();
-
-    expect(learnerGoalsSpy).toHaveBeenCalled();
-  }));
-  it('should remove topic from learner goals if already present', fakeAsync(() => {
-    component.topicIdsInCurrentGoals = ['1', '2', '3'];
-
-    const learnerGoalsSpy = spyOn(
-      learnerDashboardActivityBackendApiService,
-      'addToLearnerGoals'
-    ).and.returnValue(Promise.resolve(true));
-    tick();
-    const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
-
-    component.addToLearnerGoals(component.editGoals[0], '2', 1);
-    fixture.detectChanges();
-
-    expect(removeTopicSpy).toHaveBeenCalled();
-    expect(learnerGoalsSpy).not.toHaveBeenCalled();
-  }));
-
-  it('should remove topic from the learner goals', () => {
-    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-      .toBeUndefined;
-    component.topicIdsInCurrentGoals = ['1', '2', '3'];
-
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockRemoveActivityNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
-
-    component.removeFromLearnerGoals(
-      component.editGoals[0],
-      '1',
-      'topicName',
-      0
-    );
-    component.removeFromLearnerGoals(
-      component.editGoals[1],
-      '2',
-      'topicName',
-      0
-    );
-
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should get static image url', () => {
-    const urlSpy = spyOn(
-      urlInterpolationService,
-      'getStaticImageUrl'
-    ).and.returnValue('/assets/images/learner_dashboard/star.svg');
-
-    component.getStaticImageUrl('/learner_dashboard/star.svg');
-    fixture.detectChanges();
-
-    expect(urlSpy).toHaveBeenCalled();
-  });
-
-  it('should correctly show and hide the dropdown', () => {
-    for (let i = 0; i < component.currentGoals.length; i++) {
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
-
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(false);
-
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
-
-      let fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(fakeClickAwayEvent, 'target', {
-        value: document.createElement('div'),
-      });
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
-      expect(component.showThreeDotsDropdown[i]).toBe(false);
-
-      // Three dots are not shown when no goals are present.
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
-      expect(component.showThreeDotsDropdown[i]).toBe(false);
-    }
-  });
-
   it('should open add-goals-modal when add goal button is clicked', () => {
-    component.learnerDashboardRedesignFeatureFlag = true;
     fixture.detectChanges();
 
     const dialogConfig = new MatDialogConfig();

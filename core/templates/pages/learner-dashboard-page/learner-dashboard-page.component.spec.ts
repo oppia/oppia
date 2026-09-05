@@ -110,9 +110,6 @@ class MockTranslateService {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      ShowRedesignedLearnerDashboard: {
-        isEnabled: false,
-      },
       EnableCertificateAssessment: {
         isEnabled: false,
       },
@@ -122,9 +119,6 @@ class MockPlatformFeatureService {
     };
   }
 }
-
-@Component({selector: 'background-banner', template: ''})
-class BackgroundBannerComponentStub {}
 
 @Component({selector: 'exploration-summary-tile', template: ''})
 class ExplorationSummaryTileComponentStub {}
@@ -281,7 +275,6 @@ describe('Learner dashboard page', () => {
           SortByPipe,
           MockSlicePipe,
           MockTruncatePipe,
-          BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
           LoadingDotsComponentStub,
@@ -813,19 +806,6 @@ describe('Learner dashboard page', () => {
       );
     });
 
-    it('should toggle active subsection type when changing subsection type', () => {
-      // Active subsection is set as I18N_DASHBOARD_SKILL_PROFICIENCY when
-      // component is initialized.
-      expect(component.activeSubsection).toBe(
-        'I18N_DASHBOARD_SKILL_PROFICIENCY'
-      );
-
-      let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
-      component.setActiveSubsection(newActiveSubsection2);
-
-      expect(component.activeSubsection).toBe(newActiveSubsection2);
-    });
-
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(component.showUsernamePopover('abc')).toBe('none');
@@ -885,13 +865,6 @@ describe('Learner dashboard page', () => {
       expect(result).toBe('шеллы');
     });
 
-    it('should get show_redesigned_learner_dashboard flag', () => {
-      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: false,
-        },
-      });
-    });
     it('should correctly get subtopic masteries', fakeAsync(() => {
       let subtopic = {
         skill_ids: ['skill_id_2'],
@@ -1106,9 +1079,6 @@ describe('Learner dashboard page', () => {
 
     it('should set active section to my suggestions when my suggestions tab is active', fakeAsync(() => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         EnableCertificateAssessment: {
           isEnabled: false,
         },
@@ -1164,7 +1134,6 @@ describe('Learner dashboard page', () => {
           SortByPipe,
           MockSlicePipe,
           MockTruncatePipe,
-          BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
           LoadingDotsComponentStub,
@@ -1268,120 +1237,6 @@ describe('Learner dashboard page', () => {
         'Failed to get learner dashboard explorations data'
       );
     }));
-
-    it(
-      'should show an alert warning when fails to get collections data' +
-        'in mobile view',
-      fakeAsync(() => {
-        const fetchDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardCollectionsDataAsync'
-        ).and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-
-        let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-        component.setActiveSubsection(newActiveSectionName);
-
-        tick();
-        fixture.detectChanges();
-
-        expect(alertsSpy).toHaveBeenCalledWith(
-          'Failed to get learner dashboard collections data'
-        );
-        expect(fetchDataSpy).toHaveBeenCalled();
-      })
-    );
-
-    it(
-      'should show an alert warning when fails to get explorations data in' +
-        'mobile view',
-      fakeAsync(() => {
-        const fetchDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardExplorationsDataAsync'
-        ).and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-
-        let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-        component.setActiveSubsection(newActiveSectionName);
-
-        tick();
-        fixture.detectChanges();
-
-        expect(alertsSpy).toHaveBeenCalledWith(
-          'Failed to get learner dashboard explorations data'
-        );
-        expect(fetchDataSpy).toHaveBeenCalled();
-      })
-    );
-
-    it(
-      'should get explorations and collections data when user clicks ' +
-        'communtiy lessons tab in mobile view',
-      fakeAsync(() => {
-        const fetchCollectionsDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardCollectionsDataAsync'
-        ).and.returnValue(
-          Promise.resolve({
-            completedCollectionsList:
-              learnerDashboardCollectionsData.completed_collections_list.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
-            incompleteCollectionsList:
-              learnerDashboardCollectionsData.incomplete_collections_list.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
-            completedToIncompleteCollections:
-              learnerDashboardCollectionsData.completed_to_incomplete_collections,
-            numberOfNonexistentCollections:
-              NonExistentCollections.createFromBackendDict(
-                learnerDashboardCollectionsData.number_of_nonexistent_collections
-              ),
-          })
-        );
-
-        const fetchExplorationsDataSpy = spyOn(
-          learnerDashboardBackendApiService,
-          'fetchLearnerDashboardExplorationsDataAsync'
-        ).and.returnValue(
-          Promise.resolve({
-            completedExplorationsList:
-              learnerDashboardExplorationsData.completed_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            incompleteExplorationsList:
-              learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            numberOfNonexistentExplorations:
-              NonExistentExplorations.createFromBackendDict(
-                learnerDashboardExplorationsData.number_of_nonexistent_explorations
-              ),
-            subscriptionList:
-              learnerDashboardExplorationsData.subscription_list.map(
-                profileSummary =>
-                  ProfileSummary.createFromCreatorBackendDict(profileSummary)
-              ),
-          })
-        );
-
-        let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-        component.setActiveSubsection(newActiveSectionName);
-
-        tick();
-        fixture.detectChanges();
-
-        expect(fetchCollectionsDataSpy).toHaveBeenCalled();
-        flush();
-        expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-        expect(component.communityLessonsDataLoaded).toEqual(true);
-      })
-    );
 
     it(
       'should show an alert warning when fails to get collections data ' +
@@ -1532,9 +1387,6 @@ describe('Learner dashboard page', () => {
         EnableCertificateAssessment: {
           isEnabled: true,
         },
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: false,
         },
@@ -1555,9 +1407,6 @@ describe('Learner dashboard page', () => {
         EnableCertificateAssessment: {
           isEnabled: false,
         },
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: true,
         },
@@ -1575,9 +1424,6 @@ describe('Learner dashboard page', () => {
 
     it('should keep the current tab when my certificates is disabled', () => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         EnableCertificateAssessment: {
           isEnabled: false,
         },
@@ -1600,9 +1446,6 @@ describe('Learner dashboard page', () => {
 
     it('should keep the current tab when my suggestions is disabled', () => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: true,
-        },
         EnableCertificateAssessment: {
           isEnabled: false,
         },
