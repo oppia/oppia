@@ -59,6 +59,59 @@ METHOD_NAME_REGEX: Final = r'async\s+(\w+)\s*\('
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
+APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
+    os.getcwd(),
+    'core',
+    'templates',
+    'pages',
+    'oppia-root',
+    'routing',
+    'app.routing.module.ts',
+)
+
+LIGHTHOUSE_PAGES_JSON_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'lighthouse-pages.json'
+)
+
+ROUTE_KEY_REGEX: Final = (
+    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
+)
+
+MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
+
+
+def _extract_top_level_route_objects(content: str) -> List[str]:
+    """Returns each top-level (outermost) balanced curly-brace group.
+
+    Route objects in app.routing.module.ts are object literals that follow a
+    `PAGES_REGISTERED_WITH_FRONTEND.<KEY>.ROUTE` path. Scanning for balanced
+    braces keeps each route object's key and its lazy import together even
+    when the object contains nested object literals (such as a data block) or
+    a block-bodied loadChildren.
+
+    Args:
+        content: str. The normalized routing module source.
+
+    Returns:
+        list(str). The text of each outermost balanced {...} group, in
+        source order.
+    """
+    route_objects = []
+    start_index = -1
+    depth = 0
+    for index, char in enumerate(content):
+        if char == '{':
+            if depth == 0:
+                start_index = index
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0 and start_index != -1:
+                route_objects.append(content[start_index : index + 1])
+                start_index = -1
+    return route_objects
+
+
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
@@ -93,6 +146,62 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
         'type_defs_filename_prefix': 'nerdamer-defs-',
     },
 ]
+
+# Routes that are not covered by Lighthouse tests. Each entry is a
+# PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
+# this list without asking @Hardikgoyal2003.
+LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
+    'ANDROID',
+    'BLOG_ADMIN',
+    'BLOG_HOMEPAGE',
+    'BLOG_POST_PAGE',
+    'CERTIFICATE_ASSESSMENT_PLAYER',
+    'CERTIFICATE_ASSESSMENT_RESULT',
+    'CERTIFICATE_CREATOR_DASHBOARD',
+    'CERTIFICATE_OFFERING_AVAILABLE',
+    'CLASSROOM_ADMIN_PAGE',
+    'CLASSROOMS',
+    'CONTRIBUTOR_DASHBOARD_ADMIN',
+    'CREATE_CERTIFICATE_OFFERING',
+    'DIAGNOSTIC_TEST_PLAYER',
+    'EDIT_CERTIFICATE_OFFERING',
+    'END_OF_ARC_TEST',
+    'FACILITATOR_DASHBOARD',
+    'FEEDBACK_UPDATES',
+    'LEARNER_GROUP_CREATOR',
+    'LEARNER_GROUP_EDITOR',
+    'LEARNER_GROUP_VIEWER',
+    'MASTERY_CHALLENGE',
+    'NEW_LESSON_PLAYER',
+    'NODE_PRACTICE_SESSION',
+    'PARTNERSHIPS',
+    'PENDING_ACCOUNT_DELETION',
+    'PRACTICE_SESSION',
+    'RELEASE_COORDINATOR_PAGE',
+    'SUBTOPIC_VIEWER',
+    'TECHNICAL_FEEDBACK_DASHBOARD',
+    'TECHNICAL_FEEDBACK_DETAIL',
+    'VOICEOVER_ADMIN',
+    # Deprecation needs to be discussed with the prodops team first.
+    'BLOG_AUTHOR_PROFILE_PAGE',
+    'COLLECTION_EDITOR',
+    'COLLECTION_PLAYER',
+    # These routes are deprecated or slated for deprecation.
+    'BLOG_HOMEPAGE_SEARCH',
+    'LESSON_PLAYER_EMBED',
+    'LIBRARY_RECENTLY_PUBLISHED',
+    'LIBRARY_SEARCH',
+    'LIBRARY_TOP_RATED',
+    'REVIEW_TEST',
+    # These routes are excluded either because they are for redirection or
+    # because they are rarely used.
+    'ERROR',
+    'EXPLORATION_PLAYER_EMBED',
+    'ERROR_IFRAMED',
+    'LOGIN',
+    'LOGOUT',
+    'MAINTENANCE',
+}
 
 
 class CustomLintChecksManager(linter_utils.BaseLinter):
@@ -354,6 +463,88 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             for job in jobs_with_unnamed_step
         ]
 
+    def check_lighthouse_page_coverage(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that every route in the routing module has a corresponding
+        Lighthouse page entry in lighthouse-pages.json, or is explicitly
+        listed in the exclusion set.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the
+            lint check.
+        """
+        name = 'Lighthouse page coverage'
+
+        error_messages: List[str] = []
+
+        routing_content = self.file_cache.read(APP_ROUTING_MODULE_FILEPATH)
+        lh_pages_content = self.file_cache.read(LIGHTHOUSE_PAGES_JSON_FILEPATH)
+
+        # Normalize routing content: remove single-line comments and
+        # join string-concatenated import paths so that the regex can
+        # match them reliably.
+        normalized = re.sub(r'//[^\n]*', '', routing_content)
+        # The regex and replacement contain literal single quotes from
+        # the TypeScript source, so double-quote delimiters are required.
+        normalized = re.sub(
+            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=invalid-string-quote
+            r"'\1\2'",  # pylint: disable=invalid-string-quote
+            normalized,
+        )
+
+        # Parse lighthouse-pages.json and extract page_module paths,
+        # normalized to match the routing module import format.
+        lh_pages = json.loads(lh_pages_content)
+        lh_modules = set()
+        for page_entry in lh_pages.values():
+            page_module = page_entry.get('page_module', '')
+            if page_module.startswith('core/templates/'):
+                page_module = page_module[len('core/templates/') :]
+            if page_module.endswith('.ts'):
+                page_module = page_module[:-3]
+            lh_modules.add(os.path.normpath(page_module))
+
+        # Parse each route object to find its key and associated module
+        # import path. Splitting on every '{' would break routes that
+        # contain nested object literals (e.g. a data object) or a
+        # block-bodied loadChildren, because the key and its import could
+        # be placed in separate fragments. Instead, extract each top-level
+        # route object as a whole so the key and its import always stay
+        # together.
+        key_to_modules: Dict[str, List[str]] = {}
+        for route_object in _extract_top_level_route_objects(normalized):
+            key_match = re.search(ROUTE_KEY_REGEX, route_object)
+            if not key_match:
+                continue
+            key = key_match.group(1)
+            import_matches = re.findall(MODULE_IMPORT_REGEX, route_object)
+            if import_matches:
+                key_to_modules.setdefault(key, []).extend(import_matches)
+
+        # Find routes that have no corresponding Lighthouse page entry.
+        uncovered_keys = []
+        for key, modules in sorted(key_to_modules.items()):
+            if key in LIGHTHOUSE_ROUTE_EXCLUSIONS:
+                continue
+            covered = any(os.path.normpath(m) in lh_modules for m in modules)
+            if not covered:
+                uncovered_keys.append(key)
+
+        if uncovered_keys:
+            error_messages.append(
+                'New routes found in app.routing.module.ts that are '
+                'missing from core/tests/lighthouse-pages.json:\n\n'
+                '  %s\n\n'
+                'Add a corresponding page_module entry to '
+                'lighthouse-pages.json for each route above.'
+                % '\n  '.join(sorted(uncovered_keys))
+            )
+
+        return concurrent_task_utils.TaskResult(
+            name, bool(error_messages), error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -370,6 +561,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         linter_stdout.append(
             self.check_duplicate_method_names_in_user_utilities()
         )
+        linter_stdout.append(self.check_lighthouse_page_coverage())
 
         return linter_stdout
 
