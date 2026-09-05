@@ -24,6 +24,7 @@ import {ChangeDetectorRef} from '@angular/core';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface SetOfAlgebraicIdentifierEditorSchema {
   type: 'list';
@@ -91,9 +92,12 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: string[]): void {
-    if (this.value !== newValue) {
-      this.value = newValue;
+  updateValue(newValue: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
+    // value is always a string array.
+    const updatedValue = newValue as string[];
+    if (this.value !== updatedValue) {
+      this.value = updatedValue;
       this.valueChanged.emit(this.value);
       this.changeDetectorRef.detectChanges();
     }

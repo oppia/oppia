@@ -133,13 +133,3 @@ extensions/objects/templates/nonnegative-int-editor.component.ts
 extensions/objects/templates/parameter-name-editor.component.ts
 extensions/objects/templates/position-of-terms-editor.component.ts
 extensions/objects/templates/positive-int-editor.component.ts
-extensions/objects/templates/real-editor.component.ts
-extensions/objects/templates/sanitized-url-editor.component.ts
-extensions/objects/templates/set-of-algebraic-identifier-editor.component.ts
-extensions/objects/templates/set-of-translatable-html-content-ids-editor.component.ts
-extensions/objects/templates/set-of-unicode-string-editor.component.ts
-extensions/objects/templates/subtitled-html-editor.component.ts
-extensions/objects/templates/subtitled-unicode-editor.component.ts
-extensions/objects/templates/svg-editor.component.ts
-extensions/objects/templates/translatable-html-content-id.component.ts
-extensions/objects/templates/translatable-set-of-normalized-string-editor.component.ts

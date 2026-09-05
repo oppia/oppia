@@ -31,7 +31,7 @@ import {
 } from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 interface RealSchema {
-  type: string;
+  type: 'float';
 }
 @Component({
   selector: 'real-editor',
@@ -81,7 +81,7 @@ export class RealEditorComponent
     return this.schema;
   }
 
-  updateValue(newValue: number | string): void {
+  updateValue(newValue: SchemaDefaultValue): void {
     if (
       this.value === newValue ||
       ((newValue === '' || newValue === null) && this.value === 0.0)
@@ -95,7 +95,9 @@ export class RealEditorComponent
       this.changeDetectorRef.detectChanges();
       return;
     }
-    this.value = newValue;
+    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
+    // value is always a number or a string.
+    this.value = newValue as number | string;
     this.valueChanged.emit(this.value);
     this.onValidatorChange();
     this.changeDetectorRef.detectChanges();
