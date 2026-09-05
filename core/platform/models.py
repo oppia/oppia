@@ -498,9 +498,9 @@ class _Gae(Platform):
 
             return translate_emulator
         else:
-            from core.platform.translate import azure_translate_services
+            from core.platform.translate import gcp_translate_services
 
-            return azure_translate_services
+            return gcp_translate_services
 
     @classmethod
     def import_storage_services(cls) -> ModuleType:

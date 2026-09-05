@@ -726,6 +726,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "contributor-dashboard-admin/manage-auto-translation-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "collection-creator/create-a-collection",
       "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts",
       "framework": "puppeteer"

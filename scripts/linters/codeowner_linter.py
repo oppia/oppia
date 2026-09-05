@@ -59,6 +59,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/controllers/firebase*.py',
     '/core/domain/android*.py',
     '/core/domain/html*.py',
+    '/core/domain/html_translation_services*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',

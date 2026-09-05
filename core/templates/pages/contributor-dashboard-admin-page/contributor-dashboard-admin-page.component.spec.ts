@@ -38,6 +38,9 @@ class MockPlatformFeatureService {
     CdAdminDashboardNewUi: {
       isEnabled: false,
     },
+    EnableAutomaticTranslationSuggestions: {
+      isEnabled: false,
+    },
   };
 }
 
