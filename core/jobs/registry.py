@@ -104,6 +104,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     remove_profile_picture_data_url_field_jobs,
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    remove_auto_tts_enabled_from_exp_models_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     story_node_jobs,
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
