@@ -1623,6 +1623,9 @@ URLS.extend(
             r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
+        get_redirect_route(
+            r'/lesson/<exploration_id>', oppia_root.OppiaRootPage
+        ),
     )
 )
 

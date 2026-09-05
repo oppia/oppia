@@ -91,6 +91,17 @@ export interface AdminPageDataBackendDict {
   platform_params_dicts: PlatformParameterBackendDict[];
   skill_list: SkillSummaryBackendDict[];
   story_list: StoryBackendDict[];
+  classroom_list: ClassroomSummaryBackendDict[];
+}
+
+export interface ClassroomSummaryBackendDict {
+  classroom_id: string;
+  name: string;
+}
+
+export interface ClassroomSummary {
+  classroomId: string;
+  name: string;
 }
 
 export interface AdminPageData {
@@ -105,6 +116,7 @@ export interface AdminPageData {
   platformParameters: PlatformParameter[];
   skillList: SkillSummary[];
   storyList: Story[];
+  classroomList: ClassroomSummary[];
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -147,6 +159,10 @@ export class AdminBackendApiService {
               storyList: response.story_list.map(dict =>
                 Story.createFromBackendDict(dict)
               ),
+              classroomList: response.classroom_list.map(dict => ({
+                classroomId: dict.classroom_id,
+                name: dict.name,
+              })),
             });
           },
           errorResponse => {
@@ -683,9 +699,32 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyClassroomDataAsync(): Promise<void> {
+  async generateDummyClassroomDataAsync(
+    numberOfClassrooms: number
+  ): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_classroom',
+      num_dummy_classrooms_to_generate: numberOfClassrooms,
+    });
+  }
+
+  async generateDummyDefaultClassroomsAsync(
+    numberOfClassrooms: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_default_classroom',
+      num_dummy_classrooms_to_generate: numberOfClassrooms,
+    });
+  }
+
+  async generateDummyTopicsAsync(
+    numberOfTopics: number,
+    classroomId: string
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_topics',
+      num_dummy_topics_to_generate: numberOfTopics,
+      dummy_topic_classroom_id: classroomId,
     });
   }
 

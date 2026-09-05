@@ -127,6 +127,20 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
         self.OLD_VALUE: List[str] = []
 
+    def test_update_story_node_acquired_skill_ids_after_publish(self) -> None:
+        # The node_1 node is not present in the mapping, so it should keep its
+        # existing (empty) acquired skill ids.
+        node_ids_to_skill_ids = {self.NODE_ID_2: ['skill_id_2']}
+
+        story_services.update_story_node_acquired_skill_ids_after_publish(
+            self.USER_ID, self.STORY_ID, node_ids_to_skill_ids
+        )
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(len(story.story_contents.nodes), 1)
+        self.assertEqual(story.story_contents.nodes[0].id, self.NODE_ID_1)
+        self.assertEqual(story.story_contents.nodes[0].acquired_skill_ids, [])
+
     def test_compute_summary(self) -> None:
         story_summary = story_services.compute_summary_of_story(self.story)
 

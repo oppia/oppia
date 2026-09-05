@@ -144,21 +144,87 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ms-0">
-      <h3>Generate a dummy math classroom (only curriculum admins)</h3>
-      <div class="row">
-        <span class="col-lg-8 col-md-8 col-sm-4">
-          Generate a dummy math classroom with 5 published topics containing 1
-          skill per topic and 3 questions linked per skill.
-        </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
-          <button type="button"
-                  class="btn btn-secondary float-end load-dummy-math-classroom"
-                  (click)="generateNewClassroom()">
-            Generate Data
-          </button>
-        </span>
-      </div>
+    <div class="container">
+      <h3>Generate dummy math classrooms (only curriculum admins)</h3>
+      <p>
+        Use this form to generate dummy math classrooms, each with 5 published
+        topics containing 1 skill per topic and 3 questions linked per skill.
+      </p>
+      <span class="row">
+        <label for="label-target-number-of-classrooms-to-generate" class="form-label">Number of classrooms to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="numDummyClassroomsToGenerate"
+               placeholder="Classrooms to generate" type="number" min="0"
+               id="label-target-number-of-classrooms-to-generate">
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text load-dummy-math-classroom"
+                (click)="generateNewClassroom()"
+                [disabled]="!numDummyClassroomsToGenerate">
+          Generate Math Classrooms
+        </button>
+      </span>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate dummy default classrooms (only curriculum admins)</h3>
+      <p>
+        Use this form to generate dummy default classrooms that contain no
+        topics, skills or questions.
+      </p>
+      <span class="row">
+        <label for="label-target-number-of-default-classrooms-to-generate" class="form-label">Number of default classrooms to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="numDummyDefaultClassroomsToGenerate"
+               placeholder="Default classrooms to generate" type="number" min="0"
+               id="label-target-number-of-default-classrooms-to-generate">
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text load-dummy-default-classroom"
+                (click)="generateNewDefaultClassrooms()"
+                [disabled]="!numDummyDefaultClassroomsToGenerate">
+          Generate Default Classrooms
+        </button>
+      </span>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate dummy topics (only curriculum admins)</h3>
+      <p>
+        Use this form to generate dummy topics, each with 1 skill and 3 questions
+        linked per topic, and publish them in the selected classroom.
+      </p>
+      <span class="row">
+        <label for="label-target-number-of-topics-to-generate" class="form-label">Number of topics to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="numDummyTopicsToGenerate"
+               placeholder="Topics to generate" type="number" min="0"
+               id="label-target-number-of-topics-to-generate">
+
+        <label for="label-target-classroom-selection" class="form-label">Select classroom</label>
+        <select id="label-target-classroom-selection" class="form-select"
+                (change)="selectedClassroomId=$event.target.value">
+          <option *ngFor="let classroom of classroomList"
+                  [value]="classroom.classroomId">
+            {{classroom.name}}
+          </option>
+        </select>
+
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text load-dummy-topic"
+                (click)="generateNewTopics()"
+                [disabled]="!numDummyTopicsToGenerate || !selectedClassroomId">
+          Generate Topics
+        </button>
+      </span>
       <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
         assign this role to your username.
       </p>

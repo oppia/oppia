@@ -38,6 +38,11 @@ var explorationId = 'Exploration editor not loaded';
 var topicId = 'Topic editor not loaded';
 var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
+var blogUrlFragment = 'Blog post page not loaded';
+var learnerGroupId = 'Learner group not loaded';
+var technicalFeedbackReportId = 'Technical feedback report not loaded';
+var certificateId = 'Certificate not loaded';
+var attemptId = 'Attempt not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -47,6 +52,8 @@ var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
+var creationModalSelector = '.e2e-test-creation-modal';
+var createExplorationInModalSelector = '.e2e-test-create-exploration';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
 var stateEditSelector = '.e2e-test-state-edit-content';
 var saveContentButton = '.e2e-test-save-state-content';
@@ -70,6 +77,7 @@ var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
 var topicUploadButton = '.e2e-test-photo-upload-input';
+var imageUploadLabel = '.e2e-test-image-upload-label';
 var topicPhotoSubmit = 'button.e2e-test-photo-upload-submit';
 var thumbnailContainer = '.e2e-test-thumbnail-container';
 var confirmTopicCreationButton = '.e2e-test-confirm-topic-creation-button';
@@ -99,6 +107,26 @@ var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
+var blogGenerateButton = '.e2e-test-generate-blog-post';
+var classroomEditButton = '.e2e-test-edit-classroom-config-button';
+var diagnosticTestStatusButton = '.e2e-test-toggle-diagnostic-test-status-btn';
+var classroomSaveButton = '.e2e-test-save-classroom-config-button';
+var classroomNameView = '.e2e-test-classroom-name-view';
+var featuresTab = '.e2e-test-features-tab';
+var featureFlagDiv = '.e2e-test-feature-flag';
+var featureFlagNameSelector = '.e2e-test-feature-name';
+var featureFlagValueSelector = '.e2e-test-value-selector';
+var featureFlagSaveButton = '.e2e-test-save-button';
+var generateClassroomCountInput =
+  '#label-target-number-of-classrooms-to-generate';
+var generateDefaultClassroomCountInput =
+  '#label-target-number-of-default-classrooms-to-generate';
+var generateDefaultClassroomButton = '.load-dummy-default-classroom';
+var generateExplorationsCountInput = '#label-target-explorations-to-generate';
+var generateExplorationsPublishInput = '#label-target-explorations-to-publish';
+var reloadExplorationButton = '.e2e-test-reload-exploration-button';
+var reloadExplorationRow = '.e2e-test-reload-exploration-row';
+var reloadExplorationTitle = '.e2e-test-reload-exploration-title';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
@@ -109,20 +137,56 @@ var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 var roleOptionLabels = {
   ADMIN: 'curriculum admin',
   COLLECTION_EDITOR: 'collection editor',
+  FULL_USER: 'full user',
+  RELEASE_COORDINATOR: 'release coordinator',
+  TECH_TEAM_LEAD: 'tech team lead',
+  TRANSLATION_ADMIN: 'translation admin',
+  VOICEOVER_ADMIN: 'voiceover admin',
+};
+
+// Wraps a setup step so it logs its name and elapsed time to stdout. This
+// surfaces each scaffolded piece of data (login, generated explorations,
+// generated classrooms, and so on) in the CI logs, which makes it easy to see
+// which step consumes the most time in a shard setup.
+const logStep = async function (name, step) {
+  // eslint-disable-next-line no-console
+  console.log(`[lighthouse-setup] ${name}...`);
+  const startTime = Date.now();
+  await step();
+  const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
+  // eslint-disable-next-line no-console
+  console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
 const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    // networkidle0 can wait forever on the heavy /admin page when its
+    // background requests keep a connection open (seen as a local hang), so
+    // allow up to two connections and cap the wait to surface a hard error
+    // instead of spinning silently.
+    await page.goto(ADMIN_URL, {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
 
     let cookies = await page.cookies();
     if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
-      await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
-      await page.click(cookieBannerAcceptButton);
+      // The consent banner may not render in every run (it can be dismissed
+      // or not yet hydrated), so its acknowledgement is best-effort: try to
+      // accept it but continue even if it does not appear in time.
+      try {
+        await page.waitForSelector(cookieBannerAcceptButton, {
+          visible: true,
+          timeout: 5000,
+        });
+        await page.click(cookieBannerAcceptButton);
+      } catch (error) {
+        // Best-effort: login proceeds without the banner acknowledgement.
+      }
     }
 
     let usernameInputElement = null;
@@ -136,7 +200,10 @@ const login = async function (browser, page) {
     }
 
     if (usernameInputElement === null) {
-      await page.waitForSelector(navbarToggle);
+      // The first load against a fresh datastore can be slow while the
+      // appserver warms up, so allow more than the default 30s for the
+      // post-login navigation.
+      await page.waitForSelector(navbarToggle, {timeout: 60000});
       return;
     }
 
@@ -149,10 +216,16 @@ const login = async function (browser, page) {
         document.querySelector(selector).blur();
       }, usernameInput),
     ]);
+    await page.waitForSelector(agreeToTermsCheckBox, {visible: true});
     await page.click(agreeToTermsCheckBox);
-    await page.waitForSelector(registerUser);
+    // The first registration against a fresh datastore can be slow while the
+    // appserver warms up, so allow more than the default 30s for the register
+    // button to become enabled.
+    await page.waitForSelector(registerUser, {timeout: 60000});
     await page.click(registerUser);
-    await page.waitForSelector(navbarToggle);
+    // The first registration against a fresh datastore can be slow while the
+    // appserver warms up, so allow more than the default 30s for the redirect.
+    await page.waitForSelector(navbarToggle, {timeout: 60000});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Login Failed');
@@ -250,11 +323,48 @@ const getExplorationEditorUrl = async function (browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createButtonSelector, {visible: true});
-    await page.click(createButtonSelector);
-    await page.waitForSelector(dismissWelcomeModalSelector, {visible: true});
 
-    await page.click(dismissWelcomeModalSelector);
-    await page.waitForTimeout(3000);
+    await page.click(createButtonSelector);
+
+    // The create button opens a creation modal when the user has the
+    // collection-creator role (as the CI admin does). In that case we need to
+    // pick the exploration option to reach the exploration editor, instead of
+    // navigating directly.
+    const isCreationModalVisible = await page
+      .waitForSelector(creationModalSelector, {visible: true, timeout: 10000})
+      .then(() => true)
+      .catch(() => false);
+
+    if (isCreationModalVisible) {
+      await page.waitForSelector(createExplorationInModalSelector, {
+        visible: true,
+      });
+      await page.click(createExplorationInModalSelector);
+    }
+
+    // Wait for the navigation to the created exploration's editor before
+    // interacting with it.
+    await page.waitForFunction(
+      urlFragment => document.URL.indexOf(urlFragment) !== -1,
+      {},
+      '/create/'
+    );
+
+    // The exploration creation flow may or may not show a welcome modal,
+    // depending on prior state, so the dismissal is optional to avoid
+    // blocking the whole shard setup when the modal never appears.
+    try {
+      await page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 30000,
+      });
+      await page.click(dismissWelcomeModalSelector);
+      await page.waitForTimeout(3000);
+    } catch (e) {
+      if (!(e instanceof puppeteer.errors.TimeoutError)) {
+        throw e;
+      }
+    }
     await page.waitForSelector(stateEditSelector, {visible: true});
     await page.click(stateEditSelector);
     await page.waitForTimeout(5000);
@@ -475,6 +585,24 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
           : '';
       });
     } while (statusMessage !== successMessage);
+
+    // Capture the seeded learner group id from the facilitator dashboard,
+    // which lists the groups the admin is a facilitator of.
+    learnerGroupId = await page.evaluate(async () => {
+      const response = await fetch('/facilitator_dashboard_handler');
+      const data = await response.json();
+      return data.learner_groups_list[0].id;
+    });
+
+    // Capture the seeded technical feedback report id from the
+    // technical-external dashboard summaries.
+    technicalFeedbackReportId = await page.evaluate(async () => {
+      const response = await fetch(
+        '/platform-feedback/technical/tech-external'
+      );
+      const data = await response.json();
+      return data.summaries.length > 0 ? data.summaries[0].id : null;
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -490,6 +618,11 @@ const generateDataForClassroom = async function (browser, page) {
     });
 
     await page.waitForSelector(generateClassroomButton);
+    // Only the first dummy math classroom is needed here: it backs the
+    // diagnostic test toggle, the topic thumbnails and the certificate
+    // offering/attempt captures below. The classroom routes get their
+    // additional populated classrooms from generateBareClassrooms.
+    await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
     const successMessage = 'Dummy new classroom generated successfully.';
@@ -510,6 +643,320 @@ const generateDataForClassroom = async function (browser, page) {
     await addThumbnailToTopic(page, 'Subtraction');
     await addThumbnailToTopic(page, 'Multiplication');
     await addThumbnailToTopic(page, 'Division');
+
+    // Capture the seeded certificate offering and the attempt started for the
+    // admin so that the certificate pages render real content. Shards that do
+    // not enable the certificate flag (or that run before the certificate data
+    // is seeded) receive a non-JSON response, so the parse failures are caught
+    // and treated as "no certificate data" instead of failing the setup.
+    certificateId = await page.evaluate(async () => {
+      const response = await fetch('/certificate_assessment_offering_handler');
+      try {
+        const data = await response.json();
+        return data.certificate_offerings.length > 0
+          ? data.certificate_offerings[0].id
+          : null;
+      } catch (error) {
+        return null;
+      }
+    });
+    attemptId = await page.evaluate(async () => {
+      const response = await fetch('/certificate_assessment_attempts_handler');
+      try {
+        const data = await response.json();
+        return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
+      } catch (error) {
+        return null;
+      }
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateBareClassrooms = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    await page.waitForSelector(generateDefaultClassroomCountInput);
+    await page.type(generateDefaultClassroomCountInput, '5');
+    await page.waitForSelector(generateDefaultClassroomButton);
+    await page.click(generateDefaultClassroomButton);
+
+    const successMessage = 'Dummy default classrooms generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateDataForBlogPosts = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    await page.waitForSelector(blogGenerateButton);
+
+    // The activities tab provides a separate generate button for each dummy
+    // blog post title. Each click creates a single blog post, so 11 dummy
+    // blog posts are generated by cycling through the available buttons.
+    const successMessage = 'Dummy Blog Post generated successfully.';
+    for (let i = 0; i < 11; i++) {
+      const blogGenerateButtons = await page.$$(blogGenerateButton);
+      await blogGenerateButtons[i % blogGenerateButtons.length].click();
+      let statusMessage;
+      do {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        statusMessage = await page.evaluate(() => {
+          const statusMessageElement = document.querySelector(
+            '.oppia-status-message-container'
+          );
+          return statusMessageElement
+            ? statusMessageElement.textContent.trim()
+            : '';
+        });
+      } while (statusMessage !== successMessage);
+    }
+
+    // Navigate to the blog homepage and open the first published blog post to
+    // capture its URL fragment, which is needed for the blog post page
+    // lighthouse check.
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/blog', {waitUntil: networkIdle});
+    await page.waitForSelector('.e2e-test-blog-post-list .blog-card', {
+      visible: true,
+    });
+    const blogCards = await page.$$('.e2e-test-blog-post-list .blog-card');
+    await blogCards[0].click();
+    await page.waitForFunction(() =>
+      window.location.pathname.startsWith('/blog/')
+    );
+    blogUrlFragment = new URL(await page.url()).pathname.split('/')[2];
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateDummyExplorations = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: networkIdle,
+    });
+
+    await page.waitForSelector(generateExplorationsCountInput);
+    await page.type(generateExplorationsCountInput, '5');
+    await page.waitForSelector(generateExplorationsPublishInput);
+    await page.type(generateExplorationsPublishInput, '5');
+
+    // The generate button uses the shared .oppia-generate-exploration-text
+    // class across several cards, so it is targeted by its label text instead.
+    await page.waitForXPath(
+      "//*[contains(normalize-space(text()), 'Generate Explorations')]"
+    );
+    const [generateButton] = await page.$x(
+      "//*[contains(normalize-space(text()), 'Generate Explorations')]"
+    );
+    await generateButton.click();
+
+    const successMessage = 'Dummy explorations generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const reloadAllInteractionsExploration = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    // Like the login navigation, the admin activities tab can keep a
+    // background connection open, so avoid networkidle0 which can wait
+    // forever; allow up to two connections and cap the wait.
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
+
+    // The reload button is guarded by a native confirm dialog. Without a
+    // dialog handler the page can block indefinitely waiting for it to be
+    // answered, so accept any dialog that appears before clicking.
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+
+    // Locate the reload button for the all_interactions demo exploration so
+    // that the exploration editor, player and new lesson player pages have
+    // content exercising every interaction type to render. Cap the wait so a
+    // slow render of the activity rows fails loudly instead of hanging.
+    await page.waitForSelector(reloadExplorationRow, {timeout: 60000});
+    const reloadButtons = await page.$$(reloadExplorationButton);
+    for (let i = 0; i < reloadButtons.length; i++) {
+      const title = await page.evaluate(
+        (el, sel, titleSelector) =>
+          el.closest(sel).querySelector(titleSelector).textContent.trim(),
+        reloadButtons[i],
+        reloadExplorationRow,
+        reloadExplorationTitle
+      );
+      if (title === 'all_interactions') {
+        await reloadButtons[i].click();
+        break;
+      }
+    }
+
+    const successMessage = 'Data reloaded successfully.';
+    let statusMessage;
+    let tries = 0;
+    do {
+      if (tries++ > 120) {
+        throw new Error(
+          'Timed out waiting for the all_interactions exploration reload.'
+        );
+      }
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return statusMessageElement
+          ? statusMessageElement.textContent.trim()
+          : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const enableDiagnosticTestForMathClassroom = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/classroom-admin', {
+      waitUntil: networkIdle,
+    });
+
+    // Open the details of the first dummy math classroom that was generated
+    // by the generate dummy classrooms action.
+    const classroomTileXPath =
+      "//*[contains(@class, 'e2e-test-classroom-tile')][.//*[contains(@class, 'e2e-test-classroom-tile-name')][text()='math']]";
+    await page.waitForXPath(classroomTileXPath);
+    const [classroomTileElement] = await page.$x(classroomTileXPath);
+    await classroomTileElement.click();
+
+    // Enter the editor mode to reveal the diagnostic test status toggle.
+    await page.waitForSelector(classroomEditButton, {visible: true});
+    await page.click(classroomEditButton);
+
+    // Enable the diagnostic test for the math classroom.
+    await page.waitForSelector(diagnosticTestStatusButton, {visible: true});
+    await page.click(diagnosticTestStatusButton);
+
+    // Wait for the save button to become enabled and save the changes.
+    await page.waitForSelector(classroomSaveButton, {visible: true});
+    await page.waitForFunction(
+      selector => {
+        const button = document.querySelector(selector);
+        return button && !button.disabled;
+      },
+      {},
+      classroomSaveButton
+    );
+    await page.click(classroomSaveButton);
+
+    // Wait for the classroom data to be saved and the editor to close.
+    await page.waitForSelector(classroomNameView, {visible: true});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const enableFeatureFlag = async function (browser, page, featureName) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/release-coordinator', {
+      waitUntil: networkIdle,
+    });
+    await page.waitForSelector(featuresTab);
+    await page.click(featuresTab);
+
+    // Locate the feature flag card and force-enable it for all users.
+    await page.waitForSelector(featureFlagDiv);
+    const featureFlags = await page.$$(featureFlagDiv);
+    let targetFeatureFlag = null;
+    for (let i = 0; i < featureFlags.length; i++) {
+      const featureFlagNameElement = await featureFlags[i].$(
+        featureFlagNameSelector
+      );
+      const featureFlagName = await page.evaluate(
+        element => element.textContent.trim(),
+        featureFlagNameElement
+      );
+      if (featureFlagName === featureName) {
+        targetFeatureFlag = featureFlags[i];
+        break;
+      }
+    }
+    if (!targetFeatureFlag) {
+      throw new Error(`Feature flag ${featureName} was not found.`);
+    }
+
+    await targetFeatureFlag.waitForSelector(featureFlagValueSelector);
+    const valueSelectorElement = await targetFeatureFlag.$(
+      featureFlagValueSelector
+    );
+    await valueSelectorElement.select('0: true');
+
+    await targetFeatureFlag.waitForSelector(
+      `${featureFlagSaveButton}:not([disabled])`,
+      {visible: true}
+    );
+    const saveButtonElement = await targetFeatureFlag.$(featureFlagSaveButton);
+    await saveButtonElement.click();
+
+    // Wait for the feature flag configuration to be saved.
+    await targetFeatureFlag.waitForSelector(
+      `${featureFlagSaveButton}[disabled]`,
+      {visible: true}
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -533,7 +980,10 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(topicThumbnailResetButton);
     await page.click(topicThumbnailResetButton);
 
-    await page.waitForSelector(topicUploadButton, {visible: true});
+    // The file input is always in the DOM but CSS-hidden. Wait for the
+    // visible upload label as a sync point, then use the hidden input
+    // directly (uploadFile works on hidden elements via CDP).
+    await page.waitForSelector(imageUploadLabel, {visible: true});
 
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
@@ -561,6 +1011,234 @@ const addThumbnailToTopic = async function (page, topicName) {
     console.log(e);
     process.exit(1);
   }
+};
+
+// Assigns the given roles, one at a time. Each assignment navigates to the
+// admin roles page and waits on several UI selectors, so only the roles a
+// shard's pages actually require are passed in to avoid wasting setup time.
+const setRoles = async function (browser, page, roles) {
+  for (let i = 0; i < roles.length; i++) {
+    await setRole(browser, page, roles[i]);
+  }
+};
+
+const runDataPagesSetup = async function (browser, page, roles) {
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  await logStep('assigning roles', () => setRoles(browser, page, roles));
+
+  // Feature flags must be enabled before the data-generation steps below,
+  // because those steps fetch the handlers that are gated by the flags (e.g.
+  // the learner group and technical feedback dashboard captures inside
+  // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
+  // disabled, so enabling them here avoids the captures failing.
+  await logStep('enabling story_editor_arcs flag', () =>
+    enableFeatureFlag(browser, page, 'story_editor_arcs')
+  );
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
+  );
+  await logStep('enabling technical_feedback flag', () =>
+    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
+  );
+  await logStep('enabling certificate_assessment flag', () =>
+    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
+  );
+  await logStep('topic editor URL setup', () =>
+    getTopicEditorUrl(browser, page)
+  );
+  await logStep('story editor URL setup', () =>
+    getStoryEditorUrl(browser, page)
+  );
+  await logStep('skill editor URL setup', () =>
+    getSkillEditorUrl(browser, page)
+  );
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  await logStep('enabling diagnostic test', () =>
+    enableDiagnosticTestForMathClassroom(browser, page)
+  );
+  await logStep('generating dummy explorations', () =>
+    generateDummyExplorations(browser, page)
+  );
+  await logStep('loading all-interactions exploration', () =>
+    reloadAllInteractionsExploration(browser, page)
+  );
+  await logStep('generating bare classrooms', () =>
+    generateBareClassrooms(browser, page)
+  );
+};
+
+const runFullSetup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  await logStep('data pages setup', () =>
+    runDataPagesSetup(browser, page, [
+      'COLLECTION_EDITOR',
+      'VOICEOVER_ADMIN',
+      'ADMIN',
+      'RELEASE_COORDINATOR',
+      'FULL_USER',
+      'TECH_TEAM_LEAD',
+      'TRANSLATION_ADMIN',
+    ])
+  );
+  await logStep('generating blog posts', () =>
+    generateDataForBlogPosts(browser, page)
+  );
+};
+
+const shard2Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 2 audits the release-coordinator role-gated page and the
+  // contributor-admin-dashboard (translation admin) page, so only these two
+  // roles are assigned. Its data generation uses the admin activities tab,
+  // which the CI super-admin user can access without an additional role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['RELEASE_COORDINATOR', 'TRANSLATION_ADMIN'])
+  );
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  await logStep('generating blog posts', () =>
+    generateDataForBlogPosts(browser, page)
+  );
+};
+
+const shard3Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
+  // (voiceover admin) role-gated pages, so these roles are assigned.
+  // Note that RELEASE_COORDINATOR is also assigned because the feature flags
+  // tab for the new lesson player below lives on the release-coordinator page.
+  // Its other pages (classrooms, classroom, creator-dashboard,
+  // exploration-editor, exploration-player, new-lesson-player,
+  // community-library, pending-account-deletion) are public or login-only, so
+  // no topic/story/skill generation is needed here.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  // The /lesson/<exploration_id> (new lesson player) page renders only when
+  // its feature flag is enabled, so enable it for the audits. With the flag
+  // on, /explore/<exploration_id> navigates to the same player client-side.
+  await logStep('enabling new lesson player flag', () =>
+    enableFeatureFlag(browser, page, 'new_lesson_player')
+  );
+  // The exploration editor setup creates the exploration that backs the
+  // exploration-editor, exploration-player and new-lesson-player pages.
+  await logStep('exploration editor setup', () =>
+    getExplorationEditorUrl(browser, page)
+  );
+  // The populated math classroom backs the /learn/math (classroom) page.
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  // Dummy explorations populate the creator-dashboard and community-library
+  // page listings, and the all-interactions exploration gives the player
+  // pages content for every interaction type.
+  await logStep('generating dummy explorations', () =>
+    generateDummyExplorations(browser, page)
+  );
+  await logStep('loading all-interactions exploration', () =>
+    reloadAllInteractionsExploration(browser, page)
+  );
+  // Bare classrooms populate the /learn (classrooms) listing page.
+  await logStep('generating bare classrooms', () =>
+    generateBareClassrooms(browser, page)
+  );
+};
+
+const shard4Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
+  // topic/story/skill editors, and the classroom-admin page used to toggle the
+  // diagnostic test, so only the curriculum admin and release coordinator
+  // roles are assigned. Its data generation uses the admin activities tab,
+  // which the CI super-admin user can access without an additional role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
+  );
+  // The structures step seeds the staging topic (dummy-topic-one), its story
+  // and subtopic, plus the learner group and technical feedback report. The
+  // staging topic backs the topic/story/practice/subtopic pages.
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  // The topic, story and skill editor pages need real entity ids, which are
+  // captured by creating each entity through its editor UI.
+  await logStep('creating topic editor', () =>
+    getTopicEditorUrl(browser, page)
+  );
+  await logStep('creating story editor', () =>
+    getStoryEditorUrl(browser, page)
+  );
+  await logStep('creating skill editor', () =>
+    getSkillEditorUrl(browser, page)
+  );
+  // The math classroom backs the diagnostic test player page, which needs the
+  // diagnostic test to be enabled on the classroom-admin page.
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+  await logStep('enabling diagnostic test', () =>
+    enableDiagnosticTestForMathClassroom(browser, page)
+  );
+};
+
+const shard5Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 5 audits the learner-group, technical-feedback and certificate
+  // pages, so the release coordinator enables their feature flags while the
+  // curriculum admin role covers the certificate dashboard. Only these two
+  // roles are assigned.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  await logStep('enabling learner_groups flag', () =>
+    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
+  );
+  await logStep('enabling technical_feedback flag', () =>
+    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
+  );
+  await logStep('enabling certificate_assessment flag', () =>
+    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
+  );
+  // The structures step seeds a learner group (the admin is its facilitator)
+  // and a technical feedback report, which back the learner group and
+  // technical feedback pages. It also seeds the staging topic, which is unused
+  // by this shard but is created atomically by the same handler.
+  await logStep('generating topic and story data', () =>
+    generateDataForTopicAndStoryPlayer(browser, page)
+  );
+  // The classroom step seeds the certificate offering and attempt that back
+  // the certificate pages.
+  await logStep('generating math classroom', () =>
+    generateDataForClassroom(browser, page)
+  );
+};
+
+const shard6Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 6 exists to audit the role-gated admin pages themselves, so all
+  // configurable roles are assigned here.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, [
+      'COLLECTION_EDITOR',
+      'VOICEOVER_ADMIN',
+      'ADMIN',
+      'RELEASE_COORDINATOR',
+      'FULL_USER',
+      'TECH_TEAM_LEAD',
+      'TRANSLATION_ADMIN',
+    ])
+  );
 };
 
 const main = async function () {
@@ -602,31 +1280,105 @@ const main = async function () {
     await recorder.start(videoPath);
   }
 
-  await login(browser, page);
-  await getExplorationEditorUrl(browser, page);
+  const shard = Number(process.env.LIGHTHOUSE_SHARD || 0);
+  const shardSetupRunners = {
+    2: shard2Setup,
+    3: shard3Setup,
+    4: shard4Setup,
+    5: shard5Setup,
+    6: shard6Setup,
+  };
+  // Each shard runs only the setup its pages need. Shard 1 audits only static
+  // public pages, so the runner never invokes this script for it. An unset
+  // shard (0) keeps the previous full setup for local runs.
+  const runShardSetup = shardSetupRunners[shard] || runFullSetup;
+  // Only record the entities and URL lines produced by the steps the current
+  // shard ran, so that unresolvable URLs are not reported. The flags below
+  // mirror the setup steps each shard function executes.
+  const setupKind =
+    shard === 2
+      ? 'blog'
+      : shard === 3
+        ? 'data-player'
+        : shard === 4
+          ? 'editors'
+          : shard === 5
+            ? 'certificates'
+            : shard === 6
+              ? 'roles'
+              : 'full';
+  const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
+  const ranExplorationSetup =
+    setupKind === 'data' ||
+    setupKind === 'data-player' ||
+    setupKind === 'full' ||
+    setupKind === 'blog';
+  const ranTopicStorySkillSetup =
+    setupKind === 'data' || setupKind === 'full' || setupKind === 'editors';
+  const ranStructuresSetup =
+    setupKind === 'data' ||
+    setupKind === 'full' ||
+    setupKind === 'certificates';
+  const ranClassroomSetup =
+    setupKind === 'data' ||
+    setupKind === 'full' ||
+    setupKind === 'certificates';
 
-  await setRole(browser, page, 'COLLECTION_EDITOR');
+  await runShardSetup(browser, page);
 
-  await setRole(browser, page, 'ADMIN');
-  await getTopicEditorUrl(browser, page);
-  await getStoryEditorUrl(browser, page);
-  await getSkillEditorUrl(browser, page);
-  await generateDataForTopicAndStoryPlayer(browser, page);
-  await generateDataForClassroom(browser, page);
+  var envEntries = [];
+  if (ranExplorationSetup) {
+    envEntries.push(`exploration_id=${explorationId}`);
+  }
+  if (ranTopicStorySkillSetup) {
+    envEntries.push(`topic_id=${topicId}`);
+    envEntries.push(`story_id=${storyId}`);
+    envEntries.push(`skill_id=${skillId}`);
+  }
+  if (ranStructuresSetup) {
+    envEntries.push(`learner_group_id=${learnerGroupId}`);
+    envEntries.push(
+      `technical_feedback_report_id=${technicalFeedbackReportId}`
+    );
+  }
+  if (ranClassroomSetup) {
+    envEntries.push(`certificate_id=${certificateId}`);
+    envEntries.push(`attempt_id=${attemptId}`);
+    envEntries.push(`certificate_offering_id=${certificateId}`);
+  }
+  if (ranBlogSetup) {
+    envEntries.push(`blog_post_url_fragment=${blogUrlFragment}`);
+  }
+  fs.writeFileSync('core/tests/puppeteer/.env', envEntries.join('\n'));
 
-  fs.writeFileSync(
-    'core/tests/puppeteer/.env',
-    `exploration_id=${explorationId}\n` +
-      `story_id=${storyId}\n` +
-      `topic_id=${topicId}\n` +
-      `skill_id=${skillId}\n`
-  );
-
-  await process.stdout.write(
-    [explorationEditorUrl, topicEditorUrl, storyEditorUrl, skillEditorUrl].join(
-      '\n'
-    )
-  );
+  var urls = [];
+  if (ranTopicStorySkillSetup) {
+    urls.push(topicEditorUrl);
+    urls.push(storyEditorUrl);
+    urls.push(skillEditorUrl);
+  }
+  if (ranStructuresSetup) {
+    urls.push(`http://localhost:8181/learner-group/${learnerGroupId}`);
+    urls.push(
+      `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`
+    );
+  }
+  if (ranClassroomSetup) {
+    urls.push(`http://localhost:8181/certificate-assessment/${certificateId}`);
+    urls.push(
+      `http://localhost:8181/certificate-assessment-result/${attemptId}`
+    );
+    urls.push(
+      `http://localhost:8181/edit-certificate-assessment-offering/${certificateId}`
+    );
+  }
+  if (ranExplorationSetup) {
+    urls.push(explorationEditorUrl);
+  }
+  if (ranBlogSetup) {
+    urls.push(`http://localhost:8181/blog/${blogUrlFragment}`);
+  }
+  await process.stdout.write(urls.join('\n'));
   if (record) {
     await recorder.stop();
   }

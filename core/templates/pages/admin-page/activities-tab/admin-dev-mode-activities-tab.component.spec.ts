@@ -95,6 +95,12 @@ describe('Admin dev mode activities tab', () => {
     platformParameters: [],
     skillList: [skillSummary],
     storyList: [story],
+    classroomList: [
+      {
+        classroomId: 'classroomId1',
+        name: 'math',
+      },
+    ],
   };
   let mockConfirmResult: (val: boolean) => void;
 
@@ -619,9 +625,13 @@ describe('Admin dev mode activities tab', () => {
         'generateDummyClassroomDataAsync'
       ).and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
+      component.numDummyClassroomsToGenerate = 3;
 
       component.generateNewClassroom();
 
+      expect(
+        adminBackendApiService.generateDummyClassroomDataAsync
+      ).toHaveBeenCalledWith(3);
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Processing...'
       );
@@ -654,6 +664,97 @@ describe('Admin dev mode activities tab', () => {
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Server error: New classroom data not generated.'
+        );
+      });
+    }));
+  });
+
+  describe('.generateNewDefaultClassrooms', () => {
+    it('should generate default classroom data', waitForAsync(() => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyDefaultClassroomsAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+      component.numDummyDefaultClassroomsToGenerate = 3;
+
+      component.generateNewDefaultClassrooms();
+
+      expect(
+        adminBackendApiService.generateDummyDefaultClassroomsAsync
+      ).toHaveBeenCalledWith(3);
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy default classrooms generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message if default classroom data is not generated', waitForAsync(() => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyDefaultClassroomsAsync'
+      ).and.returnValue(
+        Promise.reject('Default classroom data not generated.')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateNewDefaultClassrooms();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Default classroom data not generated.'
+        );
+      });
+    }));
+  });
+
+  describe('.generateNewTopics', () => {
+    it('should generate topic data', waitForAsync(() => {
+      spyOn(adminBackendApiService, 'generateDummyTopicsAsync').and.returnValue(
+        Promise.resolve()
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.numDummyTopicsToGenerate = 3;
+      component.selectedClassroomId = 'classroom1';
+
+      component.generateNewTopics();
+
+      expect(
+        adminBackendApiService.generateDummyTopicsAsync
+      ).toHaveBeenCalledWith(3, 'classroom1');
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy new topics generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message if new topic data is not generated', waitForAsync(() => {
+      spyOn(adminBackendApiService, 'generateDummyTopicsAsync').and.returnValue(
+        Promise.reject('New topic data not generated.')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateNewTopics();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: New topic data not generated.'
         );
       });
     }));

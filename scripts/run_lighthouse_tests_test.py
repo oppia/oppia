@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import builtins
+import io
 import json
 import os
 import subprocess
@@ -131,10 +132,34 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages.json',
         )
+        # A config with one URL that references an entity, used to exercise the
+        # data-setup path where the puppeteer script must run.
+        with open(
+            'dummy-lighthouse-pages-with-entities.json', 'w', encoding='utf-8'
+        ) as f:
+            f.write(
+                json.dumps(
+                    {
+                        'about': {'url': 'http://localhost:8181/about'},
+                        'topic-editor': {
+                            'url': (
+                                'http://localhost:8181/'
+                                'topic_editor/{{topic_id}}'
+                            )
+                        },
+                    }
+                )
+            )
+        self.lighthouse_pages_json_filepath_with_entities_swap = self.swap(
+            run_lighthouse_tests,
+            'LIGHTHOUSE_PAGES_JSON_FILEPATH',
+            'dummy-lighthouse-pages-with-entities.json',
+        )
 
     def tearDown(self) -> None:
         super().tearDown()
         os.remove('dummy-lighthouse-pages.json')
+        os.remove('dummy-lighthouse-pages-with-entities.json')
 
     def test_inject_entities_into_url_with_valid_entity(self) -> None:
         entities = {'topic_id': '4'}
@@ -188,20 +213,75 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 },
             )
 
+    def test_get_lighthouse_entities_skips_setup_for_shard_one(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda *unused_args: {'topic_id': '4'},
+            called=False,
+        )
+        with self.print_swap, swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                1
+            )
+        self.assertEqual(entities, {})
+        self.assertIn(
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
+        )
+
+    def test_get_lighthouse_entities_runs_setup_for_later_shards(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda *unused_args: {'topic_id': '4'},
+            expected_args=((True, 2),),
+        )
+        with swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                2, record=True
+            )
+        self.assertEqual(entities, {'topic_id': '4'})
+
+    def test_get_lighthouse_entities_passes_shard_to_setup(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            lambda *unused_args: {},
+            expected_args=((False, 3),),
+        )
+        with swap_run_puppeteer_script:
+            entities = run_lighthouse_tests._get_lighthouse_entities(  # pylint: disable=protected-access
+                3
+            )
+        self.assertEqual(entities, {})
+
+    def test_get_resolvable_lighthouse_all_urls_skips_unresolvable(
+        self,
+    ) -> None:
+        pages_config = {
+            'about': 'http://localhost:8181/about',
+            'topic-editor': 'http://localhost:8181/topic_editor/{{topic_id}}',
+        }
+        all_urls = run_lighthouse_tests._get_resolvable_lighthouse_all_urls(  # pylint: disable=protected-access
+            list(pages_config.keys()), {}, pages_config
+        )
+        self.assertEqual(all_urls, ['http://localhost:8181/about'])
+
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
             returncode = 0
+            stdout = io.BytesIO(
+                b'https://oppia.org/create/4\n'
+                + b'https://oppia.org/topic_editor/4\n'
+                + b'https://oppia.org/story_editor/4\n'
+                + b'https://oppia.org/skill_editor/4\n'
+            )
+            stderr = io.BytesIO(b'Task output.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'Task output.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -213,6 +293,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, swap_popen:
@@ -225,17 +312,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
             returncode = 1
+            stdout = io.BytesIO(b'https://oppia.org/create/4\n')
+            stderr = io.BytesIO(b'ABC error.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'ABC error.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -247,6 +328,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
@@ -262,17 +350,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 0
+            stdout = io.BytesIO(
+                b'https://oppia.org/create/4\n'
+                + b'https://oppia.org/topic_editor/4\n'
+                + b'https://oppia.org/story_editor/4\n'
+                + b'https://oppia.org/skill_editor/4\n'
+            )
+            stderr = io.BytesIO(b'Task output.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'Task output.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -285,6 +372,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, swap_popen, swap_isfile:
@@ -304,17 +398,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_fails_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 1
+            stdout = io.BytesIO(b'https://oppia.org/create/4\n')
+            stderr = io.BytesIO(b'ABC error.')
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (
-                    b'https://oppia.org/create/4\n'
-                    + b'https://oppia.org/topic_editor/4\n'
-                    + b'https://oppia.org/story_editor/4\n'
-                    + b'https://oppia.org/skill_editor/4\n',
-                    b'ABC error.',
-                )
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                pass
 
         def mock_popen(
             *unused_args: str, **unused_kwargs: str
@@ -327,6 +415,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Popen',
             mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
+            expected_kwargs=[
+                {
+                    'stdout': -1,
+                    'stderr': -1,
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                }
+            ],
         )
 
         with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
@@ -693,7 +788,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-                                run_lighthouse_tests.main(args=[])
+                                run_lighthouse_tests.main(args=['--shard', '1'])
                                 expected_all_lighthouse_urls = ','.join(
                                     [
                                         'http://localhost:8181/',
@@ -711,6 +806,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
+        )
+        self.assertNotIn(
             'Puppeteer script completed successfully.', self.print_arr
         )
 
@@ -751,7 +851,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
                                 run_lighthouse_tests.main(
-                                    args=['--pages', 'splash, about']
+                                    args=[
+                                        '--shard',
+                                        '1',
+                                        '--pages',
+                                        'splash, about',
+                                    ]
                                 )
                                 expected_all_lighthouse_urls = ','.join(
                                     [
@@ -780,7 +885,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
         )
 
     def test_run_lighthouse_tests_with_skip_build(self) -> None:
@@ -836,7 +943,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with self.swap_redis_server, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
                                 run_lighthouse_tests.main(
-                                    args=['--skip_build', '--pages', 'splash']
+                                    args=[
+                                        '--skip_build',
+                                        '--shard',
+                                        '1',
+                                        '--pages',
+                                        'splash',
+                                    ]
                                 )
 
         self.assertIn(
@@ -848,7 +961,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
         self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.',
+            self.print_arr,
         )
 
     def test_main_function_calls_puppeteer_record(self) -> None:
@@ -862,7 +977,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_run_puppeteer_script(*unused_args: str) -> dict[str, str]:
             return {
-                'exploration_id': '4',
+                'topic_id': '4',
             }
 
         # Set up pseudo-chrome path env variable.
@@ -879,7 +994,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
             mock_run_puppeteer_script,
-            expected_args=((True,),),
+            expected_args=((True, 0),),
         )
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests,
@@ -927,9 +1042,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
                             with swap_run_puppeteer_script:
-                                with self.lighthouse_pages_json_filepath_swap:
+                                with (
+                                    self.lighthouse_pages_json_filepath_with_entities_swap
+                                ):
                                     run_lighthouse_tests.main(
-                                        args=['--skip_build', '--record_screen']
+                                        args=[
+                                            '--skip_build',
+                                            '--record_screen',
+                                        ]
                                     )
 
     def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(
@@ -955,11 +1075,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     **unused_kwargs: object,
                 ) -> None:
                     self.returncode = 0
+                    self.stdout = io.BytesIO(b'topic:123\n')
+                    self.stderr = io.BytesIO(b'')
 
-                def communicate(  # pylint: disable=missing-docstring
-                    self,
-                ) -> tuple[bytes, bytes]:
-                    return (b'topic:123\n', b'')
+                def wait(self) -> None:  # pylint: disable=missing-docstring
+                    pass
 
             with (
                 self.swap(os, 'getcwd', lambda: tmp_working_dir),

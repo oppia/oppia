@@ -22,11 +22,12 @@ import os
 import re
 import subprocess
 import sys
+import threading
 
 from core.constants import constants
 from scripts import build, common, servers
 
-from typing import Final, Iterator, List, Optional
+from typing import IO, Final, Iterator, List, Optional
 
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
@@ -40,6 +41,8 @@ APP_YAML_FILENAMES: Final = {
 LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
+
+ENTITY_MATCHER: Final = r'\{\{(.*?)\}\}'
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -65,14 +68,58 @@ _PARSER.add_argument(
     action='store_true',
 )
 
+_PARSER.add_argument(
+    '--shard',
+    help=(
+        'The one-based index of the Lighthouse shard being run. Each shard '
+        'runs only the setup its pages need: shard 1 audits the static and '
+        'public pages so its setup is skipped, shard 2 audits the blog and '
+        'logged-in-user pages so only the blog setup runs, and the remaining '
+        'shards audit the data-dependent pages so all data setup except the '
+        'blog runs.'
+    ),
+    type=int,
+    default=0,
+)
 
-def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
+
+def _get_puppeteer_setup_environment(shard: int) -> dict[str, str]:
+    """Returns an environment that tells the puppeteer setup which shard runs.
+
+    Args:
+        shard: int. The one-based index of the Lighthouse shard being run.
+
+    Returns:
+        dict(str, str). A copy of the current environment with the shard
+        variable set for the puppeteer setup script to read.
+    """
+    env = os.environ.copy()
+    env['LIGHTHOUSE_SHARD'] = str(shard)
+    return env
+
+
+def _drain_pipe(stream: IO[bytes], output_lines: list[bytes]) -> None:
+    """Reads every line from a subprocess pipe into output_lines.
+
+    Args:
+        stream: IO(byte). A buffered binary pipe from the subprocess.
+        output_lines: list(bytes). The list that the lines are appended to.
+    """
+    for line in iter(stream.readline, b''):
+        output_lines.append(line)
+
+
+def run_lighthouse_puppeteer_script(
+    record: bool = False, shard: int = 0
+) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
         record: bool. Set to True to record the LHCI puppeteer script
             via puppeteer-screen-recorder and False to not. Note that
             puppeteer-screen-recorder must be separately installed to record.
+        shard: int. The one-based index of the Lighthouse shard being run.
+            The script selects the per-shard setup that matches this shard.
 
     Returns:
         dict(str, str). The entities and their IDs that were collected.
@@ -93,11 +140,33 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Video Path:' + video_path)
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_puppeteer_setup_environment(shard),
     )
-    stdout, stderr = process.communicate()
+
+    # Stream the puppeteer output line by line as it arrives so that the
+    # "[lighthouse-setup]" progress markers are visible live. Buffering the
+    # output until the process finished hid which setup step was stuck when a
+    # step (for example the login, which first navigates the slow /admin page)
+    # took a long time; streaming surfaces the exact step as soon as it
+    # produces output. stderr is drained from a background thread so that the
+    # pipe cannot fill up and block the puppeteer script.
+    stdout_lines: list[bytes] = []
+    stderr_lines: list[bytes] = []
+    stderr_thread = threading.Thread(
+        target=_drain_pipe, args=(process.stderr, stderr_lines)
+    )
+    stderr_thread.start()
+    for line in iter(process.stdout.readline, b''):
+        stdout_lines.append(line)
+        sys.stdout.write(line.decode('utf-8'))
+        sys.stdout.flush()
+    process.wait()
+    stderr_thread.join()
+
     if process.returncode == 0:
-        print(stdout)
         # The entities are collected from the standard output of the
         # puppeteer script. Each entity is a dictionary with the entity
         # name as the key and the entity ID as the value. An entity
@@ -105,7 +174,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         # or skill. The entity ID is the unique identifier for the entity
         # that will be used to inject into the URLs for the Lighthouse checks.
         entities: dict[str, str] = {}
-        for line in stdout.split(b'\n'):
+        for line in stdout_lines:
             # Standard output is in bytes, we need to decode the line to
             # print it.
             entity = get_entity(line.decode('utf-8'))
@@ -121,15 +190,48 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('OUTPUT:')
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        print(stdout.decode('utf-8'))
+        for line in stdout_lines:
+            print(line.decode('utf-8'))
         print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
-        print(stderr.decode('utf-8'))
+        for line in stderr_lines:
+            print(line.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)
         sys.exit(1)
+
+
+def _get_lighthouse_entities(
+    shard: int, record: bool = False
+) -> dict[str, str]:
+    """Runs the puppeteer setup script and returns the entity IDs it collects.
+
+    Shard 1 audits only static and public marketing pages, which render without
+    any seeded database data, roles or feature flags, so its heavy login and
+    data-seeding setup can be skipped entirely. Every other shard runs the
+    setup, and the puppeteer script picks the setup that its pages need based
+    on the shard.
+
+    Args:
+        shard: int. The one-based index of the Lighthouse shard being run.
+            When 0, no shard identity was provided and the full setup runs to
+            be safe.
+        record: bool. Whether to record the puppeteer setup via the screen
+            recorder.
+
+    Returns:
+        dict(str, str). The collected entity IDs, or an empty dict when the
+        running shard is the static shard 1.
+    """
+    if shard == 1:
+        print(
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.'
+        )
+        return {}
+    return run_lighthouse_puppeteer_script(record, shard)
 
 
 def get_entity(line: str) -> tuple[str, str] | None:
@@ -144,14 +246,30 @@ def get_entity(line: str) -> tuple[str, str] | None:
     """
     url_parts = line.split('/')
     print('Parsing entity ID in line: %s' % line)
-    if 'create' in line:
-        return 'exploration_id', url_parts[4]
-    elif 'topic_editor' in line:
-        return 'topic_id', url_parts[4]
-    elif 'story_editor' in line:
-        return 'story_id', url_parts[4]
-    elif 'skill_editor' in line:
-        return 'skill_id', url_parts[4]
+    url_patterns_to_entity_names = {
+        'create': ('exploration_id', 4),
+        'topic_editor': ('topic_id', 4),
+        'story_editor': ('story_id', 4),
+        'skill_editor': ('skill_id', 4),
+        '/blog/': ('blog_post_url_fragment', 4),
+        '/learner-group/': ('learner_group_id', 4),
+        '/technical-feedback-dashboard/': (
+            'technical_feedback_report_id',
+            5,
+        ),
+        '/certificate-assessment-result/': ('attempt_id', 4),
+        '/certificate-assessment/': ('certificate_id', 4),
+        '/edit-certificate-assessment-offering/': (
+            'certificate_offering_id',
+            4,
+        ),
+    }
+    for url_pattern, (
+        entity_name,
+        entity_id_index,
+    ) in url_patterns_to_entity_names.items():
+        if url_pattern in line:
+            return entity_name, url_parts[entity_id_index]
 
     return None
 
@@ -339,9 +457,8 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         ValueError. The entity referenced in the URL is not found in the
             entities.
     """
-    entity_matcher = r'\{\{(.*?)\}\}'
     injected_url = url
-    for match in re.findall(entity_matcher, url):
+    for match in re.findall(ENTITY_MATCHER, url):
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
@@ -372,6 +489,34 @@ def get_lighthouse_urls_to_run(
     return lighthouse_urls_to_run
 
 
+def _get_resolvable_lighthouse_all_urls(
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
+) -> List[str]:
+    """Gets the URLs across all configured pages whose entities can be
+    resolved.
+
+    Pages whose URLs reference an entity not present in ``entities`` cannot be
+    audited by the current shard (a static-page shard skips the data setup, so
+    it has no entity IDs to inject), so they are omitted from the summary list.
+
+    Args:
+        pages: list(str). The pages to resolve.
+        entities: dict(str, str). The available entities to inject.
+        pages_config: dict(str, str). The configuration for the pages.
+
+    Returns:
+        list(str). The resolvable URLs across the given pages.
+    """
+    resolvable_urls: List[str] = []
+    for page in pages:
+        url = pages_config[page]
+        unresolved_entities = re.findall(ENTITY_MATCHER, url)
+        if any(entity not in entities for entity in unresolved_entities):
+            continue
+        resolvable_urls.append(inject_entities_into_url(url, entities))
+    return resolvable_urls
+
+
 def set_lighthouse_url_environment_variables(
     pages: Optional[str], entities: dict[str, str]
 ) -> None:
@@ -385,7 +530,9 @@ def set_lighthouse_url_environment_variables(
     """
     pages_config: dict[str, str] = get_lighthouse_pages_config()
     all_pages = list(pages_config.keys())
-    all_urls = get_lighthouse_urls_to_run(all_pages, entities, pages_config)
+    all_urls = _get_resolvable_lighthouse_all_urls(
+        all_pages, entities, pages_config
+    )
     os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(all_urls)
 
     pages_to_run = (
@@ -449,8 +596,8 @@ def main(args: Optional[List[str]] = None) -> None:
             servers.run_ng_compilation()
 
         with managed_lighthouse_appserver(SERVER_MODE_DEV):
-            entities = run_lighthouse_puppeteer_script(
-                parsed_args.record_screen
+            entities = _get_lighthouse_entities(
+                parsed_args.shard, parsed_args.record_screen
             )
 
         if parsed_args.skip_build:

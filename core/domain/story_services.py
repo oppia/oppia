@@ -41,7 +41,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast
+from typing import Dict, List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -858,6 +858,58 @@ def _save_story(
         caching_services.CACHE_NAMESPACE_STORY, None, [story.id]
     )
     story.version += 1
+
+
+def update_story_node_acquired_skill_ids_after_publish(
+    committer_id: str,
+    story_id: str,
+    node_ids_to_skill_ids: Dict[str, List[str]],
+) -> None:
+    """Attaches the given skill ids to the nodes of a published story.
+
+    The standard story update flow cannot be used for this because saving an
+    already-published story re-validates its linked explorations and the
+    publish flow validates that every skill has at least
+    MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH questions. Both validations would fail
+    for the dummy data seeded in dev mode for lighthouse runs.
+
+    Args:
+        committer_id: str. The ID of the user who is performing the update.
+        story_id: str. The ID of the story whose nodes should be updated.
+        node_ids_to_skill_ids: dict(str, list(str)). A mapping from node ID
+            to the list of skill ids to attach to that node.
+    """
+    story_model = story_models.StoryModel.get(story_id)
+    story_contents = story_model.story_contents
+    change_list = []
+    for node in story_contents['nodes']:
+        node_id = node['id']
+        if node_id in node_ids_to_skill_ids:
+            old_value = node['acquired_skill_ids']
+            new_value = node_ids_to_skill_ids[node_id]
+            node['acquired_skill_ids'] = new_value
+            change_list.append(
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'node_id': node_id,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                        ),
+                        'new_value': new_value,
+                        'old_value': old_value,
+                    }
+                )
+            )
+    story_model.story_contents = story_contents
+    story_model.commit(
+        committer_id,
+        'Attached skills to story nodes.',
+        [change.to_dict() for change in change_list],
+    )
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story_id]
+    )
 
 
 def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:

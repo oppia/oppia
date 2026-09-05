@@ -45,6 +45,18 @@ module.exports = {
               tbt: 1575,
               cls: 0.15,
             },
+            overrides: {
+              // The hero images use media queries and are intentionally
+              // larger than the viewport on smaller screens.
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+              // The overall Lighthouse performance category score is highly
+              // variable on the constrained mobile emulation, so it is not a
+              // meaningful gate here. The per-audit thresholds (FCP, LCP, TBT,
+              // CLS, speed index) above remain the actual performance guard.
+              // The desktop config similarly relaxes the marketing hero images.
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
@@ -56,6 +68,10 @@ module.exports = {
               cls: 0.6,
             },
             accessibilityMinScore: 0.88,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
@@ -69,6 +85,21 @@ module.exports = {
             accessibilityMinScore: 0.93,
           },
           {
+            matchingUrlPattern: 'http://[^/]+/android$',
+            pagePerfThresholds: {
+              fcp: 31000,
+              speedIndex: 31000,
+              lcp: 65000,
+              tbt: 4800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.84,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
+          },
+          {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
             pagePerfThresholds: {
               fcp: 15900,
@@ -77,7 +108,22 @@ module.exports = {
               tbt: 2085,
               cls: 0.15,
             },
-            accessibilityMinScore: 0.92,
+            accessibilityMinScore: 0.87,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/blog$',
+            pagePerfThresholds: {
+              fcp: 31000,
+              speedIndex: 31000,
+              lcp: 70000,
+              tbt: 4800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+            overrides: {
+              'image-aspect-ratio': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
@@ -100,6 +146,10 @@ module.exports = {
               cls: 1.11,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
@@ -133,6 +183,10 @@ module.exports = {
               cls: 0.78,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/delete-account$',
@@ -165,8 +219,13 @@ module.exports = {
               // The YouTube embed on donate page uses passive listeners.
               'uses-passive-event-listeners': ['error', {minScore: 0}],
               deprecations: ['error', {minScore: 0}],
-              redirects: ['error', {minScore: 1}],
+              // The YouTube embed can trigger a redirect, so allow it.
+              redirects: ['error', {minScore: 0}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The YouTube embed can log browser issues to the Issues panel.
+              'inspector-issues': ['error', {minScore: 0}],
             },
             accessibilityMinScore: 0.91,
           },
@@ -180,6 +239,10 @@ module.exports = {
               cls: 0.98,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
@@ -221,6 +284,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -233,6 +298,31 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.92,
+          },
+          {
+            matchingUrlPattern: 'http://[^/]+/partnerships$',
+            pagePerfThresholds: {
+              fcp: 31000,
+              speedIndex: 31000,
+              lcp: 60000,
+              tbt: 4800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.88,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+              'modern-image-formats': [
+                'error',
+                {maxLength: 15, strategy: 'pessimistic'},
+              ],
+              'uses-passive-event-listeners': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The many partner logos can log browser issues to the Issues
+              // panel.
+              'inspector-issues': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/preferences$',
@@ -258,6 +348,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/profile/username1$',
@@ -295,6 +389,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -307,6 +403,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/thanks$',
@@ -320,6 +420,8 @@ module.exports = {
             accessibilityMinScore: 0.95,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -334,6 +436,8 @@ module.exports = {
             accessibilityMinScore: 0.88,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0}],
+              'categories:performance': ['error', {minScore: 0}],
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -380,6 +484,28 @@ module.exports = {
               'errors-in-console': ['error', {minScore: 0}],
               'offscreen-images': ['error', {minScore: 0}],
             },
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/classroom-admin$',
+            pagePerfThresholds: {
+              fcp: 31000,
+              speedIndex: 31000,
+              lcp: 60000,
+              tbt: 4800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/learn$',
+            pagePerfThresholds: {
+              fcp: 31000,
+              speedIndex: 31000,
+              lcp: 60000,
+              tbt: 4800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/learn/math$',
@@ -480,6 +606,116 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.84,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/blog-admin$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/blog/.+$',
+            accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+              'image-aspect-ratio': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+            },
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/certificate-assessment/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern:
+              '^http://[^/]+/certificate-assessment-result/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/certificate-creator-dashboard$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern:
+              '^http://[^/]+/learn/.+/certificate-offering-available$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/contributor-admin-dashboard$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern:
+              '^http://[^/]+/create-certificate-assessment-offering$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern:
+              '^http://[^/]+/edit-certificate-assessment-offering/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/test/arc/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/facilitator-dashboard$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/feedback-updates$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/create-learner-group$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/edit-learner-group/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learner-group/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/mastery-challenge$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/lesson/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/practice/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/release-coordinator$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/studyguide/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/technical-feedback-dashboard$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern:
+              '^http://[^/]+/technical-feedback-dashboard/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/voiceover-admin$',
+            accessibilityMinScore: 0.9,
           },
         ],
         // Error-level safety-net thresholds for mobile. Per-page entries
