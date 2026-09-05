@@ -75,8 +75,10 @@ html, body {
 .preview-conversation-skin {
   bottom: 0;
   left: 0;
+  overflow-y: auto;
   position: fixed;
   right: 0;
+  top: 126px;
   z-index: 1010;
 }
 
@@ -84,8 +86,12 @@ html, body {
   top: 116px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .restart-btn {
     top: 46px;
+  }
+
+  .preview-conversation-skin {
+    top: 0;
   }
 }

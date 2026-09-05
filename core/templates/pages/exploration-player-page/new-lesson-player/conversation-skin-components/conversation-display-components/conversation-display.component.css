@@ -13,17 +13,21 @@
 }
 
 .oppia-learner-view-card {
+  background: #fff;
   border-radius: 2px;
-  margin-left: 40px ;
+  margin-left: 40px;
+  margin-right: 40px;
   max-width: 100vw;
   padding-bottom: 18px;
   padding-left: 0;
-  padding-top: 20px;
+  padding-top: 0;
   text-align: left;
 }
 
 .oppia-learner-view-card-top-content {
+  background-color: rgba(224,242,241,1);
   border-top-left-radius: 0;
+  margin-bottom: 12px;
   padding: 12px;
   width: 100%;
 }
@@ -97,7 +101,7 @@
 }
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
-  background-color: #fff;
+  background-color: rgba(224,242,241,0.4);
 }
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
@@ -131,6 +135,7 @@
 .response-history-container {
   align-items: center;
   display: flex;
+  justify-content: center;
 }
 
 .response-history-container hr {
@@ -165,21 +170,16 @@
 }
 
 .conversation-skin-inline-interaction {
-  border-radius: 8px;
-  margin-left: 40px;
-  padding: 10px;
+  padding: 8px 20px 25px;
   position: relative;
 }
 
 .conversation-skin-inline-interaction .form-control {
-  border: none;
   outline: none;
   resize: none;
 }
 
 input.form-control:focus {
-  border: none;
-  box-shadow: none;
   outline: none;
 }
 
@@ -321,6 +321,7 @@ input.form-control:focus {
 
   .oppia-learner-view-card {
     margin-left: 40px;
+    margin-right: 0;
     margin-top: 30px;
     padding-bottom: 30px;
   }
@@ -348,6 +349,7 @@ input.form-control:focus {
 
   .oppia-learner-view-card {
     margin-left: 55px;
+    margin-right: 0;
     margin-top: 30px;
     padding-bottom: 30px;
   }

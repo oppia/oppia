@@ -211,6 +211,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {CardInteractionControlsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-interaction-controls.component';
 import {RouterModule} from '@angular/router';
 import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
@@ -285,6 +286,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     ProgressBarComponent,
     NewConversationSkinComponent,
     ProgressTrackerComponent,
@@ -456,6 +458,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     ProgressTrackerComponent,
     CheckpointBarComponent,
     NewConversationSkinComponent,
@@ -651,6 +654,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,

@@ -6,7 +6,7 @@
 
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
-  padding: 0 20px;
+  padding: 0 10px;
   position: relative;
 }
 
@@ -17,9 +17,26 @@
   width: 100px;
 }
 
+.feedback-wrapper {
+  box-sizing: border-box;
+  padding-left: 20px;
+  position: relative;
+}
+
+.feedback-wrapper .conversation-skin-oppia-avatar {
+  border: 2px solid #c55f45;
+  border-radius: 50%;
+  height: 100px;
+  left: -105px;
+  position: absolute;
+  top: 5px;
+  width: 100px;
+}
+
 .conversation-skin-oppia-feedback-container {
-  background-color: #fff;
-  border-radius: 0 16px 16px;
+  background-color: rgba(224,242,241,1);
+  border-radius: 0; 
+  margin-bottom: 20px;
   margin-top: 10px;
   width: 70%;
 }
@@ -28,14 +45,58 @@
   border-bottom-right-radius: 0;
 }
 
-.conversation-skin-oppia-feedback-content {
-  padding: 12px;
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  padding: 8px;
   word-wrap: break-word;
 }
 
 .conversation-skin-oppia-feedback-content,
 .conversation-skin-help-card-content {
   border-top-left-radius: 0;
+}
+
+.oppia-loading-dot-one,
+.oppia-loading-dot-two,
+.oppia-loading-dot-three {
+  background-color: #666;
+  border-radius: 50%;
+  display: inline-block;
+  font-size: 0;
+  height: 5px;
+  margin-right: 4px;
+  width: 5px;
+}
+
+.oppia-loading-dot-one {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.0s;
+  -moz-animation-delay: 0.0s;
+  animation-delay: 0.0s;
+  opacity: 0;
+}
+
+.oppia-loading-dot-two {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.2s;
+  -moz-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.oppia-loading-dot-three {
+  -moz-animation: dot 1.0s infinite;
+  -webkit-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -moz-animation-delay: 0.4s;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+  margin-right: 0;
+  opacity: 0;
 }
 
 .conversation-skin-learner-answer-container {
@@ -122,6 +183,13 @@
     top: -7px;
     width: 19px;
   }
+
+  .feedback-wrapper .conversation-skin-oppia-avatar {
+    height: 34px;
+    left: -38px;
+    top: 7px;
+    width: 34px;
+  }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -155,6 +223,12 @@
     top: 3px;
     width: 64px;
   }
+
+  .feedback-wrapper .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    width: 64px;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
@@ -186,6 +260,12 @@
     height: 64px;
     right: -69px;
     top: 3px;
+    width: 64px;
+  }
+
+  .feedback-wrapper .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
     width: 64px;
   }
 }

@@ -6,12 +6,12 @@
               (click)="toggleSidebar()"
               [class.expanded]="sidebarIsExpanded">
         <div *ngIf="!sidebarIsExpanded">
+          <i class="fa fa-lg fa-chevron-left"></i>
           {{ 'I18N_LESSON_PLAYER_OPEN_SIDEBAR' | translate }}
-          <i class="fa fa-lg fa-chevron-right"></i>
         </div>
         <div *ngIf="sidebarIsExpanded" class="expanded-sidebar-label">
+          <i class="fa fa-lg fa-chevron-right lesson-player-sidebar-chevron"></i>
           {{ 'I18N_LESSON_PLAYER_CLOSE_SIDEBAR' | translate }}
-          <i class="fa fa-lg fa-chevron-left lesson-player-sidebar-chevron"></i>
         </div>
       </button>
       <div *ngIf="sidebarIsExpanded">
