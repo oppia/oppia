@@ -327,6 +327,21 @@ indexes:
   - name: target_id
   - name: author_id
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: language_code
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: suggestion_type
+  - name: last_updated
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer

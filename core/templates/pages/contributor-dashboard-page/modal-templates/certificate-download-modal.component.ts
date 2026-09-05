@@ -272,6 +272,60 @@ export class CertificateDownloadModalComponent {
       linePosition += 100;
 
       if (this.suggestionType === 'translate_content') {
+        // Wording is derived from the contribution data, never from which
+        // dashboard card opened this modal. `?? 0` guards the optional
+        // interface fields (the backend always sends them at runtime).
+        const translatedWords = info.translated_word_count ?? 0;
+        const reviewedWords = info.reviewed_word_count ?? 0;
+        const isBoth = translatedWords > 0 && reviewedWords > 0;
+        const isReviewOnly = translatedWords === 0 && reviewedWords > 0;
+
+        const contentDescription = isBoth
+          ? 'translated and reviewed'
+          : isReviewOnly
+            ? 'reviewed'
+            : 'translated';
+
+        // Dedication lines are pre-wrapped so each line fits inside the
+        // certificate box (the canvas does not wrap text automatically).
+        let dedicationLines: string[];
+        if (isBoth) {
+          dedicationLines = [
+            'for their dedication and time in translating and reviewing ' +
+              "Oppia's",
+            'basic maths, science, and financial literacy lessons in ' +
+              info.language +
+              ',',
+            'which will help our ' +
+              info.language +
+              '-speaking learners better understand',
+            'the lessons.',
+          ];
+        } else if (isReviewOnly) {
+          dedicationLines = [
+            "for their dedication and time in reviewing Oppia's basic maths, " +
+              'science,',
+            'and financial literacy lessons submitted by translators in ' +
+              info.language +
+              ',',
+            'which will help our ' +
+              info.language +
+              '-speaking learners better understand',
+            'the lessons.',
+          ];
+        } else {
+          dedicationLines = [
+            "for their dedication and time in translating Oppia's " +
+              'basic maths, science,',
+            'and financial literacy lessons to ' +
+              info.language +
+              ' which will help our ' +
+              info.language +
+              '-speaking',
+            'learners better understand the lessons.',
+          ];
+        }
+
         // Determine time display: use minutes if less than 1 hour,
         // otherwise use hours.
         let timeDisplay: string;
@@ -282,45 +336,33 @@ export class CertificateDownloadModalComponent {
           timeDisplay = info.contribution_hours + ' hours';
         }
 
-        const certificateContentData: CertificateContentData[] = [
-          {
-            text:
-              "for their dedication and time in translating Oppia's " +
-              'basic maths, science,',
-            linePosition: linePosition,
-          },
-          {
-            text:
-              'and financial literacy lessons to ' +
-              info.language +
-              ' which will help our ' +
-              info.language +
-              '-speaking',
-            linePosition: (linePosition += 40),
-          },
-          {
-            text: 'learners better understand the lessons.',
-            linePosition: (linePosition += 40),
-          },
-          {
-            text:
-              'This certificate confirms the completion of ' +
-              info.contribution_word_count +
-              ' words of translated content,',
-            linePosition: (linePosition += 80),
-          },
-          {
-            text:
-              'representing ' +
-              timeDisplay +
-              ' of service from ' +
-              info.from_date +
-              ' to ' +
-              info.to_date +
-              '.',
-            linePosition: (linePosition += 40),
-          },
-        ];
+        const certificateContentData: CertificateContentData[] = [];
+        dedicationLines.forEach((line, index) => {
+          certificateContentData.push({
+            text: line,
+            linePosition: index === 0 ? linePosition : (linePosition += 40),
+          });
+        });
+        certificateContentData.push({
+          text:
+            'This certificate confirms the completion of ' +
+            info.contribution_word_count +
+            ' words of ' +
+            contentDescription +
+            ' content,',
+          linePosition: (linePosition += 80),
+        });
+        certificateContentData.push({
+          text:
+            'representing ' +
+            timeDisplay +
+            ' of service from ' +
+            info.from_date +
+            ' to ' +
+            info.to_date +
+            '.',
+          linePosition: (linePosition += 40),
+        });
         this.fillCertificateContent(ctx, certificateContentData);
         linePosition += 100;
       } else {
