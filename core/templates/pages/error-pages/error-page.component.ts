@@ -20,11 +20,12 @@ import {Component, Input, OnInit} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './error-page.component.css';
 
 @Component({
   selector: 'error-page',
   templateUrl: './error-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./error-page.component.css'],
 })
 export class ErrorPageComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks.
