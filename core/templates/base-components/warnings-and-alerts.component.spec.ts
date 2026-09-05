@@ -184,4 +184,38 @@ describe('Warnings and Alert Component', () => {
     expect(alertsService.deleteWarning).toHaveBeenCalledWith(secondWarning);
     expect(modalService.open).toHaveBeenCalledTimes(2);
   }));
+
+  it('should process sequential warnings queue when modal is dismissed', fakeAsync(() => {
+    let mockNgbModalRef = {
+      componentInstance: {
+        errorMessage: '',
+      },
+      result: Promise.reject(),
+    };
+    (modalService.open as jasmine.Spy).and.returnValue(
+      mockNgbModalRef as unknown as NgbModalRef
+    );
+    (modalService.hasOpenModals as jasmine.Spy).and.returnValue(false);
+    let warnings: Warning[] = [
+      {content: 'First Warning', type: 'error'},
+      {content: 'Second Warning', type: 'error'},
+    ];
+    const firstWarning = warnings[0];
+    const secondWarning = warnings[1];
+    spyOnProperty(alertsService, 'warnings').and.returnValue(warnings);
+
+    spyOn(alertsService, 'deleteWarning').and.callFake(warning => {
+      const index = warnings.indexOf(warning);
+      if (index > -1) {
+        warnings.splice(index, 1);
+      }
+    });
+
+    componentInstance.openErrorModal('First Warning');
+    tick();
+
+    expect(alertsService.deleteWarning).toHaveBeenCalledWith(firstWarning);
+    expect(alertsService.deleteWarning).toHaveBeenCalledWith(secondWarning);
+    expect(modalService.open).toHaveBeenCalledTimes(2);
+  }));
 });

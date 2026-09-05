@@ -62,7 +62,7 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
     });
     modalRef.componentInstance.errorMessage = warningMessage;
 
-    modalRef.result.finally(() => {
+    const handleModalFinished = () => {
       this.isErrorModalOpen = false;
       if (this.alertsService.warnings.length > 0) {
         this.alertsService.deleteWarning(this.alertsService.warnings[0]);
@@ -71,7 +71,9 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
       if (this.alertsService.warnings.length > 0) {
         this.openErrorModal(this.alertsService.warnings[0].content);
       }
-    });
+    };
+
+    modalRef.result.then(handleModalFinished, handleModalFinished);
   }
 
   getWarnings(): Warning[] {
