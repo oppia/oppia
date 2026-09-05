@@ -20,6 +20,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import './list-of-sets-of-translatable-html-content-ids-editor.component.css';
 
 interface Choice {
   id: string;
@@ -31,7 +32,9 @@ interface Choice {
   // eslint-disable-next-line max-len
   templateUrl:
     './list-of-sets-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: [],
+  styleUrls: [
+    './list-of-sets-of-translatable-html-content-ids-editor.component.css',
+  ],
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   @Output() valueChanged = new EventEmitter();

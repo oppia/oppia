@@ -29,11 +29,12 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 import {RatioExpressionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {RatioInputAnswer, InteractionAnswer} from 'interactions/answer-defs';
+import './ratio-expression-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-ratio-expression-input',
   templateUrl: './ratio-expression-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./ratio-expression-input-interaction.component.css'],
 })
 export class InteractiveRatioExpressionInputComponent
   implements OnInit, OnDestroy

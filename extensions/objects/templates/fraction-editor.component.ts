@@ -20,11 +20,12 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Fraction} from 'domain/objects/fraction.model';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {FractionAnswer} from 'interactions/answer-defs';
+import './fraction-editor.component.css';
 
 @Component({
   selector: 'fraction-editor',
   templateUrl: './fraction-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./fraction-editor.component.css'],
 })
 export class FractionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -24,11 +24,12 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import './filepath-editor.component.css';
 
 @Component({
   selector: 'filepath-editor',
   templateUrl: './filepath-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./filepath-editor.component.css'],
 })
 export class FilepathEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
