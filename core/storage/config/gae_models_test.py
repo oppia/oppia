@@ -44,6 +44,22 @@ class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
         )
 
 
+class BasePlatformParameterConfigModelTests(test_utils.GenericTestBase):
+    """Test BasePlatformParameterConfigModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.BasePlatformParameterConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.BasePlatformParameterConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     """Test PlatformParameterModel class."""
 
@@ -198,6 +214,22 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
             expected_export_policy_dict,
+        )
+
+
+class BaseFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test BaseFeatureFlagConfigModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.BaseFeatureFlagConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.BaseFeatureFlagConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 
 

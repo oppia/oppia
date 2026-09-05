@@ -53,6 +53,31 @@ class PlatformParameterSnapshotContentModel(
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class BasePlatformParameterConfigModel(base_models.VersionedModel):
+    """Abstract base model for platform parameter configuration.
+
+    This model defines the common storage structure for platform parameters
+    across Web and Android. It must not be instantiated directly.
+
+    The id field represents the unique platform parameter name.
+
+    Fields:
+        id: str. Unique name of the platform parameter.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """BasePlatformParameterConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+
 class PlatformParameterModel(base_models.VersionedModel):
     """A class that represents a named dynamic platform parameter.
     This model only stores fields that can be updated in run time.
@@ -132,6 +157,31 @@ class PlatformParameterModel(base_models.VersionedModel):
             rule_schema_version=rule_schema_version,
             default_value=default_value,
         )
+
+
+class BaseFeatureFlagConfigModel(base_models.BaseModel):
+    """Abstract base model for feature flag configuration.
+
+    This model defines the common structure for all feature flags across
+    Web and Android. It must not be instantiated directly.
+
+    The id field represents the globally unique feature flag name.
+
+    Fields:
+        id: str. Unique name of the feature flag.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """BaseFeatureFlagConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
 
 class FeatureFlagConfigModel(base_models.BaseModel):
