@@ -12,8 +12,8 @@
     },
     {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
@@ -652,8 +652,8 @@
     },
     {
       "name": "translation-coordinator/manage-contributors-translation-review-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
