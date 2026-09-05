@@ -258,4 +258,86 @@ describe('CertificateAssessmentPlayerStateService', () => {
     expect(() => service.ngOnDestroy()).not.toThrowError();
     expect(window.clearInterval).not.toHaveBeenCalled();
   });
+
+  describe('network loss handling', () => {
+    it('should pause the countdown while offline and freeze the remaining time', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(30000);
+      expect(service.remainingTimeInSeconds).toBe(3570);
+      const frozenRemaining = service.remainingTimeInSeconds;
+
+      service.pauseForNetworkLoss();
+
+      expect(window.clearInterval).toHaveBeenCalled();
+      // The disconnected duration is not counted down.
+      tick(60000);
+      expect(service.remainingTimeInSeconds).toBe(frozenRemaining);
+      service.ngOnDestroy();
+    }));
+
+    it('should not pause the countdown when not in the questions stage', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      service.showIntro();
+
+      service.pauseForNetworkLoss();
+
+      // No-op when not actively answering questions.
+      tick(2000);
+      expect(service.remainingTimeInSeconds).toBe(3598);
+      service.ngOnDestroy();
+    }));
+
+    it('should surface the interrupt card when reconnecting after a pause', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(30000);
+      service.pauseForNetworkLoss();
+      expect(service.showAssessmentInterruptCard).toBeFalse();
+
+      service.handleReconnect();
+
+      expect(service.showAssessmentInterruptCard).toBeTrue();
+      service.ngOnDestroy();
+    }));
+
+    it('should not surface the interrupt card on reconnect when not paused', () => {
+      service.handleReconnect();
+
+      expect(service.showAssessmentInterruptCard).toBeFalse();
+    });
+
+    it('should resume from the frozen remaining time after a network-loss pause', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(30000);
+      expect(service.remainingTimeInSeconds).toBe(3570);
+      service.pauseForNetworkLoss();
+
+      service.resumeQuestionsStage();
+
+      expect(service.showAssessmentInterruptCard).toBeFalse();
+      expect(service.currentStage).toBe(
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+      );
+      tick(2000);
+      expect(service.remainingTimeInSeconds).toBe(3568);
+      service.ngOnDestroy();
+    }));
+
+    it('should mark the window expired when the resumed countdown reaches zero', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(30000);
+      service.pauseForNetworkLoss();
+      service.resumeQuestionsStage();
+
+      tick(3570000);
+
+      expect(service.remainingTimeInSeconds).toBe(0);
+      expect(service.isTimeExpired).toBeTrue();
+      expect(window.clearInterval).toHaveBeenCalled();
+    }));
+  });
 });

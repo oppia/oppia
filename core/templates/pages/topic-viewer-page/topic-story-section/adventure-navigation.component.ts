@@ -64,6 +64,7 @@ export class AdventureNavigationComponent
   @Output() lessonSelected =
     new EventEmitter<AdventureNavigationLessonSelection>();
   @Output() practiceSelected = new EventEmitter<string>();
+  @Output() masteryChallengeClicked = new EventEmitter<void>();
 
   @ViewChild('scrollWrapper') scrollWrapper!: ElementRef<HTMLElement>;
 
@@ -72,6 +73,8 @@ export class AdventureNavigationComponent
   hasHorizontalOverflow: boolean = false;
 
   private scrollCheckTimeouts: ReturnType<typeof setTimeout>[] = [];
+
+  constructor() {}
 
   ngAfterViewInit(): void {
     // Defer checks to allow DOM to fully render.
@@ -161,11 +164,11 @@ export class AdventureNavigationComponent
     this.practiceSelected.emit(arcId);
   }
 
-  getLessonBadgeIconName(isCompleted: boolean): string {
-    return isCompleted ? 'check' : '';
+  getPracticeBadgeIconName(): string {
+    return 'edit';
   }
 
-  getPracticeBadgeIconName(isPracticeCompleted: boolean): string {
-    return isPracticeCompleted ? 'check' : 'edit';
+  onMasteryClick(): void {
+    this.masteryChallengeClicked.emit();
   }
 }

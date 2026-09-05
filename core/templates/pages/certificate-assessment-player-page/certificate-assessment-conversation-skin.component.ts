@@ -22,6 +22,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
@@ -36,6 +37,11 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
   @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
   @Input() interactionHtml = '';
+  // Previously recorded answer for the current question, restored into the
+  // interaction so the learner sees their earlier input after navigating away
+  // and back. Consumed by the interaction via the `[last-answer]` binding in
+  // the generated interaction HTML (see exploration-html-formatter.service).
+  @Input() lastAnswer: InteractionAnswer | null = null;
 
   @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
@@ -66,6 +72,19 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
       this.currentInteractionService.submitAnswer();
     }
     this.nextQuestion.emit();
+  }
+
+  // The interaction only reads `lastAnswer` when it is (re)built, so we must
+  // change `htmlData` whenever the stored answer changes to force a rebuild
+  // and re-apply the pre-populated value. A trailing comment with the encoded
+  // answer is harmless to the parsed interaction tag but makes the string
+  // unique per answer, guaranteeing the interaction refreshes.
+  get cachedInteractionHtml(): string {
+    const answerToken =
+      this.lastAnswer === null
+        ? 'null'
+        : JSON.stringify(this.lastAnswer).replace(/--/g, '__');
+    return this.interactionHtml + '<!-- answer:' + answerToken + ' -->';
   }
 
   onSubmitAssessment(): void {

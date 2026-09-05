@@ -28,6 +28,7 @@ import {
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {PageHeadService} from 'services/page-head.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
@@ -74,6 +75,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
     private router: Router,
     protected translateService: TranslateService
@@ -103,12 +105,31 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   async ngOnInit(): Promise<void> {
+    this.internetConnectivityService.startCheckingConnection();
+    this.directiveSubscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        isOnline => this.handleNetworkStateChange(isOnline)
+      )
+    );
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     await this.loadCertificateOffering();
     if (currentRoute === 'session' && !this.hasError) {
       await this.startAssessment();
+    }
+  }
+
+  /**
+   * Pauses the assessment countdown while the learner is offline and surfaces
+   * a resume option once they reconnect, so disconnected time is never counted
+   * towards the assessment expiry window.
+   */
+  private handleNetworkStateChange(isOnline: boolean): void {
+    if (isOnline) {
+      this.certificateAssessmentPlayerStateService.handleReconnect();
+    } else {
+      this.certificateAssessmentPlayerStateService.pauseForNetworkLoss();
     }
   }
 

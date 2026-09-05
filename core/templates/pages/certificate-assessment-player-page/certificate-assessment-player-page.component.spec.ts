@@ -175,10 +175,7 @@ const makeAttempt = (
     })),
   });
 
-const modalRef = (
-  reject = false,
-  resolveValue: string | null = null
-): NgbModalRef =>
+const modalRef = (reject = false, resolveValue: unknown = null): NgbModalRef =>
   ({
     componentInstance: {} as Record<string, unknown>,
     result: reject
@@ -186,7 +183,7 @@ const modalRef = (
       : Promise.resolve(resolveValue),
     close: () => {},
     dismiss: () => {},
-  }) as NgbModalRef;
+  }) as unknown as NgbModalRef;
 
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
@@ -493,6 +490,34 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.answers.q1).toBe(1);
   }));
 
+  it('should normalize object answers with toDict into plain dicts', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    const dictForm = {
+      isNegative: false,
+      wholeNumber: 3,
+      numerator: 1,
+      denominator: 2,
+    };
+    const answerWithToDict = {
+      ...dictForm,
+      toDict: jasmine.createSpy('toDict').and.returnValue(dictForm),
+    };
+
+    component.handleInteractionSubmit(answerWithToDict);
+
+    expect(answerWithToDict.toDict).toHaveBeenCalled();
+    expect(component.answers.q1).toEqual(dictForm);
+  }));
+
+  it('should store plain answer as-is when it has no toDict method', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    const plainAnswer: InteractionAnswer = 'plain text answer';
+    component.handleInteractionSubmit(plainAnswer);
+    expect(component.answers.q1).toBe('plain text answer');
+  }));
+
   it('should not throw when no question loaded', () => {
     expect(() => component.handleInteractionSubmit(1)).not.toThrowError();
   });
@@ -504,6 +529,28 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   it('should return html for loaded question', fakeAsync(() => {
     load();
     expect(component.getInteractionHtml()).toBe('<div>interaction</div>');
+  }));
+
+  it('should return null for lastAnswerForCurrentQuestion when no questions loaded', () => {
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
+  });
+
+  it('should return null for lastAnswerForCurrentQuestion when current question has no answer', fakeAsync(() => {
+    loadQ1();
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
+  }));
+
+  it('should return stored answer for lastAnswerForCurrentQuestion', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    component.handleInteractionSubmit('my answer');
+    expect(component.lastAnswerForCurrentQuestion).toBe('my answer');
+  }));
+
+  it('should return null for lastAnswerForCurrentQuestion when loaded question index is beyond array', fakeAsync(() => {
+    loadQ1();
+    component.currentQuestionIndex = 5;
+    expect(component.lastAnswerForCurrentQuestion).toBeNull();
   }));
 
   it('should return null when no questions loaded', () => {
@@ -614,22 +661,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
     component.isTimeExpired = true;
-    component.ngOnInit();
-    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
-    expect(modalSpy.open).toHaveBeenCalledTimes(1);
-  }));
-
-  it('should not handle time expiry when the flag has not become true', fakeAsync(() => {
-    loadQ1();
-    component.ngOnChanges({});
-    expect(modalSpy.open).not.toHaveBeenCalled();
-  }));
-
-  it('should not handle time expiry again while the flag stays true', fakeAsync(() => {
-    loadQ1();
-    triggerTimeExpiry();
-    expect(modalSpy.open).toHaveBeenCalledTimes(1);
-
     component.ngOnChanges({
       isTimeExpired: {
         currentValue: true,
@@ -638,19 +669,24 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         isFirstChange: () => false,
       },
     });
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
     expect(modalSpy.open).toHaveBeenCalledTimes(1);
   }));
 
-  it('should take no action when the desktop time-expired modal resolves without view-results', fakeAsync(() => {
+  it('should ignore a repeated time-expiry handling request on re-init', fakeAsync(() => {
     loadQ1();
-    spyOn(component.viewResults, 'emit');
-    spyOn(component.assessmentEnded, 'emit');
-    modalSpy.open.and.returnValue(modalRef(false, null));
+    spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
-    flushMicrotasks();
+    component.ngOnInit();
 
-    expect(component.viewResults.emit).not.toHaveBeenCalled();
-    expect(component.assessmentEnded.emit).not.toHaveBeenCalled();
+    expect(component.assessmentSubmitted.emit).toHaveBeenCalledTimes(1);
+    expect(modalSpy.open).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should not handle time expiry when the flag has not become true', fakeAsync(() => {
+    loadQ1();
+    component.ngOnChanges({});
+    expect(modalSpy.open).not.toHaveBeenCalled();
   }));
 
   it('should handle time expiry on init when already expired', fakeAsync(() => {

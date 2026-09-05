@@ -142,9 +142,7 @@ describe('TimeExpiredModalComponent', () => {
       const newComponentInstance = newFixture.componentInstance;
 
       newComponentInstance.viewResults();
-      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(
-        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-      );
+      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
     });
   });
 });

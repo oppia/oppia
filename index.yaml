@@ -713,6 +713,13 @@ indexes:
 
 - kind: CertificateAssessmentAttemptModel
   properties:
+  - name: certificate_id
+  - name: learner_id
+  - name: created_on
+    direction: desc
+
+- kind: CertificateAssessmentAttemptModel
+  properties:
   - name: learner_id
   - name: certificate_id
   - name: is_submitted
@@ -827,3 +834,30 @@ indexes:
   - name: target_type
   - name: created_on
     direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: last_updated
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: status
+  - name: last_updated
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status

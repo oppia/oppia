@@ -7,16 +7,6 @@
   margin: 0 -24px;
   opacity: 1;
   padding: 0 24px;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 56px;
-  z-index: 30;
-}
-
-@media (max-width: 800px) {
-  .adventure-navigation-container {
-    top: 56px;
-  }
 }
 
 .adventure-navigation-scroll-area {
@@ -32,10 +22,10 @@
   flex: 1 1 0;
   flex-wrap: nowrap;
   gap: 10px;
-  margin: 8px 0 4px;
+  margin: 24px 0 12px;
   min-width: 0;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 0;
   position: relative;
 }
 
@@ -125,7 +115,7 @@
 .adventure-navigation-group {
   align-items: center;
   border: 2.5px solid;
-  border-radius: 36px;
+  border-radius: 30px;
   display: inline-flex;
   flex: 0 0 auto;
   gap: 10px;
@@ -140,10 +130,12 @@
   align-items: center;
   border: 2.5px solid #f5a623;
   border-radius: 36px;
+  cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;
   padding: 8px 14px;
+  position: relative;
 }
 
 .adventure-navigation-clickable {
