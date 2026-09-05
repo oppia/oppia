@@ -172,6 +172,18 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
+const addTitleBar = 'input#explorationTitle';
+const explorationTitleSelector = '.e2e-test-exploration-title-input';
+const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
+const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
+const mobileDiscardButtonSelector =
+  'button.e2e-test-mobile-exploration-discard-tab';
+const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
+
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -1735,6 +1747,119 @@ export class ExplorationEditor extends BaseUser {
           `but found ${totalUsers} instead.`
       );
     }
+  }
+  /**
+   * Deletes the previous written title and updates the new title.
+   * @param {string} title - The new title to be added to the exploration.
+   */
+  async updateTitleTo(title: string): Promise<void> {
+    await this.expectElementToBeVisible(addTitleBar);
+    await this.clearAllTextFrom(addTitleBar);
+    await this.typeInInputField(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+    const newTitle = await this.page.$eval(addTitleBar, el =>
+      (el as HTMLInputElement).value?.trim()
+    );
+    // Compare first 36 characters of title.
+    if (newTitle !== title.slice(0, 36)) {
+      throw new Error(
+        `Failed to update title. Expected: ${title}, but got: ${newTitle}`
+      );
+    }
+    showMessage(`Title has been updated to ${newTitle}`);
+  }
+
+  /**
+   * Matches the expected title with the current title.
+   * @param {string} expectedTitle - The expected title.
+   */
+  async expectTitleToBe(expectedTitle: string): Promise<void> {
+    await this.page.waitForSelector(explorationTitleSelector, {visible: true});
+    const currentTitle = await this.page.$eval(
+      explorationTitleSelector,
+      el => (el as HTMLInputElement).value
+    );
+    if (expectedTitle === currentTitle) {
+      showMessage('Title matches the expected title.');
+    } else {
+      throw new Error(
+        `Expected title "${expectedTitle}", but got "${currentTitle}".`
+      );
+    }
+  }
+
+  /**
+   * Discards the current changes.
+   */
+  async discardCurrentChanges(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.expectElementToBeVisible(
+        `${mobileDiscardButtonSelector}:not(.disabled)`
+      );
+      await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
+    } else {
+      await this.expectElementToBeVisible(discardDraftDropdownSelector);
+      await this.clickOnElementWithSelector(discardDraftDropdownSelector);
+      await this.expectElementToBeVisible(desktopDiscardDraftButton);
+      await this.expectElementToBeVisible(
+        `${desktopDiscardDraftButton}:not(.disabled)`
+      );
+      await this.clickOnElementWithSelector(desktopDiscardDraftButton);
+    }
+    await this.expectElementToBeVisible(confirmDiscardButton);
+    await Promise.all([
+      this.clickOnElementWithSelector(confirmDiscardButton),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+    ]);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(confirmDiscardButton, false);
+  }
+  /**
+   * Adds an Image Region interaction to the current exploration.
+   * @param {string} feedback - The feedback for the correct answer.
+   * @param {string} nextCard - The next card to navigate to.
+   */
+  async addImageInteraction(
+    feedback: string = 'Correct!',
+    nextCard?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.expectModalTitleToBe('Choose Interaction');
+    await this.clickOnElementWithText('Image Region');
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Image Region)'
+    );
+    await this.clickOnElementWithSelector(uploadImageButton);
+    await this.uploadFile(imageToUpload);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible('.btn-danger');
+    const imageContainer = await this.page.$('.btn-danger');
+    if (!imageContainer) {
+      throw new Error('Image region container not found.');
+    }
+    const box = await imageContainer.boundingBox();
+    if (!box) {
+      throw new Error('Could not get bounding box of image region container.');
+    }
+    // Select region from (5%, 50%) to (90%, 45%) of the container.
+    await this.page.mouse.move(
+      box.x + box.width * 0.05,
+      box.y + box.height * 0.5
+    );
+    await this.page.mouse.down();
+    await this.page.mouse.move(
+      box.x + box.width * 0.9,
+      box.y + box.height * 0.45
+    );
+    await this.page.mouse.up();
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    await this.expectModalTitleToBe('Add Response');
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
   }
 }
 
