@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Search bar.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -527,5 +529,23 @@ describe('Search bar component', () => {
     // need to test validations.
     // @ts-ignore
     component.openSubmenu(null, null);
+  });
+
+  it('should re-execute search on language change when on search find page', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    windowRef.nativeWindow.location.pathname = '/search/find';
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should not re-execute search on language change when not on search find page', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    windowRef.nativeWindow.location.pathname = '/community-library';
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
   });
 });

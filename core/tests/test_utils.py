@@ -272,11 +272,11 @@ def mock_load_template(
     filename: str, template_is_aot_compiled: bool = False
 ) -> str:
     """Mock for load_template function. This mock is required for backend tests
-    since we do not have webpack compilation before backend tests. The folder to
-    search templates is webpack_bundles which is generated after webpack
-    compilation. Since this folder will be missing, load_template function will
-    return an error. So, we use a mock for load_template which returns the html
-    file from the source directory instead.
+    since the compiled output may not be available. The compiled output would
+    normally be served from the build directory. Since this folder will be
+    missing during backend tests, load_template function will return an error.
+    So, we use a mock for load_template which returns the html file from the
+    source directory instead.
 
     Args:
         filename: str. The name of the file for which template is to be
@@ -321,8 +321,7 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
     """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.Names:
-        yield name
+    yield from models.Names
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
@@ -867,13 +866,24 @@ class ElasticSearchStub:
                     result_docs = [doc for doc in result_docs if v in doc[k]]
             else:
                 for k, v in f['match'].items():
-                    # In explorations and collections, 'doc[k]' is a single
-                    # language or category to which the exploration or
-                    # collection belongs, 'v' is a string of all the languages
-                    # or categories (separated by space eg. 'en hi') in which if
-                    # doc[k] is present, the 'doc' should be returned.
-                    # Therefore, we check using 'doc[k] in v'.
-                    result_docs = [doc for doc in result_docs if doc[k] in v]
+                    # 'v' is a string of all the requested languages or
+                    # categories, separated by spaces (eg. '"en" "hi"'). A
+                    # collection's value is a single string, while an
+                    # exploration's language_code is a list, because an
+                    # exploration is indexed under its own language and every
+                    # language it has an up-to-date translation in. The doc
+                    # matches if any of its values appears in 'v', which is how
+                    # Elasticsearch treats an array field in a match query.
+                    result_docs = [
+                        doc
+                        for doc in result_docs
+                        if any(
+                            value in v
+                            for value in (
+                                doc[k] if isinstance(doc[k], list) else [doc[k]]
+                            )
+                        )
+                    ]
 
         if terms:
             filtered_docs = []
@@ -3026,9 +3036,8 @@ version: 1
         expect_errors = expected_status_int >= 400
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url,
@@ -3141,10 +3150,11 @@ version: 1
                 msg='Expected params to be a dict, received %s' % params,
             )
 
+        response = None
+
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
 
             if http_method == 'GET':
@@ -3162,7 +3172,7 @@ version: 1
             )
         elif http_method != 'GET':
             raise Exception('Invalid http method %s' % http_method)
-
+        assert response is not None
         self.assertIn(response.status_int, expected_status_int_list)
 
         return response
@@ -3396,21 +3406,20 @@ version: 1
             webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
-        if upload_files is not None:
-            encoded_upload_files = tuple(
-                tuple(
-                    f.encode('utf-8') if isinstance(f, str) else f
-                    for f in upload_file
-                )
-                for upload_file in upload_files
+        encoded_upload_files = tuple(
+            tuple(
+                f.encode('utf-8') if isinstance(f, str) else f
+                for f in upload_file
             )
+            for upload_file in (upload_files or ())
+        )
 
         return app.post(
             url,
             params=data,
             headers=headers,
             status=expected_status_int,
-            upload_files=(encoded_upload_files if upload_files else None),
+            upload_files=encoded_upload_files or None,
             expect_errors=expect_errors,
         )
 

@@ -25,6 +25,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './story-preview-tab.component.css';
 
 interface IconsArray {
   // Thumbnails for the story nodes are null if they are not yet uploaded.
@@ -37,6 +38,7 @@ interface IconsArray {
 @Component({
   selector: 'oppia-story-preview-tab',
   templateUrl: './story-preview-tab.component.html',
+  styleUrls: ['./story-preview-tab.component.css'],
 })
 export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
