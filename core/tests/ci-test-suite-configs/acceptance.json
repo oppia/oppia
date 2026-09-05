@@ -172,8 +172,8 @@
     },
     {
       "name": "logged-in-user/create-and-delete-account",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/edit-avatar-and-view-exploration-from-profile-page",
