@@ -148,6 +148,17 @@ describe('ImageWithRegionsEditorComponent', () => {
     expect(component.imageValueChanged).toHaveBeenCalled();
   }));
 
+  it('should not update the image path when the new value is not a string', () => {
+    spyOn(component.valueChanged, 'emit');
+
+    component.imageValueChanged(5);
+
+    expect(component.value.imagePath).toBe(
+      'img_20210627_214959_mwljsqraka_height_691_width_392.svg'
+    );
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
+  });
+
   it('should not re-initialize editor once initialized', fakeAsync(() => {
     expect(component.editorIsInitialized).toBe(false);
     component.initializeEditor();

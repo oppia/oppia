@@ -75,13 +75,15 @@ export class NonnegativeIntEditorComponent implements OnInit {
   }
 
   updateValue(value: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always an int.
-    const updatedValue = value as number;
-    if (updatedValue === this.value) {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers are accepted.
+    if (typeof value !== 'number') {
       return;
     }
-    this.value = updatedValue;
+    if (value === this.value) {
+      return;
+    }
+    this.value = value;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }

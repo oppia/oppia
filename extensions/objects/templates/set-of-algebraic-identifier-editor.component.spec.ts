@@ -47,4 +47,13 @@ describe('SetOfAlgebraicIdentifier', function () {
     component.updateValue(['a', 'b', 'c']);
     expect(component.value).toEqual(['a', 'b', 'c']);
   });
+
+  it('should not update the value when the input is not a string array', () => {
+    component.getSchema();
+    component.ngOnInit();
+
+    component.updateValue('abc');
+
+    expect(component.value).toEqual([]);
+  });
 });

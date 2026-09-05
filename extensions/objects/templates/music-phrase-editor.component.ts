@@ -134,15 +134,17 @@ export class MusicPhraseEditorComponent implements OnInit {
   }
 
   updateValue(newValue: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a string array.
-    const updatedValue = newValue as string[];
-    if (updatedValue.length !== this._localValue.length) {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only string arrays are accepted.
+    if (!Array.isArray(newValue)) {
       return;
     }
-    for (let i = 0; i < updatedValue.length; i++) {
-      if (updatedValue[i] !== this._localValue[i]) {
-        this.localValue = updatedValue;
+    if (newValue.length !== this._localValue.length) {
+      return;
+    }
+    for (let i = 0; i < newValue.length; i++) {
+      if (newValue[i] !== this._localValue[i]) {
+        this.localValue = newValue as string[];
         break;
       }
     }

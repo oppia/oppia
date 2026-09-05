@@ -61,10 +61,12 @@ export class IntEditorComponent implements OnInit {
   }
 
   updateValue(value: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always an int.
-    const updatedValue = value as number;
-    this.value = updatedValue;
-    this.valueChanged.emit(updatedValue);
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers are accepted.
+    if (typeof value !== 'number') {
+      return;
+    }
+    this.value = value;
+    this.valueChanged.emit(value);
   }
 }

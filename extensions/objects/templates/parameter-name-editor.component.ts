@@ -68,10 +68,12 @@ export class ParameterNameEditorComponent implements OnInit {
   }
 
   updateValue(value: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a unicode string.
-    const updatedValue = value as string;
-    this.value = updatedValue;
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof value !== 'string') {
+      return;
+    }
+    this.value = value;
     this._validate();
     this.valueChanged.emit(this.value);
   }

@@ -41,10 +41,12 @@ export class HtmlEditorComponent {
   };
 
   updateValue(value: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always an html string.
-    const updatedValue = value as string;
-    this.value = updatedValue;
-    this.valueChanged.emit(updatedValue);
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only html strings are accepted.
+    if (typeof value !== 'string') {
+      return;
+    }
+    this.value = value;
+    this.valueChanged.emit(value);
   }
 }

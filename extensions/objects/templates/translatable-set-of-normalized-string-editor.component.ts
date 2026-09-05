@@ -66,13 +66,15 @@ export class TranslatableSetOfNormalizedStringEditorComponent
   }
 
   updateValue(val: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a normalized string.
-    const updatedValue = val as string;
-    if (this.value.normalizedStrSet === updatedValue) {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only normalized strings are accepted.
+    if (typeof val !== 'string') {
       return;
     }
-    this.value.normalizedStrSet = updatedValue;
+    if (this.value.normalizedStrSet === val) {
+      return;
+    }
+    this.value.normalizedStrSet = val;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }

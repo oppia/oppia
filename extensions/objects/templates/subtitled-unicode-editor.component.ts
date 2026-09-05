@@ -43,15 +43,17 @@ export class SubtitledUnicodeEditorComponent {
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   updateValue(val: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof val !== 'string') {
+      return;
+    }
     if (this.value) {
-      // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-      // value is always a unicode string.
-      const updatedValue = val as string;
-      if (this.value.unicode === updatedValue) {
+      if (this.value.unicode === val) {
         return;
       }
 
-      this.value.unicode = updatedValue;
+      this.value.unicode = val;
       this.valueChanged.emit(this.value);
       this.changeDetectorRef.detectChanges();
     }

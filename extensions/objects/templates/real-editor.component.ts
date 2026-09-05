@@ -95,9 +95,12 @@ export class RealEditorComponent
       this.changeDetectorRef.detectChanges();
       return;
     }
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a number or a string.
-    this.value = newValue as number | string;
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers or strings are accepted.
+    if (typeof newValue !== 'number' && typeof newValue !== 'string') {
+      return;
+    }
+    this.value = newValue;
     this.valueChanged.emit(this.value);
     this.onValidatorChange();
     this.changeDetectorRef.detectChanges();

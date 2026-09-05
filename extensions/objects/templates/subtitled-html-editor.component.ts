@@ -66,14 +66,16 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   }
 
   updateValue(newValue: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always an html string.
-    const updatedValue = newValue as string;
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only html strings are accepted.
+    if (typeof newValue !== 'string') {
+      return;
+    }
     if (this.value) {
-      if (this.value.html === updatedValue) {
+      if (this.value.html === newValue) {
         return;
       }
-      this.value.html = updatedValue;
+      this.value.html = newValue;
       this.valueChanged.emit(this.value);
       this.changeDetectorRef.detectChanges();
     }

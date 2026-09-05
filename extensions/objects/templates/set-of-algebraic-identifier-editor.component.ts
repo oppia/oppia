@@ -93,11 +93,13 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   }
 
   updateValue(newValue: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a string array.
-    const updatedValue = newValue as string[];
-    if (this.value !== updatedValue) {
-      this.value = updatedValue;
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only string arrays are accepted.
+    if (!Array.isArray(newValue)) {
+      return;
+    }
+    if (this.value !== newValue) {
+      this.value = newValue as string[];
       this.valueChanged.emit(this.value);
       this.changeDetectorRef.detectChanges();
     }

@@ -61,13 +61,15 @@ export class TranslatableSetOfUnicodeStringEditorComponent implements OnInit {
   }
 
   updateValue(val: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a unicode string.
-    const updatedValue = val as string;
-    if (this.value.unicodeStrSet === updatedValue) {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof val !== 'string') {
       return;
     }
-    this.value.unicodeStrSet = updatedValue;
+    if (this.value.unicodeStrSet === val) {
+      return;
+    }
+    this.value.unicodeStrSet = val;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }

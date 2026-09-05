@@ -51,7 +51,10 @@ export class OppiaVisualizationEnumeratedFrequencyTableComponent
 
   getAnswerList(answer: InteractionAnswer): string[] {
     // This visualization is configured only for interactions whose answers
-    // are lists of strings, so the answer is always a string array.
+    // are lists of strings. Guard the value so the answer is a string array.
+    if (!Array.isArray(answer)) {
+      return [];
+    }
     return answer as string[];
   }
 

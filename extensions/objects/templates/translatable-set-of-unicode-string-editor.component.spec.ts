@@ -49,6 +49,14 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     expect(component.value.unicodeStrSet).toBe('abc');
   });
 
+  it('should not update the value when the input is not a string', () => {
+    component.value = {unicodeStrSet: 'random val'};
+
+    component.updateValue(5);
+
+    expect(component.value.unicodeStrSet).toBe('random val');
+  });
+
   it('should initialize the schema property value', () => {
     expect(component.value.unicodeStrSet).toBe('');
   });

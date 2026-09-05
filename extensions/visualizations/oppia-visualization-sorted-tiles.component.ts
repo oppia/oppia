@@ -88,8 +88,11 @@ export class VisualizationSortedTilesComponent implements OnInit {
 
   getAnswerHtml(answer: InteractionAnswer): string {
     // This visualization is configured only for interactions whose answers
-    // are HTML strings, so the answer is always a string.
-    return answer as string;
+    // are HTML strings. Guard the value so the answer is a string.
+    if (typeof answer !== 'string') {
+      return '';
+    }
+    return answer;
   }
 
   ngOnInit(): void {

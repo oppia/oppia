@@ -3364,4 +3364,17 @@ describe('ImageEditor', () => {
       'img_12345_height_250_width_250.png'
     );
   });
+
+  it('should get issue URL from svg sanitizer service', () => {
+    const invalidTagsAndAttrs = {
+      tags: ['script'],
+      attrs: ['onclick'],
+    };
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue-url');
+
+    expect(component.getIssueURL(invalidTagsAndAttrs)).toBe('issue-url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
+  });
 });

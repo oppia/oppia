@@ -234,11 +234,18 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
-    public svgSanitizerService: SvgSanitizerService,
+    private svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private gifFramesService: GifFramesService
   ) {}
+
+  // Public wrapper for the SVG sanitizer service's getIssueURL method.
+  // This is needed because Angular strict template checking does not
+  // allow direct access to private class members from templates.
+  getIssueURL(invalidTagsAndAttributes: InvalidSvgTagsAndAttributes): string {
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
+  }
 
   ngOnInit(): void {
     this.validityChange.emit({empty: false});

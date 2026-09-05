@@ -733,12 +733,14 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   imageValueChanged(newVal: SchemaDefaultValue): void {
     // Called when the image is changed to calculate the required
     // width and height, especially for large images.
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always a unicode string.
-    const updatedValue = newVal as string;
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof newVal !== 'string') {
+      return;
+    }
     const that = this;
-    this.value.imagePath = updatedValue;
-    if (updatedValue !== '') {
+    this.value.imagePath = newVal;
+    if (newVal !== '') {
       // Loads the image in hanging <img> tag so as to get the
       // width and height.
       const setHeightAndWidth = (img: HTMLCanvasElement) => {
@@ -749,7 +751,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       img.onload = function () {
         setHeightAndWidth(this as HTMLCanvasElement);
       };
-      img.src = this.getPreviewUrl(updatedValue) as string;
+      img.src = this.getPreviewUrl(newVal) as string;
     }
     this.valueChanged.emit(this.value);
   }

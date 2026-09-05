@@ -75,13 +75,15 @@ export class PositiveIntEditorComponent implements OnInit {
   }
 
   updateValue(newValue: SchemaDefaultValue): void {
-    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
-    // value is always an int.
-    const updatedValue = newValue as number;
-    if (this.value === updatedValue) {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers are accepted.
+    if (typeof newValue !== 'number') {
       return;
     }
-    this.value = updatedValue;
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }
