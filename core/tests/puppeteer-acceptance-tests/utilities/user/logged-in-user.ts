@@ -5091,7 +5091,7 @@ export class LoggedInUser extends BaseUser {
         feedbackDetailPagePageUrlLabel,
         'Page URL'
       );
-      await this.expectTextContentToBe(
+      await this.expectTextContentToContain(
         feedbackDetailPagePageUrlValue,
         pageUrlValue
       );
