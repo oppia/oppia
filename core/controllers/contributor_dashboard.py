@@ -76,6 +76,7 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     """A dictionary representation of client side SkillOpportunity object."""
 
     topic_name: str
+    questions_in_review_count: int
 
 
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -250,6 +251,7 @@ class ContributionOpportunitiesHandler(
                                 'question_count'
                             ],
                             'topic_name': topic_name,
+                            'questions_in_review_count': 0,
                         }
                         opportunities.append(client_side_skill_opportunity_dict)
             if (
@@ -259,6 +261,24 @@ class ContributionOpportunitiesHandler(
                 break
             skill_opportunities, cursor, more = (
                 opportunity_services.get_skill_opportunities(cursor)
+            )
+
+        skill_ids = [opp['id'] for opp in opportunities]
+        in_review_suggestions = (
+            suggestion_services.get_question_suggestions_in_review_by_skill_ids(
+                skill_ids
+            )
+        )
+        skill_id_to_in_review_count: Dict[str, int] = {}
+        for suggestion in in_review_suggestions:
+            if suggestion is not None:
+                skill_id_to_in_review_count[suggestion.target_id] = (
+                    skill_id_to_in_review_count.get(suggestion.target_id, 0) + 1
+                )
+
+        for opp in opportunities:
+            opp['questions_in_review_count'] = skill_id_to_in_review_count.get(
+                opp['id'], 0
             )
 
         return opportunities, cursor, more

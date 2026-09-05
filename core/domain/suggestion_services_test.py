@@ -2926,6 +2926,24 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0].language_code, 'en')
         self.assertEqual(suggestions[0].target_id, self.target_id_1)
 
+    def test_get_question_suggestions_in_review_by_skill_ids(self) -> None:
+        suggestions = (
+            suggestion_services.get_question_suggestions_in_review_by_skill_ids(
+                ['skill_1', 'skill_2']
+            )
+        )
+        self.assertEqual(len(suggestions), 0)
+        self._create_question_suggestion_with_skill_id('skill_1')
+        suggestions = (
+            suggestion_services.get_question_suggestions_in_review_by_skill_ids(
+                ['skill_1']
+            )
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[0] is not None
+        self.assertEqual(suggestions[0].author_id, self.author_id_1)
+        self.assertEqual(suggestions[0].target_id, 'skill_1')
+
     def test_get_by_target_id(self) -> None:
         queries = [
             ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
