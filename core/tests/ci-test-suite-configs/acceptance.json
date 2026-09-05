@@ -582,8 +582,8 @@
     },
     {
       "name": "topic-manager/edit-the-topic",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-the-topic.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/topic-manager/edit-the-topic.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard",

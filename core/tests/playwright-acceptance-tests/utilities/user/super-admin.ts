@@ -137,13 +137,18 @@ export class SuperAdmin extends LoggedInUser {
   private async selectTopicForTopicManagerRole(
     topicName: string
   ): Promise<void> {
+    // 1. Wait for the dropdown element itself to be visible.
     await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
+
+    // 2. CRITICAL FIX: Wait for the <option> elements to actually populate in the DOM.
+    // We use 'attached' because options are hidden by the OS, so 'visible' will cause a timeout.
+    await this.page.waitForSelector(`${selectTopicForAssignmentSelector} option`, { state: 'attached' });
+
     const selectElement = await this.page.$(selectTopicForAssignmentSelector);
     if (!selectElement) {
       throw new Error('Select element not found');
     }
 
-    await this.expectElementToBeVisible('.e2e-test-select-topic option');
     const optionElements = await selectElement.$$('option');
     if (!optionElements.length) {
       throw new Error('No options found in the select element');
@@ -154,8 +159,10 @@ export class SuperAdmin extends LoggedInUser {
         el => el.textContent,
         optionElement
       );
+
+      // Safely skip empty default options rather than crashing.
       if (!optionText) {
-        throw new Error('Option text not found');
+        continue;
       }
 
       if (optionText.trim() === topicName) {
