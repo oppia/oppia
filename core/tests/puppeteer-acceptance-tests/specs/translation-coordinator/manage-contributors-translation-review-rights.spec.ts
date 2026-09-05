@@ -33,6 +33,11 @@ import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 
 const ROLES = testConstants.Roles;
 
+const LANGUAGE_SELECTOR_SELECTED = '.e2e-test-language-selector-selected';
+// This selector represents the empty stats table card. Waiting for it ensures
+// the background layout is fully rendered before taking the modal screenshot.
+const NO_DATA_MESSAGE_SELECTOR = '.e2e-test-no-data-message';
+
 describe('Translation Coordinator', function () {
   let translationCoordinator: TranslationCoordinator & ContributorAdmin;
   let translationSubmitter: ExplorationEditor &
@@ -161,12 +166,12 @@ describe('Translation Coordinator', function () {
     // Wait for the background Language row to settle (async fetch to complete)
     // before opening the modal and taking a screenshot.
     await translationCoordinator.expectTextContentToContain(
-      '.e2e-test-language-selector-selected',
+      LANGUAGE_SELECTOR_SELECTED,
       'English'
     );
 
     await translationCoordinator.expectElementToBeVisible(
-      '.e2e-test-no-data-message'
+      NO_DATA_MESSAGE_SELECTOR
     );
 
     // Add translation rights.
