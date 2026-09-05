@@ -230,8 +230,8 @@ describe('Logged-in User', function () {
       statusLabels[FeedbackStatus.OPEN],
       'Lesson',
       'Web',
-      'typo',
-      expId
+      'Typo',
+      'http://localhost:8181/lesson/' + expId
     );
     await lessonCreator.verifyFeedbackDetailPageLessonContextSection(
       expId,
@@ -246,7 +246,8 @@ describe('Logged-in User', function () {
     await lessonCreator.verifyFeedbackDetailPageUserFeedbackSection(
       'There is a typo in the question text.'
     );
-    await lessonCreator.verifyFeedbackDetailPageRepliesSection(false);
+    await lessonCreator.verifyFeedbackDetailPageRepliesSection(false, true);
+    await lessonCreator.clickFeedbackDetailBackButton();
   });
 
   it('should be able to change the status of feedbacks', async function () {
@@ -258,9 +259,77 @@ describe('Logged-in User', function () {
     await lessonCreator.clickOnFeedbackListEntryWithDescription(
       'Question 2 is confusing.'
     );
+
+    await lessonCreator.verifyFeedbacKDetailStatusActionsButtons();
+    await lessonCreator.clickFeedbackDetailStatusButton('compliment');
+
+    await lessonCreator.verifyFeedbackStatusActions('compliment', 'open');
+    await lessonCreator.expectToastMessage(
+      'Feedback status updated to compliment.'
+    );
+
+    await lessonCreator.expectScreenshotToMatch(
+      'feedbackAfterStatusChange',
+      __dirname
+    );
+
+    await lessonCreator.verifyExplorationFeedbackDetailView(
+      'feedback',
+      'Compliment'
+    );
+    await lessonCreator.verifyFeedbackDetailPageDetailsSection(
+      statusLabels[FeedbackStatus.COMPLIMENT],
+      'Lesson',
+      'Web'
+    );
+
+    await lessonCreator.clickFeedbackDetailBackButton();
+    await lessonCreator.selectFeedbackStatusFilter('compliment');
+    await lessonCreator.clickApplyButton();
+
+    await lessonCreator.expectScreenshotToMatch(
+      'complimentFilterTableList',
+      __dirname
+    );
+
+    await lessonCreator.expectFeedbackTableEntry({
+      description: 'Question 2 is confusing.',
+      status: statusLabels[FeedbackStatus.COMPLIMENT],
+      lessonTitle: 'What are the Place Values',
+    });
+
+    await lessonCreator.clickOnFeedbackListEntryWithDescription(
+      'Question 2 is confusing.'
+    );
+    await lessonCreator.clickFeedbackDetailStatusButton('fixed');
+    await lessonCreator.verifyFeedbackStatusActions('fixed', 'compliment');
+    await lessonCreator.expectToastMessage('Feedback status updated to fixed.');
   });
 
-  // afterAll(async function () {
-  //   await UserFactory.closeAllBrowsers();
-  // });
+  it("should be able to reply to a learner's lesson feedback", async function () {
+    // Already in Entry 1 feedback.
+    await lessonCreator.verifyFeedbackDetailPageRepliesSection(false);
+    await lessonCreator.verifyFeedbackDetailPageActionsSection(true);
+
+    await lessonCreator.submitFeedbackReplyInTextArea(
+      'Thanks for pointing this out, we have fixed the question.'
+    );
+    await lessonCreator.sendFeedbackDetailReply();
+
+    await lessonCreator.expectToastMessage('Reply sent successfully.');
+
+    await lessonCreator.expectScreenshotToMatch(
+      'FeedbackWithCreatorReply',
+      __dirname
+    );
+
+    await lessonCreator.verifyfeedbackDetailResponseReply(
+      'Thanks for pointing this out, we have fixed the question.'
+    );
+    await lessonCreator.verifyFeedbackDetailPageActionsSection(true);
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

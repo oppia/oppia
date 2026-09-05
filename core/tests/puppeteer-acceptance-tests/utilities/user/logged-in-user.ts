@@ -416,12 +416,8 @@ const mySuggestionsTabLearnerThreadDate =
   '.e2e-test-my-suggestions-learner-thread-date';
 const mySuggestionsTabLearnerThreadText =
   '.e2e-test-my-suggestions-learner-thread-text';
-const mySuggestionsTabCreatorThreadHeader =
-  '.e2e-test-my-suggestions-creator-thread-header';
 const mySuggestionsTabCreatorThreadDate =
   '.e2e-test-my-suggestions-creator-thread-date';
-const mySuggestionsTabCreatorThreadText =
-  '.e2e-test-my-suggestions-creators-response-text';
 // Feedback-table row selectors.
 const feedbackTableRow = '.e2e-test-feedback-table-row';
 // Feedback-detail-page selectors, used accross exploration feedback tab and
@@ -493,9 +489,25 @@ const feedbackDetailPageLearnerAnswerlabel =
 const feedbackDetailPageLearnerAnswerValue =
   '.e2e-test-feedback-detail-learner-answer-value';
 const feedbackDetailPageUserMessage = '.e2e-test-feedback-detail-user-message';
-const feedbackdetailScreensshotPreview =
+const feedbackDetailScreensshotPreview =
   '.e2e-test-feedback-detail-screenshot-preview';
-const feedbackdetailScreensshotBtn = '.e2e-test-feedback-detail-screenshot-btn';
+const feedbackDetailScreensshotBtn = '.e2e-test-feedback-detail-screenshot-btn';
+const feedbackDetailActionStatusLabel =
+  '.e2e-test-feedback-detail-action-status-label';
+const feedbackDetailActionStatusNote =
+  '.e2e-test-feedback-detail-action-status-note';
+const feedbackDetailActionStatusOpenBtn =
+  '.e2e-test-feedback-detail-action-open-status-btn';
+const feedbackDetailActionStatusComplimentBtn =
+  '.e2e-test-feedback-detail-action-compliment-status-btn';
+const feedbackDetailActionStatusFixedBtn =
+  '.e2e-test-feedback-detail-action-fixed-status-btn';
+const feedbackDetailActionStatusNotActionableBtn =
+  '.e2e-test-feedback-detail-action-not_actionable-status-btn';
+const feedbackDetailResponseReplyheader =
+  '.e2e-test-feedback-detail-response-reply-header';
+const feedbackDetailResponseReplyText =
+  '.e2e-test-feedback-detail-response-reply-text';
 
 interface FeedbackTableRowExpectation {
   description: string;
@@ -5153,10 +5165,10 @@ export class LoggedInUser extends BaseUser {
   }
 
   async verifyFeedbackDetailScreenshotSection(): Promise<void> {
-    await this.expectElementToBeVisible(feedbackdetailScreensshotPreview, true);
-    await this.expectElementToBeClickable(feedbackdetailScreensshotBtn, true);
+    await this.expectElementToBeVisible(feedbackDetailScreensshotPreview, true);
+    await this.expectElementToBeClickable(feedbackDetailScreensshotBtn, true);
     await this.expectTextContentToBe(
-      feedbackdetailScreensshotBtn,
+      feedbackDetailScreensshotBtn,
       'Open screenshot in new tab'
     );
   }
@@ -5225,6 +5237,12 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  async selectFeedbackStatusFilter(status: string): Promise<void> {
+    await this.select(feedbackFilterStatus, status);
+
+    await this.expectElementValue(feedbackFilterStatus, status);
+  }
+
   async verifyFeedbackDetailPageUserFeedbackSection(
     userMessage: string
   ): Promise<void> {
@@ -5239,18 +5257,28 @@ export class LoggedInUser extends BaseUser {
   }
 
   async verifyFeedbackDetailPageRepliesSection(
-    hasReply: boolean
+    hasReplies: boolean,
+    isReport: boolean = false
   ): Promise<void> {
-    if (hasReply) {
+    if (hasReplies) {
       await this.expectTextContentToContain(
         feedbackDetailPageRepliesSection,
         'Replies'
       );
-    } else {
-      await this.expectElementToBeVisible(
-        feedbackDetailPageRepliesSection,
-        false
+      return;
+    }
+
+    await this.expectElementToBeVisible(
+      feedbackDetailPageRepliesSection,
+      false
+    );
+
+    if (!isReport) {
+      await this.expectTextContentToBe(
+        feedbackDetailPageEmptyReplyText,
+        'No replies yet.'
       );
+    } else {
       await this.expectElementToBeVisible(
         feedbackDetailPageEmptyReplyText,
         false
@@ -5261,6 +5289,17 @@ export class LoggedInUser extends BaseUser {
   async clickFeedbackDetailBackButton(): Promise<void> {
     await this.expectElementToBeClickable(feedbackDetailPageBackBtn, true);
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
+  }
+
+  async verifyfeedbackDetailResponseReply(replytext: string): Promise<void> {
+    await this.expectTextContentToBe(
+      feedbackDetailResponseReplyheader,
+      'Creator'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailResponseReplyText,
+      replytext
+    );
   }
 
   async verifyFeedbackDetailPageActionsSection(
@@ -5294,6 +5333,104 @@ export class LoggedInUser extends BaseUser {
         false
       );
     }
+  }
+
+  /**
+   * Submits the feedback reply in the text area.
+   * @param feedbackReply - Reply sent by lesson creator for the feedback.
+   */
+  async submitFeedbackReplyInTextArea(feedbackReply: string): Promise<void> {
+    await this.clickOnElementWithSelector(
+      feedbackDetailPageActionReplyTextarea
+    );
+    await this.typeInInputField(
+      feedbackDetailPageActionReplyTextarea,
+      feedbackReply
+    );
+    await this.expectElementToBeClickable(
+      feedbackDetailPageActionSubmitButton,
+      true
+    );
+  }
+
+  async sendFeedbackDetailReply(): Promise<void> {
+    await this.expectElementToBeClickable(
+      feedbackDetailPageActionSubmitButton,
+      true
+    );
+    await this.clickOnElementWithSelector(feedbackDetailPageActionSubmitButton);
+    await this.waitForNetworkIdle();
+    showMessage('Sent Reply to Learner');
+  }
+
+  async verifyFeedbacKDetailStatusActionsButtons(): Promise<void> {
+    await this.expectTextContentToBe(
+      feedbackDetailActionStatusLabel,
+      'Change status:'
+    );
+    await this.expectTextContentToBe(
+      feedbackDetailActionStatusNote,
+      'Note: Marking this report as "Fixed" will also report the user.'
+    );
+    await this.expectElementToBeVisible(
+      feedbackDetailActionStatusOpenBtn,
+      true
+    );
+    await this.expectElementToBeClickable(
+      feedbackDetailActionStatusOpenBtn,
+      false
+    );
+    await this.expectElementToBeVisible(
+      feedbackDetailActionStatusComplimentBtn,
+      true
+    );
+    await this.expectElementToBeVisible(
+      feedbackDetailActionStatusFixedBtn,
+      true
+    );
+    await this.expectElementToBeVisible(
+      feedbackDetailActionStatusNotActionableBtn,
+      true
+    );
+  }
+
+  async clickFeedbackDetailStatusButton(status: string): Promise<void> {
+    let selector: string;
+
+    switch (status) {
+      case 'open':
+        selector = feedbackDetailActionStatusOpenBtn;
+        break;
+      case 'fixed':
+        selector = feedbackDetailActionStatusFixedBtn;
+        break;
+      case 'compliment':
+        selector = feedbackDetailActionStatusComplimentBtn;
+        break;
+      case 'not_actionable':
+        selector = feedbackDetailActionStatusNotActionableBtn;
+        break;
+      default:
+        throw new Error(`Invalid feedback status: ${status}`);
+    }
+
+    await this.expectElementToBeClickable(selector, true);
+    await this.clickOnElementWithSelector(selector);
+  }
+
+  async verifyFeedbackStatusActions(
+    selectedStatus: string,
+    otherStatus: string
+  ): Promise<void> {
+    await this.expectElementToBeClickable(
+      `.e2e-test-feedback-detail-action-${selectedStatus}-status-btn`,
+      false
+    );
+
+    await this.expectElementToBeClickable(
+      `.e2e-test-feedback-detail-action-${otherStatus}-status-btn`,
+      true
+    );
   }
 
   async verifyMySuggestionsFeedbackDetailView(

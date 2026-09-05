@@ -183,13 +183,13 @@
                      class="oppia-feedback-response">
 
                   <div class="oppia-feedback-response-header">
-                    <span class="oppia-feedback-response-author">Creator</span>
+                    <span class="oppia-feedback-response-author e2e-test-feedback-detail-response-reply-header">Creator</span>
                     <span class="oppia-feedback-response-date">
                       {{ formatDate(response.responded_on) }}
                     </span>
                   </div>
 
-                  <div class="oppia-feedback-response-text">
+                  <div class="oppia-feedback-response-text e2e-test-feedback-detail-response-reply-text">
                     {{ response.response_text }}
                   </div>
 
@@ -226,9 +226,9 @@
                 </div>
               </section>
               <section class="oppia-feedback-detail-status-row">
-                <span class="oppia-feedback-detail-actions-label">Change status:</span>
+                <span class="oppia-feedback-detail-actions-label e2e-test-feedback-detail-action-status-label">Change status:</span>
                 <span *ngIf="feedbackDetailPageConfig.showResponse"
-                      class="oppia-feedback-detail-status-note">
+                      class="oppia-feedback-detail-status-note e2e-test-feedback-detail-action-status-note">
                   Note: Marking this report as "Fixed" will also report the user.
                 </span>
                 <div class="oppia-feedback-detail-actions-buttons">
@@ -237,7 +237,7 @@
                             type="button"
                             [disabled]="statusOption === feedback.status"
                             [attr.aria-pressed]="statusOption === feedback.status"
-                            class="btn btn-primary oppia-feedback-detail-status-button e2e-test-feedback-detail-status-button"
+                            class="btn btn-primary oppia-feedback-detail-status-button e2e-test-feedback-detail-action-{{statusOption}}-status-btn"
                             (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
                     </button>
