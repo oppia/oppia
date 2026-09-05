@@ -162,8 +162,8 @@
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/view-subtopic-study-guides",
