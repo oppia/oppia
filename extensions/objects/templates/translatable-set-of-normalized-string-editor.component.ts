@@ -25,8 +25,8 @@ import {
 } from '@angular/core';
 
 export interface TranslatableSetOfStringSchema {
-  type: string;
-  items: {type: string};
+  type: 'list';
+  items: {type: 'unicode'};
   validators: {id: string}[];
 }
 

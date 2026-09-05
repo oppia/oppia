@@ -26,6 +26,7 @@ import {
 } from '@angular/core';
 
 import {TranslatableSetOfStringSchema} from './translatable-set-of-normalized-string-editor.component';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'translatable-set-of-unicode-string-editor',
@@ -59,11 +60,14 @@ export class TranslatableSetOfUnicodeStringEditorComponent implements OnInit {
     }
   }
 
-  updateValue(val: string): void {
-    if (this.value.unicodeStrSet === val) {
+  updateValue(val: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
+    // value is always a unicode string.
+    const updatedValue = val as string;
+    if (this.value.unicodeStrSet === updatedValue) {
       return;
     }
-    this.value.unicodeStrSet = val;
+    this.value.unicodeStrSet = updatedValue;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }

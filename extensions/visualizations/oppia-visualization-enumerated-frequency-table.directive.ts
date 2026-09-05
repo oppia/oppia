@@ -18,6 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 import './oppia-visualization-enumerated-frequency-table.directive.css';
 
@@ -46,6 +47,12 @@ export class OppiaVisualizationEnumeratedFrequencyTableComponent
 
   toggleAnswerVisibility(i: number): void {
     this.answerVisible[i] = !this.answerVisible[i];
+  }
+
+  getAnswerList(answer: InteractionAnswer): string[] {
+    // This visualization is configured only for interactions whose answers
+    // are lists of strings, so the answer is always a string array.
+    return answer as string[];
   }
 
   ngOnInit(): void {
