@@ -657,8 +657,8 @@
     },
     {
       "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/manage-contributors-question-review-submission-rights.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-coordinator/manage-contributors-question-review-submission-rights.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "release-coordinator/enable-feature-flag",
