@@ -23,7 +23,7 @@ import os
 import re
 import subprocess
 
-from typing import Dict, Final, FrozenSet, List, Optional, Tuple
+from typing import Dict, Final, List, Optional, Tuple
 
 from .. import common, concurrent_task_utils
 from . import linter_utils
@@ -39,19 +39,7 @@ class TagMismatchException(Exception):
     pass
 
 
-LEGACY_STYLE_TAG_ALLOWLIST_PATH: Final = os.path.join(
-    os.getcwd(), 'scripts', 'linters', 'html_style_tag_allowlist.txt'
-)
 STYLE_TAG_DISALLOWED_PATH_PREFIXES: Final = ('core/', 'extensions/')
-
-
-def _load_legacy_style_tag_allowlist() -> FrozenSet[str]:
-    """Loads the list of legacy HTML files that still contain style tags."""
-    with open(LEGACY_STYLE_TAG_ALLOWLIST_PATH, encoding='utf-8') as f:
-        return frozenset(line.strip() for line in f.readlines() if line.strip())
-
-
-LEGACY_STYLE_TAG_ALLOWLIST: Final = _load_legacy_style_tag_allowlist()
 
 
 def _get_repo_relative_filepath(filepath: str) -> str:
@@ -64,11 +52,9 @@ def _get_repo_relative_filepath(filepath: str) -> str:
 def _is_disallowed_style_tag_filepath(filepath: str) -> bool:
     """Returns whether a style tag should be disallowed for the filepath."""
     normalized_filepath = _get_repo_relative_filepath(filepath)
-    return (
-        normalized_filepath.endswith('.html')
-        and normalized_filepath.startswith(STYLE_TAG_DISALLOWED_PATH_PREFIXES)
-        and normalized_filepath not in LEGACY_STYLE_TAG_ALLOWLIST
-    )
+    return normalized_filepath.endswith(
+        '.html'
+    ) and normalized_filepath.startswith(STYLE_TAG_DISALLOWED_PATH_PREFIXES)
 
 
 class CustomHTMLParser(html.parser.HTMLParser):

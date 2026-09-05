@@ -39,6 +39,7 @@ import {CustomSchema} from 'services/schema-default-value.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {UtilsService} from 'services/utils.service';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
+import './image-with-regions-editor.component.css';
 
 export interface Region {
   region: {
@@ -53,7 +54,7 @@ export interface Region {
 @Component({
   selector: 'image-with-regions-editor',
   templateUrl: './image-with-regions-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./image-with-regions-editor.component.css'],
 })
 export class ImageWithRegionsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
