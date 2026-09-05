@@ -35,6 +35,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ContributorDashboardAdminPageRootComponent} from './contributor-dashboard-admin-page-root.component';
 import {ContributorDashboardAdminAuthGuard} from './contributor-dashboard-admin-auth.guard';
 import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-admin-page.component';
+import {FeaturedTranslationLanguagesEditorComponent} from './featured-translation-languages-editor/featured-translation-languages-editor.component';
 
 @NgModule({
   imports: [
@@ -61,6 +62,7 @@ import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-ad
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
+    FeaturedTranslationLanguagesEditorComponent,
     ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent,
   ],
