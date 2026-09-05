@@ -802,7 +802,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       this.needsUpdateTooltipMessage =
-        'Audio needs update to ' + 'match text. Please record new audio.';
+        'Audio needs update to ' + 'match text. Please add new audio.';
     } else {
       this.needsUpdateTooltipMessage =
         'Translation needs update ' +
