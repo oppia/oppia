@@ -592,7 +592,9 @@ export class TopicStorySectionComponent
 
   scrollToMasteryChallenge(): void {
     setTimeout(() => {
-      const el = document.querySelector('.mastery-challenge-card');
+      const el = this.windowRef.nativeWindow.document.querySelector(
+        '.mastery-challenge-card'
+      );
       if (el) {
         this.scrollToElement(el);
       }
@@ -600,7 +602,7 @@ export class TopicStorySectionComponent
   }
 
   private scrollToElementById(id: string): void {
-    const el = document.getElementById(id);
+    const el = this.windowRef.nativeWindow.document.getElementById(id);
     if (el) {
       this.scrollToElement(el);
     }
@@ -608,13 +610,18 @@ export class TopicStorySectionComponent
 
   private scrollToElement(el: Element): void {
     const navbarHeight = 56;
-    const moduleNav = document.querySelector('.module-navigation-container');
+    const moduleNav = this.windowRef.nativeWindow.document.querySelector(
+      '.module-navigation-container'
+    );
     const moduleNavHeight = moduleNav
       ? moduleNav.getBoundingClientRect().height
       : 0;
     const offset = navbarHeight + moduleNavHeight + 16;
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({top, behavior: 'smooth'});
+    const top =
+      el.getBoundingClientRect().top +
+      this.windowRef.nativeWindow.scrollY -
+      offset;
+    this.windowRef.nativeWindow.scrollTo({top, behavior: 'smooth'});
   }
 
   constructor(

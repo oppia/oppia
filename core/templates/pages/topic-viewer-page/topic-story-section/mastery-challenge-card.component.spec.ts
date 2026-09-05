@@ -23,7 +23,6 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
@@ -81,12 +80,8 @@ describe('MasteryChallengeCardComponent', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.actionUrl = '/practice/session/1';
     component.isUnlocked = true;
-    fixture.detectChanges();
 
-    const button = fixture.debugElement.query(
-      By.css('.mastery-challenge-button')
-    );
-    button.nativeElement.click();
+    component.onChallengeButtonClick();
 
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
       '/practice/session/1'

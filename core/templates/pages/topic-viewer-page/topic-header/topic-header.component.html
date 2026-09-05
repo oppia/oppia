@@ -6,10 +6,10 @@
       <i class="fa fa-angle-left" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && isLanguageRTL()"></i>
       <a *ngIf="classroomName || classroomUrlFragment" [href]="getClassroomUrl()">
         <ng-container *ngIf="classroomName; else classroomFromUrlFragmentInDefaultBreadcrumb">
-          <bdi>{{ capitalizedClassroomName }}</bdi>
+          <bdi>{{ classroomName | capitalizePipe }}</bdi>
         </ng-container>
         <ng-template #classroomFromUrlFragmentInDefaultBreadcrumb>
-          <bdi>{{ capitalizedClassroomUrlFragment }}</bdi>
+          <bdi>{{ classroomUrlFragment | capitalizePipe }}</bdi>
         </ng-template>
       </a>
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && !isLanguageRTL()"></i>
@@ -23,10 +23,10 @@
     <ng-template #studySkillsBreadcrumb>
       <a [href]="getClassroomUrl()">
         <ng-container *ngIf="classroomName; else classroomFromUrlFragment">
-          <bdi>{{ capitalizedClassroomName }}</bdi>
+          <bdi>{{ classroomName | capitalizePipe }}</bdi>
         </ng-container>
         <ng-template #classroomFromUrlFragment>
-          <bdi>{{ (capitalizedClassroomUrlFragment || ('I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate)) }}</bdi>
+          <bdi>{{ (classroomUrlFragment | capitalizePipe) || ('I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate) }}</bdi>
         </ng-template>
       </a>
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
@@ -59,11 +59,11 @@
       <a *ngIf="classroomName"
          [href]="getClassroomUrl()"
          class="e2e-test-mobile-breadcrumbs-classroom">
-        {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: capitalizedClassroomName } }}
+        {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName | capitalizePipe } }}
       </a>
       <a *ngIf="!classroomName && classroomUrlFragment"
          [href]="getClassroomUrl()">
-        {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: capitalizedClassroomUrlFragment } }}
+        {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomUrlFragment | capitalizePipe } }}
       </a>
       <a *ngIf="!classroomName && !classroomUrlFragment"
          href="/learn">

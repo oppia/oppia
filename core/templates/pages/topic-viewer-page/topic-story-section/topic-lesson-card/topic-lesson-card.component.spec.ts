@@ -31,7 +31,7 @@ class MockWindowRef {
   nativeWindow = {
     location: {
       assign: (url: string) => {},
-      origin: 'https://www.oppia.org',
+      origin: 'http://localhost:8181',
     },
   };
 }
@@ -261,7 +261,7 @@ describe('TopicLessonCardComponent', () => {
     expect(component.startLessonClick.emit).toHaveBeenCalledWith({
       lessonNumber: 1,
       startUrl:
-        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr',
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr',
     });
   });
 
@@ -691,7 +691,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     expect(result).toBe(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr'
+      'http://localhost:8181/explore/123?initialContentLanguageCode=fr'
     );
   });
 
@@ -704,7 +704,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     expect(result).toBe(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA'
+      'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA'
     );
   });
 
@@ -819,7 +819,7 @@ describe('TopicLessonCardComponent', () => {
     expect(component.startLessonClick.emit).toHaveBeenCalledWith({
       lessonNumber: 3,
       startUrl:
-        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr&restart=1',
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr&restart=1',
     });
   });
 
@@ -1104,7 +1104,7 @@ describe('TopicLessonCardComponent', () => {
     expect(component.startLessonClick.emit).toHaveBeenCalledWith({
       lessonNumber: 1,
       startUrl:
-        'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA',
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA',
     });
   });
 
@@ -1117,7 +1117,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     expect(result).toBe(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=es'
+      'http://localhost:8181/explore/123?initialContentLanguageCode=es'
     );
   });
 

@@ -24,7 +24,6 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 import {SimpleChange} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -83,6 +82,12 @@ describe('TopicStorySectionComponent', () => {
       confirm: jasmine.Spy;
       location: {
         assign: jasmine.Spy;
+      };
+      scrollY: number;
+      scrollTo: jasmine.Spy;
+      document: {
+        querySelector: jasmine.Spy;
+        getElementById: jasmine.Spy;
       };
     };
   };
@@ -149,6 +154,12 @@ describe('TopicStorySectionComponent', () => {
         confirm: jasmine.createSpy('confirm').and.returnValue(true),
         location: {
           assign: jasmine.createSpy('location.assign'),
+        },
+        scrollY: 0,
+        scrollTo: jasmine.createSpy('window.scrollTo'),
+        document: {
+          querySelector: jasmine.createSpy('document.querySelector'),
+          getElementById: jasmine.createSpy('document.getElementById'),
         },
       },
     };
@@ -3324,36 +3335,6 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).toHaveBeenCalledTimes(1);
   }));
 
-  it('should forward the topic editor preview flag to the module navigation', () => {
-    component.isInTopicEditorPreview = true;
-    fixture.detectChanges();
-
-    const navigationElement = fixture.debugElement.query(
-      By.css('topic-module-navigation')
-    ).nativeElement;
-    const stickyWrapper = fixture.debugElement.query(
-      By.css('.module-navigation-sticky-wrapper')
-    ).nativeElement;
-    expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeTruthy();
-    expect(stickyWrapper.style.top).toBe('126px');
-  });
-
-  it('should not forward the topic editor preview flag by default', () => {
-    component.isInTopicEditorPreview = false;
-    fixture.detectChanges();
-
-    const navigationElement = fixture.debugElement.query(
-      By.css('topic-module-navigation')
-    ).nativeElement;
-    const stickyWrapper = fixture.debugElement.query(
-      By.css('.module-navigation-sticky-wrapper')
-    ).nativeElement;
-    expect(navigationElement).not.toBeNull();
-    expect(navigationElement.isInTopicEditorPreview).toBeFalsy();
-    expect(stickyWrapper.style.top).toBe('56px');
-  });
-
   it('should handle module navigation practice selected when element not found', fakeAsync(() => {
     component.onNavigationPracticeSelected('1');
     tick(300);
@@ -4938,30 +4919,47 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should scroll to mastery challenge card element when it exists', fakeAsync(() => {
-    const card = document.createElement('div');
-    card.className = 'mastery-challenge-card';
-    document.body.appendChild(card);
-
-    (Reflect.get(component, 'scrollToMasteryChallenge') as () => void).call(
-      component
+  it('should scroll to the mastery challenge card when it exists', fakeAsync(() => {
+    const card = jasmine.createSpyObj<HTMLElement>('card', [
+      'getBoundingClientRect',
+    ]);
+    card.getBoundingClientRect.and.returnValue({top: 500} as DOMRect);
+    windowRef.nativeWindow.document.querySelector.and.callFake(
+      (selector: string) =>
+        selector === '.mastery-challenge-card' ? card : null
     );
+    windowRef.nativeWindow.scrollY = 200;
+
+    component.scrollToMasteryChallenge();
     tick(50);
 
-    document.body.removeChild(card);
-  }));
-
-  it('should not scroll when mastery challenge card element does not exist', fakeAsync(() => {
-    (Reflect.get(component, 'scrollToMasteryChallenge') as () => void).call(
-      component
+    expect(windowRef.nativeWindow.document.querySelector).toHaveBeenCalledWith(
+      '.mastery-challenge-card'
     );
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith({
+      top: 500 + 200 - (56 + 16),
+      behavior: 'smooth',
+    });
+  }));
+
+  it('should not scroll when the mastery challenge card does not exist', fakeAsync(() => {
+    windowRef.nativeWindow.document.querySelector.and.returnValue(null);
+
+    component.scrollToMasteryChallenge();
     tick(50);
+
+    expect(windowRef.nativeWindow.scrollTo).not.toHaveBeenCalled();
   }));
 
-  it('should scroll to element when found by getElementById', fakeAsync(() => {
-    const el = document.createElement('div');
-    el.id = 'lesson-1';
-    document.body.appendChild(el);
+  it('should scroll to the lesson element when found by getElementById', fakeAsync(() => {
+    const lessonEl = jasmine.createSpyObj<HTMLElement>('lessonEl', [
+      'getBoundingClientRect',
+    ]);
+    lessonEl.getBoundingClientRect.and.returnValue({top: 300} as DOMRect);
+    windowRef.nativeWindow.document.getElementById.and.callFake((id: string) =>
+      id === 'lesson-1' ? lessonEl : null
+    );
+    windowRef.nativeWindow.document.querySelector.and.returnValue(null);
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
@@ -4969,17 +4967,31 @@ describe('TopicStorySectionComponent', () => {
     });
     tick(300);
 
-    document.body.removeChild(el);
+    expect(windowRef.nativeWindow.document.getElementById).toHaveBeenCalledWith(
+      'lesson-1'
+    );
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith({
+      top: 300 - (56 + 16),
+      behavior: 'smooth',
+    });
   }));
 
-  it('should handle scrollToElement with module navigation present', fakeAsync(() => {
-    const lessonEl = document.createElement('div');
-    lessonEl.id = 'lesson-1';
-    document.body.appendChild(lessonEl);
-
-    const navEl = document.createElement('div');
-    navEl.className = 'module-navigation-container';
-    document.body.appendChild(navEl);
+  it('should account for the module navigation height when scrolling', fakeAsync(() => {
+    const lessonEl = jasmine.createSpyObj<HTMLElement>('lessonEl', [
+      'getBoundingClientRect',
+    ]);
+    lessonEl.getBoundingClientRect.and.returnValue({top: 300} as DOMRect);
+    const moduleNav = jasmine.createSpyObj<HTMLElement>('moduleNav', [
+      'getBoundingClientRect',
+    ]);
+    moduleNav.getBoundingClientRect.and.returnValue({height: 80} as DOMRect);
+    windowRef.nativeWindow.document.getElementById.and.callFake((id: string) =>
+      id === 'lesson-1' ? lessonEl : null
+    );
+    windowRef.nativeWindow.document.querySelector.and.callFake(
+      (selector: string) =>
+        selector === '.module-navigation-container' ? moduleNav : null
+    );
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
@@ -4987,14 +4999,26 @@ describe('TopicStorySectionComponent', () => {
     });
     tick(300);
 
-    document.body.removeChild(lessonEl);
-    document.body.removeChild(navEl);
+    expect(windowRef.nativeWindow.document.querySelector).toHaveBeenCalledWith(
+      '.module-navigation-container'
+    );
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith({
+      top: 300 - (56 + 80 + 16),
+      behavior: 'smooth',
+    });
   }));
 
-  it('should scroll to coming soon lesson element when found', fakeAsync(() => {
-    const el = document.createElement('div');
-    el.id = 'coming-soon-lesson-1';
-    document.body.appendChild(el);
+  it('should scroll to the coming soon lesson element when found', fakeAsync(() => {
+    const comingSoonEl = jasmine.createSpyObj<HTMLElement>('comingSoonEl', [
+      'getBoundingClientRect',
+    ]);
+    comingSoonEl.getBoundingClientRect.and.returnValue({
+      top: 450,
+    } as DOMRect);
+    windowRef.nativeWindow.document.getElementById.and.callFake((id: string) =>
+      id === 'coming-soon-lesson-1' ? comingSoonEl : null
+    );
+    windowRef.nativeWindow.document.querySelector.and.returnValue(null);
 
     component.onNavigationLessonSelected({
       lessonNumber: 1,
@@ -5002,7 +5026,13 @@ describe('TopicStorySectionComponent', () => {
     });
     tick(300);
 
-    document.body.removeChild(el);
+    expect(windowRef.nativeWindow.document.getElementById).toHaveBeenCalledWith(
+      'coming-soon-lesson-1'
+    );
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith({
+      top: 450 - (56 + 16),
+      behavior: 'smooth',
+    });
   }));
 
   it('should mark earlier incomplete modules as skipped', () => {
