@@ -18,10 +18,12 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import './thanks-for-donating-modal.component.css';
 
 @Component({
   selector: 'thanks-for-donating-modal',
   templateUrl: './thanks-for-donating-modal.component.html',
+  styleUrls: ['./thanks-for-donating-modal.component.css'],
 })
 export class ThanksForDonatingModalComponent {
   constructor(private activeModal: NgbActiveModal) {}
