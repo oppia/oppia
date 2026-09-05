@@ -16,7 +16,14 @@
  * @fileoverview Component for the error 404 page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -29,12 +36,16 @@ import './error-404-page.component.css';
   templateUrl: './error-404-page.component.html',
   styleUrls: ['./error-404-page.component.css'],
 })
-export class Error404PageComponent implements OnInit, OnDestroy {
+export class Error404PageComponent implements OnInit, OnDestroy, AfterViewInit {
   directiveSubscriptions = new Subscription();
+  private usingKeyboard = false;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +54,57 @@ export class Error404PageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+  }
+
+  private attachFocusListeners(links: NodeListOf<HTMLElement>): void {
+    this.renderer.listen('window', 'keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        this.usingKeyboard = true;
+      }
+    });
+    this.renderer.listen('window', 'mousedown', () => {
+      this.usingKeyboard = false;
+    });
+
+    links.forEach(link => {
+      this.renderer.listen(link, 'focus', () => {
+        if (this.usingKeyboard) {
+          this.renderer.setStyle(link, 'outline', '2px solid #0844aa');
+          this.renderer.setStyle(link, 'outline-offset', '2px');
+        }
+      });
+      this.renderer.listen(link, 'blur', () => {
+        this.renderer.removeStyle(link, 'outline');
+        this.renderer.removeStyle(link, 'outline-offset');
+      });
+    });
+  }
+
+  ngAfterViewInit(): void {
+    const container: HTMLElement | null =
+      this.elementRef.nativeElement.querySelector('.oppia-wide-panel-content');
+
+    if (!container) {
+      return;
+    }
+
+    const existingLinks: NodeListOf<HTMLElement> =
+      container.querySelectorAll('a');
+
+    if (existingLinks.length > 0) {
+      this.attachFocusListeners(existingLinks);
+    } else {
+      // The links are injected asynchronously via [innerHTML] once the
+      // translation resolves, so we observe the DOM until they appear.
+      const observer = new MutationObserver(() => {
+        const links: NodeListOf<HTMLElement> = container.querySelectorAll('a');
+        if (links.length > 0) {
+          this.attachFocusListeners(links);
+          observer.disconnect();
+        }
+      });
+      observer.observe(container, {childList: true, subtree: true});
+    }
   }
 
   setPageTitle(): void {

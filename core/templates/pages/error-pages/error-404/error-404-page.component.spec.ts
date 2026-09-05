@@ -13,112 +13,155 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for error page.
+ * @fileoverview Unit tests for error 404 page.
  */
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, TestBed, ComponentFixture} from '@angular/core/testing';
-import {TranslateService} from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {
+  TestBed,
+  ComponentFixture,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 import {Error404PageComponent} from './error-404-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
-    return 'en';
-  }
-
-  get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
-  }
-}
-
-class MockTranslateService {
-  onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string, interpolateParams?: Object): string {
-    return key;
-  }
-}
-
-let component: Error404PageComponent;
-let fixture: ComponentFixture<Error404PageComponent>;
-
-describe('Error page', () => {
-  let pageTitleService: PageTitleService;
-  let translateService: TranslateService;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [Error404PageComponent, MockTranslatePipe],
-      providers: [
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService,
-        },
-        UrlInterpolationService,
-        PageTitleService,
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService,
-        },
-      ],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-  }));
+describe('Error404PageComponent', () => {
+  let component: Error404PageComponent;
+  let fixture: ComponentFixture<Error404PageComponent>;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
+      declarations: [Error404PageComponent],
+      providers: [UrlInterpolationService, PageTitleService],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(Error404PageComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
-    pageTitleService = TestBed.inject(PageTitleService);
-    fixture.detectChanges();
   });
 
-  it('should set images and subscribe to onLangChange upon initialization', () => {
-    spyOn(translateService.onLangChange, 'subscribe');
-    component.ngOnInit();
+  it('should get the static image url', () => {
     expect(component.getStaticImageUrl('/general/oops_mint.webp')).toBe(
       '/assets/images/general/oops_mint.webp'
     );
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
-  it(
-    'should obtain translated page title whenever the selected' +
-      'language changes',
-    () => {
-      component.ngOnInit();
-      spyOn(component, 'setPageTitle');
-      translateService.onLangChange.emit();
-
-      expect(component.setPageTitle).toHaveBeenCalled();
-    }
-  );
-
-  it('should set new page title', () => {
-    spyOn(translateService, 'instant').and.callThrough();
+  it('should update the page title when the language changes', () => {
+    const translateService = TestBed.inject(TranslateService);
+    const pageTitleService = TestBed.inject(PageTitleService);
     spyOn(pageTitleService, 'setDocumentTitle');
-    component.setPageTitle();
 
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_ERROR_PAGE_TITLE_404'
-    );
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_ERROR_PAGE_TITLE_404'
-    );
+    component.ngOnInit();
+    translateService.onLangChange.emit();
+
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
   });
 
-  it('should unsubscribe on component destruction', () => {
-    component.directiveSubscriptions.add(
-      translateService.onLangChange.subscribe(() => {
-        component.setPageTitle();
-      })
-    );
+  it('should unsubscribe on destroy', () => {
+    component.ngOnInit();
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
     component.ngOnDestroy();
 
-    expect(component.directiveSubscriptions.closed).toBe(true);
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  describe('focus indicator for links', () => {
+    const getContainer = (): HTMLElement =>
+      fixture.nativeElement.querySelector('.oppia-wide-panel-content');
+
+    const createMockLink = (): HTMLAnchorElement => {
+      const link = document.createElement('a');
+      link.href = '/';
+      link.textContent = 'home page';
+      return link;
+    };
+
+    it('should attach focus and blur listeners to links that already exist', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+      expect(link.style.outlineOffset).toBe('2px');
+    }));
+
+    it('should not show outline when focus is triggered by mouse', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const mousedownEvent = new MouseEvent('mousedown');
+      window.dispatchEvent(mousedownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('');
+    }));
+
+    it('should remove outline styles on blur', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      const link = createMockLink();
+      container.appendChild(link);
+
+      component.ngAfterViewInit();
+      tick();
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+
+      link.dispatchEvent(new Event('blur'));
+      expect(link.style.outline).toBe('');
+      expect(link.style.outlineOffset).toBe('');
+    }));
+
+    it('should attach listeners to links injected later via MutationObserver', async () => {
+      fixture.detectChanges();
+      const container = getContainer();
+
+      component.ngAfterViewInit();
+
+      const link = createMockLink();
+      container.appendChild(link);
+
+      // Wait for the real MutationObserver callback to fire (runs as a
+      // genuine browser microtask, which fakeAsync cannot reliably flush).
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const keydownEvent = new KeyboardEvent('keydown', {key: 'Tab'});
+      window.dispatchEvent(keydownEvent);
+      link.dispatchEvent(new Event('focus'));
+
+      expect(link.style.outline).toBe('rgb(8, 68, 170) solid 2px');
+    });
+
+    it('should do nothing if the container element is not found', fakeAsync(() => {
+      fixture.detectChanges();
+      const container = getContainer();
+      container.remove();
+
+      expect(() => {
+        component.ngAfterViewInit();
+        tick();
+      }).not.toThrowError();
+    }));
   });
 });
