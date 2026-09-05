@@ -483,6 +483,7 @@ class MigrateExplorationJobTests(
             'content_count': 4,
             'translation_counts': {'hi': 0, 'bn': 0},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {'hi': ['new'], 'bn': ['new']},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -953,6 +954,7 @@ class AuditExplorationMigrationJobTests(
             'content_count': 4,
             'translation_counts': {'hi': 0},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {'hi': ['new']},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }

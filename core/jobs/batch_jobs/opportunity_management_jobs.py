@@ -371,6 +371,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                         opportunity.incomplete_translation_language_codes
                     ),
                     translation_counts=opportunity.translation_counts,
+                    translation_missing_reasons=opportunity.translation_missing_reasons,
                     language_codes_needing_voice_artists=(
                         opportunity.language_codes_needing_voice_artists
                     ),

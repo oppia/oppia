@@ -37,6 +37,7 @@ export interface ExplorationOpportunity {
   actionButtonTitle?: string;
   translationWordCount?: number;
   isPinned?: boolean;
+  translationMissingReasons?: string[];
   topicName: string;
 }
 
