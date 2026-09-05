@@ -122,6 +122,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
+        userIsReviewer: this.userIsReviewer,
         // An opportunity's entity type comes from the opportunity itself, not
         // from the dashboard filter, since the filter can be set to "all".
         // Legacy opportunities carry no entity type and are always
@@ -164,6 +165,15 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
       windowClass: 'forced-modal-stack',
     });
     modalRef.componentInstance.opportunity = opportunity;
+
+    modalRef.result.then(
+      () => {
+        this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+      },
+      () => {
+        this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+      }
+    );
   }
 
   ngOnInit(): void {

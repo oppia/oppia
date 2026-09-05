@@ -114,7 +114,7 @@
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <div class="oppia-opportunities-button-wrapper"
          [disableTooltip]="!opportunityButtonDisabled"
-         ngbTooltip="All available translations are currently in review."
+         [ngbTooltip]="tooltipText"
          placement="bottom">
       <button class="e2e-test-opportunity-list-item-button"
               [ngClass]="{'oppia-opportunities-button': !opportunityButtonDisabled, 'oppia-opportunities-disabled-button': opportunityButtonDisabled}"

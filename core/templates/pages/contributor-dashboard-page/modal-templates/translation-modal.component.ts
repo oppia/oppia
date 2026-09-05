@@ -94,6 +94,7 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
   reviewerOnlyContentCount: number;
+  userIsReviewer?: boolean;
   entityType: string;
 }
 export interface ModifyTranslationOpportunity {
@@ -640,6 +641,7 @@ export class TranslationModalComponent {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
+            this.pageContextService.resetImageSaveDestination();
             this.closeWithoutUnsavedCheck();
           }
         },
@@ -651,10 +653,6 @@ export class TranslationModalComponent {
           this.closeWithoutUnsavedCheck();
         }
       );
-    }
-    if (!this.moreAvailable) {
-      this.pageContextService.resetImageSaveDestination();
-      this.closeWithoutUnsavedCheck();
     }
   }
 

@@ -16,7 +16,13 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -38,6 +44,8 @@ export interface ExplorationOpportunity {
   translationWordCount?: number;
   isPinned?: boolean;
   topicName: string;
+  reviewerOnlyContentCount?: number;
+  userIsReviewer?: boolean;
 }
 
 @Component({
@@ -105,6 +113,7 @@ export class OpportunitiesListItemComponent {
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;
+  tooltipText: string = 'All available translations are currently in review.';
 
   ngOnInit(): void {
     this.onMobile =
@@ -116,6 +125,17 @@ export class OpportunitiesListItemComponent {
           this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
       });
 
+    this.initOpportunityData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.opportunity) {
+      this.initOpportunityData();
+    }
+  }
+
+  initOpportunityData(): void {
+    this.correspondingOpportunityDeleted = false;
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
@@ -141,14 +161,23 @@ export class OpportunitiesListItemComponent {
           this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
           this.translationProgressBar = true;
-          const translatedPercentage =
-            (this.opportunity.translationsCount / this.opportunity.totalCount) *
-            100;
-          const inReviewTranslationsPercentage =
-            (this.opportunity.inReviewCount / this.opportunity.totalCount) *
-            100;
-          const untranslatedPercentage =
-            100 - (translatedPercentage + inReviewTranslationsPercentage);
+          let translatedPercentage = 100;
+          let inReviewTranslationsPercentage = 0;
+          let untranslatedPercentage = 0;
+
+          if (this.opportunity.totalCount > 0) {
+            translatedPercentage =
+              (this.opportunity.translationsCount /
+                this.opportunity.totalCount) *
+              100;
+            inReviewTranslationsPercentage =
+              (this.opportunity.inReviewCount / this.opportunity.totalCount) *
+              100;
+            untranslatedPercentage =
+              100 - (translatedPercentage + inReviewTranslationsPercentage);
+          } else {
+            this.progressPercentage = '100%';
+          }
 
           this.cardsAvailable =
             this.opportunity.totalCount -
@@ -162,11 +191,34 @@ export class OpportunitiesListItemComponent {
           this.inReviewProgressStyle = {
             width: inReviewTranslationsPercentage + '%',
           };
+          let maxTranslatableCards = this.opportunity.totalCount;
+          if (
+            !this.opportunity.userIsReviewer &&
+            this.opportunity.reviewerOnlyContentCount !== undefined
+          ) {
+            maxTranslatableCards -= this.opportunity.reviewerOnlyContentCount;
+          }
+
           this.opportunityButtonDisabled =
             this.disableButtonOnComplete &&
             this.opportunity.translationsCount +
-              this.opportunity.inReviewCount ===
-              this.opportunity.totalCount;
+              this.opportunity.inReviewCount >=
+              maxTranslatableCards;
+
+          if (this.opportunityButtonDisabled) {
+            if (
+              !this.opportunity.userIsReviewer &&
+              this.opportunity.reviewerOnlyContentCount !== undefined &&
+              this.opportunity.reviewerOnlyContentCount > 0 &&
+              this.cardsAvailable > 0
+            ) {
+              this.tooltipText =
+                'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.';
+            } else {
+              this.tooltipText =
+                'All available translations are currently in review.';
+            }
+          }
         } else {
           this.progressBarStyle = {width: this.progressPercentage};
         }
