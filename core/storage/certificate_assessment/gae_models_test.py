@@ -67,7 +67,6 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
             classroom_id='cs_classroom_101',
             topic_ids=['topic_id_101'],
             total_questions=10,
-            time_limit_in_minutes=25,
             demonstrates=['Data Hashing'],
             async_status='Available',
         )
@@ -155,7 +154,6 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
                     classroom_id='classroom_id',
                     topic_ids=['topic_id'],
                     total_questions=1,
-                    time_limit_in_minutes=5,
                     demonstrates=['Skill'],
                     async_status='Not_Ready',
                 )
@@ -179,7 +177,6 @@ class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
             classroom_id='classroom_xyz',
             topic_ids=['topic_xyz'],
             total_questions=10,
-            time_limit_in_minutes=15,
             demonstrates=['Testing Link'],
             async_status='Blocked',
         )

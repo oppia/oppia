@@ -61,7 +61,6 @@ interface GetCertificateOfferingBackendResponse {
     };
     demonstrates: string[];
     total_questions: number;
-    time_limit_in_minutes: number;
     async_status: string;
     version: number;
   };
@@ -205,8 +204,6 @@ export class CertificateAssessmentOfferingBackendApiService {
                       demonstrates: certificateOfferingBackendDict.demonstrates,
                       total_questions:
                         certificateOfferingBackendDict.total_questions,
-                      time_limit_in_minutes:
-                        certificateOfferingBackendDict.time_limit_in_minutes,
                       async_status: certificateOfferingBackendDict.async_status,
                       version: certificateOfferingBackendDict.version,
                     }
@@ -240,8 +237,6 @@ export class CertificateAssessmentOfferingBackendApiService {
         topic_data: response.certificate_offering.topic_data,
         demonstrates: response.certificate_offering.demonstrates,
         total_questions: response.certificate_offering.total_questions,
-        time_limit_in_minutes:
-          response.certificate_offering.time_limit_in_minutes,
         async_status: response.certificate_offering.async_status,
         version: response.certificate_offering.version,
       });
@@ -266,8 +261,6 @@ export class CertificateAssessmentOfferingBackendApiService {
               topic_id: topicId,
             })),
             total_questions: certificateAssessmentOffering.totalQuestions,
-            time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes,
             demonstrates: certificateAssessmentOffering.demonstrates,
             async_status: certificateAssessmentOffering.asyncStatus,
           }
@@ -296,8 +289,6 @@ export class CertificateAssessmentOfferingBackendApiService {
               topic_id: topicId,
             })),
             total_questions: certificateAssessmentOffering.totalQuestions,
-            time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes,
             demonstrates: certificateAssessmentOffering.demonstrates,
             async_status: certificateAssessmentOffering.asyncStatus,
           }

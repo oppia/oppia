@@ -108,6 +108,7 @@ class CertificateOfferingClassroomSummary(TypedDict):
     certificate_id: str
     title: str
     attempt_status: str
+    attempt_id: Optional[str]
     passed_on_date: Optional[float]
     failed_on_date: Optional[float]
 
@@ -650,7 +651,6 @@ def start_certificate_assessment_attempt(
             classroom_id=offering.classroom_id,
             topic_ids=offering.topic_ids,
             total_questions=offering.total_questions,
-            time_limit_in_minutes=offering.time_limit_in_minutes,
             demonstrates=offering.demonstrates,
             async_status='Blocked',
         )
@@ -1091,9 +1091,6 @@ def _model_to_domain(
         classroom_id=certificate_assessment_offering_model.classroom_id,
         topic_ids=list(certificate_assessment_offering_model.topic_ids),
         total_questions=certificate_assessment_offering_model.total_questions,
-        time_limit_in_minutes=(
-            certificate_assessment_offering_model.time_limit_in_minutes
-        ),
         demonstrates=list(certificate_assessment_offering_model.demonstrates),
         async_status=certificate_assessment_offering_model.async_status,
         version=certificate_assessment_offering_model.version,
@@ -1124,7 +1121,6 @@ def create_certificate_assessment_offering(
     classroom_id: str,
     topic_ids: list[str],
     total_questions: int,
-    time_limit_in_minutes: int,
     demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
@@ -1137,8 +1133,6 @@ def create_certificate_assessment_offering(
         classroom_id: str. The classroom ID associated with the offering.
         topic_ids: list(str). The topic IDs associated with the offering.
         total_questions: int. The total number of questions in the offering.
-        time_limit_in_minutes: int. The time limit for the offering in
-            minutes.
         demonstrates: list(str). The list of skills demonstrated by the
             offering.
         async_status: str. The availability status of the offering.
@@ -1156,7 +1150,6 @@ def create_certificate_assessment_offering(
             classroom_id=classroom_id,
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=async_status,
             version=1,
@@ -1171,7 +1164,6 @@ def create_certificate_assessment_offering(
             classroom_id=classroom_id,
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=async_status,
         )
@@ -1248,7 +1240,6 @@ def update_certificate_assessment_offering(
     classroom_id: str,
     topic_ids: list[str],
     total_questions: int,
-    time_limit_in_minutes: int,
     demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
@@ -1262,8 +1253,6 @@ def update_certificate_assessment_offering(
         classroom_id: str. The classroom ID associated with the offering.
         topic_ids: list(str). The topic IDs associated with the offering.
         total_questions: int. The total number of questions in the offering.
-        time_limit_in_minutes: int. The time limit for the offering in
-            minutes.
         demonstrates: list(str). The list of skills demonstrated by the
             offering.
         async_status: str. The availability status of the offering.
@@ -1291,9 +1280,6 @@ def update_certificate_assessment_offering(
     certificate_assessment_offering_model.classroom_id = classroom_id
     certificate_assessment_offering_model.topic_ids = topic_ids
     certificate_assessment_offering_model.total_questions = total_questions
-    certificate_assessment_offering_model.time_limit_in_minutes = (
-        time_limit_in_minutes
-    )
     certificate_assessment_offering_model.demonstrates = demonstrates
     certificate_assessment_offering_model.async_status = async_status
 
@@ -1313,10 +1299,6 @@ def update_certificate_assessment_offering(
             {
                 'cmd': 'update_total_questions',
                 'new_total_questions': total_questions,
-            },
-            {
-                'cmd': 'update_time_limit_in_minutes',
-                'new_time_limit_in_minutes': time_limit_in_minutes,
             },
             {'cmd': 'update_demonstrates', 'new_demonstrates': demonstrates},
             {'cmd': 'update_async_status', 'new_async_status': async_status},
@@ -1587,6 +1569,9 @@ def get_certificate_offerings_for_classroom(
                 'certificate_id': offering_model.id,
                 'title': offering_model.title,
                 'attempt_status': attempt_status,
+                'attempt_id': (
+                    latest_attempt.id if latest_attempt is not None else None
+                ),
                 'passed_on_date': passed_on_date,
                 'failed_on_date': failed_on_date,
             }
