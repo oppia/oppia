@@ -68,6 +68,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
+  private selectionsOnDropdownOpen: Record<string, string> = {};
   @Input() enableDropup: boolean = false;
 
   constructor(
@@ -192,11 +193,26 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Triggers a search query when the dropdown menu is closed.
+   * Snapshots a dropdown's selections when it opens, and only
+   * triggers a search when it closes if the selections actually
+   * changed — not merely because the user clicked outside to
+   * dismiss it.
    * @param {boolean} isOpen - The new open state of the dropdown.
+   * @param {string} itemsType - Which selectionDetails entry this
+   * dropdown controls ('categories' or 'languageCodes').
    */
-  triggerSearchOnDropdownClose(isOpen: boolean): void {
-    if (!isOpen) {
+  triggerSearchOnDropdownClose(isOpen: boolean, itemsType: string): void {
+    if (isOpen) {
+      this.selectionsOnDropdownOpen[itemsType] = JSON.stringify(
+        this.selectionDetails[itemsType].selections
+      );
+      return;
+    }
+
+    let currentSelections = JSON.stringify(
+      this.selectionDetails[itemsType].selections
+    );
+    if (currentSelections !== this.selectionsOnDropdownOpen[itemsType]) {
       this.onSearchQueryChangeExec();
     }
   }
