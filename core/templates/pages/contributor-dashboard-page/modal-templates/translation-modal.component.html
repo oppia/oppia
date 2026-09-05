@@ -99,6 +99,22 @@
       </div>
     </div>
     <div class="oppia-translation-error-section">
+      <div *ngIf="isFormulaAsText(activeWrittenTranslation)" class="alert alert-warning e2e-test-formula-as-text-warning d-flex justify-content-between"
+           [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
+        <div *ngIf="!mathWarningIsMinimized">
+          <i class="fas fa-exclamation-triangle mr-1"></i>
+          <span [innerHTML]="'I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION' | translate"></span>
+        </div>
+        <div *ngIf="mathWarningIsMinimized">
+          <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
+          <span [innerHTML]="'I18N_WARNING_MATH_EXPRESSION_MINIMIZED' | translate"></span>
+        </div>
+        <i class="fas"
+           [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"
+           (click)="toggleMathWarning()"
+           [title]="mathWarningIsMinimized ? 'Expand warning' : 'Minimize warning'">
+        </i>
+      </div>
       <p *ngIf="hasImgCopyError">
         All images should be copied.
       </p>

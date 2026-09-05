@@ -56,8 +56,10 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 enum ExpansionTabType {
   CONTENT,
@@ -69,6 +71,13 @@ class MockChangeDetectorRef {
 }
 
 class MockConfirmTranslationExitModal {
+  componentInstance = {};
+  result = Promise.resolve();
+  close(): void {}
+  dismiss(): void {}
+}
+
+class MockConfirmFormulaAsTextModal {
   componentInstance = {};
   result = Promise.resolve();
   close(): void {}
@@ -175,6 +184,8 @@ describe('Translation Modal Component', () => {
         TranslationModalComponent,
         WrapTextWithEllipsisPipe,
         ConfirmTranslationExitModalComponent,
+        ConfirmFormulaAsTextModalComponent,
+        MockTranslatePipe,
       ],
       providers: [
         NgbActiveModal,
@@ -191,6 +202,10 @@ describe('Translation Modal Component', () => {
         {
           provide: ConfirmTranslationExitModalComponent,
           useClass: MockConfirmTranslationExitModal,
+        },
+        {
+          provide: ConfirmFormulaAsTextModalComponent,
+          useClass: MockConfirmFormulaAsTextModal,
         },
         {
           provide: WindowRef,
@@ -1340,6 +1355,8 @@ describe('Translation Modal Component', () => {
             TranslationModalComponent,
             WrapTextWithEllipsisPipe,
             ConfirmTranslationExitModalComponent,
+            ConfirmFormulaAsTextModalComponent,
+            MockTranslatePipe,
           ],
           providers: [
             NgbActiveModal,
@@ -1521,6 +1538,113 @@ describe('Translation Modal Component', () => {
         expect(ngbModal.open).not.toHaveBeenCalled();
         expect(component.activeModal.close).toHaveBeenCalled();
       }));
+    });
+
+    describe('isFormulaAsText', () => {
+      it('should return true when math formulas exist in RTL language', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+        // MathFormulaDetectionService will be called here. We just need to mock it if we injected it, but it's easier to just check the result since we didn't mock it.
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBeTrue();
+      });
+
+      it('should return false when language direction is not rtl, even if formula exists', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('ltr');
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBeFalse();
+      });
+    });
+
+    describe('when saving or submitting formula as text in RTL', () => {
+      beforeEach(() => {
+        component.loadingData = false;
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+      });
+
+      it('should open confirmation modal and proceed on confirm during suggestTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const suggestSpy = spyOn(translateTextService, 'suggestTranslatedText');
+
+        mockModalRef.result = Promise.resolve();
+        component.suggestTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(suggestSpy).toHaveBeenCalled();
+      }));
+
+      it('should open confirmation modal and not proceed on cancel during suggestTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const suggestSpy = spyOn(translateTextService, 'suggestTranslatedText');
+
+        mockModalRef.result = Promise.reject();
+        component.suggestTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(suggestSpy).not.toHaveBeenCalled();
+      }));
+
+      it('should open confirmation modal and close on confirm during updateTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        spyOn(component.activeModal, 'close');
+
+        mockModalRef.result = Promise.resolve();
+        component.updateTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(component.activeModal.close).toHaveBeenCalledWith('2 + 2 = 4');
+      }));
+
+      it('should open confirmation modal and not close on cancel during updateTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        spyOn(component.activeModal, 'close');
+
+        mockModalRef.result = Promise.reject();
+        component.updateTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(component.activeModal.close).not.toHaveBeenCalled();
+      }));
+    });
+
+    describe('toggleMathWarning', () => {
+      it('should toggle mathWarningIsMinimized', () => {
+        expect(component.mathWarningIsMinimized).toBeFalse();
+        component.toggleMathWarning();
+        expect(component.mathWarningIsMinimized).toBeTrue();
+        component.toggleMathWarning();
+        expect(component.mathWarningIsMinimized).toBeFalse();
+      });
     });
   });
 
