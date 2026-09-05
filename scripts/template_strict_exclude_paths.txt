@@ -123,13 +123,3 @@ extensions/interactions/TextInput/directives/oppia-interactive-text-input.compon
 extensions/objects/templates/boolean-editor.component.ts
 extensions/objects/templates/code-string-editor.component.ts
 extensions/objects/templates/drag-and-drop-positive-int-editor.component.ts
-extensions/objects/templates/html-editor.component.ts
-extensions/objects/templates/image-editor.component.ts
-extensions/objects/templates/image-with-regions-editor.component.ts
-extensions/objects/templates/int-editor.component.ts
-extensions/objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts
-extensions/objects/templates/music-phrase-editor.component.ts
-extensions/objects/templates/nonnegative-int-editor.component.ts
-extensions/objects/templates/parameter-name-editor.component.ts
-extensions/objects/templates/position-of-terms-editor.component.ts
-extensions/objects/templates/positive-int-editor.component.ts

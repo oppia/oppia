@@ -184,7 +184,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   // Define the cursors for the crop area.
   CROP_CURSORS: Record<number, string> = {};
   imageContainerStyle: Record<string, string> = {};
-  allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
+  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
   ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
   imageResizeRatio: number = 1;
@@ -234,7 +234,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private svgSanitizerService: SvgSanitizerService,
+    public svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private gifFramesService: GifFramesService

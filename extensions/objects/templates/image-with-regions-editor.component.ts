@@ -35,7 +35,10 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {CustomSchema} from 'services/schema-default-value.service';
+import {
+  CustomSchema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {UtilsService} from 'services/utils.service';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
@@ -727,12 +730,15 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     this.valueChanged.emit({...this.value});
   }
 
-  imageValueChanged(newVal: string): void {
+  imageValueChanged(newVal: SchemaDefaultValue): void {
     // Called when the image is changed to calculate the required
     // width and height, especially for large images.
+    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
+    // value is always a unicode string.
+    const updatedValue = newVal as string;
     const that = this;
-    this.value.imagePath = newVal;
-    if (newVal !== '') {
+    this.value.imagePath = updatedValue;
+    if (updatedValue !== '') {
       // Loads the image in hanging <img> tag so as to get the
       // width and height.
       const setHeightAndWidth = (img: HTMLCanvasElement) => {
@@ -743,7 +749,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       img.onload = function () {
         setHeightAndWidth(this as HTMLCanvasElement);
       };
-      img.src = this.getPreviewUrl(newVal) as string;
+      img.src = this.getPreviewUrl(updatedValue) as string;
     }
     this.valueChanged.emit(this.value);
   }

@@ -23,7 +23,7 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 
 interface Choice {
   id: string;
-  selectedRank: string;
+  selectedRank: string | number;
   val: string;
 }
 @Component({
@@ -63,8 +63,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 
   selectItem(choiceListIndex: number): void {
     const choiceContentId = this.choices[choiceListIndex].val;
-    const selectedRank =
-      parseInt(this.choices[choiceListIndex].selectedRank) - 1;
+    const selectedRank = +this.choices[choiceListIndex].selectedRank - 1;
     this.errorMessage = '';
     let choiceIdHasBeenAdded = false;
 

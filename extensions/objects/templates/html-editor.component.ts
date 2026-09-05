@@ -22,6 +22,7 @@
 //
 // This component is based on the UnicodeString directive.
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'html-editor',
@@ -35,12 +36,15 @@ export class HtmlEditorComponent {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
-  schema = {
+  schema: {type: 'html'} = {
     type: 'html',
   };
 
-  updateValue(value: string): void {
-    this.value = value;
-    this.valueChanged.emit(value);
+  updateValue(value: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue, but this editor's
+    // value is always an html string.
+    const updatedValue = value as string;
+    this.value = updatedValue;
+    this.valueChanged.emit(updatedValue);
   }
 }
