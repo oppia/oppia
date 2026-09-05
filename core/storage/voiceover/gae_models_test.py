@@ -245,6 +245,51 @@ class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
         )
 
 
+class LanguageAccentCodeToBeamJobRunModelTest(test_utils.GenericTestBase):
+    """Tests for LanguageAccentCodeToBeamJobRunModel."""
+
+    def test_create_and_get_model(self) -> None:
+        model = voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            language_accent_code='en-US', beam_job_run_id='beam-run-id'
+        )
+        model.update_timestamps()
+        model.put()
+
+        retrieved_model = (
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+                'en-US'
+            )
+        )
+
+        self.assertEqual(retrieved_model.language_accent_code, 'en-US')
+        self.assertEqual(retrieved_model.beam_job_run_id, 'beam-run-id')
+
+    def test_get_export_policy(self) -> None:
+        model_cls = voiceover_models.LanguageAccentCodeToBeamJobRunModel
+        self.assertEqual(
+            model_cls.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'beam_job_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+
 class CachedAutomaticVoiceoversModelTests(test_utils.GenericTestBase):
     """Unit test for CachedAutomaticVoiceoversModel class."""
 

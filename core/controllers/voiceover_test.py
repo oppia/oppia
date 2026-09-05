@@ -71,6 +71,9 @@ class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             json_response['language_codes_mapping'], language_codes_mapping
         )
+        self.assertDictEqual(
+            json_response['language_accent_code_to_beam_job_state'], {}
+        )
 
         self.logout()
 
