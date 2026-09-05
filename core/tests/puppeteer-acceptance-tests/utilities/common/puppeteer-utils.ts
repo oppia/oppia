@@ -930,6 +930,16 @@ export class BaseUser {
 
     await element.type(text);
   }
+  /**
+   * Types text specifically into a Rich Text Editor (CKEditor) field.
+   * CKEditor requires an explicit visibility check and focus click before it
+   * can properly register keystrokes.
+   */
+  async typeInRichTextEditor(selector: string, text: string): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.clickOnElementWithSelector(selector);
+    await this.typeInInputField(selector, text);
+  }
 
   /**
    * Checks if the value of text input with the given selector is equal to the given value.

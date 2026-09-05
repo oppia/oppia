@@ -861,8 +861,7 @@ export class TopicManager extends BaseUser {
     await this.openSkillEditor(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
     await this.clickOnElementWithSelector(textStateEditSelector);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.typeInInputField(richTextAreaField, 'Add 1+2');
+    await this.typeInRichTextEditor(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOnElementWithSelector(saveContentButton);
 
@@ -898,13 +897,12 @@ export class TopicManager extends BaseUser {
 
     await this.clickOnElementWithSelector(defaultFeedbackTab);
     await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
-    await this.clickOnElementWithSelector(richTextAreaField);
-    await this.typeInInputField(richTextAreaField, 'The answer is 3');
+    await this.typeInRichTextEditor(richTextAreaField, 'The answer is 3');
     await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
 
     await this.clickOnElementWithSelector(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.typeInInputField(richTextAreaField, '3');
+    await this.typeInRichTextEditor(richTextAreaField, '3');
     await this.clickOnElementWithSelector(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -916,10 +914,11 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitAnswerButton);
-    await this.typeInInputField(richTextAreaField, '1+2 is 3');
+    await this.typeInRichTextEditor(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.page.waitForSelector(`${saveQuestionButton}:not([disabled])`);
 
     await this.clickOnElementWithSelector(saveQuestionButton);
 
