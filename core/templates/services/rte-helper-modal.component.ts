@@ -165,8 +165,8 @@ export class RteHelperModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
     private htmlLengthService: HtmlLengthService,
-    private translationLanguageService: TranslationLanguageService
-        @Optional() private ngbActiveModal: NgbActiveModal,
+    private translationLanguageService: TranslationLanguageService,
+    @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional()
     private rteHelperBottomSheetRef?: MatBottomSheetRef<RteHelperModalComponent>,
     @Optional()
