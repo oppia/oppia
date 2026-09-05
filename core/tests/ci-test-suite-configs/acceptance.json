@@ -1,6 +1,26 @@
 {
   "suites": [
     {
+      "name": "lesson-creator/view-and-answer-feedback-and-reports-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-and-answer-feedback-and-reports-of-the-lesson.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "serial-chapter-launch/serial-chapter",
       "module": "core/tests/puppeteer-acceptance-tests/specs/serial-chapter-launch/serial-chapter.spec.ts",
       "framework": "puppeteer"

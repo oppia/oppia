@@ -134,6 +134,7 @@ export default {
     UserDocumentation: 'https://oppia.github.io/#/',
     BaseExplorationPlayer: 'http://localhost:8181/explore',
     ExplorationPlayer: 'http://localhost:8181/explore/',
+    LessonPlayer: 'http://localhost:8181/lesson/',
     SkillEditor: 'http://localhost:8181/skill_editor',
     TopicEditor: 'http://localhost:8181/topic_editor',
   },
@@ -185,6 +186,7 @@ export default {
       __dirname,
       '../../data/intro-content-hi.mp3'
     ),
+    oppiaPage: path.resolve(__dirname, '../../data/oppia-page.png'),
     ContinueInteractionVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/continue-interaction-hi.mp3'
@@ -302,6 +304,7 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile-1920.png'
   ),
+  SAMPLE_TEST_PDF: path.resolve(__dirname, '../../data/sample_test.pdf'),
   BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
   BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
   BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),

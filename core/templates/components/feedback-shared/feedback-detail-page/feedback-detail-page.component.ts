@@ -501,4 +501,12 @@ export class FeedbackDetailPageComponent {
       `#/feedback/lesson_feedback/${encodeURIComponent(feedback.parent_feedback_id)}`
     );
   }
+
+  shouldShowStatusOption(statusOption: FeedbackStatus): boolean {
+    return !(
+      statusOption === FeedbackStatus.COMPLIMENT &&
+      this.getFeedbackCategory(this.feedbackDetailResponse!) ===
+        ReportAnIssueCategory.TYPO
+    );
+  }
 }

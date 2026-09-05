@@ -267,7 +267,8 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
-
+const explorationFeedbackTabTitleSelector =
+  '.e2e-test-exploration-feedback-title';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
@@ -552,6 +553,9 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
+// New Exploration editor feedback tab selectors.
+const feedbackDetailStatusButton = '.e2e-test-feedback-detail-status-button';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Truncates a card name the same way the frontend graph visualization does.
@@ -2911,6 +2915,14 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  async expectNewExplorationFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+    await this.expectTextContentToBe(
+      explorationFeedbackTabTitleSelector,
+      'Exploration Feedback'
+    );
   }
 
   /**
@@ -6214,10 +6226,12 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (title === explorationName) {
-      const explorationTileElement = await this.page.$(
-        explorationSummaryTileTitleSelector
-      );
-      await explorationTileElement?.click();
+      await this.page.evaluate(selector => {
+        const titleElement = document.querySelector(selector);
+        if (titleElement) {
+          titleElement.parentElement.click();
+        }
+      }, explorationSummaryTileTitleSelector);
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }
@@ -8750,6 +8764,24 @@ export class ExplorationEditor extends BaseUser {
       emptyCreatorDashboardMessageSelector,
       expectedText
     );
+  }
+
+  async selectStatusOnFeedbackTab(status: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackDetailStatusButton, true);
+    const statusButtons = await this.page.$$(feedbackDetailStatusButton);
+
+    for (const button of statusButtons) {
+      const buttonText = await button.evaluate(element =>
+        element.textContent?.trim()
+      );
+
+      if (buttonText === status) {
+        await button.click();
+        return;
+      }
+    }
+
+    throw new Error(`Status button "${status}" was not found.`);
   }
 }
 
