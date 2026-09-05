@@ -41,7 +41,6 @@ class FeatureNames(enum.Enum):
         'serial_chapter_launch_curriculum_admin_view'
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
-    SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
         'show_feedback_updates_in_profile_pic_dropdown'
@@ -166,7 +165,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
@@ -190,7 +188,6 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -212,12 +209,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
-        (
-            'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
