@@ -67,6 +67,26 @@ const featuredLanguageExplainationSelector =
 const languageDropdownToggleArrowSelector =
   '.e2e-test-language-dropdown-toggle-arrow';
 
+const entityTypeSelector = '.e2e-test-entity-type-selector';
+const selectedEntityTypeSelector = '.e2e-test-entity-type-selector-selected';
+const entityTypeOptionSelector = '.e2e-test-entity-type-selector-option';
+
+// How long to wait when checking whether the "Content Type" dropdown is
+// already open. The dropdown is toggled by a local click with no network call
+// behind it, so this only has to cover a render, and keeping it well below the
+// default probe timeout keeps the common closed case cheap.
+const dropdownStateProbeTimeoutMsecs = 2000;
+
+/**
+ * The options offered by the "Content Type" filter on the "Translate Text" and
+ * "Review Translations" tabs.
+ */
+export enum CONTENT_TYPE_FILTER {
+  ALL = 'All',
+  LESSONS = 'Lessons',
+  SKILLS = 'Skills',
+}
+
 export class Contributor extends ExplorationEditor {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -482,9 +502,19 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Tab ${tabName} not found.`);
     }
 
-    // Click on the tab.
-    await this.waitForElementToBeClickable(tabElement);
-    await tabElement.click();
+    // The tab is a list item and its click handler sits on the link inside it,
+    // so the link is what has to be clicked.
+    const tabLink = await tabElement.$('a');
+    if (!tabLink) {
+      throw new Error(`Tab ${tabName} has no link to click.`);
+    }
+
+    // The click is dispatched on the link rather than made natively because
+    // Puppeteer re-centres a target before dispatching a mouse event, which at
+    // mobile width parks the tab under the sticky navigation bar and delivers
+    // the click to the bar instead.
+    await this.waitForElementToStabilize(tabLink);
+    await tabLink.evaluate(el => (el as HTMLElement).click());
 
     // Verify tab is active.
     if (tabName !== 'My Contributions') {
@@ -700,6 +730,132 @@ export class Contributor extends ExplorationEditor {
    */
   async expectQuestionInReviewModalToBe(question: string): Promise<void> {
     await this.expectTextContentToBe(rteDisplaySelector, question);
+  }
+
+  /**
+   * Selects an option in the "Content Type" filter.
+   * @param contentType - The content type to filter the opportunity list by.
+   */
+  async selectContentTypeFilter(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.openContentTypeFilterDropdown();
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    for (const option of await this.page.$$(entityTypeOptionSelector)) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contentType) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Content type option ${contentType} not found.`);
+    }
+
+    // The option is dispatched on the element for the same reason the toggle
+    // is. A native click re-centres the option first, which at mobile width
+    // puts it under the sticky navigation bar, and the click then lands on the
+    // bar instead. The dropdown closes on that outside click without the
+    // option ever being selected.
+    await optionElement.evaluate(el => (el as HTMLElement).click());
+
+    // Verify the option is selected.
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
+  }
+
+  /**
+   * Opens the "Content Type" dropdown, unless it is already open. The control
+   * toggles, so clicking it when the options are already showing would close
+   * them again.
+   */
+  private async openContentTypeFilterDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(selectedEntityTypeSelector);
+    const dropdownIsOpen = await this.isElementVisible(
+      entityTypeOptionSelector,
+      true,
+      dropdownStateProbeTimeoutMsecs
+    );
+    if (dropdownIsOpen) {
+      return;
+    }
+    await this.clickContentTypeFilterToggle();
+  }
+
+  /**
+   * Clicks the control that opens and closes the "Content Type" dropdown.
+   */
+  private async clickContentTypeFilterToggle(): Promise<void> {
+    // At mobile width the filter row sits under the sticky navigation bar.
+    // Puppeteer scrolls a target back to the centre of the viewport before it
+    // dispatches a mouse event, which parks the control under that bar and
+    // delivers the click to the bar instead, so the click is dispatched on the
+    // control itself where it cannot be intercepted.
+    const toggle = await this.page.waitForSelector(selectedEntityTypeSelector);
+    if (!toggle) {
+      throw new Error('The content type filter was not found.');
+    }
+    await this.waitForElementToStabilize(toggle);
+    await toggle.evaluate(el => (el as HTMLElement).click());
+  }
+
+  /**
+   * Checks that the "Content Type" filter offers exactly the expected options.
+   * The dropdown is closed again afterwards, so that the filter is left as it
+   * was found.
+   * @param expectedOptions - The options the dropdown should offer, in order.
+   */
+  async expectContentTypeFilterOptionsToBe(
+    expectedOptions: CONTENT_TYPE_FILTER[]
+  ): Promise<void> {
+    await this.openContentTypeFilterDropdown();
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    const options = await this.page.$$eval(entityTypeOptionSelector, elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+
+    if (options.length !== expectedOptions.length) {
+      throw new Error(
+        `Expected the content type filter to offer ${expectedOptions.length} ` +
+          `options, but it offered ${options.length}: ${options}.`
+      );
+    }
+    for (let i = 0; i < expectedOptions.length; i++) {
+      if (options[i] !== expectedOptions[i]) {
+        throw new Error(
+          `Expected content type option ${i} to be "${expectedOptions[i]}", ` +
+            `but it was "${options[i]}".`
+        );
+      }
+    }
+    await this.clickContentTypeFilterToggle();
+    await this.expectElementToBeVisible(entityTypeOptionSelector, false);
+    showMessage(
+      `Success: The content type filter offers exactly ${expectedOptions}.`
+    );
+  }
+
+  /**
+   * Checks whether the "Content Type" filter is shown on the active tab.
+   * @param visible - Whether the filter should be shown.
+   */
+  async expectContentTypeFilterToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(entityTypeSelector, visible);
+  }
+
+  /**
+   * Checks that the "Content Type" filter currently shows the given option.
+   * @param contentType - The option the filter is expected to show.
+   */
+  async expectSelectedContentTypeFilterToBe(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
   }
 }
 

@@ -323,6 +323,7 @@ const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationObjectiveSelector = '.e2e-test-exp-summary-tile-objective';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
 const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
@@ -8357,6 +8358,60 @@ export class LoggedOutUser extends BaseUser {
     if (status !== 200) {
       throw new Error(`Expected ${url} to return HTTP 200 but got ${status}`);
     }
+  }
+
+  /**
+   * Checks the title and objective shown on a lesson tile in the community
+   * library. The objective is only rendered at desktop width, so it is checked
+   * only there.
+   * @param title - The title the tile is expected to show.
+   * @param objective - The objective the tile is expected to show.
+   */
+  async expectLessonTileToShow(
+    title: string,
+    objective: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const tiles = await this.page.$$(lessonCardSelector);
+
+    const titlesFound: (string | undefined)[] = [];
+    for (const tile of tiles) {
+      const tileTitle = await tile.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        explorationTitleSelector
+      );
+      titlesFound.push(tileTitle);
+      if (tileTitle !== title) {
+        continue;
+      }
+      if (this.isViewportAtMobileWidth()) {
+        showMessage(`Success: The lesson tile shows the title "${title}".`);
+        return;
+      }
+      const tileObjective = await tile.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        explorationObjectiveSelector
+      );
+      // The tile truncates the objective at 95 characters, so the rendered
+      // text is checked for the expected objective rather than against it.
+      if (!tileObjective?.includes(objective)) {
+        throw new Error(
+          `The lesson tile titled "${title}" shows the objective ` +
+            `"${tileObjective}", but "${objective}" was expected.`
+        );
+      }
+      showMessage(
+        `Success: The lesson tile shows the title "${title}" and the ` +
+          `objective "${objective}".`
+      );
+      return;
+    }
+
+    throw new Error(
+      `The lesson tile titled "${title}" was not found. Tiles found: ${titlesFound.join(', ')}`
+    );
   }
 }
 

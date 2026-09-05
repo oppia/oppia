@@ -521,6 +521,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/translate-metadata-and-skill-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/translate-metadata-and-skill-in-target-language.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/check-their-accomplishment",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
       "framework": "puppeteer"
@@ -548,6 +553,26 @@
     {
       "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/filter-opportunities-by-entity-type",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/filter-opportunities-by-entity-type.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/review-metadata-and-skill-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/review-metadata-and-skill-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-out-user/feature-translation-opps-with-new-opps-model/view-translated-lesson-metadata-and-concept-cards",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/feature-translation-opps-with-new-opps-model/view-translated-lesson-metadata-and-concept-cards.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "community-library-browser/feature-translation-opps-with-new-opps-model/search-for-an-exploration-using-its-translated-title",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/community-library-browser/feature-translation-opps-with-new-opps-model/search-for-an-exploration-using-its-translated-title.spec.ts",
       "framework": "puppeteer"
     },
     {
