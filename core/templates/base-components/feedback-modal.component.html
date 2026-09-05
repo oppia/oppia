@@ -4,21 +4,23 @@
     <div class="modal-header
              oppia-lesson-feedback-header
              border-bottom-0">
-      {{ 'I18N_LESSON_FEEDBACK_GUEST_TITLE' | translate }}
-      <p class="oppia-lesson-feedback-text">
+      <span class="e2e-test-modal-header">{{ 'I18N_LESSON_FEEDBACK_GUEST_TITLE' | translate }}</span>
+      <p class="oppia-lesson-feedback-text e2e-test-modal-subHeader">
         {{
         'I18N_LESSON_FEEDBACK_GUEST_SUBTITLE'
         | translate
         }}
       </p>
-      <div class="oppia-guest-feedback-body">
-        <button class="oppia-guest-signup-btn" (click)="signIn()">
+      <div class="oppia-guest-feedback-body e2e-test-modal-body">
+        <button class="oppia-guest-signup-btn e2e-test-confirm-action-button"
+                (click)="signIn()">
           {{
           'I18N_LESSON_FEEDBACK_SIGN_IN_BUTTON'
           | translate
           }}
         </button>
-        <button class="oppia-guest-continue-btn" (click)="closeModal()">
+        <button class="oppia-guest-continue-btn e2e-test-cancel-action-button"
+                (click)="closeModal()">
           {{
           'I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON'
           | translate
@@ -44,13 +46,13 @@
           </mat-icon>
         </div>
         <div>
-          <h3>{{ title | translate }}</h3>
-          <p>{{ subTitle | translate }}</p>
+          <h3 class="e2e-test-modal-header">{{ title | translate }}</h3>
+          <p class="e2e-test-modal-subHeader" >{{ subTitle | translate }}</p>
         </div>
       </div>
     </div>
 
-    <div class="modal-body oppia-feedback-body">
+    <div class="modal-body oppia-feedback-body e2e-test-modal-body">
 
       <p *ngIf="isLessonFeedbackMode" class="oppia-lesson-feedback-microcopy">
         {{
@@ -70,30 +72,30 @@
           </span>
         </div>
 
-        <div class="oppia-flag-category-chips" aria-label="Issue category">
+        <div class="oppia-flag-category-chips e2e-test-flag-category-chips" aria-label="Issue category">
           <button type="button"
-                  class="oppia-flag-category-chip"
+                  class="oppia-flag-category-chip e2e-test-report-issue-typo-chip"
                   [class.selected]="category === ReportAnIssueCategory.TYPO"
                   (click)="selectCategory(ReportAnIssueCategory.TYPO)">
             <mat-icon aria-hidden="true">spellcheck</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_TYPO' | translate }}
           </button>
           <button type="button"
-                  class="oppia-flag-category-chip"
+                  class="oppia-flag-category-chip e2e-test-report-issue-broken-layout-chip"
                   [class.selected]="category === ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE"
                   (click)="selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE)">
             <mat-icon aria-hidden="true">broken_image</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_BROKEN_LAYOUT' | translate }}
           </button>
           <button type="button"
-                  class="oppia-flag-category-chip"
+                  class="oppia-flag-category-chip e2e-test-report-issue-confusing-or-incorrect-chip"
                   [class.selected]="category === ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER"
                   (click)="selectCategory(ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER)">
             <mat-icon aria-hidden="true">error_outline</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_CONFUSING' | translate }}
           </button>
           <button type="button"
-                  class="oppia-flag-category-chip"
+                  class="oppia-flag-category-chip e2e-test-report-issue-other-chip"
                   [class.selected]="category === ReportAnIssueCategory.OTHER_OR_NOT_SURE"
                   (click)="selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE)">
             <mat-icon aria-hidden="true">help_outline</mat-icon>
@@ -113,12 +115,12 @@
                 (ngModelChange)="clearFormError()"
                 [ngModelOptions]="{standalone: true}"
                 [placeholder]="textarePlaceholder | translate"
-                class="oppia-feedback-textarea">
+                class="oppia-feedback-textarea e2e-test-feedback-modal-textarea">
       </textarea>
-      <div *ngIf="formError" class="oppia-feedback-error-text">
+      <div *ngIf="formError" class="oppia-feedback-error-text e2e-test-form-error">
         {{ formError }}
       </div>
-      <div class="oppia-flag-character-count">
+      <div class="oppia-flag-character-count e2e-test-feedback-text-count ">
         {{ feedbackText.length }}
         /
         {{ MAX_REPORT_MESSAGE_LENGTH }}
@@ -137,9 +139,10 @@
             </oppia-image-receiver>
           </div>
         </div>
-        <div *ngIf="screenshotPreviewDataUrl" class="oppia-feedback-screenshot-preview">
+        <div *ngIf="screenshotPreviewDataUrl" class="oppia-feedback-screenshot-preview e2e-test-feedback-screenshot-preview">
           <button type="button"
-                  class="oppia-feedback-screenshot-remove-button" aria-label="Remove screenshot"
+                  class="oppia-feedback-screenshot-remove-button e2e-test-cancel-feedback-upload-button"
+                  aria-label="Remove screenshot"
                   (click)="removeScreenshot()">
             <mat-icon aria-hidden="true">close</mat-icon>
           </button>
@@ -153,8 +156,11 @@
         </div>
       </div>
       <label *ngIf="shouldShowTechnicalLogs" class="oppia-flag-technical-logs-checkbox">
-        <input type="checkbox" [(ngModel)]="includeTechnicalLogs" [ngModelOptions]="{standalone: true}">
-        <span>
+        <input type="checkbox"
+               [(ngModel)]="includeTechnicalLogs"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-technical-logs">
+        <span class="e2e-test-technical-logs-label">
           {{
           'I18N_TECHNICAL_ERROR_LOG_CHECKBOX_TEXT'
           | translate
@@ -162,7 +168,7 @@
         </span>
       </label>
       <div class="oppia-feedback-captcha-section" *ngIf="!isLessonFeedbackMode && !isUserLoggedIn">
-        <div #turnstileContainer class="oppia-feedback-turnstile-container">
+        <div #turnstileContainer class="oppia-feedback-turnstile-container e2e-test-feedback-captcha-container">
         </div>
         <div *ngIf="captchaLoadError" class="oppia-feedback-error-text">
           {{ captchaLoadError }}
@@ -175,13 +181,13 @@
 
 
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="closeModal()">
+      <button class="btn btn-secondary e2e-test-cancel-action-button" (click)="closeModal()">
         {{
         'I18N_MODAL_CANCEL_BUTTON'
         | translate
         }}
       </button>
-      <button class="btn btn-success"
+      <button class="btn btn-success e2e-test-confirm-action-button"
               type="button"
               [disabled]="isSubmittingFeedback"
               (click)="submit()">
