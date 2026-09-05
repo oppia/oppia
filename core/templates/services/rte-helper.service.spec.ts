@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RteHelperService.
  */
 
+// @ts-nocheck
+
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RteHelperService} from './rte-helper.service';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';

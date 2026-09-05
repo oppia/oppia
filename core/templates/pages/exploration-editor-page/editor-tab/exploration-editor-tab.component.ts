@@ -55,10 +55,12 @@ import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import './exploration-editor-tab.component.css';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
   templateUrl: './exploration-editor-tab.component.html',
+  styleUrls: ['./exploration-editor-tab.component.css'],
 })
 export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   @Input() explorationIsLinkedToStory = false;

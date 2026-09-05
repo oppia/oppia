@@ -22,10 +22,12 @@ import {Topic} from 'domain/topic/topic-object.model';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicRights} from 'domain/topic/topic-rights.model';
+import './topic-editor-navbar-breadcrumb.component.css';
 
 @Component({
   selector: 'oppia-topic-editor-navbar-breadcrumb',
   templateUrl: './topic-editor-navbar-breadcrumb.component.html',
+  styleUrls: ['./topic-editor-navbar-breadcrumb.component.css'],
 })
 export class TopicEditorNavbarBreadcrumbComponent {
   // This property is initialized using Angular lifecycle hooks

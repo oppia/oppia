@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './remove-item-modal.component.css';
 
 @Component({
   selector: 'oppia-remove-item-modal',
   templateUrl: './remove-item-modal.component.html',
+  styleUrls: ['./remove-item-modal.component.css'],
 })
 export class RemoveItemModalComponent extends ConfirmOrCancelModal {
   confirmationTitle!: string;
