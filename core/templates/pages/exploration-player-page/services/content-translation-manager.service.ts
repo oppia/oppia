@@ -37,6 +37,8 @@ import {PlayerPositionService} from '../services/player-position.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
+import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -67,7 +69,8 @@ export class ContentTranslationManagerService {
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private audioPreloaderService: AudioPreloaderService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private conceptCardBackendApiService: ConceptCardBackendApiService
   ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
@@ -97,6 +100,7 @@ export class ContentTranslationManagerService {
    * @param {string} languageCode The language code to display translations for.
    */
   displayTranslations(languageCode: string): void {
+    this.preloadConceptCards(languageCode);
     if (languageCode === this.explorationLanguageCode) {
       this.playerTranscriptService.restoreImmutably(
         cloneDeep(this.originalTranscript)
@@ -106,8 +110,10 @@ export class ContentTranslationManagerService {
       this.entityTranslationsService
         .getEntityTranslationsAsync(languageCode)
         .then(entityTranslations => {
-          // Image preloading is disabled in the exploration editor preview mode.
-          if (!this.pageContextService.isInExplorationEditorPage()) {
+          if (
+            !this.pageContextService.isInExplorationEditorPage() &&
+            this.playerTranscriptService.getCard(0)
+          ) {
             this.imagePreloaderService.restartImagePreloader(
               this.playerTranscriptService.getCard(0).getStateName()
             );
@@ -161,6 +167,7 @@ export class ContentTranslationManagerService {
       newLanguageCode
     );
     this.displayTranslations(newLanguageCode);
+    this.preloadConceptCards(newLanguageCode);
   }
 
   initLessonTranslations(): void {
@@ -200,6 +207,31 @@ export class ContentTranslationManagerService {
             this.getCurrentStateName()
           );
         });
+      this.preloadConceptCards(selectedLanguageCode);
+    }
+  }
+
+  preloadConceptCards(languageCode: string): void {
+    if (
+      !this.audioPreloaderService.exploration ||
+      !this.audioPreloaderService.exploration.states
+    ) {
+      return;
+    }
+    const skillIds: string[] = [];
+    const stateObjects =
+      this.audioPreloaderService.exploration.states.getStateObjects();
+    for (const stateName in stateObjects) {
+      const linkedSkillId = stateObjects[stateName].linkedSkillId;
+      if (linkedSkillId && !skillIds.includes(linkedSkillId)) {
+        skillIds.push(linkedSkillId);
+      }
+    }
+    if (skillIds.length > 0) {
+      this.conceptCardBackendApiService.loadConceptCardsAsync(
+        skillIds,
+        languageCode
+      );
     }
   }
 

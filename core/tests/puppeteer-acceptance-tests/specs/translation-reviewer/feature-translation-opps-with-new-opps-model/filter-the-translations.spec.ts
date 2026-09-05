@@ -130,7 +130,6 @@ describe('Translation Reviewer V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
     await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
@@ -143,7 +142,6 @@ describe('Translation Reviewer V2', function () {
       'Trading Slices',
       'Exploration - Fractions'
     );
-    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE(
@@ -160,7 +158,6 @@ describe('Translation Reviewer V2', function () {
       'Chemical Reactions',
       'Exploration - States of Matter'
     );
-    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
