@@ -21,6 +21,7 @@ import {
   Component,
   ElementRef,
   Input,
+  OnDestroy,
   OnInit,
   Renderer2,
 } from '@angular/core';
@@ -33,7 +34,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   templateUrl: './error-page.component.html',
   styleUrls: [],
 })
-export class ErrorPageComponent implements OnInit, AfterViewInit {
+export class ErrorPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // This property is initialized using Angular lifecycle hooks.
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -41,6 +42,8 @@ export class ErrorPageComponent implements OnInit, AfterViewInit {
 
   customErrorMessage: string | null = null;
   private usingKeyboard = false;
+  private unlistenFns: Array<() => void> = [];
+  private mutationObserver: MutationObserver | null = null;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -66,26 +69,34 @@ export class ErrorPageComponent implements OnInit, AfterViewInit {
   }
 
   private attachFocusListeners(links: NodeListOf<HTMLElement>): void {
-    this.renderer.listen('window', 'keydown', (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        this.usingKeyboard = true;
-      }
-    });
-    this.renderer.listen('window', 'mousedown', () => {
-      this.usingKeyboard = false;
-    });
+    this.unlistenFns.push(
+      this.renderer.listen('window', 'keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Tab') {
+          this.usingKeyboard = true;
+        }
+      })
+    );
+    this.unlistenFns.push(
+      this.renderer.listen('window', 'mousedown', () => {
+        this.usingKeyboard = false;
+      })
+    );
 
     links.forEach(link => {
-      this.renderer.listen(link, 'focus', () => {
-        if (this.usingKeyboard) {
-          this.renderer.setStyle(link, 'outline', '2px solid #0844aa');
-          this.renderer.setStyle(link, 'outline-offset', '2px');
-        }
-      });
-      this.renderer.listen(link, 'blur', () => {
-        this.renderer.removeStyle(link, 'outline');
-        this.renderer.removeStyle(link, 'outline-offset');
-      });
+      this.unlistenFns.push(
+        this.renderer.listen(link, 'focus', () => {
+          if (this.usingKeyboard) {
+            this.renderer.setStyle(link, 'outline', '2px solid #0844aa');
+            this.renderer.setStyle(link, 'outline-offset', '2px');
+          }
+        })
+      );
+      this.unlistenFns.push(
+        this.renderer.listen(link, 'blur', () => {
+          this.renderer.removeStyle(link, 'outline');
+          this.renderer.removeStyle(link, 'outline-offset');
+        })
+      );
     });
   }
 
@@ -105,14 +116,18 @@ export class ErrorPageComponent implements OnInit, AfterViewInit {
     } else {
       // The links are injected asynchronously via [innerHTML] once the
       // translation resolves, so we observe the DOM until they appear.
-      const observer = new MutationObserver(() => {
+      this.mutationObserver = new MutationObserver(() => {
         const links: NodeListOf<HTMLElement> = container.querySelectorAll('a');
         if (links.length > 0) {
           this.attachFocusListeners(links);
-          observer.disconnect();
+          this.mutationObserver?.disconnect();
+          this.mutationObserver = null;
         }
       });
-      observer.observe(container, {childList: true, subtree: true});
+      this.mutationObserver.observe(container, {
+        childList: true,
+        subtree: true,
+      });
     }
   }
 
@@ -122,5 +137,17 @@ export class ErrorPageComponent implements OnInit, AfterViewInit {
 
   getStatusCode(): number {
     return Number(this.statusCode);
+  }
+
+  ngOnDestroy(): void {
+    // Clean up all window/element listeners so they don't leak beyond this
+    // component's lifetime and interfere with other parts of the app.
+    this.unlistenFns.forEach(unlisten => unlisten());
+    this.unlistenFns = [];
+
+    // Disconnect the MutationObserver if it's still active (e.g. if the
+    // links never appeared before the component was destroyed).
+    this.mutationObserver?.disconnect();
+    this.mutationObserver = null;
   }
 }
