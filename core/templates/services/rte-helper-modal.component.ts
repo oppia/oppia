@@ -35,7 +35,6 @@ import {ServicesConstants} from 'services/services.constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
-import './rte-helper-modal.component.css';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 

@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import './checkpoint-bar.component.css';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';

@@ -23,8 +23,6 @@ import {Component, OnInit} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
 
-import './promo-bar.component.css';
-
 @Component({
   selector: 'oppia-promo-bar',
   templateUrl: './promo-bar.component.html',

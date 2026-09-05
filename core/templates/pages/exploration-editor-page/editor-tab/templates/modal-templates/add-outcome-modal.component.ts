@@ -21,7 +21,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {Outcome} from 'domain/exploration/outcome.model';
-import './add-outcome-modal.component.css';
 
 @Component({
   selector: 'oppia-add-outcome-modal',

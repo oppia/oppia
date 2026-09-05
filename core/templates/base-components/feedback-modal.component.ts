@@ -56,7 +56,6 @@ import {
 } from 'services/insert-script.service';
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
-import './feedback-modal.component.css';
 
 interface TurnstileApi {
   render: (

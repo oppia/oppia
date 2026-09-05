@@ -18,7 +18,6 @@
 
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import './terms-page.component.css';
 
 @Component({
   selector: 'terms-page',

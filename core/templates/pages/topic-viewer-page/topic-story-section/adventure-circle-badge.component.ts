@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import './adventure-circle-badge.component.css';
 
 @Component({
   selector: 'topic-adventure-circle-badge',

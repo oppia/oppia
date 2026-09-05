@@ -18,8 +18,6 @@
 
 import {Component} from '@angular/core';
 
-import './social-buttons.component.css';
-
 @Component({
   selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',

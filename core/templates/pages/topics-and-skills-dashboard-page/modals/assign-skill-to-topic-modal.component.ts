@@ -20,7 +20,6 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import './assign-skill-to-topic-modal.component.css';
 
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',

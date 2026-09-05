@@ -23,7 +23,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
-import './exploration-metadata-diff-modal.component.css';
 
 interface headersAndYamlStrs {
   leftPane: string;

@@ -29,7 +29,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import './edit-profile-picture-modal.component.css';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({

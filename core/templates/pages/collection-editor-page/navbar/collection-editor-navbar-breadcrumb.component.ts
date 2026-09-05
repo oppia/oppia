@@ -22,7 +22,6 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
 import {CollectionEditorRoutingService} from '../services/collection-editor-routing.service';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
-import './collection-editor-navbar-breadcrumb.component.css';
 
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller

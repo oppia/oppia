@@ -27,7 +27,6 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
-import './interaction-display.component.css';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
 type ScopedValue =

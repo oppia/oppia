@@ -33,8 +33,6 @@ import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
-import './collection-player-page.component.css';
-
 export interface IconParametersArray {
   thumbnailIconUrl: string;
   left: string;

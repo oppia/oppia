@@ -50,7 +50,6 @@ import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.ser
 import {LocalStorageService} from 'services/local-storage.service';
 
 import constants from 'assets/constants';
-import './topic-story-section.component.css';
 
 import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
 import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';

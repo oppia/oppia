@@ -18,7 +18,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './assessment-interrupt.component.css';
 
 @Component({
   selector: 'oppia-assessment-interrupt',

@@ -26,7 +26,6 @@ import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './goal-list.component.css';
 
 @Component({
   selector: 'oppia-goal-list',

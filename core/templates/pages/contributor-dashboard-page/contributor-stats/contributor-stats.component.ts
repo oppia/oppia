@@ -37,7 +37,6 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CertificateDownloadModalComponent} from '../modal-templates/certificate-download-modal.component';
-import './contributor-stats.component.css';
 
 interface Option {
   contributionType: string;

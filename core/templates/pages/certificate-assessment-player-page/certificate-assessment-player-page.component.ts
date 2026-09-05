@@ -54,7 +54,6 @@ import {
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
-import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
