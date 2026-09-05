@@ -128,7 +128,8 @@ describe('Old Progress tab Component', () => {
       story_titles: ['Story 1'],
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: true,
       canonical_story_summary_dict: [
         {
