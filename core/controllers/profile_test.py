@@ -873,7 +873,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
@@ -1432,7 +1431,6 @@ class SignupTests(test_utils.GenericTestBase):
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
 
         values_dict = {
-            'server_can_send_emails': False,
             'has_agreed_to_latest_terms': False,
             'has_ever_registered': False,
             'username': None,
@@ -1444,7 +1442,6 @@ class SignupTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
@@ -1479,7 +1476,6 @@ class SignupTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
         values_dict = {
-            'server_can_send_emails': True,
             'has_agreed_to_latest_terms': True,
             'has_ever_registered': True,
             'username': 'owner',
@@ -1708,7 +1704,6 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
         ]
     )
     def test_post(self) -> None:

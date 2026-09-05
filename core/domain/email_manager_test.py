@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import pathlib
 import types
 from unittest import mock
 
@@ -85,7 +86,6 @@ class EmailToAdminTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -118,7 +118,6 @@ class DummyMailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -252,7 +251,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -281,7 +279,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
@@ -309,23 +306,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_role_notification_email(
-            self.editor_id,
-            self.new_user_id,
-            rights_domain.ROLE_OWNER,
-            self.exploration.id,
-            self.exploration.title,
-        )
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -342,7 +323,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -392,7 +372,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -467,7 +446,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -538,7 +516,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -609,7 +586,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -627,6 +603,16 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                     self.exploration.id,
                     self.exploration.title,
                 )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_role_notification_email(
+                'dummy', 'dummy', 'dummy', 'dummy', 'dummy'
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class SignupEmailTests(test_utils.EmailTestBase):
@@ -779,7 +765,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
@@ -811,7 +796,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -865,7 +849,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -945,7 +928,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
@@ -1001,7 +983,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1091,7 +1072,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1150,7 +1130,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1208,7 +1187,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'),
@@ -1370,7 +1348,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1445,7 +1422,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1519,7 +1495,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1595,7 +1570,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1671,7 +1645,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1747,7 +1720,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, NEW_FOOTER),
             (
@@ -1939,41 +1911,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         # so that the email body is recognized as a string.
         return cast(str, mock_send_email.call_args[0][4])
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_submission_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_submission_email(feedback)
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
+    @test_utils.set_platform_parameters([])
     def test_submission_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2000,10 +1938,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
@@ -2060,10 +1994,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_curriculum_platform_feedback_submission_email(self) -> None:
@@ -2114,10 +2044,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_technical_external_platform_feedback_email(self) -> None:
@@ -2158,10 +2084,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
         ]
     )
     def test_sends_technical_internal_platform_feedback_email(self) -> None:
@@ -2197,14 +2119,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             email_body,
         )
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            )
-        ]
-    )
+    @test_utils.set_platform_parameters([])
     def test_submission_email_with_invalid_dashboard_raises_error(
         self,
     ) -> None:
@@ -2226,45 +2141,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_status_change_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_status_change_email(
-                    feedback,
-                    self.user.user_id,
-                )
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
+    @test_utils.set_platform_parameters([])
     def test_status_change_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2294,10 +2171,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
@@ -2335,45 +2208,7 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             email_body,
         )
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                False,
-            ),
-        ]
-    )
-    def test_reply_email_not_sent_when_server_cannot_send_emails(
-        self,
-    ) -> None:
-        feedback = self._get_lesson_feedback()
-        mock_send_email = mock.Mock()
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.swap(
-                email_manager,
-                '_send_email',
-                mock_send_email,
-            ), self.log_new_error_ctx:
-                email_manager.send_feedback_reply_email(
-                    feedback,
-                    'Thanks for the suggestion.',
-                    self.user.user_id,
-                )
-
-        mock_send_email.assert_not_called()
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
-        [
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
-        ]
-    )
+    @test_utils.set_platform_parameters([])
     def test_reply_email_not_sent_when_transactional_emails_are_disabled(
         self,
     ) -> None:
@@ -2404,10 +2239,6 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             (
                 param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
             ),
         ]
     )
@@ -2444,6 +2275,27 @@ class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
             email_body,
         )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_feedback_submission_email(mock.Mock())
+            email_manager.send_feedback_status_change_email(
+                mock.Mock(), 'dummy'
+            )
+            email_manager.send_feedback_reply_email(
+                mock.Mock(), 'dummy', 'dummy'
+            )
+        self.assertEqual(
+            logs,
+            [
+                'This app cannot send feedback message emails to users.',
+                'This app cannot send feedback message emails to users.',
+                'This app cannot send feedback message emails to users.',
+            ],
+        )
+
 
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
@@ -2468,27 +2320,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
-            self.exploration.id: {
-                'title': self.exploration.title,
-                'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3'],
-            }
-        }
-        email_manager.send_feedback_message_email(
-            self.editor_id, feedback_messages
-        )
-
-        # Check that email is not sent.
-        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2507,9 +2339,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_that_email_not_sent_if_feedback_messages_are_empty(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
         with self.can_send_feedback_email_ctx:
@@ -2523,7 +2353,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2617,6 +2446,16 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 sent_email_model.subject, self.expected_email_subject
             )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_feedback_message_email(
+                'dummy', {'dummy': mock.Mock()}
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class SuggestionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
@@ -2639,24 +2478,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        email_manager.send_suggestion_email(
-            self.exploration.title,
-            self.exploration.id,
-            self.new_user_id,
-            self.recipient_list,
-        )
-
-        # Check that email is not sent.
-        messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2674,7 +2496,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2751,6 +2572,16 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
             )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_suggestion_email(
+                'dummy', 'dummy', 'dummy', [mock.Mock()]
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
@@ -2777,21 +2608,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-        ]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_emails_to_subscribers(
-            self.editor_id, self.exploration.id, self.exploration.title
-        )
-
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
         ]
     )
@@ -2808,7 +2624,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -2881,6 +2696,14 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
             )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_emails_to_subscribers('dummy', 'dummy', 'dummy')
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
@@ -2903,27 +2726,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_instant_feedback_message_email(
-            self.new_user_id,
-            self.editor_id,
-            'editor message',
-            'New Oppia message in "a subject"',
-            self.exploration.title,
-            self.exploration.id,
-            'a subject',
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self,
     ) -> None:
@@ -2944,7 +2747,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3022,6 +2824,16 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
             )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_instant_feedback_message_email(
+                'dummy', 'dummy', 'dummy', 'dummy', 'dummy', 'dummy', 'dummy'
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
@@ -3053,23 +2865,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
         self.report_text = 'AD'
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_flag_exploration_email(
-            self.exploration.title,
-            self.exploration.id,
-            self.new_user_id,
-            self.report_text,
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3164,7 +2960,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 param_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
@@ -3209,6 +3004,16 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             'LINK_TO_PREFERENCES_PAGE',
             messages[0].html,
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_flag_exploration_email(
+                'dummy', 'dummy', 'dummy', 'dummy'
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class RenderedEmailFooterTest(test_utils.GenericTestBase):
@@ -3255,20 +3060,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_mail_to_onboard_new_reviewers(
-            self.reviewer_id, 'Algebra'
-        )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3326,6 +3118,14 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CD_USER
         )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_onboard_new_reviewers('dummy', 'dummy')
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent while notifying reviewers."""
@@ -3347,19 +3147,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_mail_to_notify_users_to_review(
-            self.reviewer_id, 'Algebra'
-        )
-
-        messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3410,6 +3198,14 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
         )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_users_to_review('dummy', 'dummy')
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent when notifying contributor
@@ -3432,25 +3228,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        contributor_ranking_email_info = (
-            suggestion_registry.ContributorMilestoneEmailInfo(
-                self.user_id, 'question', 'edit', None, 'Initial Contributor'
-            )
-        )
-        email_manager.send_mail_to_notify_contributor_ranking_achievement(
-            contributor_ranking_email_info
-        )
-
-        messages = self._get_sent_email_messages(self.USER_EMAIL)
-
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -3483,7 +3261,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3549,7 +3326,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3615,7 +3391,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3681,7 +3456,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3741,7 +3515,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3801,7 +3574,6 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -3858,6 +3630,16 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             sent_email_model.intent,
             feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                mock.Mock()
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
@@ -4064,24 +3846,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
-                    [self.reviewer_1_id],
-                    [[self.reviewable_suggestion_email_info]],
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4110,7 +3875,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4144,7 +3908,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4169,7 +3932,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4202,7 +3964,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4284,7 +4045,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4366,7 +4126,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4448,7 +4207,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4530,7 +4288,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4612,7 +4369,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4694,7 +4450,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4776,7 +4531,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -4872,7 +4626,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5030,7 +4783,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5115,7 +4867,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5199,7 +4950,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5285,7 +5035,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5371,7 +5120,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5457,7 +5205,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5543,7 +5290,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5629,7 +5375,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5727,7 +5472,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -5889,7 +5633,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6046,6 +5789,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.reviewer_2_id,
             self.REVIEWER_2_EMAIL,
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                [mock.Mock()], [mock.Mock()]
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
@@ -6250,33 +6003,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                with self.swap(
-                    suggestion_models,
-                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
-                    0,
-                ):
-                    (
-                        email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [],
-                            [],
-                            [self.reviewable_suggestion_email_info],
-                        )
-                    )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 False,
@@ -6314,7 +6041,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 True,
@@ -6355,7 +6081,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
                 True,
@@ -6383,7 +6108,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6417,7 +6141,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6517,7 +6240,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6630,7 +6352,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6731,7 +6452,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -6847,7 +6567,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7005,7 +6724,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7140,6 +6858,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             self.admin_2_id,
             self.CURRICULUM_ADMIN_2_EMAIL,
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
@@ -7298,32 +7029,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         return translation_suggestion
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                reviewer_ids_by_language: DefaultDict[str, List[str]] = (
-                    DefaultDict(list)
-                )
-                suggestions_by_language: DefaultDict[
-                    str, List[suggestion_registry.ReviewableSuggestionEmailInfo]
-                ] = DefaultDict(list)
-                reviewer_ids_by_language['en'] = []
-                suggestions_by_language['en'] = []
-
-                email_manager.send_reviewer_notifications(
-                    reviewer_ids_by_language, suggestions_by_language
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7361,7 +7067,6 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7441,6 +7146,14 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
                 % (DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)
             ),
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_reviewer_notifications(mock.Mock(), mock.Mock())
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -7593,26 +7306,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.log_new_error_ctx:
-                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
-                    [self.admin_1_id],
-                    [],
-                    [],
-                    self.suggestion_types_needing_reviewers,
-                )
-
-            messages = self._get_all_sent_email_messages()
-            self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
-            self.assertEqual(logs[0], 'This app cannot send emails to users.')
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7645,7 +7339,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7668,7 +7361,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7697,7 +7389,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7733,7 +7424,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7801,7 +7491,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7902,7 +7591,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -7969,7 +7657,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8068,7 +7755,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8141,7 +7827,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8251,7 +7936,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8398,6 +8082,19 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self.CURRICULUM_ADMIN_2_EMAIL,
         )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
+                [mock.Mock()],
+                [mock.Mock()],
+                [mock.Mock()],
+                {'dummy': mock.Mock()},
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to account deletion application emails."""
@@ -8411,19 +8108,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_account_deleted_email(
-            self.applicant_id, self.APPLICANT_EMAIL
-        )
-
-        messages = self._get_sent_email_messages(self.APPLICANT_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -8457,7 +8142,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8496,6 +8180,14 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         self.assertEqual(
             sent_email_model.intent, feconf.EMAIL_INTENT_ACCOUNT_DELETED
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_account_deleted_email('dummy', 'dummy')
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class EmailPreferencesTests(test_utils.EmailTestBase):
@@ -8655,17 +8347,8 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
         self.recipient_id = self.get_user_id_from_email(self.RECIPIENT_EMAIL)
 
-    def test_exception_raised_if_server_can_send_emails_is_false(self) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'For moderator emails to be sent, please ensure that '
-            'SERVER_CAN_SEND_EMAILS is set to True.',
-        ):
-            email_manager.require_moderator_email_prereqs_are_satisfied()
-
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (
@@ -8688,18 +8371,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(d_text, expected_draft_text_body)
 
     @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_blank_draft_received_exploration_unpublish_exception_raised(
-        self,
-    ) -> None:
-        expected_draft_text_body = ''
-        d_text = email_manager.get_moderator_unpublish_exploration_email()
-        self.assertEqual(d_text, expected_draft_text_body)
-
-    @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8719,6 +8391,17 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         )
         messages = self._get_sent_email_messages(self.RECIPIENT_EMAIL)
         self.assertEqual(len(messages), 1)
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            res_get_moderator_unpublish_exploration_email = (
+                email_manager.get_moderator_unpublish_exploration_email()
+            )
+            self.assertEqual(res_get_moderator_unpublish_exploration_email, '')
+        self.assertEqual(logs, [])
 
 
 class CDUserEmailTest(test_utils.EmailTestBase):
@@ -8768,26 +8451,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
-        self,
-    ) -> None:
-        email_manager.send_email_to_new_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
-
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self,
     ) -> None:
@@ -8799,9 +8463,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -8848,7 +8510,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8909,7 +8570,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -8967,7 +8627,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -9023,21 +8682,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CD_USER
         )
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_email_to_removed_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
-
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
-
     def test_remove_translation_reviewer_email_for_invalid_category(
         self,
     ) -> None:
@@ -9071,7 +8715,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -9131,7 +8774,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -9188,7 +8830,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
@@ -9243,13 +8884,31 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER
         )
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_email_to_new_cd_user(
+                'dummy', 'dummy', mock.Mock()
+            )
+            email_manager.send_email_to_removed_cd_user(
+                'dummy', 'dummy', mock.Mock()
+            )
+        self.assertEqual(
+            logs,
+            [
+                'This app cannot send emails to users.',
+                'This app cannot send emails to users.',
+            ],
+        )
+
 
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to not mergeable change list emails sent to admin."""
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
@@ -9287,6 +8946,16 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             'Thanks!',
             messages[0].html,
         )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_not_mergeable_change_list_to_admin_for_review(
+                'dummy', 1, 1, [mock.Mock()]
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
 
 
 class MailchimpSecretTest(test_utils.GenericTestBase):
@@ -9349,22 +9018,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         )
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
 
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
-    )
-    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        email_manager.send_reminder_mail_to_notify_curriculum_admins(
-            [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL], []
-        )
-
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 0)
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    @test_utils.set_platform_parameters(
-        [(param_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([])
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             email_manager.send_reminder_mail_to_notify_curriculum_admins([], [])
@@ -9377,7 +9031,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
             (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
             (
@@ -9399,7 +9052,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -9458,7 +9110,6 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
@@ -9523,13 +9174,22 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         )
         self.assertEqual(sent_email_model.html_body, expected_email_html_body)
 
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                [mock.Mock()], [mock.Mock()]
+            )
+        self.assertEqual(logs, ['This app cannot send emails to users.'])
+
 
 class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
     """Tests for the voiceover regeneration notification emails."""
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
@@ -9611,7 +9271,6 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
@@ -9689,7 +9348,6 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
@@ -9852,3 +9510,112 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
 
         models_after = len(email_models.SentEmailModel.query().fetch())
         self.assertEqual(models_before, models_after)
+
+
+class EmailManagerCoverageTests(test_utils.EmailTestBase):
+    """Tests to cover specific branches in email_manager.py."""
+
+    def test_coverage_branches(self) -> None:
+        mock_prefs = mock.Mock()
+        mock_prefs.can_receive_subscription_email = False
+        mock_prefs.can_receive_email_updates = False
+        mock_prefs.can_receive_feedback_message_email = False
+
+        mock_settings = mock.Mock()
+        mock_settings.username = 'dummy_username'
+
+        with self.swap(
+            user_services,
+            'get_users_email_preferences',
+            lambda user_ids, **kwargs: [mock_prefs] * len(user_ids),
+        ), self.swap(
+            user_services,
+            'get_email_preferences',
+            lambda *args, **kwargs: mock_prefs,
+        ), self.swap(
+            user_services,
+            'get_users_settings',
+            lambda user_ids, **kwargs: [mock_settings] * len(user_ids),
+        ), self.swap(
+            subscription_services,
+            'get_all_subscribers_of_creator',
+            lambda *args, **kwargs: ['subscriber_1'],
+        ), self.swap(
+            user_services,
+            'get_usernames',
+            lambda *args, **kwargs: ['subscriber_username'],
+        ):
+            email_manager.send_emails_to_subscribers(
+                'creator_id', 'exp_id', 'exp_title'
+            )
+            email_manager.send_suggestion_email(
+                'dummy_type', 'category', 'exp_id', ['target_node_id']
+            )
+            email_manager.send_instant_feedback_message_email(
+                'recipient_id',
+                'sender_id',
+                'message',
+                'subject',
+                'title',
+                'exp_id',
+                'thread_title',
+            )
+            email_manager.send_mail_to_onboard_new_reviewers(
+                'recipient_id', 'category'
+            )
+            email_manager.send_mail_to_notify_users_to_review(
+                'recipient_id', 'category'
+            )
+            email_manager.send_email_to_new_cd_user(
+                'recipient_id',
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                None,
+            )
+            email_manager.send_email_to_removed_cd_user(
+                'recipient_id',
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                None,
+            )
+
+        with self.swap(
+            topic_services,
+            'get_topic_ids_for_exploration_id',
+            lambda x: ['dummy'],
+        ), self.swap(
+            classroom_config_services,
+            'get_classroom_by_topic_id',
+            lambda x: None,
+        ):
+            getattr(email_manager, '_get_classroom_feedback_recipient_email')(
+                'exp_id'
+            )
+
+        dummy_data = {
+            'task': 'dummy',
+            'category': 'dummy',
+            'description': 'dummy',
+            'rights_message': 'dummy',
+            'description_template': 'dummy',
+            'rights_message_template': 'dummy',
+            'to_review': 'dummy',
+        }
+        email_manager.NEW_CD_USER_EMAIL_DATA['DUMMY'] = dummy_data
+        try:
+            with self.swap(
+                user_services,
+                'get_email_preferences',
+                lambda *args, **kwargs: mock_prefs,
+            ), self.swap(
+                user_services, 'get_username', lambda *args, **kwargs: 'dummy'
+            ):
+                email_manager.send_email_to_new_cd_user(
+                    'recipient_id', 'DUMMY', None
+                )
+        finally:
+            del email_manager.NEW_CD_USER_EMAIL_DATA['DUMMY']
+        mock_path_instance = mock.Mock()
+        mock_path_instance.exists.return_value = False
+        with self.swap(pathlib, 'Path', lambda path: mock_path_instance):
+            email_manager._delete_voiceover_error_attachments(  # pylint: disable=protected-access
+                [{'filename': 'dummy', 'path': 'dummy'}]
+            )

@@ -399,9 +399,12 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-
     await this.typeInInputField(usernameSelector, username);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
     await this.clickOnElementWithSelector(termsCheckboxSelector);
+
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
@@ -1883,12 +1886,20 @@ export class BaseUser {
     shouldBeNavigable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
-
     const currentUrl = this.page.url();
 
-    await chapterElement.click();
-    // Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
-    await this.waitForPageToFullyLoad();
+    if (shouldBeNavigable) {
+      // If it should navigate, wait for navigation concurrently with click to avoid
+      // execution context destroyed errors during page load.
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        chapterElement.click(),
+      ]);
+    } else {
+      await chapterElement.click();
+      await this.page.waitForTimeout(2000); // Wait briefly to verify no navigation happens.
+    }
+
     const newUrl = this.page.url();
     const didNavigate = newUrl !== currentUrl;
 
