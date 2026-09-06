@@ -297,7 +297,7 @@ def get_available_providers_for_ui() -> List[Dict[str, str]]:
         [
             {
                 'id': pid,
-                'displayName': feconf.MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES.get(
+                'display_name': feconf.MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES.get(
                     pid, pid.capitalize()
                 ),
             }

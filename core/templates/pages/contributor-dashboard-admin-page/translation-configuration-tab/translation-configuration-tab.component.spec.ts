@@ -26,7 +26,7 @@ import {
 import {TranslationConfigurationTabComponent} from './translation-configuration-tab.component';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {TranslationAdminConfig} from '../contributor-dashboard-admin-summary.model';
+import {TranslationAdminConfig} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {FormsModule} from '@angular/forms';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIconModule} from '@angular/material/icon';

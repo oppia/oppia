@@ -26,7 +26,7 @@ import {AppConstants} from 'app.constants';
 import {
   TranslationAdminConfig,
   TranslationAdminConfigBackendDict,
-} from '../contributor-dashboard-admin-summary.model';
+} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 export interface ViewContributionBackendResponse {
   usernames: string[];

@@ -99,7 +99,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         expected_protected = (
             '<span data-temp-attr-name="alt-with-value" data-temp-comp-id="0">A red car</span>'
             '<span data-temp-attr-name="caption-with-value" data-temp-comp-id="0">Figure 1</span>'
-            '<oppia-noninteractive-image filepath-with-value="img.png" data-temp-comp-id="0" translate="no">'
+            '<oppia-noninteractive-image data-temp-comp-id="0" filepath-with-value="img.png" translate="no">'
             '</oppia-noninteractive-image>'
         )
         self.assertEqual(protected, expected_protected)

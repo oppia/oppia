@@ -267,7 +267,7 @@ export interface TranslationProviderOption {
 export interface TranslationAdminConfigBackendDict {
   provider_mapping: Record<string, string>;
   automatic_translation_is_enabled: boolean;
-  available_providers: {id: string; displayName: string}[];
+  available_providers: {id: string; display_name: string}[];
 }
 
 export class TranslationAdminConfig {
@@ -285,7 +285,7 @@ export class TranslationAdminConfig {
       backendDict.automatic_translation_is_enabled,
       backendDict.available_providers.map(p => ({
         id: p.id,
-        displayName: p.displayName,
+        displayName: p.display_name,
       }))
     );
   }

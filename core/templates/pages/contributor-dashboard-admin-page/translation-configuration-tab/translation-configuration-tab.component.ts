@@ -21,7 +21,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {TranslationProviderOption} from '../contributor-dashboard-admin-summary.model';
+import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 interface LanguageOption {
   code: string;
