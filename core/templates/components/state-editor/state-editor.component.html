@@ -85,4 +85,17 @@
       </state-skill-editor>
     </div>
   </div>
+  <div class="oppia-tour-empty-state-placeholder" *ngIf="!interactionIdIsSet || currentStateIsTerminal" tabindex="0">
+    Once you add an interaction, learner response options will appear here.
+  </div>
 </div>
+
+<style>
+  .oppia-tour-empty-state-placeholder {
+    padding: 16px;
+    border: 1px dashed #9e9e9e;
+    border-radius: 4px;
+    color: #666;
+    font-style: italic;
+  }
+</style>
