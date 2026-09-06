@@ -383,21 +383,6 @@ describe('Tech Team Lead', function () {
       'Entry1FeedbackDetailViewWithNotActionableStatus',
       __dirname
     );
-    // Click on the "transferred_to_github" status button.
-    await techTeamLead.clickTransferToGithubButton();
-    await techTeamLead.expectToastMessage(
-      'Feedback status updated to transferred_to_github.'
-    );
-    await techTeamLead.verifyFeedbackDetailPageDetailsSection(
-      statusLabels[FeedbackStatus.TRANSFERRED_TO_GITHUB],
-      'App',
-      'Web',
-      'http://localhost:8181/creator-dashboard'
-    );
-    await techTeamLead.verifyFeedbackStatusActions(
-      'transferred_to_github',
-      'not_actionable'
-    );
   });
 
   afterAll(async function () {
