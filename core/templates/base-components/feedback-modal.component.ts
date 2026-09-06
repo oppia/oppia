@@ -107,6 +107,7 @@ export class FeedbackModalComponent implements OnInit {
   captchaSiteKey: string | null = null;
   captchaLoadError: string | null = null;
   captchaSubmitError: string | null = null;
+  isSubmittingFeedback: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -334,6 +335,7 @@ export class FeedbackModalComponent implements OnInit {
     if (!this.isFormValid()) {
       return;
     }
+    this.isSubmittingFeedback = true;
     switch (this.feedbackModalType) {
       case FeedbackModalType.LESSON_FEEDBACK:
         await this.submitLessonFeedback();
@@ -347,6 +349,7 @@ export class FeedbackModalComponent implements OnInit {
         await this.submitSiteIssue();
         break;
     }
+    this.isSubmittingFeedback = false;
   }
 
   private getLessonFeedbackMetadata(): LessonFeedbackMetadata {
@@ -559,6 +562,7 @@ export class FeedbackModalComponent implements OnInit {
     this.formError = null;
     this.captchaToken = '';
     this.captchaSubmitError = null;
+    this.isSubmittingFeedback = false;
     this.removeScreenshot();
     if (this.feedbackBottomSheetRef) {
       this.feedbackBottomSheetRef.dismiss();

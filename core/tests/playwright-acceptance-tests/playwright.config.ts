@@ -25,7 +25,7 @@ const PLAYWRIGHT_RESULTS_DIR = path.resolve(
 );
 
 const isMobile = process.env.MOBILE === 'true';
-const isCI = process.env.PROD_ENV === 'true';
+const isProd = process.env.PROD_ENV === 'true';
 
 export default defineConfig({
   expect: {
@@ -39,12 +39,12 @@ export default defineConfig({
   testDir: './specs',
   timeout: 300000,
   fullyParallel: false,
-  reporter: 'list',
+  reporter: [['./reporters/compact-reporter.ts']],
   use: {
     baseURL: 'http://localhost:8181',
     headless: process.env.HEADLESS !== 'false',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: 'off',
     video: 'on-first-retry',
   },
   snapshotPathTemplate:
@@ -52,13 +52,13 @@ export default defineConfig({
   projects: isMobile
     ? [
         {
-          name: isCI ? 'prod-mobile' : 'dev-mobile',
+          name: isProd ? 'prod-mobile' : 'dev-mobile',
           use: {...devices['Pixel 7'], video: 'on'},
         },
       ]
     : [
         {
-          name: isCI ? 'prod-desktop' : 'dev-desktop',
+          name: isProd ? 'prod-desktop' : 'dev-desktop',
           use: {...devices['Desktop Chrome'], video: 'on'},
         },
       ],

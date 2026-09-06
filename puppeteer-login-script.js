@@ -57,6 +57,7 @@ module.exports = async (browser, context) => {
     await setRole(page, 'BLOG_ADMIN');
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
+  await page.close();
 };
 
 const seedBlankPagesForLighthouseRuns = async function (
@@ -65,10 +66,9 @@ const seedBlankPagesForLighthouseRuns = async function (
   context
 ) {
   const numberOfRuns = Number(context.options.numberOfRuns) || 1;
-  await page.goto('about:blank');
 
   let pages = await browser.pages();
-  for (let i = pages.length; i < numberOfRuns; i++) {
+  for (let i = pages.length; i <= numberOfRuns; i++) {
     const blankPage = await browser.newPage();
     await blankPage.goto('about:blank');
   }

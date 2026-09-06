@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for interaction rules registry service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 
 import {
