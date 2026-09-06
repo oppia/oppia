@@ -236,6 +236,11 @@ def postprocess_translated_html(translated_html: str) -> str:
     6. Strips any remaining translate="no" via regex.
     7. Runs the result through html_cleaner.clean() for final sanitization.
 
+    Example:
+        Input: '<p>Haga clic <a href="https://example.com">aquí</a> para un <span data-temp-comp-id="0" data-temp-attr-name="alt-with-value">"Un coche rojo"</span><oppia-noninteractive-image data-temp-comp-id="0" translate="no"></oppia-noninteractive-image></p>'
+        Output: '<p>Haga clic <a href="https://example.com">aquí</a> para un <oppia-noninteractive-image alt-with-value="&amp;quot;Un coche rojo&amp;quot;"></oppia-noninteractive-image></p>'
+
+
     Args:
         translated_html: str. The raw HTML returned by the translation API.
 
