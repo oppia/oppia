@@ -1165,6 +1165,8 @@
   "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE": "Logout | Oppia",
   "I18N_LOGOUT_PAGE_TITLE": "Logout",
   "I18N_MODAL_CANCEL_BUTTON": "Cancel",
+  "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_1": "It looks like your translation contains a math formula written as plain text. In Right-to-Left (RTL) languages, plain-text formulas can break and render out of order.",
+  "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_2": "Are you sure you want to save anyway, or would you like to continue editing and use the <strong>Math Formula component</strong> instead?",
   "I18N_MODAL_CONTINUE_BUTTON": "Continue",
   "I18N_MODAL_REMOVE_BUTTON": "Remove",
   "I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "Step into Oppia Classrooms and explore educational materials curated by our team with your learning journey in mind!",
@@ -1934,7 +1936,10 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2_CONTENT": "Collaborate alongside peers to develop your skills through contributing to a meaningful, open-source project.",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Meaningful projects",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Your work directly helps underserved students around the world gain access to free, high-quality education.",
+  "I18N_WARNING_MATH_EXPRESSION_MINIMIZED": "&nbsp;Math expression warning",
   "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
   "I18N_WARNING_MODAL_TITLE": "Warning!",
+  "I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION": "This content contains plain-text math expressions. Consider using<br class=\"d-none d-md-inline\"> the <strong>Math Formula (x²)</strong> component to ensure correct rendering across all languages.",
+  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "<strong>Warning:</strong> Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using<br class=\"d-none d-md-inline\"> the <strong>Math Formula (x²)</strong> tool from the editor toolbar above.",
   "I18N_YES": "Yes"
 }
