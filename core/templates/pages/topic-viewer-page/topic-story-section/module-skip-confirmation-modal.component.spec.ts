@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ArcSkipConfirmationModalComponent.
+ * @fileoverview Unit tests for ModuleSkipConfirmationModalComponent.
  */
 
 import {TestBed, waitForAsync} from '@angular/core/testing';
@@ -25,10 +25,10 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
+import {ModuleSkipConfirmationModalComponent} from './module-skip-confirmation-modal.component';
 
-describe('ArcSkipConfirmationModalComponent', () => {
-  let component: ArcSkipConfirmationModalComponent;
+describe('ModuleSkipConfirmationModalComponent', () => {
+  let component: ModuleSkipConfirmationModalComponent;
   let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
 
   beforeEach(waitForAsync(() => {
@@ -38,16 +38,18 @@ describe('ArcSkipConfirmationModalComponent', () => {
     ]);
 
     TestBed.configureTestingModule({
-      declarations: [ArcSkipConfirmationModalComponent, MockTranslatePipe],
+      declarations: [ModuleSkipConfirmationModalComponent, MockTranslatePipe],
       providers: [{provide: NgbActiveModal, useValue: ngbActiveModal}],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    const fixture = TestBed.createComponent(ArcSkipConfirmationModalComponent);
+    const fixture = TestBed.createComponent(
+      ModuleSkipConfirmationModalComponent
+    );
     component = fixture.componentInstance;
-    component.adventureLabel = 'Adventure 2';
-    component.confirmationMessage = 'Adventure 1 will be skipped';
+    component.moduleLabel = 'Module 2';
+    component.confirmationMessage = 'Module 1 will be skipped';
   });
 
   it('should dismiss the modal when cancel is called', () => {
@@ -63,31 +65,32 @@ describe('ArcSkipConfirmationModalComponent', () => {
   });
 
   it('should render the title, message, and action buttons', () => {
-    const fixture = TestBed.createComponent(ArcSkipConfirmationModalComponent);
-    fixture.componentInstance.adventureLabel = 'Adventure 2';
-    fixture.componentInstance.confirmationMessage =
-      'Adventure 1 will be skipped';
+    const fixture = TestBed.createComponent(
+      ModuleSkipConfirmationModalComponent
+    );
+    fixture.componentInstance.moduleLabel = 'Module 2';
+    fixture.componentInstance.confirmationMessage = 'Module 1 will be skipped';
     fixture.detectChanges();
 
     expect(
-      fixture.nativeElement.querySelector('.arc-skip-confirmation-title')
+      fixture.nativeElement.querySelector('.module-skip-confirmation-title')
     ).toBeTruthy();
     expect(
       fixture.nativeElement
-        .querySelector('.arc-skip-confirmation-message')
+        .querySelector('.module-skip-confirmation-message')
         .textContent.trim()
-    ).toBe('Adventure 1 will be skipped');
+    ).toBe('Module 1 will be skipped');
     expect(
-      fixture.nativeElement.querySelector('.arc-skip-confirmation-cancel')
+      fixture.nativeElement.querySelector('.module-skip-confirmation-cancel')
     ).toBeTruthy();
     expect(
-      fixture.nativeElement.querySelector('.arc-skip-confirmation-proceed')
+      fixture.nativeElement.querySelector('.module-skip-confirmation-proceed')
     ).toBeTruthy();
   });
 
   describe('when opened as MatBottomSheet', () => {
     let bottomSheetRef: jasmine.SpyObj<
-      MatBottomSheetRef<ArcSkipConfirmationModalComponent>
+      MatBottomSheetRef<ModuleSkipConfirmationModalComponent>
     >;
 
     beforeEach(waitForAsync(() => {
@@ -95,15 +98,15 @@ describe('ArcSkipConfirmationModalComponent', () => {
 
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
-        declarations: [ArcSkipConfirmationModalComponent, MockTranslatePipe],
+        declarations: [ModuleSkipConfirmationModalComponent, MockTranslatePipe],
         providers: [
           {provide: NgbActiveModal, useValue: ngbActiveModal},
           {provide: MatBottomSheetRef, useValue: bottomSheetRef},
           {
             provide: MAT_BOTTOM_SHEET_DATA,
             useValue: {
-              adventureLabel: 'Adventure 2',
-              confirmationMessage: 'Adventure 1 will be skipped',
+              moduleLabel: 'Module 2',
+              confirmationMessage: 'Module 1 will be skipped',
             },
           },
         ],
@@ -112,14 +115,14 @@ describe('ArcSkipConfirmationModalComponent', () => {
 
     beforeEach(() => {
       const fixture = TestBed.createComponent(
-        ArcSkipConfirmationModalComponent
+        ModuleSkipConfirmationModalComponent
       );
       component = fixture.componentInstance;
     });
 
     it('should read data from MAT_BOTTOM_SHEET_DATA', () => {
-      expect(component.adventureLabel).toBe('Adventure 2');
-      expect(component.confirmationMessage).toBe('Adventure 1 will be skipped');
+      expect(component.moduleLabel).toBe('Module 2');
+      expect(component.confirmationMessage).toBe('Module 1 will be skipped');
     });
 
     it('should dismiss the bottom sheet on confirm', () => {

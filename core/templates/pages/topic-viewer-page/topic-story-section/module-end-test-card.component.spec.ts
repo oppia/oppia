@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdventureEndTestCardComponent.
+ * @fileoverview Unit tests for ModuleEndTestCardComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 
-import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
+import {ModuleEndTestCardComponent} from './module-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -32,9 +33,9 @@ class MockWindowRef {
   };
 }
 
-describe('AdventureEndTestCardComponent', () => {
-  let component: AdventureEndTestCardComponent;
-  let fixture: ComponentFixture<AdventureEndTestCardComponent>;
+describe('ModuleEndTestCardComponent', () => {
+  let component: ModuleEndTestCardComponent;
+  let fixture: ComponentFixture<ModuleEndTestCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
 
@@ -45,7 +46,7 @@ describe('AdventureEndTestCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [AdventureEndTestCardComponent, MockTranslatePipe],
+      declarations: [ModuleEndTestCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
@@ -59,7 +60,7 @@ describe('AdventureEndTestCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdventureEndTestCardComponent);
+    fixture = TestBed.createComponent(ModuleEndTestCardComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
@@ -107,6 +108,53 @@ describe('AdventureEndTestCardComponent', () => {
     expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
   });
 
+  it('should fall back and hide the image when thumbnail loading fails', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/fallback-thumbnail.webp'
+    );
+    component.thumbnailUrl = '/assets/broken-thumbnail.png';
+    fixture.detectChanges();
+    const thumbnail = fixture.debugElement.query(
+      By.css('.module-end-test-card-image')
+    );
+
+    thumbnail.nativeElement.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/fallback-thumbnail.webp'
+    );
+    expect(component.isThumbnailVisible).toBeTrue();
+
+    thumbnail.nativeElement.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    expect(component.isThumbnailVisible).toBeFalse();
+    expect(
+      thumbnail.nativeElement.classList.contains(
+        'module-end-test-card-image-hidden'
+      )
+    ).toBeTrue();
+  });
+
+  it('should show a new thumbnail when the input changes', () => {
+    component.thumbnailUrl = '/assets/updated-thumbnail.png';
+    component.isThumbnailVisible = false;
+
+    component.ngOnChanges({
+      thumbnailUrl: new SimpleChange(
+        '/assets/previous-thumbnail.png',
+        component.thumbnailUrl,
+        false
+      ),
+    });
+
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/updated-thumbnail.png'
+    );
+    expect(component.isThumbnailVisible).toBeTrue();
+  });
+
   it('should execute navigateTo when url is provided', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
 
@@ -127,6 +175,26 @@ describe('AdventureEndTestCardComponent', () => {
     expect(() => {
       component.navigateTo('');
     }).not.toThrowError();
+  });
+
+  it('should navigate to practice when questions are available', () => {
+    spyOn(component, 'navigateTo');
+    component.practiceUrl = '/practice/session';
+    component.hasPracticeQuestions = true;
+
+    component.onPracticeButtonClick();
+
+    expect(component.navigateTo).toHaveBeenCalledWith('/practice/session');
+  });
+
+  it('should not navigate when practice questions are unavailable', () => {
+    spyOn(component, 'navigateTo');
+    component.practiceUrl = '/practice/session';
+    component.hasPracticeQuestions = false;
+
+    component.onPracticeButtonClick();
+
+    expect(component.navigateTo).not.toHaveBeenCalled();
   });
 
   it('should return provided practice description', () => {
