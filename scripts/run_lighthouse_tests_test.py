@@ -297,7 +297,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 {
                     'stdout': -1,
                     'stderr': -1,
-                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '1'},
                 }
             ],
         )
@@ -332,7 +332,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 {
                     'stdout': -1,
                     'stderr': -1,
-                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '1'},
                 }
             ],
         )
@@ -376,7 +376,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 {
                     'stdout': -1,
                     'stderr': -1,
-                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '1'},
                 }
             ],
         )
@@ -419,7 +419,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 {
                     'stdout': -1,
                     'stderr': -1,
-                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '0'},
+                    'env': {**os.environ.copy(), 'LIGHTHOUSE_SHARD': '1'},
                 }
             ],
         )
@@ -994,7 +994,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
             mock_run_puppeteer_script,
-            expected_args=((True, 0),),
+            expected_args=((True, 2),),
         )
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests,
@@ -1049,6 +1049,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                         args=[
                                             '--skip_build',
                                             '--record_screen',
+                                            '--shard',
+                                            '2',
                                         ]
                                     )
 

@@ -79,7 +79,7 @@ _PARSER.add_argument(
         'blog runs.'
     ),
     type=int,
-    default=0,
+    required=True,
 )
 
 
@@ -110,7 +110,7 @@ def _drain_pipe(stream: IO[bytes], output_lines: list[bytes]) -> None:
 
 
 def run_lighthouse_puppeteer_script(
-    record: bool = False, shard: int = 0
+    record: bool = False, shard: int = 1
 ) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
 
@@ -216,8 +216,6 @@ def _get_lighthouse_entities(
 
     Args:
         shard: int. The one-based index of the Lighthouse shard being run.
-            When 0, no shard identity was provided and the full setup runs to
-            be safe.
         record: bool. Whether to record the puppeteer setup via the screen
             recorder.
 

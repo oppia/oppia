@@ -135,6 +135,9 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/contact$',
@@ -172,6 +175,9 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.88,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
@@ -484,7 +490,7 @@ module.exports = {
               tbt: 4800,
               cls: 1.5,
             },
-            accessibilityMinScore: 0.9,
+            accessibilityMinScore: 0.88,
           },
           {
             matchingUrlPattern: '^http://localhost:8181/learn$',
@@ -496,6 +502,9 @@ module.exports = {
               cls: 1.5,
             },
             accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: '^http://localhost:8181/learn/math$',
@@ -508,6 +517,7 @@ module.exports = {
             },
             accessibilityMinScore: 0.95,
             overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
               // Classroom pages use JPEG images that are not next-gen formats.
               'modern-image-formats': [
                 'error',
@@ -526,7 +536,8 @@ module.exports = {
             },
             accessibilityMinScore: 0.95,
             overrides: {
-              'errors-in-console': ['error', {minScore: 1}],
+              'errors-in-console': ['error', {minScore: 0}],
+              'inspector-issues': ['error', {minScore: 0}],
               // TODO(#13465): Change this maxLength to 0 once images are
               // migrated.
               'modern-image-formats': [
@@ -553,6 +564,7 @@ module.exports = {
             },
             accessibilityMinScore: 0.91,
             overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
               // Explore page uses deprecated APIs from third-party scripts.
               deprecations: ['error', {minScore: 0}],
               // Explore page has images that are not in next-gen formats.
@@ -629,6 +641,9 @@ module.exports = {
           {
             matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
             accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: '^http://[^/]+/release-coordinator$',

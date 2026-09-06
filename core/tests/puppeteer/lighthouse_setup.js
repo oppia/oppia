@@ -39,10 +39,6 @@ var topicId = 'Topic editor not loaded';
 var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
-var learnerGroupId = 'Learner group not loaded';
-var technicalFeedbackReportId = 'Technical feedback report not loaded';
-var certificateId = 'Certificate not loaded';
-var attemptId = 'Attempt not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -112,11 +108,6 @@ var classroomEditButton = '.e2e-test-edit-classroom-config-button';
 var diagnosticTestStatusButton = '.e2e-test-toggle-diagnostic-test-status-btn';
 var classroomSaveButton = '.e2e-test-save-classroom-config-button';
 var classroomNameView = '.e2e-test-classroom-name-view';
-var featuresTab = '.e2e-test-features-tab';
-var featureFlagDiv = '.e2e-test-feature-flag';
-var featureFlagNameSelector = '.e2e-test-feature-name';
-var featureFlagValueSelector = '.e2e-test-value-selector';
-var featureFlagSaveButton = '.e2e-test-save-button';
 var generateClassroomCountInput =
   '#label-target-number-of-classrooms-to-generate';
 var generateDefaultClassroomCountInput =
@@ -578,24 +569,6 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
           : '';
       });
     } while (statusMessage !== successMessage);
-
-    // Capture the seeded learner group id from the facilitator dashboard,
-    // which lists the groups the admin is a facilitator of.
-    learnerGroupId = await page.evaluate(async () => {
-      const response = await fetch('/facilitator_dashboard_handler');
-      const data = await response.json();
-      return data.learner_groups_list[0].id;
-    });
-
-    // Capture the seeded technical feedback report id from the
-    // technical-external dashboard summaries.
-    technicalFeedbackReportId = await page.evaluate(async () => {
-      const response = await fetch(
-        '/platform-feedback/technical/tech-external'
-      );
-      const data = await response.json();
-      return data.summaries.length > 0 ? data.summaries[0].id : null;
-    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -612,9 +585,8 @@ const generateDataForClassroom = async function (browser, page) {
 
     await page.waitForSelector(generateClassroomButton);
     // Only the first dummy math classroom is needed here: it backs the
-    // diagnostic test toggle, the topic thumbnails and the certificate
-    // offering/attempt captures below. The classroom routes get their
-    // additional populated classrooms from generateBareClassrooms.
+    // diagnostic test toggle and the topic thumbnails. The classroom routes
+    // get their additional populated classrooms from generateBareClassrooms.
     await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
@@ -637,31 +609,8 @@ const generateDataForClassroom = async function (browser, page) {
     await addThumbnailToTopic(page, 'Multiplication');
     await addThumbnailToTopic(page, 'Division');
 
-    // Capture the seeded certificate offering and the attempt started for the
-    // admin so that the certificate pages render real content. Shards that do
-    // not enable the certificate flag (or that run before the certificate data
-    // is seeded) receive a non-JSON response, so the parse failures are caught
-    // and treated as "no certificate data" instead of failing the setup.
-    certificateId = await page.evaluate(async () => {
-      const response = await fetch('/certificate_assessment_offering_handler');
-      try {
-        const data = await response.json();
-        return data.certificate_offerings.length > 0
-          ? data.certificate_offerings[0].id
-          : null;
-      } catch (error) {
-        return null;
-      }
-    });
-    attemptId = await page.evaluate(async () => {
-      const response = await fetch('/certificate_assessment_attempts_handler');
-      try {
-        const data = await response.json();
-        return data.attempts.length > 0 ? data.attempts[0].attempt_id : null;
-      } catch (error) {
-        return null;
-      }
-    });
+    // The certificate pages are not part of any Lighthouse shard, so no
+    // certificate offering or attempt is captured here.
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -902,61 +851,6 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   }
 };
 
-const enableFeatureFlag = async function (browser, page, featureName) {
-  try {
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://localhost:8181/release-coordinator', {
-      waitUntil: networkIdle,
-    });
-    await page.waitForSelector(featuresTab);
-    await page.click(featuresTab);
-
-    // Locate the feature flag card and force-enable it for all users.
-    await page.waitForSelector(featureFlagDiv);
-    const featureFlags = await page.$$(featureFlagDiv);
-    let targetFeatureFlag = null;
-    for (let i = 0; i < featureFlags.length; i++) {
-      const featureFlagNameElement = await featureFlags[i].$(
-        featureFlagNameSelector
-      );
-      const featureFlagName = await page.evaluate(
-        element => element.textContent.trim(),
-        featureFlagNameElement
-      );
-      if (featureFlagName === featureName) {
-        targetFeatureFlag = featureFlags[i];
-        break;
-      }
-    }
-    if (!targetFeatureFlag) {
-      throw new Error(`Feature flag ${featureName} was not found.`);
-    }
-
-    await targetFeatureFlag.waitForSelector(featureFlagValueSelector);
-    const valueSelectorElement = await targetFeatureFlag.$(
-      featureFlagValueSelector
-    );
-    await valueSelectorElement.select('0: true');
-
-    await targetFeatureFlag.waitForSelector(
-      `${featureFlagSaveButton}:not([disabled])`,
-      {visible: true}
-    );
-    const saveButtonElement = await targetFeatureFlag.$(featureFlagSaveButton);
-    await saveButtonElement.click();
-
-    // Wait for the feature flag configuration to be saved.
-    await targetFeatureFlag.waitForSelector(
-      `${featureFlagSaveButton}[disabled]`,
-      {visible: true}
-    );
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    process.exit(1);
-  }
-};
-
 const addThumbnailToTopic = async function (page, topicName) {
   try {
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
@@ -1040,76 +934,6 @@ const setRoles = async function (browser, page, roles) {
   }
 };
 
-const runDataPagesSetup = async function (browser, page, roles) {
-  await logStep('exploration editor setup', () =>
-    getExplorationEditorUrl(browser, page)
-  );
-  await logStep('assigning roles', () => setRoles(browser, page, roles));
-
-  // Feature flags must be enabled before the data-generation steps below,
-  // because those steps fetch the handlers that are gated by the flags (e.g.
-  // the learner group and technical feedback dashboard captures inside
-  // generateDataForTopicAndStoryPlayer). On a fresh datastore the flags start
-  // disabled, so enabling them here avoids the captures failing.
-  await logStep('enabling story_editor_arcs flag', () =>
-    enableFeatureFlag(browser, page, 'story_editor_arcs')
-  );
-  await logStep('enabling learner_groups flag', () =>
-    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
-  );
-  await logStep('enabling technical_feedback flag', () =>
-    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
-  );
-  await logStep('enabling certificate_assessment flag', () =>
-    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
-  );
-  await logStep('topic editor URL setup', () =>
-    getTopicEditorUrl(browser, page)
-  );
-  await logStep('story editor URL setup', () =>
-    getStoryEditorUrl(browser, page)
-  );
-  await logStep('skill editor URL setup', () =>
-    getSkillEditorUrl(browser, page)
-  );
-  await logStep('generating topic and story data', () =>
-    generateDataForTopicAndStoryPlayer(browser, page)
-  );
-  await logStep('generating math classroom', () =>
-    generateDataForClassroom(browser, page)
-  );
-  await logStep('enabling diagnostic test', () =>
-    enableDiagnosticTestForMathClassroom(browser, page)
-  );
-  await logStep('generating dummy explorations', () =>
-    generateDummyExplorations(browser, page)
-  );
-  await logStep('loading all-interactions exploration', () =>
-    reloadAllInteractionsExploration(browser, page)
-  );
-  await logStep('generating bare classrooms', () =>
-    generateBareClassrooms(browser, page)
-  );
-};
-
-const runFullSetup = async function (browser, page) {
-  await logStep('logging in', () => login(browser, page));
-  await logStep('data pages setup', () =>
-    runDataPagesSetup(browser, page, [
-      'COLLECTION_EDITOR',
-      'VOICEOVER_ADMIN',
-      'ADMIN',
-      'RELEASE_COORDINATOR',
-      'FULL_USER',
-      'TECH_TEAM_LEAD',
-      'TRANSLATION_ADMIN',
-    ])
-  );
-  await logStep('generating blog posts', () =>
-    generateDataForBlogPosts(browser, page)
-  );
-};
-
 const shard2Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 2 audits the release-coordinator role-gated page and the
@@ -1171,9 +995,6 @@ const shard4Setup = async function (browser, page) {
   // which the CI super-admin user can access without an additional role.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
-  );
-  await logStep('enabling learner_groups flag', () =>
-    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
   );
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic, plus the learner group and technical feedback report. The
@@ -1241,16 +1062,25 @@ const main = async function () {
     await recorder.start(videoPath);
   }
 
-  const shard = Number(process.env.LIGHTHOUSE_SHARD || 0);
+  const shard = Number(process.env.LIGHTHOUSE_SHARD);
+  // Shards have dedicated, minimal setups. Shards 2, 3 and 4 seed the data
+  // their pages need; shard 1 audits only static, public pages, so it needs no
+  // setup at all.
   const shardSetupRunners = {
+    1: async function () {},
     2: shard2Setup,
     3: shard3Setup,
     4: shard4Setup,
   };
-  // Each shard runs only the setup its pages need. Shard 1 audits only static
-  // public pages, so the runner never invokes this script for it. An unset
-  // shard (0) keeps the previous full setup for local runs.
-  const runShardSetup = shardSetupRunners[shard] || runFullSetup;
+  const runShardSetup = shardSetupRunners[shard];
+  if (!runShardSetup) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `No setup exists for LIGHTHOUSE_SHARD ${shard}. Configured shards: ` +
+        `${Object.keys(shardSetupRunners).join(', ')}.`
+    );
+    process.exit(1);
+  }
   // Only record the entities and URL lines produced by the steps the current
   // shard ran, so that unresolvable URLs are not reported. The flags below
   // mirror the setup steps each shard function executes.
@@ -1261,17 +1091,11 @@ const main = async function () {
         ? 'data-player'
         : shard === 4
           ? 'editors'
-          : 'full';
-  const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
+          : 'static';
+  const ranBlogSetup = setupKind === 'blog';
   const ranExplorationSetup =
-    setupKind === 'data' ||
-    setupKind === 'data-player' ||
-    setupKind === 'full' ||
-    setupKind === 'blog';
-  const ranTopicStorySkillSetup =
-    setupKind === 'data' || setupKind === 'full' || setupKind === 'editors';
-  const ranStructuresSetup = setupKind === 'data' || setupKind === 'full';
-  const ranClassroomSetup = setupKind === 'data' || setupKind === 'full';
+    setupKind === 'data-player' || setupKind === 'blog';
+  const ranTopicStorySkillSetup = setupKind === 'editors';
 
   await runShardSetup(browser, page);
 
@@ -1284,17 +1108,6 @@ const main = async function () {
     envEntries.push(`story_id=${storyId}`);
     envEntries.push(`skill_id=${skillId}`);
   }
-  if (ranStructuresSetup) {
-    envEntries.push(`learner_group_id=${learnerGroupId}`);
-    envEntries.push(
-      `technical_feedback_report_id=${technicalFeedbackReportId}`
-    );
-  }
-  if (ranClassroomSetup) {
-    envEntries.push(`certificate_id=${certificateId}`);
-    envEntries.push(`attempt_id=${attemptId}`);
-    envEntries.push(`certificate_offering_id=${certificateId}`);
-  }
   if (ranBlogSetup) {
     envEntries.push(`blog_post_url_fragment=${blogUrlFragment}`);
   }
@@ -1305,21 +1118,6 @@ const main = async function () {
     urls.push(topicEditorUrl);
     urls.push(storyEditorUrl);
     urls.push(skillEditorUrl);
-  }
-  if (ranStructuresSetup) {
-    urls.push(`http://localhost:8181/learner-group/${learnerGroupId}`);
-    urls.push(
-      `http://localhost:8181/technical-feedback-dashboard/tech-external/${technicalFeedbackReportId}`
-    );
-  }
-  if (ranClassroomSetup) {
-    urls.push(`http://localhost:8181/certificate-assessment/${certificateId}`);
-    urls.push(
-      `http://localhost:8181/certificate-assessment-result/${attemptId}`
-    );
-    urls.push(
-      `http://localhost:8181/edit-certificate-assessment-offering/${certificateId}`
-    );
   }
   if (ranExplorationSetup) {
     urls.push(explorationEditorUrl);
