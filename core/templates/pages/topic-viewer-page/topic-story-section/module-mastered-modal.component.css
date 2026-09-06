@@ -1,4 +1,4 @@
-.adventure-mastered-modal-backdrop {
+.module-mastered-modal-backdrop {
   align-items: center;
   background: rgba(16, 24, 40, 0.52);
   bottom: 0;
@@ -12,7 +12,7 @@
   z-index: 1210;
 }
 
-.adventure-mastered-modal {
+.module-mastered-modal {
   background: #fff;
   border: 1px solid #edf1f7;
   border-radius: 16px;
@@ -26,7 +26,7 @@
   width: min(620px, calc(100vw - 32px));
 }
 
-.adventure-mastered-confetti {
+.module-mastered-confetti {
   height: 120px;
   left: 0;
   pointer-events: none;
@@ -35,13 +35,13 @@
   top: 0;
 }
 
-.adventure-mastered-confetti-piece {
+.module-mastered-confetti-piece {
   border-radius: 999px;
   display: inline-block;
   position: absolute;
 }
 
-.adventure-mastered-confetti-piece.piece-1 {
+.module-mastered-confetti-piece.piece-1 {
   background: #ffb703;
   height: 16px;
   left: 10%;
@@ -49,7 +49,7 @@
   width: 6px;
 }
 
-.adventure-mastered-confetti-piece.piece-2 {
+.module-mastered-confetti-piece.piece-2 {
   background: #3b82f6;
   height: 6px;
   left: 22%;
@@ -57,7 +57,7 @@
   width: 16px;
 }
 
-.adventure-mastered-confetti-piece.piece-3 {
+.module-mastered-confetti-piece.piece-3 {
   background: #22c55e;
   height: 10px;
   left: 36%;
@@ -65,7 +65,7 @@
   width: 10px;
 }
 
-.adventure-mastered-confetti-piece.piece-4 {
+.module-mastered-confetti-piece.piece-4 {
   background: #f97316;
   height: 6px;
   left: 47%;
@@ -73,7 +73,7 @@
   width: 14px;
 }
 
-.adventure-mastered-confetti-piece.piece-5 {
+.module-mastered-confetti-piece.piece-5 {
   background: #a855f7;
   height: 12px;
   left: 62%;
@@ -81,7 +81,7 @@
   width: 8px;
 }
 
-.adventure-mastered-confetti-piece.piece-6 {
+.module-mastered-confetti-piece.piece-6 {
   background: #06b6d4;
   height: 8px;
   left: 76%;
@@ -89,7 +89,7 @@
   width: 8px;
 }
 
-.adventure-mastered-confetti-piece.piece-7 {
+.module-mastered-confetti-piece.piece-7 {
   background: #ec4899;
   height: 6px;
   left: 88%;
@@ -97,7 +97,7 @@
   width: 14px;
 }
 
-.adventure-mastered-confetti-piece.piece-8 {
+.module-mastered-confetti-piece.piece-8 {
   background: #ffb703;
   height: 12px;
   left: 16%;
@@ -105,7 +105,7 @@
   width: 12px;
 }
 
-.adventure-mastered-confetti-piece.piece-9 {
+.module-mastered-confetti-piece.piece-9 {
   background: #7c3aed;
   height: 12px;
   left: 70%;
@@ -113,7 +113,7 @@
   width: 12px;
 }
 
-.adventure-mastered-confetti-piece.piece-10 {
+.module-mastered-confetti-piece.piece-10 {
   background: #14b8a6;
   height: 10px;
   left: 83%;
@@ -121,14 +121,14 @@
   width: 10px;
 }
 
-.adventure-mastered-trophy {
+.module-mastered-trophy {
   display: block;
   height: 150px;
   margin: 52px auto 14px;
   width: 150px;
 }
 
-.adventure-mastered-title {
+.module-mastered-title {
   color: #111827;
   font-family: Roboto, Arial, sans-serif;
   font-size: 44px;
@@ -137,7 +137,7 @@
   margin: 0;
 }
 
-.adventure-mastered-message {
+.module-mastered-message {
   color: #374151;
   font-family: Roboto, Arial, sans-serif;
   font-size: 20px;
@@ -146,7 +146,7 @@
   max-width: 410px;
 }
 
-.adventure-mastered-continue {
+.module-mastered-continue {
   background: #00645c;
   border: 2px solid #00645c;
   border-radius: 6px;
@@ -159,39 +159,39 @@
   padding: 10px 22px;
 }
 
-.adventure-mastered-continue:focus-visible {
+.module-mastered-continue:focus-visible {
   outline: 2px solid #00645c;
   outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
-  .adventure-mastered-modal {
+  .module-mastered-modal {
     border-radius: 12px;
     padding: 16px 16px 18px;
     width: min(560px, calc(100vw - 24px));
   }
 
-  .adventure-mastered-confetti {
+  .module-mastered-confetti {
     height: 90px;
   }
 
-  .adventure-mastered-trophy {
+  .module-mastered-trophy {
     height: 112px;
     margin: 36px auto 12px;
     width: 112px;
   }
 
-  .adventure-mastered-title {
+  .module-mastered-title {
     font-size: 30px;
   }
 
-  .adventure-mastered-message {
+  .module-mastered-message {
     font-size: 16px;
     margin: 10px auto 16px;
     max-width: 100%;
   }
 
-  .adventure-mastered-continue {
+  .module-mastered-continue {
     font-size: 16px;
     min-height: 48px;
     min-width: 0;

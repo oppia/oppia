@@ -13,20 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Shared circular badge used in adventure navigation and lesson rows.
+ * @fileoverview Shared circular badge used in module navigation and lesson rows.
  */
 
 import {Component, Input} from '@angular/core';
-import './adventure-circle-badge.component.css';
+import './module-circle-badge.component.css';
 
 @Component({
-  selector: 'topic-adventure-circle-badge',
-  templateUrl: './adventure-circle-badge.component.html',
-  styleUrls: ['./adventure-circle-badge.component.css'],
+  selector: 'topic-module-circle-badge',
+  templateUrl: './module-circle-badge.component.html',
+  styleUrls: ['./module-circle-badge.component.css'],
 })
-export class AdventureCircleBadgeComponent {
+export class ModuleCircleBadgeComponent {
   @Input() label: string = '';
   @Input() iconName: string = '';
+  @Input() iconImageUrl: string = '';
   @Input() backgroundColor: string = '#fff';
   @Input() borderColor: string = '#7f8c8d';
   @Input() textColor: string = '#334155';
@@ -35,12 +36,16 @@ export class AdventureCircleBadgeComponent {
 
   get circleClass(): string {
     return this.size === 'sm'
-      ? 'adventure-circle-badge adventure-circle-badge--sm'
-      : 'adventure-circle-badge';
+      ? 'module-circle-badge module-circle-badge--sm'
+      : 'module-circle-badge';
   }
 
   get hasIcon(): boolean {
-    return this.iconName !== '';
+    return this.iconName !== '' || this.iconImageUrl !== '';
+  }
+
+  get hasIconImage(): boolean {
+    return this.iconImageUrl !== '';
   }
 
   getAriaLabel(): string {
