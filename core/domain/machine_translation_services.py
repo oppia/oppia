@@ -207,7 +207,9 @@ def generate_and_cache_translation(
 
     provider_instance = _PROVIDER_REGISTRY.get_provider_instance(provider_id)
     if not provider_instance:
-        return None
+        raise Exception(
+            'The mapped provider class for %s is not registered.' % provider_id
+        )
 
     protected_html = html_translation_services.preprocess_html_for_translation(
         source_text
@@ -295,7 +297,7 @@ def get_available_providers_for_ui() -> List[Dict[str, str]]:
         [
             {
                 'id': pid,
-                'display_name': feconf.MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES.get(
+                'displayName': feconf.MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES.get(
                     pid, pid.capitalize()
                 ),
             }

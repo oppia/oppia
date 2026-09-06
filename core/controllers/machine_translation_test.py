@@ -218,7 +218,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         providers_swap = self.swap(
             machine_translation_services,
             'get_available_providers_for_ui',
-            lambda: [{'id': 'azure', 'display_name': 'Azure Translator'}],
+            lambda: [{'id': 'azure', 'displayName': 'Azure Translator'}],
         )
 
         with self.feature_flag_swap, (
@@ -230,7 +230,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['automatic_translation_is_enabled'], True)
         self.assertEqual(
             response['available_providers'],
-            [{'id': 'azure', 'display_name': 'Azure Translator'}],
+            [{'id': 'azure', 'displayName': 'Azure Translator'}],
         )
         self.logout()
 

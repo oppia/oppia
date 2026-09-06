@@ -1,0 +1,193 @@
+from __future__ import annotations
+
+import logging
+from collections.abc import Iterable
+from contextlib import nullcontext
+from typing import TYPE_CHECKING
+
+from pip._internal.build_env import (
+    BuildIsolationMode,
+    NoOpBuildEnvironment,
+    VenvBuildEnvironment,
+    VirtualBuildEnvironment,
+)
+from pip._internal.distributions.base import AbstractDistribution
+from pip._internal.exceptions import InstallationError
+from pip._internal.metadata import BaseDistribution
+from pip._internal.utils.subprocess import runner_with_spinner_message
+
+if TYPE_CHECKING:
+    from pip._internal.build_env import BuildEnvironmentInstaller
+
+logger = logging.getLogger(__name__)
+
+
+class SourceDistribution(AbstractDistribution):
+    """Represents a source distribution.
+
+    The preparation step for these needs metadata for the packages to be
+    generated.
+    """
+
+    @property
+    def build_tracker_id(self) -> str | None:
+        """Identify this requirement uniquely by its link."""
+        assert self.req.link
+        return self.req.link.url_without_fragment
+
+    def get_metadata_distribution(self) -> BaseDistribution:
+        return self.req.get_dist()
+
+    def prepare_distribution_metadata(
+        self,
+        build_env_installer: BuildEnvironmentInstaller,
+        build_isolation: BuildIsolationMode,
+        check_build_deps: bool,
+        allow_editables: bool,
+    ) -> None:
+        # Load pyproject.toml and set up backend environment
+        self.req.load_pyproject_toml()
+        self._prepare_build_env(build_isolation, build_env_installer)
+
+        # Set up the build isolation, if this requirement should be isolated
+        if build_isolation != "off":
+            # Setup an isolated environment and install the build backend static
+            # requirements in it.
+            self._prepare_build_backend(build_isolation)
+            # Check that the build backend supports PEP 660. This cannot be done
+            # earlier because we need to setup the build backend to verify it
+            # supports build_editable, nor can it be done later, because we want
+            # to avoid installing build requirements needlessly.
+            self.req.editable_sanity_check()
+            # Install the dynamic build requirements.
+            self._install_build_reqs(
+                build_env_installer, build_isolation, allow_editables=allow_editables
+            )
+        else:
+            # When not using build isolation, we still need to check that
+            # the build backend supports PEP 660.
+            self.req.editable_sanity_check()
+        # Check if the current environment provides build dependencies
+        if check_build_deps:
+            pyproject_requires = self.req.pyproject_requires
+            assert pyproject_requires is not None
+            conflicting, missing = self.req.build_env.check_requirements(
+                pyproject_requires
+            )
+            if conflicting:
+                self._raise_conflicts("the backend dependencies", conflicting)
+            if missing:
+                self._raise_missing_reqs(missing)
+        self.req.prepare_metadata(allow_editables)
+
+    def _prepare_build_env(
+        self,
+        build_isolation: BuildIsolationMode,
+        build_env_installer: BuildEnvironmentInstaller,
+    ) -> None:
+        if build_isolation == "virtual":
+            self.req.build_env = VirtualBuildEnvironment(build_env_installer)
+        elif build_isolation == "venv":
+            self.req.build_env = VenvBuildEnvironment(build_env_installer)
+
+        self.req.configure_backend(self.req.build_env.python_executable)
+
+    def _prepare_build_backend(self, build_isolation: BuildIsolationMode) -> None:
+        # Install the pyproject.toml declared build-time requirements.
+        pyproject_requires = self.req.pyproject_requires
+        assert pyproject_requires is not None
+        assert not isinstance(self.req.build_env, NoOpBuildEnvironment)
+
+        context = self.req.build_env if build_isolation == "venv" else nullcontext()
+        with context:
+            self.req.build_env.install_requirements(
+                pyproject_requires,
+                "overlay",
+                kind="build dependencies",
+                for_req=self.req,
+            )
+        conflicting, missing = self.req.build_env.check_requirements(
+            self.req.requirements_to_check
+        )
+        if conflicting:
+            self._raise_conflicts("PEP 517/518 supported requirements", conflicting)
+        if missing:
+            logger.warning(
+                "Missing build requirements in pyproject.toml for %s.",
+                self.req,
+            )
+            logger.warning(
+                "The project does not specify a build backend, and "
+                "pip cannot fall back to setuptools without %s.",
+                " and ".join(map(repr, sorted(missing))),
+            )
+
+    def _get_build_requires_wheel(self) -> Iterable[str]:
+        with self.req.build_env:
+            runner = runner_with_spinner_message("Getting requirements to build wheel")
+            backend = self.req.pep517_backend
+            assert backend is not None
+            with backend.subprocess_runner(runner):
+                return backend.get_requires_for_build_wheel()
+
+    def _get_build_requires_editable(self) -> Iterable[str]:
+        with self.req.build_env:
+            runner = runner_with_spinner_message(
+                "Getting requirements to build editable"
+            )
+            backend = self.req.pep517_backend
+            assert backend is not None
+            with backend.subprocess_runner(runner):
+                return backend.get_requires_for_build_editable()
+
+    def _install_build_reqs(
+        self,
+        build_env_installer: BuildEnvironmentInstaller,
+        build_isolation: BuildIsolationMode,
+        allow_editables: bool,
+    ) -> None:
+        # Install any extra build dependencies that the backend requests.
+        # This must be done in a second pass, as the pyproject.toml
+        # dependencies must be installed before we can call the backend.
+        if (
+            self.req.editable
+            and allow_editables
+            and self.req.supports_pyproject_editable
+        ):
+            build_reqs = self._get_build_requires_editable()
+        else:
+            build_reqs = self._get_build_requires_wheel()
+        conflicting, missing = self.req.build_env.check_requirements(build_reqs)
+        if conflicting:
+            self._raise_conflicts("the backend dependencies", conflicting)
+        context = self.req.build_env if build_isolation == "venv" else nullcontext()
+        with context:
+            self.req.build_env.install_requirements(
+                missing, "normal", kind="backend dependencies", for_req=self.req
+            )
+
+    def _raise_conflicts(
+        self, conflicting_with: str, conflicting_reqs: set[tuple[str, str]]
+    ) -> None:
+        format_string = (
+            "Some build dependencies for {requirement} "
+            "conflict with {conflicting_with}: {description}."
+        )
+        error_message = format_string.format(
+            requirement=self.req,
+            conflicting_with=conflicting_with,
+            description=", ".join(
+                f"{installed} is incompatible with {wanted}"
+                for installed, wanted in sorted(conflicting_reqs)
+            ),
+        )
+        raise InstallationError(error_message)
+
+    def _raise_missing_reqs(self, missing: set[str]) -> None:
+        format_string = (
+            "Some build dependencies for {requirement} are missing: {missing}."
+        )
+        error_message = format_string.format(
+            requirement=self.req, missing=", ".join(map(repr, sorted(missing)))
+        )
+        raise InstallationError(error_message)

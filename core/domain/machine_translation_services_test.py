@@ -195,7 +195,7 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
             )
             self.assertIsNone(result)
 
-    def test_returns_none_if_no_provider_instance_available(self) -> None:
+    def test_raises_exception_if_no_provider_instance_available(self) -> None:
         provider_instance_swap = self.swap(
             machine_translation_services._PROVIDER_REGISTRY,  # pylint: disable=protected-access
             'get_provider_instance',
@@ -203,12 +203,13 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
         )
 
         with self.mock_provider_id_swap, provider_instance_swap:
-            result = (
+            with self.assertRaisesRegex(
+                Exception,
+                'The mapped provider class for azure is not registered.',
+            ):
                 machine_translation_services.generate_and_cache_translation(
                     'en', 'hi', 'Hello'
                 )
-            )
-            self.assertIsNone(result)
 
     def test_api_failure_sends_email_and_raises_exception(self) -> None:
         class MockFailingProvider:

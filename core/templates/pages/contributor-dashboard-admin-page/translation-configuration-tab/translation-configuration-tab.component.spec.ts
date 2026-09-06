@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import {
 import {TranslationConfigurationTabComponent} from './translation-configuration-tab.component';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {TranslationAdminConfig} from '../contributor-dashboard-admin-summary.model';
 import {FormsModule} from '@angular/forms';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIconModule} from '@angular/material/icon';
@@ -38,11 +39,11 @@ describe('TranslationConfigurationTabComponent', () => {
   let mockApiService: jasmine.SpyObj<ContributorDashboardAdminBackendApiService>;
   let mockLanguageUtilService: jasmine.SpyObj<LanguageUtilService>;
 
-  const MOCK_CONFIG = {
-    provider_mapping: {hi: 'azure'},
-    automatic_translation_is_enabled: true,
-    available_providers: [{id: 'azure', display_name: 'Azure Translator'}],
-  };
+  const MOCK_CONFIG = new TranslationAdminConfig(
+    {hi: 'azure'},
+    true,
+    [{id: 'azure', displayName: 'Azure Translator'}]
+  );
 
   beforeEach(waitForAsync(() => {
     mockApiService = jasmine.createSpyObj(
@@ -106,7 +107,7 @@ describe('TranslationConfigurationTabComponent', () => {
     expect(component.providerMapping).toEqual({hi: 'azure'});
     expect(component.isAutomaticTranslationEnabled).toBeTrue();
     expect(component.allAvailableProviders).toEqual([
-      {id: 'azure', display_name: 'Azure Translator'},
+      {id: 'azure', displayName: 'Azure Translator'},
     ]);
   }));
 
@@ -185,13 +186,13 @@ describe('TranslationConfigurationTabComponent', () => {
   it('should reset selected provider on language change', () => {
     component.selectedProvider = 'azure';
     component.allAvailableProviders = [
-      {id: 'azure', display_name: 'Azure Translator'},
+      {id: 'azure', displayName: 'Azure Translator'},
     ];
     component.onLanguageChange();
 
     expect(component.selectedProvider).toBe('');
     expect(component.availableProvidersForLanguage).toEqual([
-      {id: 'azure', display_name: 'Azure Translator'},
+      {id: 'azure', displayName: 'Azure Translator'},
     ]);
   });
 

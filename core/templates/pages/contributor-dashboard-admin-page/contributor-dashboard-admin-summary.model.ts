@@ -199,3 +199,35 @@ export class QuestionReviewerStats {
     );
   }
 }
+
+export interface TranslationProviderOption {
+  id: string;
+  displayName: string;
+}
+
+export interface TranslationAdminConfigBackendDict {
+  provider_mapping: Record<string, string>;
+  automatic_translation_is_enabled: boolean;
+  available_providers: {id: string; displayName: string}[];
+}
+
+export class TranslationAdminConfig {
+  constructor(
+    public providerMapping: Record<string, string>,
+    public automaticTranslationIsEnabled: boolean,
+    public availableProviders: TranslationProviderOption[]
+  ) {}
+
+  static createFromBackendDict(
+    backendDict: TranslationAdminConfigBackendDict
+  ): TranslationAdminConfig {
+    return new TranslationAdminConfig(
+      backendDict.provider_mapping,
+      backendDict.automatic_translation_is_enabled,
+      backendDict.available_providers.map(p => ({
+        id: p.id,
+        displayName: p.displayName,
+      }))
+    );
+  }
+}

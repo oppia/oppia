@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-
-interface ProviderOption {
-  id: string;
-  display_name: string;
-}
+import {TranslationProviderOption} from '../contributor-dashboard-admin-summary.model';
 
 interface LanguageOption {
   code: string;
@@ -41,10 +37,10 @@ export class TranslationConfigurationTabComponent implements OnInit {
   isAutomaticTranslationEnabled: boolean = false;
 
   // All providers available in the static whitelist JSON.
-  allAvailableProviders: ProviderOption[] = [];
+  allAvailableProviders: TranslationProviderOption[] = [];
 
   // Subset of allAvailableProviders relevant for the currently selected language.
-  availableProvidersForLanguage: ProviderOption[] = [];
+  availableProvidersForLanguage: TranslationProviderOption[] = [];
 
   selectedLanguage: string = '';
   selectedProvider: string = '';
@@ -60,10 +56,9 @@ export class TranslationConfigurationTabComponent implements OnInit {
 
   async loadConfiguration(): Promise<void> {
     const config = await this.apiService.fetchTranslationConfigurationAsync();
-    this.providerMapping = config.provider_mapping;
-    this.isAutomaticTranslationEnabled =
-      config.automatic_translation_is_enabled;
-    this.allAvailableProviders = config.available_providers;
+    this.providerMapping = config.providerMapping;
+    this.isAutomaticTranslationEnabled = config.automaticTranslationIsEnabled;
+    this.allAvailableProviders = config.availableProviders;
   }
 
   getLanguageName(code: string): string {
@@ -72,7 +67,7 @@ export class TranslationConfigurationTabComponent implements OnInit {
 
   getProviderDisplayName(providerId: string): string {
     const match = this.allAvailableProviders.find(p => p.id === providerId);
-    return match ? match.display_name : providerId;
+    return match ? match.displayName : providerId;
   }
 
   // Returns available languages that are not yet mapped to a provider.
