@@ -38,7 +38,7 @@ import {PageTitleService} from 'services/page-title.service';
 export class Error404PageComponent implements OnInit, OnDestroy, AfterViewInit {
   directiveSubscriptions = new Subscription();
   private usingKeyboard = false;
-  private unlistenFns: Array<() => void> = [];
+  private unlistenFns: (() => void)[] = [];
   private mutationObserver: MutationObserver | null = null;
 
   constructor(

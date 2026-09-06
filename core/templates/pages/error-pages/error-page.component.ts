@@ -42,7 +42,7 @@ export class ErrorPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   customErrorMessage: string | null = null;
   private usingKeyboard = false;
-  private unlistenFns: Array<() => void> = [];
+  private unlistenFns: (() => void)[] = [];
   private mutationObserver: MutationObserver | null = null;
 
   constructor(
