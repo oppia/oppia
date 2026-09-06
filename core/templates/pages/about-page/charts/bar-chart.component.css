@@ -4,6 +4,154 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
+/*
+  The following rules are inlined from the charts-library bundle
+  (node_modules/charts.css/dist/charts.css) that has been removed from
+  angular.json. Only the rules that apply to this bar chart component are
+  reproduced here, scoped under .oppia-bar-chart so they do not leak to other
+  pages.
+*/
+@property --color {
+  syntax: "<color>";
+  inherits: true;
+}
+.oppia-bar-chart .charts-css {
+  --color-1: rgba(240, 50, 50, 0.75);
+  --color-2: rgba(255, 180, 50, 0.75);
+  --color-3: rgba(255, 220, 90, 0.75);
+  --color-4: rgba(100, 210, 80, 0.75);
+  --color-5: rgba(90, 165, 255, 0.75);
+  --color-6: rgba(170, 90, 240, 0.75);
+  --color-7: rgba(180, 180, 180, 0.75);
+  --color-8: rgba(110, 110, 110, 0.75);
+  --color-9: rgba(170, 150, 110, 0.75);
+  --color-10: rgba(130, 50, 20, 0.75);
+  --primary-axis-width: 1px;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+}
+.oppia-bar-chart .charts-css,
+.oppia-bar-chart .charts-css::after,
+.oppia-bar-chart .charts-css::before,
+.oppia-bar-chart .charts-css *,
+.oppia-bar-chart .charts-css *::after,
+.oppia-bar-chart .charts-css *::before {
+  box-sizing: border-box;
+}
+.oppia-bar-chart .charts-css {
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+  overflow: initial;
+  background-color: transparent;
+}
+.oppia-bar-chart .charts-css,
+.oppia-bar-chart .charts-css tbody,
+.oppia-bar-chart .charts-css tr,
+.oppia-bar-chart .charts-css th,
+.oppia-bar-chart .charts-css td {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+}
+.oppia-bar-chart .charts-css tbody {
+  position: relative;
+}
+.oppia-bar-chart .charts-css .data {
+  display: flex;
+}
+.oppia-bar-chart .charts-css.bar.show-labels tbody tr th {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: var(--labels-align-block, center);
+  justify-content: var(--labels-align-inline, flex-start);
+}
+.oppia-bar-chart .charts-css.bar tbody {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  aspect-ratio: var(--aspect-ratio, auto);
+  flex-direction: column;
+}
+.oppia-bar-chart .charts-css.bar tbody tr {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  overflow-wrap: anywhere;
+  align-items: flex-start;
+  margin-inline-start: var(--labels-size);
+  flex-direction: column;
+}
+.oppia-bar-chart .charts-css.bar tbody tr th {
+  position: absolute;
+  inset: 0;
+  width: var(--labels-size);
+  margin-inline-end: auto;
+  margin-inline-start: calc(-1 * var(--labels-size) - var(--primary-axis-width));
+}
+.oppia-bar-chart .charts-css.bar tbody tr td {
+  display: flex;
+  align-items: center;
+  width: calc(100% * var(--end, var(--size, 1)));
+  height: 100%;
+  min-height: 1rem;
+  padding-block-start: 10px;
+  padding-block-end: 10px;
+  position: relative;
+  justify-content: var(--data-position, flex-end);
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+.oppia-bar-chart .charts-css.bar.data-spacing-4 tbody tr {
+  padding-block-start: 4px;
+  padding-block-end: 4px;
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 1) td {
+  background: var(--color, var(--color-1));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 2) td {
+  background: var(--color, var(--color-2));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 3) td {
+  background: var(--color, var(--color-3));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 4) td {
+  background: var(--color, var(--color-4));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 5) td {
+  background: var(--color, var(--color-5));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 6) td {
+  background: var(--color, var(--color-6));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 7) td {
+  background: var(--color, var(--color-7));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 8) td {
+  background: var(--color, var(--color-8));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 9) td {
+  background: var(--color, var(--color-9));
+}
+.oppia-bar-chart .charts-css.bar tbody tr:nth-of-type(10n + 10) td {
+  background: var(--color, var(--color-10));
+}
+
 .oppia-bar-chart .charts-css.bar {
   --labels-size: 220px;
   margin-left: var(--labels-size); 

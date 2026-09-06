@@ -81,11 +81,6 @@
                 "bundleName": "vendor-styles",
                 "inject": true
               },
-              {
-                "input": "node_modules/charts.css/dist/charts.css",
-                "bundleName": "charts-library",
-                "inject": true
-              },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
@@ -192,11 +187,6 @@
               {
                 "input": "src/vendor-styles.css",
                 "bundleName": "vendor-styles",
-                "inject": true
-              },
-              {
-                "input": "node_modules/charts.css/dist/charts.css",
-                "bundleName": "charts-library",
                 "inject": true
               },
               "core/templates/css/oppia.css",
