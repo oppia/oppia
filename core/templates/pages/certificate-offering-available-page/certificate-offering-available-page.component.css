@@ -264,4 +264,8 @@
   .oppia-certificate-offering-available-page-actions {
     flex-direction: column;
   }
+
+  .oppia-certificate-offering-available-page-actions .btn-outline-primary {
+    min-width: 0;
+  }
 }

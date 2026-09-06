@@ -90,7 +90,9 @@
 }
 
 .btn-secondary.assessment-interrupt-action-button:hover {
-  background: #f0f7f6;
+  background: #0d6259;
+  border-color: #0d6259;
+  color: #fff;
 }
 
 .btn-primary.assessment-interrupt-action-button:hover {

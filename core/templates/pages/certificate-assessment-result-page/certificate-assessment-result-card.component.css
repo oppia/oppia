@@ -22,8 +22,9 @@
   z-index: 1;
 }
 
-.result-card--failed {
-  --oppia-result-accent: #b3261e;
+.result-card--failed .result-card-score {
+  color: #b3261e;
+  font-weight: 400;
 }
 
 .result-card-heading {
@@ -102,7 +103,9 @@
 }
 
 .result-card-retry-btn:hover {
-  background: var(--oppia-teal-pale);
+  background: var(--oppia-teal-dark);
+  border-color: var(--oppia-teal-dark);
+  color: #fff;
 }
 
 @media (max-width: 640px) {
