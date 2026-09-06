@@ -24,6 +24,7 @@ import types
 from core import feconf, utils
 from core.constants import constants
 from core.platform import models
+from core.storage.config import gae_models
 from core.tests import test_utils
 
 from typing import Dict, List, Set, Union, cast
@@ -970,10 +971,17 @@ class VersionedModelTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         all_model_classes = models.Registry.get_all_storage_model_classes()
+
+        # Abstract base models do not have snapshot classes.
+        ignored_versioned_classes = (
+            gae_models.BaseFeatureFlagConfigModel,
+            gae_models.BasePlatformParameterConfigModel,
+        )
         all_versioned_classes = [
             clazz
             for clazz in all_model_classes
             if issubclass(clazz, base_models.VersionedModel)
+            and clazz not in ignored_versioned_classes
         ]
         self.assertGreater(len(all_versioned_classes), 0)
 
