@@ -42,6 +42,7 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   private timerId: number | null = null;
   private expiryTimestampMs: number | null = null;
   private hasStartedTimer = false;
+  private hasPausedForNetworkLoss = false;
   private timeLimitInSeconds = 0;
 
   /**
@@ -98,14 +99,46 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   }
 
   /**
-   * Handles "resume" after an interruption: the learner returns to the
-   * questions of their existing attempt, picking up whatever time remains.
+   * Handles "resume" after a network-loss interruption: the learner returns
+   * to the questions of their existing attempt, picking up whatever time
+   * remains (the disconnected duration was never counted down).
    */
   resumeQuestionsStage(): void {
     this.showAssessmentInterruptCard = false;
+    this.hasPausedForNetworkLoss = false;
     this.currentStage =
       CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    this.startTimerIfReady();
+    this.resumeTimer();
+  }
+
+  /**
+   * Freezes the countdown while the learner is offline so that disconnected
+   * time is not counted towards the assessment expiry window. The elapsed
+   * time already shown is preserved and continues once the learner reconnects
+   * and chooses to resume.
+   */
+  pauseForNetworkLoss(): void {
+    if (
+      this.currentStage !==
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS ||
+      this.timerId === null ||
+      this.isTimeExpired
+    ) {
+      return;
+    }
+    this.hasPausedForNetworkLoss = true;
+    this.clearTimer();
+  }
+
+  /**
+   * Surfaces the assessment interrupt card (with a resume option) when the
+   * learner comes back online, but only if the countdown was actually paused
+   * for a network loss and the window has not already expired.
+   */
+  handleReconnect(): void {
+    if (this.hasPausedForNetworkLoss && !this.isTimeExpired) {
+      this.showAssessmentInterruptCard = true;
+    }
   }
 
   ngOnDestroy(): void {
@@ -155,6 +188,35 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   }
 
   /**
+   * Restarts the countdown from the time that was left when it was paused for
+   * a network loss, rather than from the full configured limit.
+   */
+  private resumeTimer(): void {
+    if (
+      this.currentStage !==
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS ||
+      this.timerId !== null ||
+      this.remainingTimeInSeconds <= 0 ||
+      this.isTimeExpired
+    ) {
+      return;
+    }
+    this.hasStartedTimer = true;
+    const expiryTimestampMs = Date.now() + this.remainingTimeInSeconds * 1000;
+    this.expiryTimestampMs = expiryTimestampMs;
+    this.timerId = window.setInterval(() => {
+      this.remainingTimeInSeconds = Math.max(
+        0,
+        Math.ceil((expiryTimestampMs - Date.now()) / 1000)
+      );
+      if (this.remainingTimeInSeconds === 0) {
+        this.isTimeExpired = true;
+        this.clearTimer();
+      }
+    }, 1000);
+  }
+
+  /**
    * Wipes all attempt-scoped timing state: the running interval, the
    * deadline, the displayed countdown and the expiry flag. Only ever
    * called while arming a replacement attempt.
@@ -162,6 +224,7 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   private resetTimerState(): void {
     this.clearTimer();
     this.hasStartedTimer = false;
+    this.hasPausedForNetworkLoss = false;
     this.isTimeExpired = false;
     this.remainingTimeInSeconds = 0;
     this.expiryTimestampMs = null;

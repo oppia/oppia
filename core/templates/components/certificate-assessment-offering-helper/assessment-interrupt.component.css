@@ -1,5 +1,16 @@
 * { box-sizing: border-box; }
 
+.assessment-interrupt-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 16px;
+  position: fixed;
+  z-index: 1000;
+}
+
 .assessment-interrupt-card {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.12);

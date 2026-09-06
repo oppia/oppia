@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   I18nLanguageCodeService,
@@ -86,6 +87,21 @@ describe('TopicHeaderComponent', () => {
     expect(component.topicUrlFragment).toBe('place-values');
   });
 
+  it('should update the classroom breadcrumb when inputs arrive late', () => {
+    component.classroomName = null;
+    component.classroomUrlFragment = '';
+    fixture.detectChanges();
+
+    component.classroomName = 'math';
+    component.classroomUrlFragment = 'math';
+    fixture.detectChanges();
+
+    const classroomBreadcrumb = fixture.debugElement.query(
+      By.css('.topic-header-breadcrumbs-desktop a[href="/learn/math"]')
+    );
+    expect(classroomBreadcrumb.nativeElement.textContent.trim()).toBe('Math');
+  });
+
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
     component.classroomUrlFragment = '';
@@ -112,6 +128,12 @@ describe('TopicHeaderComponent', () => {
     component.classroomName = null;
     fixture.detectChanges();
     expect(component.classroomName).toBeNull();
+  });
+
+  it('should return empty string when capitalizedClassroomName is null', () => {
+    component.classroomName = null;
+    fixture.detectChanges();
+    expect(component.capitalizedClassroomName).toBe('');
   });
 
   it('should initialize topic and classroom translation keys on init', () => {

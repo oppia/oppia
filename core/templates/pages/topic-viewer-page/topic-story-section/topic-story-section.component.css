@@ -58,7 +58,7 @@
 
 .story-card {
   background: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   margin-top: 16px;
   max-width: 960px;
@@ -68,6 +68,7 @@
 .story-card-header {
   align-items: center;
   background: #00645c;
+  border-radius: 8px 8px 0 0;
   color: #fff;
   display: flex;
   justify-content: space-between;
@@ -301,9 +302,12 @@
   width: 52px;
 }
 
-.adventure-flag-icon .material-icons {
-  font-size: 24px;
+.adventure-flag-icon .material-icons,
+.adventure-flag-icon-img {
+  font-size: 32px;
+  height: 32px;
   line-height: 1;
+  width: 32px;
 }
 
 .adventure-flag-icon-completed .material-icons {
@@ -457,6 +461,13 @@ topic-mastery-challenge-card {
   display: block;
 }
 
+.adventure-navigation-sticky-wrapper {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 56px;
+  z-index: 30;
+}
+
 @media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
@@ -575,8 +586,8 @@ topic-mastery-challenge-card {
   }
 
   .skipped-adventure-start-cta {
-    font-size: 14px;
-    min-height: 44px;
+    font-size: 16px;
+    min-height: 52px;
     min-width: 0;
     padding: 10px 14px;
     width: 100%;
@@ -634,8 +645,11 @@ topic-mastery-challenge-card {
     width: 38px;
   }
 
-  .adventure-flag-icon .material-icons {
-    font-size: 18px;
+  .adventure-flag-icon .material-icons,
+  .adventure-flag-icon-img {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
   }
 
   .adventure-title {

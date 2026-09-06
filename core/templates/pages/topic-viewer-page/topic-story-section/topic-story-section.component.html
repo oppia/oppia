@@ -17,10 +17,7 @@
   <div class="story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h3 class="story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
-        <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
-          {{ getStoryMetaText() }}
-        </p>
+        <h3 class="story-title"><span class="story-label">{{ 'I18N_TOPIC_VIEWER_STORY_LABEL' | translate }}</span>"{{ storyTitle }}"</h3>
       </div>
       <div class="story-card-header-right">
         <a class="study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL' | translate: {storyTitle: storyTitle || 'this story'}">
@@ -34,13 +31,17 @@
     </div>
 
     <div class="story-card-body">
-      <topic-adventure-navigation
-        [adventureGroups]="adventureNavigationGroups"
-        [activeLessonNumber]="activeLessonNumber"
-        [isInTopicEditorPreview]="isInTopicEditorPreview"
-        (lessonSelected)="onNavigationLessonSelected($event)"
-        (practiceSelected)="onNavigationPracticeSelected($event)">
-      </topic-adventure-navigation>
+      <div class="adventure-navigation-sticky-wrapper"
+           [style.top]="isInTopicEditorPreview ? '126px' : '56px'">
+        <topic-adventure-navigation
+          [adventureGroups]="adventureNavigationGroups"
+          [activeLessonNumber]="activeLessonNumber"
+          [isInTopicEditorPreview]="isInTopicEditorPreview"
+          (lessonSelected)="onNavigationLessonSelected($event)"
+          (practiceSelected)="onNavigationPracticeSelected($event)"
+          (masteryChallengeClicked)="onNavigationMasteryChallengeClicked()">
+        </topic-adventure-navigation>
+      </div>
 
       <ng-container *ngIf="adventureGroups.length > 0; else flatLessonList">
         <div *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx">
@@ -82,7 +83,11 @@
                 <div class="adventure-flag-icon"
                      [class.adventure-flag-icon-completed]="isAdventureCompleted(adventureIdx)"
                      [ngStyle]="{'background-color': isAdventureCompleted(adventureIdx) ? '#27a844' : adventureGroup.iconBg}">
-                  <i class="material-icons">{{ isAdventureCompleted(adventureIdx) ? 'check' : 'menu_book' }}</i>
+                  <img *ngIf="!isAdventureCompleted(adventureIdx)"
+                       src="/assets/images/icons/menu-book.svg"
+                       alt="Menu book"
+                       class="adventure-flag-icon-img">
+                  <i *ngIf="isAdventureCompleted(adventureIdx)" class="material-icons">check</i>
                 </div>
                 <div class="adventure-header-text">
                   <h4 class="adventure-title">{{ adventureGroup.adventureTitle }}</h4>
@@ -97,33 +102,16 @@
               {{ adventureGroup.adventureDescription }}
             </p>
             <div *ngIf="isAdventureExpanded(adventureIdx)" class="adventure-lessons">
-              <div class="story-lesson-card-wrapper"
-                   #lessonWrapper
-                   [id]="'lesson-' + lessonCard.lessonNumber"
-                   *ngFor="let lessonCard of adventureGroup.lessonCards">
-                <topic-lesson-card
-                  [lessonTitle]="lessonCard.lessonTitle"
-                  [lessonDescription]="lessonCard.lessonDescription"
-                  [thumbnailUrl]="lessonCard.thumbnailUrl"
-                  [startUrl]="lessonCard.startUrl"
-                  [studyUrl]="studyGuideUrl"
-                  [practiceUrl]="lessonCard.practiceUrl"
-                  [lessonNumber]="lessonCard.lessonNumber"
-                  [adventureAccentColor]="adventureGroup.accentColor"
-                  [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
-                  [lessonProgressStatus]="lessonCard.lessonProgressStatus"
-                  [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
-                  [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
-                  [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
-                  [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-                  [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
-                  [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
-                  [navigatedLessonNumber]="navigatedLessonNumber">
-                </topic-lesson-card>
-              </div>
+              <ng-container *ngFor="let lessonCard of adventureGroup.lessonCards">
+                <ng-container *ngTemplateOutlet="lessonCardTemplate; context: {
+                  $implicit: lessonCard,
+                  accentColor: adventureGroup.accentColor,
+                  isActive: lessonCard.lessonNumber === activeLessonNumber,
+                  isComingSoon: false
+                }"></ng-container>
+              </ng-container>
 
               <div class="story-practice-card-wrapper"
-                   #practiceWrapper
                    [id]="'practice-card-' + adventureGroup.arcId"
                    *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
                 <topic-adventure-end-test-card
@@ -134,7 +122,8 @@
                   [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
                   [cardAccentColor]="adventureGroup.accentColor"
                   [isPracticeCompleted]="isAdventurePracticeCompleted(adventureIdx)"
-                  [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)">
+                  [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)"
+                  [hasPracticeQuestions]="adventureGroup.hasPracticeQuestions">
                 </topic-adventure-end-test-card>
               </div>
             </div>
@@ -143,33 +132,16 @@
       </ng-container>
 
       <ng-template #flatLessonList>
-        <div class="story-lesson-card-wrapper"
-             #lessonWrapper
-             [id]="'lesson-' + lessonCard.lessonNumber"
-             *ngFor="let lessonCard of availableLessonCards">
-          <topic-lesson-card
-            [lessonTitle]="lessonCard.lessonTitle"
-            [lessonDescription]="lessonCard.lessonDescription"
-            [thumbnailUrl]="lessonCard.thumbnailUrl"
-            [startUrl]="lessonCard.startUrl"
-            [studyUrl]="studyGuideUrl"
-            [practiceUrl]="lessonCard.practiceUrl"
-            [lessonNumber]="lessonCard.lessonNumber"
-            [adventureAccentColor]="'#00645c'"
-            [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
-            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
-            [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
-            [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
-            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
-            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
-            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
-            [navigatedLessonNumber]="navigatedLessonNumber">
-          </topic-lesson-card>
-        </div>
+        <ng-container *ngFor="let lessonCard of availableLessonCards">
+          <ng-container *ngTemplateOutlet="lessonCardTemplate; context: {
+            $implicit: lessonCard,
+            accentColor: defaultFallbackAccentColor,
+            isActive: lessonCard.lessonNumber === activeLessonNumber,
+            isComingSoon: false
+          }"></ng-container>
+        </ng-container>
 
         <div class="story-practice-card-wrapper"
-             #practiceWrapper
              id="practice-card-flat"
              *ngIf="isPracticeCardVisible">
           <topic-adventure-end-test-card
@@ -177,10 +149,37 @@
             [practiceDescription]="practiceCard.practiceDescription"
             [thumbnailUrl]="practiceCard.thumbnailUrl"
             [studyUrl]="practiceCard.studyUrl"
-            [cardBackgroundColor]="'#ecf7f6'"
-            [cardAccentColor]="'#0b776d'"
-            [practiceUrl]="practiceCard.practiceUrl">
+            [cardBackgroundColor]="defaultPracticeBgColor"
+            [cardAccentColor]="defaultPracticeAccentColor"
+            [practiceUrl]="practiceCard.practiceUrl"
+            [hasPracticeQuestions]="practiceCard.hasPracticeQuestions">
           </topic-adventure-end-test-card>
+        </div>
+      </ng-template>
+
+      <ng-template #lessonCardTemplate let-lessonCard let-accent="accentColor" let-isActive="isActive" let-isComingSoon="isComingSoon">
+        <div class="story-lesson-card-wrapper"
+             [id]="(isComingSoon ? 'coming-soon-lesson-' : 'lesson-') + lessonCard.lessonNumber">
+          <topic-lesson-card
+            [lessonTitle]="lessonCard.lessonTitle"
+            [lessonDescription]="lessonCard.lessonDescription"
+            [thumbnailUrl]="lessonCard.thumbnailUrl"
+            [startUrl]="lessonCard.startUrl"
+            [studyUrl]="studyGuideUrl"
+            [practiceUrl]="lessonCard.practiceUrl"
+            [hasPracticeQuestions]="lessonCard.hasPracticeQuestions"
+            [lessonNumber]="lessonCard.lessonNumber"
+            [adventureAccentColor]="accent"
+            [isActiveLesson]="isActive"
+            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
+            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
+            [isComingSoonSectionCard]="isComingSoon"
+            [navigatedLessonNumber]="navigatedLessonNumber"
+            (startLessonClick)="onLessonStartClick($event)">
+          </topic-lesson-card>
         </div>
       </ng-template>
 
@@ -199,37 +198,20 @@
             </p>
           </div>
         </div>
-        <div
-             class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
-             #lessonWrapper
-             [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
-             *ngFor="let lessonCard of comingSoonLessonCards">
-          <topic-lesson-card
-            [lessonTitle]="lessonCard.lessonTitle"
-            [lessonDescription]="lessonCard.lessonDescription"
-            [thumbnailUrl]="lessonCard.thumbnailUrl"
-            [startUrl]="lessonCard.startUrl"
-            [studyUrl]="studyGuideUrl"
-            [practiceUrl]="lessonCard.practiceUrl"
-            [lessonNumber]="lessonCard.lessonNumber"
-            [adventureAccentColor]="'#6b7280'"
-            [isActiveLesson]="false"
-            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
-            [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
-            [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
-            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
-            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
-            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
-            [isComingSoonSectionCard]="true"
-            [navigatedLessonNumber]="navigatedLessonNumber">
-          </topic-lesson-card>
-        </div>
+        <ng-container *ngFor="let lessonCard of comingSoonLessonCards">
+          <ng-container *ngTemplateOutlet="lessonCardTemplate; context: {
+            $implicit: lessonCard,
+            accentColor: comingSoonAccentColor,
+            isActive: false,
+            isComingSoon: true
+          }"></ng-container>
+        </ng-container>
       </section>
 
       <topic-mastery-challenge-card
         [actionUrl]="masteryChallengeUrl"
-        [isUnlocked]="isStoryCompleted()">
+        [isUnlocked]="isMasteryUnlocked"
+        (buttonClicked)="onMasteryChallengeCardClicked()">
       </topic-mastery-challenge-card>
     </div>
   </div>

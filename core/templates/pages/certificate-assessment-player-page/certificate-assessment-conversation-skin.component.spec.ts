@@ -153,4 +153,47 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     expect(() => component.onSubmitAssessment()).toThrowError('submit failed');
     expect(component.submitAssessment.emit).not.toHaveBeenCalled();
   });
+
+  it('should append null answer token when lastAnswer is null', () => {
+    component.interactionHtml =
+      '<oppia-interactive-text></oppia-interactive-text>';
+    component.lastAnswer = null;
+
+    expect(component.cachedInteractionHtml).toBe(
+      '<oppia-interactive-text></oppia-interactive-text><!-- answer:null -->'
+    );
+  });
+
+  it('should append JSON-encoded answer token when lastAnswer is set', () => {
+    component.interactionHtml =
+      '<oppia-interactive-text></oppia-interactive-text>';
+    component.lastAnswer = 'hello';
+
+    expect(component.cachedInteractionHtml).toBe(
+      '<oppia-interactive-text></oppia-interactive-text><!-- answer:"hello" -->'
+    );
+  });
+
+  it('should replace double dashes with double underscores in the answer token', () => {
+    component.interactionHtml =
+      '<oppia-interactive-text></oppia-interactive-text>';
+    component.lastAnswer = 'a--b';
+
+    const expectedJson = JSON.stringify('a--b');
+    expect(component.cachedInteractionHtml).toBe(
+      `<oppia-interactive-text></oppia-interactive-text><!-- answer:${expectedJson.replace(/--/g, '__')} -->`
+    );
+  });
+
+  it('should change cached HTML when lastAnswer changes to force interaction rebuild', () => {
+    component.interactionHtml =
+      '<oppia-interactive-text></oppia-interactive-text>';
+    component.lastAnswer = null;
+    const htmlWithNull = component.cachedInteractionHtml;
+
+    component.lastAnswer = 'new-value';
+    const htmlWithAnswer = component.cachedInteractionHtml;
+
+    expect(htmlWithNull).not.toBe(htmlWithAnswer);
+  });
 });
