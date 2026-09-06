@@ -36,10 +36,12 @@ import {Component, Input, OnInit} from '@angular/core';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DraftChapterConfirmationModalComponent} from '../modal-templates/draft-chapter-confirmation-modal.component';
+import './story-editor-navbar.component.css';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
   templateUrl: './story-editor-navbar.component.html',
+  styleUrls: ['./story-editor-navbar.component.css'],
 })
 export class StoryEditorNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
