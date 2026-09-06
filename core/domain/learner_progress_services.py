@@ -31,6 +31,8 @@ from core.domain import (
     exp_fetchers,
     learner_goals_services,
     learner_progress_domain,
+    rights_domain,
+    rights_manager,
     skill_services,
     story_domain,
     story_fetchers,
@@ -281,10 +283,25 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     exploration has already been completed or has been created/edited by the
     user. It is also removed from the incomplete list (if present).
 
+    Only explorations that exist and are public are added. This prevents
+    stale references to deleted or private explorations from being written
+    into the CompletedActivitiesModel.
+
     Args:
         user_id: str. The id of the user who has completed the exploration.
         exp_id: str. The id of the completed exploration.
     """
+    # Guard: only record completions for explorations that exist and are
+    # publicly available. This prevents writing stale references when a
+    # race condition occurs between exploration deletion/unpublish and
+    # learner completion.
+    exp_rights = rights_manager.get_exploration_rights(exp_id, strict=False)
+    if (
+        exp_rights is None
+        or exp_rights.status != rights_domain.ACTIVITY_STATUS_PUBLIC
+    ):
+        return
+
     completed_activities_model = user_models.CompletedActivitiesModel.get(
         user_id, strict=False
     )
@@ -451,6 +468,10 @@ def mark_exploration_as_incomplete(
     user. If the exploration is already present in the incomplete list, just the
     details associated with it are updated.
 
+    Only explorations that exist and are public are added. This prevents
+    stale references to deleted or private explorations from being written
+    into the IncompleteActivitiesModel.
+
     Args:
         user_id: str. The id of the user who partially completed the
             exploration.
@@ -460,6 +481,19 @@ def mark_exploration_as_incomplete(
         exploration_version: int. The version of the exploration played by the
             learner.
     """
+    # Guard: only record progress for explorations that exist and are
+    # publicly available. This prevents writing stale references when a
+    # race condition occurs between exploration deletion/unpublish and
+    # learner progress tracking.
+    exp_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False
+    )
+    if (
+        exp_rights is None
+        or exp_rights.status != rights_domain.ACTIVITY_STATUS_PUBLIC
+    ):
+        return
+
     incomplete_activities_model = user_models.IncompleteActivitiesModel.get(
         user_id, strict=False
     )
