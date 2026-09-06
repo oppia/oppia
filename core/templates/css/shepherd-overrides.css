@@ -38,6 +38,7 @@
   top: 10px;
   transition: none;
   width: 24px;
+  z-index: 1;
 }
 
 .shepherd-content {
@@ -64,7 +65,9 @@
   box-shadow: 0 0 30px 1px #000;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
-  max-width: 900px;
+  max-height: calc(100vh - 32px);
+  max-width: 450px;
+  overflow-y: auto;
   position: absolute;
   z-index: 1016;
 }
@@ -211,6 +214,7 @@
   top: 10px;
   transition: none;
   width: 24px;
+  z-index: 1;
 }
 
 .shepherd-has-title .shepherd-content .shepherd-header {

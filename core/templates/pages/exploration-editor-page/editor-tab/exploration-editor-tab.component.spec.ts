@@ -1196,9 +1196,7 @@ describe('Exploration editor tab component', () => {
     interface TourStep {
       id: string;
       buttons: {text: string; action?: () => void}[];
-      when?: {
-        show?: () => void;
-      };
+      beforeShowPromise?: () => Promise<void>;
     }
 
     interface TestShepherdService {
@@ -1230,6 +1228,12 @@ describe('Exploration editor tab component', () => {
       },
       'smoothScrollTo'
     );
+    const scrollTourTargetIntoViewSpy = spyOn(
+      component as unknown as {
+        scrollTourTargetIntoView: (selector: string) => Promise<void>;
+      },
+      'scrollTourTargetIntoView'
+    ).and.returnValue(Promise.resolve());
     // eslint-disable-next-line dot-notation
     const tickSpy = spyOn(component['applicationRef'], 'tick');
 
@@ -1253,12 +1257,17 @@ describe('Exploration editor tab component', () => {
     expect(steps.length).toBeGreaterThan(0);
 
     steps.forEach(step => {
-      if (step.when && typeof step.when.show === 'function') {
-        step.when.show();
+      if (
+        step.beforeShowPromise &&
+        typeof step.beforeShowPromise === 'function'
+      ) {
+        step.beforeShowPromise();
       }
     });
+    tick(500);
 
-    expect(smoothScrollToSpy).toHaveBeenCalled();
+    expect(scrollTourTargetIntoViewSpy).toHaveBeenCalled();
+    expect(smoothScrollToSpy).not.toHaveBeenCalled();
 
     const lastStep = steps[steps.length - 1];
     const doneButton = lastStep.buttons.find(btn => btn.text === 'Done');

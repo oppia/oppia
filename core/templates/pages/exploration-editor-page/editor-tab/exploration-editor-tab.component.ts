@@ -131,6 +131,41 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
+  private scrollTourTargetIntoView(selector: string): Promise<void> {
+    const scrollDurationMs = 500;
+    return new Promise(resolve => {
+      if (
+        selector === '#tutorialPreviewTab' ||
+        selector === '#editorTabTourSaveDraft'
+      ) {
+        this.smoothScrollTo(0, scrollDurationMs);
+        setTimeout(() => resolve(), scrollDurationMs);
+        return;
+      }
+      const element = document.querySelector(selector);
+      if (!element) {
+        resolve();
+        return;
+      }
+      element.scrollIntoView({behavior: 'smooth', block: 'center'});
+      setTimeout(() => resolve(), scrollDurationMs);
+    });
+  }
+
+  private getTourCancelButton(): {
+    text: string;
+    action: () => void;
+    classes: string;
+  } {
+    return {
+      text: 'Skip',
+      action: () => {
+        this.shepherdService.cancel();
+      },
+      classes: 'shepherd-button-secondary',
+    };
+  }
+
   private getTourContent(id: string): string {
     const element = document.getElementById(id + 'Content');
     // eslint-disable-next-line oppia/no-inner-html
@@ -141,111 +176,95 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     const steps = [
       {
         id: 'editorTabTourContainer',
-        attachTo: {element: '#editorTabTourContainer', on: 'top'},
+        attachTo: {element: '.oppia-editor-cards-container', on: 'bottom'},
         title: 'Creating in Oppia',
         text: this.getTourContent('editorTabTourContainer'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
+          this.getTourCancelButton(),
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            this.smoothScrollTo(0, 1000);
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('.oppia-editor-cards-container'),
       },
       {
         id: 'editorTabTourContentEditorTab',
-        attachTo: {element: '#editorTabTourContentEditorTab', on: 'top'},
+        attachTo: {element: '#editorTabTourContentEditorTab', on: 'bottom'},
         title: 'Content',
         text: this.getTourContent('editorTabTourContentEditorTab'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            this.smoothScrollTo(0, 1000);
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('#editorTabTourContentEditorTab'),
       },
       {
         id: 'editorTabTourSlideStateInteractionEditorTab',
         attachTo: {
           element: '#editorTabTourSlideStateInteractionEditorTab',
-          on: 'top',
+          on: 'bottom',
         },
         title: 'Interaction',
         text: this.getTourContent(
           'editorTabTourSlideStateInteractionEditorTab'
         ),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            this.smoothScrollTo(0, 1000);
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView(
+            '#editorTabTourSlideStateInteractionEditorTab'
+          ),
       },
       {
         id: 'editorTabTourStateResponsesTab',
-        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'top'},
+        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'bottom'},
         title: 'Responses',
         text: this.getTourContent('editorTabTourStateResponsesTab'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('#editorTabTourStateResponsesTab'),
       },
       {
         id: 'editorTabTourPreviewTab',
-        attachTo: {element: '#tutorialPreviewTab', on: 'top'},
+        attachTo: {element: '#tutorialPreviewTab', on: 'bottom'},
         title: 'Preview',
         text: this.getTourContent('editorTabTourPreviewTab'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            this.smoothScrollTo(0, 1000);
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('#tutorialPreviewTab'),
       },
       {
         id: 'editorTabTourSaveDraft',
-        attachTo: {element: '#editorTabTourSaveDraft', on: 'top'},
+        attachTo: {element: '#editorTabTourSaveDraft', on: 'bottom'},
         title: 'Save',
         text: this.getTourContent('editorTabTourSaveDraft'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
-        when: {
-          show: () => {
-            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-          },
-        },
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('#editorTabTourSaveDraft'),
       },
       {
         id: 'editorTabTourTutorialComplete',
-        attachTo: {element: '#editorTabTourTutorialComplete', on: 'top'},
+        attachTo: {element: '#editorTabTourTutorialComplete', on: 'bottom'},
         title: 'Tutorial Complete',
         text: this.getTourContent('editorTabTourTutorialComplete'),
+        cancelIcon: {enabled: true, label: 'Close Tour'},
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {
@@ -257,6 +276,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             classes: 'shepherd-button-primary',
           },
         ],
+        beforeShowPromise: () =>
+          this.scrollTourTargetIntoView('#editorTabTourTutorialComplete'),
       },
     ];
     return steps;
@@ -271,7 +292,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
     this.shepherdService.defaultStepOptions = {
       scrollTo: false,
-      cancelIcon: {enabled: true},
+      cancelIcon: {enabled: true, label: 'Close Tour'},
     };
     this.shepherdService.modal = true;
     this.shepherdService.addSteps(steps);
