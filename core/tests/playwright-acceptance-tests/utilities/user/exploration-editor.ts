@@ -1230,16 +1230,27 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.getElementInParent(
-        mobileNavbarOptions
-      ).catch(() => null);
-      if (!mobileNavbarElement) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-        await this.expectElementToBeVisible(mobileNavbarDropdown);
       }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileNavbarPane);
-      await this.clickOnElementWithSelector(mobileFeedbackTabButton);
+      await this.clickAndWaitForNavigation(mobileFeedbackTabButton, true);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.clickOnElementWithSelector(dropdownToggleIcon);
+      }
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
