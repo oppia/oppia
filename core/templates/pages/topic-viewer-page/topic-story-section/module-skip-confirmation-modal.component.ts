@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal that asks the learner to confirm skipping an adventure
- * when they select a lesson in a later adventure from the navigation.
+ * @fileoverview Modal that asks the learner to confirm skipping a module
+ * when they select a lesson in a later module from the navigation.
  */
 
 import {Component, Inject, Input, Optional} from '@angular/core';
@@ -26,15 +26,15 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-import './arc-skip-confirmation-modal.component.css';
+import './module-skip-confirmation-modal.component.css';
 
 @Component({
-  selector: 'arc-skip-confirmation-modal',
-  templateUrl: './arc-skip-confirmation-modal.component.html',
-  styleUrls: ['./arc-skip-confirmation-modal.component.css'],
+  selector: 'module-skip-confirmation-modal',
+  templateUrl: './module-skip-confirmation-modal.component.html',
+  styleUrls: ['./module-skip-confirmation-modal.component.css'],
 })
-export class ArcSkipConfirmationModalComponent extends ConfirmOrCancelModal {
-  @Input() adventureLabel!: string;
+export class ModuleSkipConfirmationModalComponent extends ConfirmOrCancelModal {
+  @Input() moduleLabel!: string;
   @Input() confirmationMessage!: string;
 
   protected bottomSheetRef: MatBottomSheetRef | undefined;
@@ -43,12 +43,12 @@ export class ArcSkipConfirmationModalComponent extends ConfirmOrCancelModal {
     @Optional() bottomSheetRef: MatBottomSheetRef | null,
     @Optional()
     @Inject(MAT_BOTTOM_SHEET_DATA)
-    private data: {adventureLabel: string; confirmationMessage: string} | null
+    private data: {moduleLabel: string; confirmationMessage: string} | null
   ) {
     super(ngbActiveModal);
     this.bottomSheetRef = bottomSheetRef ?? undefined;
     if (this.data) {
-      this.adventureLabel = this.data.adventureLabel;
+      this.moduleLabel = this.data.moduleLabel;
       this.confirmationMessage = this.data.confirmationMessage;
     }
   }
