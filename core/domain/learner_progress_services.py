@@ -44,19 +44,29 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, TypedDict
+from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        collection_models,
         datastore_services,
+        exp_models,
         story_models,
         topic_models,
         user_models,
     )
 
-(user_models, topic_models, story_models) = models.Registry.import_models(
-    [models.Names.USER, models.Names.TOPIC, models.Names.STORY]
+(user_models, topic_models, story_models, exp_models, collection_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.USER,
+            models.Names.TOPIC,
+            models.Names.STORY,
+            models.Names.EXPLORATION,
+            models.Names.COLLECTION,
+        ]
+    )
 )
 datastore_services = models.Registry.import_datastore_services()
 
@@ -206,15 +216,15 @@ def _save_completed_activities(
         activities_completed: CompletedActivities. The activities
             completed domain object to be saved in the datastore.
     """
-    activities_completed_dict = {
+    activities_completed_dict: Dict[str, Any] = {
         'exploration_ids': (activities_completed.exploration_ids),
         'collection_ids': activities_completed.collection_ids,
         'story_ids': activities_completed.story_ids,
         'learnt_topic_ids': activities_completed.learnt_topic_ids,
     }
 
-    completed_activities_model = user_models.CompletedActivitiesModel.get_by_id(
-        activities_completed.id
+    completed_activities_model = user_models.CompletedActivitiesModel.get(
+        activities_completed.id, strict=False
     )
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)
@@ -1843,7 +1853,7 @@ def get_learner_dashboard_activities(
         ActivityIdsInLearnerDashboard. The domain object containing the ids of
         all activities in the learner dashboard.
     """
-    learner_progress_models = (
+    learner_progress_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('CompletedActivitiesModel', [user_id]),
@@ -1983,7 +1993,7 @@ def get_topics_and_stories_progress(
             + untracked_topic_ids
         )
     )
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('TopicSummaryModel', unique_topic_ids),
@@ -2183,7 +2193,7 @@ def get_collection_progress(
     unique_collection_ids = list(
         set(incomplete_collection_ids + completed_collection_ids)
     )
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('CollectionSummaryModel', unique_collection_ids)]
         )
@@ -2194,6 +2204,7 @@ def get_collection_progress(
     ] = {}
     for model in activity_models[0]:
         if model is not None:
+            assert isinstance(model, collection_models.CollectionSummaryModel)
             collection_id_to_model_dict[model.id] = (
                 collection_services.get_collection_summary_from_model(model)
             )
@@ -2297,7 +2308,7 @@ def get_exploration_progress(
     unique_exploration_ids = list(
         set(incomplete_exploration_ids + completed_exploration_ids)
     )
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('ExpSummaryModel', unique_exploration_ids)]
         )
@@ -2306,6 +2317,7 @@ def get_exploration_progress(
     exploration_id_to_model_dict: Dict[str, exp_domain.ExplorationSummary] = {}
     for model in activity_models[0]:
         if model is not None:
+            assert isinstance(model, exp_models.ExpSummaryModel)
             exploration_id_to_model_dict[model.id] = (
                 exp_fetchers.get_exploration_summary_from_model(model)
             )
