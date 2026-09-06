@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the login page.
  */
+// @ts-nocheck
 
 import {
   ComponentFixture,

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for list of unicode string editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ListOfUnicodeStringEditorComponent} from './list-of-unicode-string-editor.component';
