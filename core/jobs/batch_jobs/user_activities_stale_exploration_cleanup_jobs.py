@@ -34,7 +34,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, List, Set
+from typing import Iterable, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -228,7 +228,10 @@ class CleanupStaleActivitiesExplorationRefsJob(base_jobs.JobBase):
 
     @staticmethod
     def _has_stale_exploration_ids(
-        model: user_models.CompletedActivitiesModel,
+        model: Union[
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel,
+        ],
         valid_ids_iter: Iterable[str],
         public_ids_iter: Iterable[str],
     ) -> bool:
@@ -288,7 +291,10 @@ class CleanupStaleActivitiesExplorationRefsJob(base_jobs.JobBase):
 
     @staticmethod
     def _log_stale_model(
-        model: user_models.CompletedActivitiesModel,
+        model: Union[
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel,
+        ],
         model_name: str,
         valid_ids_iter: Iterable[str],
         public_ids_iter: Iterable[str],
@@ -393,10 +399,16 @@ class CleanupStaleActivitiesExplorationRefsJob(base_jobs.JobBase):
 
     @staticmethod
     def _clean_model(
-        model: user_models.CompletedActivitiesModel,
+        model: Union[
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel,
+        ],
         valid_ids_iter: Iterable[str],
         public_ids_iter: Iterable[str],
-    ) -> user_models.CompletedActivitiesModel:
+    ) -> Union[
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+    ]:
         """Removes stale exploration IDs from the model.
 
         Args:
