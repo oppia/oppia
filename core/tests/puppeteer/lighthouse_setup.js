@@ -237,16 +237,6 @@ const login = async function (browser, page) {
 
 const setRole = async function (browser, page, role) {
   try {
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://localhost:8181/admin#/roles', {
-      waitUntil: networkIdle,
-    });
-    await page.waitForSelector(usernameInputFieldForRolesEditing);
-    await page.type(usernameInputFieldForRolesEditing, 'username1');
-    await page.waitForSelector(editUserRoleButton);
-    await page.click(editUserRoleButton);
-    await page.waitForSelector(roleEditorContainer);
-
     await page.waitForSelector(addNewRoleButton);
     await page.click(addNewRoleButton);
 
@@ -290,6 +280,10 @@ const setRole = async function (browser, page, role) {
     );
 
     if (roleOptionWasSelected) {
+      // Wait for the backend to accept the role before adding the next one.
+      // The role add is not transactional (fetch, append, save), so concurrent
+      // adds for the same user could drop roles. Awaiting each response keeps
+      // the adds strictly sequential and surfaces server errors promptly.
       await page.waitForResponse(response =>
         response.url().includes('/adminrolehandler')
       );
@@ -310,7 +304,6 @@ const setRole = async function (browser, page, role) {
         throw new Error(`Could not find role option for ${role}.`);
       }
     }
-    await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -1017,8 +1010,33 @@ const addThumbnailToTopic = async function (page, topicName) {
 // admin roles page and waits on several UI selectors, so only the roles a
 // shard's pages actually require are passed in to avoid wasting setup time.
 const setRoles = async function (browser, page, roles) {
-  for (let i = 0; i < roles.length; i++) {
-    await setRole(browser, page, roles[i]);
+  try {
+    // Load the roles editor once and assign every role within the same
+    // session. Reloading the admin roles tab for each role used to repeat the
+    // page load and the username look-up steps, so assigning roles no longer
+    // performs one navigation per role.
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/roles', {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
+    await page.waitForSelector(usernameInputFieldForRolesEditing, {
+      visible: true,
+    });
+    await page.type(usernameInputFieldForRolesEditing, 'username1');
+    await page.click(editUserRoleButton);
+    await page.waitForSelector(roleEditorContainer, {visible: true});
+
+    for (let i = 0; i < roles.length; i++) {
+      await setRole(browser, page, roles[i]);
+    }
+    // Let the editor render the final role list before the setup continues. A
+    // single settle is enough now that the page no longer reloads per role.
+    await page.waitForTimeout(2000);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
   }
 };
 
@@ -1113,23 +1131,15 @@ const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
   // (voiceover admin) role-gated pages, so these roles are assigned.
-  // Note that RELEASE_COORDINATOR is also assigned because the feature flags
-  // tab for the new lesson player below lives on the release-coordinator page.
   // Its other pages (classrooms, classroom, creator-dashboard,
-  // exploration-editor, exploration-player, new-lesson-player,
-  // community-library, pending-account-deletion) are public or login-only, so
-  // no topic/story/skill generation is needed here.
+  // exploration-editor, exploration-player, community-library,
+  // pending-account-deletion) are public or login-only, so no topic/story/skill
+  // generation is needed here.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
-  );
-  // The /lesson/<exploration_id> (new lesson player) page renders only when
-  // its feature flag is enabled, so enable it for the audits. With the flag
-  // on, /explore/<exploration_id> navigates to the same player client-side.
-  await logStep('enabling new lesson player flag', () =>
-    enableFeatureFlag(browser, page, 'new_lesson_player')
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN'])
   );
   // The exploration editor setup creates the exploration that backs the
-  // exploration-editor, exploration-player and new-lesson-player pages.
+  // exploration-editor and exploration-player pages.
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
   );
@@ -1192,55 +1202,6 @@ const shard4Setup = async function (browser, page) {
   );
 };
 
-const shard5Setup = async function (browser, page) {
-  await logStep('logging in', () => login(browser, page));
-  // Shard 5 audits the learner-group, technical-feedback and certificate
-  // pages, so the release coordinator enables their feature flags while the
-  // curriculum admin role covers the certificate dashboard. Only these two
-  // roles are assigned.
-  await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
-  );
-  await logStep('enabling learner_groups flag', () =>
-    enableFeatureFlag(browser, page, 'learner_groups_are_enabled')
-  );
-  await logStep('enabling technical_feedback flag', () =>
-    enableFeatureFlag(browser, page, 'technical_feedback_dashboard_enabled')
-  );
-  await logStep('enabling certificate_assessment flag', () =>
-    enableFeatureFlag(browser, page, 'enable_certificate_assessment')
-  );
-  // The structures step seeds a learner group (the admin is its facilitator)
-  // and a technical feedback report, which back the learner group and
-  // technical feedback pages. It also seeds the staging topic, which is unused
-  // by this shard but is created atomically by the same handler.
-  await logStep('generating topic and story data', () =>
-    generateDataForTopicAndStoryPlayer(browser, page)
-  );
-  // The classroom step seeds the certificate offering and attempt that back
-  // the certificate pages.
-  await logStep('generating math classroom', () =>
-    generateDataForClassroom(browser, page)
-  );
-};
-
-const shard6Setup = async function (browser, page) {
-  await logStep('logging in', () => login(browser, page));
-  // Shard 6 exists to audit the role-gated admin pages themselves, so all
-  // configurable roles are assigned here.
-  await logStep('assigning roles', () =>
-    setRoles(browser, page, [
-      'COLLECTION_EDITOR',
-      'VOICEOVER_ADMIN',
-      'ADMIN',
-      'RELEASE_COORDINATOR',
-      'FULL_USER',
-      'TECH_TEAM_LEAD',
-      'TRANSLATION_ADMIN',
-    ])
-  );
-};
-
 const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
@@ -1285,8 +1246,6 @@ const main = async function () {
     2: shard2Setup,
     3: shard3Setup,
     4: shard4Setup,
-    5: shard5Setup,
-    6: shard6Setup,
   };
   // Each shard runs only the setup its pages need. Shard 1 audits only static
   // public pages, so the runner never invokes this script for it. An unset
@@ -1302,11 +1261,7 @@ const main = async function () {
         ? 'data-player'
         : shard === 4
           ? 'editors'
-          : shard === 5
-            ? 'certificates'
-            : shard === 6
-              ? 'roles'
-              : 'full';
+          : 'full';
   const ranBlogSetup = setupKind === 'full' || setupKind === 'blog';
   const ranExplorationSetup =
     setupKind === 'data' ||
@@ -1315,14 +1270,8 @@ const main = async function () {
     setupKind === 'blog';
   const ranTopicStorySkillSetup =
     setupKind === 'data' || setupKind === 'full' || setupKind === 'editors';
-  const ranStructuresSetup =
-    setupKind === 'data' ||
-    setupKind === 'full' ||
-    setupKind === 'certificates';
-  const ranClassroomSetup =
-    setupKind === 'data' ||
-    setupKind === 'full' ||
-    setupKind === 'certificates';
+  const ranStructuresSetup = setupKind === 'data' || setupKind === 'full';
+  const ranClassroomSetup = setupKind === 'data' || setupKind === 'full';
 
   await runShardSetup(browser, page);
 

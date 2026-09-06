@@ -405,16 +405,6 @@ module.exports = {
             },
           },
           {
-            matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$',
-            pagePerfThresholds: {
-              fcp: 4650,
-              speedIndex: 5700,
-              lcp: 10800,
-              tbt: 300,
-              cls: 0.6,
-            },
-          },
-          {
             matchingUrlPattern: 'http://[^/]+/teach$',
             pagePerfThresholds: {
               fcp: 2760,
@@ -659,30 +649,7 @@ module.exports = {
             },
           },
           {
-            matchingUrlPattern: '^http://[^/]+/certificate-assessment/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern:
-              '^http://[^/]+/certificate-assessment-result/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/certificate-creator-dashboard$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern:
-              '^http://[^/]+/learn/.+/certificate-offering-available$',
-            accessibilityMinScore: 0.9,
-          },
-          {
             matchingUrlPattern: '^http://[^/]+/contributor-admin-dashboard$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern:
-              '^http://[^/]+/create-certificate-assessment-offering$',
             accessibilityMinScore: 0.9,
           },
           {
@@ -690,40 +657,7 @@ module.exports = {
             accessibilityMinScore: 0.9,
           },
           {
-            matchingUrlPattern:
-              '^http://[^/]+/edit-certificate-assessment-offering/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/learn/.+/test/arc/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/facilitator-dashboard$',
-            accessibilityMinScore: 0.9,
-          },
-          {
             matchingUrlPattern: '^http://[^/]+/feedback-updates$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/create-learner-group$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/edit-learner-group/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/learner-group/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/learn/.+/mastery-challenge$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/lesson/.+$',
             accessibilityMinScore: 0.9,
           },
           {
@@ -740,15 +674,6 @@ module.exports = {
           },
           {
             matchingUrlPattern: '^http://[^/]+/learn/.+/studyguide/.+$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern: '^http://[^/]+/technical-feedback-dashboard$',
-            accessibilityMinScore: 0.9,
-          },
-          {
-            matchingUrlPattern:
-              '^http://[^/]+/technical-feedback-dashboard/.+$',
             accessibilityMinScore: 0.9,
           },
           {

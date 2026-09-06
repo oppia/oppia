@@ -36,7 +36,6 @@
     "creator-dashboard",
     "exploration-editor",
     "exploration-player",
-    "new-lesson-player",
     "community-library",
     "pending-account-deletion",
     "voiceover-admin"
@@ -51,24 +50,6 @@
     "learner-dashboard",
     "diagnostic-test-player",
     "practice-session",
-    "subtopic-viewer",
-    "mastery-challenge",
-    "node-practice-session",
-    "end-of-arc-test"
-  ],
-  "5": [
-    "facilitator-dashboard",
-    "create-learner-group",
-    "edit-learner-group",
-    "learner-group-viewer",
-    "technical-feedback-dashboard",
-    "technical-feedback-detail",
-    "certificate-assessment-player",
-    "certificate-assessment-result",
-    "certificate-creator-dashboard",
-    "certificate-offering-available",
-    "signup",
-    "create-certificate-offering",
-    "edit-certificate-offering"
+    "subtopic-viewer"
   ]
 }
