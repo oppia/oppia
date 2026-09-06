@@ -20,7 +20,6 @@ import {Component} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteAccountBackendApiService} from './services/delete-account-backend-api.service';
 import {DeleteAccountModalComponent} from './templates/delete-account-modal.component';
-import './delete-account-page.component.css';
 
 @Component({
   selector: 'oppia-delete-account-page',

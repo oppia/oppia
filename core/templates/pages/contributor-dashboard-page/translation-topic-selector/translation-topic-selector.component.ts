@@ -28,7 +28,6 @@ import {
 } from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import './translation-topic-selector.component.css';
 import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len

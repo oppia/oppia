@@ -45,7 +45,6 @@ import {StateCardIsCheckpointService} from 'components/state-editor/state-editor
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import {TranslationStatusService} from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import './state-graph-visualization.component.css';
 
 interface ElementDimensions {
   h: number;

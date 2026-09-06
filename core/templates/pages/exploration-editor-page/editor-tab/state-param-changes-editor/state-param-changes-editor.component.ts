@@ -18,7 +18,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import './state-param-changes-editor.component.css';
 import {
   StateParamChangesService,
   // eslint-disable-next-line max-len
