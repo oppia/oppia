@@ -6492,6 +6492,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks on the include technical log checkbox.
+   */
+  async clickOnIncludetechnicalLogCheckbox(): Promise<void> {
+    await this.expectElementToBeClickable(technicalLogsSelector, true);
+    await this.clickOnElementWithSelector(technicalLogsSelector);
+  }
+
+  /**
    * Waits for the Cloudflare Turnstile iframe to finish loading.
    * This avoids interacting with the captcha before the third-party
    * iframe has been fully initialized.

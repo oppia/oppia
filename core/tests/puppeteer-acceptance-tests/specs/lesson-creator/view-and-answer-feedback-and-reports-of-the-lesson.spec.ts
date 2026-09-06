@@ -34,7 +34,7 @@ import {
 const ROLES = testConstants.Roles;
 const statusLabels = FEEDBACK_STATUS_LABELS;
 
-describe('Logged-in User', function () {
+describe('Lesson Creator', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let releaseCoordinator: ReleaseCoordinator;
   let lessonCreator: ExplorationEditor & LoggedInUser;
@@ -230,8 +230,8 @@ describe('Logged-in User', function () {
       statusLabels[FeedbackStatus.OPEN],
       'Lesson',
       'Web',
-      'Typo',
-      'http://localhost:8181/lesson/' + expId
+      'http://localhost:8181/lesson/' + expId,
+      'Typo'
     );
     await lessonCreator.verifyFeedbackDetailPageLessonContextSection(
       expId,
@@ -260,7 +260,7 @@ describe('Logged-in User', function () {
       'Question 2 is confusing.'
     );
 
-    await lessonCreator.verifyFeedbacKDetailStatusActionsButtons();
+    await lessonCreator.verifyFeedbackDetailStatusActionsButtons();
     await lessonCreator.clickFeedbackDetailStatusButton('compliment');
 
     await lessonCreator.verifyFeedbackStatusActions('compliment', 'open');

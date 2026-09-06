@@ -136,24 +136,24 @@
                                          iconClass="fas fa-file-alt" [isCollapsible]="true">
             <ng-container *ngIf="sessionInfo as logs; else noSessionInfo">
               <div class="oppia-feedback-detail-log-block">
-                <div class="oppia-feedback-detail-log-heading">Environment</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.environment | json }}</pre>
+                <div class="oppia-feedback-detail-log-heading e2e-test-feedback-detail-environment-label">Environment</div>
+                <pre class="oppia-feedback-detail-log-content e2e-test-feedback-detail-environment-value">{{ logs.environment | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
-                <div class="oppia-feedback-detail-log-heading">Console logs</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.console_logs | json }}</pre>
+                <div class="oppia-feedback-detail-log-heading e2e-test-feedback-detail-console-label">Console logs</div>
+                <pre class="oppia-feedback-detail-log-content e2e-test-feedback-detail-console-value">{{ logs.console_logs | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
-                <div class="oppia-feedback-detail-log-heading">Failed requests</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.failed_requests | json }}</pre>
+                <div class="oppia-feedback-detail-log-heading e2e-test-feedback-detail-failed-requests-label">Failed requests</div>
+                <pre class="oppia-feedback-detail-log-content e2e-test-feedback-detail-failed-requests-value">{{ logs.failed_requests | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
-                <div class="oppia-feedback-detail-log-heading">Navigation history</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.navigation_history | json }}</pre>
+                <div class="oppia-feedback-detail-log-heading e2e-test-feedback-detail-navigation-history-label">Navigation history</div>
+                <pre class="oppia-feedback-detail-log-content e2e-test-feedback-detail-navigation-history-value">{{ logs.navigation_history | json }}</pre>
               </div>
             </ng-container>
             <ng-template #noSessionInfo>
-              <p class="oppia-feedback-detail-empty">No session information was attached to this report.</p>
+              <p class="oppia-feedback-detail-empty e2e-test-feedback-detail-no-sessionLogs">No session information was attached to this report.</p>
             </ng-template>
           </oppia-feedback-detail-section>
         </div>

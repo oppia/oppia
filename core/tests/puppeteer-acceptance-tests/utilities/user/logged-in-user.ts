@@ -432,8 +432,6 @@ const feedbackDetailPageCategoryChipSelector =
 const feedbackDetailPageDetailsSection = '.e2e-test-feedback-details-section';
 const feedbackDetailPageLessonContextSection =
   '.e2e-feedback-detail-lesson-context-section';
-const feedbackDetailPageSessionInfoSection =
-  '.e2e-test-feedback-detail-session-info-section';
 const feedbackDetailPageUserFeedbackSection =
   '.e2e-test-feedback-detail-user-feedback-section';
 const feedbackDetailPageRepliesSection =
@@ -4787,7 +4785,7 @@ export class LoggedInUser extends BaseUser {
     expect(actualValue).toBe(expectedValue);
   }
 
-  private async verifyDefaultFeedbackTabFilter(
+  async verifyDefaultFeedbackTabFilter(
     expectedStatus: string,
     additionalFilterSelector?: string,
     expectedAdditionalFilterValue?: string
@@ -4826,7 +4824,7 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
-  private async verifyFeedbackFilterRowContents(
+  async verifyFeedbackFilterRowContents(
     additionalFilterSelector?: string
   ): Promise<void> {
     await this.expectElementToBeVisible(feedbackFilterBar, true);
@@ -4853,13 +4851,7 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
-  async verifyTechnicalFeedbackDashboardFeedbackFilterRowContents(): Promise<void> {
-    await this.verifyFeedbackFilterRowContents(feedbackFilterTechnicalTeam);
-  }
-
-  private async verifyFeedbackList(
-    additionalSelectors: string[] = []
-  ): Promise<void> {
+  async verifyFeedbackList(additionalSelectors: string[] = []): Promise<void> {
     await this.expectElementToBeVisible(feedbackTableDiv, true);
     await this.expectElementToBeVisible(feedbackTableStatus, true);
     await this.expectElementToBeVisible(feedbackTableDescription, true);
@@ -4885,10 +4877,6 @@ export class LoggedInUser extends BaseUser {
         feedbackTableCategoryChip,
       ]);
     }
-  }
-
-  async verifyTechnicalFeedbackDashboardFeedbackList(): Promise<void> {
-    await this.verifyFeedbackList([feedbackTableCategoryChip]);
   }
 
   async expectMySuggestionsTabTotalNotification(
@@ -5042,8 +5030,8 @@ export class LoggedInUser extends BaseUser {
     statusValue: string,
     sourceValue: string,
     platformValue: string,
-    categoryValue?: string,
-    pageUrlValue?: string
+    pageUrlValue?: string,
+    categoryValue?: string
   ): Promise<void> {
     await this.expectTextContentToContain(
       feedbackDetailPageDetailsSection,
@@ -5363,7 +5351,7 @@ export class LoggedInUser extends BaseUser {
     showMessage('Sent Reply to Learner');
   }
 
-  async verifyFeedbacKDetailStatusActionsButtons(): Promise<void> {
+  async verifyFeedbackDetailStatusActionsButtons(): Promise<void> {
     await this.expectTextContentToBe(
       feedbackDetailActionStatusLabel,
       'Change status:'
