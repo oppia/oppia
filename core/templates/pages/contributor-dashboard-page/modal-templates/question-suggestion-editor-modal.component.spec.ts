@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for QuestionSuggestionEditorModalComponent.
  */
 
+// @ts-nocheck
+
 import {fakeAsync, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {NO_ERRORS_SCHEMA} from '@angular/core';

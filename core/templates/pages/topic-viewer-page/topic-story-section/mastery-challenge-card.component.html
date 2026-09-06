@@ -13,8 +13,9 @@
     <button class="mastery-challenge-button e2e-test-mastery-challenge-button"
             type="button"
             [class.mastery-challenge-button-locked]="!isUnlocked"
-            [disabled]="isActionDisabled()"
-            (click)="onChallengeButtonClick()">
+            (click)="onChallengeButtonClick()"
+            (mouseenter)="onButtonMouseEnter()"
+            (mouseleave)="onButtonMouseLeave()">
       <span class="mastery-challenge-button-icon"
             [class.mastery-challenge-button-icon-locked]="!isUnlocked"
             aria-hidden="true">
