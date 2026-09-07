@@ -273,15 +273,22 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(messages_summary['author_username'], None)
 
-    def test_raises_error_if_wrong_type_of_suggestion_provided(self) -> None:
+    def test_get_translation_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
+
+        # Get the exploration to find a valid content_id.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
+        state = exploration.states['Welcome!']
+        # Use the actual content_id from the state.
+        content_id = state.content.content_id
+        content_html = state.content.html
 
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content',
+            'state_name': 'Welcome!',
+            'content_id': content_id,
             'language_code': 'hi',
-            'content_html': '<p>This is a content.</p>',
+            'content_html': content_html,
             'translation_html': '<p>This is translated html.</p>',
             'data_format': 'html',
         }
@@ -310,6 +317,49 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         )
         with self.swap_to_always_return(
             suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ):
+            response_dict = self.get_json(thread_url)
+            messages_summary = response_dict['message_summary_list']
+            self.assertEqual(len(messages_summary), 1)
+            suggestion_summary = messages_summary[0]
+            self.assertEqual(
+                suggestion_summary['suggestion_html'],
+                '<p>This is translated html.</p>',
+            )
+            self.assertEqual(
+                suggestion_summary['current_content_html'], content_html
+            )
+            self.assertEqual(
+                suggestion_summary['description'],
+                self._get_unicode_test_string('subject'),
+            )
+            self.assertEqual(suggestion_summary['author_username'], 'editor')
+
+    def test_raises_error_for_unsupported_suggestion_type(self) -> None:
+        """Test that an error is raised when a suggestion type that is not
+        SuggestionEditStateContent or SuggestionTranslateContent is provided.
+        """
+        self.login(self.EDITOR_EMAIL)
+
+        # Create a mock suggestion object that is neither EditStateContent
+        # nor TranslateContent. We use a simple object for this test.
+        class MockUnsupportedSuggestion:
+            """Mock suggestion class for testing unsupported types."""
+
+            pass
+
+        mock_suggestion = MockUnsupportedSuggestion()
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', mock_suggestion
         ):
             with self.assertRaisesRegex(
                 Exception,

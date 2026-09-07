@@ -166,26 +166,51 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
             )
-            if not isinstance(
+            if isinstance(
                 suggestion, suggestion_registry.SuggestionEditStateContent
             ):
+                exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+                current_content_html = exploration.states[
+                    suggestion.change_cmd.state_name
+                ].content.html
+                suggestion_summary: SuggestionSummaryDict = {
+                    'suggestion_html': suggestion.change_cmd.new_value['html'],
+                    'current_content_html': current_content_html,
+                    'description': suggestion_thread.subject,
+                    'author_username': suggestion_author_setting.username,
+                    'created_on_msecs': utils.get_time_in_millisecs(
+                        messages[0].created_on
+                    ),
+                }
+            elif isinstance(
+                suggestion, suggestion_registry.SuggestionTranslateContent
+            ):
+                exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+                current_content_html = exploration.get_content_html(
+                    suggestion.change_cmd.state_name,
+                    suggestion.change_cmd.content_id,
+                )
+                # translation_html and content_html can be str or List[str],
+                # but SuggestionSummaryDict expects str. Convert to str if needed.
+                suggestion_html = suggestion.change_cmd.translation_html
+                if isinstance(suggestion_html, list):
+                    suggestion_html = ' '.join(suggestion_html)
+                if isinstance(current_content_html, list):
+                    current_content_html = ' '.join(current_content_html)
+                suggestion_summary: SuggestionSummaryDict = {
+                    'suggestion_html': suggestion_html,
+                    'current_content_html': current_content_html,
+                    'description': suggestion_thread.subject,
+                    'author_username': suggestion_author_setting.username,
+                    'created_on_msecs': utils.get_time_in_millisecs(
+                        messages[0].created_on
+                    ),
+                }
+            else:
                 raise Exception(
                     'No edit state content suggestion found for the given '
                     'thread_id: %s' % thread_id
                 )
-            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-            current_content_html = exploration.states[
-                suggestion.change_cmd.state_name
-            ].content.html
-            suggestion_summary: SuggestionSummaryDict = {
-                'suggestion_html': suggestion.change_cmd.new_value['html'],
-                'current_content_html': current_content_html,
-                'description': suggestion_thread.subject,
-                'author_username': suggestion_author_setting.username,
-                'created_on_msecs': utils.get_time_in_millisecs(
-                    messages[0].created_on
-                ),
-            }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
             authors_settings.pop(0)
