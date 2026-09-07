@@ -557,7 +557,6 @@
 	"I18N_TOPIC_TITLE": "Theema",
 	"I18N_TOPIC_VIEWER_CHAPTER": "Kapitel",
 	"I18N_TOPIC_VIEWER_CHAPTERS": "{count, plural, one{ee Kapitel} other{# Kapitelen}}",
-	"I18N_TOPIC_VIEWER_CLOSE_BUTTON": "Zoumaachen",
 	"I18N_TOPIC_VIEWER_COMING_SOON": "Deemnächst!",
 	"I18N_TOPIC_VIEWER_LEARN": "Léieren",
 	"I18N_TOPIC_VIEWER_LESSON_NEW_LABEL": "NEI",
