@@ -191,7 +191,7 @@ describe('Tech Team Lead', function () {
 
     await techTeamLead.verifyTechnicalFeedbackDashboardFeedbackFilterRowContents();
     await techTeamLead.verifyDefaultTechnicalFeedbackDashboardFilter();
-    await techTeamLead.verifyTechnicalFeedbackDashboardFeedbackList();
+    await techTeamLead.verifyTechnicalFeedbackDashboardFeedbackListColumns();
 
     await techTeamLead.expectFeedbackTableEntry({
       description: 'Answer is not submitting in this card.',
@@ -256,7 +256,7 @@ describe('Tech Team Lead', function () {
     await techTeamLead.clickFeedbackDetailBackButton();
     await techTeamLead.expectPageURLToContain('technical-feedback-dashboard');
     await techTeamLead.expectTechnicalFeedbackDashboard();
-    await techTeamLead.verifyTechnicalFeedbackDashboardFeedbackList();
+    await techTeamLead.verifyTechnicalFeedbackDashboardFeedbackListColumns();
   });
 
   it('should open a report with no screenshot but NO session logs', async function () {
