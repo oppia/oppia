@@ -29,6 +29,7 @@ import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
 import {StudyGuide} from 'domain/topic/study-guide.model';
+import './create-new-subtopic-modal.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -37,6 +38,7 @@ import {
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
   templateUrl: './create-new-subtopic-modal.component.html',
+  styleUrls: ['./create-new-subtopic-modal.component.css'],
 })
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal

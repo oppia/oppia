@@ -35,6 +35,7 @@ import {ServicesConstants} from 'services/services.constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
+import './rte-helper-modal.component.css';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -117,6 +118,7 @@ interface RteHelperModalData {
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
+  styleUrls: ['./rte-helper-modal.component.css'],
 })
 export class RteHelperModalComponent {
   @Input() componentId: RteComponentId;

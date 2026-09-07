@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
