@@ -22,6 +22,7 @@ import {Component, OnInit} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
+import {AlertsService} from 'services/alerts.service';
 
 interface LanguageOption {
   code: string;
@@ -47,7 +48,8 @@ export class TranslationConfigurationTabComponent implements OnInit {
 
   constructor(
     private readonly apiService: ContributorDashboardAdminBackendApiService,
-    private readonly languageUtilService: LanguageUtilService
+    private readonly languageUtilService: LanguageUtilService,
+    private readonly alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
@@ -117,9 +119,14 @@ export class TranslationConfigurationTabComponent implements OnInit {
   }
 
   private async saveConfiguration(): Promise<void> {
-    await this.apiService.updateTranslationConfigurationAsync(
-      this.providerMapping,
-      this.isAutomaticTranslationEnabled
-    );
+    try {
+      await this.apiService.updateTranslationConfigurationAsync(
+        this.providerMapping,
+        this.isAutomaticTranslationEnabled
+      );
+      this.alertsService.addSuccessMessage('Configuration saved successfully.');
+    } catch (error) {
+      this.alertsService.addWarning(error.message || 'Failed to save configuration.');
+    }
   }
 }

@@ -27,6 +27,7 @@ import {TranslationConfigurationTabComponent} from './translation-configuration-
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationAdminConfig} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
+import {AlertsService} from 'services/alerts.service';
 import {FormsModule} from '@angular/forms';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIconModule} from '@angular/material/icon';
@@ -38,6 +39,7 @@ describe('TranslationConfigurationTabComponent', () => {
   let fixture: ComponentFixture<TranslationConfigurationTabComponent>;
   let mockApiService: jasmine.SpyObj<ContributorDashboardAdminBackendApiService>;
   let mockLanguageUtilService: jasmine.SpyObj<LanguageUtilService>;
+  let mockAlertsService: jasmine.SpyObj<AlertsService>;
 
   const MOCK_CONFIG = new TranslationAdminConfig(
     {hi: 'azure'},
@@ -64,6 +66,10 @@ describe('TranslationConfigurationTabComponent', () => {
       'getAudioLanguageDescription',
       'getAllVoiceoverLanguageCodes',
     ]);
+    mockAlertsService = jasmine.createSpyObj('AlertsService', [
+      'addSuccessMessage',
+      'addWarning',
+    ]);
     mockLanguageUtilService.getAudioLanguageDescription.and.callFake(
       (code: string) =>
         code === 'hi' ? 'Hindi' : code === 'es' ? 'Spanish' : code
@@ -87,6 +93,7 @@ describe('TranslationConfigurationTabComponent', () => {
           useValue: mockApiService,
         },
         {provide: LanguageUtilService, useValue: mockLanguageUtilService},
+        {provide: AlertsService, useValue: mockAlertsService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -203,5 +210,20 @@ describe('TranslationConfigurationTabComponent', () => {
     expect(component.getUnmappedLanguageOptions()).toEqual([
       {code: 'es', name: 'Spanish'},
     ]);
+  }));
+
+  it('should show warning if updating configuration fails', fakeAsync(() => {
+    mockApiService.updateTranslationConfigurationAsync.and.returnValue(
+      Promise.reject(new Error('Failed to update config.'))
+    );
+
+    component.providerMapping = {hi: 'azure'};
+    component.isAutomaticTranslationEnabled = true;
+
+    // Trigger save via toggle
+    component.toggleAutomaticTranslation();
+    tick();
+
+    expect(mockAlertsService.addWarning).toHaveBeenCalledWith('Failed to update config.');
   }));
 });
