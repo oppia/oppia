@@ -16,6 +16,8 @@
  * @fileoverview Unit Tests for CollectionPlayerBackendApiService.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

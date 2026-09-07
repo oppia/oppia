@@ -21,6 +21,7 @@ import {Rubric} from 'domain/skill/rubric.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Subscription} from 'rxjs';
+import './skill-questions-tab.component.css';
 import {
   CategorizedSkills,
   TopicsAndSkillsDashboardBackendApiService,
@@ -33,6 +34,7 @@ import {
 @Component({
   selector: 'oppia-questions-tab',
   templateUrl: './skill-questions-tab.component.html',
+  styleUrls: ['./skill-questions-tab.component.css'],
 })
 export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks

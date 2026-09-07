@@ -1,6 +1,6 @@
 <oppia-titled-background-banner [title]="bannerTitleI18nKey"
                                 [buttonText]="bannerButtonI18nKey"
-                                [buttonRoute]="classroomUrlFragment ? ['/learn', classroomUrlFragment, 'certificate-offering-available'] : ['/learn']">
+                                (bannerClick)="onExit()">
 </oppia-titled-background-banner>
 <div *ngIf="currentQuestion">
   <oppia-certificate-assessment-conversation-skin #conversationSkin

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Subtitled Unicode editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';

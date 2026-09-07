@@ -11,8 +11,8 @@ __pycache__/
 # Markdown files.
 *.md
 
-# Typescript files in core and extension they are not needed as
-# we compile webpack which contains these files.
+# Typescript files in core and extension are not needed as
+# we use the Angular CLI build which compiles these files.
 core/**/*.ts
 extensions/**/*.ts
 
