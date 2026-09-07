@@ -26,7 +26,9 @@ import {
   Output,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {Router} from '@angular/router';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
   AssessmentQuestion,
@@ -45,13 +47,13 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   UnansweredQuestionModalComponent,
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
-import {TranslateService} from '@ngx-translate/core';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -90,7 +92,9 @@ export class CertificateAssessmentPlayerPageComponent
     private alertsService: AlertsService,
     private internetConnectivityService: InternetConnectivityService,
     @Optional() private ngbModal: NgbModal,
+    private router: Router,
     private translateService: TranslateService,
+    private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
     private answerClassificationService: AnswerClassificationService,
     private currentInteractionService: CurrentInteractionService,
@@ -199,6 +203,20 @@ export class CertificateAssessmentPlayerPageComponent
     }
     this.currentQuestionIndex += 1;
     this.refreshComputedFields();
+  }
+
+  onExit(): void {
+    const exitRoute = this.classroomUrlFragment
+      ? ['/learn', this.classroomUrlFragment, 'certificate-offering-available']
+      : ['/learn'];
+    const shouldLeave = this.windowRef.nativeWindow.confirm(
+      this.translateService.instant('I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM')
+    );
+    if (shouldLeave) {
+      // Only navigate when the learner confirms; otherwise they stay on
+      // the current question so they can keep working.
+      this.router.navigate(exitRoute);
+    }
   }
 
   previousQuestion(): void {

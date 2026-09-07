@@ -29,6 +29,7 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 import {AlertsService} from 'services/alerts.service';
 import {PageHeadService} from 'services/page-head.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
@@ -37,8 +38,8 @@ import {CertificateAssessmentPlayerStateService} from './certificate-assessment-
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
-  // The state service is scoped to this component so that its countdown
-  // interval is torn down together with the page it belongs to.
+  // The state service is scoped to this component so its state resets
+  // together with the page it belongs to.
   providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
@@ -68,6 +69,9 @@ export class CertificateAssessmentPlayerPageRootComponent
   // Tracks the most recent submission so that result navigation can wait
   // until the final answers have actually been persisted.
   private pendingSubmission: Promise<void> = Promise.resolve();
+  // Set once the learner's answers have been saved, so the beforeunload
+  // guard stops warning once there is nothing left to lose.
+  private attemptIsSubmitted = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -77,6 +81,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     private classroomBackendApiService: ClassroomBackendApiService,
     private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private router: Router,
     protected translateService: TranslateService
   ) {
@@ -91,15 +96,13 @@ export class CertificateAssessmentPlayerPageRootComponent
     return this.certificateAssessmentPlayerStateService.getAttempt();
   }
 
-  get showAssessmentInterruptCard(): boolean {
-    return this.certificateAssessmentPlayerStateService
-      .showAssessmentInterruptCard;
-  }
-
   async ngOnInit(): Promise<void> {
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
+    this.preventPageUnloadEventService.addListener(() => {
+      return this.attempt !== null && !this.attemptIsSubmitted;
+    });
     await this.loadCertificateOffering();
     if (currentRoute === 'session' && !this.hasError) {
       await this.startAssessment();
@@ -151,10 +154,8 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Starts a new attempt on the server. The learner only moves to the
-   * questions once the server confirms the attempt; that confirmation is
-   * also what arms a fresh time window for them (see
-   * `beginNewAttempt`), so a failed start leaves any existing timing
-   * state untouched.
+   * questions once the server confirms the attempt; a failed start leaves
+   * them back on the intro to try again.
    */
   async startAssessment(): Promise<void> {
     try {
@@ -216,6 +217,7 @@ export class CertificateAssessmentPlayerPageRootComponent
           attemptId,
           answers
         );
+        this.attemptIsSubmitted = true;
         await this.navigateToResultPage();
       } catch {
         if (!this.internetConnectivityService.isOnline()) {
@@ -238,20 +240,13 @@ export class CertificateAssessmentPlayerPageRootComponent
     await this.pendingSubmission;
   }
 
-  onRetryAssessment(): void {
-    this.certificateAssessmentPlayerStateService.returnToIntroAfterRetry();
-  }
-
-  onResumeAssessment(): void {
-    this.certificateAssessmentPlayerStateService.resumeQuestionsStage();
-  }
-
   async onViewResults(): Promise<boolean> {
     await this.pendingSubmission;
     return this.navigateToResultPage();
   }
 
   ngOnDestroy(): void {
+    this.preventPageUnloadEventService.removeListener();
     super.ngOnDestroy();
   }
 

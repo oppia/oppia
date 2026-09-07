@@ -43,7 +43,6 @@ describe('CertificateAssessmentPlayerStateService', () => {
     expect(service.currentStage).toBe(
       CertificateAssessmentPlayerPageConstants.STAGE_INTRO
     );
-    expect(service.showAssessmentInterruptCard).toBeFalse();
     expect(service.getAttempt()).toBeNull();
   });
 
@@ -72,33 +71,6 @@ describe('CertificateAssessmentPlayerStateService', () => {
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
       );
       expect(service.getAttempt()).toEqual(mockAttempt);
-    });
-  });
-
-  describe('retry and resume after an interruption', () => {
-    it('should return to the intro on retry', () => {
-      service.beginNewAttempt(mockAttempt);
-      service.showAssessmentInterruptCard = true;
-
-      service.returnToIntroAfterRetry();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_INTRO
-      );
-    });
-
-    it('should return to the questions on resume', () => {
-      service.beginNewAttempt(mockAttempt);
-      service.showAssessmentInterruptCard = true;
-      service.returnToIntroAfterRetry();
-
-      service.resumeQuestionsStage();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-      );
     });
   });
 });
