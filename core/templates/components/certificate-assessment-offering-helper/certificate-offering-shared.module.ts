@@ -29,7 +29,6 @@ import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-o
 import {AssessmentInterruptComponent} from './assessment-interrupt.component';
 import {AssessmentUnavailableModalComponent} from './assessment-unavailable-modal.component';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
-import {TimeExpiredModalComponent} from './time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 import {FormsModule} from '@angular/forms';
 
@@ -44,7 +43,6 @@ import {FormsModule} from '@angular/forms';
     AssessmentInterruptComponent,
     AssessmentUnavailableModalComponent,
     PostCertificateOfferingResultModalComponent,
-    TimeExpiredModalComponent,
     UnansweredQuestionModalComponent,
   ],
   exports: [
@@ -56,13 +54,11 @@ import {FormsModule} from '@angular/forms';
     AssessmentInterruptComponent,
     AssessmentUnavailableModalComponent,
     PostCertificateOfferingResultModalComponent,
-    TimeExpiredModalComponent,
     UnansweredQuestionModalComponent,
   ],
   entryComponents: [
     CertificateOfferingConfirmationModalComponent,
     PostCertificateOfferingResultModalComponent,
-    TimeExpiredModalComponent,
     UnansweredQuestionModalComponent,
   ],
 })

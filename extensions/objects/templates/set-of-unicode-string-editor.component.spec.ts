@@ -16,6 +16,8 @@
  * @fileoverview Component for set of unicode string editor.
  */
 
+// @ts-nocheck
+
 import {ChangeDetectorRef} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';

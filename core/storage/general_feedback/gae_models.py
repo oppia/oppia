@@ -241,6 +241,34 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         feedback_model.put()
         return feedback_id
 
+    @classmethod
+    def get_total_unread_response_count(cls, author_id: str) -> int:
+        """Returns the learner's total number of unread creator responses.
+
+        The count spans every non-deleted lesson feedback entry authored by
+        the learner, so it is independent of list pagination.
+
+        Args:
+            author_id: str. The learner user ID.
+
+        Returns:
+            int. Sum of unread_response_count across the learner's entries.
+        """
+        # unread_response_count is not an indexed property, so the learner's
+        # entries are fetched and summed in memory. The volume per learner is
+        # small since it only includes their own submissions.
+        feedback_models: Sequence[LessonFeedbackModel] = (
+            cls.get_all()
+            .filter(cls.deleted.IN([False]))
+            .filter(cls.author_id == author_id)
+            .fetch()
+        )
+        return sum(
+            model.unread_response_count
+            for model in feedback_models
+            if model.unread_response_count > 0
+        )
+
 
 class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     """Primary datastore model for lesson issue reports and site issue reports.
@@ -402,7 +430,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     def _get_filtered_query(
         cls,
         author_id: Optional[str] = None,
-        status_filter: Optional[str] = 'open',
+        status_filter: Optional[List[str]] = None,
         exploration_id: Optional[str] = None,
         date_from: Optional[datetime.datetime] = None,
         date_to: Optional[datetime.datetime] = None,
@@ -415,7 +443,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
 
         Args:
             author_id: Optional[str]. If provided, filters by author ID.
-            status_filter: Optional[str]. If provided, filters by status.
+            status_filter: Optional[List[str]]. If provided, filters by these
+                status values.
             exploration_id: Optional[str]. If provided, filters by
                 exploration ID.
             date_from: Optional[datetime]. If provided, filters reports created

@@ -21,7 +21,7 @@ import {
   QuestionSubmitterStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
-} from './contributor-dashboard-admin-summary.model';
+} from '../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 describe('Translation Submitter Stats Model', () => {
   it('should correctly convert backend dict to domain object.', () => {

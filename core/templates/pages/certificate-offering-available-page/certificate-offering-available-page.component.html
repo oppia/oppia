@@ -83,7 +83,8 @@
           <ng-container *ngSwitchCase="'passed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_PASSED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary e2e-test-check-score-button">
+<button type="button" class="btn btn-primary"
+                      [routerLink]="certificate.resultRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
@@ -97,7 +98,8 @@
           <ng-container *ngSwitchCase="'failed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FAILED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary e2e-test-check-score-button">
+<button type="button" class="btn btn-primary"
+                      [routerLink]="certificate.resultRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"

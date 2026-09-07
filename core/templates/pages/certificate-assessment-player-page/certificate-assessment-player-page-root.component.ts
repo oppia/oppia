@@ -96,14 +96,6 @@ export class CertificateAssessmentPlayerPageRootComponent
       .showAssessmentInterruptCard;
   }
 
-  get isTimeExpired(): boolean {
-    return this.certificateAssessmentPlayerStateService.isTimeExpired;
-  }
-
-  get remainingTimeInSeconds(): number {
-    return this.certificateAssessmentPlayerStateService.remainingTimeInSeconds;
-  }
-
   async ngOnInit(): Promise<void> {
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
@@ -121,9 +113,6 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       await this.loadClassroomUrlFragment();
-      this.certificateAssessmentPlayerStateService.configureForOffering(
-        this.certificateOffering.timeLimitInMinutes
-      );
     } catch {
       this.hasError = true;
       await this.redirectToNotFound();
@@ -210,9 +199,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   /**
-   * Submits the learner's final answers exactly once and navigates to the
-   * result page, unless the submission raced against the expiry of the
-   * time window (in which case the auto-submit keeps them on the page).
+   * Submits the learner's final answers and navigates to the result page.
    */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
@@ -221,7 +208,6 @@ export class CertificateAssessmentPlayerPageRootComponent
     if (attempt === null || this.isSubmissionInProgress) {
       return;
     }
-    const submittedBeforeExpiry = !this.isTimeExpired;
     const attemptId = attempt.attemptId;
     this.isSubmissionInProgress = true;
     this.pendingSubmission = (async () => {
@@ -230,9 +216,7 @@ export class CertificateAssessmentPlayerPageRootComponent
           attemptId,
           answers
         );
-        if (submittedBeforeExpiry) {
-          await this.navigateToResultPage();
-        }
+        await this.navigateToResultPage();
       } catch {
         if (!this.internetConnectivityService.isOnline()) {
           this.alertsService.addWarning(
@@ -267,20 +251,8 @@ export class CertificateAssessmentPlayerPageRootComponent
     return this.navigateToResultPage();
   }
 
-  onAssessmentEnded(): Promise<boolean> {
-    return this.navigateToLearnerDashboard();
-  }
-
   ngOnDestroy(): void {
-    // Stops the countdown before the base class unsubscribes its listeners.
-    this.certificateAssessmentPlayerStateService.ngOnDestroy();
     super.ngOnDestroy();
-  }
-
-  private async navigateToLearnerDashboard(): Promise<boolean> {
-    return this.router.navigate([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
-    ]);
   }
 
   private async navigateToResultPage(): Promise<boolean> {
