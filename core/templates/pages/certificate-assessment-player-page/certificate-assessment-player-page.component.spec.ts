@@ -44,6 +44,9 @@ import {InteractionRulesRegistryService} from 'services/interaction-rules-regist
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
+import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {TranslateService} from '@ngx-translate/core';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -259,6 +262,23 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
           provide: FocusManagerService,
           useValue: jasmine.createSpyObj('Focus', ['generateFocusLabel']),
         },
+        {
+          provide: AlertsService,
+          useValue: jasmine.createSpyObj('AlertsService', [
+            'addWarning',
+            'addInfoMessage',
+          ]),
+        },
+        {
+          provide: InternetConnectivityService,
+          useValue: jasmine.createSpyObj('InternetConnectivityService', [
+            'isOnline',
+          ]),
+        },
+        {
+          provide: TranslateService,
+          useValue: jasmine.createSpyObj('TranslateService', ['instant']),
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -272,8 +292,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     fixture.detectChanges();
     flushMicrotasks();
   };
-
-  const loadQ1 = load;
 
   beforeEach(async () => {
     await setup();
@@ -292,7 +310,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   });
 
   it('should register and clear its onSubmit callback on destroy', fakeAsync(() => {
-    loadQ1();
+    load();
     const registeredFn =
       currentInteractionServiceSpy.setOnSubmitFn.calls.mostRecent().args[0];
     expect(typeof registeredFn).toBe('function');
@@ -362,7 +380,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should recompute derived fields on first load', fakeAsync(() => {
     expect(component.currentQuestion).toBeNull();
-    loadQ1();
+    load();
     expect(component.currentQuestion).toEqual(component.questions[0]);
     expect(component.totalQuestionCount).toBe(3);
     expect(component.questionStatuses[0]).toBe('visited');
