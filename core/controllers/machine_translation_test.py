@@ -301,7 +301,9 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        self.assertEqual(response['status'], 'success')
+        self.assertIn('provider_mapping', response)
+        self.assertIn('automatic_translation_is_enabled', response)
+        self.assertIn('available_providers', response)
         self.assertEqual(saved_mapping, self.valid_payload['provider_mapping'])
         self.logout()
 
@@ -384,7 +386,9 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        self.assertEqual(response['status'], 'success')
+        self.assertIn('provider_mapping', response)
+        self.assertIn('automatic_translation_is_enabled', response)
+        self.assertIn('available_providers', response)
         self.assertEqual(policy_calls, [({'hi': 'azure'}, True)])
         self.logout()
 
@@ -415,7 +419,9 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        self.assertEqual(response['status'], 'success')
+        self.assertIn('provider_mapping', response)
+        self.assertIn('automatic_translation_is_enabled', response)
+        self.assertIn('available_providers', response)
         self.assertEqual(
             policy_calls, [({'hi': 'azure', 'es': 'google'}, None)]
         )

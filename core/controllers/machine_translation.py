@@ -201,4 +201,20 @@ class TranslationProviderMappingHandler(
         except Exception as e:
             raise self.InternalErrorException(str(e))
 
-        self.render_json({'status': 'success'})
+        mapping = (
+            machine_translation_services.get_translation_provider_mapping()
+        )
+        is_enabled = (
+            machine_translation_services.is_automatic_translation_enabled()
+        )
+        available_providers = (
+            machine_translation_services.get_available_providers_for_ui()
+        )
+
+        self.render_json(
+            {
+                'provider_mapping': mapping,
+                'automatic_translation_is_enabled': is_enabled,
+                'available_providers': available_providers,
+            }
+        )

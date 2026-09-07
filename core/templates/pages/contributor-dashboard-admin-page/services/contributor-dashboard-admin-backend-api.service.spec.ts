@@ -574,10 +574,17 @@ describe('Contributor dashboard admin backend api service', () => {
       provider_mapping: mockMapping,
       automatic_translation_is_enabled: true,
     });
-    req.flush({});
+    const mockResponse = {
+      provider_mapping: mockMapping,
+      automatic_translation_is_enabled: true,
+      available_providers: [],
+    };
+    req.flush(mockResponse);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(
+      TranslationAdminConfig.createFromBackendDict(mockResponse)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

@@ -252,43 +252,37 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async fetchTranslationConfigurationAsync(): Promise<TranslationAdminConfig> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .get<TranslationAdminConfigBackendDict>('/translation-provider-mapping')
-        .toPromise()
-        .then(
-          response => {
-            resolve(
-              TranslationAdminConfig.createFromBackendDict(response)
-            );
-          },
-          errorResponse => {
-            reject(errorResponse.error.error);
-          }
-        );
-    });
+    return this.http
+      .get<TranslationAdminConfigBackendDict>('/translation-provider-mapping')
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 
   async updateTranslationConfigurationAsync(
     mapping: Record<string, string>,
     isEnabled: boolean
-  ): Promise<void> {
+  ): Promise<TranslationAdminConfig> {
     const payload = {
       provider_mapping: mapping,
       automatic_translation_is_enabled: isEnabled,
     };
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<void>('/translation-provider-mapping', payload)
-        .toPromise()
-        .then(
-          response => {
-            resolve(response);
-          },
-          errorResponse => {
-            reject(errorResponse.error.error);
-          }
-        );
-    });
+    return this.http
+      .put<TranslationAdminConfigBackendDict>('/translation-provider-mapping', payload)
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }
