@@ -60,8 +60,10 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -140,6 +142,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectArcTitlesToBeVisibleOnTimeline();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterArcHeadersOnTimeline',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -149,6 +155,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.expectActiveChapterCardToShowStartAndSecondaryActions(
         2
+      );
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterActiveCardWithActions',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -171,6 +181,10 @@ describe('Logged-in Learner', function () {
       // chapter is shown with the completed state.
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectCompletedLessonToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterCompletedLessonProgression',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -179,6 +193,10 @@ describe('Logged-in Learner', function () {
     'should collapse completed chapter into compact row with Play Again action',
     async function () {
       await loggedInLearner.expectCompletedChapterToBeCollapsed();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterCompletedRowPlayAgain',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -187,6 +205,10 @@ describe('Logged-in Learner', function () {
     'should display the next chapter as the active lesson after completion',
     async function () {
       await loggedInLearner.expectNextChapterToBeActive();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterNextChapterActive',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -196,14 +218,18 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.scrollMasteryChallengeCardIntoView();
       await loggedInLearner.expectMasteryChallengeCardToShowDescription();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterMasteryChallengeLockedDescription',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should show helper tooltip when clicking the locked Mastery Challenge button',
+    'should show helper tooltip when hovering over the locked Mastery Challenge button',
     async function () {
-      await loggedInLearner.clickLockedMasteryChallengeButtonAndExpectHelperTooltip();
+      await loggedInLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -227,6 +253,10 @@ describe('Logged-in Learner', function () {
 
       await loggedInLearner.scrollMasteryChallengeCardIntoView();
       await loggedInLearner.expectMasteryChallengeToBeUnlocked();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterMasteryChallengeUnlocked',
+        __dirname
+      );
       await loggedInLearner.clickMasteryChallengeAndNavigateToPracticeSession();
 
       // Return to the topic page so the final test can run against the topic
@@ -240,6 +270,10 @@ describe('Logged-in Learner', function () {
     'should display the practice test card with Practice Test button',
     async function () {
       await loggedInLearner.expectPracticeTestCardToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'chapterPracticeTestCard',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

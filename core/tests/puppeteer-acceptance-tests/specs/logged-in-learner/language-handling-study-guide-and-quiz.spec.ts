@@ -72,9 +72,11 @@ describe('Logged-in Learner', function () {
     );
     await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
-    await releaseCoordinator.enableFeatureFlag(
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
       'exploration_editor_can_modify_translations'
     );
 
@@ -154,7 +156,7 @@ describe('Logged-in Learner', function () {
 
     await curriculumAdmin.saveStoryDraft();
 
-    await releaseCoordinator.enableFeatureFlag(
+    await releaseCoordinator.enableFeatureFlagWithRetries(
       'serial_chapter_launch_curriculum_admin_view'
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
@@ -204,6 +206,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectStoryCardToBeVisible();
       await loggedInLearner.expectStoryTitleToContain('The Fraction Journey');
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageStoryCard',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -212,6 +218,10 @@ describe('Logged-in Learner', function () {
     'should display language selector with text and voiceover dropdowns',
     async function () {
       await loggedInLearner.expectLessonLanguageSelectorToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageSelectorOnLessonCard',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -290,6 +300,11 @@ describe('Logged-in Learner', function () {
       // With English selected, there is no voiceover compatible with it (only
       // Hindi has a voiceover), so the voiceover dropdown is disabled.
       await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);
+      await loggedInLearner.expectFallbackInfoIconToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageEnglishNoVoiceoverFallback',
+        __dirname
+      );
 
       // Switching the text language to Hindi enables the voiceover dropdown and
       // syncs it to the compatible Hindi voiceover.
@@ -298,6 +313,10 @@ describe('Logged-in Learner', function () {
       // The topic reacts to the Hindi text language by syncing the voiceover to
       // the compatible Hindi (India) accent code.
       await loggedInLearner.expectSelectedVoiceoverLanguageToBe('hi-IN');
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageHindiVoiceoverSelected',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -325,6 +344,10 @@ describe('Logged-in Learner', function () {
       // topic viewer page before asserting topic-page elements.
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectStudySkillsCtaToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageStoryCardWithStudySkillsCta',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -333,6 +356,10 @@ describe('Logged-in Learner', function () {
     'should display new chapter badge for the most recently published lesson',
     async function () {
       await loggedInLearner.expectNewLessonBadgeToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageNewChapterBadge',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -342,6 +369,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.scrollMasteryChallengeCardIntoView();
       await loggedInLearner.expectMasteryChallengeCardToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'languageMasteryChallengeCard',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

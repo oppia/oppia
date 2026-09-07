@@ -380,12 +380,11 @@ const desktopClassroomBreadcrumbLinkSelector =
   '.topic-header-breadcrumbs-desktop a[href="/learn/math"]';
 const mobileClassroomBreadcrumbLinkSelector =
   '.e2e-test-mobile-breadcrumbs-classroom';
-const adventureNavigationSelector = '.e2e-test-adventure-navigation';
-const adventureNavigationWrapperSelector = '.adventure-navigation-wrapper';
-const adventureNavigationArrowLeftSelector =
-  '.adventure-navigation-arrow--left';
-const adventureNavigationArrowRightSelector =
-  '.adventure-navigation-arrow--right';
+const adventureNavigationSelector = '.module-navigation-container';
+const adventureNavigationWrapperSelector = '.module-navigation-wrapper';
+const adventureNavigationArrowLeftSelector = '.module-navigation-arrow--left';
+const adventureNavigationArrowRightSelector = '.module-navigation-arrow--right';
+const dockStickyWrapperSelector = '.module-navigation-sticky-wrapper';
 const topicStoryCardSelector = '.e2e-test-story-card';
 const topicStoryTitleSelector = '.e2e-test-story-title';
 const topicLessonCardSelector = '.e2e-test-lesson-card';
@@ -394,7 +393,7 @@ const topicLessonCardDescriptionSelector = '.e2e-test-lesson-card-description';
 const topicLessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 const topicLessonCardSecondaryButtonSelector =
   '.e2e-test-lesson-card-secondary-button';
-const topicLessonCardNewLabelSelector = '.e2e-test-lesson-card-new-label';
+const topicLessonCardNewLabelSelector = '.topic-lesson-card-new-label';
 const topicLessonCardCompletedClassSelector =
   '.e2e-test-lesson-card.completed-lesson';
 const topicLessonCardCompletedCollapsedSelector =
@@ -406,9 +405,9 @@ const topicLessonCardCompletedLabelSelector =
 const comingSoonChaptersTitleSelector = '.e2e-test-coming-soon-chapters-title';
 const comingSoonChaptersCountSelector = '.coming-soon-chapters-count';
 const comingSoonLessonCardWrapperSelector =
-  '.e2e-test-coming-soon-lesson-card-wrapper';
+  '.coming-soon-chapters-section .story-lesson-card-wrapper';
 const comingSoonLessonCardLabelSelector =
-  '.e2e-test-lesson-card-coming-soon-label';
+  '.topic-lesson-card-coming-soon-label';
 const masteryChallengeCardSelector = '.e2e-test-mastery-challenge-card';
 const masteryChallengeTitleSelector = '.e2e-test-mastery-challenge-title';
 const masteryChallengeDescriptionSelector =
@@ -422,23 +421,22 @@ const masteryChallengeHelperTitleSelector =
 const masteryChallengeHelperDescriptionSelector =
   '.e2e-test-mastery-challenge-helper-description';
 const topicStudySkillsCtaSelector = '.e2e-test-study-skills-cta';
-const adventureGroupSelector = '.e2e-test-adventure-group';
-const adventureTitleSelector = '.e2e-test-adventure-title';
-const adventureHeaderSelector = '.adventure-header';
-const adventureEndTestCardSelector = '.e2e-test-adventure-end-test-card';
-const adventureEndTestTitleSelector = '.e2e-test-adventure-end-test-card-title';
+const adventureGroupSelector = '.module-group';
+const adventureTitleSelector = '.module-title';
+const adventureHeaderSelector = '.module-header';
+const adventureEndTestCardSelector = '.module-end-test-card';
+const adventureEndTestTitleSelector = '.module-end-test-card-title';
 const adventureEndTestPracticeButtonSelector =
-  '.e2e-test-adventure-end-test-card-practice-button';
+  '.module-end-test-card-practice-button';
 const topicPracticeSessionContainerSelector =
   '.e2e-test-practice-session-container';
-const arcSkipModalSelector = '.e2e-test-arc-skip-confirmation-modal';
-const arcSkipProceedButtonSelector = '.e2e-test-arc-skip-confirmation-proceed';
-const arcSkipCancelButtonSelector = '.e2e-test-arc-skip-confirmation-cancel';
-const skippedAdventureCardSelector = '.e2e-test-skipped-adventure-card';
-const skippedAdventureBadgeSelector = '.e2e-test-skipped-adventure-badge';
-const skippedAdventureMessageSelector = '.e2e-test-skipped-adventure-message';
-const skippedAdventureStartCtaSelector =
-  '.e2e-test-skipped-adventure-start-cta';
+const arcSkipModalSelector = '.module-skip-confirmation-modal';
+const arcSkipProceedButtonSelector = '.module-skip-confirmation-proceed';
+const arcSkipCancelButtonSelector = '.module-skip-confirmation-cancel';
+const skippedAdventureCardSelector = '.skipped-module-card';
+const skippedAdventureBadgeSelector = '.skipped-module-badge';
+const skippedAdventureMessageSelector = '.skipped-module-message';
+const skippedAdventureStartCtaSelector = '.skipped-module-start-cta';
 const topicLessonLanguageSelector = '.e2e-test-topic-lesson-language-selector';
 const topicTextLanguageSelector =
   '.e2e-test-topic-lesson-text-language-selector';
@@ -450,11 +448,11 @@ const conversationSkinCardsContainerSelector =
 const topicSessionFallbackLanguageStorageKey =
   'topic_session_fallback_language';
 const dockBadgeSelector =
-  '.adventure-navigation-group topic-adventure-circle-badge ' +
-  '.adventure-circle-badge';
+  '.module-navigation-group topic-module-circle-badge ' +
+  '.module-circle-badge';
 const dockBadgeLabelSelector =
-  '.adventure-navigation-group topic-adventure-circle-badge ' +
-  '.adventure-circle-badge-label';
+  '.module-navigation-group topic-module-circle-badge ' +
+  '.module-circle-badge-label';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -4883,7 +4881,7 @@ export class LoggedInUser extends BaseUser {
               : '',
         };
       },
-      adventureNavigationSelector,
+      dockStickyWrapperSelector,
       dockBadgeSelector
     );
 
@@ -5229,12 +5227,16 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the locked Mastery Challenge button and verifies that the helper
-   * tooltip (with its title and description) is shown and then disappears.
+   * Hovers over the locked Mastery Challenge button and verifies that the
+   * helper tooltip (with its title and description) is shown and then
+   * disappears.
    */
-  async clickLockedMasteryChallengeButtonAndExpectHelperTooltip(): Promise<void> {
+  async hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip(): Promise<void> {
     if (!(await this.isMasteryChallengeUnlocked())) {
-      await this.clickOnElementWithSelector(masteryChallengeButtonSelector);
+      // The helper tooltip appears on hover over the locked button, whereas
+      // clicking it opens the locked modal instead.
+      await this.scrollMasteryChallengeCardIntoView();
+      await this.page.hover(masteryChallengeButtonSelector);
       await this.expectElementToBeVisible(
         masteryChallengeHelperTooltipSelector
       );
@@ -5308,7 +5310,7 @@ export class LoggedInUser extends BaseUser {
    */
   private async getDockCircleBadges(): Promise<ElementHandle<Element>[]> {
     return this.page.$$(
-      `${adventureNavigationSelector} topic-adventure-circle-badge`
+      `${adventureNavigationSelector} topic-module-circle-badge`
     );
   }
 

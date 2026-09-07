@@ -59,8 +59,10 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
@@ -139,6 +141,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectAdventureNavigationDockToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcNavigationDockVisible',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -148,6 +154,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.expectAdventureTitlesToBeVisible();
       await loggedInLearner.expectAdventureCountToBeGreaterThanZero();
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcTimelineAdventureTitles',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -164,6 +174,10 @@ describe('Logged-in Learner', function () {
     'should skip to later arc and show skipped adventure cards',
     async function () {
       await loggedInLearner.skipToLaterArcAndExpectSkippedAdventureCards(2);
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcSkippedAdventureCardsVisible',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -172,6 +186,10 @@ describe('Logged-in Learner', function () {
     'should navigate to a later arc milestone with smooth scrolling and no page reload',
     async function () {
       await loggedInLearner.navigateToLaterArcMilestoneAndExpectNoPageReload(2);
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcLaterMilestoneNoReload',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -180,6 +198,10 @@ describe('Logged-in Learner', function () {
     'should expand a skipped adventure when clicking its Start CTA',
     async function () {
       await loggedInLearner.expandSkippedAdventureByClickingStartCta();
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcSkippedAdventureExpanded',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -191,6 +213,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectMasteryChallengeCardToBeVisible();
       await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
       await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'arcMasteryChallengeCard',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -66,8 +66,10 @@ describe('Logged-in Learner', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlagWithRetries(
+      'redesigned_topic_viewer_page'
+    );
+    await releaseCoordinator.enableFeatureFlagWithRetries('story_editor_arcs');
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -149,7 +151,7 @@ describe('Logged-in Learner', function () {
 
     await curriculumAdmin.saveStoryDraft();
 
-    await releaseCoordinator.enableFeatureFlag(
+    await releaseCoordinator.enableFeatureFlagWithRetries(
       'serial_chapter_launch_curriculum_admin_view'
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
@@ -182,6 +184,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectTopicPageBreadcrumbToContain('Math');
       await loggedInLearner.expectStoryCardToBeVisible();
       await loggedInLearner.expectStoryTitleToContain('The Fraction Journey');
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageStoryCard',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -204,6 +210,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectAdventureNavigationDockToBeVisible();
       await loggedInLearner.expectAdventureCountToBe(4);
       await loggedInLearner.expectAdventureTitlesToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageNavigationDockBadges',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -221,6 +231,10 @@ describe('Logged-in Learner', function () {
     'should keep the navigation dock stuck at the top with the active milestone highlighted',
     async function () {
       await loggedInLearner.expectDockToStickToTopWithActiveMilestoneHighlighted();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageDockStuckTopActiveMilestone',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -229,6 +243,10 @@ describe('Logged-in Learner', function () {
     'should show navigation dock scroll arrows only when it overflows',
     async function () {
       await loggedInLearner.expectDockScrollArrowsToBeShownOnlyWhenOverflowing();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageDockScrollArrows',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -237,6 +255,10 @@ describe('Logged-in Learner', function () {
     'should expand the first chapter card and show CTA, Practice, and Study Guide actions',
     async function () {
       await loggedInLearner.expectFirstChapterCardToShowStartAndSecondaryActions();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageExpandedChapterCardActions',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -245,6 +267,10 @@ describe('Logged-in Learner', function () {
     'should display New badge for recently published lessons',
     async function () {
       await loggedInLearner.expectNewLessonBadgeToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageNewLessonBadge',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -266,6 +292,10 @@ describe('Logged-in Learner', function () {
       // only the twelve published chapters get dock badges, so the
       // ready-to-publish (13) and the draft (14) lesson numbers are absent.
       await loggedInLearner.expectDockLessonNumbersToBe(12, [13, 14]);
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageComingSoonSection',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -301,6 +331,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectMasteryChallengeCardToBeVisible();
       await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
       await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageMasteryChallengeCard',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -310,6 +344,10 @@ describe('Logged-in Learner', function () {
     async function () {
       await loggedInLearner.scrollToTopOfTopicPage();
       await loggedInLearner.expectStudySkillsCtaToBeVisible();
+      await loggedInLearner.expectScreenshotToMatch(
+        'topicPageStoryCardWithStudySkillsCta',
+        __dirname
+      );
     },
     SPEC_TIMEOUT_MSECS
   );
