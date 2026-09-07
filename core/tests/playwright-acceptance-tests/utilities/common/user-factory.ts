@@ -18,7 +18,7 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser} from '@playwright/test';
+import {Browser, Page} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -36,6 +36,19 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  TranslationSubmitter,
+  TranslationSubmitterFactory,
+} from '../user/translation-submitter';
+import {
+  TranslationReviewer,
+  TranslationReviewerFactory,
+} from '../user/translation-reviewer';
+import {
+  TranslationAdmin,
+  TranslationAdminFactory,
+} from '../user/translation-admin';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,6 +65,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -84,9 +98,23 @@ type BasicRolesUser = LoggedOutUser &
   TopicManager;
 
 /**
+ * Test utility classes that can be composed onto a user via createNewUser().
+ * These are test-only capabilities (e.g. contributor dashboard interactions)
+ * and are kept separate from the actual Oppia roles assigned to a user.
+ */
+type TestUserUtility = Contributor | TranslationSubmitter;
+
+type TestUserUtilityFactory = (page: Page) => TestUserUtility;
+
+type TestUserUtilityIntersection<TUtilities extends TestUserUtilityFactory[]> =
+  UnionToIntersection<ReturnType<TUtilities[number]>>;
+
+/**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance:
+  | (SuperAdmin & VoiceoverAdmin & TranslationAdmin)
+  | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -176,6 +204,26 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.TRANSLATION_REVIEWER: {
+          // Review rights are granted per language through the contributor
+          // dashboard admin page, so the language code(s) must be provided
+          // as arguments (e.g. 'hi' for Hindi).
+          const languageCodes =
+            typeof args === 'string' ? [args] : (args as string[]);
+          if (languageCodes.length === 0) {
+            throw new Error(
+              'Language code(s) are required to assign the translation reviewer role.'
+            );
+          }
+          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          for (const languageCode of languageCodes) {
+            await superAdminInstance.addTranslationLanguageReviewRights(
+              user.username,
+              languageCode
+            );
+          }
+          break;
+        }
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -202,16 +250,24 @@ export class UserFactory {
    * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
    * @param {string | string[]} args - The arguments to pass to the role
    *     assignment function.
+   * @param {TUtilities} utilities - The test utility factories to compose
+   *     onto the user (e.g. ContributorFactory).
    */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
+    TUtilities extends TestUserUtilityFactory[] = never[],
   >(
     username: string,
     email: string,
     browser: Browser,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    args?: string | string[]
-  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
+    args?: string | string[],
+    utilities: TUtilities = [] as unknown as TUtilities
+  ): Promise<
+    BasicRolesUser &
+      MultipleRoleIntersection<TRoles> &
+      TestUserUtilityIntersection<TUtilities>
+  > {
     const context = await browser.newContext({
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
@@ -233,12 +289,22 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
+    const utilityInstances = utilities.map(utility => utility(user.page)) as {
+      [K in keyof TUtilities]: ReturnType<TUtilities[K]>;
+    };
+
+    if (utilityInstances.length > 0) {
+      user = UserFactory.composeUserWithRoles(user, utilityInstances);
+    }
+
     return (await UserFactory.assignRolesToUser(
       user,
       roles,
       browser,
       args
-    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
+    )) as BasicRolesUser &
+      MultipleRoleIntersection<TRoles> &
+      TestUserUtilityIntersection<TUtilities>;
   };
 
   /**
@@ -277,7 +343,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & TranslationAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -291,7 +357,20 @@ export class UserFactory {
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
+      TranslationAdminFactory(user.page),
     ]);
+
+    // The super admin needs the translation admin role to access the
+    // contributor dashboard admin page, which is guarded to translation
+    // admins and coordinators only.
+    await superAdminInstance.assignRoleToUser(
+      'superAdm',
+      ROLES.TRANSLATION_ADMIN
+    );
+    await superAdminInstance.expectUserToHaveRole(
+      'superAdm',
+      ROLES.TRANSLATION_ADMIN
+    );
 
     showMessage('Super admin created successfully.');
     return superAdminInstance;

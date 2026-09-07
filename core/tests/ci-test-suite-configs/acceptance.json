@@ -522,13 +522,13 @@
     },
     {
       "name": "translation-submitter/check-their-accomplishment",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-reviewer/review-the-translations",
