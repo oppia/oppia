@@ -197,6 +197,13 @@ class TopicEditorStoryHandler(
                         overdue_chapters_count += 1
 
             upcoming_chapters_expected_days.sort()
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, summary['id']
+            )['pending_nodes']
+            pending_node_titles = [node.title for node in pending_nodes]
+            completed_node_titles = utils.compute_list_difference(
+                summary['node_titles'], pending_node_titles
+            )
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -212,7 +219,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]
                 ),
-                'completed_node_titles': [],
+                'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in nodes],
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
@@ -229,6 +236,13 @@ class TopicEditorStoryHandler(
 
         updated_additional_story_summary_dicts = []
         for summary in additional_story_summary_dicts:
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, summary['id']
+            )['pending_nodes']
+            pending_node_titles = [node.title for node in pending_nodes]
+            additional_completed_node_titles = utils.compute_list_difference(
+                summary['node_titles'], pending_node_titles
+            )
             updated_additional_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -244,7 +258,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]
                 ),
-                'completed_node_titles': [],
+                'completed_node_titles': additional_completed_node_titles,
                 'all_node_dicts': [],
             }
             updated_additional_story_summary_dicts.append(

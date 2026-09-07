@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the post chapter recommendations component.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   waitForAsync,

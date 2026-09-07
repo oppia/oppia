@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './invite-successful-modal.component.css';
 
 @Component({
   selector: 'oppia-invite-successful-modal',
   templateUrl: './invite-successful-modal.component.html',
+  styleUrls: ['./invite-successful-modal.component.css'],
 })
 export class InviteSuccessfulModalComponent extends ConfirmOrCancelModal {
   successMessage!: string;
