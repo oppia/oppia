@@ -51,7 +51,6 @@ import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
-import {TranslateService} from '@ngx-translate/core';
 
 const outcome = (labelledAsCorrect: boolean): OutcomeBackendDict => ({
   dest: 'final',
@@ -304,10 +303,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
             'isOnline',
           ]),
         },
-        {
-          provide: TranslateService,
-          useValue: jasmine.createSpyObj('TranslateService', ['instant']),
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -447,7 +442,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   });
 
   it('should open the time-expired modal as a bottom sheet on mobile screens', fakeAsync(() => {
-    loadQ1();
+    load();
     dimsSpy.getWidth.and.returnValue(400);
     spyOn(component.assessmentSubmitted, 'emit');
     triggerTimeExpiry();
