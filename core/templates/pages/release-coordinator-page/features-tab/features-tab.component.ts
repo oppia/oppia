@@ -39,6 +39,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
+import './features-tab.component.css';
 
 interface IntSchema {
   type: 'int';
@@ -53,6 +54,7 @@ interface FeatureFlagViewModel extends FeatureFlag {
 @Component({
   selector: 'features-tab',
   templateUrl: './features-tab.component.html',
+  styleUrls: ['./features-tab.component.css'],
 })
 export class FeaturesTabComponent implements OnInit {
   @ViewChildren('userGroupInput') userGroupInputs!: QueryList<ElementRef>;

@@ -30,11 +30,12 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {Subscription} from 'rxjs';
 import {GraphInputRulesService} from './graph-input-rules.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './graph-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-graph-input',
   templateUrl: './graph-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./graph-input-interaction.component.css'],
 })
 export class InteractiveGraphInput implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
