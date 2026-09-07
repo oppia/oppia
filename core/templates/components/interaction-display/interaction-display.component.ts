@@ -27,6 +27,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
+import './interaction-display.component.css';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
 type ScopedValue =
@@ -45,6 +46,7 @@ type ScopedValue =
 @Component({
   selector: 'oppia-interaction-display',
   templateUrl: './interaction-display.component.html',
+  styleUrls: ['./interaction-display.component.css'],
 })
 export class InteractionDisplayComponent {
   // These properties are initialized using Angular lifecycle hooks

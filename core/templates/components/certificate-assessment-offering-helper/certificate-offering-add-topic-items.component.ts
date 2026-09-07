@@ -31,7 +31,7 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingTopicData,
-} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 import './certificate-offering-add-topic-items.component.css';

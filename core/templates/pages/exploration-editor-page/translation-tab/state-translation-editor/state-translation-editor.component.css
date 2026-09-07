@@ -1,0 +1,33 @@
+.oppia-translated-content-header {
+  background: #ccc;
+  font-size: 12px;
+  font-style: italic;
+  height: 16px;
+  text-align: center;
+}
+.oppia-editor-edit-icon {
+  position: absolute;
+  top: 10px;
+}
+.oppia-translation-needs-update-button {
+  border-radius: 14px;
+  color: yellow;
+  height: 28px;
+  left: 3px;
+  padding: 0 0 3px 0;
+  position: absolute;
+  width: 28px;
+}
+.oppia-translation-editable-mask {
+  background-color: #eee;
+}
+.oppia-translated-content-display {
+  max-width: 100%;
+  text-align: left;
+}
+.oppia-translation-editor {
+  min-height: 160px;
+}
+state-translation-editor .oppia-save-item-button-container {
+  margin-top: 2px;
+}

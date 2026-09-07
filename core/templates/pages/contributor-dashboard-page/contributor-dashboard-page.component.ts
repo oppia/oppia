@@ -28,6 +28,7 @@ import {ContributionAndReviewService} from './services/contribution-and-review.s
 import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
@@ -55,6 +56,8 @@ export class ContributorDashboardPageComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
   topicName!: string;
+  activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   activeTabName!: string;
   // The following property is set to null when the
   // user is not logged in.
@@ -66,6 +69,7 @@ export class ContributorDashboardPageComponent implements OnInit {
     private focusManagerService: FocusManagerService,
     private languageUtilService: LanguageUtilService,
     private localStorageService: LocalStorageService,
+    private platformFeatureService: PlatformFeatureService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
@@ -103,6 +107,28 @@ export class ContributorDashboardPageComponent implements OnInit {
         this.activeTabName as keyof ContributorDashboardTabsDetails
       ];
     return activeTabDetail.customizationOptions.includes('language');
+  }
+
+  onChangeEntityType(entityType: string): void {
+    this.activeEntityType = entityType;
+  }
+
+  showEntityTypeSelector(): boolean {
+    // My Contributions also holds the question lists and the accomplishments
+    // pages, and none of those can be filtered by content type, so the
+    // selector is shown there only while translations are on screen. The
+    // Translate Text tab lists nothing but translation opportunities.
+    const userIsViewingTranslationSuggestions =
+      this.contributionAndReviewService.getActiveSuggestionType() ===
+      'translate_content';
+
+    return (
+      (this.activeTabName === 'translateTextTab' ||
+        ((this.activeTabName === 'myContributionTab' || !this.activeTabName) &&
+          userIsViewingTranslationSuggestions)) &&
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    );
   }
 
   onChangeTopic(topicName: string): void {

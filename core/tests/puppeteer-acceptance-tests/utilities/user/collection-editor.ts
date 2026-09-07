@@ -17,6 +17,7 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
+import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 // Creator Dashboard selectors.
@@ -49,6 +50,26 @@ const editorDeleteNode = '.e2e-test-editor-delete-node';
 
 // Library page selectors.
 const searchInput = '.e2e-test-search-input';
+
+const addExplorationInputSelector = '.e2e-test-add-exploration-input';
+const addExplorationButtonSelector = '.e2e-test-add-exploration-button';
+const publishCollectionButtonSelector = '.e2e-test-editor-publish-button';
+const saveDraftButtonSelector = '.e2e-test-save-draft-button';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const collectionTitleInputSelector = '.e2e-test-collection-editor-title-input';
+const collectionObjectiveInputSelector =
+  '.e2e-test-collection-editor-objective-input';
+const collectionCategoryDropdownSelector =
+  '.e2e-test-collection-editor-category-dropdown';
+const collectionSaveChangesButtonSelector =
+  '.e2e-test-collection-save-changes-button';
+const createNewExplorationButtonSelector =
+  'button.e2e-test-create-new-exploration-button';
+const creationModalSelector = '.e2e-test-creation-modal';
+const createCollectionButtonSelector = '.e2e-test-create-collection';
+const collectionCategoryMatSelectSelector = `${collectionCategoryDropdownSelector} mat-select`;
+const collectionCategoryOptionSelector = 'mat-option .mat-option-text';
 
 export class CollectionEditor extends BaseUser {
   /**
@@ -435,12 +456,48 @@ export class CollectionEditor extends BaseUser {
   }
 
   /**
-   * Sets the collection category.
+   * Sets the collection category. Tries the shared `selectMatOption` helper
+   * first; if that fails, falls back to manually dispatching a click on the
+   * matching `mat-option` (kept from the alternate implementation, since the
+   * shared helper has been observed to fail in some environments).
    * @param {string} category - The category to select.
    */
   async setCategory(category: string): Promise<void> {
     await this.clickOnElementWithSelector(categoryFilterDropdown);
-    await this.selectMatOption(category);
+
+    try {
+      await this.selectMatOption(category);
+    } catch (e) {
+      showMessage(
+        'selectMatOption helper failed; falling back to manual mat-option dispatch.'
+      );
+      await this.clickOnElementWithSelector(
+        collectionCategoryMatSelectSelector
+      );
+      await this.page.waitForFunction(
+        (cat: string, selector: string) => {
+          const options = Array.from(document.querySelectorAll(selector));
+          return options.some(el => el.textContent?.trim() === cat);
+        },
+        {timeout: 10000},
+        category,
+        collectionCategoryOptionSelector
+      );
+      await this.page.evaluate(
+        (cat: string, selector: string) => {
+          const options = Array.from(document.querySelectorAll(selector));
+          const match = options.find(
+            el => el.textContent?.trim() === cat
+          ) as HTMLElement;
+
+          match
+            ?.closest('mat-option')
+            ?.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+        },
+        category,
+        collectionCategoryOptionSelector
+      );
+    }
 
     // Post-check: verify the dropdown displays the selected category.
     await this.page.waitForFunction(
@@ -516,6 +573,193 @@ export class CollectionEditor extends BaseUser {
       '/collection'
     );
     showMessage('Verified that we are on the collection player page.');
+  }
+
+  /**
+   * Creates a new collection from scratch, adds the given explorations to
+   * it, and publishes it in a single end-to-end flow. This is a convenience
+   * orchestrator kept alongside the atomic step methods above (createACollection,
+   * addExistingExploration, saveCollectionDraft, setTitle/setObjective/setCategory,
+   * saveChanges, etc.) for callers that want one call instead of composing steps
+   * manually. Uses its own creation-flow selectors
+   * (createNewExplorationButtonSelector + creationModalSelector) rather than
+   * createACollection()'s, since the two flows have not been confirmed to be
+   * interchangeable.
+   * @param {string} title
+   * @param {string} objective
+   * @param {string} category
+   * @param {string[]} explorationIds
+   * @returns {Promise<string>}
+   */
+  async createAndPublishCollection(
+    title: string,
+    objective: string,
+    category: string,
+    explorationIds: string[]
+  ): Promise<string> {
+    await this.goto(testConstants.URLs.CreatorDashboard);
+
+    await this.clickOnElementWithSelector(createNewExplorationButtonSelector);
+
+    await this.page.waitForSelector(creationModalSelector, {
+      visible: true,
+      timeout: 10000,
+    });
+
+    await this.clickAndWaitForNavigation(createCollectionButtonSelector, true);
+
+    await this.page.waitForFunction(
+      () => window.location.href.includes('/collection_editor/create/'),
+      {timeout: 30000}
+    );
+
+    const url = this.page.url();
+    const collectionId = url
+      .split('/collection_editor/create/')[1]
+      .split('?')[0];
+
+    for (const expId of explorationIds) {
+      await this.page.waitForSelector(addExplorationInputSelector, {
+        visible: true,
+      });
+      await this.page.click(addExplorationInputSelector, {clickCount: 3});
+      await this.page.type(addExplorationInputSelector, expId);
+
+      await this.clickOnElementWithSelector(addExplorationButtonSelector);
+      await this.waitForNetworkIdle();
+      showMessage(`Added exploration ${expId} to collection.`);
+    }
+
+    try {
+      await this.clickOnElementWithSelector(saveDraftButtonSelector);
+      await this.page.waitForSelector(commitMessageInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (e) {
+      showMessage(
+        'Save draft click did not open the commit modal; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, saveDraftButtonSelector);
+      await this.page.waitForSelector(commitMessageInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+
+    await this.page.type(
+      commitMessageInputSelector,
+      'Initial collection setup.'
+    );
+
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+
+    await this.waitForNetworkIdle();
+
+    try {
+      await this.clickOnElementWithSelector(publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (e) {
+      showMessage(
+        'Publish click did not open the metadata modal; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+    await this.page.click(collectionTitleInputSelector);
+    await this.page.type(collectionTitleInputSelector, title);
+
+    await this.page.click(collectionObjectiveInputSelector);
+    await this.page.type(collectionObjectiveInputSelector, objective);
+
+    await this.clickOnElementWithSelector(collectionCategoryMatSelectSelector);
+
+    await this.page.waitForFunction(
+      (cat: string, selector: string) => {
+        const options = Array.from(document.querySelectorAll(selector));
+        return options.some(el => el.textContent?.trim() === cat);
+      },
+      {timeout: 10000},
+      category,
+      collectionCategoryOptionSelector
+    );
+
+    await this.page.evaluate(
+      (cat: string, selector: string) => {
+        const options = Array.from(document.querySelectorAll(selector));
+        const match = options.find(
+          el => el.textContent?.trim() === cat
+        ) as HTMLElement;
+
+        match
+          ?.closest('mat-option')
+          ?.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+      },
+      category,
+      collectionCategoryOptionSelector
+    );
+
+    try {
+      await this.clickOnElementWithSelector(
+        collectionSaveChangesButtonSelector
+      );
+    } catch (e) {
+      showMessage(
+        'Save changes click failed; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, collectionSaveChangesButtonSelector);
+    }
+    await this.waitForNetworkIdle();
+
+    showMessage(
+      `Collection "${title}" created and published with ID: ${collectionId}`
+    );
+    return collectionId;
   }
 
   /**

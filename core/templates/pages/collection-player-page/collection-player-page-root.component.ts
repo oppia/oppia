@@ -25,6 +25,7 @@ import './collection-player-page-root.component.css';
 @Component({
   selector: 'oppia-collection-player-page-root',
   templateUrl: './collection-player-page-root.component.html',
+  styleUrls: ['./collection-player-page-root.component.css'],
 })
 export class CollectionPlayerPageRootComponent extends BaseRootComponent {
   title: string =

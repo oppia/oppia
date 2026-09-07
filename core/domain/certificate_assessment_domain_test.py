@@ -42,7 +42,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             classroom_id='math_classroom_01',
             topic_ids=['topic_place_values', 'topic_addition'],
             total_questions=12,
-            time_limit_in_minutes=60,
             demonstrates=['Understanding of whole numbers'],
             async_status='Available',
             version=1,
@@ -59,7 +58,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             'classroom_id': 'math_classroom_01',
             'topic_ids': ['topic_place_values', 'topic_addition'],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': ['Understanding of whole numbers'],
             'async_status': 'Available',
             'version': 1,
@@ -78,7 +76,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             ['topic_place_values', 'topic_addition'],
         )
         self.assertEqual(offering.total_questions, 12)
-        self.assertEqual(offering.time_limit_in_minutes, 60)
         self.assertEqual(
             offering.demonstrates, ['Understanding of whole numbers']
         )
@@ -181,34 +178,6 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'total_questions must be at most 50'
-        ):
-            offering.validate()
-
-    def test_validate_rejects_invalid_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        offering.time_limit_in_minutes = 4
-
-        with self.assertRaisesRegex(
-            Exception,
-            'time_limit_in_minutes must be greater than or equal to 5',
-        ):
-            offering.validate()
-
-    def test_validate_rejects_non_integer_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        setattr(offering, 'time_limit_in_minutes', '60')
-
-        with self.assertRaisesRegex(
-            Exception, 'time_limit_in_minutes must be a positive integer'
-        ):
-            offering.validate()
-
-    def test_validate_rejects_too_long_time_limit(self) -> None:
-        offering = self._get_sample_offering()
-        offering.time_limit_in_minutes = 61
-
-        with self.assertRaisesRegex(
-            Exception, 'time_limit_in_minutes must be at most 60'
         ):
             offering.validate()
 
@@ -389,6 +358,31 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         attempt.finished_at = None
         attempt.is_submitted = False
         attempt.validate()
+
+    def test_validate_accepts_placeholder_values_for_unsubmitted_attempt(
+        self,
+    ) -> None:
+        attempt = certificate_assessment_domain.CertificateAssessmentAttempt(
+            attempt_id='attempt_abc123',
+            learner_id='learner_id_1',
+            total_score=0.0,
+            attempt_index=0,
+            attempt_data={},
+            version_data=self._get_sample_version_data(),
+            started_at=self.SAMPLE_STARTED_AT,
+            finished_at=None,
+            is_submitted=False,
+        )
+        attempt.validate()
+
+    def test_validate_rejects_non_dict_attempt_data(self) -> None:
+        attempt = self._get_sample_attempt()
+        # Here we use MyPy ignore because this test intentionally assigns an
+        # invalid value to exercise the validation branch.
+        attempt.attempt_data = None  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(Exception, 'attempt_data must be a dict.'):
+            attempt.validate()
 
     def test_validate_rejects_empty_attempt_id(self) -> None:
         attempt = self._get_sample_attempt()
@@ -770,18 +764,55 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
         ):
             response.validate()
 
-    def test_validate_rejects_empty_selected_answer(self) -> None:
+    def test_validate_allows_empty_selected_answer_for_unanswered(self) -> None:
         response = self._get_sample_response()
-        response.selected_answer = '   '
+        response.selected_answer = ''
+        response.validate()
+
+    def test_validate_rejects_non_string_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        setattr(response, 'selected_answer', None)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
         ):
             response.validate()
 
         response = self._get_sample_response()
-        setattr(response, 'selected_answer', None)
+        setattr(response, 'selected_answer', 42)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
+        ):
+            response.validate()
+
+    def test_validate_rejects_oversized_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
+        ):
+            response.validate()
+
+    def test_validate_accepts_answer_at_size_limit(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+        )
+        response.validate()
+
+    def test_validate_oversized_limit_is_byte_based(self) -> None:
+        # Non-ASCII characters encode to two bytes each in UTF-8, so a string
+        # below the character limit can still exceed the byte limit.
+        oversized_character_count = (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            // 2
+        ) + 1
+        response = self._get_sample_response()
+        response.selected_answer = '\u00e9' * oversized_character_count
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
         ):
             response.validate()
 

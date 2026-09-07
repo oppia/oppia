@@ -22,10 +22,12 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {TranslationStatusService} from '../services/translation-status.service';
+import './state-translation-status-graph.component.css';
 
 @Component({
   selector: 'oppia-state-translation-status-graph',
   templateUrl: './state-translation-status-graph.component.html',
+  styleUrls: ['./state-translation-status-graph.component.css'],
 })
 export class StateTranslationStatusGraphComponent {
   // This property is initialized using Angular lifecycle hooks

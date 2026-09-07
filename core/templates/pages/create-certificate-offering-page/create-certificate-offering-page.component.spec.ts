@@ -29,7 +29,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {
   CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,

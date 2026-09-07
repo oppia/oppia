@@ -20,10 +20,12 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
+import './view-learner-group-invitation-modal.component.css';
 
 @Component({
   selector: 'oppia-view-learner-group-invitation-modal',
   templateUrl: './view-learner-group-invitation-modal.component.html',
+  styleUrls: ['./view-learner-group-invitation-modal.component.css'],
 })
 export class ViewLearnerGroupInvitationModalComponent extends ConfirmOrCancelModal {
   learnerGroup!: ShortLearnerGroupSummary;

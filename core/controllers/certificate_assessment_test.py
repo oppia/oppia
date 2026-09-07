@@ -32,7 +32,7 @@ from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
-from typing import Optional
+from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -69,6 +69,7 @@ def _create_attempt_model(
     """
     return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
         learner_id=learner_id,
+        certificate_id=certificate_id,
         total_score=total_score,
         attempt_index=attempt_index,
         attempt_data={
@@ -111,14 +112,13 @@ def _create_certificate_offering() -> (
             classroom_id='math_classroom_01',
             topic_ids=['topic_place_values'],
             total_questions=12,
-            time_limit_in_minutes=60,
             demonstrates=['Understanding of whole numbers'],
             async_status='Available',
         )
     )
 
 
-class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentOfferingHandler."""
 
     def test_get_returns_empty_certificate_offerings(self) -> None:
@@ -138,7 +138,6 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
                 }
             ],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': ['Understanding of whole numbers'],
             'async_status': 'Available',
         }
@@ -174,7 +173,6 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
                 }
             ],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': [],
             'async_status': 'Available',
         }
@@ -201,7 +199,6 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
             classroom_id='physics_classroom_01',
             topic_ids=['topic_motion'],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Basic physics reasoning'],
             async_status='Available',
         )
@@ -217,12 +214,13 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(offering['classroom_id'], 'physics_classroom_01')
         self.assertEqual(offering['topic_ids'], ['topic_motion'])
         self.assertEqual(offering['total_questions'], 5)
-        self.assertEqual(offering['time_limit_in_minutes'], 30)
         self.assertEqual(offering['demonstrates'], ['Basic physics reasoning'])
         self.assertEqual(offering['async_status'], 'Available')
 
 
-class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentOfferingByIdHandlerUnitTests(
+    test_utils.GenericTestBase
+):
     """Tests class for CertificateAssessmentOfferingByIdHandler."""
 
     def test_get_returns_real_certificate_offering(self) -> None:
@@ -232,7 +230,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -252,7 +249,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
                     'classroom_id': 'science_classroom_01',
                     'topic_ids': ['topic_atoms'],
                     'total_questions': 7,
-                    'time_limit_in_minutes': 35,
                     'demonstrates': ['Scientific reasoning'],
                     'async_status': 'Available',
                     'version': 1,
@@ -277,7 +273,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -299,7 +294,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
                     },
                 ],
                 'total_questions': 9,
-                'time_limit_in_minutes': 40,
                 'demonstrates': ['Scientific reasoning'],
                 'async_status': 'Blocked',
             },
@@ -324,7 +318,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             updated_offering.topic_ids, ['topic_atoms', 'topic_bonds']
         )
         self.assertEqual(updated_offering.total_questions, 9)
-        self.assertEqual(updated_offering.time_limit_in_minutes, 40)
         self.assertEqual(updated_offering.async_status, 'Blocked')
         self.assertEqual(updated_offering.version, 2)
 
@@ -345,7 +338,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
                     },
                 ],
                 'total_questions': 9,
-                'time_limit_in_minutes': 40,
                 'demonstrates': ['Scientific reasoning'],
                 'async_status': 'Blocked',
             },
@@ -374,7 +366,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
                         },
                     ],
                     'total_questions': 9,
-                    'time_limit_in_minutes': 40,
                     'demonstrates': ['Scientific reasoning'],
                     'async_status': 'Blocked',
                 },
@@ -389,7 +380,6 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -416,7 +406,7 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class ValidateCertificateAssessmentOfferingHandlerTest(
+class ValidateCertificateAssessmentOfferingHandlerUnitTests(
     test_utils.GenericTestBase
 ):
     """Tests class for ValidateCertificateAssessmentOfferingHandler."""
@@ -541,7 +531,6 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Sample skill'],
             async_status='Available',
         )
@@ -551,7 +540,8 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         )
         started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
         finished_at = started_at + datetime.timedelta(minutes=5)
-        gae_models.CertificateAssessmentAttemptModel.create(
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
+            certificate_id=certificate_ids[0]['certificate_id'],
             learner_id=learner_id,
             total_score=90.0,
             attempt_index=1,
@@ -599,6 +589,10 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         self.assertIsNone(
             response['available_certificate_offerings'][0]['failed_on_date']
         )
+        self.assertEqual(
+            response['available_certificate_offerings'][0]['attempt_id'],
+            attempt_model.id,
+        )
 
     def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
         handler = certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.__new__(
@@ -614,66 +608,6 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
                 certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get,
                 '__wrapped__',
             )(handler, self.classroom_url_fragment)
-
-
-class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
-    """Tests class for StartCertificateAssessmentHandler."""
-
-    def test_post_returns_hardcoded_attempt_and_questions(self) -> None:
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
-            {'certificate_id': 'dummy_certificate_id'},
-            csrf_token=csrf_token,
-        )
-        self.assertEqual(
-            response,
-            {
-                'attempt_id': 'dummy_attempt_id',
-                'questions': [
-                    {
-                        'question_id': 'dummy_question_id_1',
-                        'question_version': 1,
-                    },
-                    {
-                        'question_id': 'dummy_question_id_2',
-                        'question_version': 1,
-                    },
-                ],
-            },
-        )
-
-
-class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
-    """Tests class for SubmitCertificateAssessmentHandler."""
-
-    def test_post_returns_hardcoded_submission_confirmation(self) -> None:
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
-                '<attempt_id>', 'dummy_attempt_id'
-            ),
-            {
-                'answers': [
-                    {
-                        'question_id': 'dummy_question_id_1',
-                        'selected_answer': 'A',
-                    },
-                    {
-                        'question_id': 'dummy_question_id_2',
-                        'selected_answer': 'B',
-                    },
-                ]
-            },
-            csrf_token=csrf_token,
-        )
-        self.assertEqual(
-            response,
-            {
-                'attempt_id': 'dummy_attempt_id',
-                'is_submitted': True,
-            },
-        )
 
 
 class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
@@ -812,7 +746,7 @@ class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentAttemptsHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentAttemptsHandler."""
 
     def setUp(self) -> None:
@@ -880,7 +814,6 @@ class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
             classroom_id='geography_classroom_01',
             topic_ids=['topic_place_values'],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -910,3 +843,434 @@ class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.logout()
+
+
+class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for the start certificate assessment handler."""
+
+    def test_post_returns_real_attempt_payload(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            return_value=(
+                mock.Mock(attempt_id='attempt_1'),
+                [{'question_id': 'q1', 'question_version': 1}],
+            ),
+        ), mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        render_json_mock.assert_called_once_with(
+            {
+                'attempt_id': 'attempt_1',
+                'questions': [{'question_id': 'q1', 'question_version': 1}],
+            }
+        )
+
+    def test_post_raises_invalid_input_on_not_ready_exception(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=(
+                certificate_assessment_services.CertificateAssessmentAttemptNotReadyException(
+                    'not ready'
+                )
+            ),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'not ready'
+            ):
+                handler.post()
+
+    def test_post_raises_invalid_input_on_validation_error(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=utils.ValidationError('invalid certificate id'),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'invalid certificate id'
+            ):
+                handler.post()
+
+    def test_post_raises_invalid_input_on_invalidated_offering(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=(
+                certificate_assessment_services.CertificateAssessmentAttemptNotReadyException(
+                    'assessment is not ready'
+                )
+            ),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'assessment is not ready'
+            ):
+                handler.post()
+
+    def test_post_returns_cooldown_error_with_remaining_minutes(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException(
+                    6
+                )
+            ),
+        ), mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'error',
+        ) as error_mock, mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        error_mock.assert_called_once_with(429)
+        render_json_mock.assert_called_once_with(
+            {
+                'error': 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+                'error_type': 'cooldown',
+                'remaining_minutes': 6,
+                'status_code': 429,
+            }
+        )
+
+
+class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for the submit certificate assessment handler."""
+
+    def test_post_returns_submission_confirmation(self) -> None:
+        handler = (
+            certificate_assessment.SubmitCertificateAssessmentHandler.__new__(
+                certificate_assessment.SubmitCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {
+            'answers': [
+                {
+                    'question_id': 'q1',
+                    'selected_answer': 'A',
+                    'is_correct': True,
+                }
+            ]
+        }
+        with mock.patch.object(
+            certificate_assessment_services,
+            'get_certificate_assessment_attempt',
+            return_value=mock.Mock(
+                learner_id='user_id_1',
+                is_submitted=False,
+            ),
+        ), mock.patch.object(
+            certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            return_value=mock.Mock(attempt_id='attempt_1'),
+        ), mock.patch.object(
+            certificate_assessment.SubmitCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post('attempt_1')
+
+        render_json_mock.assert_called_once_with(
+            {'attempt_id': 'attempt_1', 'is_submitted': True}
+        )
+
+    def test_post_raises_invalid_input_on_validation_error(self) -> None:
+        handler = (
+            certificate_assessment.SubmitCertificateAssessmentHandler.__new__(
+                certificate_assessment.SubmitCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {
+            'answers': [
+                {
+                    'question_id': 'q1',
+                    'selected_answer': 'A',
+                    'is_correct': True,
+                }
+            ]
+        }
+        attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)
+        with mock.patch.object(
+            certificate_assessment_services,
+            'get_certificate_assessment_attempt',
+            return_value=attempt,
+        ), mock.patch.object(
+            certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            side_effect=utils.ValidationError('invalid attempt'),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'invalid attempt'
+            ):
+                handler.post('attempt_1')
+
+    def test_post_accepts_non_string_selected_answer(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        version_data: Dict[
+            str, Union[str, int, Dict[str, int], Dict[str, List[str]]]
+        ] = {
+            'certificate_id': 'cert_1',
+            'certificate_version': 1,
+            'topic_versions': {'topic_1': 1},
+            'question_versions': {'q1': 1},
+            'question_topic_links': {'q1': ['topic_1']},
+        }
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id='cert_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data=version_data,
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
+                '<attempt_id>', attempt.id
+            ),
+            {
+                'answers': [
+                    {
+                        'question_id': 'q1',
+                        'selected_answer': 42,
+                        'is_correct': True,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        self.assertEqual(
+            response, {'attempt_id': attempt.id, 'is_submitted': True}
+        )
+
+    def test_post_defaults_selected_answer_to_none_when_omitted(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        version_data: Dict[
+            str, Union[str, int, Dict[str, int], Dict[str, List[str]]]
+        ] = {
+            'certificate_id': 'cert_1',
+            'certificate_version': 1,
+            'topic_versions': {'topic_1': 1},
+            'question_versions': {'q1': 1},
+            'question_topic_links': {'q1': ['topic_1']},
+        }
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id='cert_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data=version_data,
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with mock.patch.object(
+            certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            return_value=mock.Mock(attempt_id=attempt.id),
+        ) as submit_mock:
+            response = self.post_json(
+                feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
+                    '<attempt_id>', attempt.id
+                ),
+                {
+                    'answers': [
+                        {
+                            'question_id': 'q1',
+                            'is_correct': True,
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+        self.assertEqual(
+            response, {'attempt_id': attempt.id, 'is_submitted': True}
+        )
+        submit_mock.assert_called_once_with(
+            attempt.id,
+            [
+                {
+                    'question_id': 'q1',
+                    'selected_answer': None,
+                    'is_correct': True,
+                }
+            ],
+        )
+
+    def test_post_raises_invalid_input_when_is_correct_is_missing(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        empty_topic_versions: Dict[str, int] = {}
+        empty_question_versions: Dict[str, int] = {}
+        empty_question_topic_links: Dict[str, List[str]] = {}
+        version_data: Dict[
+            str, Union[str, int, Dict[str, int], Dict[str, List[str]]]
+        ] = {
+            'certificate_id': 'cert_1',
+            'certificate_version': 1,
+            'topic_versions': empty_topic_versions,
+            'question_versions': empty_question_versions,
+            'question_topic_links': empty_question_topic_links,
+        }
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id='cert_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data=version_data,
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        url = feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
+            '<attempt_id>', attempt.id
+        )
+        response = self.post_json(
+            url,
+            {
+                'answers': [
+                    {
+                        'question_id': 'q1',
+                        'selected_answer': 42,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.logout()
+
+        self.assertIn(
+            'Schema validation for \'answers\' failed', response['error']
+        )
+
+
+class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for the certificate question handler."""
+
+    def test_get_returns_question_state_data(self) -> None:
+        handler = certificate_assessment.CertificateQuestionHandler.__new__(
+            certificate_assessment.CertificateQuestionHandler
+        )
+        handler.user_id = 'user_id_1'
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='user_id_1',
+            certificate_id='cert_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'question_versions': {'q1': 1},
+                'question_topic_links': {'q1': ['topic_1']},
+                'topic_versions': {'topic_1': 1},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        with mock.patch.object(
+            certificate_assessment_services,
+            'get_question_state_data_for_assessment_attempt',
+            return_value={'content': 'state'},
+        ), mock.patch.object(
+            certificate_assessment.CertificateQuestionHandler, 'render_json'
+        ) as render_json_mock:
+            handler.get(attempt_model.id, 'q1')
+
+        render_json_mock.assert_called_once_with(
+            {
+                'question_id': 'q1',
+                'question_state_data': {'content': 'state'},
+            }
+        )
+
+    def test_get_raises_invalid_input_on_validation_error(self) -> None:
+        handler = certificate_assessment.CertificateQuestionHandler.__new__(
+            certificate_assessment.CertificateQuestionHandler
+        )
+        handler.user_id = 'user_id_1'
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='user_id_1',
+            certificate_id='cert_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'question_versions': {'q1': 1},
+                'question_topic_links': {'q1': ['topic_1']},
+                'topic_versions': {'topic_1': 1},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        with mock.patch.object(
+            certificate_assessment_services,
+            'get_question_state_data_for_assessment_attempt',
+            side_effect=utils.ValidationError('bad question'),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'bad question'
+            ):
+                handler.get(attempt_model.id, 'q1')

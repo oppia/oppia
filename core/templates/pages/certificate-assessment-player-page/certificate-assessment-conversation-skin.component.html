@@ -25,41 +25,18 @@
         <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
       <div class="certificate-assessment-prompt-pill">
-        {{ currentQuestion.prompt }}
+        <oppia-rte-output-display [rteString]="currentQuestion.prompt">
+        </oppia-rte-output-display>
       </div>
     </div>
 
-    <div *ngIf="currentQuestion.type === 'multiple_choice'" class="certificate-assessment-options">
-      <label *ngFor="let option of currentQuestion.options" class="certificate-assessment-option-row">
-        <input type="radio" class="certificate-assessment-radio" [name]="currentQuestion.id" [checked]="isOptionSelected(option.id)"
-               (change)="selectSingleChoice(option.id)">
-        <span class="certificate-assessment-option-text">{{ option.text }}</span>
-      </label>
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'multiple_select'" class="certificate-assessment-options">
-      <label *ngFor="let option of currentQuestion.options"
-             class="certificate-assessment-option-row">
-        <input type="checkbox" class="certificate-assessment-checkbox"
-               [checked]="isOptionSelected(option.id)"
-               (change)="toggleMultipleSelect(option.id)">
-        <span class="certificate-assessment-option-text">{{ option.text }}</span>
-      </label>
-    </div>
-
-    <div *ngIf="currentQuestion.type === 'text_input' || currentQuestion.type === 'numeric_input'"
-         class="certificate-assessment-free-response">
-      <label class="certificate-assessment-free-response-label"
-             [for]="'certificate-assessment-free-response-input-' + currentQuestion.id"
-      >
-        {{ 'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_YOUR_ANSWER' | translate }}
-      </label>
-      <input
-             [id]="'certificate-assessment-free-response-input-' + currentQuestion.id"
-             [type]="getQuestionInputType()" class="certificate-assessment-free-response-input"
-             [placeholder]="currentQuestion.placeholder || ''"  [value]="freeResponse"
-             #freeResponseInput
-             (input)="updateFreeResponse(freeResponseInput.value)">
+    <div *ngIf="interactionHtml"
+         class="certificate-assessment-interaction conversation-skin-interaction-container">
+      <oppia-interaction-display
+        classStr="e2e-test-conversation-input"
+        [htmlData]="interactionHtml"
+        [parentScope]="this">
+      </oppia-interaction-display>
     </div>
   </div>
 

@@ -197,6 +197,7 @@ export class SearchService {
         },
         errorResponse => {
           this.numSearchesInProgress--;
+          this._isCurrentlyFetchingResults = false;
           if (errorCallback) {
             errorCallback(errorResponse.error.error);
           }

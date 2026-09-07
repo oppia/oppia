@@ -21,10 +21,12 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subscription} from 'rxjs';
 import {PageTitleService} from 'services/page-title.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-content/topic-viewer-content.component';
 
 @Component({
   selector: 'oppia-topic-preview-tab',
@@ -46,6 +48,7 @@ export class TopicPreviewTabComponent {
   topicUrlFragment!: string;
   subtopics!: Subtopic[];
   canonicalStorySummaries!: StorySummary[];
+  canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
   activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
   practiceTabIsDisplayed: boolean = false;
@@ -54,7 +57,8 @@ export class TopicPreviewTabComponent {
     private topicEditorStateService: TopicEditorStateService,
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -74,6 +78,7 @@ export class TopicPreviewTabComponent {
       this.chapterCount +=
         this.canonicalStorySummaries[idx].getNodeTitles().length;
     }
+    this.canonicalStorySectionData = this.getCanonicalStorySectionData();
     this.setPageTitle();
     this.subscribeToOnLangChange();
   }
@@ -102,6 +107,36 @@ export class TopicPreviewTabComponent {
 
   isPracticeTabEnabled(): boolean {
     return this.topic.getPracticeTabIsDisplayed();
+  }
+
+  isRedesignedTopicViewerPageFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.RedesignedTopicViewerPage
+      .isEnabled;
+  }
+
+  private getCanonicalStorySectionData(): readonly TopicViewerStorySectionData[] {
+    const practiceSubtopicIds = this.topic
+      .getSubtopics()
+      .filter(subtopic => {
+        return subtopic.getSkillSummaries().length > 0;
+      })
+      .map(subtopic => subtopic.getId());
+
+    const practiceCount = practiceSubtopicIds.length;
+
+    return this.canonicalStorySummaries.map(storySummary => {
+      return {
+        storyId: storySummary.getId(),
+        storyTitle: storySummary.getTitle(),
+        storyDescription: storySummary.getDescription() || '',
+        storySummary,
+        practiceSubtopicIds,
+        classroomUrlFragment: this.classroomUrlFragment,
+        topicUrlFragment: this.topicUrlFragment,
+        lessonCount: storySummary.getNodeTitles().length,
+        practiceCount,
+      };
+    });
   }
 
   subscribeToOnLangChange(): void {

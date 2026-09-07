@@ -46,9 +46,12 @@ export interface LessonFeedbackBackendDict {
 export interface LessonFeedbackSummary {
   id: string;
   feedback_text_preview: string;
+  latest_response_preview: string;
   status: FeedbackStatus;
+  lesson_title: string;
   source: string;
   unread_response_count: number;
+  last_updated_msecs: number;
 }
 
 export interface LessonFeedbackBackendResponse {
@@ -201,6 +204,10 @@ export enum FeedbackStatus {
   COMPLIMENT = 'compliment',
   NOT_ACTIONABLE = 'not_actionable',
   TRANSFERRED_TO_GITHUB = 'transferred_to_github',
+  ALL = 'all',
+  SUBMITTED = 'submitted',
+  REVIEWED_BY_TEAM = 'reviewed_by_team',
+  LESSON_UPDATED = 'lesson_updated',
 }
 
 export interface FeedbackSessionInfo {
@@ -247,6 +254,24 @@ export interface FeedbackCaptchaConfigResponse {
 
 export interface FeedbackSubmitResponse {
   id: string;
+}
+
+export interface MyFeedbackUnreadCountResponse {
+  unread_count: number;
+}
+
+export interface FeedbackStatusCounts {
+  open: number;
+  fixed: number;
+  compliment: number;
+  not_actionable: number;
+  transferred_to_github: number;
+  total: number;
+}
+
+export interface FeedbackStatusCountsBackendResponse {
+  lesson_feedback_counts: FeedbackStatusCounts;
+  platform_report_counts: FeedbackStatusCounts;
 }
 
 export interface PlatformFeedbackSummary {
@@ -307,10 +332,12 @@ export interface FeedbackFilterConfig {
 /** Configuration passed to FeedbackCard to control visibility. */
 export interface FeedbackCardConfig {
   showCategory: boolean;
+  showLesson: boolean;
   showResponse: boolean;
   showScreenshot: boolean;
   showLessonMetadata: boolean;
   showSessionInfo: boolean;
+  showNotificationSummary: boolean;
 }
 
 export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
@@ -328,10 +355,12 @@ export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
 
 export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
   showCategory: true,
+  showLesson: true,
   showResponse: false,
   showLessonMetadata: true,
   showScreenshot: true,
   showSessionInfo: true,
+  showNotificationSummary: false,
 };
 
 export const CREATOR_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
@@ -347,6 +376,19 @@ export const CREATOR_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
   ],
 };
 
+export const MY_SUGGESTIONS_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: false,
+  showCreatorFeedbackTypeFilter: false,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.ALL,
+    FeedbackStatus.SUBMITTED,
+    FeedbackStatus.REVIEWED_BY_TEAM,
+    FeedbackStatus.LESSON_UPDATED,
+  ],
+};
+
 // Human readable labels for enums.
 export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
   [FeedbackStatus.OPEN]: 'Open',
@@ -354,6 +396,10 @@ export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
   [FeedbackStatus.NOT_ACTIONABLE]: 'Not Actionable',
   [FeedbackStatus.COMPLIMENT]: 'Compliment',
   [FeedbackStatus.TRANSFERRED_TO_GITHUB]: 'Transferred to GitHub',
+  [FeedbackStatus.ALL]: 'All',
+  [FeedbackStatus.SUBMITTED]: 'Submitted',
+  [FeedbackStatus.REVIEWED_BY_TEAM]: 'Reviewed by Team',
+  [FeedbackStatus.LESSON_UPDATED]: 'Lesson Updated',
 };
 
 export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {

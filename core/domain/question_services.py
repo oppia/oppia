@@ -30,6 +30,7 @@ from core.domain import (
     state_domain,
 )
 from core.platform import models
+from core.storage.base_model import gae_models as base_models
 
 from typing import Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
@@ -42,6 +43,16 @@ if MYPY:  # pragma: no cover
 )
 
 transaction_services = models.Registry.import_transaction_services()
+
+
+class QuestionSnapshotNotFoundError(utils.ValidationError):
+    """Error raised when the pinned snapshot of a question version is missing.
+
+    This is a domain-level exception that callers can translate into a
+    user-facing error instead of letting a storage EntityNotFoundError escape.
+    """
+
+    pass
 
 
 def create_new_question(
@@ -462,6 +473,59 @@ def get_question_by_id(
         return question
     else:
         return None
+
+
+def get_question_by_id_and_version(
+    question_id: str, question_version: int
+) -> question_domain.Question:
+    """Returns a historical version of a question.
+
+    Args:
+        question_id: str. The ID of the question.
+        question_version: int. The version number to load.
+
+    Returns:
+        Question. The domain object representing the pinned question version.
+
+    Raises:
+        QuestionSnapshotNotFoundError. If the requested version's snapshot
+            does not exist.
+    """
+    question_snapshot_id = question_models.QuestionModel.get_snapshot_id(
+        question_id, question_version
+    )
+    try:
+        question_snapshot_model = (
+            question_models.QuestionSnapshotContentModel.get(
+                question_snapshot_id
+            )
+        )
+    except base_models.BaseModel.EntityNotFoundError as e:
+        raise QuestionSnapshotNotFoundError(
+            'Question snapshot for question %s version %s was not found.'
+            % (question_id, question_version)
+        ) from e
+    question_model = question_models.QuestionModel(
+        id=question_id,
+        question_state_data=question_snapshot_model.content[
+            'question_state_data'
+        ],
+        language_code=question_snapshot_model.content['language_code'],
+        version=question_snapshot_model.content['version'],
+        linked_skill_ids=question_snapshot_model.content['linked_skill_ids'],
+        inapplicable_skill_misconception_ids=question_snapshot_model.content[
+            'inapplicable_skill_misconception_ids'
+        ],
+        next_content_id_index=question_snapshot_model.content[
+            'next_content_id_index'
+        ],
+    )
+    question_model.question_state_data_schema_version = (
+        question_snapshot_model.content['question_state_data_schema_version']
+    )
+    question_model.created_on = question_snapshot_model.created_on
+    question_model.last_updated = question_snapshot_model.last_updated
+    return question_fetchers.get_question_from_model(question_model)
 
 
 def get_question_skill_links_of_skill(

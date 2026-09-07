@@ -16,9 +16,17 @@
  * @fileoverview Component for the save pending changes modal.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, Optional, Inject} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+
+interface SavePendingChangesModalData {
+  body: string;
+}
 
 @Component({
   selector: 'oppia-save-pending-changes-modal',
@@ -30,7 +38,17 @@ export class SavePendingChangesModalComponent extends ConfirmOrCancelModal {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() body!: string;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    savePendingChangesBottomSheetRef?: MatBottomSheetRef<SavePendingChangesModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    data?: SavePendingChangesModalData
+  ) {
+    super(ngbActiveModal, savePendingChangesBottomSheetRef);
+    if (data) {
+      this.body = data.body;
+    }
   }
 }

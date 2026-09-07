@@ -136,6 +136,7 @@ class EditableStoryDataHandler(
             )
         )
 
+        story_is_published = False
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_is_published = story_reference.story_is_published

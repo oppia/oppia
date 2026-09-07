@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import (
     blog_services,
     collection_services,
+    exp_domain,
     exp_fetchers,
     exp_services,
     rating_services,
@@ -34,6 +36,10 @@ from core.tests import test_utils
 from typing import Final, List, Optional, Tuple
 
 gae_search_services = models.Registry.import_search_services()
+
+(translation_models,) = models.Registry.import_models(
+    [models.Names.TRANSLATION]
+)
 
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
@@ -284,6 +290,192 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(delete_docs_counter.times_called, 1)
+
+    def test_index_exploration_summaries_with_translations(self) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID,
+            title='Exploration Title',
+            category='Category',
+        )
+        exp.objective = 'Objective'
+        exp.tags = ['algebra', 'math']
+        exp_services.save_new_exploration(self.owner_id, exp)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
+
+        # 1. Test case: No translations.
+        indexed_docs: List[search_services.ExplorationSearchDict] = []
+
+        def mock_add_docs(
+            docs: List[search_services.ExplorationSearchDict], index: str
+        ) -> None:
+            self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
+            indexed_docs.extend(docs)
+
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+        add_docs_swap = self.swap(
+            gae_search_services, 'add_documents_to_index', add_docs_counter
+        )
+
+        with add_docs_swap:
+            search_services.index_exploration_summaries([exp_summary])
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(len(indexed_docs), 1)
+        self.assertEqual(indexed_docs[0]['language_code'], ['en'])
+        self.assertEqual(indexed_docs[0]['translated_titles'], [])
+        self.assertEqual(indexed_docs[0]['translated_objectives'], [])
+        self.assertEqual(indexed_docs[0]['translated_tags'], [])
+
+        # 2. Test case: Accepted translations.
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            self.EXP_ID,
+            1,
+            'hi',
+            {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                    'content_value': 'translated title hi',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
+                    'content_value': 'translated objective hi',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
+                    'content_value': 'translated tag hi',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+            },
+        ).put()
+
+        # Let's add a second language translation.
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            self.EXP_ID,
+            1,
+            'bn',
+            {
+                feconf.EXPLORATION_TITLE_CONTENT_ID: {
+                    'content_value': 'translated title bn',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                # Stale translation (needs_update=True) for objective.
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID: {
+                    'content_value': 'stale objective bn',
+                    'needs_update': True,
+                    'content_format': 'unicode',
+                },
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0': {
+                    # Duplicate tag translation.
+                    'content_value': 'translated tag hi',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+                f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_1': {
+                    'content_value': 'translated tag bn',
+                    'needs_update': False,
+                    'content_format': 'unicode',
+                },
+            },
+        ).put()
+
+        indexed_docs = []
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+        add_docs_swap = self.swap(
+            gae_search_services, 'add_documents_to_index', add_docs_counter
+        )
+
+        with add_docs_swap:
+            search_services.index_exploration_summaries([exp_summary])
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(len(indexed_docs), 1)
+        # Verify title translations (sorted, deduplicated).
+        self.assertEqual(
+            indexed_docs[0]['translated_titles'],
+            ['translated title bn', 'translated title hi'],
+        )
+        # Verify objective translations (stale translation excluded).
+        self.assertEqual(
+            indexed_docs[0]['translated_objectives'],
+            ['translated objective hi'],
+        )
+        # Verify tag translations (sorted, deduplicated, stale/untranslated excluded).
+        self.assertEqual(
+            indexed_docs[0]['translated_tags'],
+            ['translated tag bn', 'translated tag hi'],
+        )
+        # Verify language codes (original + languages with valid translations, sorted).
+        self.assertEqual(
+            indexed_docs[0]['language_code'],
+            ['bn', 'en', 'hi'],
+        )
+
+        # 3. Test case: Exploration not found in explorations_dict (defensive check).
+        indexed_docs = []
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+        add_docs_swap = self.swap(
+            gae_search_services, 'add_documents_to_index', add_docs_counter
+        )
+        get_multiple_swap = self.swap(
+            exp_fetchers,
+            'get_multiple_explorations_by_id',
+            lambda *args, **kwargs: {},
+        )
+
+        with add_docs_swap, get_multiple_swap:
+            search_services.index_exploration_summaries([exp_summary])
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(len(indexed_docs), 1)
+        self.assertEqual(indexed_docs[0]['language_code'], ['en'])
+        self.assertEqual(indexed_docs[0]['translated_titles'], [])
+        self.assertEqual(indexed_docs[0]['translated_objectives'], [])
+        self.assertEqual(indexed_docs[0]['translated_tags'], [])
+
+    def test_index_exploration_summaries_batches_explorations_lookups(
+        self,
+    ) -> None:
+        # Create multiple explorations.
+        self.save_new_valid_exploration(
+            'exp_id_1',
+            self.owner_id,
+            title='Title 1',
+            category='Category',
+        )
+        rights_manager.publish_exploration(self.owner, 'exp_id_1')
+        self.save_new_valid_exploration(
+            'exp_id_2',
+            self.owner_id,
+            title='Title 2',
+            category='Category',
+        )
+        rights_manager.publish_exploration(self.owner, 'exp_id_2')
+        summaries = [
+            exp_fetchers.get_exploration_summary_by_id('exp_id_1'),
+            exp_fetchers.get_exploration_summary_by_id('exp_id_2'),
+        ]
+
+        # Use CallCounter to verify how many times get_multiple_explorations_by_id is called.
+        orig_get_multiple = exp_fetchers.get_multiple_explorations_by_id
+        get_multiple_counter = test_utils.CallCounter(orig_get_multiple)
+
+        get_multiple_swap = self.swap(
+            exp_fetchers,
+            'get_multiple_explorations_by_id',
+            get_multiple_counter,
+        )
+
+        with get_multiple_swap:
+            search_services.index_exploration_summaries(summaries)
+
+        # It should be called exactly once, not N times (where N = 2).
+        self.assertEqual(get_multiple_counter.times_called, 1)
 
 
 class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):

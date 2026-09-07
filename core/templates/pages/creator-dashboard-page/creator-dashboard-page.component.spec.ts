@@ -43,6 +43,16 @@ import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorNewCreatorFeedbackTab: {
+      isEnabled: false,
+    },
+  };
+}
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe implements PipeTransform {
@@ -50,6 +60,33 @@ class MockTruncatePipe implements PipeTransform {
     return value;
   }
 }
+
+const createExplorationBackendDict = (id: string, status: string) => ({
+  human_readable_contributors_summary: {username: {num_commits: 3}},
+  category: 'Algebra',
+  community_owned: false,
+  tags: [],
+  title: 'Testing Exploration',
+  created_on_msec: 1593786508029.501,
+  num_total_threads: 0,
+  num_views: 1,
+  last_updated_msec: 1593786607552.753,
+  status,
+  num_open_threads: 0,
+  thumbnail_icon_url: '/subjects/Algebra.svg',
+  language_code: 'en',
+  objective: 'To test exploration recommendations',
+  id,
+  thumbnail_bg_color: '#cc4b00',
+  activity_type: 'exploration',
+  ratings: {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+  },
+});
 
 describe('Creator Dashboard Page Component', () => {
   let fixture: ComponentFixture<CreatorDashboardPageComponent>;
@@ -59,6 +96,8 @@ describe('Creator Dashboard Page Component', () => {
   let userService: UserService;
   let explorationCreationService: ExplorationCreationService;
   let windowDimensionsService: WindowDimensionsService;
+  let feedbackBackendApiService: FeedbackBackendApiService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let userInfo = {
     canCreateCollections: () => true,
   };
@@ -72,12 +111,19 @@ describe('Creator Dashboard Page Component', () => {
         MockTruncatePipe,
         SortByPipe,
       ],
-      providers: [],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+      false;
     fixture = TestBed.createComponent(CreatorDashboardPageComponent);
     component = fixture.componentInstance;
     creatorDashboardBackendApiService = TestBed.inject(
@@ -87,6 +133,7 @@ describe('Creator Dashboard Page Component', () => {
     explorationCreationService = TestBed.inject(ExplorationCreationService);
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token')
@@ -359,6 +406,16 @@ describe('Creator Dashboard Page Component', () => {
       component.ngOnInit();
     }));
 
+    it('should not fetch feedback status counts when the feature flag is disabled', () => {
+      const fetchSpy = spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      );
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(component.feedbackStatusCounts).toBeNull();
+    });
+
     it(
       'should save the exploration format view in the backend when creator' +
         ' changes the format view',
@@ -522,6 +579,141 @@ describe('Creator Dashboard Page Component', () => {
         'This exploration is private. Publish it to receive statistics.'
       );
     }));
+  });
+
+  const createFeedbackStatusCountsTestDashboardData = (
+    explorationDicts: ReturnType<typeof createExplorationBackendDict>[]
+  ): Promise<CreatorDashboardData> => {
+    return Promise.resolve({
+      dashboardStats: CreatorDashboardStats.createFromBackendDict({
+        average_ratings: 0,
+        num_ratings: 0,
+        total_open_feedback: 0,
+        total_plays: 10,
+      }),
+      lastWeekStats: null,
+      displayPreference: 'card',
+      subscribersList: [],
+      explorationsList: explorationDicts.map(dict =>
+        CreatorExplorationSummary.createFromBackendDict(dict)
+      ),
+      collectionsList: [],
+    } as unknown as CreatorDashboardData);
+  };
+
+  describe('when the new creator feedback feature flag is enabled', () => {
+    const countsResponse = {
+      lesson_feedback_counts: {
+        open: 2,
+        fixed: 1,
+        compliment: 0,
+        not_actionable: 0,
+        transferred_to_github: 0,
+        total: 3,
+      },
+      platform_report_counts: {
+        open: 9,
+        fixed: 9,
+        compliment: 9,
+        not_actionable: 9,
+        transferred_to_github: 9,
+        total: 45,
+      },
+    };
+
+    beforeEach(waitForAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      spyOn(
+        creatorDashboardBackendApiService,
+        'fetchDashboardDataAsync'
+      ).and.returnValue(
+        createFeedbackStatusCountsTestDashboardData([
+          createExplorationBackendDict('publicExp1', 'public'),
+          createExplorationBackendDict('privateExp1', 'private'),
+        ])
+      );
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(countsResponse));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo as UserInfo)
+      );
+
+      component.ngOnInit();
+    }));
+
+    it('should aggregate lesson feedback status counts across public explorations only', () => {
+      expect(
+        feedbackBackendApiService.fetchLessonFeedbackStatusCountsAsync
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        feedbackBackendApiService.fetchLessonFeedbackStatusCountsAsync
+      ).toHaveBeenCalledWith('publicExp1');
+      expect(component.feedbackStatusCounts).toEqual(
+        countsResponse.lesson_feedback_counts
+      );
+    });
+  });
+
+  describe('when the new creator feedback feature flag is enabled and a status count request fails', () => {
+    beforeEach(waitForAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      spyOn(
+        creatorDashboardBackendApiService,
+        'fetchDashboardDataAsync'
+      ).and.returnValue(
+        createFeedbackStatusCountsTestDashboardData([
+          createExplorationBackendDict('publicExp1', 'public'),
+        ])
+      );
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.reject());
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo as UserInfo)
+      );
+
+      component.ngOnInit();
+    }));
+
+    it('should hide the status breakdown', () => {
+      expect(component.feedbackStatusCounts).toBeNull();
+    });
+  });
+
+  describe('when the new creator feedback feature flag is enabled with no public explorations', () => {
+    let fetchCountsSpy: jasmine.Spy;
+
+    beforeEach(waitForAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      spyOn(
+        creatorDashboardBackendApiService,
+        'fetchDashboardDataAsync'
+      ).and.returnValue(
+        createFeedbackStatusCountsTestDashboardData([
+          createExplorationBackendDict('privateExp1', 'private'),
+        ])
+      );
+      fetchCountsSpy = spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo as UserInfo)
+      );
+
+      component.ngOnInit();
+    }));
+
+    it('should not fetch any status counts', () => {
+      expect(fetchCountsSpy).not.toHaveBeenCalled();
+      expect(component.feedbackStatusCounts).toBeNull();
+    });
   });
 
   describe('when on collections tab', () => {

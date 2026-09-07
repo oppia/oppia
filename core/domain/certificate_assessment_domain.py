@@ -28,10 +28,16 @@ from typing import Dict, List, Optional, TypedDict
 VALID_ASYNC_STATUSES: List[str] = ['Available', 'Not_Ready', 'Blocked']
 MAX_TITLE_LENGTH = 80
 MAX_DESCRIPTION_LENGTH = 500
-MIN_TIME_LIMIT_IN_MINUTES = 5
-MAX_TIME_LIMIT_IN_MINUTES = 60
 MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
+# Minimum time (in minutes) that must elapse between a learner's last
+# attempt start and their next attempt start for the same certificate.
+MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES = 10
+
+# Maximum size in bytes of a serialized selected_answer for a certificate
+# assessment. Each response is stored in its own Datastore entity, so this
+# bound keeps a single answer well below the entity size limit (1 MB).
+MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES = 10 * 1024
 
 # Keys that must be present in a version_data dict for an attempt.
 REQUIRED_VERSION_DATA_KEYS: List[str] = [
@@ -52,7 +58,6 @@ class CertificateAssessmentOfferingDict(TypedDict):
     classroom_id: str
     topic_ids: List[str]
     total_questions: int
-    time_limit_in_minutes: int
     demonstrates: List[str]
     async_status: str
     version: int
@@ -78,7 +83,6 @@ class CertificateAssessmentOffering:
         classroom_id: str,
         topic_ids: List[str],
         total_questions: int,
-        time_limit_in_minutes: int,
         demonstrates: List[str],
         async_status: str,
         version: int,
@@ -97,8 +101,6 @@ class CertificateAssessmentOffering:
                 certificate.
             total_questions: int. Total number of questions in the
                 certificate assessment.
-            time_limit_in_minutes: int. Maximum time (in minutes) a
-                learner has to complete the assessment.
             demonstrates: list(str). Human-readable strings stating
                 what skills this certificate demonstrates.
             async_status: str. The publication status of this offering.
@@ -113,7 +115,6 @@ class CertificateAssessmentOffering:
         self.classroom_id = classroom_id
         self.topic_ids = topic_ids
         self.total_questions = total_questions
-        self.time_limit_in_minutes = time_limit_in_minutes
         self.demonstrates = demonstrates
         self.async_status = async_status
         self.version = version
@@ -174,20 +175,6 @@ class CertificateAssessmentOffering:
             raise utils.ValidationError(
                 'total_questions must be at most %d.' % MAX_TOTAL_QUESTIONS
             )
-        if not isinstance(self.time_limit_in_minutes, int):
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be a positive integer.'
-            )
-        if self.time_limit_in_minutes < MIN_TIME_LIMIT_IN_MINUTES:
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be greater than or equal to %d.'
-                % MIN_TIME_LIMIT_IN_MINUTES
-            )
-        if self.time_limit_in_minutes > MAX_TIME_LIMIT_IN_MINUTES:
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be at most %d.'
-                % MAX_TIME_LIMIT_IN_MINUTES
-            )
         if not isinstance(self.demonstrates, list):
             raise utils.ValidationError(
                 'demonstrates must be a list of strings.'
@@ -226,7 +213,6 @@ class CertificateAssessmentOffering:
             'classroom_id': self.classroom_id,
             'topic_ids': self.topic_ids,
             'total_questions': self.total_questions,
-            'time_limit_in_minutes': self.time_limit_in_minutes,
             'demonstrates': self.demonstrates,
             'async_status': self.async_status,
             'version': self.version,
@@ -256,9 +242,6 @@ class CertificateAssessmentOffering:
             classroom_id=certificate_offering_dict['classroom_id'],
             topic_ids=certificate_offering_dict['topic_ids'],
             total_questions=certificate_offering_dict['total_questions'],
-            time_limit_in_minutes=(
-                certificate_offering_dict['time_limit_in_minutes']
-            ),
             demonstrates=certificate_offering_dict['demonstrates'],
             async_status=certificate_offering_dict['async_status'],
             version=certificate_offering_dict['version'],
@@ -334,7 +317,7 @@ class CertificateAssessmentAttempt:
             total_score: float. The total score achieved in this
                 attempt.
             attempt_index: int. The index of this attempt for the
-                given learner (1-based).
+                given learner and certificate (1-based).
             attempt_data: dict. Maps topic_id to a dict containing
                 'total_related_questions' and
                 'total_correct_questions' for that topic.
@@ -387,18 +370,25 @@ class CertificateAssessmentAttempt:
             raise utils.ValidationError(
                 'total_score must be a non-negative number.'
             )
+        # In-progress attempts are stored with a placeholder index of 0 until
+        # they are submitted, at which point the real 1-based index is set.
+        min_attempt_index = 1 if self.is_submitted else 0
         if (
             isinstance(self.attempt_index, bool)
             or not isinstance(self.attempt_index, int)
-            or self.attempt_index < 1
+            or self.attempt_index < min_attempt_index
         ):
             raise utils.ValidationError(
-                'attempt_index must be a positive integer.'
+                'attempt_index must be a %s integer.'
+                % ('positive' if self.is_submitted else 'non-negative')
             )
 
     def _validate_attempt_data(self) -> None:
         """Validates the per-topic attempt statistics."""
-        if not isinstance(self.attempt_data, dict) or not self.attempt_data:
+        if not isinstance(self.attempt_data, dict):
+            raise utils.ValidationError('attempt_data must be a dict.')
+        # In-progress attempts have empty per-topic stats until submission.
+        if not self.attempt_data and self.is_submitted:
             raise utils.ValidationError(
                 'attempt_data must contain stats for at least one topic.'
             )
@@ -577,6 +567,12 @@ class CertificateAssessmentResponseDict(TypedDict):
 class CertificateAssessmentResponse:
     """Domain object representing a single response submitted by a
     learner to a question during a certificate assessment attempt.
+
+    The service builds and validates one of these for each submitted answer
+    right before the response is persisted, so this is the gate that keeps
+    malformed or oversized data out of the Datastore. selected_answer holds
+    the already-serialized string form of the learner's answer; an empty
+    string means the question was unanswered.
     """
 
     def __init__(
@@ -595,7 +591,8 @@ class CertificateAssessmentResponse:
             question_id: str. The ID of the question being answered.
             question_version: int. The version of the question that
                 was answered.
-            selected_answer: str. The answer selected by the learner.
+            selected_answer: str. The serialized answer selected by the
+                learner. An empty string means the question was unanswered.
             is_correct: bool. Whether the selected answer was correct.
         """
         self.attempt_id = attempt_id
@@ -606,6 +603,13 @@ class CertificateAssessmentResponse:
 
     def validate(self) -> None:
         """Validates the CertificateAssessmentResponse domain object.
+
+        The learner's browser already grades each answer and sends the
+        is_correct flag, so this method does not re-score anything. Its job
+        is to make sure the serialized answer can be stored safely: the ids
+        must be non-empty, is_correct must genuinely be a boolean (otherwise
+        bool('false') would silently count as correct), and the serialized
+        answer must fit well below the Datastore entity size limit.
 
         Raises:
             utils.ValidationError. If any field is invalid.
@@ -626,12 +630,15 @@ class CertificateAssessmentResponse:
             raise utils.ValidationError(
                 'question_version must be a positive integer.'
             )
+        if not isinstance(self.selected_answer, str):
+            raise utils.ValidationError('selected_answer must be a string.')
         if (
-            not isinstance(self.selected_answer, str)
-            or not self.selected_answer.strip()
+            len(self.selected_answer.encode('utf-8'))
+            > MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
         ):
             raise utils.ValidationError(
-                'selected_answer must be a non-empty string.'
+                'selected_answer must be at most %d bytes when '
+                'serialized.' % MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
             )
         if not isinstance(self.is_correct, bool):
             raise utils.ValidationError('is_correct must be a boolean.')

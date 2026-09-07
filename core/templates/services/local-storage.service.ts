@@ -61,6 +61,10 @@ export class LocalStorageService {
 
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
+  SKIPPED_ADVENTURES_KEY = 'skipped_adventures';
+
+  MASTERED_ADVENTURES_KEY = 'mastered_adventures';
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -453,5 +457,126 @@ export class LocalStorageService {
       return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
     }
     return null;
+  }
+
+  /**
+   * Parse the stored skipped adventures dict, falling back to an empty dict if
+   * the stored value is not valid JSON.
+   * @returns The stored skipped adventures dict, or an empty dict.
+   */
+  private parseSkippedAdventuresDict(): {[storyId: string]: number[]} {
+    const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
+      this.SKIPPED_ADVENTURES_KEY
+    );
+    if (!stringifiedSkippedAdventures) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(stringifiedSkippedAdventures);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: number[]};
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Save the given skipped adventure indices for a story to localStorage.
+   * @param storyId The id of the story the skipped adventures belong to.
+   * @param skippedAdventureIndices The indices of the skipped adventures.
+   */
+  updateSkippedAdventures(
+    storyId: string,
+    skippedAdventureIndices: number[]
+  ): void {
+    if (this.isStorageAvailable()) {
+      const skippedAdventuresDict = this.parseSkippedAdventuresDict();
+      skippedAdventuresDict[storyId] = skippedAdventureIndices;
+      (this.storage as Storage).setItem(
+        this.SKIPPED_ADVENTURES_KEY,
+        JSON.stringify(skippedAdventuresDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the skipped adventure indices for a story from localStorage.
+   * @param storyId The id of the story the skipped adventures belong to.
+   * @returns The indices of the skipped adventures, or an empty array if none
+   *   are stored.
+   */
+  getSkippedAdventures(storyId: string): number[] {
+    if (this.isStorageAvailable()) {
+      const skippedAdventures = this.parseSkippedAdventuresDict()[storyId];
+      if (Array.isArray(skippedAdventures)) {
+        return skippedAdventures;
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Parse the stored mastered adventures dict, falling back to an empty dict
+   * if the stored value is not valid JSON.
+   * @returns The stored mastered adventures dict, or an empty dict.
+   */
+  private parseMasteredAdventuresDict(): {[storyId: string]: string[]} {
+    const stringifiedMasteredAdventures = (this.storage as Storage).getItem(
+      this.MASTERED_ADVENTURES_KEY
+    );
+    if (!stringifiedMasteredAdventures) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(stringifiedMasteredAdventures);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: string[]};
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Save the given mastered adventure arc IDs for a story to localStorage.
+   * @param storyId The id of the story the mastered adventures belong to.
+   * @param masteredArcIds The arc IDs of the mastered adventures.
+   */
+  updateMasteredAdventures(storyId: string, masteredArcIds: string[]): void {
+    if (this.isStorageAvailable()) {
+      const masteredAdventuresDict = this.parseMasteredAdventuresDict();
+      masteredAdventuresDict[storyId] = masteredArcIds;
+      (this.storage as Storage).setItem(
+        this.MASTERED_ADVENTURES_KEY,
+        JSON.stringify(masteredAdventuresDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the mastered adventure arc IDs for a story from localStorage.
+   * @param storyId The id of the story the mastered adventures belong to.
+   * @returns The arc IDs of the mastered adventures, or an empty array if none
+   *   are stored.
+   */
+  getMasteredAdventures(storyId: string): string[] {
+    if (this.isStorageAvailable()) {
+      const masteredAdventures = this.parseMasteredAdventuresDict()[storyId];
+      if (Array.isArray(masteredAdventures)) {
+        return masteredAdventures;
+      }
+    }
+    return [];
   }
 }

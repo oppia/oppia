@@ -37,6 +37,7 @@ export class AdventureEndTestCardComponent implements OnInit {
   @Input() practiceUrl: string = '';
   @Input() cardBackgroundColor: string = '#ecf7f6';
   @Input() cardAccentColor: string = '#0b776d';
+  @Input() isPracticeCompleted: boolean = false;
 
   resolvedThumbnailUrl: string = '';
 

@@ -1074,6 +1074,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=self.USER_ID_1,
+            certificate_id='cert_abc123',
             total_score=84.5,
             attempt_index=1,
             attempt_data={

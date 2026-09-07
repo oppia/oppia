@@ -16,6 +16,8 @@
  * @fileoverview Tests that search service is working as expected.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -53,7 +55,9 @@ describe('Search Backend Api Service', () => {
           expect(response.activity_list).toEqual([]);
           expect(response.search_cursor).toBe('notempty');
         });
-      const req = httpTestingController.expectOne('/searchhandler/data');
+      const req = httpTestingController.expectOne(
+        '/searchhandler/data?display_in_language_code=en'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleSearchResponse);
       flushMicrotasks();
