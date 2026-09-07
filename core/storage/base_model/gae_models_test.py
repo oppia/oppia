@@ -972,16 +972,10 @@ class VersionedModelTests(test_utils.GenericTestBase):
     ) -> None:
         all_model_classes = models.Registry.get_all_storage_model_classes()
 
-        # Abstract base models do not have snapshot classes.
-        ignored_versioned_classes = (
-            gae_models.BaseFeatureFlagConfigModel,
-            gae_models.BasePlatformParameterConfigModel,
-        )
         all_versioned_classes = [
             clazz
             for clazz in all_model_classes
             if issubclass(clazz, base_models.VersionedModel)
-            and clazz not in ignored_versioned_classes
         ]
         self.assertGreater(len(all_versioned_classes), 0)
 
@@ -1520,4 +1514,36 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             [feedback_model.id for feedback_model in feedback_models],
             ['feedback_1', 'feedback_2'],
+        )
+
+
+class BaseFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test BaseFeatureFlagConfigModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            base_models.BaseFeatureFlagConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            base_models.BaseFeatureFlagConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+
+class BasePlatformParameterConfigModelTests(test_utils.GenericTestBase):
+    """Test BasePlatformParameterConfigModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            base_models.BasePlatformParameterConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            base_models.BasePlatformParameterConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )

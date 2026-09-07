@@ -2404,3 +2404,49 @@ class BaseFeedbackModel(BaseModel):
                 else raw_next_cursor
             )
         return results, next_cursor_str, more
+
+
+class BasePlatformParameterConfigModel(VersionedModel):
+    """Abstract base model for platform parameter configuration.
+
+    This model defines the common storage structure for platform parameters
+    across Web and Android. It must not be instantiated directly.
+
+    The id field represents the unique platform parameter name.
+
+    Fields:
+        id: str. Unique name of the platform parameter.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> DELETION_POLICY:
+        """BasePlatformParameterConfigModel is not related to users."""
+        return DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+
+class BaseFeatureFlagConfigModel(BaseModel):
+    """Abstract base model for feature flag configuration.
+
+    This model defines the common structure for all feature flags across
+    Web and Android. It must not be instantiated directly.
+
+    The id field represents the globally unique feature flag name.
+
+    Fields:
+        id: str. Unique name of the feature flag.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> DELETION_POLICY:
+        """BaseFeatureFlagConfigModel is not related to users."""
+        return DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
