@@ -1401,6 +1401,47 @@ describe('Conversation flow service', () => {
     );
   }));
 
+  it('should not load the most recently reached checkpoint when restart is set', fakeAsync(() => {
+    const card = createCard('', 'TextInput');
+    conversationFlowService.displayedCard = card;
+    spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
+      () => {}
+    );
+    spyOn(playerPositionService.onNewCardOpened, 'emit').and.callFake(() => {});
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getUrlParams').and.returnValue({restart: '1'});
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    spyOn(
+      explorationModeService,
+      'isInDiagnosticTestPlayerMode'
+    ).and.returnValue(false);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop').and.callFake(() => {});
+    spyOn(loaderService, 'hideLoadingScreen').and.callFake(() => {});
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode').and.callFake(
+      () => {}
+    );
+    spyOn(cardAnimationService, 'adjustPageHeight');
+    spyOn(windowRef.nativeWindow, 'scrollTo').and.callFake(() => {});
+    const loadSpy = spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadLatestExplorationAsync'
+    );
+
+    conversationFlowService.initializeDirectiveComponents(card, 'focus-label');
+
+    tick();
+    expect(loadSpy).not.toHaveBeenCalled();
+  }));
+
   it('should set i18nLanguageCode to URL lang if iframe and lang is valid', fakeAsync(() => {
     const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
