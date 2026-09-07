@@ -28,7 +28,9 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {Router} from '@angular/router';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
@@ -48,6 +50,7 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {
   UnansweredQuestionModalComponent,
@@ -97,6 +100,9 @@ export class CertificateAssessmentPlayerPageComponent
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
     @Optional() private ngbModal: NgbModal,
+    private router: Router,
+    private translateService: TranslateService,
+    private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private answerClassificationService: AnswerClassificationService,
@@ -277,6 +283,20 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentQuestionIndex += 1;
     this.loadQuestion(this.currentQuestionIndex);
     this.refreshComputedFields();
+  }
+
+  onExit(): void {
+    const exitRoute = this.classroomUrlFragment
+      ? ['/learn', this.classroomUrlFragment, 'certificate-offering-available']
+      : ['/learn'];
+    const shouldLeave = this.windowRef.nativeWindow.confirm(
+      this.translateService.instant('I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM')
+    );
+    if (shouldLeave) {
+      // Only navigate when the learner confirms; otherwise they stay on
+      // the current question so they can keep working.
+      this.router.navigate(exitRoute);
+    }
   }
 
   previousQuestion(): void {
