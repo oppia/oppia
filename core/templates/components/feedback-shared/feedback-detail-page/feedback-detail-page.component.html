@@ -167,10 +167,9 @@
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
                                          heading="Replies"
-                                         class="e2e-test-feedback-detail-replies-section"
                                          [isCollapsible]="true"
                                          iconClass="fas fa-comments"
-                                         class="oppia-feedback-detail-replies-bar">
+                                         class="oppia-feedback-detail-replies-bar e2e-test-feedback-detail-replies-section">
             <ng-container *ngIf="getFeedbackResponses(feedback) as responses">
               <div *ngIf="responses.length === 0"
                    class="oppia-feedback-response-empty e2e-test-feedback-response-empty">
