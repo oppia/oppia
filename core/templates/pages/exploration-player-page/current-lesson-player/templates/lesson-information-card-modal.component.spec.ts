@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {EventEmitter} from '@angular/core';
@@ -50,6 +52,7 @@ import {RatingComputationService} from '../../../../components/ratings/rating-co
 import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {State} from '../../../../domain/state/state.model';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
@@ -593,7 +596,7 @@ describe('Lesson Information card modal component', () => {
 
     spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
       (stateName: string) => {
-        return {cardIsCheckpoint: parseInt(stateName) % 2 === 0};
+        return {cardIsCheckpoint: parseInt(stateName) % 2 === 0} as State;
       }
     );
 

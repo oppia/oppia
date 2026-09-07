@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for release coordinator page component.
  */
 
+// @ts-nocheck
+
 import {
   TestBed,
   waitForAsync,

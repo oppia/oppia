@@ -536,7 +536,25 @@ def main() -> None:
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n',
     )
-    subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+    # The install runs under the same Node 20 installation that is used for
+    # the Lighthouse and Playwright acceptance tests (see
+    # LIGHTHOUSE_NODE_PATH in common.py). This satisfies the engines
+    # requirement of Lighthouse 12 (Node 18.20 or newer), so no
+    # --ignore-engines flag is needed.
+    # TODO(#26264): Simplify this install step by using the default Node
+    # version once it is upgraded to 20.
+    install_env = {
+        **os.environ,
+        'PATH': os.pathsep.join(
+            [
+                os.path.join(common.LIGHTHOUSE_NODE_PATH, 'bin'),
+                os.environ['PATH'],
+            ]
+        ),
+    }
+    subprocess.check_call(
+        ['yarn', 'install', '--pure-lockfile'], env=install_env
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

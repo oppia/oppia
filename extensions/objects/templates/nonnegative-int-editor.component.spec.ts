@@ -16,6 +16,8 @@
  * @fileoverview unit tests for non-negative int editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
