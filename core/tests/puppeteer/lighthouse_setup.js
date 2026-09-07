@@ -837,8 +837,21 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
       }
     }
     if (!classroomTileElement) {
+      const pageState = await page.evaluate(() => {
+        const tileNameElements = Array.from(
+          document.querySelectorAll('.e2e-test-classroom-tile-name')
+        );
+        return {
+          url: window.location.href,
+          hasSpinner: Boolean(document.querySelector('.loading-spinner')),
+          tileCount: document.querySelectorAll('.e2e-test-classroom-tile')
+            .length,
+          tileNames: tileNameElements.map(element => element.textContent),
+        };
+      });
       throw new Error(
-        'The math classroom tile was not found on classroom-admin.'
+        'The math classroom tile was not found on classroom-admin. ' +
+          `Page state: ${JSON.stringify(pageState)}`
       );
     }
     await classroomTileElement.click();
