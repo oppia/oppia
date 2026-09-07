@@ -576,6 +576,14 @@ describe('FeedbackDetailPageComponent', () => {
     );
   });
 
+  it('should return early false if feedbackDetailResponse is null', () => {
+    component.feedbackDetailResponse = null;
+
+    expect(component.shouldShowStatusOption(FeedbackStatus.COMPLIMENT)).toBe(
+      false
+    );
+  });
+
   it('should hide Compliment status option for Typo category', () => {
     component.feedbackDetailResponse = {
       ...mockPlatformFeedbackDetailResponse,

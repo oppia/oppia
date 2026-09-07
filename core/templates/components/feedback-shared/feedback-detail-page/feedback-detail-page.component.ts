@@ -503,9 +503,12 @@ export class FeedbackDetailPageComponent {
   }
 
   shouldShowStatusOption(statusOption: FeedbackStatus): boolean {
+    if (!this.feedbackDetailResponse) {
+      return false;
+    }
     return !(
       statusOption === FeedbackStatus.COMPLIMENT &&
-      this.getFeedbackCategory(this.feedbackDetailResponse!) ===
+      this.getFeedbackCategory(this.feedbackDetailResponse) ===
         ReportAnIssueCategory.TYPO
     );
   }

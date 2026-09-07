@@ -131,6 +131,7 @@ describe('Tech Team Lead', function () {
       'Report a Website Issue',
       'confirm'
     );
+    showMessage('Submitted a site report.');
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.clickOnProfileDropdown();
@@ -287,7 +288,9 @@ describe('Tech Team Lead', function () {
 
   it('should be able to change the status of a feedback report', async function () {
     await techTeamLead.clickFeedbackDetailBackButton();
-    await techTeamLead.selectFeedbackStatusFilter('open');
+    await techTeamLead.selectFeedbackStatusFilter(
+      FEEDBACK_STATUS_LABELS[FeedbackStatus.OPEN]
+    );
     await techTeamLead.selectFeedbackTechnicalTeamFilter('tech-internal');
 
     await techTeamLead.clickApplyButton();
@@ -314,8 +317,13 @@ describe('Tech Team Lead', function () {
       'http://localhost:8181/creator-dashboard'
     );
 
-    await techTeamLead.clickFeedbackDetailStatusButton('fixed');
-    await techTeamLead.verifyFeedbackStatusActions('fixed', 'open');
+    await techTeamLead.clickFeedbackDetailStatusButton(
+      statusLabels[FeedbackStatus.FIXED]
+    );
+    await techTeamLead.verifyFeedbackStatusActions(
+      statusLabels[FeedbackStatus.FIXED],
+      statusLabels[FeedbackStatus.OPEN]
+    );
     await techTeamLead.expectToastMessage('Feedback status updated to fixed.');
 
     await techTeamLead.expectScreenshotToMatch(
@@ -352,7 +360,9 @@ describe('Tech Team Lead', function () {
     );
     await techTeamLead.verifyExplorationFeedbackDetailView('report', 'Fixed');
     // Click on the "open" status  button.
-    await techTeamLead.clickFeedbackDetailStatusButton('open');
+    await techTeamLead.clickFeedbackDetailStatusButton(
+      statusLabels[FeedbackStatus.OPEN]
+    );
     await techTeamLead.expectToastMessage('Feedback status updated to open.');
     await techTeamLead.verifyFeedbackDetailPageDetailsSection(
       statusLabels[FeedbackStatus.OPEN],
@@ -360,14 +370,19 @@ describe('Tech Team Lead', function () {
       'Web',
       'http://localhost:8181/creator-dashboard'
     );
-    await techTeamLead.verifyFeedbackStatusActions('open', 'fixed');
+    await techTeamLead.verifyFeedbackStatusActions(
+      statusLabels[FeedbackStatus.OPEN],
+      statusLabels[FeedbackStatus.FIXED]
+    );
 
     await techTeamLead.expectScreenshotToMatch(
       'Entry1FeedbackDetailViewWithOpenStatus',
       __dirname
     );
     // Click on the "not_actionable" status button.
-    await techTeamLead.clickFeedbackDetailStatusButton('not_actionable');
+    await techTeamLead.clickFeedbackDetailStatusButton(
+      statusLabels[FeedbackStatus.NOT_ACTIONABLE]
+    );
     await techTeamLead.expectToastMessage(
       'Feedback status updated to not_actionable.'
     );
@@ -377,7 +392,10 @@ describe('Tech Team Lead', function () {
       'Web',
       'http://localhost:8181/creator-dashboard'
     );
-    await techTeamLead.verifyFeedbackStatusActions('not_actionable', 'open');
+    await techTeamLead.verifyFeedbackStatusActions(
+      statusLabels[FeedbackStatus.NOT_ACTIONABLE],
+      statusLabels[FeedbackStatus.OPEN]
+    );
 
     await techTeamLead.expectScreenshotToMatch(
       'Entry1FeedbackDetailViewWithNotActionableStatus',

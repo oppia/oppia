@@ -4768,11 +4768,19 @@ export class LoggedInUser extends BaseUser {
     await this.waitForNetworkIdle();
   }
 
+  /**
+   * Navigates to the My Suggestions tab.
+   */
   async navigateToMySuggestionsTab(): Promise<void> {
     await this.navigateToLearnerDashboard();
     await this.clickOnElementWithSelector(tabSelectorMap.My_Suggestions);
   }
 
+  /**
+   * Verifies the value of an element.
+   * @param selector - The selector for the element.
+   * @param expectedValue - The expected value of the element.
+   */
   async expectElementValue(
     selector: string,
     expectedValue: string
@@ -4785,6 +4793,12 @@ export class LoggedInUser extends BaseUser {
     expect(actualValue).toBe(expectedValue);
   }
 
+  /**
+   * Verifies the default Feedback Tab filter.
+   * @param expectedStatus - The expected status of the filter.
+   * @param additionalFilterSelector - The selector for the additional filter.
+   * @param expectedAdditionalFilterValue - The expected value of the additional filter.
+   */
   async verifyDefaultFeedbackTabFilter(
     expectedStatus: string,
     additionalFilterSelector?: string,
@@ -4804,10 +4818,16 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementValue(feedbackFilterToDateInput, '');
   }
 
+  /**
+   * Verifies the default My Suggestions Tab filter.
+   */
   async verifyDefaultMySuggestionsTabFilter(): Promise<void> {
     await this.verifyDefaultFeedbackTabFilter('all');
   }
 
+  /**
+   * Verifies the default New Exploration Feedback Tab filter.
+   */
   async verifyDefaultNewExplorationFeedbackTabFilter(): Promise<void> {
     await this.verifyDefaultFeedbackTabFilter(
       'open',
@@ -4816,6 +4836,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the default Technical Feedback Dashboard filter.
+   */
   async verifyDefaultTechnicalFeedbackDashboardFilter(): Promise<void> {
     await this.verifyDefaultFeedbackTabFilter(
       'open',
@@ -4824,6 +4847,11 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the feedback filter row contents, used by My Suggestions Tab,
+   * Exploration Editor feedback tab and Technical Feedback Dashboard.
+   * @param {string} additionalFilterSelector - The selector of the additional filter, based on the dashboards.
+   */
   async verifyFeedbackFilterRowContents(
     additionalFilterSelector?: string
   ): Promise<void> {
@@ -4841,16 +4869,28 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(feedbackFilterClearButton, true);
   }
 
+  /**
+   * Verifies the feedback filter row contents in the My Suggestions Tab.
+   */
   async verifyMySuggestionsFeedbackFilterRowContents(): Promise<void> {
     await this.verifyFeedbackFilterRowContents();
   }
 
+  /**
+   * Verifies the feedback filter row contents in the Exploration Editor feedback tab.
+   */
   async verifyNewExplorationEditorFeedbacktabFilterRowContents(): Promise<void> {
     await this.verifyFeedbackFilterRowContents(
       feedbackFilterCreatorFeedbackType
     );
   }
 
+  /**
+   * Verifies the feedback list, used in My Suggestions Tab,
+   * Exploration Editor feedback tab, Technical Feedback Dashboard .
+   * @param additionalSelectors - A list of additional selectors to verify, based on the
+   * dashboards.
+   */
   async verifyFeedbackList(additionalSelectors: string[] = []): Promise<void> {
     await this.expectElementToBeVisible(feedbackTableDiv, true);
     await this.expectElementToBeVisible(feedbackTableStatus, true);
@@ -4862,10 +4902,17 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Verifies the feedback list in the My Suggestions tab.
+   */
   async verifyMySuggestionsFeedbackList(): Promise<void> {
     await this.verifyFeedbackList([feedbackTableMySuggestionsLessonTitle]);
   }
 
+  /**
+   * Verifies the feedback list in the new exploration editor.
+   * @param feedbackType - The type of feedback to verify.
+   */
   async verifyNewExplorationEditorFeedbackList(
     feedbackType: string
   ): Promise<void> {
@@ -4879,6 +4926,11 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Expects the total notification number on the My Suggestions tab.
+   * @param shouldBeVisible - Whether the total notification number should be visible.
+   * @param expectedNotificationNo - The expected notification number.
+   */
   async expectMySuggestionsTabTotalNotification(
     shouldBeVisible: boolean,
     expectedNotificationNo?: string
@@ -4901,6 +4953,10 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Expects that the feedback table contains the expected entry.
+   * @param {FeedbackTableRowExpectation} expected - The expected entry.
+   */
   async expectFeedbackTableEntry(
     expected: FeedbackTableRowExpectation
   ): Promise<void> {
@@ -4953,6 +5009,11 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Finds the feedback list entry with the given description.
+   * @param description - The description of the feedback list entry to find.
+   * @returns The feedback list entry with the given description.
+   */
   async findFeedbackTableRow(
     description: string
   ): Promise<ElementHandle<Element>> {
@@ -4974,6 +5035,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Clicks on the feedback list entry with the given description.
+   * @param givenDescription - The description of the feedback list entry to click on.
+   */
   async clickOnFeedbackListEntryWithDescription(
     givenDescription: string
   ): Promise<void> {
@@ -4981,6 +5046,9 @@ export class LoggedInUser extends BaseUser {
     await row.click();
   }
 
+  /**
+   * Removes the dynamic elements from the My Suggestions tab.
+   */
   async removeMySuggestionsDynamicElements(): Promise<void> {
     const selectors = [
       mySuggestionsTabDetailSubmittedOnValue,
@@ -5003,6 +5071,12 @@ export class LoggedInUser extends BaseUser {
     }, selectors);
   }
 
+  /**
+   * Verify the details section of the feedback detail page.
+   * @param feedbackType - The type of feedback ('feedback' or 'report').
+   * @param statusValue - The expected status value.
+   * @param categoryValue - The expected category value.
+   */
   async verifyExplorationFeedbackDetailView(
     feedbackType: 'feedback' | 'report',
     statusValue: string,
@@ -5018,7 +5092,7 @@ export class LoggedInUser extends BaseUser {
       feedbackDetailPageStatusChipSelector,
       statusValue
     );
-    if (feedbackType == 'report' && categoryValue) {
+    if (feedbackType === 'report' && categoryValue) {
       await this.expectTextContentToBe(
         feedbackDetailPageCategoryChipSelector,
         categoryValue
@@ -5026,6 +5100,14 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Verify the details section of the feedback detail page.
+   * @param statusValue - The expected status value.
+   * @param sourceValue - The expected source value.
+   * @param platformValue - The expected platform value.
+   * @param pageUrlValue - The expected page URL value.
+   * @param categoryValue - The expected category value.
+   */
   async verifyFeedbackDetailPageDetailsSection(
     statusValue: string,
     sourceValue: string,
@@ -5091,18 +5173,27 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /*
+   * Clicks Apply button in the Feedback Filter options.
+   */
   async clickApplyButton(): Promise<void> {
     await this.expectElementToBeClickable(feedbackFilterApplyButton, true);
     await this.clickOnElementWithSelector(feedbackFilterApplyButton);
     showMessage('Clicked Apply button in the Feedback Filter options');
   }
 
+  /*
+   * Clicks Clear button in the Feedback Filter options.
+   */
   async clickClearButton(): Promise<void> {
     await this.expectElementToBeClickable(feedbackFilterClearButton, true);
     await this.clickOnElementWithSelector(feedbackFilterClearButton);
     showMessage('Clicked Clear button in the Feedback Filter options');
   }
 
+  /*
+   * Verifies the feedback detail page lesson context section.
+   */
   async verifyFeedbackDetailPageLessonContextSection(
     expId: string,
     version: string,
@@ -5152,6 +5243,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /*
+   * Verifies the feedback detail page screenshot section.
+   */
   async verifyFeedbackDetailScreenshotSection(): Promise<void> {
     await this.expectElementToBeVisible(feedbackDetailScreensshotPreview, true);
     await this.expectElementToBeClickable(feedbackDetailScreensshotBtn, true);
@@ -5161,6 +5255,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /*
+   * Clicks the reported lesson version link.
+   */
   async clickReportedLessonVersionLink(
     expId: string,
     version: string
@@ -5187,6 +5284,11 @@ export class LoggedInUser extends BaseUser {
     showMessage('switched back to default page');
   }
 
+  /**
+   * Clicks the reported lesson state editor link.
+   * @param expId - The exploration id.
+   * @param stateName - The state name.
+   */
   async clickReportedLessonStateEditorLink(
     expId: string,
     stateName: string
@@ -5216,6 +5318,10 @@ export class LoggedInUser extends BaseUser {
     showMessage('switched back to default page');
   }
 
+  /**
+   * Selects a feedback type in filters section of exploration editor feedback tab.
+   * @param feedbackType - feedback type to be selected.
+   */
   async selectCreatorFeedbackType(feedbackType: string): Promise<void> {
     await this.select(feedbackFilterCreatorFeedbackType, feedbackType);
 
@@ -5225,12 +5331,20 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Selects a feedback status in filters section of Feedback filter component.
+   * @param status - feedback status to be selected.
+   */
   async selectFeedbackStatusFilter(status: string): Promise<void> {
     await this.select(feedbackFilterStatus, status);
 
     await this.expectElementValue(feedbackFilterStatus, status);
   }
 
+  /**
+   * Verifies the feedback detail page user feedback section.
+   * @param userMessage - user's feedback message.
+   */
   async verifyFeedbackDetailPageUserFeedbackSection(
     userMessage: string
   ): Promise<void> {
@@ -5244,6 +5358,11 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the feedback detail page replies section.
+   * @param hasReplies - boolean value to check if replies are present.
+   * @param isReport - boolean value to check if feedback is a report.
+   */
   async verifyFeedbackDetailPageRepliesSection(
     hasReplies: boolean,
     isReport: boolean = false
@@ -5274,11 +5393,18 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /*
+   * Clicks the back button in feedback detail page.
+   */
   async clickFeedbackDetailBackButton(): Promise<void> {
     await this.expectElementToBeClickable(feedbackDetailPageBackBtn, true);
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
   }
 
+  /**
+   * Verifies the feedback detail page reply section.
+   * @param replytext - reply text sent by creators.
+   */
   async verifyfeedbackDetailResponseReply(replytext: string): Promise<void> {
     await this.expectTextContentToBe(
       feedbackDetailResponseReplyheader,
@@ -5290,6 +5416,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the feedback detail page actions section.
+   * @param shouldShowReplyOptions - boolean value to check if reply options are present.
+   */
   async verifyFeedbackDetailPageActionsSection(
     shouldShowReplyOptions: boolean
   ): Promise<void> {
@@ -5341,6 +5471,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Clicks the send button to send the reply in Feedback Detail page.
+   */
   async sendFeedbackDetailReply(): Promise<void> {
     await this.expectElementToBeClickable(
       feedbackDetailPageActionSubmitButton,
@@ -5351,6 +5484,9 @@ export class LoggedInUser extends BaseUser {
     showMessage('Sent Reply to Learner');
   }
 
+  /**
+   * Verifies the feedback detail status actions buttons.
+   */
   async verifyFeedbackDetailStatusActionsButtons(): Promise<void> {
     await this.expectTextContentToBe(
       feedbackDetailActionStatusLabel,
@@ -5382,6 +5518,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Clicks the feedback detail status button.
+   * @param status - The status to be clicked.
+   */
   async clickFeedbackDetailStatusButton(status: string): Promise<void> {
     let selector: string;
 
@@ -5406,6 +5546,12 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(selector);
   }
 
+  /**
+   * Verifies the clickablity of feedback detail status actions buttons
+   * based on the selected status.
+   * @param selectedStatus - The status that is selected.
+   * @param otherStatus - The other status that is not selected.
+   */
   async verifyFeedbackStatusActions(
     selectedStatus: string,
     otherStatus: string
@@ -5421,6 +5567,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the My Suggestions tab detail view.
+   * @param followUpNoteClickable - Whether the follow-up note button is clickable.
+   */
   async verifyMySuggestionsFeedbackDetailView(
     followUpNoteClickable: boolean
   ): Promise<void> {
@@ -5464,6 +5614,12 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies the My Suggestions tab detail view.
+   * @param expectedStatus - The expected status.
+   * @param expectedFeedback - The expected feedback.
+   * @param expectedLessonContext - The expected lesson context.
+   */
   async expectMySuggestionsFeedbackDetail(
     expectedStatus: string,
     expectedFeedback: string,
@@ -5485,6 +5641,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Clicks the My Suggestions tab lesson context link.
+   * @param expId - The exploration id.
+   */
   async clickOnMySuggestionsFeedbackLessonContextLink(
     expId: string
   ): Promise<void> {
@@ -5493,6 +5653,9 @@ export class LoggedInUser extends BaseUser {
     await this.expectPageURLToContain('lesson/' + expId);
   }
 
+  /**
+   * Navigates back to the My Suggestions tab list.
+   */
   async goBackToMySuggestionsTabList(): Promise<void> {
     await this.clickOnElementWithSelector(mySuggestionsTabBackButton);
     showMessage('Navigated back to My Suggestions tab list.');
@@ -5500,6 +5663,9 @@ export class LoggedInUser extends BaseUser {
     await this.verifyMySuggestionsFeedbackList();
   }
 
+  /**
+   * Clicks the Add a follow-up note button.
+   */
   async clickOnAddAFollowUpNote(): Promise<void> {
     await this.clickOnElementWithSelector(mySuggestionsTabFollowUpButton);
     await this.expectModalTitleToBe('Add a follow-up note');

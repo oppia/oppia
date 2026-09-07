@@ -2917,6 +2917,9 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
+  /**
+   * Expects new exploration feedback tab to be visible.
+   */
   async expectNewExplorationFeedbackTab(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
     await this.expectTextContentToBe(
@@ -8764,24 +8767,6 @@ export class ExplorationEditor extends BaseUser {
       emptyCreatorDashboardMessageSelector,
       expectedText
     );
-  }
-
-  async selectStatusOnFeedbackTab(status: string): Promise<void> {
-    await this.expectElementToBeVisible(feedbackDetailStatusButton, true);
-    const statusButtons = await this.page.$$(feedbackDetailStatusButton);
-
-    for (const button of statusButtons) {
-      const buttonText = await button.evaluate(element =>
-        element.textContent?.trim()
-      );
-
-      if (buttonText === status) {
-        await button.click();
-        return;
-      }
-    }
-
-    throw new Error(`Status button "${status}" was not found.`);
   }
 }
 

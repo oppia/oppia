@@ -53,7 +53,7 @@ const feedbackDetailPageNavigationHistoryValue =
   '.e2e-test-feedback-detail-navigation-history-value';
 const feedbackDetailPageActionsSection =
   '.e2e-test-feedback-detail-actions-section';
-// Action Btns:
+// Action Btns selectors.
 const feedbackDetailActionStatusLabel =
   '.e2e-test-feedback-detail-action-status-label';
 const feedbackDetailActionStatusOpenBtn =
@@ -70,12 +70,8 @@ const feedbackDetailScreensshotBtn = '.e2e-test-feedback-detail-screenshot-btn';
 
 export class TechTeamLead extends LoggedInUser {
   /**
-   * Navigates to the technical feedback dashboard.
+   * Verifies the Technical Feedback Dashboard page.
    */
-  async navigateToTechnicalFeedbackDashboard(): Promise<void> {
-    await this.goto(technicalFeedbackDashboardUrl);
-  }
-
   async expectTechnicalFeedbackDashboard(): Promise<void> {
     await this.expectElementToBeVisible(
       technicalFeedbackDashboardPageContent,
@@ -113,29 +109,43 @@ export class TechTeamLead extends LoggedInUser {
     );
   }
 
+  /**
+   * Verifies the feedback filter row contents of the Technical Feedback Dashboard.
+   */
   async verifyTechnicalFeedbackDashboardFeedbackFilterRowContents(): Promise<void> {
     await this.verifyFeedbackFilterRowContents(feedbackFilterTechnicalTeam);
   }
 
+  /**
+   * Selects the Technical Team feedback filter option.
+   */
   async selectFeedbackTechnicalTeamFilter(team: string): Promise<void> {
     await this.select(feedbackFilterTechnicalTeam, team);
 
     await this.expectElementValue(feedbackFilterTechnicalTeam, team);
   }
 
+  /**
+   * Verifies the feedback list of the Technical Feedback Dashboard.
+   */
   async verifyTechnicalFeedbackDashboardFeedbackList(): Promise<void> {
     await this.verifyFeedbackList([feedbackTableCategoryChip]);
   }
 
+  /**
+   * Verifies the feedback detail page has no screenshot.
+   */
   async verifyFeedbackDetailScreenshotIsNotPresent(): Promise<void> {
     await this.expectElementToBeVisible(
       feedbackDetailScreensshotPreview,
       false
     );
-
     await this.expectElementToBeVisible(feedbackDetailScreensshotBtn, false);
   }
 
+  /**
+   * Verifies the feedback detail page has no session information.
+   */
   async verifyFeedbackDetailPageHasNoSessionInformation(): Promise<void> {
     await this.expectTextContentToContain(
       feedbackDetailPageSessionInfoSection,
@@ -148,12 +158,9 @@ export class TechTeamLead extends LoggedInUser {
     );
   }
 
-  async clickTransferToGithubButton(): Promise<void> {
-    await this.clickOnElementWithSelector(
-      '.e2e-test-feedback-detail-action-transferred_to_github-status-btn'
-    );
-  }
-
+  /**
+   * Verifies the feedback detail page Technical logs section.
+   */
   async verifyFeedbackDetailTechnicalLogsSection(): Promise<void> {
     await this.expectTextContentToContain(
       feedbackDetailPageSessionInfoSection,
@@ -183,6 +190,9 @@ export class TechTeamLead extends LoggedInUser {
     );
   }
 
+  /**
+   * Verifies the feedback detail page status actions buttons.
+   */
   async verifyTechnicalFeedbackDetailStatusActionsButtons(): Promise<void> {
     await this.expectTextContentToContain(
       feedbackDetailPageActionsSection,

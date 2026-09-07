@@ -196,7 +196,7 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    await explorationEditor.selectStatusOnFeedbackTab(
+    await explorationEditor.clickFeedbackDetailStatusButton(
       statusLabels[FeedbackStatus.NOT_ACTIONABLE]
     );
     await explorationEditor.expectScreenshotToMatch(
@@ -244,7 +244,7 @@ describe('Logged-in User', function () {
     await explorationEditor.clickOnFeedbackListEntryWithDescription(
       'This Lesson seems too short, can we make it longer?'
     );
-    await explorationEditor.selectStatusOnFeedbackTab(
+    await explorationEditor.clickFeedbackDetailStatusButton(
       statusLabels[FeedbackStatus.FIXED]
     );
 
