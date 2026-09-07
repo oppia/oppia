@@ -113,13 +113,25 @@ describe('Certified learner', function () {
       CERTIFICATE_TITLE,
       'Not Attempted'
     );
+    await learner.expectScreenshotToMatch(
+      'availableCertificateWithContinueButton',
+      __dirname
+    );
   });
 
   it('should be able to review the certificate details before attempting', async function () {
     await learner.gotoMathClassroomCertificateOfferings();
     await learner.openCertificateAssessment(CERTIFICATE_TITLE);
     await learner.expectCertificateIntroductionCard(CERTIFICATE_TITLE);
+    await learner.expectScreenshotToMatch(
+      'certificateIntroductionCard',
+      __dirname
+    );
     await learner.continueToAssessmentInstructions();
+    await learner.expectScreenshotToMatch(
+      'certificateAssessmentInstructions',
+      __dirname
+    );
   });
 
   it('should complete and fail the certificate assessment', async function () {
@@ -127,6 +139,10 @@ describe('Certified learner', function () {
     await learner.answerCertificateQuestions(7, 10);
     await learner.waitForPageToFullyLoad();
     await learner.expectCertificateAssessmentResult("Don't give up", '70%');
+    await learner.expectScreenshotToMatch(
+      'certificateAssessmentResultFailed',
+      __dirname
+    );
   });
 
   it('should show the failed status on the available certificate page', async function () {
@@ -134,6 +150,10 @@ describe('Certified learner', function () {
     await learner.expectCertificateTileWithStatus(
       CERTIFICATE_TITLE,
       'Not Passed'
+    );
+    await learner.expectScreenshotToMatch(
+      'availableCertificateWithRetryAndCheckScoreButtons',
+      __dirname
     );
   });
 
@@ -155,6 +175,10 @@ describe('Certified learner', function () {
     await learner.expectCertificateAssessmentResult(
       'Congratulations, you passed',
       '80%'
+    );
+    await learner.expectScreenshotToMatch(
+      'certificateAssessmentResultPassed',
+      __dirname
     );
   });
 
@@ -184,6 +208,10 @@ describe('Certified learner', function () {
       CERTIFICATE_TITLE,
       '70%',
       'Not Passed'
+    );
+    await learner.expectScreenshotToMatch(
+      'certificateAttemptHistory',
+      __dirname
     );
   });
 
