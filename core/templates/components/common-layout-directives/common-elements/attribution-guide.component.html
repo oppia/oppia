@@ -53,11 +53,11 @@
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_TWO' | translate: { linkText: '<u>Oppia</u> // <u>CC BY SA 4.0</u>' }"></span></li>
             </ol>
-            <div data-bs-trigger="manual"
-                 data-bs-toggle="tooltip"
-                 data-bs-title="Copied!"
-                 data-bs-placement="bottom"
-                 data-bs-offset="0 20"
+            <div ngbTooltip="Copied!"
+                 triggers="manual"
+                 autoClose="false"
+                 placement="bottom"
+                 #htmlAttributionTooltip="ngbTooltip"
                  class="attribution-html-code font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
             </div>
@@ -69,11 +69,11 @@
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_TWO' | translate: { link: printAttributionLink }"></span></li>
             </ol>
-            <div data-bs-trigger="manual"
-                 data-bs-toggle="tooltip"
-                 data-bs-title="Copied!"
-                 data-bs-placement="bottom"
-                 data-bs-offset="0 20"
+            <div ngbTooltip="Copied!"
+                 triggers="manual"
+                 autoClose="false"
+                 placement="bottom"
+                 #printAttributionTooltip="ngbTooltip"
                  class="attribution-print-text font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               "{{getExplorationTitle()}}" by {{getAuthors()}}. Oppia. {{getPageUrl()}}
             </div>
