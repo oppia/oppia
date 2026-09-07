@@ -874,23 +874,19 @@ class UserInfoHandler(
         self.response.cache_control.no_store = True
         if self.username:
             assert self.user_id is not None
-            user_actions = user_services.get_user_actions_info(
-                self.user_id
-            ).actions
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=True
+            roles, user_actions, user_settings = (
+                user_services.get_user_roles_and_actions(self.user_id)
             )
+            assert user_settings is not None
             self.render_json(
                 {
-                    'roles': self.roles,
-                    'is_moderator': (user_services.is_moderator(self.user_id)),
-                    'is_curriculum_admin': user_services.is_curriculum_admin(
-                        self.user_id
+                    'roles': roles,
+                    'is_moderator': feconf.ROLE_ID_MODERATOR in roles,
+                    'is_curriculum_admin': (
+                        feconf.ROLE_ID_CURRICULUM_ADMIN in roles
                     ),
                     'is_super_admin': self.current_user_is_super_admin,
-                    'is_topic_manager': (
-                        user_services.is_topic_manager(self.user_id)
-                    ),
+                    'is_topic_manager': feconf.ROLE_ID_TOPIC_MANAGER in roles,
                     'can_create_collections': bool(
                         role_services.ACTION_CREATE_COLLECTION in user_actions
                     ),

@@ -192,6 +192,41 @@ describe('User Api Service', () => {
       flushMicrotasks();
     }));
 
+    it('should share a single HTTP request when called concurrently', fakeAsync(() => {
+      const sampleUserInfoBackendObject = {
+        roles: ['USER_ROLE'],
+        is_moderator: false,
+        is_curriculum_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: true,
+      };
+      const sampleUserInfo = UserInfo.createFromBackendDict(
+        sampleUserInfoBackendObject
+      );
+
+      const firstCallPromise = userService.getUserInfoAsync();
+      const secondCallPromise = userService.getUserInfoAsync();
+
+      firstCallPromise.then(userInfo => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+      secondCallPromise.then(userInfo => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+
+      // Both calls must be served by a single shared request.
+      const req = httpTestingController.expectOne('/userinfohandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleUserInfoBackendObject);
+
+      flushMicrotasks();
+    }));
+
     it('should return new userInfo data if user is not logged', fakeAsync(() => {
       const sampleUserInfoBackendObject = {
         role: 'USER_ROLE',
