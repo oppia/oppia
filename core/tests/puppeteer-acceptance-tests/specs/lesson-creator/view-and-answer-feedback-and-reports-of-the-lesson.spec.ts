@@ -108,6 +108,7 @@ describe('Lesson Creator', function () {
 
     await loggedInLearner.playLesson(expId);
     await loggedInLearner.submitAnswer('1');
+    await loggedInLearner.expectOppiaFeedbackToBe('Wrong, try again!');
     await loggedInLearner.toggleOptionsSidebar();
 
     await loggedInLearner.clickLessonFeedbackButton(true);

@@ -95,7 +95,7 @@ export class TechTeamLead extends LoggedInUser {
     });
     await this.clickOnElementWithSelector(technicalFeedbackDashboardLink);
     await this.waitForNetworkIdle();
-    await this.expectPageURLToContain('technical-feedback-dashboard');
+    await this.expectPageURLToContain(technicalFeedbackDashboardUrl);
   }
 
   /**

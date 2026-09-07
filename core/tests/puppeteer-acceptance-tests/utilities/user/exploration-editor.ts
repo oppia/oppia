@@ -553,8 +553,6 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
-// New Exploration editor feedback tab selectors.
-const feedbackDetailStatusButton = '.e2e-test-feedback-detail-status-button';
 
 export class ExplorationEditor extends BaseUser {
   /**
