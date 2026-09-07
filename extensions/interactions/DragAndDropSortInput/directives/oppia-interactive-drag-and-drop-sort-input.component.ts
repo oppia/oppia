@@ -41,11 +41,12 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {DragAndDropAnswer} from 'interactions/answer-defs';
 
 import {Subscription} from 'rxjs';
+import './drag-and-drop-sort-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./drag-and-drop-sort-input-interaction.component.css'],
 })
 export class InteractiveDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

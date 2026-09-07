@@ -1,0 +1,77 @@
+.oppia-add-a-follow-up-note-modal .modal-title {
+  color: #00645c;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.oppia-follow-up-modal-helper {
+  color: #5f6368;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0 0 16px;
+}
+
+.oppia-follow-up-modal-original {
+  background: #f8f9fa;
+  border-left: 3px solid #d5d8dc;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+}
+
+.oppia-follow-up-modal-original-label {
+  color: #5f6368;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.oppia-follow-up-modal-original-text {
+  -webkit-box-orient: vertical;
+  color: #333;
+  display: -webkit-box;
+  font-size: 14px;
+  -webkit-line-clamp: 3;
+  line-height: 20px;
+  margin: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.oppia-follow-up-modal-label {
+  color: #333;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.oppia-my-suggestions-textarea {
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 0;
+  padding: 10px;
+  resize: vertical;
+  width: 100%;
+}
+
+.oppia-my-suggestions-textarea:focus {
+  border-color: #00645c;
+  outline: none;
+}
+
+.oppia-my-suggestions-textarea:disabled {
+  background: #f5f5f5;
+  cursor: default;
+}
+
+.oppia-follow-up-modal-char-count {
+  color: #9aa0a6;
+  font-size: 12px;
+  margin-top: 4px;
+  text-align: right;
+}

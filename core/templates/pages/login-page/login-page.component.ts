@@ -26,10 +26,12 @@ import {AuthService} from 'services/auth.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './login-page.component.css';
 
 @Component({
   selector: 'login-page',
   templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
