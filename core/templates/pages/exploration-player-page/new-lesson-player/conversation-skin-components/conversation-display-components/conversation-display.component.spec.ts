@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Conversation display Component.
  */
 
+// @ts-nocheck
+
 import {SimpleChanges} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';

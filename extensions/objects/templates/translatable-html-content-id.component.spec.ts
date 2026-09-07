@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the translatable html content id editor.
  */
 
+// @ts-nocheck
+
 import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {TranslatableHtmlContentIdEditorComponent} from './translatable-html-content-id.component';

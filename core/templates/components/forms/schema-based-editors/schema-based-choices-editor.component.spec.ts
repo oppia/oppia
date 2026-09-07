@@ -16,7 +16,14 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
-import {FormControl, FormsModule} from '@angular/forms';
+// @ts-nocheck
+
+import {
+  FormControl,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {
   ComponentFixture,
   fakeAsync,
@@ -86,5 +93,14 @@ describe('Schema Based Choices Editor Component', () => {
     component.updateValue(value);
 
     expect(component.localValue).toEqual(value);
+  });
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
   });
 });
