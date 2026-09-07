@@ -43,9 +43,9 @@ const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const certificateOfferingAvailableUrl =
   testConstants.URLs.CertificateOfferingAvailableForMathClassroom;
 const takeCertificateAssessmentLink = '.e2e-test-take-certificate-assessment';
+const availableCertificateHeading =
+  '.e2e-test-available-certificate-heading-text';
 const certificateTileSelector = '.e2e-test-certificate-tile';
-const certificateTileTitleSelector = '.e2e-test-certificate-tile-title';
-const certificateTileStatusSelector = '.e2e-test-certificate-tile-status';
 const continueToAssessmentButton = '.e2e-test-continue-to-assessment-button';
 const retryAssessmentButton = '.e2e-test-retry-assessment-button';
 const introCardContinueButton = '.e2e-test-continue-button';
@@ -4639,7 +4639,7 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(takeCertificateAssessmentLink);
     await this.clickAndWaitForNavigation(takeCertificateAssessmentLink, true);
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(certificateTileSelector);
+    await this.expectElementToBeVisible(availableCertificateHeading);
   }
 
   /**
@@ -4661,10 +4661,24 @@ export class LoggedInUser extends BaseUser {
   /**
    * Opens the certificate assessment for an available certificate from its
    * tile.
+   * @param {string} certificateTitle - The certificate offering title.
    */
-  async openCertificateAssessment(): Promise<void> {
+  async openCertificateAssessment(certificateTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(certificateTileSelector);
+    await this.expectElementContentToContain(
+      certificateTileSelector,
+      certificateTitle
+    );
     await this.clickOnElementWithSelector(continueToAssessmentButton);
     await this.expectElementToBeVisible(introCardContinueButton);
+  }
+
+  /**
+   * Clicks the "Check Score" button on the available certificate tile to view
+   * the result of the latest attempt.
+   */
+  async clickCheckScoreOnCertificateTile(): Promise<void> {
+    await this.clickOnElementWithText('Check Score');
   }
 
   /**

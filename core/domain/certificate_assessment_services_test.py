@@ -389,7 +389,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )

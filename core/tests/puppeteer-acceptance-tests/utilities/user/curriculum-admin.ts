@@ -321,7 +321,6 @@ const questionDifficultyContainerSelector =
 const newCertificateButton = '.e2e-test-new-certificate-btn';
 const certificateTitleInput = '.e2e-test-certificate-title-input';
 const certificateDescriptionInput = '.e2e-test-certificate-description-input';
-const certificateTimeLimitInput = '.e2e-test-certificate-time-limit-input';
 const certificateTotalQuestionsInput =
   '.e2e-test-certificate-total-questions-input';
 const certificateClassroomSelect = '.e2e-test-certificate-classroom-select';
@@ -3232,7 +3231,6 @@ export class CurriculumAdmin extends TopicManager {
    * learners in the classroom.
    * @param {Object} params.title - The certificate offering title.
    * @param {string} params.description - The certificate offering description.
-   * @param {number} params.timeLimitInMinutes - The assessment time limit.
    * @param {number} params.totalQuestionCount - The total assessment question
    *   count.
    * @param {string} params.classroomName - The classroom to associate the
@@ -3244,7 +3242,6 @@ export class CurriculumAdmin extends TopicManager {
   async createCertificateOfferingAndPublish(params: {
     title: string;
     description: string;
-    timeLimitInMinutes: number;
     totalQuestionCount: number;
     classroomName: string;
     outcomes: string[];
@@ -3257,10 +3254,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.typeInInputField(
       certificateDescriptionInput,
       params.description
-    );
-    await this.typeInInputField(
-      certificateTimeLimitInput,
-      params.timeLimitInMinutes.toString()
     );
     await this.typeInInputField(
       certificateTotalQuestionsInput,

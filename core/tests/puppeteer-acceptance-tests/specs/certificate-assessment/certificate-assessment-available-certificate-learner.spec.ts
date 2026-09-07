@@ -100,7 +100,6 @@ describe('Certified learner', function () {
     await curriculumAdmin.createCertificateOfferingAndPublish({
       title: CERTIFICATE_TITLE,
       description: CERTIFICATE_DESCRIPTION,
-      timeLimitInMinutes: 10,
       totalQuestionCount: 10,
       classroomName: 'Math',
       outcomes: CERTIFICATE_OUTCOMES,
@@ -118,19 +117,12 @@ describe('Certified learner', function () {
 
   it('should be able to review the certificate details before attempting', async function () {
     await learner.gotoMathClassroomCertificateOfferings();
-    await learner.expectCertificateTileWithStatus(
-      CERTIFICATE_TITLE,
-      'Not Attempted'
-    );
-    await learner.openCertificateAssessment();
+    await learner.openCertificateAssessment(CERTIFICATE_TITLE);
     await learner.expectCertificateIntroductionCard(CERTIFICATE_TITLE);
     await learner.continueToAssessmentInstructions();
   });
 
   it('should complete and fail the certificate assessment', async function () {
-    await learner.gotoMathClassroomCertificateOfferings();
-    await learner.openCertificateAssessment();
-    await learner.continueToAssessmentInstructions();
     await learner.startCertificateAssessment();
     await learner.answerCertificateQuestions(7, 10);
     await learner.waitForPageToFullyLoad();
@@ -145,6 +137,13 @@ describe('Certified learner', function () {
     );
   });
 
+  it('should show the score of the failed attempt when checking the score', async function () {
+    await learner.gotoMathClassroomCertificateOfferings();
+    await learner.clickCheckScoreOnCertificateTile();
+    await learner.expectCertificateAssessmentResult("Don't give up", '70%');
+  });
+
+  // Working
   it('should complete and pass the certificate assessment on retry', async function () {
     await learner.gotoMathClassroomCertificateOfferings();
     await learner.retryCertificateAssessment();
