@@ -24,7 +24,6 @@ import types
 from core import feconf, utils
 from core.constants import constants
 from core.platform import models
-from core.storage.config import gae_models
 from core.tests import test_utils
 
 from typing import Dict, List, Set, Union, cast
