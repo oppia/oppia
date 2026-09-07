@@ -600,11 +600,14 @@ def start_certificate_assessment_attempt(
             )
         )
         if most_recent_attempt is not None:
-            cooldown = datetime.timedelta(
-                minutes=(
-                    certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
-                )
+            # In dev mode we disable the cooldown so tests can retry the
+            # assessment immediately; production keeps the real limit.
+            min_time_between_attempts = (
+                0
+                if constants.DEV_MODE
+                else certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
             )
+            cooldown = datetime.timedelta(minutes=min_time_between_attempts)
             remaining_cooldown = cooldown - (
                 datetime.datetime.utcnow() - most_recent_attempt.started_at
             )
