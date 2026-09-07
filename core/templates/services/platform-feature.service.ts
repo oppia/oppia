@@ -40,10 +40,16 @@ import {
   FeatureStatusChecker,
   FeatureStatusSummary,
 } from 'domain/feature-flag/feature-status-summary.model';
-import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+
+/**
+ * The id of the HTML element that carries the feature flag evaluations. The
+ * server injects the evaluated flags into this element on the initial page
+ * load, so that they are available without an extra blocking network request.
+ */
+const OPPIA_FEATURE_FLAGS_ELEMENT_ID = 'oppia-feature-flags';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +65,6 @@ export class PlatformFeatureService {
   static _isSkipped = false;
 
   constructor(
-    private featureFlagBackendApiService: FeatureFlagBackendApiService,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
     private urlService: UrlService
@@ -101,7 +106,8 @@ export class PlatformFeatureService {
   }
 
   /**
-   * Checks if there's any error, e.g. request timeout, during initialization.
+   * Checks if there's any error, e.g. missing injected data, during
+   * initialization.
    *
    * @returns {boolean} - True if there is any error during initialization.
    */
@@ -119,8 +125,8 @@ export class PlatformFeatureService {
   }
 
   /**
-   * Initializes the PlatformFeatureService by sending a request to the server
-   * to get the feature flag result.
+   * Initializes the PlatformFeatureService by reading the feature flag
+   * evaluations that the server injected into the initial page load.
    *
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
@@ -130,8 +136,9 @@ export class PlatformFeatureService {
       this.clearSavedResults();
 
       // The user is 'partially logged-in' at the signup page, we need to skip
-      // the loading from server otherwise the request will have the cookies
-      // erased, leading to the 'Registration session expired' error.
+      // the loading otherwise the injected flag values may not reflect the
+      // account after the registration session is completed, leading to the
+      // 'Registration session expired' error.
       if (this.urlService.getPathname() === '/signup') {
         PlatformFeatureService._isSkipped = true;
         PlatformFeatureService.featureStatusSummary =
@@ -140,7 +147,7 @@ export class PlatformFeatureService {
       }
 
       PlatformFeatureService.featureStatusSummary =
-        await this.loadFeatureFlagsFromServer();
+        this.getFeatureFlagsFromHtml();
     } catch (err: unknown) {
       if (err instanceof Error) {
         this.loggerService.error(
@@ -156,8 +163,20 @@ export class PlatformFeatureService {
     }
   }
 
-  private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
-    return this.featureFlagBackendApiService.fetchFeatureFlags();
+  /**
+   * Reads the feature flag evaluations that the server injected into the
+   * initial page load.
+   *
+   * @returns {FeatureStatusSummary} - The parsed feature status summary.
+   */
+  private getFeatureFlagsFromHtml(): FeatureStatusSummary {
+    const document = this.windowRef.nativeWindow.document;
+    const element = document.getElementById(OPPIA_FEATURE_FLAGS_ELEMENT_ID);
+    if (!element || !element.textContent) {
+      throw new Error('Feature flags data not found in the HTML.');
+    }
+    const backendDict = JSON.parse(element.textContent);
+    return FeatureStatusSummary.createFromBackendDict(backendDict);
   }
 
   /**
@@ -173,5 +192,5 @@ export class PlatformFeatureService {
 }
 
 export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
-  return async (): Promise<void> => service.initialize();
+  return (): Promise<void> => service.initialize();
 };

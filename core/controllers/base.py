@@ -31,7 +31,12 @@ import urllib
 
 from core import feconf, handler_schema_constants, utils
 from core.controllers import payload_validator
-from core.domain import auth_domain, auth_services, user_services
+from core.domain import (
+    auth_domain,
+    auth_services,
+    feature_flag_services,
+    user_services,
+)
 
 import webapp2
 from typing import (
@@ -713,8 +718,18 @@ class BaseHandler(
         iframe_restriction: Optional[str] = 'DENY',
         *,
         template_is_aot_compiled: bool = False,
+        values: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Prepares an HTML response to be sent to the client.
+
+        Template variable substitution is supported via the ``values``
+        argument. Each key in ``values`` is substituted for the corresponding
+        ``___KEY___`` marker within the template (e.g. a key of
+        ``feature_flags`` replaces every ``___feature_flags___`` occurrence).
+        Non-string values are JSON-encoded before substitution, so containers
+        can be injected into ``<script type="application/json">`` tags. This
+        allows server-side data (such as feature flag evaluations) to be
+        delivered with the initial page load instead of as a separate request.
 
         Args:
             filepath: str. The template filepath.
@@ -726,6 +741,9 @@ class BaseHandler(
                     on the same origin as the page itself.
             template_is_aot_compiled: bool. False by default. Use
                 True when the template is compiled by angular AoT compiler.
+            values: dict|None. A dict of template variables to substitute into
+                the template. Keys are matched against ``___KEY___`` markers.
+                Defaults to None (no substitution).
 
         Raises:
             Exception. Invalid iframe restriction value.
@@ -756,11 +774,16 @@ class BaseHandler(
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
-        self.response.write(
-            load_template(
-                filepath, template_is_aot_compiled=template_is_aot_compiled
-            )
+        html = load_template(
+            filepath, template_is_aot_compiled=template_is_aot_compiled
         )
+        if values:
+            for key, value in values.items():
+                rendered_value = (
+                    value if isinstance(value, str) else json.dumps(value)
+                )
+                html = html.replace('___%s___' % key, rendered_value)
+        self.response.write(html)
 
     def _render_exception_json_or_html(
         self, return_type: str, values: ResponseValueDict
@@ -780,7 +803,15 @@ class BaseHandler(
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
-                self.render_template('oppia-root.mainpage.html')
+                feature_flags = (
+                    feature_flag_services.evaluate_all_feature_flag_configs(
+                        self.user_id
+                    )
+                )
+                self.render_template(
+                    'oppia-root.mainpage.html',
+                    values={'OPPIA_FEATURE_FLAGS': feature_flags},
+                )
         else:
             if return_type not in (
                 feconf.HANDLER_TYPE_JSON,
