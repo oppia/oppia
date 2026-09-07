@@ -4819,13 +4819,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies the default My Suggestions Tab filter.
-   */
-  async verifyDefaultMySuggestionsTabFilter(): Promise<void> {
-    await this.verifyDefaultFeedbackTabFilter('all');
-  }
-
-  /**
    * Verifies the default New Exploration Feedback Tab filter.
    */
   async verifyDefaultNewExplorationFeedbackTabFilter(): Promise<void> {
@@ -4870,13 +4863,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies the feedback filter row contents in the My Suggestions Tab.
-   */
-  async verifyMySuggestionsFeedbackFilterRowContents(): Promise<void> {
-    await this.verifyFeedbackFilterRowContents();
-  }
-
-  /**
    * Verifies the feedback filter row contents in the Exploration Editor feedback tab.
    */
   async verifyNewExplorationEditorFeedbacktabFilterRowContents(): Promise<void> {
@@ -4886,12 +4872,14 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies the feedback list, used in My Suggestions Tab,
+   * Verifies the feedback list's columns, used in My Suggestions Tab,
    * Exploration Editor feedback tab, Technical Feedback Dashboard .
    * @param additionalSelectors - A list of additional selectors to verify, based on the
    * dashboards.
    */
-  async verifyFeedbackList(additionalSelectors: string[] = []): Promise<void> {
+  async verifyFeedbackListColumns(
+    additionalSelectors: string[] = []
+  ): Promise<void> {
     await this.expectElementToBeVisible(feedbackTableDiv, true);
     await this.expectElementToBeVisible(feedbackTableStatus, true);
     await this.expectElementToBeVisible(feedbackTableDescription, true);
@@ -4903,23 +4891,27 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies the feedback list in the My Suggestions tab.
+   * Verifies the feedback list's columns in the My Suggestions tab.
    */
-  async verifyMySuggestionsFeedbackList(): Promise<void> {
-    await this.verifyFeedbackList([feedbackTableMySuggestionsLessonTitle]);
+  async verifyMySuggestionsFeedbackListColumns(): Promise<void> {
+    await this.verifyFeedbackListColumns([
+      feedbackTableMySuggestionsLessonTitle,
+    ]);
   }
 
   /**
-   * Verifies the feedback list in the new exploration editor.
+   * Verifies the feedback list's columns in the new exploration editor.
    * @param feedbackType - The type of feedback to verify.
    */
-  async verifyNewExplorationEditorFeedbackList(
+  async verifyNewExplorationEditorFeedbackListColumns(
     feedbackType: string
   ): Promise<void> {
     if (feedbackType === 'feedback') {
-      await this.verifyFeedbackList([feedbackTableMySuggestionsLessonTitle]);
+      await this.verifyFeedbackListColumns([
+        feedbackTableMySuggestionsLessonTitle,
+      ]);
     } else {
-      await this.verifyFeedbackList([
+      await this.verifyFeedbackListColumns([
         feedbackTableMySuggestionsLessonTitle,
         feedbackTableCategoryChip,
       ]);
@@ -5659,8 +5651,8 @@ export class LoggedInUser extends BaseUser {
   async goBackToMySuggestionsTabList(): Promise<void> {
     await this.clickOnElementWithSelector(mySuggestionsTabBackButton);
     showMessage('Navigated back to My Suggestions tab list.');
-    await this.verifyMySuggestionsFeedbackFilterRowContents();
-    await this.verifyMySuggestionsFeedbackList();
+    await this.verifyFeedbackFilterRowContents();
+    await this.verifyMySuggestionsFeedbackListColumns();
   }
 
   /**

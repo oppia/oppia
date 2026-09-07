@@ -108,6 +108,7 @@ describe('Logged-in User', function () {
       'sendALessonFeedbackModalAfterEnteringFeedback',
       __dirname
     );
+    showMessage('Sending feedback to the Lessons Team.');
     await loggedInLearner.clickButtonInModal(
       'Send Feedback to the Lessons Team',
       'confirm'
@@ -123,9 +124,9 @@ describe('Logged-in User', function () {
 
     // Navigate to My Suggestions Tab.
     await loggedInLearner.navigateToMySuggestionsTab();
-    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
-    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
-    await loggedInLearner.verifyMySuggestionsFeedbackList();
+    await loggedInLearner.verifyFeedbackFilterRowContents();
+    await loggedInLearner.verifyDefaultFeedbackTabFilter('all');
+    await loggedInLearner.verifyMySuggestionsFeedbackListColumns();
 
     await loggedInLearner.expectFeedbackTableEntry({
       description:
@@ -208,9 +209,6 @@ describe('Logged-in User', function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectMySuggestionsTabTotalNotification(false);
     await loggedInLearner.navigateToMySuggestionsTab();
-    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
-    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
-    await loggedInLearner.verifyMySuggestionsFeedbackList();
 
     await loggedInLearner.expectFeedbackTableEntry({
       description:
@@ -231,6 +229,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.submitFeedbackInTextArea(
       'This Lesson seems too short, can we make it longer?'
     );
+    showMessage('Sending feedback to the Lessons Team.');
     await loggedInLearner.clickButtonInModal(
       'Send Feedback to the Lessons Team',
       'confirm'
@@ -252,9 +251,9 @@ describe('Logged-in User', function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectMySuggestionsTabTotalNotification(true, '1');
     await loggedInLearner.navigateToMySuggestionsTab();
-    await loggedInLearner.verifyMySuggestionsFeedbackFilterRowContents();
-    await loggedInLearner.verifyDefaultMySuggestionsTabFilter();
-    await loggedInLearner.verifyMySuggestionsFeedbackList();
+    await loggedInLearner.verifyFeedbackFilterRowContents();
+    await loggedInLearner.verifyDefaultFeedbackTabFilter('all');
+    await loggedInLearner.verifyMySuggestionsFeedbackListColumns();
 
     await loggedInLearner.expectFeedbackTableEntry({
       description: 'This Lesson seems too short, can we make it longer?',
@@ -304,6 +303,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.submitFeedbackInTextArea(
       'This Question answer is still wrong, please recheck, Thanks.'
     );
+    showMessage('Sending follow up note to the Lessons Team.');
     await loggedInLearner.clickButtonInModal('Add a follow-up note', 'confirm');
     // The underlying my suggestions page returns to full opacity immediately,
     // bringing the student back to where they left off.
@@ -380,6 +380,7 @@ describe('Logged-in User', function () {
       'reportALessonModalAfterEnteringFeedbackWithTypoChip',
       __dirname
     );
+    showMessage('Sending feedback report to the Lessons Team.');
     await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
     await loggedInLearner.expectToastMessage(
       'Thank you for your feedback! The team has received your report.'
@@ -402,6 +403,7 @@ describe('Logged-in User', function () {
       'reportALessonModalAfterEnteringFeedbackWithConfusingChip',
       __dirname
     );
+    showMessage('Sending feedback report to the Lessons Team.');
     await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
     await loggedInLearner.expectToastMessage(
       'Thank you for your feedback! The team has received your report.'
@@ -421,6 +423,7 @@ describe('Logged-in User', function () {
       'reportALessonModalAfterEnteringFeedbackWithBrokenLayoutChip',
       __dirname
     );
+    showMessage('Sending feedback report to the Lessons Team.');
     await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
     await loggedInLearner.expectToastMessage(
       'Thank you! Your report has been sent to the technical team.'
@@ -439,6 +442,7 @@ describe('Logged-in User', function () {
       'reportALessonModalAfterEnteringFeedbackWithOtherChip',
       __dirname
     );
+    showMessage('Sending feedback report to the Lessons Team.');
     await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
     await loggedInLearner.expectToastMessage(
       'Thank you! Your report has been sent to the technical team.'

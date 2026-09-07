@@ -148,7 +148,9 @@ describe('Lesson Creator', function () {
     await lessonCreator.expectNewExplorationFeedbackTab();
     await lessonCreator.verifyNewExplorationEditorFeedbacktabFilterRowContents();
     await lessonCreator.verifyDefaultNewExplorationFeedbackTabFilter();
-    await lessonCreator.verifyNewExplorationEditorFeedbackList('feedback');
+    await lessonCreator.verifyNewExplorationEditorFeedbackListColumns(
+      'feedback'
+    );
 
     await lessonCreator.expectFeedbackTableEntry({
       description: 'This card does not accept my answer.',

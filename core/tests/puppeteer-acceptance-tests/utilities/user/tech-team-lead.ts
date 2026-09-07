@@ -118,6 +118,7 @@ export class TechTeamLead extends LoggedInUser {
 
   /**
    * Selects the Technical Team feedback filter option.
+   * @param team - The team value that needs to b eselected.
    */
   async selectFeedbackTechnicalTeamFilter(team: string): Promise<void> {
     await this.select(feedbackFilterTechnicalTeam, team);
@@ -126,10 +127,10 @@ export class TechTeamLead extends LoggedInUser {
   }
 
   /**
-   * Verifies the feedback list of the Technical Feedback Dashboard.
+   * Verifies the feedback list's columns of the Technical Feedback Dashboard.
    */
-  async verifyTechnicalFeedbackDashboardFeedbackList(): Promise<void> {
-    await this.verifyFeedbackList([feedbackTableCategoryChip]);
+  async verifyTechnicalFeedbackDashboardFeedbackListColumns(): Promise<void> {
+    await this.verifyFeedbackListColumns([feedbackTableCategoryChip]);
   }
 
   /**
