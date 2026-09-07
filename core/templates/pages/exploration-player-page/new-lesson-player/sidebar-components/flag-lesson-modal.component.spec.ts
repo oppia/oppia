@@ -229,4 +229,15 @@ describe('Flag lesson modal', () => {
 
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   });
+
+  it('should close modal when close icon button is clicked', () => {
+    spyOn(component, 'closeModal');
+    fixture.detectChanges();
+
+    const closeButton =
+      fixture.debugElement.nativeElement.querySelector('.close-modal-btn');
+    closeButton.click();
+
+    expect(component.closeModal).toHaveBeenCalled();
+  });
 });
