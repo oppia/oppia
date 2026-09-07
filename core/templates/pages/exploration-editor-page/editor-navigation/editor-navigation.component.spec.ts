@@ -537,14 +537,14 @@ describe('Editor Navigation Component', () => {
     it('should return true when new creator feedback tab is enabled ', () => {
       mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
         true;
-
+      component.ngOnInit();
       expect(component.newCreatorFeedbackTabIsEnabled).toBe(true);
     });
 
     it('should return false when new creator feedback tab is disabled ', () => {
       mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
         false;
-
+      component.ngOnInit();
       expect(component.newCreatorFeedbackTabIsEnabled).toBe(false);
     });
   });

@@ -215,6 +215,7 @@ describe('FeedbackModalComponent', () => {
   let translateService: jasmine.SpyObj<TranslateService>;
   let alertService: jasmine.SpyObj<AlertsService>;
   let sas: jasmine.SpyObj<SiteAnalyticsService>;
+  let focusManagerService: jasmine.SpyObj<FocusManagerService>;
 
   const createComponent = (
     modalType: FeedbackModalType = FeedbackModalType.LESSON_FEEDBACK
@@ -306,6 +307,12 @@ describe('FeedbackModalComponent', () => {
       }
     );
 
+    focusManagerService = jasmine.createSpyObj('FocusManagerService', [
+      'generateFocusLabel',
+      'setFocus',
+    ]);
+
+    focusManagerService.generateFocusLabel.and.returnValue('feedback-textarea');
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule, RouterTestingModule],
       declarations: [
@@ -359,9 +366,7 @@ describe('FeedbackModalComponent', () => {
         },
         {
           provide: FocusManagerService,
-          useValue: jasmine.createSpyObj('Focus', [
-            'feedbackTextareaFocusLabel',
-          ]),
+          useValue: focusManagerService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
