@@ -36,34 +36,6 @@ if MYPY:  # pragma: no cover
 )
 
 
-def _create_offering_model(
-    self: job_test_utils.JobTestBase,
-    certificate_id: str,
-    time_limit_in_minutes: int,
-) -> certificate_assessment_offering_models.CertificateAssessmentOfferingModel:
-    """Helper to build a CertificateAssessmentOfferingModel for these tests.
-
-    Args:
-        certificate_id: str. The id of the certificate offering.
-        time_limit_in_minutes: int. The offering's time limit in minutes.
-
-    Returns:
-        CertificateAssessmentOfferingModel. The created offering model.
-    """
-    return self.create_model(
-        certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
-        id=certificate_id,
-        title='Certificate for %s' % certificate_id,
-        description='Description for %s.' % certificate_id,
-        classroom_id='classroom_1',
-        topic_ids=['topic_1'],
-        total_questions=5,
-        time_limit_in_minutes=time_limit_in_minutes,
-        demonstrates=[],
-        async_status='Available',
-    )
-
-
 def _create_attempt_model(
     self: job_test_utils.JobTestBase,
     attempt_id: str,
@@ -119,15 +91,16 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
 
     def test_deletes_abandoned_in_progress_attempt(self) -> None:
-        """An in-progress attempt past its deadline should be deleted."""
-        offering_model = _create_offering_model(self, 'cert_1', 20)
+        """An in-progress attempt started more than seven days ago should be
+        deleted.
+        """
         abandoned_attempt = _create_attempt_model(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(hours=3),
+            datetime.datetime.utcnow() - datetime.timedelta(days=10),
         )
-        self.put_multi([offering_model, abandoned_attempt])
+        self.put_multi([abandoned_attempt])
 
         self.assert_job_output_is(
             [
@@ -146,16 +119,17 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNone(deleted_model)
 
-    def test_keeps_in_progress_attempt_within_deadline(self) -> None:
-        """An in-progress attempt still inside its deadline should be kept."""
-        offering_model = _create_offering_model(self, 'cert_1', 20)
+    def test_keeps_in_progress_attempt_within_abandonment_period(self) -> None:
+        """An in-progress attempt started within the abandonment period should
+        be kept.
+        """
         active_attempt = _create_attempt_model(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
+            datetime.datetime.utcnow() - datetime.timedelta(days=6),
         )
-        self.put_multi([offering_model, active_attempt])
+        self.put_multi([active_attempt])
 
         self.assert_job_output_is(
             [
@@ -170,20 +144,15 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNotNone(kept_model)
 
-    def test_keeps_in_progress_attempt_past_time_limit_within_grace_period(
-        self,
-    ) -> None:
-        """An in-progress attempt past its time limit but still inside the
-        combined deadline (time limit plus grace period) should be kept.
-        """
-        offering_model = _create_offering_model(self, 'cert_1', 20)
+    def test_keeps_in_progress_attempt_started_recently(self) -> None:
+        """An in-progress attempt started recently should be kept."""
         active_attempt = _create_attempt_model(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=70),
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
         )
-        self.put_multi([offering_model, active_attempt])
+        self.put_multi([active_attempt])
 
         self.assert_job_output_is(
             [
@@ -200,7 +169,6 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
 
     def test_keeps_submitted_attempt_even_if_old(self) -> None:
         """A submitted attempt should never be deleted, however old."""
-        offering_model = _create_offering_model(self, 'cert_1', 20)
         submitted_attempt = _create_attempt_model(
             self,
             'attempt_submitted',
@@ -208,7 +176,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             datetime.datetime.utcnow() - datetime.timedelta(days=30),
             is_submitted=True,
         )
-        self.put_multi([offering_model, submitted_attempt])
+        self.put_multi([submitted_attempt])
 
         self.assert_job_output_is(
             [
@@ -223,16 +191,15 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNotNone(kept_model)
 
-    def test_deletes_only_the_abandoned_attempts_of_one_offering(self) -> None:
-        """When several attempts share one offering, only those past their
-        deadline should be deleted.
+    def test_deletes_only_the_abandoned_attempts(self) -> None:
+        """When several attempts exist, only those started more than seven days
+        ago and still in progress should be deleted.
         """
-        offering_model = _create_offering_model(self, 'cert_1', 20)
         abandoned_attempt = _create_attempt_model(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(hours=3),
+            datetime.datetime.utcnow() - datetime.timedelta(days=10),
         )
         active_attempt = _create_attempt_model(
             self,
@@ -249,7 +216,6 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.put_multi(
             [
-                offering_model,
                 abandoned_attempt,
                 active_attempt,
                 submitted_attempt,
@@ -281,9 +247,9 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
         self.assertIsNotNone(kept_submitted_model)
 
-    def test_keeps_attempt_without_matching_offering(self) -> None:
-        """An attempt whose offering no longer exists has no computable
-        deadline and should be left untouched.
+    def test_deletes_abandoned_attempt_without_matching_offering(self) -> None:
+        """An abandoned attempt is deleted regardless of whether its offering
+        still exists.
         """
         orphaned_attempt = _create_attempt_model(
             self,
@@ -296,15 +262,19 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentAttemptModels deleted: 0.'
+                    'Number of CertificateAssessmentAttemptModels deleted: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Deleted CertificateAssessmentAttemptModel with ID: '
+                    'attempt_orphaned.'
                 ),
             ]
         )
 
-        kept_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
-            'attempt_orphaned'
+        deleted_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get(
+            'attempt_orphaned', strict=False
         )
-        self.assertIsNotNone(kept_model)
+        self.assertIsNone(deleted_model)
 
 
 class DeleteAbandonedCertificateAssessmentAttemptsAuditJobTests(
@@ -331,14 +301,13 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJobTests(
 
     def test_audit_job_reports_but_does_not_delete_attempts(self) -> None:
         """The audit job should log abandoned attempts without deleting them."""
-        offering_model = _create_offering_model(self, 'cert_1', 20)
         abandoned_attempt = _create_attempt_model(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(hours=3),
+            datetime.datetime.utcnow() - datetime.timedelta(days=10),
         )
-        self.put_multi([offering_model, abandoned_attempt])
+        self.put_multi([abandoned_attempt])
 
         self.assert_job_output_is(
             [

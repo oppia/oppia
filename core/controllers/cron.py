@@ -497,7 +497,8 @@ class CronCertificateAssessmentAttemptCleanupHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler for deleting abandoned in-progress certificate assessment
-    attempts whose deadline has passed."""
+    attempts that have been in progress for more than the abandonment
+    period."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

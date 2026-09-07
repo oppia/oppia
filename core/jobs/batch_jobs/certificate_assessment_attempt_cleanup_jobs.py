@@ -20,20 +20,18 @@ A CertificateAssessmentAttemptModel entry is created when a learner starts a
 certificate assessment and stays in an in-progress state (is_submitted is
 False) until the learner submits it. If a learner disconnects mid-assessment
 or simply walks away, that in-progress attempt can linger in the datastore
-forever, even though the learner is allowed to resume it only within a short
-grace period.
+forever.
 
 DeleteAbandonedCertificateAssessmentAttemptsAuditJob reports in-progress
-attempts whose deadline has passed without writing any changes, and
-DeleteAbandonedCertificateAssessmentAttemptsJob opts into deleting them. The
-deadline is computed as:
+attempts that were started more than the abandonment period ago without
+writing any changes, and DeleteAbandonedCertificateAssessmentAttemptsJob
+opts into deleting them. Since certificate assessments no longer impose a
+time limit, the age of the attempt alone decides whether it is abandoned:
 
-    started_at + certificate offering time limit + grace period
+    started_at + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
 
-The grace period is an additional buffer on top of the assessment's time
-limit that accounts for brief network losses, during which a learner may
-reconnect and resume the same attempt. Any in-progress attempt still present
-after this combined window is treated as abandoned.
+An in-progress attempt still present after this window is treated as
+abandoned.
 
 Both jobs only read from the datastore through Beam's NDB I/O transforms, so
 they are safe to run over large datasets.
@@ -50,7 +48,6 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, Iterable, Iterator, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,10 +57,11 @@ if MYPY:  # pragma: no cover
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
-# The grace period (in minutes) added on top of the certificate offering's
-# time limit when computing an attempt's deadline. It gives learners a buffer
-# to reconnect and resume an in-progress attempt after brief network losses.
-ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_GRACE_PERIOD_MINUTES = 60
+# The number of days after which an in-progress certificate assessment attempt
+# is considered abandoned and can be cleaned up. Learners may resume an
+# in-progress attempt at their own pace, so an attempt that has not been
+# submitted within this window is treated as abandoned.
+ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS = 7
 
 
 class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
@@ -73,96 +71,35 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = False
 
-    def get_certificate_id_time_limit_pair(
-        self,
-        offering_model: (
-            certificate_assessment_offering_models.CertificateAssessmentOfferingModel
-        ),
-    ) -> Tuple[str, int]:
-        """Extracts the (certificate_id, time_limit_in_minutes) pair from a
-        certificate assessment offering model.
-
-        Args:
-            offering_model: CertificateAssessmentOfferingModel. The offering
-                model to read from.
-
-        Returns:
-            tuple(str, int). The certificate id paired with the offering's
-            time limit in minutes.
-        """
-        return (offering_model.id, offering_model.time_limit_in_minutes)
-
     def is_attempt_abandoned(
         self,
         attempt_model: (
             certificate_assessment_offering_models.CertificateAssessmentAttemptModel
         ),
-        time_limit_in_minutes: int,
     ) -> bool:
-        """Determines whether an in-progress attempt is past its deadline,
-        i.e. abandoned.
+        """Determines whether an in-progress attempt is abandoned, i.e. it was
+        started more than the abandonment period ago and has not been
+        submitted.
 
         Args:
             attempt_model: CertificateAssessmentAttemptModel. The attempt
                 model to check.
-            time_limit_in_minutes: int. The offering's time limit in minutes.
 
         Returns:
             bool. Whether the attempt should be treated as abandoned.
         """
-        deadline: datetime.datetime = (
+        if attempt_model.is_submitted:
+            return False
+        abandonment_cutoff: datetime.datetime = (
             attempt_model.started_at
             + datetime.timedelta(
-                minutes=(
-                    time_limit_in_minutes
-                    + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_GRACE_PERIOD_MINUTES
-                )
+                days=ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
             )
         )
         current_time = datetime.datetime.now(datetime.timezone.utc).replace(
             tzinfo=None
         )
-        return current_time > deadline
-
-    def find_abandoned_attempts_in_group(
-        self,
-        grouped_record: Tuple[
-            str,
-            # Here we use type Any because the co-grouped values could either
-            # be ints (offering time limits) or attempt models.
-            Dict[str, Iterable[Any]],
-        ],
-    ) -> Iterator[
-        certificate_assessment_offering_models.CertificateAssessmentAttemptModel
-    ]:
-        """Yields the abandoned in-progress attempts that belong to one
-        certificate offering.
-
-        An attempt is only considered for cleanup when it has not been
-        submitted and its certificate offering still exists, so its deadline
-        can be computed. Attempts without a matching offering are left
-        untouched by this job.
-
-        Args:
-            grouped_record: tuple(str, dict). The co-grouped record of one
-                certificate id with its offering's time limits and its
-                attempts, e.g.
-                ('cert_1', {'time_limits': [20], 'attempts': [...]}).
-
-        Yields:
-            CertificateAssessmentAttemptModel. Each abandoned in-progress
-            attempt found in the group.
-        """
-        _, records = grouped_record
-        time_limits = list(records['time_limits'])
-        if not time_limits:
-            return
-        time_limit_in_minutes = time_limits[0]
-        for attempt_model in records['attempts']:
-            if not attempt_model.is_submitted and self.is_attempt_abandoned(
-                attempt_model, time_limit_in_minutes
-            ):
-                yield attempt_model
+        return current_time > abandonment_cutoff
 
     def delete_attempt(
         self,
@@ -241,35 +178,14 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
             JobRunResult. Contains the total number of abandoned attempts
             found, along with the IDs of those attempts.
         """
-        attempt_pairs = (
+        abandoned_attempt_models = (
             self.pipeline
             | 'Get CertificateAssessmentAttemptModels from the datastore'
             >> ndb_io.GetModels(
                 certificate_assessment_offering_models.CertificateAssessmentAttemptModel.get_all()
             )
-            | 'Key attempts by their certificate id'
-            >> beam.Map(lambda model: (model.certificate_id, model))
-        )
-
-        offering_time_limit_pairs = (
-            self.pipeline
-            | 'Get CertificateAssessmentOfferingModels from the datastore'
-            >> ndb_io.GetModels(
-                certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get_all()
-            )
-            | 'Key offering time limits by their certificate id'
-            >> beam.Map(self.get_certificate_id_time_limit_pair)
-        )
-
-        abandoned_attempt_models = (
-            {
-                'attempts': attempt_pairs,
-                'time_limits': offering_time_limit_pairs,
-            }
-            | 'CoGroup attempts with their certificate offerings'
-            >> beam.CoGroupByKey()
             | 'Find abandoned in-progress attempts'
-            >> beam.FlatMap(self.find_abandoned_attempts_in_group)
+            >> beam.Filter(self.is_attempt_abandoned)
             | 'Log abandoned attempt models' >> beam.Map(self.delete_attempt)
         )
 
@@ -304,8 +220,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
 class DeleteAbandonedCertificateAssessmentAttemptsJob(
     DeleteAbandonedCertificateAssessmentAttemptsAuditJob
 ):
-    """Deletes in-progress certificate assessment attempts whose deadline has
-    passed.
+    """Deletes in-progress certificate assessment attempts that have been
+    started more than the abandonment period ago.
     """
 
     DATASTORE_UPDATES_ALLOWED = True
