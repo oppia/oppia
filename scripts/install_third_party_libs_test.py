@@ -596,8 +596,8 @@ class SetupTests(test_utils.GenericTestBase):
             check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
+        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
+            unused_self: str, path: str, filter: str = 'data'
         ) -> None:
             check_function_calls['extractall_is_called'] = True
 
@@ -947,8 +947,8 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
+        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
+            unused_self: str, path: str, filter: str = 'data'
         ) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
@@ -1051,8 +1051,8 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
+        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
+            unused_self: str, path: str, filter: str = 'data'
         ) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
