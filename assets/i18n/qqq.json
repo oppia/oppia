@@ -1165,6 +1165,8 @@
   "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE": "Text displayed on the browser tab when on the Logout page.",
   "I18N_LOGOUT_PAGE_TITLE": "Title displayed in the tab on the Browser in the logout page - In this page the user is waiting for the logout process to complete. Keep in two or three short words.",
   "I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",
+  "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_1": "First paragraph of the modal confirming if the user wants to save a plain text math formula.",
+  "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_2": "Second paragraph of the modal confirming if the user wants to save a plain text math formula.",
   "I18N_MODAL_CONTINUE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to continue with the action.\n{{Identical|Continue}}",
   "I18N_MODAL_REMOVE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to remove a syllabus item from the learner group syllabus.",
   "I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "The text which is displayed in the classrooms page. Gives information about classrooms.",
@@ -1934,7 +1936,10 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2_CONTENT": "Text content in why to volunteer section in volunteer page. -Second paragraph",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Heading in why to volunteer section in volunteer page. -Third paragraph",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Text content in why to volunteer section in volunteer page. -Third paragraph",
+  "I18N_WARNING_MATH_EXPRESSION_MINIMIZED": "Minimized warning text indicating a math expression was typed as plain text.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Text shown in the warning modal before the solution is displayed",
   "I18N_WARNING_MODAL_TITLE": "Title of the modal shown before the modal that displays the solution, to warn the user\n\n{{Identical|Warning}}",
-  "I18N_YES": "Text on button to accept the content of a modal.\n\n{{Identical|Yes}}"
+  "I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION": "Warning text shown in the editor to indicate that a math expression was typed as plain text.",
+  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "Warning text shown to translators to indicate that a math expression was typed as plain text.",
+  "I18N_YES": "Text for the option Yes, when a user wants to proceed with some action.\n{{Identical|Yes}}"
 }
