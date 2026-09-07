@@ -44,7 +44,7 @@
   border: 2px solid;
   border-radius: 2px;
   box-sizing: border-box;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: Roboto, Arial, sans-serif;
   font-size: 18px;
   font-weight: 400;
   line-height: 21.6px;
@@ -148,10 +148,6 @@
 
   .oppia-bar-chart .oppia-bar-chart-table .data {
     margin-right: 8px;
-  }
-
-  .oppia-bar-chart .oppia-bar-chart-table td {
-    min-height: 16px;
   }
 
   .oppia-bar-chart .oppia-scale-number {
