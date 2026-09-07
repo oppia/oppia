@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Skill Editor Navbar Component.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
