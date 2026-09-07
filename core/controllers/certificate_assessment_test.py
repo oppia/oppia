@@ -1075,7 +1075,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1121,7 +1121,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1184,7 +1184,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1234,7 +1234,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
                 'question_topic_links': {'q1': ['topic_1']},
                 'topic_versions': {'topic_1': 1},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1272,7 +1272,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
                 'question_topic_links': {'q1': ['topic_1']},
                 'topic_versions': {'topic_1': 1},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )

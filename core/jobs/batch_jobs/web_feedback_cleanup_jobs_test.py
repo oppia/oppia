@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import utils
 from core.domain import fs_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import web_feedback_cleanup_jobs
@@ -92,25 +93,25 @@ class LessonFeedbackCleanupJobTests(LessonFeedbackCleanupJobTestBase):
             'old_closed_feedback_id',
             'old closed feedback',
             feconf.STATUS_CHOICES_FIXED,
-            datetime.datetime.utcnow() - datetime.timedelta(days=181),
+            utils.get_current_utc_datetime() - datetime.timedelta(days=181),
         )
         fresh_closed_feedback_model = self.create_lesson_feedback_model(
             'fresh_closed_feedback_id',
             'fresh closed feedback',
             feconf.STATUS_CHOICES_FIXED,
-            datetime.datetime.utcnow() - datetime.timedelta(days=179),
+            utils.get_current_utc_datetime() - datetime.timedelta(days=179),
         )
         old_open_feedback_model = self.create_lesson_feedback_model(
             'old_open_feedback_id',
             'old open feedback',
             feconf.STATUS_CHOICES_OPEN,
-            datetime.datetime.utcnow() - datetime.timedelta(days=366),
+            utils.get_current_utc_datetime() - datetime.timedelta(days=366),
         )
         already_cleared_feedback_model = self.create_lesson_feedback_model(
             'already_cleared_feedback_id',
             web_feedback_cleanup_jobs.CLEARED_FEEDBACK_TEXT,
             feconf.STATUS_CHOICES_FIXED,
-            datetime.datetime.utcnow() - datetime.timedelta(days=179),
+            utils.get_current_utc_datetime() - datetime.timedelta(days=179),
         )
         self.put_multi(
             [
@@ -173,7 +174,7 @@ class LessonFeedbackCleanupAuditJobTests(LessonFeedbackCleanupJobTestBase):
             'old_closed_feedback_id',
             'old closed feedback',
             feconf.STATUS_CHOICES_FIXED,
-            datetime.datetime.utcnow() - datetime.timedelta(days=181),
+            utils.get_current_utc_datetime() - datetime.timedelta(days=181),
         )
         self.put_multi([old_closed_feedback_model])
 
@@ -290,7 +291,7 @@ class PrepareWebFeedbackRetentionTestJobTests(
     ] = web_feedback_cleanup_jobs.PrepareWebFeedbackRetentionTestJob
 
     def test_job_makes_web_feedback_models_expired(self) -> None:
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         open_lesson_feedback_model = self.create_lesson_feedback_model(
             'open_lesson_feedback_id',
             'open lesson feedback',
@@ -366,11 +367,11 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
     def test_job_deletes_expired_feedback_and_associated_resources(
         self,
     ) -> None:
-        old_created_on = datetime.datetime.utcnow() - datetime.timedelta(
+        old_created_on = utils.get_current_utc_datetime() - datetime.timedelta(
             days=91
         )
-        fresh_created_on = datetime.datetime.utcnow() - datetime.timedelta(
-            days=89
+        fresh_created_on = (
+            utils.get_current_utc_datetime() - datetime.timedelta(days=89)
         )
         expired_feedback_model = self.create_platform_feedback_model(
             'expired_feedback_id',
@@ -432,7 +433,7 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
         )
 
     def test_cleanup_deletes_feedback_when_session_log_is_missing(self) -> None:
-        old_created_on = datetime.datetime.utcnow() - datetime.timedelta(
+        old_created_on = utils.get_current_utc_datetime() - datetime.timedelta(
             days=91
         )
         expired_feedback_model = self.create_platform_feedback_model(
@@ -466,7 +467,7 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
     ) -> None:
         no_screenshot_model = self.create_platform_feedback_model(
             'no_screenshot_feedback_id',
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
         )
         # Here we use cast because self.job is typed as JobBase in JobTestBase,
         # but this test always runs PlatformFeedbackCleanupJob, which defines
@@ -484,7 +485,7 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
     def test_screenshot_deletion_uses_expected_gcs_filepath(self) -> None:
         platform_feedback_model = self.create_platform_feedback_model(
             'feedback_id',
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
             screenshot_filename='screenshot.png',
             screenshot_entity_id='screenshot_entity_id',
         )
@@ -519,7 +520,7 @@ class PlatformFeedbackCleanupAuditJobTests(PlatformFeedbackCleanupJobTestBase):
     def test_job_audits_expired_feedback_and_associated_resources(
         self,
     ) -> None:
-        old_created_on = datetime.datetime.utcnow() - datetime.timedelta(
+        old_created_on = utils.get_current_utc_datetime() - datetime.timedelta(
             days=91
         )
         expired_feedback_model = self.create_platform_feedback_model(
