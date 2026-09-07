@@ -5307,25 +5307,71 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Returns the lesson circle badges in the adventure navigation dock.
+   * Icon-only badges (practice tests and the Mastery Challenge) are excluded
+   * so that the returned indexes map one-to-one to the adventure (module)
+   * lesson nodes.
    */
   private async getDockCircleBadges(): Promise<ElementHandle<Element>[]> {
-    return this.page.$$(
+    await this.page.waitForSelector(
+      `${adventureNavigationSelector} topic-module-circle-badge`,
+      {timeout: 30000}
+    );
+    const allBadges = await this.page.$$(
       `${adventureNavigationSelector} topic-module-circle-badge`
     );
+    const lessonBadges: ElementHandle<Element>[] = [];
+    for (const badge of allBadges) {
+      const label = await badge.$('.module-circle-badge-label');
+      if (label) {
+        lessonBadges.push(badge);
+      }
+    }
+    return lessonBadges;
   }
 
   /**
-   * Clicks the dock badge for the later arc at the given index, verifies that
-   * the skip confirmation modal (with Cancel and Proceed) opens, and then
-   * dismisses it with Cancel.
-   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   * Returns the lesson number shown on the given dock lesson circle badge.
+   * @param {ElementHandle<Element>} badge - The dock lesson circle badge.
+   */
+  private async getLessonNumberFromDockBadge(
+    badge: ElementHandle<Element>
+  ): Promise<number> {
+    const label = await badge.$('.module-circle-badge-label');
+    if (!label) {
+      throw new Error('Dock badge has no lesson number label.');
+    }
+    const labelText = await label.evaluate(el =>
+      (el as HTMLElement).textContent?.trim()
+    );
+    return Number(labelText);
+  }
+
+  /**
+   * Selects the later arc's lesson from the navigation dock (which scrolls to
+   * it and expands its card), clicks its Start button to open the skip
+   * confirmation modal, verifies the Cancel and Proceed buttons, and then
+   * dismisses the modal with Cancel.
+   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later arc.
    */
   async clickDockBadgeAndExpectSkipModalToShowThenCancel(
     arcNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
-      await circleBadges[arcNodeIndex].click();
+      const targetBadge = circleBadges[arcNodeIndex];
+      const targetLessonNumber =
+        await this.getLessonNumberFromDockBadge(targetBadge);
+
+      // Clicking the dock badge only scrolls to the selected lesson and
+      // expands its module; the skip confirmation is triggered when the
+      // lesson is started.
+      await this.clickOnElement(targetBadge);
+      await this.page.waitForTimeout(500);
+
+      const startButtonSelector = `#lesson-${targetLessonNumber} .e2e-test-lesson-card-start-button`;
+      await this.clickOnElementWithSelector(startButtonSelector);
+
       await this.expectElementToBeVisible(arcSkipModalSelector);
       await this.expectElementToBeVisible(arcSkipCancelButtonSelector);
       await this.expectElementToBeVisible(arcSkipProceedButtonSelector);
@@ -5335,20 +5381,44 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the dock badge for the later arc at the given index, confirms the
-   * skip, and verifies that the earlier adventures are shown as skipped cards
-   * with the SKIPPED badge, message, and Start CTA.
-   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   * Selects the later arc's lesson from the navigation dock, clicks its Start
+   * button, confirms the skip, and verifies that the earlier adventures are
+   * shown as skipped cards with the SKIPPED badge, message, and Start CTA.
+   * Confirming the skip starts the selected lesson, so the test returns to
+   * the topic page to verify that the skip state was persisted.
+   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later arc.
    */
   async skipToLaterArcAndExpectSkippedAdventureCards(
     arcNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
-      await circleBadges[arcNodeIndex].click();
+      const targetBadge = circleBadges[arcNodeIndex];
+      const targetLessonNumber =
+        await this.getLessonNumberFromDockBadge(targetBadge);
+
+      await this.clickOnElement(targetBadge);
+      await this.page.waitForTimeout(500);
+
+      const topicPageUrl = this.page.url();
+      const startButtonSelector = `#lesson-${targetLessonNumber} .e2e-test-lesson-card-start-button`;
+      await this.clickOnElementWithSelector(startButtonSelector);
       await this.expectElementToBeVisible(arcSkipModalSelector);
       await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
-      await this.page.waitForTimeout(1000);
+
+      // Confirming the skip starts the selected lesson, which navigates away
+      // from the topic page. Wait for the lesson player to load and then
+      // return to the topic page, where the earlier adventures are restored
+      // as skipped cards.
+      await this.waitForPageToFullyLoad();
+      expect(this.page.url()).toContain('/explore/');
+
+      await this.goto(topicPageUrl);
+      await this.waitForPageToFullyLoad();
+      await this.expectElementToBeVisible(topicViewerContainerSelector);
+
+      await this.expectElementToBeVisible(skippedAdventureCardSelector);
       const skippedCards = await this.page.$$(skippedAdventureCardSelector);
       expect(skippedCards.length).toBeGreaterThan(0);
       await this.expectElementToBeVisible(skippedAdventureBadgeSelector);
@@ -5362,16 +5432,20 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the dock badge for the later arc at the given index, confirms the
-   * skip, and verifies that the page smooth-scrolls to the selected milestone
-   * without reloading.
-   * @param {number} arcNodeIndex - The zero-based index of the dock badge.
+   * Clicks the dock badge for the later arc at the given index and verifies
+   * that the page smooth-scrolls to the selected milestone without reloading.
+   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later arc.
    */
   async navigateToLaterArcMilestoneAndExpectNoPageReload(
     arcNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
+      const lessonNumber = await this.getLessonNumberFromDockBadge(
+        circleBadges[arcNodeIndex]
+      );
+
       // Start from the top of the page and record the browser's navigation
       // time origin. If the page reloaded during dock navigation, the time
       // origin would change, which is how we verify there is no reload.
@@ -5391,8 +5465,6 @@ export class LoggedInUser extends BaseUser {
       // on mobile the navigation dock can scroll while the page is
       // smooth-scrolling, so a raw click's coordinates can land off-target.
       await this.clickOnElement(circleBadges[arcNodeIndex]);
-      await this.expectElementToBeVisible(arcSkipModalSelector);
-      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
 
       // The dock scrolls to the selected milestone with a 300 ms delay before
       // a smooth scroll, so give the smooth scroll time to finish.
@@ -5413,7 +5485,7 @@ export class LoggedInUser extends BaseUser {
         scrollYBeforeNavigation + 100
       );
 
-      const lessonElementId = `lesson-${arcNodeIndex + 1}`;
+      const lessonElementId = `lesson-${lessonNumber}`;
       const selectedLessonTop = await this.page.evaluate(
         (elementId: string) => {
           const element = document.getElementById(elementId);
@@ -5430,19 +5502,25 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Clicks the Start CTA of the first skipped adventure card and verifies that
-   * the skipped adventure expands to show its lessons.
+   * the skipped adventure expands to show its lessons. Other skipped
+   * adventures (if any) remain as skipped cards.
    */
   async expandSkippedAdventureByClickingStartCta(): Promise<void> {
     const startCtas = await this.page.$$(skippedAdventureStartCtaSelector);
-    if (startCtas.length > 0) {
-      // Use the stabilized click helper instead of a raw Puppeteer click:
-      // the page is still smooth-scrolling toward the previously selected
-      // arc, and a raw click's coordinates can land off-target mid-scroll.
-      await this.clickOnElement(startCtas[0]);
-      await this.expectElementToBeVisible(skippedAdventureCardSelector, false);
-      const lessonCards = await this.page.$$(topicLessonCardSelector);
-      expect(lessonCards.length).toBeGreaterThan(0);
-    }
+    expect(startCtas.length).toBeGreaterThan(0);
+    const skippedCardsBefore = await this.page.$$(skippedAdventureCardSelector);
+    // Use the stabilized click helper instead of a raw Puppeteer click:
+    // the page is still smooth-scrolling toward the previously selected
+    // arc, and a raw click's coordinates can land off-target mid-scroll.
+    await this.clickOnElement(startCtas[0]);
+    await this.page.waitForTimeout(1000);
+
+    // The clicked skipped adventure expands into a full module, so exactly
+    // one fewer skipped card remains.
+    const skippedCardsAfter = await this.page.$$(skippedAdventureCardSelector);
+    expect(skippedCardsAfter.length).toBe(skippedCardsBefore.length - 1);
+    const lessonCards = await this.page.$$(topicLessonCardSelector);
+    expect(lessonCards.length).toBeGreaterThan(0);
   }
 
   /**

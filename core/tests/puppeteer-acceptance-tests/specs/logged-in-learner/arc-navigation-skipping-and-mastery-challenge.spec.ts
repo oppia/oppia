@@ -18,7 +18,7 @@
  *
  * Covers:
  * - Adventure navigation dock with clickable lesson nodes.
- * - Clicking a later arc node triggers skip confirmation modal.
+ * - Starting a lesson in a later arc triggers skip confirmation modal.
  * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
  * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
  * - Smooth-scroll navigates to the selected Arc without reloading the page.
@@ -163,7 +163,7 @@ describe('Logged-in Learner', function () {
   );
 
   it(
-    'should show skip confirmation modal when clicking a later arc node',
+    'should show skip confirmation modal when starting a lesson in a later arc',
     async function () {
       await loggedInLearner.clickDockBadgeAndExpectSkipModalToShowThenCancel(2);
     },
