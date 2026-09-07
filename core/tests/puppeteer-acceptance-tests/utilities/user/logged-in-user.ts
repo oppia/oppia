@@ -39,6 +39,31 @@ const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const loginPageUrl = testConstants.URLs.Login;
+const mathClassroomUrl = testConstants.URLs.MathClassroom;
+const certificateOfferingAvailableUrl =
+  testConstants.URLs.CertificateOfferingAvailableForMathClassroom;
+const takeCertificateAssessmentLink = '.e2e-test-take-certificate-assessment';
+const certificateTileSelector = '.e2e-test-certificate-tile';
+const certificateTileTitleSelector = '.e2e-test-certificate-tile-title';
+const certificateTileStatusSelector = '.e2e-test-certificate-tile-status';
+const continueToAssessmentButton = '.e2e-test-continue-to-assessment-button';
+const retryAssessmentButton = '.e2e-test-retry-assessment-button';
+const introCardContinueButton = '.e2e-test-continue-button';
+const startAssessmentButton = '.e2e-test-start-assessment-button';
+const questionCounterSelector = '.e2e-test-question-counter';
+const questionPromptSelector = '.e2e-test-question-prompt';
+const certificateAnswerInputSelector =
+  '.e2e-test-conversation-input .e2e-test-float-form-input';
+const nextQuestionButton = '.e2e-test-next-question-button';
+const submitAssessmentButton = '.e2e-test-submit-assessment-button';
+const resultHeadingSelector = '.e2e-test-result-heading';
+const resultScoreSelector = '.e2e-test-result-score';
+const resultRetryButton = '.e2e-test-result-retry-button';
+const myCertificatesSection = '.e2e-test-my-certificates-section';
+const certificateAttemptRowSelector = '.e2e-test-certificate-attempt-row';
+const certificateAttemptTitleSelector = '.e2e-test-certificate-attempt-title';
+const certificateAttemptScoreSelector = '.e2e-test-certificate-attempt-score';
+const certificateAttemptStatusSelector = '.e2e-test-certificate-attempt-status';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -4602,6 +4627,173 @@ export class LoggedInUser extends BaseUser {
       (path: string) => window.location.href.includes(path),
       {},
       expectedProfilePath
+    );
+  }
+
+  /**
+   * Navigates to the math classroom page and opens the available certificate
+   * offerings page through the "Learn more" link.
+   */
+  async gotoMathClassroomCertificateOfferings(): Promise<void> {
+    await this.goto(mathClassroomUrl);
+    await this.expectElementToBeVisible(takeCertificateAssessmentLink);
+    await this.clickAndWaitForNavigation(takeCertificateAssessmentLink, true);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(certificateTileSelector);
+  }
+
+  /**
+   * Expects a certificate tile with the given title and status text to be
+   * visible on the available certificate offerings page.
+   * @param {string} title - The certificate offering title.
+   * @param {string} status - The expected status text (for example 'Not
+   *   Attempted', 'Passed' or 'Not Passed').
+   */
+  async expectCertificateTileWithStatus(
+    title: string,
+    status: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(certificateTileSelector);
+    await this.expectElementContentToContain(certificateTileSelector, title);
+    await this.expectElementContentToContain(certificateTileSelector, status);
+  }
+
+  /**
+   * Opens the certificate assessment for an available certificate from its
+   * tile.
+   */
+  async openCertificateAssessment(): Promise<void> {
+    await this.clickOnElementWithSelector(continueToAssessmentButton);
+    await this.expectElementToBeVisible(introCardContinueButton);
+  }
+
+  /**
+   * Opens a "Retry Assessment" attempt for a certificate from its tile.
+   */
+  async retryCertificateAssessment(): Promise<void> {
+    await this.clickOnElementWithSelector(retryAssessmentButton);
+    await this.expectElementToBeVisible(introCardContinueButton);
+  }
+
+  /**
+   * Expects the certificate introduction card to display the given
+   * certificate title and a list of skills demonstrated by the certificate.
+   * @param {string} title - The certificate offering title.
+   */
+  async expectCertificateIntroductionCard(title: string): Promise<void> {
+    await this.expectElementContentToContain('body', title);
+    await this.expectElementContentToContain(
+      'body',
+      'What this certificate demonstrates'
+    );
+  }
+
+  /**
+   * Continues from the introduction card to the assessment instructions.
+   */
+  async continueToAssessmentInstructions(): Promise<void> {
+    await this.clickOnElementWithSelector(introCardContinueButton);
+    await this.expectElementToBeVisible(startAssessmentButton);
+  }
+
+  /**
+   * Starts the certificate assessment from the instructions panel.
+   */
+  async startCertificateAssessment(): Promise<void> {
+    await this.clickOnElementWithSelector(startAssessmentButton);
+    await this.expectElementToBeVisible(questionCounterSelector);
+    await this.expectElementToBeVisible(nextQuestionButton);
+  }
+
+  /**
+   * Answers certificate assessment questions. The assessment uses a Number
+   * Input interaction ("Add 1 + 2"), so typing '3' is correct and any other
+   * number is incorrect.
+   * @param {number} correctCount - The number of questions to answer
+   *   correctly.
+   * @param {number} total - The total number of questions to answer.
+   */
+  async answerCertificateQuestions(
+    correctCount: number,
+    total: number
+  ): Promise<void> {
+    for (let index = 0; index < total; index++) {
+      await this.typeInInputField(
+        certificateAnswerInputSelector,
+        index < correctCount ? '3' : '5'
+      );
+      if (index < total - 1) {
+        await this.clickOnElementWithSelector(nextQuestionButton);
+      } else {
+        await this.clickOnElementWithSelector(submitAssessmentButton);
+      }
+    }
+  }
+
+  /**
+   * Expects the unanswered questions modal to be shown when the learner
+   * submits an assessment with unanswered questions.
+   */
+  async expectUnansweredQuestionsModal(): Promise<void> {
+    await this.expectElementContentToContain(
+      'body',
+      'Some questions are unanswered'
+    );
+    await this.expectElementContentToContain(
+      'body',
+      'Unanswered questions will be marked incorrect.'
+    );
+  }
+
+  /**
+   * Expects the certificate assessment result page to show the expected
+   * heading and percentage score.
+   * @param {string} heading - A substring of the expected result heading.
+   * @param {string} score - A substring of the expected score text (for
+   *   example '70%').
+   */
+  async expectCertificateAssessmentResult(
+    heading: string,
+    score: string
+  ): Promise<void> {
+    await this.expectElementContentToContain(resultHeadingSelector, heading);
+    await this.expectElementContentToContain(resultScoreSelector, score);
+  }
+
+  /**
+   * Navigates to the "My certificates" tab in the learner dashboard.
+   */
+  async navigateToMyCertificatesTab(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+    await this.expectElementToBeVisible(myCertificatesSection);
+    await this.clickOnElementWithSelector(myCertificatesSection);
+  }
+
+  /**
+   * Expects a certificate attempt row with the given title, percentage score
+   * and status to be visible in the learner dashboard.
+   * @param {string} title - The certificate offering title.
+   * @param {string} score - The expected score text (for example '80%').
+   * @param {string} status - The expected status text ('Passed' or 'Not
+   *   Passed').
+   */
+  async expectCertificateAttemptRow(
+    title: string,
+    score: string,
+    status: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(certificateAttemptRowSelector);
+    await this.expectElementContentToContain(
+      certificateAttemptRowSelector,
+      title
+    );
+    await this.expectElementContentToContain(
+      certificateAttemptRowSelector,
+      score
+    );
+    await this.expectElementContentToContain(
+      certificateAttemptRowSelector,
+      status
     );
   }
 }

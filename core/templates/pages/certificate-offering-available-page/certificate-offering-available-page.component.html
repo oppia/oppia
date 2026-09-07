@@ -38,7 +38,7 @@
     </p>
 
     <div class="oppia-certificate-offering-available-page-tiles">
-      <article class="oppia-certificate-offering-available-page-tile"
+      <article class="oppia-certificate-offering-available-page-tile e2e-test-certificate-tile"
                *ngFor="let certificate of availableCertificates">
         <div class="oppia-certificate-offering-available-page-tile-top">
           <div class="oppia-certificate-offering-available-page-tile-heading">
@@ -48,11 +48,11 @@
                    alt="" height="85">
             </span>
             <div>
-              <h3 class="oppia-certificate-offering-available-page-tile-heading-text">{{ certificate.title }}</h3>
+              <h3 class="oppia-certificate-offering-available-page-tile-heading-text e2e-test-certificate-tile-title">{{ certificate.title }}</h3>
             </div>
           </div>
 
-          <div class="oppia-certificate-offering-available-page-status-wrapper"
+          <div class="oppia-certificate-offering-available-page-status-wrapper e2e-test-certificate-tile-status"
                [ngSwitch]="certificate.status">
             <span *ngSwitchCase="'passed'"
                   class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
@@ -83,11 +83,11 @@
           <ng-container *ngSwitchCase="'passed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_PASSED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary">
+              <button type="button" class="btn btn-primary e2e-test-check-score-button">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
-                      class="btn btn-outline-primary"
+                      class="btn btn-outline-primary e2e-test-retry-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
@@ -97,11 +97,11 @@
           <ng-container *ngSwitchCase="'failed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FAILED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary">
+              <button type="button" class="btn btn-primary e2e-test-check-score-button">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
-                      class="btn btn-outline-primary"
+                      class="btn btn-outline-primary e2e-test-retry-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
@@ -112,7 +112,7 @@
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_NOT_ATTEMPTED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button"
-                      class="btn btn-primary"
+                      class="btn btn-primary e2e-test-continue-to-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>

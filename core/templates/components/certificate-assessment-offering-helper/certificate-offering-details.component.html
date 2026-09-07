@@ -7,7 +7,7 @@
         Certificate Title<span class="oppia-certificate-required">*</span>
       </label>
       <input id="certificate-offering-title" name="certificateOfferingTitle"
-             class="oppia-certificate-input" type="text" required
+             class="oppia-certificate-input e2e-test-certificate-title-input" type="text" required
              [attr.maxlength]="MAX_TITLE_LENGTH" [(ngModel)]="title"
              [disabled]="isLoadingClassrooms"
              placeholder="Enter title" aria-required="true">
@@ -26,7 +26,7 @@
         </label>
         <div class="oppia-certificate-textarea-wrap">
           <textarea id="certificate-offering-description" name="certificateOfferingDescription"
-                    class="oppia-certificate-textarea" required rows="6"
+                    class="oppia-certificate-textarea e2e-test-certificate-description-input" required rows="6"
                     [attr.maxlength]="MAX_DESCRIPTION_LENGTH" [(ngModel)]="description"
                     [disabled]="isLoadingClassrooms"
                     placeholder="Enter description" aria-required="true">
@@ -47,7 +47,7 @@
             Time Limit<span class="oppia-certificate-required">*</span>
           </label>
           <input id="certificate-offering-time-limit" name="certificateOfferingTimeLimit"
-                 class="oppia-certificate-input" type="number" required
+                 class="oppia-certificate-input e2e-test-certificate-time-limit-input" type="number" required
                  [attr.min]="MIN_TIME_LIMIT_IN_MINUTES"
                  [attr.max]="MAX_TIME_LIMIT_IN_MINUTES"
                  [(ngModel)]="timeLimitInMinutes"
@@ -77,7 +77,7 @@
             Total Number of Questions<span class="oppia-certificate-required">*</span>
           </label>
           <input id="certificate-offering-total-questions" name="certificateOfferingTotalQuestions"
-                 class="oppia-certificate-input" type="number" required
+                 class="oppia-certificate-input e2e-test-certificate-total-questions-input" type="number" required
                  [attr.min]="MIN_TOTAL_QUESTIONS"
                  [attr.max]="MAX_TOTAL_QUESTIONS"
                  [(ngModel)]="totalQuestions"
@@ -106,7 +106,7 @@
             Classroom<span class="oppia-certificate-required">*</span>
           </label>
           <select id="certificate-offering-classroom" name="certificateOfferingClassroom"
-                  class="oppia-certificate-input" required [(ngModel)]="classroomId"
+                  class="oppia-certificate-input e2e-test-certificate-classroom-select" required [(ngModel)]="classroomId"
                   [disabled]="isLoadingClassrooms"
                   aria-label="Select classroom" aria-required="true">
             <option value="" disabled selected>Select a classroom</option>
@@ -138,7 +138,7 @@
 
       <div *ngFor="let outcome of demonstratesList; let i = index; trackBy: trackByIndex"
            class="oppia-certificate-outcome-row">
-        <input class="oppia-certificate-input oppia-certificate-outcome-input"
+        <input class="oppia-certificate-input oppia-certificate-outcome-input e2e-test-certificate-outcome-input"
                [(ngModel)]="demonstratesList[i]" [name]="'demonstrates_' + i"
                [id]="'demonstrates_' + i" placeholder="Enter a learning outcome..." required aria-required="true"
                [disabled]="isLoadingClassrooms"
@@ -150,7 +150,7 @@
         </button>
       </div>
 
-      <button class="oppia-certificate-outcome-add" type="button" [disabled]="isLoadingClassrooms"
+      <button class="oppia-certificate-outcome-add e2e-test-certificate-add-outcome" type="button" [disabled]="isLoadingClassrooms"
               (click)="addOutcome()">
         <span aria-hidden="true">+</span> Add another outcome
       </button>

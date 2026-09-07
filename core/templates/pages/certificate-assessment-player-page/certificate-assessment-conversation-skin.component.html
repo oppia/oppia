@@ -28,14 +28,14 @@
   </div>
 
   <div class="oppia-question-player-card certificate-assessment-question-card">
-    <div class="certificate-assessment-question-counter">
+    <div class="certificate-assessment-question-counter e2e-test-question-counter">
       Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}
     </div>
     <div class="certificate-assessment-question-header">
       <div class="certificate-assessment-avatar">
         <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
-      <div class="certificate-assessment-prompt-pill">
+      <div class="certificate-assessment-prompt-pill e2e-test-question-prompt">
         <oppia-rte-output-display [rteString]="currentQuestion.prompt">
         </oppia-rte-output-display>
       </div>
@@ -65,7 +65,7 @@
     <span *ngIf="currentQuestionIndex === 0"></span>
 
     <button *ngIf="!isLastQuestion" type="button"
-            class="certificate-assessment-navigation-link"
+            class="certificate-assessment-navigation-link e2e-test-next-question-button"
             (click)="onNextQuestion()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON'
@@ -74,7 +74,7 @@
       <span class="certificate-assessment-navigation-arrow">&#8594;</span>
     </button>
     <button *ngIf="isLastQuestion" type="submit"
-            class="btn certificate-assessment-primary-button"
+            class="btn certificate-assessment-primary-button e2e-test-submit-assessment-button"
             (click)="onSubmitAssessment()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_SUBMIT_ASSESSMENT_BUTTON'

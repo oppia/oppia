@@ -76,6 +76,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "certificate-assessment/certificate-assessment-available-certificate-learner",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/certificate-assessment/certificate-assessment-available-certificate-learner.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "curriculum-admin/create-subtopic-study-guide-with-multiple-sections",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts",
       "framework": "puppeteer"
