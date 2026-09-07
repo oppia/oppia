@@ -136,6 +136,33 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_post_fails_if_provider_not_registered(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        def mock_generate(*args, **kwargs):
+            raise utils.ValidationError('The mapped provider class for azure is not registered.')
+
+        domain_swap = self.swap(
+            machine_translation_services,
+            'generate_and_cache_translation',
+            mock_generate,
+        )
+
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
+            self.assertEqual(
+                response['error'],
+                'The translation provider configured for this language is '
+                'not currently available.',
+            )
+        self.logout()
+
     def test_post_fails_gracefully_on_api_exception(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 

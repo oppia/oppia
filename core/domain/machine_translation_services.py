@@ -207,7 +207,7 @@ def generate_and_cache_translation(
 
     provider_instance = _PROVIDER_REGISTRY.get_provider_instance(provider_id)
     if not provider_instance:
-        raise Exception(
+        raise utils.ValidationError(
             'The mapped provider class for %s is not registered.' % provider_id
         )
 

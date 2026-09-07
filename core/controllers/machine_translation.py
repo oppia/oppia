@@ -78,6 +78,11 @@ class MachineTranslationGenerateHandler(
                     source_language_code, target_language_code, source_text
                 )
             )
+        except utils.ValidationError:
+            raise self.InvalidInputException(
+                'The translation provider configured for this language is '
+                'not currently available.'
+            )
         except Exception as e:
             raise self.InternalErrorException(str(e))
 

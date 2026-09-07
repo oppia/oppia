@@ -204,7 +204,7 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
 
         with self.mock_provider_id_swap, provider_instance_swap:
             with self.assertRaisesRegex(
-                Exception,
+                utils.ValidationError,
                 'The mapped provider class for azure is not registered.',
             ):
                 machine_translation_services.generate_and_cache_translation(
