@@ -1,8 +1,12 @@
+<div tabindex="-1" ngbAutofocus class="hidden-element"></div>
 <ng-container *ngIf="!thankYouModalIsShown">
   <div class="modal-header">
     <h3>
       {{ 'I18N_FEEDBACK_MODAL_HEADER' | translate }}
     </h3>
+    <button mat-icon-button class="close-modal-btn" (click)="closeModal()" aria-label="Close the modal">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
   <div class="modal-body oppia-long-text">
