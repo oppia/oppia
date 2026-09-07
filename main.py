@@ -53,7 +53,6 @@ from core.controllers import (
     learner_dashboard,
     learner_goals,
     learner_group,
-    learner_playlist,
     library,
     moderator,
     oppia_root,
@@ -125,7 +124,7 @@ class InternetConnectivityHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
@@ -140,7 +139,7 @@ class FrontendErrorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:  # pylint: disable=arguments-differ
+    def post(self) -> None:
         """Records errors reported by the frontend."""
         assert self.normalized_payload is not None
         logging.error(
@@ -157,7 +156,7 @@ class WarmupPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
@@ -170,7 +169,7 @@ class SplashRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         self.redirect('/')
 
 
@@ -763,10 +762,6 @@ URLS = [
         learner_goals.LearnerGoalsHandler,
     ),
     get_redirect_route(
-        r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
-        learner_playlist.LearnerPlaylistHandler,
-    ),
-    get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogPostDataHandler,
     ),
@@ -1090,8 +1085,36 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
-        general_feedback.GeneralFeedbackSubmitHandler,
+        r'%s' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/unread_count' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackUnreadCountHandler,
+    ),
+    get_redirect_route(
+        r'%s/<feedback_id>' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>/<feedback_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_STATUS_COUNTS_URL,
+        general_feedback.FeedbackStatusCountsHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackSubmitHandler,
     ),
     get_redirect_route(
         r'%s/<dashboard>/<dashboard_id>/<report_id>'
@@ -1105,15 +1128,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackListHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>'
-        % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
@@ -1462,10 +1476,13 @@ URLS = [
         feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER,
         certificate_assessment.CertificateAssessmentOfferingByIdHandler,
     ),
-
     get_redirect_route(
         feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
         certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler,
     ),
     get_redirect_route(
         feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
@@ -1482,6 +1499,10 @@ URLS = [
     get_redirect_route(
         feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER,
         certificate_assessment.CertificateAssessmentAttemptsHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_QUESTION_HANDLER,
+        certificate_assessment.CertificateQuestionHandler,
     ),
 ]
 
@@ -1660,6 +1681,14 @@ URLS.extend(
         get_redirect_route(
             r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
             cron.CronMailReviewerNewSuggestionsHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/lesson_feedback_cleanup',
+            cron.CronLessonFeedbackCleanupHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/platform_feedback_cleanup',
+            cron.CronPlatformFeedbackCleanupHandler,
         ),
     )
 )
