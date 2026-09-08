@@ -171,7 +171,15 @@ export class BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
-    await this.clickAndWaitForNavigation('Sign In');
+    // Avoid clickAndWaitForNavigation() here: it waits on
+    // page.waitForNavigation({waitUntil: 'networkidle'}), which can hang for
+    // the full timeout if the post-login redirect doesn't settle into a
+    // "networkidle" state (e.g. background polling requests keep the network
+    // busy), even though the redirect to the username-selection page has
+    // already happened. The caller (signUpNewUser) only needs the username
+    // input to be ready, so wait for that directly instead.
+    await this.clickOnElementWithText('Sign In');
+    await this.page.waitForSelector(usernameInputSelector);
   }
 
   /**
