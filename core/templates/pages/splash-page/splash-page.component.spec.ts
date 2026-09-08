@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-// @ts-nocheck
-
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
@@ -196,7 +194,7 @@ describe('Splash Page', () => {
 
   it('should get testimonials correctly', function () {
     component.ngOnInit();
-    expect(component.getTestimonials().length).toBe(component.testimonialCount);
+    expect(component.testimonialCount).toBe(component.getTestimonials().length);
   });
 
   it('should evaluate if user is logged in', fakeAsync(() => {
