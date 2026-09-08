@@ -344,14 +344,6 @@ class ExplorationDisplayableSummariesTest(
             self.EXP_ID_2,
             exp_summary_2.version,
             'hi',
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID,
-            translated_category,
-        )
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.EXP_ID_2,
-            exp_summary_2.version,
-            'hi',
             f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0',
             translated_tag_0,
         )

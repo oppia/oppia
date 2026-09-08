@@ -212,6 +212,8 @@ export class ContentTranslationManagerService {
   }
 
   preloadConceptCards(languageCode: string): void {
+    // This check is required because in unit tests, audioPreloaderService.exploration
+    // or its states property may be undefined.
     if (
       !this.audioPreloaderService.exploration ||
       !this.audioPreloaderService.exploration.states

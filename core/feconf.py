@@ -415,7 +415,6 @@ DEFAULT_STATE_CONTENT_STR = ''
 EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
 EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
-EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
 
 # Character limit for exploration title translation.

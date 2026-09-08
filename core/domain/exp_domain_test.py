@@ -5006,9 +5006,7 @@ title: Title
         self.assertNotIn(
             feconf.EXPLORATION_OBJECTIVE_CONTENT_ID, translatable_contents
         )
-        self.assertNotIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
         self.assertNotIn('exploration_tag_0', translatable_contents)
         self.assertNotIn('exploration_tag_1', translatable_contents)
 
@@ -5075,9 +5073,7 @@ title: Title
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
         )
 
-        self.assertNotIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
 
         self.assertIn('exploration_tag_0', translatable_contents)
         self.assertEqual(
