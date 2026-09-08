@@ -2523,7 +2523,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models_after_update.count(), 1)
 
-        user_audit_model = all_models_after_update.get()
+        user_audit_model: Optional[audit_models.UsernameChangeAuditModel] = (
+            all_models_after_update.get()
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert user_audit_model is not None
         self.assertEqual(user_audit_model.committer_id, committer_id)
