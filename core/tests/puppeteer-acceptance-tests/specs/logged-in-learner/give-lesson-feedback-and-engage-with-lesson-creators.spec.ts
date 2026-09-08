@@ -198,7 +198,7 @@ describe('Logged-in User', function () {
     );
 
     await explorationEditor.clickFeedbackDetailStatusButton(
-      statusLabels[FeedbackStatus.NOT_ACTIONABLE]
+      FeedbackStatus.NOT_ACTIONABLE
     );
     await explorationEditor.expectScreenshotToMatch(
       'explorationEditorFeedbackTabAfterSelectingNotActionable',
@@ -244,7 +244,7 @@ describe('Logged-in User', function () {
       'This Lesson seems too short, can we make it longer?'
     );
     await explorationEditor.clickFeedbackDetailStatusButton(
-      statusLabels[FeedbackStatus.FIXED]
+      FeedbackStatus.FIXED
     );
 
     // As Learner navigate back to My Suggestions Tab.

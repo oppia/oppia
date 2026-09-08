@@ -288,9 +288,7 @@ describe('Tech Team Lead', function () {
 
   it('should be able to change the status of a feedback report', async function () {
     await techTeamLead.clickFeedbackDetailBackButton();
-    await techTeamLead.selectFeedbackStatusFilter(
-      FEEDBACK_STATUS_LABELS[FeedbackStatus.OPEN]
-    );
+    await techTeamLead.selectFeedbackStatusFilter(FeedbackStatus.OPEN);
     await techTeamLead.selectFeedbackTechnicalTeamFilter('tech-internal');
 
     await techTeamLead.clickApplyButton();
@@ -317,12 +315,10 @@ describe('Tech Team Lead', function () {
       'http://localhost:8181/creator-dashboard'
     );
 
-    await techTeamLead.clickFeedbackDetailStatusButton(
-      statusLabels[FeedbackStatus.FIXED]
-    );
+    await techTeamLead.clickFeedbackDetailStatusButton(FeedbackStatus.FIXED);
     await techTeamLead.verifyFeedbackStatusActions(
-      statusLabels[FeedbackStatus.FIXED],
-      statusLabels[FeedbackStatus.OPEN]
+      FeedbackStatus.FIXED,
+      FeedbackStatus.OPEN
     );
     await techTeamLead.expectToastMessage('Feedback status updated to fixed.');
 
@@ -340,7 +336,7 @@ describe('Tech Team Lead', function () {
     );
 
     await techTeamLead.clickFeedbackDetailBackButton();
-    await techTeamLead.selectFeedbackStatusFilter('fixed');
+    await techTeamLead.selectFeedbackStatusFilter(FeedbackStatus.FIXED);
     await techTeamLead.selectFeedbackTechnicalTeamFilter('tech-internal');
     await techTeamLead.clickApplyButton();
 
@@ -360,9 +356,7 @@ describe('Tech Team Lead', function () {
     );
     await techTeamLead.verifyExplorationFeedbackDetailView('report', 'Fixed');
     // Click on the "open" status  button.
-    await techTeamLead.clickFeedbackDetailStatusButton(
-      statusLabels[FeedbackStatus.OPEN]
-    );
+    await techTeamLead.clickFeedbackDetailStatusButton(FeedbackStatus.OPEN);
     await techTeamLead.expectToastMessage('Feedback status updated to open.');
     await techTeamLead.verifyFeedbackDetailPageDetailsSection(
       statusLabels[FeedbackStatus.OPEN],
@@ -371,8 +365,8 @@ describe('Tech Team Lead', function () {
       'http://localhost:8181/creator-dashboard'
     );
     await techTeamLead.verifyFeedbackStatusActions(
-      statusLabels[FeedbackStatus.OPEN],
-      statusLabels[FeedbackStatus.FIXED]
+      FeedbackStatus.OPEN,
+      FeedbackStatus.FIXED
     );
 
     await techTeamLead.expectScreenshotToMatch(
@@ -381,7 +375,7 @@ describe('Tech Team Lead', function () {
     );
     // Click on the "not_actionable" status button.
     await techTeamLead.clickFeedbackDetailStatusButton(
-      statusLabels[FeedbackStatus.NOT_ACTIONABLE]
+      FeedbackStatus.NOT_ACTIONABLE
     );
     await techTeamLead.expectToastMessage(
       'Feedback status updated to not_actionable.'
@@ -393,8 +387,8 @@ describe('Tech Team Lead', function () {
       'http://localhost:8181/creator-dashboard'
     );
     await techTeamLead.verifyFeedbackStatusActions(
-      statusLabels[FeedbackStatus.NOT_ACTIONABLE],
-      statusLabels[FeedbackStatus.OPEN]
+      FeedbackStatus.NOT_ACTIONABLE,
+      FeedbackStatus.OPEN
     );
 
     await techTeamLead.expectScreenshotToMatch(

@@ -264,9 +264,14 @@ describe('Lesson Creator', function () {
     );
 
     await lessonCreator.verifyFeedbackDetailStatusActionsButtons();
-    await lessonCreator.clickFeedbackDetailStatusButton('compliment');
+    await lessonCreator.clickFeedbackDetailStatusButton(
+      FeedbackStatus.COMPLIMENT
+    );
 
-    await lessonCreator.verifyFeedbackStatusActions('compliment', 'open');
+    await lessonCreator.verifyFeedbackStatusActions(
+      FeedbackStatus.COMPLIMENT,
+      FeedbackStatus.OPEN
+    );
     await lessonCreator.expectToastMessage(
       'Feedback status updated to compliment.'
     );
@@ -287,7 +292,7 @@ describe('Lesson Creator', function () {
     );
 
     await lessonCreator.clickFeedbackDetailBackButton();
-    await lessonCreator.selectFeedbackStatusFilter('compliment');
+    await lessonCreator.selectFeedbackStatusFilter(FeedbackStatus.COMPLIMENT);
     await lessonCreator.clickApplyButton();
 
     await lessonCreator.expectScreenshotToMatch(
@@ -304,8 +309,11 @@ describe('Lesson Creator', function () {
     await lessonCreator.clickOnFeedbackListEntryWithDescription(
       'Question 2 is confusing.'
     );
-    await lessonCreator.clickFeedbackDetailStatusButton('fixed');
-    await lessonCreator.verifyFeedbackStatusActions('fixed', 'compliment');
+    await lessonCreator.clickFeedbackDetailStatusButton(FeedbackStatus.FIXED);
+    await lessonCreator.verifyFeedbackStatusActions(
+      FeedbackStatus.FIXED,
+      FeedbackStatus.COMPLIMENT
+    );
     await lessonCreator.expectToastMessage('Feedback status updated to fixed.');
   });
 

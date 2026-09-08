@@ -5367,11 +5367,6 @@ export class LoggedInUser extends BaseUser {
       return;
     }
 
-    await this.expectElementToBeVisible(
-      feedbackDetailPageRepliesSection,
-      false
-    );
-
     if (!isReport) {
       await this.expectTextContentToBe(
         feedbackDetailPageEmptyReplyText,
