@@ -50,6 +50,8 @@ test.describe('Release Coordinator', function () {
   });
 
   test('should be able to run beam job (success)', async function () {
+    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToBeamJobsTab();
     await releaseCoordinator.selectAndRunJob(DUMMY_PASS_BEAM_JOB);
     // Beam jobs, take a while to run.
     await releaseCoordinator.waitForJobToComplete();
@@ -64,7 +66,8 @@ test.describe('Release Coordinator', function () {
   });
 
   test('should be able to handle beam job (failure)', async function () {
-    await releaseCoordinator.closeOutputModal();
+    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToBeamJobsTab();
     await releaseCoordinator.selectAndRunJob(DUMMY_FAIL_BEAM_JOB);
     await releaseCoordinator.waitForJobToComplete();
     await releaseCoordinator.expectJobStatusToBeSuccessful(
