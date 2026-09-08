@@ -48,7 +48,6 @@ import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
-import {UrlService} from 'services/contextual/url.service';
 
 import './feedback-updates-page.component.css';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -433,7 +432,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     }
     const modelRef = this.ngbModal.open(
       LearnerDashboardSuggestionModalComponent,
-      {backdrop: true}
+      {backdrop: 'static'}
     );
     if (suggestionHtml) {
       modelRef.componentInstance.newContent = suggestionHtml;
