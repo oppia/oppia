@@ -46,14 +46,14 @@ const agDummyFeatureIndicator = '.e2e-test-angular-dummy-handler-indicator';
 
 // Selectors for jobs.
 const jobInputField = '.mat-input-element';
-const jobOutputRowSelector = '.mat-row';
+const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
+const jobOutputRowSelector = `${beamJobsTableSelector} tbody tr`;
 const startNewJobButton = '.job-start-button';
 const startNewJobConfirmationButton = '.e2e-test-start-new-job-button';
 const beamJobOutputDialogSelector = '.e2e-test-view-beam-job-output-dialog';
 const beamJobCloseOuputButtonSelector = '.e2e-test-close-beam-job-output';
 const copyOutputButton = '.e2e-test-copy-output-button';
 const beamJobRunOutputSelector = '.beam-job-run-output';
-const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
 const beamJobStatusSelectorPrefix = '.e2e-test-job-status-';
 
 // Selectors for the promo bar.
