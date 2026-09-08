@@ -56,6 +56,7 @@ describe('ErrorPageComponent', () => {
 
   afterEach(() => {
     windowRef.nativeWindow.sessionStorage.clear();
+    fixture.destroy();
   });
 
   it('should check if status code is a number', () => {
@@ -201,7 +202,7 @@ describe('ErrorPageComponent', () => {
       expect(() => {
         component.ngAfterViewInit();
         tick();
-      }).not.toThrowError();
+      }).not.toThrow();
     }));
   });
 });

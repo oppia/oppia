@@ -44,6 +44,10 @@ describe('Error404PageComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   it('should get the static image url', () => {
     expect(component.getStaticImageUrl('/general/oops_mint.webp')).toBe(
       '/assets/images/general/oops_mint.webp'
@@ -161,7 +165,7 @@ describe('Error404PageComponent', () => {
       expect(() => {
         component.ngAfterViewInit();
         tick();
-      }).not.toThrowError();
+      }).not.toThrow();
     }));
   });
 });
