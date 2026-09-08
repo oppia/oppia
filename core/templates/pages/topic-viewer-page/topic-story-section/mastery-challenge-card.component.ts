@@ -16,7 +16,7 @@
  * @fileoverview Mastery challenge card displayed at the end of a story section.
  */
 
-import {Component, Input, OnDestroy} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
@@ -26,7 +26,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 })
 export class MasteryChallengeCardComponent implements OnDestroy {
   @Input() actionUrl: string = '#';
-  @Input() isUnlocked: boolean = true;
+  @Input() isUnlocked: boolean = false;
+  @Output() buttonClicked = new EventEmitter<void>();
 
   showLockedTooltip: boolean = false;
   private helperTooltipTimeoutId: number | null = null;
@@ -38,12 +39,22 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   }
 
   onChallengeButtonClick(): void {
-    if (!this.isUnlocked) {
-      this.showHelperTooltip();
+    if (this.isUnlocked && this.hasActionUrl()) {
+      this.navigateToAction();
       return;
     }
+    this.buttonClicked.emit();
+  }
 
-    this.navigateToAction();
+  onButtonMouseEnter(): void {
+    if (!this.isUnlocked) {
+      this.showHelperTooltip();
+    }
+  }
+
+  onButtonMouseLeave(): void {
+    this.clearHelperTooltipTimeout();
+    this.showLockedTooltip = false;
   }
 
   navigateToAction(): void {
@@ -57,7 +68,7 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   }
 
   isActionDisabled(): boolean {
-    return this.isUnlocked && !this.hasActionUrl();
+    return !this.isUnlocked || !this.hasActionUrl();
   }
 
   private showHelperTooltip(): void {
