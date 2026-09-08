@@ -27,7 +27,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 ConsoleReporter.setConsoleErrorsToIgnore([
   /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
   /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
+  /ng:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
   /The requested path \/learn\/math is not found\./,
 ]);
 

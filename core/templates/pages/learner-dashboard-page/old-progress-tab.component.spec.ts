@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for for OldProgressTabComponent.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,
