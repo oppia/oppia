@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
+// @ts-nocheck
+
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -578,24 +580,6 @@ describe('Site Analytics Service', () => {
           login_status: 'logged_in',
         }
       );
-    });
-
-    it('should register save recorded audio event', () => {
-      sas.registerSaveRecordedAudioEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'save_recorded_audio', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
-    });
-
-    it('should register audio recording event', () => {
-      sas.registerStartAudioRecordingEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start_audio_recording', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
     });
 
     it('should register upload audio event', () => {

@@ -23,6 +23,7 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {TopicHeaderComponent} from './topic-header.component';
 
 describe('TopicHeaderComponent', () => {
@@ -32,7 +33,7 @@ describe('TopicHeaderComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TopicHeaderComponent, MockTranslatePipe],
+      declarations: [TopicHeaderComponent, MockTranslatePipe, CapitalizePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

@@ -431,18 +431,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerSaveRecordedAudioEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('save_recorded_audio', {
-      exploration_id: explorationId,
-    });
-  }
-
-  registerStartAudioRecordingEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('start_audio_recording', {
-      exploration_id: explorationId,
-    });
-  }
-
   registerUploadAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics('upload_recorded_audio', {
       exploration_id: explorationId,
