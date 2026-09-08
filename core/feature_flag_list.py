@@ -138,7 +138,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
-    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
@@ -155,6 +154,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.STORY_EDITOR_ARCS,
 ]
 
@@ -365,7 +365,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
         (
             'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED.value: (

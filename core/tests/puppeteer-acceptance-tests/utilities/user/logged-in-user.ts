@@ -40,8 +40,6 @@ const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const loginPageUrl = testConstants.URLs.Login;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
-const certificateOfferingAvailableUrl =
-  testConstants.URLs.CertificateOfferingAvailableForMathClassroom;
 const takeCertificateAssessmentLink = '.e2e-test-take-certificate-assessment';
 const availableCertificateHeading =
   '.e2e-test-available-certificate-heading-text';
@@ -51,14 +49,12 @@ const retryAssessmentButton = '.e2e-test-retry-assessment-button';
 const introCardContinueButton = '.e2e-test-continue-button';
 const startAssessmentButton = '.e2e-test-start-assessment-button';
 const questionCounterSelector = '.e2e-test-question-counter';
-const questionPromptSelector = '.e2e-test-question-prompt';
 const certificateAnswerInputSelector =
   '.e2e-test-conversation-input .e2e-test-float-form-input';
 const nextQuestionButton = '.e2e-test-next-question-button';
 const submitAssessmentButton = '.e2e-test-submit-assessment-button';
 const resultHeadingSelector = '.e2e-test-result-heading';
 const resultScoreSelector = '.e2e-test-result-score';
-const resultRetryButton = '.e2e-test-result-retry-button';
 const myCertificatesSection = '.e2e-test-my-certificates-section';
 const certificateAttemptRowSelector = '.e2e-test-certificate-attempt-row';
 const certificateAttemptTitleSelector = '.e2e-test-certificate-attempt-title';
@@ -4745,6 +4741,24 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Answers a given number of questions correctly and then submits the
+   * assessment from the final question without answering it, so that the
+   * unanswered-questions warning modal is shown.
+   * @param {number} correctCount - The number of questions to answer
+   *   correctly. This should be one fewer than the assessment's total question
+   *   count so that the final question is left unanswered.
+   */
+  async submitAssessmentWithUnansweredQuestion(
+    correctCount: number
+  ): Promise<void> {
+    for (let index = 0; index < correctCount; index++) {
+      await this.typeInInputField(certificateAnswerInputSelector, '3');
+      await this.clickOnElementWithSelector(nextQuestionButton);
+    }
+    await this.clickOnElementWithSelector(submitAssessmentButton);
+  }
+
+  /**
    * Expects the unanswered questions modal to be shown when the learner
    * submits an assessment with unanswered questions.
    */
@@ -4797,16 +4811,35 @@ export class LoggedInUser extends BaseUser {
     status: string
   ): Promise<void> {
     await this.expectElementToBeVisible(certificateAttemptRowSelector);
-    await this.expectElementContentToContain(
+    await this.page.waitForFunction(
+      (
+        rowSelector: string,
+        titleSelector: string,
+        scoreSelector: string,
+        statusSelector: string,
+        expectedTitle: string,
+        expectedScore: string,
+        expectedStatus: string
+      ) => {
+        return Array.from(document.querySelectorAll(rowSelector)).some(row => {
+          const titleText = row.querySelector(titleSelector)?.textContent ?? '';
+          const scoreText = row.querySelector(scoreSelector)?.textContent ?? '';
+          const statusText =
+            row.querySelector(statusSelector)?.textContent ?? '';
+          return (
+            titleText.includes(expectedTitle) &&
+            scoreText.includes(expectedScore) &&
+            statusText.includes(expectedStatus)
+          );
+        });
+      },
+      {},
       certificateAttemptRowSelector,
-      title
-    );
-    await this.expectElementContentToContain(
-      certificateAttemptRowSelector,
-      score
-    );
-    await this.expectElementContentToContain(
-      certificateAttemptRowSelector,
+      certificateAttemptTitleSelector,
+      certificateAttemptScoreSelector,
+      certificateAttemptStatusSelector,
+      title,
+      score,
       status
     );
   }

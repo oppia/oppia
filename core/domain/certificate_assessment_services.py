@@ -600,11 +600,12 @@ def start_certificate_assessment_attempt(
             )
         )
         if most_recent_attempt is not None:
-            # In dev mode we disable the cooldown so tests can retry the
-            # assessment immediately; production keeps the real limit.
+            # In emulator mode (local dev and the CI acceptance-test servers)
+            # we disable the cooldown so tests can retry the assessment
+            # immediately; production keeps the real limit.
             min_time_between_attempts = (
                 0
-                if constants.DEV_MODE
+                if constants.EMULATOR_MODE
                 else certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
             )
             cooldown = datetime.timedelta(minutes=min_time_between_attempts)

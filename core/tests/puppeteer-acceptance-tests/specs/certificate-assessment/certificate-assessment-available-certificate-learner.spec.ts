@@ -62,6 +62,11 @@ describe('Certified learner', function () {
     );
 
     await releaseCoordinator.enableFeatureFlag('enable_certificate_assessment');
+    // The "My certificates" tab is only rendered in the redesigned learner
+    // dashboard.
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
 
     await curriculumAdmin.createCertificateAssessmentTestSetup(
       [
@@ -163,7 +168,6 @@ describe('Certified learner', function () {
     await learner.expectCertificateAssessmentResult("Don't give up", '70%');
   });
 
-  // Working
   it('should complete and pass the certificate assessment on retry', async function () {
     await learner.gotoMathClassroomCertificateOfferings();
     await learner.retryCertificateAssessment();
@@ -187,16 +191,6 @@ describe('Certified learner', function () {
     await learner.expectCertificateTileWithStatus(CERTIFICATE_TITLE, 'Passed');
   });
 
-  it('should show a warning when submitting an assessment with unanswered questions', async function () {
-    await learner.gotoMathClassroomCertificateOfferings();
-    await learner.retryCertificateAssessment();
-    await learner.continueToAssessmentInstructions();
-    await learner.startCertificateAssessment();
-    await learner.answerCertificateQuestions(9, 9);
-    await learner.expectUnansweredQuestionsModal();
-    await learner.clickOnElementWithSelector('.btn-close');
-  });
-
   it('should show the certificate attempt history in the learner dashboard', async function () {
     await learner.navigateToMyCertificatesTab();
     await learner.expectCertificateAttemptRow(
@@ -213,6 +207,16 @@ describe('Certified learner', function () {
       'certificateAttemptHistory',
       __dirname
     );
+  });
+
+  it('should show a warning when submitting an assessment with unanswered questions', async function () {
+    await learner.gotoMathClassroomCertificateOfferings();
+    await learner.retryCertificateAssessment();
+    await learner.continueToAssessmentInstructions();
+    await learner.startCertificateAssessment();
+    await learner.submitAssessmentWithUnansweredQuestion(9);
+    await learner.expectUnansweredQuestionsModal();
+    await learner.clickOnElementWithSelector('.btn-close');
   });
 
   afterAll(async function () {

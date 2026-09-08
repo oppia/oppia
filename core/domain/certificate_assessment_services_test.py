@@ -784,7 +784,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             with mock.patch.object(
                 certificate_assessment_services,
                 'validate_certificate_assessment_offering',
@@ -865,7 +865,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             with mock.patch.object(
                 certificate_assessment_services,
                 'validate_certificate_assessment_offering',
@@ -938,7 +938,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             with mock.patch.object(
                 certificate_assessment_services,
                 'validate_certificate_assessment_offering',
@@ -955,7 +955,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             self.assertFalse(attempt.is_submitted)
             self.assertIsNotNone(attempt.started_at)
 
-    def test_start_certificate_assessment_attempt_allows_immediate_retry_in_dev_mode(
+    def test_start_certificate_assessment_attempt_allows_immediate_retry_in_emulator_mode(
         self,
     ) -> None:
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1002,7 +1002,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             is_submitted=False,
         )
 
-        with self.swap(constants, 'DEV_MODE', True):
+        with self.swap(constants, 'EMULATOR_MODE', True):
             with mock.patch.object(
                 certificate_assessment_services,
                 'validate_certificate_assessment_offering',
