@@ -23,10 +23,11 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 export interface TranslatableSetOfStringSchema {
-  type: string;
-  items: {type: string};
+  type: 'list';
+  items: {type: 'unicode'};
   validators: {id: string}[];
 }
 
@@ -64,7 +65,12 @@ export class TranslatableSetOfNormalizedStringEditorComponent
     }
   }
 
-  updateValue(val: string): void {
+  updateValue(val: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only normalized strings are accepted.
+    if (typeof val !== 'string') {
+      return;
+    }
     if (this.value.normalizedStrSet === val) {
       return;
     }
