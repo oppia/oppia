@@ -204,29 +204,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           },
         },
         {
-          id: 'translationTabRecordingOverview',
-          attachTo: {element: '#translationTabRecordingOverview', on: 'bottom'},
-          title: 'Recording Audio',
-          text: this.getTourContent('translationTabRecordingOverview'),
-          buttons: [
-            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
-            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
-          ],
-        },
-        {
-          id: 'translationTabReRecordingOverview',
-          attachTo: {
-            element: '#translationTabReRecordingOverview',
-            on: 'bottom',
-          },
-          title: 'Re-record/Re-upload audio',
-          text: this.getTourContent('translationTabReRecordingOverview'),
-          buttons: [
-            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
-            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
-          ],
-        },
-        {
           id: 'translationTabTutorialComplete',
           attachTo: {element: '#translationTabTutorialComplete', on: 'bottom'},
           title: 'Tutorial Complete',
