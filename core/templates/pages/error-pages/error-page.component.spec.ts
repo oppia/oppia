@@ -202,7 +202,7 @@ describe('ErrorPageComponent', () => {
       expect(() => {
         component.ngAfterViewInit();
         tick();
-      }).not.toThrow();
+      }).not.toThrowError();
     }));
   });
 });

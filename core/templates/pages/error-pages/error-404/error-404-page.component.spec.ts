@@ -165,7 +165,7 @@ describe('Error404PageComponent', () => {
       expect(() => {
         component.ngAfterViewInit();
         tick();
-      }).not.toThrow();
+      }).not.toThrowError();
     }));
   });
 });
