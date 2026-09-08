@@ -238,7 +238,7 @@ export class Contributor extends ExplorationEditor {
       if (Date.now() >= scanningTimeout) {
         const opportunityHeadings = await this.page.$$eval(
           opportunityItemSelector,
-          (elements, headingSelector) =>
+          (elements: Element[], headingSelector: string): string[] =>
             elements
               .map(
                 el =>
