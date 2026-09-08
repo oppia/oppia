@@ -30,6 +30,8 @@ const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
 const opportunitySubHeadingSelector =
   '.e2e-test-opportunity-list-item-subheading';
+const opportunityLoadingPlaceholderSelector =
+  '.e2e-test-opportunity-loading-placeholder';
 const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
 const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
@@ -99,20 +101,25 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
-   * Checks if the translation opportunity is visible and matches the expected values.
-   * @param heading - The expected heading of the translation opportunity.
-   * @param subheading - The expected subheading of the translation opportunity.
-   * @param visible - Whether the translation opportunity should be visible or not.
+   * Waits until the opportunity list has finished loading and its contents
+   * are stable. While the list is loading, its items are hidden and
+   * placeholder items are shown instead, so callers must not scan the list
+   * before it has settled.
    */
-  async expectOpportunityToBePresent(
-    heading: string,
-    subheading: string,
-    visible: boolean = true
-  ): Promise<ElementHandle | null> {
-    await this.page.waitForNetworkIdle();
-
-    const translationOpportunitiesPreset = await this.isElementVisible(
-      opportunityItemSelector
+  private async waitForOpportunityListToStabilize(): Promise<void> {
+    // Wait for the list to finish loading: the loading placeholder is
+    // hidden once the opportunity items have been rendered.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const placeholder = document.querySelector(selector);
+        return (
+          placeholder === null ||
+          (placeholder as HTMLElement).hidden ||
+          getComputedStyle(placeholder).display === 'none'
+        );
+      },
+      {},
+      opportunityLoadingPlaceholderSelector
     );
 
     // Sometimes, the opportunities refreshes after they have been loaded.
@@ -121,6 +128,7 @@ export class Contributor extends ExplorationEditor {
     // for 200 ms.
     let previousElementIds: string[] = [];
     let opportunityItemListChanged = true;
+    const stabilizationTimeout = Date.now() + 30000;
 
     // TODO(#23395): Currently, the opportunity list is refreshed after the
     // page is loaded. This causes the test to fail. We are using a workaround
@@ -143,23 +151,17 @@ export class Contributor extends ExplorationEditor {
         );
 
       previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
+    } while (opportunityItemListChanged && Date.now() < stabilizationTimeout);
+  }
 
-    // Handle the case where no translation opportunity is present.
-    if (!translationOpportunitiesPreset) {
-      if (visible) {
-        throw new Error(
-          `Translation opportunity for ${heading} in ${subheading} not found.`
-        );
-      } else {
-        showMessage(
-          `Success: Translation opportunity for ${heading} in ${subheading} not found.`
-        );
-        return null;
-      }
-    }
-
-    // Get the opportunity item element.
+  /**
+   * Returns the opportunity item matching the given heading and subheading,
+   * or null if no such item is currently rendered.
+   */
+  private async findOpportunityItem(
+    heading: string,
+    subheading: string
+  ): Promise<ElementHandle | null> {
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
       const opportunityItemHeading = await opportunityItemElement.evaluate(
@@ -177,24 +179,81 @@ export class Contributor extends ExplorationEditor {
         opportunityItemHeading === heading &&
         opportunityItemSubHeading?.includes(subheading)
       ) {
-        if (!visible) {
-          throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-          );
-        }
         return opportunityItemElement;
       }
     }
-
-    if (visible) {
-      throw new Error(
-        `Translation opportunity for ${heading} in ${subheading} not found.`
-      );
-    }
-    showMessage(
-      `Success: Translation opportunity for ${heading} in ${subheading} not found.`
-    );
     return null;
+  }
+
+  /**
+   * Checks if the translation opportunity is visible and matches the expected values.
+   * @param heading - The expected heading of the translation opportunity.
+   * @param subheading - The expected subheading of the translation opportunity.
+   * @param visible - Whether the translation opportunity should be visible or not.
+   */
+  async expectOpportunityToBePresent(
+    heading: string,
+    subheading: string,
+    visible: boolean = true
+  ): Promise<ElementHandle | null> {
+    await this.page.waitForNetworkIdle();
+
+    // Handle the case where no translation opportunity is expected.
+    if (!visible) {
+      await this.waitForOpportunityListToStabilize();
+      const opportunityItemElement = await this.findOpportunityItem(
+        heading,
+        subheading
+      );
+      if (opportunityItemElement !== null) {
+        const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+          (el: Element, sel: string) =>
+            el.querySelector(sel)?.textContent?.trim(),
+          opportunitySubHeadingSelector
+        );
+        throw new Error(
+          `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+        );
+      }
+      showMessage(
+        `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+      return null;
+    }
+
+    // The opportunity list can be refreshed after it has been rendered (see
+    // #23395), so a single scan may run against a stale list that does not
+    // contain the target opportunity yet. Keep scanning until the target
+    // opportunity shows up.
+    const scanningTimeout = Date.now() + 30000;
+    while (true) {
+      await this.waitForOpportunityListToStabilize();
+      const opportunityItemElement = await this.findOpportunityItem(
+        heading,
+        subheading
+      );
+      if (opportunityItemElement !== null) {
+        return opportunityItemElement;
+      }
+      if (Date.now() >= scanningTimeout) {
+        const opportunityHeadings = await this.page.$$eval(
+          opportunityItemSelector,
+          (elements, headingSelector) =>
+            elements
+              .map(
+                el =>
+                  el.querySelector(headingSelector)?.textContent?.trim() || ''
+              )
+              .filter(text => text !== ''),
+          opportunityItemHeadingSelector
+        );
+        throw new Error(
+          `Translation opportunity for ${heading} in ${subheading} not found.` +
+            ` Found opportunity headings: [${opportunityHeadings.join(', ')}]`
+        );
+      }
+      await this.page.waitForTimeout(200);
+    }
   }
 
   /**
