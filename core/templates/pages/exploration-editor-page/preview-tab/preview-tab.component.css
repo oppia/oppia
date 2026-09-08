@@ -86,7 +86,7 @@ html, body {
   top: 116px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
   .restart-btn {
     top: 46px;
   }
