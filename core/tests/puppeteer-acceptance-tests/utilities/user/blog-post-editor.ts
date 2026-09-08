@@ -316,8 +316,11 @@ export class BlogPostEditor extends BaseUser {
         );
       }
     } catch (error) {
-      const newError = new Error(`Failed to verify pasted content: ${error}`);
-      newError.stack = error.stack;
+      const err = error as Error;
+      const newError = new Error(
+        `Failed to verify pasted content: ${err.message}`
+      );
+      newError.stack = err.stack;
       throw newError;
     }
   }
