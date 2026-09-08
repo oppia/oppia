@@ -2499,6 +2499,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(roles, [feconf.ROLE_ID_FULL_USER])
         self.assertEqual(actions, expected_actions)
+        assert user_settings is not None
         self.assertEqual(user_settings.user_id, user_id)
 
         user_services.add_user_role(user_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
