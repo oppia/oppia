@@ -36,15 +36,9 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
-import {Contributor, ContributorFactory} from '../user/contributor';
-import {
-  TranslationSubmitter,
-  TranslationSubmitterFactory,
-} from '../user/translation-submitter';
-import {
-  TranslationReviewer,
-  TranslationReviewerFactory,
-} from '../user/translation-reviewer';
+import {Contributor} from '../user/contributor';
+import {TranslationSubmitter} from '../user/translation-submitter';
+import {TranslationReviewerFactory} from '../user/translation-reviewer';
 import {
   TranslationAdmin,
   TranslationAdminFactory,

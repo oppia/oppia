@@ -526,11 +526,6 @@
       "framework": "playwright"
     },
     {
-      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment",
-      "module": "core/tests/playwright-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
-      "framework": "playwright"
-    },
-    {
       "name": "translation-reviewer/review-the-translations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts",
       "framework": "puppeteer"

@@ -327,7 +327,7 @@ export class Contributor extends BaseUser {
  * @param heading - The heading displayed on the opportunity card.
  * @param subheading - The subheading displayed on the opportunity card.
  */
-export async function getTranslationOpportunityCard(
+export const getTranslationOpportunityCard = async function (
   page: Page,
   heading: string,
   subheading: string
@@ -353,7 +353,7 @@ export async function getTranslationOpportunityCard(
 
   await opportunityItem.waitFor({state: 'visible'});
   return opportunityItem;
-}
+};
 
 export const ContributorFactory = (page: Page): Contributor => {
   return new Contributor(page);
