@@ -671,7 +671,6 @@ export class TranslationModalComponent {
           }
         );
       }
-
     };
 
     if (this.isFormulaAsText(this.activeWrittenTranslation)) {
