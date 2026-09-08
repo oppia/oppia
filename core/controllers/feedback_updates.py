@@ -69,16 +69,16 @@ class FeedbackUpdatesHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'paginated_threads_list': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'list',
-                        'items': {'type': 'basestring'},
+        "POST": {
+            "paginated_threads_list": {
+                "schema": {
+                    "type": "list",
+                    "items": {
+                        "type": "list",
+                        "items": {"type": "basestring"},
                     },
                 },
-                'default_value': [],
+                "default_value": [],
             }
         }
     }
@@ -88,7 +88,7 @@ class FeedbackUpdatesHandler(
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        if not self.normalized_payload['paginated_threads_list']:
+        if not self.normalized_payload["paginated_threads_list"]:
             full_thread_ids = (
                 subscription_services.get_all_threads_subscribed_to(
                     self.user_id
@@ -100,7 +100,7 @@ class FeedbackUpdatesHandler(
             ]
         else:
             paginated_threads_list = self.normalized_payload[
-                'paginated_threads_list'
+                "paginated_threads_list"
             ]
         if paginated_threads_list and paginated_threads_list[0]:
             thread_summaries, number_of_unread_threads = (
@@ -113,9 +113,9 @@ class FeedbackUpdatesHandler(
 
         self.values.update(
             {
-                'thread_summaries': [s.to_dict() for s in thread_summaries],
-                'number_of_unread_threads': number_of_unread_threads,
-                'paginated_threads_list': paginated_threads_list[1:],
+                "thread_summaries": [s.to_dict() for s in thread_summaries],
+                "number_of_unread_threads": number_of_unread_threads,
+                "paginated_threads_list": paginated_threads_list[1:],
             }
         )
         self.render_json(self.values)
@@ -126,19 +126,19 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'thread_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [
+        "thread_id": {
+            "schema": {
+                "type": "basestring",
+                "validators": [
                     {
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                        "id": "is_regex_matched",
+                        "regex_pattern": constants.VALID_THREAD_ID_REGEX,
                     }
                 ],
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_access_feedback_updates
     def get(self, thread_id: str) -> None:
@@ -166,6 +166,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
             )
+            suggestion_summary: SuggestionSummaryDict
             if isinstance(
                 suggestion, suggestion_registry.SuggestionEditStateContent
             ):
@@ -173,12 +174,12 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 current_content_html = exploration.states[
                     suggestion.change_cmd.state_name
                 ].content.html
-                suggestion_summary: SuggestionSummaryDict = {
-                    'suggestion_html': suggestion.change_cmd.new_value['html'],
-                    'current_content_html': current_content_html,
-                    'description': suggestion_thread.subject,
-                    'author_username': suggestion_author_setting.username,
-                    'created_on_msecs': utils.get_time_in_millisecs(
+                suggestion_summary = {
+                    "suggestion_html": suggestion.change_cmd.new_value["html"],
+                    "current_content_html": current_content_html,
+                    "description": suggestion_thread.subject,
+                    "author_username": suggestion_author_setting.username,
+                    "created_on_msecs": utils.get_time_in_millisecs(
                         messages[0].created_on
                     ),
                 }
@@ -186,49 +187,50 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 suggestion, suggestion_registry.SuggestionTranslateContent
             ):
                 exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-                current_content_html = exploration.get_content_html(
+                translate_current_content_html = exploration.get_content_html(
                     suggestion.change_cmd.state_name,
                     suggestion.change_cmd.content_id,
                 )
-                # translation_html and content_html can be str or List[str],
+                translate_suggestion_html = (
+                    suggestion.change_cmd.translation_html
+                )
+                # translate_current_content_html can be str or List[str],
                 # but SuggestionSummaryDict expects str. Convert to str if needed.
-                suggestion_html = suggestion.change_cmd.translation_html
-                if isinstance(suggestion_html, list):
-                    suggestion_html = ' '.join(suggestion_html)
-                if isinstance(current_content_html, list):
-                    current_content_html = ' '.join(current_content_html)
-                suggestion_summary: SuggestionSummaryDict = {
-                    'suggestion_html': suggestion_html,
-                    'current_content_html': current_content_html,
-                    'description': suggestion_thread.subject,
-                    'author_username': suggestion_author_setting.username,
-                    'created_on_msecs': utils.get_time_in_millisecs(
+                if isinstance(translate_current_content_html, list):
+                    translate_current_content_html = " ".join(
+                        translate_current_content_html
+                    )
+                suggestion_summary = {
+                    "suggestion_html": translate_suggestion_html,
+                    "current_content_html": translate_current_content_html,
+                    "description": suggestion_thread.subject,
+                    "author_username": suggestion_author_setting.username,
+                    "created_on_msecs": utils.get_time_in_millisecs(
                         messages[0].created_on
                     ),
                 }
             else:
                 raise Exception(
-                    'No edit state content suggestion found for the given '
-                    'thread_id: %s' % thread_id
+                    "No edit state content suggestion found for the given "
+                    "thread_id: %s" % thread_id
                 )
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
-
             if author_settings is None:
                 author_username = None
             else:
                 author_username = author_settings.username
 
             message_summary: MessageSummaryDict = {
-                'message_id': m.message_id,
-                'text': m.text,
-                'updated_status': m.updated_status,
-                'author_username': author_username,
-                'created_on_msecs': utils.get_time_in_millisecs(m.created_on),
+                "message_id": m.message_id,
+                "text": m.text,
+                "updated_status": m.updated_status,
+                "author_username": author_username,
+                "created_on_msecs": utils.get_time_in_millisecs(m.created_on),
             }
             message_summary_list.append(message_summary)
 
-        self.render_json({'message_summary_list': message_summary_list})
+        self.render_json({"message_summary_list": message_summary_list})
