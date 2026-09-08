@@ -43,6 +43,8 @@ import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -174,7 +176,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
-    private urlService: UrlService
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -410,5 +412,33 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   decodePngURIData(base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
+  }
+
+  showSuggestionModal(
+    suggestionHtml: string | null,
+    currentContentHtml: string | null,
+    description: string | null
+  ): void {
+    const modelRef = this.ngbModal.open(
+      LearnerDashboardSuggestionModalComponent,
+      {backdrop: true}
+    );
+    if (suggestionHtml) {
+      modelRef.componentInstance.newContent = suggestionHtml;
+    }
+    if (currentContentHtml) {
+      modelRef.componentInstance.oldContent = currentContentHtml;
+    }
+    if (description) {
+      modelRef.componentInstance.description = description;
+    }
+    modelRef.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 }

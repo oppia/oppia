@@ -20,16 +20,19 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackUpdatesPageComponent} from './feedback-updates-page.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.component';
 import {CommonModule} from '@angular/common';
 import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
+import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
+    NgbModalModule,
     NgbPopoverModule,
     RouterModule,
     ReactiveFormsModule,
@@ -40,10 +43,12 @@ import {RouterModule} from '@angular/router';
   declarations: [
     FeedbackUpdatesPageComponent,
     FeedbackUpdatesPageRootComponent,
+    LearnerDashboardSuggestionModalComponent,
   ],
   entryComponents: [
     FeedbackUpdatesPageComponent,
     FeedbackUpdatesPageRootComponent,
+    LearnerDashboardSuggestionModalComponent,
   ],
 })
 export class FeedbackUpdatesPageModule {}
