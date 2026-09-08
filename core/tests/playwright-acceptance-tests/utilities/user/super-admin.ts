@@ -130,7 +130,7 @@ export class SuperAdmin extends LoggedInUser {
     throw new Error(`User does not have the "${role}" role!`);
   }
 
-  /**
+/**
    * Selects a topic for the Topic Manager role.
    * @param {string} topicName - The name of the topic to select.
    */
@@ -141,8 +141,7 @@ export class SuperAdmin extends LoggedInUser {
     await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
 
     // 2. CRITICAL FIX: Wait for the <option> elements to actually populate in the DOM.
-    // We use 'attached' because options are hidden by the OS, so 'visible' will cause a timeout.
-    await this.page.waitForSelector(`${selectTopicForAssignmentSelector} option`, { state: 'attached' });
+    await this.expectElementToBeAttachedInDOM(`${selectTopicForAssignmentSelector} option`);
 
     const selectElement = await this.page.$(selectTopicForAssignmentSelector);
     if (!selectElement) {

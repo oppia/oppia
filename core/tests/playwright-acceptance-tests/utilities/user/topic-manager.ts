@@ -1064,7 +1064,7 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  /**
+/**
    * Toggles the "Show practice tab to learners" in Topic Editor.
    */
   async togglePracticeTabCheckbox(): Promise<void> {
@@ -1096,8 +1096,14 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
   }
 
-  /**
+/**
    * Edit the topic's details in the topic editor.
+   * @param {string} description - The topic description.
+   * @param {string} titleFragments - The page title fragment.
+   * @param {string} metaTags - The meta tags for the topic.
+   * @param {string} thumbnail - The path to the thumbnail image.
+   * @param {string} title - The title of the topic.
+   * @param {string} urlFragment - The URL fragment for the topic.
    */
   async editTopicDetails(
     description: string,
@@ -1107,102 +1113,122 @@ export class TopicManager extends BaseUser {
     title: string,
     urlFragment: string
   ): Promise<void> {
-    const titleField = this.page.locator('.e2e-test-topic-name-field');
-    await titleField.clear();
-    await titleField.fill(title);
+    await this.clearAllTextFrom('.e2e-test-topic-name-field');
+    await this.typeInInputField('.e2e-test-topic-name-field', title);
 
-    const urlField = this.page
-      .locator(
-        '.e2e-test-topic-url-fragment-field .e2e-test-url-fragment-field, input.e2e-test-url-fragment-field'
-      )
-      .first();
-    await urlField.clear();
-    await urlField.fill(urlFragment);
+    const urlFieldSelector = '.e2e-test-topic-url-fragment-field .e2e-test-url-fragment-field';
+    await this.clearAllTextFrom(urlFieldSelector);
+    await this.typeInInputField(urlFieldSelector, urlFragment);
 
-    const descField = this.page.locator('.e2e-test-topic-description-field');
-    await descField.clear();
-    await descField.fill(description);
+    await this.clearAllTextFrom('.e2e-test-topic-description-field');
+    await this.typeInInputField('.e2e-test-topic-description-field', description);
 
-    const titleFragField = this.page.locator(
-      '.e2e-test-topic-page-title-fragment-field'
+    await this.clearAllTextFrom('.e2e-test-topic-page-title-fragment-field');
+    await this.typeInInputField(
+      '.e2e-test-topic-page-title-fragment-field',
+      titleFragments
     );
-    await titleFragField.clear();
-    await titleFragField.fill(titleFragments);
 
-    const metaField = this.page.locator(
-      '.e2e-test-topic-meta-tag-content-field'
-    );
-    await metaField.clear({force: true});
-    await metaField.fill(metaTags, {force: true});
+    await this.clearAllTextFrom('.e2e-test-topic-meta-tag-content-field');
+    await this.typeInInputField('.e2e-test-topic-meta-tag-content-field', metaTags);
+    await this.page.keyboard.press('Tab'); // Press Tab to register the meta tag chip.
 
-    await this.page.locator('div.e2e-test-photo-button').click();
-    await this.page.locator('input[type="file"]').setInputFiles(thumbnail);
-    await this.page.locator('button.e2e-test-photo-upload-submit').click();
-    await this.page
-      .locator('.e2e-test-photo-upload-submit')
-      .waitFor({state: 'hidden'});
+    await this.clickOnElementWithSelector('div.e2e-test-photo-button');
+
+    // Native Playwright method is required here because the file input is visually hidden.
+    await this.page.setInputFiles('input[type="file"]', thumbnail);
+
+    await this.clickOnElementWithSelector('button.e2e-test-photo-upload-submit');
+    await this.expectElementToBeVisible('.e2e-test-photo-upload-submit', false);
   }
 
   /**
    * Check whether the "Save Changes" button in the topic editor is enabled or disabled.
+   * @param {string} state - The expected state of the button ('enabled' or 'disabled').
    */
   async expectSaveChangesButtonInTopicEditorToBe(state: string): Promise<void> {
-    const saveButton = this.page.locator('.e2e-test-save-topic-button');
-    if (state === 'enabled') {
-      await expect(saveButton).not.toBeDisabled();
-    } else {
-      await expect(saveButton).toBeDisabled();
-    }
+    const selector = state === 'enabled'
+      ? '.e2e-test-save-topic-button:not([disabled])'
+      : '.e2e-test-save-topic-button[disabled]';
+
+    await this.expectElementToBeAttachedInDOM(selector);
   }
 
   /**
    * Assert the toast/confirmation message shown after an action.
+   * @param {string} expectedMessage - The expected toast message.
    */
   async verifyTopicManagerToastMessage(expectedMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       return;
     }
-    const toastMessage = this.page.locator('.e2e-test-toast-message');
-    await expect(toastMessage).toBeVisible();
-    await expect(toastMessage).toHaveText(expectedMessage);
+    await this.expectElementToBeVisible('.e2e-test-toast-message');
+    await this.page.waitForFunction(
+      (expected: string) => {
+        const element = document.querySelector('.e2e-test-toast-message');
+        return element && element.textContent?.trim() === expected;
+      },
+      expectedMessage
+    );
   }
 
   /**
    * Navigate to the topic preview tab.
    */
   async navigateToTopicPreviewTab(): Promise<void> {
-    await this.page.locator('.e2e-test-topic-preview-button').click();
+    await this.clickOnElementWithSelector('.e2e-test-topic-preview-button');
     await this.waitForNetworkIdle();
   }
 
   /**
    * Assert the topic preview shows the given title and description.
+   * @param {string} title - The expected title.
+   * @param {string} description - The expected description.
    */
   async expectTopicPreviewToHaveTitleAndDescription(
     title: string,
     description: string
   ): Promise<void> {
-    await expect(
-      this.page.locator('.e2e-test-preview-topic-title')
-    ).toHaveText(title);
-    await expect(
-      this.page.locator('.e2e-test-preview-topic-description')
-    ).toHaveText(description);
+    await this.expectElementToBeVisible('.e2e-test-preview-topic-title');
+    await this.page.waitForFunction(
+      (expectedTitle: string) => {
+        const element = document.querySelector('.e2e-test-preview-topic-title');
+        return element && element.textContent?.trim() === expectedTitle;
+      },
+      title
+    );
+
+    await this.expectElementToBeVisible('.e2e-test-preview-topic-description');
+    await this.page.waitForFunction(
+      (expectedDesc: string) => {
+        const element = document.querySelector('.e2e-test-preview-topic-description');
+        return element && element.textContent?.trim() === expectedDesc;
+      },
+      description
+    );
   }
 
   /**
    * Navigate to a specific tab within the topic preview.
+   * @param {string} tabName - The name of the tab to navigate to.
    */
   async navigateToTabInPreview(tabName: string): Promise<void> {
-    await this.page.locator(`text=${tabName}`).click();
+    await this.clickOnElementWithText(tabName);
     await this.waitForNetworkIdle();
   }
 
   /**
    * Assert the current tab's title text in the topic preview page.
+   * @param {string} title - The expected title of the tab.
    */
   async verifyTopicManagerTabTitle(title: string): Promise<void> {
-    await expect(this.page.getByText(title).first()).toBeVisible();
+    await this.page.waitForFunction(
+      (expectedTitle: string) => {
+        const elements = Array.from(document.querySelectorAll('*'));
+        return elements.some(el => el.textContent?.trim() === expectedTitle);
+      },
+      title
+    );
   }
 }
 
