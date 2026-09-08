@@ -80,8 +80,9 @@ class MachineTranslationGenerateHandler(
             )
         except utils.ValidationError:
             raise self.InvalidInputException(
-                'The translation provider configured for this language is '
-                'not currently available.'
+                'The translation provider mapped for this language is '
+                'currently unavailable because its corresponding provider '
+                'class could not be found in the system registry.'
             )
         except Exception as e:
             raise self.InternalErrorException(str(e))
@@ -90,8 +91,10 @@ class MachineTranslationGenerateHandler(
         # mapped for the target language.
         if translation_result is None:
             raise self.InvalidInputException(
-                'No active translation provider is configured for %s.'
-                % target_language_code
+                'No translation provider has been mapped for %s. An '
+                'administrator must configure a provider for this language '
+                'in the Translation Configuration tab before machine '
+                'translation can be used.' % target_language_code
             )
 
         translated_text, provider_id = translation_result

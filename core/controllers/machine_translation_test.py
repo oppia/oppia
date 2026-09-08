@@ -132,7 +132,10 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'No active translation provider is configured for hi.',
+                'No translation provider has been mapped for hi. An '
+                'administrator must configure a provider for this language '
+                'in the Translation Configuration tab before machine '
+                'translation can be used.',
             )
         self.logout()
 
@@ -140,7 +143,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         self.login(self.CONTRIBUTOR_EMAIL)
 
         def mock_generate(*args, **kwargs):
-            raise utils.ValidationError('The mapped provider class for azure is not registered.')
+            raise utils.ValidationError(
+                'The mapped provider class for azure is not registered.'
+            )
 
         domain_swap = self.swap(
             machine_translation_services,
@@ -158,8 +163,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'The translation provider configured for this language is '
-                'not currently available.',
+                'The translation provider mapped for this language is '
+                'currently unavailable because its corresponding provider '
+                'class could not be found in the system registry.',
             )
         self.logout()
 
