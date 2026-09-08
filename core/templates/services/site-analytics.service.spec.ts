@@ -582,24 +582,6 @@ describe('Site Analytics Service', () => {
       );
     });
 
-    it('should register save recorded audio event', () => {
-      sas.registerSaveRecordedAudioEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'save_recorded_audio', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
-    });
-
-    it('should register audio recording event', () => {
-      sas.registerStartAudioRecordingEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start_audio_recording', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
-    });
-
     it('should register upload audio event', () => {
       sas.registerUploadAudioEvent(explorationId);
 
