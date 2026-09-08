@@ -870,8 +870,29 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     // The file input is always in the DOM but CSS-hidden. Wait for the
     // visible upload label as a sync point, then use the hidden input
-    // directly (uploadFile works on hidden elements via CDP).
-    await page.waitForSelector(imageUploadLabel, {visible: true});
+    // directly (uploadFile works on hidden elements via CDP). A reset
+    // click that lands during the preview fade-in can be swallowed, which
+    // leaves the upload UI hidden, so retry the reset when the label does
+    // not appear.
+    let uploadLabelWasFound = false;
+    for (let attempt = 0; attempt < 3 && !uploadLabelWasFound; attempt++) {
+      try {
+        await page.waitForSelector(imageUploadLabel, {
+          visible: true,
+          timeout: 15000,
+        });
+        uploadLabelWasFound = true;
+      } catch (error) {
+        await page.waitForSelector(topicThumbnailResetButton, {
+          visible: true,
+          timeout: 15000,
+        });
+        await page.click(topicThumbnailResetButton);
+      }
+    }
+    if (!uploadLabelWasFound) {
+      throw new Error('The thumbnail upload label was not found after reset.');
+    }
 
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test2_svg.svg');

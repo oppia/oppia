@@ -145,6 +145,10 @@ def run_lighthouse_puppeteer_script(
         stderr=subprocess.PIPE,
         env=_get_puppeteer_setup_environment(shard),
     )
+    # The pipes are always created for a popen with PIPEs, but mypy cannot
+    # narrow the Optional handles without explicit asserts.
+    assert process.stdout is not None
+    assert process.stderr is not None
 
     # Stream the puppeteer output line by line as it arrives so that the
     # "[lighthouse-setup]" progress markers are visible live. Buffering the
