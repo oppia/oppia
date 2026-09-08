@@ -28,6 +28,7 @@ import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
 import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-
     SharedComponentsModule,
     FeedbackUpdatesPageRoutingModule,
     Error404PageModule,
+    MatBottomSheetModule,
   ],
   declarations: [
     FeedbackUpdatesPageComponent,

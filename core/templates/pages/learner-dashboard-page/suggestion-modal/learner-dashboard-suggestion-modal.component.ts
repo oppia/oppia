@@ -16,7 +16,8 @@
  * @fileoverview Component for learner dashboard suggestion modal.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -35,11 +36,15 @@ export class LearnerDashboardSuggestionModalComponent extends ConfirmOrCancelMod
   @Input() oldContent!: string;
   @Input() description!: string;
 
-  constructor(private activeModal: NgbActiveModal) {
-    super(activeModal);
+  constructor(
+    @Optional() activeModal: NgbActiveModal,
+    @Optional()
+    bottomSheetRef: MatBottomSheetRef<LearnerDashboardSuggestionModalComponent>
+  ) {
+    super(activeModal, bottomSheetRef);
   }
 
   cancel(): void {
-    this.activeModal.dismiss('cancel');
+    super.cancel('cancel');
   }
 }

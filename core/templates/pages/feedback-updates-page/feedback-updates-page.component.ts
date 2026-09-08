@@ -51,6 +51,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
 
 import './feedback-updates-page.component.css';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'oppia-feedback-updates-page',
@@ -176,7 +177,8 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private bottomSheet: MatBottomSheet
   ) {}
 
   ngOnInit(): void {
@@ -419,6 +421,16 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     currentContentHtml: string | null,
     description: string | null
   ): void {
+    if (this.windowDimensionService.isWindowNarrow()) {
+      const bottomSheetRef = this.bottomSheet.open(
+        LearnerDashboardSuggestionModalComponent
+      );
+      bottomSheetRef.instance.newContent = suggestionHtml ?? '';
+      bottomSheetRef.instance.oldContent = currentContentHtml ?? '';
+      bottomSheetRef.instance.description = description ?? '';
+
+      return;
+    }
     const modelRef = this.ngbModal.open(
       LearnerDashboardSuggestionModalComponent,
       {backdrop: true}
