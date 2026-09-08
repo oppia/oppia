@@ -307,11 +307,6 @@ class ExplorationDisplayableSummariesTest(
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             needs_update=False,
         )
-        translated_category = translation_domain.TranslatedContent(
-            'Exploration 2 Hindi Category',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
-            needs_update=False,
-        )
         translated_tag_0 = translation_domain.TranslatedContent(
             'Hindi Tag 1',
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
