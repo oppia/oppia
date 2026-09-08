@@ -52,8 +52,6 @@ EXCLUDED_DIRECTORIES: Final = [
 # these files, and every error (including new unreachable errors) in
 # every other file, still fails the build.
 NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
-    'extensions/objects/models/objects.py',
-    'core/schema_utils.py',
     'core/storage/user/gae_models.py',
     'core/storage/suggestion/gae_models.py',
     'core/storage/blog/gae_models.py',
@@ -76,7 +74,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/app_feedback_report_services.py',
     'core/controllers/story_viewer.py',
     'core/controllers/reader.py',
-    'core/jobs/transforms/validation/base_validation.py',
     'core/controllers/access_validators.py',
     'scripts/run_typescript_checks_test.py',
     'scripts/run_frontend_tests_test.py',
