@@ -23,10 +23,12 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
 import {ExplorationTitleService} from '../services/exploration-title.service';
 import {RouterService} from '../services/router.service';
+import './editor-navbar-breadcrumb.component.css';
 
 @Component({
   selector: 'oppia-editor-navbar-breadcrumb',
   templateUrl: './editor-navbar-breadcrumb.component.html',
+  styleUrls: ['./editor-navbar-breadcrumb.component.css'],
 })
 export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
