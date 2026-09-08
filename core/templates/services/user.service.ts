@@ -69,10 +69,19 @@ export class UserService {
     if (this.asyncGetUserInfoPromise === null) {
       this.asyncGetUserInfoPromise = this.userBackendApiService
         .getUserInfoAsync()
-        .then(userInfo => {
-          this.userInfo = userInfo;
-          return userInfo;
-        });
+        .then(
+          userInfo => {
+            this.userInfo = userInfo;
+            return userInfo;
+          },
+          error => {
+            // Clear the cached promise on failure so that later calls retry
+            // instead of reusing the rejected promise, then propagate the
+            // error to the current callers.
+            this.asyncGetUserInfoPromise = null;
+            throw error;
+          }
+        );
     }
     return this.asyncGetUserInfoPromise;
   }
