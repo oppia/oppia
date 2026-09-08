@@ -38,9 +38,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LocalStorageService} from 'services/local-storage.service';
-
-import constants from 'assets/constants';
-
+import {MasteryChallengeLockedModalComponent} from './mastery-challenge-locked-modal.component';
 import {ModuleMasteredModalComponent} from './module-mastered-modal.component';
 import {ModuleSkipConfirmationModalComponent} from './module-skip-confirmation-modal.component';
 import {ModuleNavigationLessonSelection} from './module-navigation.component';

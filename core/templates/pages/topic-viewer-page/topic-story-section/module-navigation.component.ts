@@ -30,7 +30,7 @@ import {
   ViewChild,
 } from '@angular/core';
 
-interface AdventureNavigationGroup {
+interface ModuleNavigationGroup {
   lessons: {
     lessonNumber: number;
     isCompleted: boolean;
