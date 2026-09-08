@@ -178,10 +178,10 @@ export class CardInteractionControlsComponent {
           this.interactionId as InteractionSpecsKey
         ].show_generic_submit_button
       );
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
+      // We use unknown type because catch errors can be any value in JS.
+      // This handles cases where `interactionId` isn’t a valid key, making
+      // `INTERACTION_SPECS[interactionId]` undefined and throwing. We then
+      // narrow with `instanceof Error`, add context, and rethrow.
     } catch (e: unknown) {
       let additionalInfo =
         '\nSubmit button debug logs:\ninterationId: ' + this.interactionId;
