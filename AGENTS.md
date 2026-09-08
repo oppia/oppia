@@ -51,11 +51,9 @@ Project-specific conventions and patterns (discoverable in the tree):
   `core/storage` and platform helpers in `core/platform`.
 - Frontend: see the `core/templates` folder.
   -- Tests mapping: tests are split into backend unit tests (`core/tests`),
-  frontend unit tests, Puppeteer-based acceptance tests
-  (`core/tests/puppeteer-acceptance-tests`) and WebdriverIO e2e
-  (`core/tests/wdio.conf.js`). The WebdriverIO e2e tests are intended to be
-  deprecated in favour of the Puppeteer tests after we have confirmed parity
-  in coverage.
+  frontend unit tests, and Puppeteer/Playwright-based acceptance tests
+  (`core/tests/puppeteer-acceptance-tests` and
+  `core/tests/playwright-acceptance-tests`).
   -- Tooling pinning: Node and other tools are provided under `oppia_tools/`
   (e.g. `node-16.13.0`). In general we prefer using the pinned versions in
   CI and in local development so that we can keep the environment consistent.

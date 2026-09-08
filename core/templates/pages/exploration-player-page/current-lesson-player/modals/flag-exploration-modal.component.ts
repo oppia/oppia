@@ -21,6 +21,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
+import './flag-exploration-modal.component.css';
 
 export interface FlagExplorationModalResult {
   report_type: boolean;
@@ -31,6 +32,7 @@ export interface FlagExplorationModalResult {
 @Component({
   selector: 'oppia-flag-exploration-modal',
   templateUrl: './flag-exploration-modal.component.html',
+  styleUrls: ['./flag-exploration-modal.component.css'],
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

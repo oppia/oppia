@@ -1040,6 +1040,42 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(skill.rubrics[1].explanations, ['<p>Explanation</p>'])
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+        self.save_new_topic(
+            'topic_1',
+            self.user_id_admin,
+            name='Topic 1',
+            subtopics=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+        )
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_1']
+        )
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                    'old_value': 'Description',
+                    'new_value': 'New Description',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id_admin,
+            self.SKILL_ID,
+            changelist,
+            'Updated skill description.',
+        )
+        model_id = f'skill.{self.SKILL_ID}'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        self.assertEqual(model.entity_type, feconf.ENTITY_TYPE_SKILL)
+
     def test_merge_skill(self) -> None:
         changelist = [
             skill_domain.SkillChange(
@@ -1163,7 +1199,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+    def test_update_skill_with_topic_updates_v2_translation_opportunity(
+        self,
+    ) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
         )

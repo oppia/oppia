@@ -6,6 +6,16 @@
       "framework": "playwright"
     },
     {
+      "name": "logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "serial-chapter-launch/serial-chapter",
       "module": "core/tests/puppeteer-acceptance-tests/specs/serial-chapter-launch/serial-chapter.spec.ts",
       "framework": "puppeteer"
@@ -127,8 +137,8 @@
     },
     {
       "name": "exploration-editor/verify-statistics-and-previous-explorations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/submit-review-and-respond-to-feedback",

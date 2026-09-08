@@ -19,6 +19,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 interface LearnerViewBackendDict {
   summaries: LearnerExplorationSummaryBackendDict[];
@@ -28,7 +29,10 @@ interface LearnerViewBackendDict {
   providedIn: 'root',
 })
 export class LearnerViewInfoBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
 
   async fetchLearnerInfoAsync(
     stringifiedExpIds: string,
@@ -41,6 +45,11 @@ export class LearnerViewInfoBackendApiService {
           params: {
             stringified_exp_ids: stringifiedExpIds,
             include_private_explorations: includePrivateExplorations,
+            // The lesson information card shows this metadata alongside the
+            // lesson itself, so it is displayed in the learner's site
+            // language.
+            display_in_language_code:
+              this.i18nLanguageCodeService.getCurrentI18nLanguageCode(),
           },
         }
       )

@@ -16,6 +16,9 @@
  * @fileoverview Frontend Model for Cloud task run.
  */
 
+export interface AdditionalContextualInformation {
+  [key: string]: string;
+}
 export interface CloudTaskRunBackendDict {
   task_run_id: string;
   cloud_task_name: string;
@@ -25,6 +28,7 @@ export interface CloudTaskRunBackendDict {
   current_retry_attempt: number;
   last_updated: Date;
   created_on: Date;
+  additional_contextual_information?: AdditionalContextualInformation;
 }
 
 export class MatIcon {
@@ -45,6 +49,7 @@ export class CloudTaskRun {
   lastUpdated: Date;
   createdOn: Date;
   matIcon!: MatIcon;
+  additionalContextualInformation!: AdditionalContextualInformation;
 
   constructor(
     taskRunId: string,
@@ -54,7 +59,8 @@ export class CloudTaskRun {
     exceptionMessagesForFailedRuns: string[],
     currentRetryAttempt: number,
     lastUpdated: Date,
-    createdOn: Date
+    createdOn: Date,
+    additionalContextualInformation?: AdditionalContextualInformation
   ) {
     this.id = taskRunId;
     this.cloudTaskName = cloudTaskName;
@@ -64,6 +70,8 @@ export class CloudTaskRun {
     this.currentRetryAttempt = currentRetryAttempt;
     this.lastUpdated = lastUpdated;
     this.createdOn = new Date(createdOn);
+    this.additionalContextualInformation =
+      additionalContextualInformation || {};
 
     switch (this.latestJobState) {
       case 'RUNNING':
@@ -95,7 +103,8 @@ export class CloudTaskRun {
       backendDict.exception_messages_for_failed_runs,
       backendDict.current_retry_attempt,
       backendDict.last_updated,
-      backendDict.created_on
+      backendDict.created_on,
+      backendDict.additional_contextual_information || {}
     );
   }
 
@@ -109,5 +118,72 @@ export class CloudTaskRun {
 
   getJobStatusMaterialThemeColor(): string | null {
     return this.matIcon.color;
+  }
+
+  getLanguageAccents(): string {
+    return (
+      this.additionalContextualInformation?.language_accents ||
+      'No language accents available'
+    );
+  }
+
+  getEventName(): string {
+    const additionalContextualInformation =
+      this.additionalContextualInformation || {};
+    const isAdditionalContextProvided =
+      Object.keys(additionalContextualInformation).length > 0;
+
+    if (
+      this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
+      !isAdditionalContextProvided
+    ) {
+      return 'Exploration content updated';
+    } else if (
+      this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
+      isAdditionalContextProvided
+    ) {
+      return `Voiceovers regenerated for "${additionalContextualInformation.exploration_title}" due to content being updated`;
+    }
+
+    if (
+      this.functionId ===
+        'regenerate_voiceovers_on_exploration_added_to_topic' &&
+      !isAdditionalContextProvided
+    ) {
+      return 'Exploration added to topic';
+    } else if (
+      this.functionId ===
+        'regenerate_voiceovers_on_exploration_added_to_topic' &&
+      isAdditionalContextProvided
+    ) {
+      return `All voiceovers generated for "${additionalContextualInformation.exploration_title}" because it was added to topic "${additionalContextualInformation.topic_name}"`;
+    }
+
+    if (
+      this.functionId ===
+        'regenerate_voiceovers_of_exploration_for_given_language_accent' &&
+      !isAdditionalContextProvided
+    ) {
+      return 'Regeneration from voiceover admin page';
+    } else if (
+      this.functionId ===
+        'regenerate_voiceovers_of_exploration_for_given_language_accent' &&
+      isAdditionalContextProvided
+    ) {
+      return `All voiceovers regenerated for "${additionalContextualInformation.exploration_title}" by voiceover admin`;
+    }
+
+    if (
+      this.functionId === 'regenerate_voiceovers_after_accepting_suggestion' &&
+      !isAdditionalContextProvided
+    ) {
+      return 'Regeneration after accepting translation';
+    } else if (
+      this.functionId === 'regenerate_voiceovers_after_accepting_suggestion' &&
+      isAdditionalContextProvided
+    ) {
+      return `Voiceover generated for "${additionalContextualInformation.exploration_title}" because translation suggestion was accepted`;
+    }
+    return '';
   }
 }

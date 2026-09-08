@@ -13,12 +13,12 @@
 
 .result-card {
   background: #fff;
-  border-radius: 6px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   margin: 70px auto 48px;
-  max-width: 650px;
+  max-width: 700px;
   padding: 40px 44px 36px;
   position: relative;
+  top: -70px;
   z-index: 1;
 }
 

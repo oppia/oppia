@@ -23,10 +23,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
+import './refresher-exploration-confirmation-modal.component.css';
 
 @Component({
   selector: 'oppia-refresher-confirmation-modal',
   templateUrl: './refresher-exploration-confirmation-modal.component.html',
+  styleUrls: ['./refresher-exploration-confirmation-modal.component.css'],
 })
 export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();

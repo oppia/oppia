@@ -54,10 +54,12 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import './voiceover-card.component.css';
 
 @Component({
   selector: 'oppia-voiceover-card',
   templateUrl: './voiceover-card.component.html',
+  styleUrls: ['./voiceover-card.component.css'],
 })
 export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   @ViewChild('visualized') visualized!: ElementRef<Element>;

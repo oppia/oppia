@@ -52,10 +52,12 @@ import {
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
+import './translator-overview.component.css';
 
 @Component({
   selector: 'oppia-translator-overview',
   templateUrl: './translator-overview.component.html',
+  styleUrls: ['./translator-overview.component.css'],
 })
 export class TranslatorOverviewComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

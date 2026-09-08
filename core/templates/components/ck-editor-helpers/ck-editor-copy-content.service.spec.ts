@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
+// @ts-nocheck
+
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';

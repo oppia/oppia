@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import datetime
 import json
+import math
 import secrets
 import sys
 
@@ -82,6 +83,23 @@ class CertificateAssessmentAttemptNotReadyException(Exception):
     """Raised when the certificate question pool is no longer valid."""
 
     pass
+
+
+class CertificateAssessmentAttemptCooldownException(Exception):
+    """Raised when a learner starts a new attempt during the cooldown window.
+
+    The message here is server-side only and intentionally not user-facing
+    English: the HTTP handler converts this into a structured response
+    (I18N key + remaining_minutes) so the frontend can render a translated
+    message via its translate pipes.
+    """
+
+    def __init__(self, remaining_minutes: int) -> None:
+        super().__init__(
+            'Assessment attempt blocked by cooldown; %d minute(s) remaining.'
+            % remaining_minutes
+        )
+        self.remaining_minutes = remaining_minutes
 
 
 class CertificateOfferingClassroomSummary(TypedDict):
@@ -441,27 +459,29 @@ def _build_version_data(
     }
 
 
-def _get_in_progress_attempt_for_learner(
-    learner_id: str,
+def _get_most_recent_attempt_for_learner_and_certificate(
+    learner_id: str, certificate_id: str
 ) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
-    """Returns the learner's in-progress assessment attempt, if any."""
-    return gae_models.CertificateAssessmentAttemptModel.query(
-        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id,
-        gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
-        == False,
-    ).get()
+    """Returns the learner's most recent attempt for a certificate, if any.
 
-
-def _get_active_attempt_for_learner(
-    learner_id: str,
-) -> gae_models.CertificateAssessmentAttemptModel:
-    """Returns the learner's active assessment attempt or raises."""
-    attempt_model = _get_in_progress_attempt_for_learner(learner_id)
-    if attempt_model is None:
-        raise utils.ValidationError(
-            'No active certificate assessment attempt was found.'
+    Attempts are ordered by their creation time. We would prefer to sort by
+    started_at, but that property is not indexed (see
+    CertificateAssessmentAttemptModel.started_at) and Datastore cannot order
+    by a computed expression such as IF(started_at, -started_at,
+    -created_on), so started_at cannot be used as a query sort key. Since
+    attempts are created when they start, creation order matches start order,
+    so ordering by created_on yields the most recently started attempt.
+    """
+    return (
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.certificate_id
+            == certificate_id,
         )
-    return attempt_model
+        .order(-gae_models.CertificateAssessmentAttemptModel.created_on)
+        .get()
+    )
 
 
 def _get_certificate_assessment_attempt_model(
@@ -550,18 +570,39 @@ def start_certificate_assessment_attempt(
     Raises:
         CertificateAssessmentAttemptNotReadyException. If the assessment can no
             longer be started because the question pool is invalid.
-        utils.ValidationError. If the learner already has an in-progress
-            attempt.
+        CertificateAssessmentAttemptCooldownException. If the learner started an attempt for this
+            certificate less than MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES minutes
+            ago.
     """
 
     def _start_txn() -> Tuple[
         certificate_assessment_domain.CertificateAssessmentAttempt,
         List[Dict[str, Union[str, int]]],
     ]:
-        if _get_in_progress_attempt_for_learner(learner_id) is not None:
-            raise utils.ValidationError(
-                'You already have an in-progress certificate assessment attempt.'
+        most_recent_attempt = (
+            _get_most_recent_attempt_for_learner_and_certificate(
+                learner_id, certificate_id
             )
+        )
+        if most_recent_attempt is not None:
+            cooldown = datetime.timedelta(
+                minutes=(
+                    certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
+                )
+            )
+            remaining_cooldown = cooldown - (
+                datetime.datetime.utcnow() - most_recent_attempt.started_at
+            )
+            if remaining_cooldown > datetime.timedelta(seconds=0):
+                # Round up so the reported wait never lapses before the actual
+                # cooldown expires, and never drop below one minute.
+                remaining_minutes = max(
+                    1,
+                    int(math.ceil(remaining_cooldown.total_seconds() / 60)),
+                )
+                raise CertificateAssessmentAttemptCooldownException(
+                    remaining_minutes
+                )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             certificate_id=certificate_id,

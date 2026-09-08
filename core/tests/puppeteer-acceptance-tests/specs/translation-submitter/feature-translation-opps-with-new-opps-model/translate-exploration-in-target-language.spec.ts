@@ -19,7 +19,6 @@
  * TS.CD.01 Translate exploration in target language.
  */
 
-import path from 'path';
 import {RTE_BUTTON_TITLES} from '../../../utilities/common/rte-editor';
 import testConstants from '../../../utilities/common/test-constants';
 import {UserFactory} from '../../../utilities/common/user-factory';
@@ -147,7 +146,7 @@ describe('Translation Submitter V2', function () {
     }
     await translationSubmitter.expectScreenshotToMatch(
       'contributorDashboard',
-      path.join(__dirname, '..')
+      __dirname
     );
 
     // Switch to the translation tab.
@@ -161,7 +160,7 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
-      path.join(__dirname, '..')
+      __dirname
     );
 
     // Should be able to show correct featured languages.

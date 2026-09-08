@@ -157,10 +157,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             [created_suggestion_model],
         )
 
-    def test_get_all_in_review_translation_suggestions_by_exp_ids(self) -> None:
+    def test_get_all_in_review_translation_suggestions_by_entity_ids(
+        self,
+    ) -> None:
         model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
+            model.get_in_review_translation_suggestions_by_entity_ids(
                 [self.target_id], 'en'
             ),
             [],
@@ -182,7 +184,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         created_suggestion_model = model.get_by_id(suggestion_id)
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
+            model.get_in_review_translation_suggestions_by_entity_ids(
                 [self.target_id], 'en'
             ),
             [created_suggestion_model],
@@ -850,6 +852,22 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[0].status, suggestion_models.STATUS_IN_REVIEW
         )
 
+        # Test passing target_type.
+        suggestions, _ = (
+            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                limit,
+                0,
+                'author_4',
+                None,
+                [self.translation_language_code],
+                ['exp1'],
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            )
+        )
+
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0].target_id, 'exp1')
+
     def test_get_translation_suggestions_in_review_with_exp_ids_by_offset_sorted(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -1040,6 +1058,22 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset_3, 2)
 
+        # Test passing target_type.
+        results, offset_4 = (
+            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id,
+                sort_key=None,
+                language_codes=[self.translation_language_code],
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            )
+        )
+        assert results is not None
+        self.assertEqual(len(results), limit)
+        self.assertEqual(results[0].id, suggestion_1_id)
+        self.assertEqual(offset_4, 1)
+
     def test_get_in_review_translation_suggestions_by_offset_no_limit(
         self,
     ) -> None:
@@ -1089,6 +1123,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, suggestion_1_id)
         self.assertEqual(results[1].id, suggestion_2_id)
         self.assertEqual(offset, 2)
+
+        # Test passing target_type.
+        results, _ = (
+            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+                limit=None,
+                offset=0,
+                user_id=user_id,
+                sort_key=None,
+                language_codes=[self.translation_language_code],
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            )
+        )
+
+        assert results is not None
+        self.assertEqual(len(results), 2)
 
     def test_get_in_review_translation_suggestions_by_offset_sorted(
         self,

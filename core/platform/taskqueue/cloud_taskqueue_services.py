@@ -96,6 +96,7 @@ def create_http_task(
     }
 
     if payload is not None:
+        payload_text = ''
         if isinstance(payload, dict):
             payload_text = json.dumps(payload)
             task['app_engine_http_request']['headers'] = {

@@ -23,10 +23,12 @@ import {ExplorationEngineService} from '../../services/exploration-engine.servic
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import './learner-answer-info-card.component.css';
 
 @Component({
   selector: 'oppia-learner-answer-info-card',
   templateUrl: './learner-answer-info-card.component.html',
+  styleUrls: ['./learner-answer-info-card.component.css'],
 })
 export class LearnerAnswerInfoCard {
   // These properties are initialized using Angular lifecycle hooks

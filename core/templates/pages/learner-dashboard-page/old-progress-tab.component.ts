@@ -28,10 +28,12 @@ import {
 } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './old-progress-tab.component.css';
 
 @Component({
   selector: 'oppia-old-progress-tab',
   templateUrl: './old-progress-tab.component.html',
+  styleUrls: ['./old-progress-tab.component.css'],
 })
 export class OldProgressTabComponent implements OnInit {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();

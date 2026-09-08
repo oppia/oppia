@@ -949,6 +949,41 @@ class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             ):
                 handler.post()
 
+    def test_post_returns_cooldown_error_with_remaining_minutes(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException(
+                    6
+                )
+            ),
+        ), mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'error',
+        ) as error_mock, mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        error_mock.assert_called_once_with(429)
+        render_json_mock.assert_called_once_with(
+            {
+                'error': 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+                'error_type': 'cooldown',
+                'remaining_minutes': 6,
+                'status_code': 429,
+            }
+        )
+
 
 class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the submit certificate assessment handler."""
