@@ -4665,7 +4665,7 @@ export class LoggedInUser extends BaseUser {
       certificateTileSelector,
       certificateTitle
     );
-    await this.clickOnElementWithSelector(continueToAssessmentButton);
+    await this.scrollToElementAndClick(continueToAssessmentButton);
     await this.expectElementToBeVisible(introCardContinueButton);
   }
 
@@ -4674,6 +4674,16 @@ export class LoggedInUser extends BaseUser {
    * the result of the latest attempt.
    */
   async clickCheckScoreOnCertificateTile(): Promise<void> {
+    // The "Check Score" button has no e2e test class, so it is located by its
+    // text. It is scrolled into view first for the same reason as the other
+    // tile buttons: the real click should not have to scroll it.
+    await this.page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      const checkScoreButton = buttons.find(button =>
+        button.textContent?.trim().includes('Check Score')
+      );
+      checkScoreButton?.scrollIntoView();
+    });
     await this.clickOnElementWithText('Check Score');
   }
 
@@ -4681,7 +4691,7 @@ export class LoggedInUser extends BaseUser {
    * Opens a "Retry Assessment" attempt for a certificate from its tile.
    */
   async retryCertificateAssessment(): Promise<void> {
-    await this.clickOnElementWithSelector(retryAssessmentButton);
+    await this.scrollToElementAndClick(retryAssessmentButton);
     await this.expectElementToBeVisible(introCardContinueButton);
   }
 

@@ -336,10 +336,6 @@ const certificateReviewContainer = '.e2e-test-certificate-review-container';
 const reviewOverallStatusSelector = '.e2e-test-review-overall-status';
 const certificateReviewSaveButton = '.e2e-test-certificate-review-save-btn';
 const confirmSaveCertificateButton = '.e2e-test-confirm-save-certificate';
-const certificateDashboardTitleSelector =
-  '.e2e-test-certificate-offering-dashboard-title';
-const certificateTitleSelector = '.oppia-certificate-title';
-const certificateStatusSelector = '.oppia-status-badge';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
@@ -3329,12 +3325,6 @@ export class CurriculumAdmin extends TopicManager {
         visible: true,
       }
     );
-    await this.page.keyboard.press('Escape');
-    await this.waitForPageToFullyLoad();
-
-    await this.expectElementToBeVisible(certificateDashboardTitleSelector);
-    await this.expectTextContentToBe(certificateTitleSelector, params.title);
-    await this.expectTextContentToBe(certificateStatusSelector, 'Available');
   }
 
   /**

@@ -709,6 +709,25 @@ export class BaseUser {
   }
 
   /**
+   * Waits for the element to be visible, scrolls it into view and then clicks
+   * it with a real mouse click. Some views re-render their content while it is
+   * being interacted with, which detaches element handles captured earlier by
+   * waitForSelector. Elements that are below the fold (for example on mobile)
+   * also need scrolling; scrolling first prevents the click below from having
+   * to scroll, avoiding the scroll-triggered re-render race that causes the
+   * "Node is detached from document" failure.
+   * @param {string} selector - The selector of the element to scroll and click.
+   */
+  async scrollToElementAndClick(selector: string): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.page.evaluate(elementSelector => {
+      document.querySelector(elementSelector)?.scrollIntoView();
+    }, selector);
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.clickOnElementWithSelector(selector);
+  }
+
+  /**
    * Clicks on the element with the given text.
    * @param text The text of the element to click on.
    */
