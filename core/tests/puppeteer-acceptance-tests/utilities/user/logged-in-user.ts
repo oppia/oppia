@@ -4891,15 +4891,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies the feedback list's columns in the My Suggestions tab.
-   */
-  async verifyMySuggestionsFeedbackListColumns(): Promise<void> {
-    await this.verifyFeedbackListColumns([
-      feedbackTableMySuggestionsLessonTitle,
-    ]);
-  }
-
-  /**
    * Verifies the feedback list's columns in the new exploration editor.
    * @param feedbackType - The type of feedback to verify.
    */
@@ -5647,7 +5638,9 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(mySuggestionsTabBackButton);
     showMessage('Navigated back to My Suggestions tab list.');
     await this.verifyFeedbackFilterRowContents();
-    await this.verifyMySuggestionsFeedbackListColumns();
+    await this.verifyFeedbackListColumns([
+      feedbackTableMySuggestionsLessonTitle,
+    ]);
   }
 
   /**

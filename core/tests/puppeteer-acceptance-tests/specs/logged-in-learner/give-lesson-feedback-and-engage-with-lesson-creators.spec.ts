@@ -34,6 +34,8 @@ import {
 const ROLES = testConstants.Roles;
 const statusLabels = FEEDBACK_STATUS_LABELS;
 const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const feedbackTableMySuggestionsLessonTitle =
+  '.e2e-test-my-suggestions-lesson-title';
 
 describe('Logged-in User', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
@@ -126,7 +128,9 @@ describe('Logged-in User', function () {
     await loggedInLearner.navigateToMySuggestionsTab();
     await loggedInLearner.verifyFeedbackFilterRowContents();
     await loggedInLearner.verifyDefaultFeedbackTabFilter('all');
-    await loggedInLearner.verifyMySuggestionsFeedbackListColumns();
+    await loggedInLearner.verifyFeedbackListColumns([
+      feedbackTableMySuggestionsLessonTitle,
+    ]);
 
     await loggedInLearner.expectFeedbackTableEntry({
       description:
@@ -172,7 +176,10 @@ describe('Logged-in User', function () {
     await loggedInLearner.clickOnFeedbackListEntryWithDescription(
       'This fraction model is awesome, but can we get more marble examples?'
     );
-    await loggedInLearner.verifyMySuggestionsFeedbackDetailView(false);
+    await loggedInLearner.expectScreenshotToMatch(
+      'mySuggestionsTabAfterSubmittingFeedback',
+      __dirname
+    );
 
     await loggedInLearner.goBackToMySuggestionsTabList();
 
@@ -253,7 +260,9 @@ describe('Logged-in User', function () {
     await loggedInLearner.navigateToMySuggestionsTab();
     await loggedInLearner.verifyFeedbackFilterRowContents();
     await loggedInLearner.verifyDefaultFeedbackTabFilter('all');
-    await loggedInLearner.verifyMySuggestionsFeedbackListColumns();
+    await loggedInLearner.verifyFeedbackListColumns([
+      feedbackTableMySuggestionsLessonTitle,
+    ]);
 
     await loggedInLearner.expectFeedbackTableEntry({
       description: 'This Lesson seems too short, can we make it longer?',
