@@ -857,16 +857,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 http_method=invalid_http_method,
             )
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
-    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'mocked_now must be datetime, got: 123'
-        ):
-            with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
-                pass
-
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No file exists for the given file name'

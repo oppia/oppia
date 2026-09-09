@@ -22,10 +22,12 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import constants from 'assets/constants';
+import './cd-admin-translation-role-editor-modal.component.css';
 
 @Component({
   selector: 'cd-admin-translation-role-editor-modal',
   templateUrl: './cd-admin-translation-role-editor-modal.component.html',
+  styleUrls: ['./cd-admin-translation-role-editor-modal.component.css'],
 })
 export class CdAdminTranslationRoleEditorModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

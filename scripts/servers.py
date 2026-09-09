@@ -637,8 +637,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 proc.send_signal(signal.SIGINT)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
-                # can just return immediately.
-                return  # pylint: disable=lost-exception
+                # can just ignore and exit normally.
+                pass
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
@@ -650,94 +650,6 @@ def managed_portserver() -> Iterator[psutil.Process]:
                     logging.error(
                         'Portserver failed to shut down after 10 seconds.'
                     )
-
-
-@contextlib.contextmanager
-def managed_webdriverio_server(
-    suite_name: str = 'full',
-    dev_mode: bool = True,
-    debug_mode: bool = False,
-    sharding_instances: int = 1,
-    chrome_version: Optional[str] = None,
-    mobile: bool = False,
-    stdout: int = subprocess.PIPE,
-) -> Iterator[psutil.Process]:
-    """Returns context manager to start/stop the WebdriverIO server gracefully.
-
-    Args:
-        suite_name: str. The suite name whose tests should be run. If the value
-            is `full`, all tests will run.
-        dev_mode: bool. Whether the test is running on dev_mode.
-        debug_mode: bool. Whether to run the webdriverio tests in debugging
-            mode. Read the following instructions to learn how to run e2e
-            tests in debugging mode:
-            https://webdriver.io/docs/debugging/#the-debug-command.
-        sharding_instances: int. How many sharding instances to be running.
-        chrome_version: str|None. The version of Google Chrome to run the tests
-            on. If None, then the currently-installed version of Google Chrome
-            is used instead.
-        stdout: int. This parameter specifies the executed program's standard
-            output file handle.
-        mobile: bool. Whether to run the webdriverio tests in mobile mode.
-
-    Yields:
-        psutil.Process. The webdriverio process.
-
-    Raises:
-        ValueError. Number of sharding instances are less than 0.
-    """
-    if sharding_instances <= 0:
-        raise ValueError('Sharding instance should be larger than 0')
-
-    if chrome_version is None:
-        chrome_version = get_chromedriver_version()
-
-    if mobile:
-        os.environ['MOBILE'] = 'true'
-    else:
-        os.environ['MOBILE'] = 'false'
-
-    webdriverio_args = [
-        common.NPX_BIN_PATH,
-        # This flag ensures tests fail if the `waitFor()` calls time out.
-        '--unhandled-rejections=strict',
-        common.NODEMODULES_WDIO_BIN_PATH,
-        common.WEBDRIVERIO_CONFIG_FILE_PATH,
-        '--suite',
-        suite_name,
-        chrome_version,
-        '--params.devMode=%s' % dev_mode,
-    ]
-
-    # Capabilities in wdio.conf.js are added as an array of object,
-    # so in order to set the value of maxmium instances of chrome
-    # in wdio.conf.js, we need to provide the index of the capability
-    # at which chrome is present, i.e. 0.
-    if sharding_instances > 1:
-        webdriverio_args.extend(
-            [
-                '--capabilities[0].maxInstances=%d' % sharding_instances,
-            ]
-        )
-
-    if debug_mode:
-        webdriverio_args.insert(0, 'DEBUG=true')
-
-    # OK to use shell=True here because we are passing string literals and
-    # constants, so there is no risk of a shell-injection attack.
-    managed_webdriverio_proc = managed_process(
-        webdriverio_args,
-        human_readable_name='WebdriverIO Server',
-        shell=True,
-        raise_on_nonzero_exit=False,
-        stdout=stdout,
-    )
-
-    try:
-        with managed_webdriverio_proc as proc:
-            yield proc
-    finally:
-        del os.environ['MOBILE']
 
 
 @contextlib.contextmanager

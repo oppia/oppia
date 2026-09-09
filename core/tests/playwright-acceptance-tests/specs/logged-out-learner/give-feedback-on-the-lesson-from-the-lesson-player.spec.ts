@@ -92,7 +92,7 @@ test.describe('Logged-Out Learner', function () {
   });
 
   test('should be able to give feedback from the navbar', async function () {
-    await loggedOutLearner.playExploration(explorationId);
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
 
     // Open Feedback popup and check "Stay Anonymous" text isn't visible.
     await loggedOutLearner.openFeedbackPopup();

@@ -119,7 +119,7 @@ class FeaturedActivitiesHandler(
                     error = f'These Exploration IDs do not exist: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
-                    error_message = error_message + error
+                    error_message = f'{error_message}{error}'
 
                 # If there are IDs for non-existent Collections,
                 # create new error message by joining all of the
@@ -130,7 +130,7 @@ class FeaturedActivitiesHandler(
                     error = f'These Collection IDs do not exist: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
-                    error_message = error_message + error
+                    error_message = f'{error_message}{error}'
 
                 # If there are IDs for private Explorations,
                 # create new error message by joining all of the
@@ -141,7 +141,7 @@ class FeaturedActivitiesHandler(
                     error = f'These Exploration IDs are private: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
-                    error_message = error_message + error
+                    error_message = f'{error_message}{error}'
 
                 # If there are IDs for private Collections,
                 # create new error message by joining all of the
@@ -152,7 +152,7 @@ class FeaturedActivitiesHandler(
                     error = f'These Collection IDs are private: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
-                    error_message = error_message + error
+                    error_message = f'{error_message}{error}'
 
                 # Join large and general error message with final piece.
                 error_message = f'{error_message}Please enter a different ID.'

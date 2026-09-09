@@ -162,7 +162,9 @@ export class TranslationStatusService {
         let noVoiceoverCount = 0;
 
         let allContentIds =
-          this.explorationStatesService.getAllContentIdsByStateName(stateName);
+          this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
+            stateName
+          );
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as

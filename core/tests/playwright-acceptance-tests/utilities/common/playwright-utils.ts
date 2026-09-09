@@ -684,6 +684,8 @@ export class BaseUser {
     await currentPage.mouse.move(-1, -1);
     await currentPage.waitForTimeout(5000);
 
+    const runningInCI = !!process.env.CI;
+
     const snapshotPath = test
       .info()
       .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
@@ -692,10 +694,18 @@ export class BaseUser {
       !fs.existsSync(snapshotPath) &&
       process.env.UPDATE_SNAPSHOTS !== 'true'
     ) {
-      throw new Error(
-        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
-          'Run with --update_snapshots to generate it.'
-      );
+      let errorMessage = `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}.`;
+      if (runningInCI) {
+        errorMessage +=
+          '\r\nWithout a baseline snapshot, the CI run cannot complete.' +
+          ' Run the update-snapshots workflow to generate baselines for both dev and prod.' +
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
+      } else {
+        errorMessage +=
+          '\r\nRun with --update_snapshots to generate it locally, then commit the new screenshot.' +
+          ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
+      }
+      throw new Error(errorMessage);
     }
 
     let failureTrigger = 0;
@@ -716,10 +726,20 @@ export class BaseUser {
       }
     }
 
-    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
-      maxDiffPixelRatio: failureTrigger,
-      ...options,
-    });
+    try {
+      await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+        maxDiffPixelRatio: failureTrigger,
+        ...options,
+      });
+    } catch (error) {
+      let errorMessage = (error as Error).message;
+      errorMessage +=
+        '\r\nIf the changes to the UI are expected, please update the baseline screenshot(s).' +
+        '\r\nTo update the screenshot(s), either run the update-snapshots workflow in CI (covers both dev and prod),' +
+        ' or run locally with --update_snapshots for dev-only baselines.' +
+        ' See https://github.com/oppia/oppia/wiki/Acceptance-Tests#screenshots-testing-functionality-in-acceptance-tests-playwright for details.';
+      throw new Error(errorMessage);
+    }
   }
 
   /**
@@ -798,16 +818,22 @@ export class BaseUser {
   }
 
   /**
-   * Returns text in nested element
-   * @param {string} selector - The selector of the element to get text from.
+   * Gets the trimmed text content of an element.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
    */
-  async getTextContent(selector: string): Promise<string> {
-    const element = await this.page.$(selector);
-    const text = await this.page.evaluate(
-      (el: Element) => el.textContent,
-      element as ElementHandle<Element>
-    );
-    return text?.trim() ?? '';
+  async getTextContent(
+    selector: string | ElementHandle<Element>
+  ): Promise<string> {
+    if (typeof selector === 'string') {
+      const element = await this.page.$(selector);
+      if (!element) {
+        throw new Error(`Element not found for selector: ${selector}`);
+      }
+      const text = await this.page.evaluate(el => el.textContent, element);
+      return text?.trim() ?? '';
+    }
+    const text = await selector.evaluate(el => el.textContent);
+    return (text ?? '').trim();
   }
 
   /**

@@ -1,0 +1,64 @@
+.modal-footer {
+  display: flex;
+  justify-content: end;
+}
+.oppia-click-to-start-editing {
+  width: 95%;
+}
+.oppia-outcome-feedback-editor-add-answer {
+  margin-top: 50px;
+}
+.rule-editor-add-answer {
+  width: 100%;
+}
+.add-answer-group-modal .modal-header i {
+  display: none;
+}
+.add-answer-group-modal .oppia-edit-feedback {
+  height: 100%;
+  margin-right: 22px;
+  width: 100%;
+}
+.add-answer-group-modal .oppia-nothing-text {
+  color: #888;
+}
+@media screen and (max-width: 768px) {
+  .oppia-click-to-start-editing {
+    margin-top: 20px;
+    position: relative;
+    top: 20px;
+  }
+  .add-answer-group-modal .modal-dialog ,
+  .add-answer-group-modal .modal-content {
+    border: 0;
+    border-radius: 0;
+    margin: auto;
+  }
+  .add-answer-group-modal .modal-content {
+    min-height: 100vh;
+  }
+  .add-answer-group-modal .modal-header {
+    background-color: #00609c;
+  }
+  .add-answer-group-modal .modal-header i {
+    color: #fff;
+    display: block;
+    font-size: 20px;
+  }
+  .add-answer-group-modal .modal-header h3 {
+    color: #fff;
+  }
+}
+@media screen and (max-width: 500px) {
+  strong {
+    font-size: 1.5rem;
+  }
+  .oppia-correctness-label-editor {
+    margin-top: 0;
+  }
+}
+@media screen and (max-width: 700px) {
+  .oppia-edit-feedback {
+    margin-top: 3rem;
+  }
+}

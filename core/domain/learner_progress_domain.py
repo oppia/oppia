@@ -92,7 +92,6 @@ class LearnerProgressInCollections:
         completed_collection_summaries: List[
             collection_domain.CollectionSummary
         ],
-        collection_playlist: List[collection_domain.CollectionSummary],
         completed_to_incomplete_collection_titles: List[str],
     ) -> None:
         """Constructs a LearnerProgress domain object.
@@ -103,8 +102,6 @@ class LearnerProgressInCollections:
                 learner.
             completed_collection_summaries: list(CollectionSummary). The
                 summaries of the collections partially completed by the learner.
-            collection_playlist: list(CollectionSummary). The summaries of the
-                collections in the learner playlist.
             completed_to_incomplete_collection_titles: list(CollectionSummary).
                 The summaries corresponding to those collections which have
                 been moved to the in progress section on account of new
@@ -112,7 +109,6 @@ class LearnerProgressInCollections:
         """
         self.incomplete_collection_summaries = incomplete_collection_summaries
         self.completed_collection_summaries = completed_collection_summaries
-        self.collection_playlist_summaries = collection_playlist
         self.completed_to_incomplete_collections = (
             completed_to_incomplete_collection_titles
         )
@@ -125,7 +121,6 @@ class LearnerProgressInExplorations:
         self,
         incomplete_exp_summaries: List[exp_domain.ExplorationSummary],
         completed_exp_summaries: List[exp_domain.ExplorationSummary],
-        exploration_playlist: List[exp_domain.ExplorationSummary],
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
@@ -134,17 +129,14 @@ class LearnerProgressInExplorations:
                 of the explorations partially completed by the learner.
             completed_exp_summaries: list(ExplorationSummary). The summaries of
                 the explorations partially completed by the learner.
-            exploration_playlist: list(ExplorationSummary). The summaries of the
-                explorations in the learner playlist.
         """
         self.incomplete_exp_summaries = incomplete_exp_summaries
         self.completed_exp_summaries = completed_exp_summaries
-        self.exploration_playlist_summaries = exploration_playlist
 
 
 class ActivityIdsInLearnerDashboard:
     """Domain object for ids of the activities completed, currently being
-    completed, in the playlist or goals of the user.
+    completed, or goals of the user.
     """
 
     def __init__(
@@ -159,8 +151,6 @@ class ActivityIdsInLearnerDashboard:
         topic_ids_to_learn: List[str],
         all_topic_ids: List[str],
         untracked_topic_ids: List[str],
-        exploration_playlist_ids: List[str],
-        collection_playlist_ids: List[str],
     ) -> None:
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
@@ -182,10 +172,6 @@ class ActivityIdsInLearnerDashboard:
             topic_ids_to_learn: list(str). The ids of the topics to learn.
             all_topic_ids: list(str). The ids of the all the topics.
             untracked_topic_ids: list(str). The ids of the untracked topics.
-            exploration_playlist_ids: list(str). The ids of the explorations
-                in the playlist of the user.
-            collection_playlist_ids: list(str). The ids of the collections
-                in the playlist of the user.
         """
         self.completed_exploration_ids = completed_exploration_ids
         self.completed_collection_ids = completed_collection_ids
@@ -197,8 +183,6 @@ class ActivityIdsInLearnerDashboard:
         self.topic_ids_to_learn = topic_ids_to_learn
         self.all_topic_ids = all_topic_ids
         self.untracked_topic_ids = untracked_topic_ids
-        self.exploration_playlist_ids = exploration_playlist_ids
-        self.collection_playlist_ids = collection_playlist_ids
 
     def to_dict(self) -> Dict[str, List[str]]:
         """Return dictionary representation of ActivityIdsInLearnerDashboard.
@@ -224,10 +208,6 @@ class ActivityIdsInLearnerDashboard:
                 'all_topic_ids': list(str). The ids of all the topics.
                 'untracked_topic_ids': list(str). The ids of the untracked
                     topics.
-                'exploration_playlist_ids': list(str). The ids of the
-                    explorations that are in the playlist
-                'collection_playlist_ids': list(str). The ids of the
-                    collections that are in the playlist.
         """
 
         return {
@@ -241,6 +221,4 @@ class ActivityIdsInLearnerDashboard:
             'topic_ids_to_learn': self.topic_ids_to_learn,
             'all_topic_ids': self.all_topic_ids,
             'untracked_topic_ids': self.untracked_topic_ids,
-            'exploration_playlist_ids': self.exploration_playlist_ids,
-            'collection_playlist_ids': self.collection_playlist_ids,
         }

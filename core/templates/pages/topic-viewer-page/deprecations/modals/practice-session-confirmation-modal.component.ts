@@ -16,8 +16,9 @@
  * @fileoverview Component for practice session confirmation modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
@@ -26,7 +27,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
   styleUrls: ['./practice-session-confirmation-modal.component.css'],
 })
 export class PracticeSessionConfirmationModal extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private practiceSessionConfirmationBottomSheetRef?: MatBottomSheetRef<PracticeSessionConfirmationModal>
+  ) {
+    super(ngbActiveModal, practiceSessionConfirmationBottomSheetRef);
   }
 }

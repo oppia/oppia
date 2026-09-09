@@ -5,6 +5,10 @@
   margin: 0;
 }
 
+.oppia-sharing-links.fx-main-start {
+  justify-content: flex-start;
+}
+
 .oppia-sharing-links .padding-0-2 {
   padding: 0 0.125rem;
 }
@@ -64,7 +68,7 @@ div.oppia-sharing-links i.oppia-share-icons .font-small {
   font-size: 1.125rem;
 }
 
-i.oppia-share-icons.fab.fa-facebook-square {
+i.oppia-share-icons.fa-brands.fa-square-facebook {
   color: #3b5998;
   font-size: 2.01rem;
 }
@@ -103,7 +107,7 @@ i.material-icons.embed-link.share-icons.embed-icon {
 .post-publish-modal-sharing-links .embed-button-icon {
   margin-top: -3px;
 }
-i.fab.fa-facebook-square.blog-post-sharing-link-icon {
+i.fa-brands.fa-square-facebook.blog-post-sharing-link-icon {
   font-size: 30px;
   margin-right: 5px;
 }

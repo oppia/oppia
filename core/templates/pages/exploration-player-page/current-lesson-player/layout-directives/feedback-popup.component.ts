@@ -24,10 +24,12 @@ import {UserService} from 'services/user.service';
 import {FeedbackPopupBackendApiService} from '../../services/feedback-popup-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {AppConstants} from 'app.constants';
+import './feedback-popup.component.css';
 
 @Component({
   selector: 'oppia-feedback-popup',
   templateUrl: './feedback-popup.component.html',
+  styleUrls: ['./feedback-popup.component.css'],
 })
 export class FeedbackPopupComponent {
   // These properties below are initialized using Angular lifecycle hooks

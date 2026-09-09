@@ -21,6 +21,7 @@ import {HttpClient} from '@angular/common/http';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OpportunityDict} from './contribution-and-review.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface FetchSuggestionsResponse {
   target_id_to_opportunity_dict: {
@@ -41,6 +42,7 @@ export interface ContributorCertificateInfo {
   contribution_word_count: number;
   team_lead: string;
   language: string | null;
+  certificate_profile_name: string;
 }
 
 interface ReviewExplorationSuggestionRequestBody {
@@ -52,7 +54,7 @@ interface ReviewExplorationSuggestionRequestBody {
 interface ReviewSkillSuggestionRequestBody {
   action: string;
   review_message: string;
-  skill_difficulty: string;
+  skill_difficulty?: number;
 }
 
 interface UpdateTranslationRequestBody {
@@ -104,8 +106,9 @@ export class ContributionAndReviewBackendApiService {
     limit: number | null,
     offset: number,
     sortKey: string,
-    explorationId: string | null,
-    topicName: string | null
+    entityId: string | null,
+    topicName: string | null,
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -118,7 +121,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration',
+        this.getTargetTypeUrlArgument(targetType),
         'translate_content',
         limit || 0,
         offset,
@@ -138,16 +141,26 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration',
+        this.getTargetTypeUrlArgument(targetType),
         'translate_content',
         limit,
         offset,
         sortKey,
-        explorationId,
+        entityId,
         null
       );
     }
     throw new Error('Invalid fetch type');
+  }
+
+  /**
+   * Returns the value to send as the target_type path argument of the
+   * suggestion list endpoints. Those endpoints accept the "all" sentinel to
+   * mean "every target type", so an absent filter is sent as that sentinel
+   * rather than being narrowed to one entity type.
+   */
+  private getTargetTypeUrlArgument(targetType?: string): string {
+    return targetType || ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   }
 
   async fetchSubmittedSuggestionsAsync(
@@ -178,7 +191,7 @@ export class ContributionAndReviewBackendApiService {
     limit: number | null,
     offset: number,
     sortKey: string,
-    explorationId: string | null,
+    entityId: string | null,
     topicName: string | null
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -192,7 +205,7 @@ export class ContributionAndReviewBackendApiService {
       limit?: string;
       offset: string;
       sort_key: string;
-      exploration_id?: string;
+      entity_id?: string;
       topic_name?: string;
     } = {
       offset: offset.toString(),
@@ -214,8 +227,8 @@ export class ContributionAndReviewBackendApiService {
     if (limit) {
       params.limit = limit.toString();
     }
-    if (explorationId) {
-      params.exploration_id = explorationId;
+    if (entityId) {
+      params.entity_id = entityId;
     }
     if (topicName) {
       params.topic_name = topicName;

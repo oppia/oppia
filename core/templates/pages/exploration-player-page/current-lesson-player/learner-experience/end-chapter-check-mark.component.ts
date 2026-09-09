@@ -17,10 +17,12 @@
  */
 
 import {Component} from '@angular/core';
+import './end-chapter-check-mark.component.css';
 
 @Component({
   selector: 'oppia-end-chapter-check-mark',
   templateUrl: './end-chapter-check-mark.component.html',
+  styleUrls: ['./end-chapter-check-mark.component.css'],
 })
 export class EndChapterCheckMarkComponent {
   constructor() {}

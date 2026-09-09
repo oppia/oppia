@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
+from core import utils
 from core.constants import constants
 from core.domain import skill_domain
 from core.platform import models
@@ -272,8 +271,8 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             misconception_count=1,
             version=1,
             language_code='en',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
         ).put()
         skill_models.SkillSummaryModel(
             id='skill_id2',
@@ -281,8 +280,8 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             misconception_count=1,
             version=1,
             language_code='en',
-            skill_model_last_updated=datetime.datetime.utcnow(),
-            skill_model_created_on=datetime.datetime.utcnow(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
         ).put()
 
         skill_summaries, next_cursor, more = (

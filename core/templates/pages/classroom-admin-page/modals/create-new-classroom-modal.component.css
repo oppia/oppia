@@ -1,0 +1,23 @@
+.new-classroom-input-data {
+  margin: 10px;
+}
+/* TODO(#16156): Remove the instances of /deep/ from the codebase. */
+:host /deep/ .oppia-create-classroom-spinning-button circle {
+  stroke: #fff;
+}
+.oppia-create-classroom-spinning-button {
+  margin: 0 5px;
+}
+.new-classroom-name-input {
+  width: 400px;
+}
+.oppia-warning-text {
+  color: #f00;
+  font-size: 0.8em;
+}
+
+@media screen and (max-width: 768px) {
+  .classroom-name-label, .classroom-url-fragment-label {
+    padding-left: 0;
+  }
+}

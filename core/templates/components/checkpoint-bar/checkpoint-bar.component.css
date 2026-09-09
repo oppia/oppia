@@ -2,6 +2,7 @@
   align-items: center;
   display: flex;
   position: relative;
+  width: 100%;
 }
 
 .multiple-checkpoints-bar {
@@ -14,9 +15,14 @@
   display: flex;
   height: 5px;
   justify-content: flex-start;
+  left: 0;
   margin-left: 0;
   position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 100%;
+  z-index: 0;
 }
 
 .completed-progress-bar {
@@ -35,7 +41,7 @@
   height: 12px;
   justify-content: center;
   width: 12px;
-  z-index: 0;
+  z-index: 1;
 }
 
 .in-progress-checkpoint-node {
@@ -47,7 +53,7 @@
   height: 20px;
   justify-content: center;
   width: 20px;
-  z-index: 0;
+  z-index: 1;
 }
 
 .incomplete-checkpoint-node {
@@ -59,5 +65,5 @@
   height: 12px;
   justify-content: center;
   width: 12px;
-  z-index: 111;
+  z-index: 1;
 }

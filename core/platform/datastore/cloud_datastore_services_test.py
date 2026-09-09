@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from core import utils
 from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
@@ -49,7 +50,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.admin_user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL
         )
-        self.curr_time = datetime.datetime.utcnow()
+        self.curr_time = utils.get_current_utc_datetime()
         self.completed_activities_model = user_models.CompletedActivitiesModel(
             id=self.admin_user_id,
             exploration_ids=[],

@@ -22,10 +22,12 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {GraphData} from 'services/compute-graph.service';
+import './exploration-graph-modal.component.css';
 
 @Component({
   selector: 'oppia-exploration-graph-modal',
   templateUrl: './exploration-graph-modal.component.html',
+  styleUrls: ['./exploration-graph-modal.component.css'],
 })
 export class ExplorationGraphModalComponent
   extends ConfirmOrCancelModal

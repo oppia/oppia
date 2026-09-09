@@ -27,7 +27,7 @@ import {
 
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 import {ValidationResponse} from './certificate-offering-review-and-availability.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';

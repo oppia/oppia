@@ -227,8 +227,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             branch_hotfix_number = int(
                 branch_name[branch_name.rfind('-') + 1 :]
             )
-            if branch_hotfix_number > last_hotfix_number:
-                last_hotfix_number = branch_hotfix_number
+            last_hotfix_number = max(last_hotfix_number, branch_hotfix_number)
 
     assert release_branch_exists, 'Release branch is missing.'
     assert (

@@ -102,9 +102,8 @@ export default {
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
-    VolunteerForm:
-      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-    VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
+    VolunteerIdealistPage:
+      'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
       'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
@@ -135,6 +134,7 @@ export default {
     UserDocumentation: 'https://oppia.github.io/#/',
     BaseExplorationPlayer: 'http://localhost:8181/explore',
     ExplorationPlayer: 'http://localhost:8181/explore/',
+    LessonPlayer: 'http://localhost:8181/lesson/',
     SkillEditor: 'http://localhost:8181/skill_editor',
     TopicEditor: 'http://localhost:8181/topic_editor',
   },
@@ -186,6 +186,7 @@ export default {
       __dirname,
       '../../data/intro-content-hi.mp3'
     ),
+    oppiaPage: path.resolve(__dirname, '../../data/oppia-page.png'),
     ContinueInteractionVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/continue-interaction-hi.mp3'
@@ -303,6 +304,7 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile-1920.png'
   ),
+  SAMPLE_TEST_PDF: path.resolve(__dirname, '../../data/sample_test.pdf'),
   BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
   BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
   BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),

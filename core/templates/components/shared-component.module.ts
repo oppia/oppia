@@ -67,7 +67,6 @@ import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
-import {LearnerDashboardIconsComponent} from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import {OutcomeEditorComponent} from './state-directives/outcome-editor/outcome-editor.component';
 import {OutcomeFeedbackEditorComponent} from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import {OnScreenKeyboardComponent} from './on-screen-keyboard/on-screen-keyboard.component';
@@ -179,6 +178,7 @@ import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-tem
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -369,7 +369,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     UploadActivityModalComponent,
-    LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
     QuestionMisconceptionSelectorComponent,
@@ -440,6 +439,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   entryComponents: [
@@ -544,7 +544,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TagMisconceptionModalComponent,
-    LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
     AddHintModalComponent,
@@ -614,6 +613,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   exports: [
@@ -731,7 +731,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     UploadActivityModalComponent,
     SummarizeNonnegativeNumberPipe,
     SavePendingChangesModalComponent,
-    LearnerDashboardIconsComponent,
     AddOrUpdateSolutionModalComponent,
     AddOutcomeModalComponent,
     QuestionMisconceptionSelectorComponent,
@@ -785,6 +784,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 })
 export class SharedComponentsModule {}

@@ -21,6 +21,7 @@ import {AppConstants} from 'app.constants';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewStatsService} from '../services/contribution-and-review-stats.service';
+import './contributor-badges.component.css';
 
 interface ContributionCounts {
   language: string | null;
@@ -46,7 +47,7 @@ export enum MobileBadgeType {
 @Component({
   selector: 'contributor-badges',
   templateUrl: './contributor-badges.component.html',
-  styleUrls: [],
+  styleUrls: ['./contributor-badges.component.css'],
 })
 export class ContributorBadgesComponent {
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;

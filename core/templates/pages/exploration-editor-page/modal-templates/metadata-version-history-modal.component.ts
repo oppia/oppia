@@ -25,6 +25,7 @@ import {PageContextService} from 'services/page-context.service';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {VersionHistoryService} from '../services/version-history.service';
+import './metadata-version-history-modal.component.css';
 
 interface HeadersAndYamlStrs {
   previousVersionMetadataYaml: string;
@@ -41,6 +42,7 @@ interface MergeviewOptions {
 @Component({
   selector: 'oppia-metadata-version-history',
   templateUrl: './metadata-version-history-modal.component.html',
+  styleUrls: ['./metadata-version-history-modal.component.css'],
 })
 export class MetadataVersionHistoryModalComponent
   extends ConfirmOrCancelModal

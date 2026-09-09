@@ -1,3 +1,5 @@
+# TODO(#24855): Depend on official stubs rather than maintaining our own.
+
 from typing import Any, Dict, Optional
 
 class App:

@@ -1,0 +1,43 @@
+.teach-oppia-modal .unresolved-answers-loading-text {
+  font-size: 1.17em;
+  text-align: center;
+}
+
+.teach-oppia-modal .unresolved-answer {
+  border: black solid 1px;
+  border-radius: 5px;
+  margin-top: 1%;
+  padding: 1%;
+}
+
+.teach-oppia-modal .unresolved-answer-btn {
+  float: right;
+}
+
+.teach-oppia-modal .answer-header-label {
+  margin: 1% 0%;
+}
+
+.teach-oppia-modal .response-header-label {
+  display: inline-block;
+  margin: 1% 0%;
+}
+
+.teach-oppia-modal .response-edit-button {
+  background: white;
+  border-color: #f0ad4e;
+  color: #f0ad4e;
+}
+
+.teach-oppia-modal .confrim-respose-button {
+  background: white;
+  border-color: green;
+  color: green;
+}
+
+.teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
+  background: whitesmoke;
+}
+.teach-oppia-modal .oppia-unresolved-answers-container {
+  padding-top: 10px;
+}

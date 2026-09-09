@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.domain import beam_job_domain, beam_job_services
 from core.jobs import base_jobs, jobs_manager
 from core.tests import test_utils
@@ -110,8 +108,8 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             model.id,
             'FooJob',
             'CANCELLING',
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
             False,
             'abc-123',
         )

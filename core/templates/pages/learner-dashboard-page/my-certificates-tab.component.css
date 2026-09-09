@@ -1,0 +1,121 @@
+.my-certificates-tab {
+  --oppia-teal-dark: #00645c;
+  --oppia-teal-line: #bfe0da;
+  --status-passed: #1e824c;
+  --status-not-passed: #d64545;
+  --header-text: #8a8f98;
+  --body-text: #1f2933;
+
+  background: #fff;
+  border: 1px solid #e6e8eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.my-certificates-filter {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.my-certificates-empty-state {
+  color: var(--body-text);
+  font-size: 20px;
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.my-certificates-filter-select-container {
+  position: relative;
+}
+
+.my-certificates-filter-select-container::after {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--header-text);
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.my-certificates-filter-select {
+  appearance: none;
+  border: 1px solid #d5d8dc;
+  border-radius: 1px;
+  color: var(--body-text);
+  cursor: pointer;
+  font-size: 15px;
+  min-width: 200px;
+  padding: 10px 5px 5px 15px;
+}
+
+.my-certificates-filter-select:focus {
+  border-color: var(--oppia-teal-dark);
+  outline: none;
+}
+
+.certificates-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.certificates-table th {
+  border-bottom: 1px solid #e6e8eb;
+  color: var(--header-text);
+  font-size: 20px;
+  font-weight: 500;
+  padding: 0 12px 12px;
+  text-align: left;
+}
+
+.certificates-table td {
+  border-bottom: 1px solid var(--oppia-teal-line);
+  font-size: 20px;
+  padding: 16px 12px;
+}
+
+.certificates-table-row:hover {
+  background: #f5faf9;
+}
+
+.certificate-title-cell {
+  font-weight: 700;
+}
+
+.certificate-title-link {
+  color: var(--oppia-teal-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.certificate-title-link:hover,
+.certificate-title-link:focus {
+  text-decoration: underline;
+}
+
+.subject-cell,
+.attempt-cell,
+.date-cell {
+  color: var(--body-text);
+  font-weight: 700;
+}
+
+.score-cell,
+.status-cell {
+  font-weight: 700;
+}
+
+.score-cell.is-passed,
+.status-cell.is-passed {
+  color: var(--status-passed);
+}
+
+.score-cell.is-not-passed,
+.status-cell.is-not-passed {
+  color: var(--status-not-passed);
+}

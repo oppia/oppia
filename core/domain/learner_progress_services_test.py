@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.constants import constants
 from core.domain import (
     collection_domain,
@@ -28,7 +29,6 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     learner_goals_services,
-    learner_playlist_services,
     learner_progress_services,
     rights_manager,
     story_domain,
@@ -665,17 +665,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_1]
         )
-        # Add an exploration to the learner playlist of the learner.
-        learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, self.EXP_ID_3
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [self.EXP_ID_3],
-        )
-
         # Test that on adding an incomplete exploration to the completed list
         # it gets removed from the incomplete list.
         learner_progress_services.mark_exploration_as_completed(
@@ -687,22 +676,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(self._get_all_incomplete_exp_ids(self.user_id), [])
 
-        # Test that on adding an exploration to the completed list, it gets
-        # removed from the learner playlist.
-        learner_progress_services.mark_exploration_as_completed(
-            self.user_id, self.EXP_ID_3
-        )
-        self.assertEqual(
-            self._get_all_completed_exp_ids(self.user_id),
-            [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3],
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [],
-        )
-
         # Test that an exploration created by the user is not added to the
         # completed list.
         learner_progress_services.mark_exploration_as_completed(
@@ -710,7 +683,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             self._get_all_completed_exp_ids(self.user_id),
-            [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3],
+            [self.EXP_ID_0, self.EXP_ID_1],
         )
 
     def test_mark_collection_as_completed(self) -> None:
@@ -759,33 +732,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [self.COL_ID_0, self.COL_ID_1],
         )
 
-        # Add a collection to the learner playlist of the learner.
-        learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, self.COL_ID_3
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [self.COL_ID_3],
-        )
-
-        # Test that on adding a collection to the completed list, it gets
-        # removed from the learner playlist.
-        learner_progress_services.mark_collection_as_completed(
-            self.user_id, self.COL_ID_3
-        )
-        self.assertEqual(
-            self._get_all_completed_collection_ids(self.user_id),
-            [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3],
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [],
-        )
-
         # Test that a collection created by the user is not added to the
         # completed list.
         learner_progress_services.mark_collection_as_completed(
@@ -793,7 +739,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             self._get_all_completed_collection_ids(self.user_id),
-            [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3],
+            [self.COL_ID_0, self.COL_ID_1],
         )
 
     def test_mark_story_as_completed(self) -> None:
@@ -934,7 +880,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': utils.get_current_utc_datetime(),
             'state_name': state_name,
             'version': version,
         }
@@ -955,7 +901,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 2
 
         modified_exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': utils.get_current_utc_datetime(),
             'state_name': state_name,
             'version': version,
         }
@@ -984,33 +930,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_0]
         )
 
-        # Add an exploration to the learner playlist.
-        learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, self.EXP_ID_3
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [self.EXP_ID_3],
-        )
-
-        # Test that on adding an exploration to the incomplete list, it gets
-        # removed from the learner playlist.
-        learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, self.EXP_ID_3, state_name, version
-        )
-        self.assertEqual(
-            self._get_all_incomplete_exp_ids(self.user_id),
-            [self.EXP_ID_0, self.EXP_ID_3],
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [],
-        )
-
         # Test that an exploration created by the user is not added to the
         # incomplete list.
         learner_progress_services.mark_exploration_as_incomplete(
@@ -1018,7 +937,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             self._get_all_incomplete_exp_ids(self.user_id),
-            [self.EXP_ID_0, self.EXP_ID_3],
+            [self.EXP_ID_0],
         )
 
     def test_mark_collection_as_incomplete(self) -> None:
@@ -1057,33 +976,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [self.COL_ID_0],
         )
 
-        # Add a collection to the learner playlist of the learner.
-        learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, self.COL_ID_3
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [self.COL_ID_3],
-        )
-
-        # Test that on adding a collection to the incomplete list, it gets
-        # removed from the learner playlist.
-        learner_progress_services.mark_collection_as_incomplete(
-            self.user_id, self.COL_ID_3
-        )
-        self.assertEqual(
-            self._get_all_incomplete_collection_ids(self.user_id),
-            [self.COL_ID_0, self.COL_ID_3],
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [],
-        )
-
         # Test that a collection created by the user is not added to the
         # incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
@@ -1091,7 +983,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             self._get_all_incomplete_collection_ids(self.user_id),
-            [self.COL_ID_0, self.COL_ID_3],
+            [self.COL_ID_0],
         )
 
     def test_record_story_started(self) -> None:
@@ -2409,36 +2301,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(incomplete_collection_summaries), 1)
 
-    def test_does_not_add_collection_if_in_complete_or_incomplete_list(
-        self,
-    ) -> None:
-        """Ensure collection is not added if already in playlist."""
-        # Add the collection to the playlist.
-        learner_progress_services.mark_collection_as_completed(
-            self.user_id, self.COL_ID_1
-        )
-
-        # Attempt to add the collection to the playlist.
-        belongs_to_completed_or_incomplete_list = (
-            learner_progress_services.add_collection_to_learner_playlist(
-                self.user_id, self.COL_ID_1
-            )
-        )[0]
-
-        self.assertTrue(belongs_to_completed_or_incomplete_list)
-
-        learner_progress_services.mark_collection_as_incomplete(
-            self.user_id, self.COL_ID_1
-        )
-
-        belongs_to_completed_or_incomplete_list = (
-            learner_progress_services.add_collection_to_learner_playlist(
-                self.user_id, self.COL_ID_1
-            )
-        )[0]
-
-        self.assertTrue(belongs_to_completed_or_incomplete_list)
-
     def test_unpublishing_partially_learnt_topic_filters_it_out(self) -> None:
         # Add topics to the partially learnt list.
         learner_progress_services.record_topic_started(
@@ -2626,242 +2488,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(topics_to_learn[0].id, 'topic_1')
         self.assertEqual(len(topics_to_learn), 1)
 
-    def test_unpublishing_exploration_filters_it_out_from_playlist(
-        self,
-    ) -> None:
-        # Add activities to the playlist section.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0
-        )
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_1
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [self.EXP_ID_0, self.EXP_ID_1],
-        )
-
-        # Unpublish EXP_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_1)
-        private_exploration = exp_fetchers.get_exploration_summary_by_id(
-            self.EXP_ID_1
-        )
-        self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
-        )
-
-        # Call get_exploration_progress to get filtered progress.
-        user_activity = learner_progress_services.get_exploration_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        exploration_playlist = (
-            all_filtered_summaries.exploration_playlist_summaries
-        )
-
-        # Test that exploration_playlist doesn't include private exploration.
-        self.assertEqual(
-            exploration_playlist[0].id, '0_en_arch_bridges_in_england'
-        )
-        self.assertEqual(len(exploration_playlist), 1)
-
-    def test_does_not_add_exploration_if_in_complete_or_incomplete_list(
-        self,
-    ) -> None:
-        """Ensure collection is not added if in playlist."""
-        # Add the collection to the playlist.
-        learner_progress_services.mark_exploration_as_completed(
-            self.user_id, self.EXP_ID_0
-        )
-
-        # Attempt to add the collection to the playlist.
-        belongs_to_completed_or_incomplete_list = (
-            learner_progress_services.add_exp_to_learner_playlist(
-                self.user_id, self.EXP_ID_0
-            )
-        )[0]
-
-        self.assertTrue(belongs_to_completed_or_incomplete_list)
-
-        learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, self.EXP_ID_0, 'state name', 1
-        )
-
-        belongs_to_completed_or_incomplete_list = (
-            learner_progress_services.add_exp_to_learner_playlist(
-                self.user_id, self.EXP_ID_0
-            )
-        )[0]
-
-        self.assertTrue(belongs_to_completed_or_incomplete_list)
-
-    def test_republishing_exploration_keeps_it_in_exploration_playlist(
-        self,
-    ) -> None:
-        # Add activity to the playlist section.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
-                self.user_id
-            ),
-            [self.EXP_ID_0],
-        )
-
-        # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
-        private_exploration = exp_fetchers.get_exploration_summary_by_id(
-            self.EXP_ID_0
-        )
-        self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
-        )
-
-        # Call get_exploration_progress to get filtered progress.
-        user_activity = learner_progress_services.get_exploration_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        exploration_playlist = (
-            all_filtered_summaries.exploration_playlist_summaries
-        )
-        # Test that exploration_playlist doesn't include private exploration.
-        self.assertEqual(len(exploration_playlist), 0)
-
-        # Republish EXP_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
-        self.publish_exploration(self.owner_id, self.EXP_ID_0)
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0
-        )
-        public_exploration = exp_fetchers.get_exploration_summary_by_id(
-            self.EXP_ID_0
-        )
-        self.assertEqual(
-            public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC
-        )
-
-        # Call get_exploration_progress to get filtered progress.
-        user_activity = learner_progress_services.get_exploration_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        exploration_playlist = (
-            all_filtered_summaries.exploration_playlist_summaries
-        )
-        # Test that exploration_playlist includes original EXP_ID_0.
-        self.assertEqual(
-            exploration_playlist[0].id, '0_en_arch_bridges_in_england'
-        )
-        self.assertEqual(len(exploration_playlist), 1)
-
-    def test_unpublishing_collection_filters_it_out_from_playlist(self) -> None:
-        # Add activities to the playlist section.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0
-        )
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_1
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [self.COL_ID_0, self.COL_ID_1],
-        )
-
-        # Unpublish COL_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_1)
-        private_collection = collection_services.get_collection_summary_by_id(
-            self.COL_ID_1
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert private_collection is not None
-        self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
-        )
-
-        # Call get_collection_progress to get filtered progress.
-        user_activity = learner_progress_services.get_collection_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        collection_playlist = (
-            all_filtered_summaries.collection_playlist_summaries
-        )
-
-        # Test that collection_playlist doesn't include private collection.
-        self.assertEqual(collection_playlist[0].id, '0_arch_bridges_in_england')
-        self.assertEqual(len(collection_playlist), 1)
-
-    def test_republishing_collection_keeps_it_in_collection_playlist(
-        self,
-    ) -> None:
-        # Add activity to the playlist section.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0
-        )
-        self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(  # pylint: disable=line-too-long
-                self.user_id
-            ),
-            [self.COL_ID_0],
-        )
-
-        # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
-        private_collection = collection_services.get_collection_summary_by_id(
-            self.COL_ID_0
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert private_collection is not None
-        self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
-        )
-
-        # Call get_collection_progress to get filtered progress.
-        user_activity = learner_progress_services.get_collection_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        collection_playlist = (
-            all_filtered_summaries.collection_playlist_summaries
-        )
-        # Test that collection_playlist doesn't include private collection.
-        self.assertEqual(len(collection_playlist), 0)
-
-        # Republish COL_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
-        self.publish_collection(self.owner_id, self.COL_ID_0)
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0
-        )
-        public_collection = collection_services.get_collection_summary_by_id(
-            self.COL_ID_0
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert public_collection is not None
-        self.assertEqual(
-            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC
-        )
-
-        # Call get_collection_progress to get filtered progress.
-        user_activity = learner_progress_services.get_collection_progress(
-            self.user_id
-        )
-        all_filtered_summaries = user_activity[0]
-        collection_playlist = (
-            all_filtered_summaries.collection_playlist_summaries
-        )
-        # Test that collection_playlist includes original COL_ID_0.
-        self.assertEqual(collection_playlist[0].id, '0_arch_bridges_in_england')
-        self.assertEqual(len(collection_playlist), 1)
-
     def test_get_ids_of_activities_in_learner_dashboard(self) -> None:
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
@@ -2893,14 +2519,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID_1
         )
 
-        # Add activities to the playlist section.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_3
-        )
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_3
-        )
-
         # Add topics to the learn section of the learner goals.
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_2
@@ -2929,8 +2547,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_ids.partially_learnt_topic_ids, [self.TOPIC_ID_1]
         )
         self.assertEqual(activity_ids.topic_ids_to_learn, [self.TOPIC_ID_2])
-        self.assertEqual(activity_ids.exploration_playlist_ids, [self.EXP_ID_3])
-        self.assertEqual(activity_ids.collection_playlist_ids, [self.COL_ID_3])
 
     def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
@@ -2969,14 +2585,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1
-        )
-
-        # Add activities to the playlist section.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_3
-        )
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_3
         )
 
         # Add topics to the learn section of the learner goals.
@@ -3025,12 +2633,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         untracked_topic_summaries = topics_and_stories_progress[
             0
         ].untracked_topic_summaries
-        exploration_playlist_summaries = exploration_progress[
-            0
-        ].exploration_playlist_summaries
-        collection_playlist_summaries = collection_progress[
-            0
-        ].collection_playlist_summaries
 
         self.assertEqual(len(incomplete_exp_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
@@ -3042,8 +2644,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(topics_to_learn_summaries), 1)
         self.assertEqual(len(all_topic_summaries), 1)
         self.assertEqual(len(untracked_topic_summaries), 1)
-        self.assertEqual(len(exploration_playlist_summaries), 1)
-        self.assertEqual(len(collection_playlist_summaries), 1)
 
         self.assertEqual(incomplete_exp_summaries[0].title, 'Sillat Suomi')
         self.assertEqual(
@@ -3057,19 +2657,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(topics_to_learn_summaries[0].name, 'topic 2')
         self.assertEqual(untracked_topic_summaries[0].name, 'topic 3')
         self.assertEqual(all_topic_summaries[0].name, 'topic 3')
-        self.assertEqual(
-            exploration_playlist_summaries[0].title, 'Welcome Oppia'
-        )
-        self.assertEqual(
-            collection_playlist_summaries[0].title, 'Welcome Oppia Collection'
-        )
 
         # Delete an exploration in the completed section.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         # Delete an exploration in the incomplete section.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
-        # Delete an exploration in the playlist section.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
         collection_services.update_collection(
             self.owner_id,
@@ -3137,9 +2729,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Check that the dashboard records the exploration deleted in the
         # incomplete section.
         self.assertEqual(exploration_progress[1]['incomplete_explorations'], 1)
-        # Check that the dashboard records the exploration deleted in the
-        # playlist section.
-        self.assertEqual(exploration_progress[1]['exploration_playlist'], 1)
 
         # Check that the dashboard records the topic deleted in the learn
         # section of the learner goals.
@@ -3179,8 +2768,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         collection_services.delete_collection(self.owner_id, self.COL_ID_0)
         # Delete a collection in the incomplete section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_1)
-        # Delete a collection in the playlist section.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_3)
 
         # Delete a topic from incomplete section.
         topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
@@ -3201,9 +2788,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Check that the dashboard records the collection deleted in the
         # incomplete section.
         self.assertEqual(collection_progress[1]['incomplete_collections'], 1)
-        # Check that the dashboard records the collection deleted in the
-        # playlist section.
-        self.assertEqual(collection_progress[1]['collection_playlist'], 1)
 
         # Check that the dashboard records the topic deleted in the incomplete
         # section.

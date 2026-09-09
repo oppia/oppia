@@ -15,8 +15,13 @@
 /**
  * @fileoverview Component for select skill modal.
  */
-import {Component} from '@angular/core';
+import {Component, Optional, Inject} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -27,6 +32,15 @@ import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-edit
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import './select-skill-modal.component.css';
 export {CategorizedSkills};
+
+interface SelectSkillModalData {
+  categorizedSkills: CategorizedSkills;
+  skillsInSameTopicCount: number;
+  skillSummaries: SkillSummaryBackendDict[];
+  untriagedSkillSummaries: SkillSummaryBackendDict[];
+  allowSkillsFromOtherTopics: boolean;
+  associatedSkillSummaries?: ShortSkillSummary[];
+}
 
 @Component({
   selector: 'oppia-select-skill',
@@ -73,8 +87,25 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
     return this._untriagedSkillSummariesForSelector;
   }
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    selectSkillBottomSheetRef?: MatBottomSheetRef<SelectSkillModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    data?: SelectSkillModalData
+  ) {
+    super(ngbActiveModal, selectSkillBottomSheetRef);
+    if (data) {
+      this.categorizedSkills = data.categorizedSkills;
+      this.skillsInSameTopicCount = data.skillsInSameTopicCount;
+      this.skillSummaries = data.skillSummaries;
+      this.untriagedSkillSummaries = data.untriagedSkillSummaries;
+      this.allowSkillsFromOtherTopics = data.allowSkillsFromOtherTopics;
+      if (data.associatedSkillSummaries) {
+        this.associatedSkillSummaries = data.associatedSkillSummaries;
+      }
+    }
   }
 
   confirm(): void {
@@ -95,7 +126,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
       summary => summary.id === this.selectedSkillId
     );
 
-    this.ngbActiveModal.close(summary);
+    super.confirm(summary);
   }
 
   setSelectedSkillId(skillId: string): void {

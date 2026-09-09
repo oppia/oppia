@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     change_domain,
     skill_domain,
@@ -104,7 +104,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
     # Language code that would normally be derived from the question_dict in
     # the change_cmd.
     question_language_code = 'en'
-    mocked_datetime_utcnow = datetime.datetime(2020, 6, 15, 5)
+    mocked_current_time = datetime.datetime(2020, 6, 15, 5)
 
     def setUp(self) -> None:
         super().setUp()
@@ -2127,7 +2127,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 score_category='translation.X',
                 language_code=self.LANGUAGE_CODE,
                 edited_by_reviewer=edited,
-                created_on=datetime.datetime.utcnow(),
+                created_on=utils.get_current_utc_datetime(),
             )
             models_to_put.append(sugg)
 
@@ -2189,7 +2189,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 score_category='question.X',
                 language_code=None,
                 edited_by_reviewer=edited,
-                created_on=datetime.datetime.utcnow(),
+                created_on=utils.get_current_utc_datetime(),
             )
             models_to_put.append(qsugg)
 
@@ -2294,7 +2294,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 score_category='translation.X',
                 language_code=self.LANGUAGE_CODE,
                 edited_by_reviewer=edited,
-                created_on=datetime.datetime.utcnow(),
+                created_on=utils.get_current_utc_datetime(),
             )
             models_to_put.append(sugg)
 
@@ -2316,7 +2316,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 score_category='question.X',
                 language_code=None,
                 edited_by_reviewer=edited,
-                created_on=datetime.datetime.utcnow(),
+                created_on=utils.get_current_utc_datetime(),
             )
             models_to_put.append(qsugg)
 
@@ -2636,7 +2636,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             score_category='translation.X',
             language_code=self.LANGUAGE_CODE,
             edited_by_reviewer=False,
-            created_on=datetime.datetime.utcnow(),
+            created_on=utils.get_current_utc_datetime(),
         )
         models_to_put.append(sugg)
         sugg = self.create_model(
@@ -2651,7 +2651,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             score_category='translation.X',
             language_code=None,
             edited_by_reviewer=False,
-            created_on=datetime.datetime.utcnow(),
+            created_on=utils.get_current_utc_datetime(),
         )
         models_to_put.append(sugg)
 
@@ -2670,7 +2670,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=self.LANGUAGE_CODE,
                     edited_by_reviewer=False,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
                 sugg = self.create_model(
@@ -2686,7 +2686,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=None,
                     edited_by_reviewer=False,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
             elif 100 <= i < 125:
@@ -2703,7 +2703,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=self.LANGUAGE_CODE,
                     edited_by_reviewer=True,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
                 sugg = self.create_model(
@@ -2719,7 +2719,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=None,
                     edited_by_reviewer=True,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
             else:
@@ -2736,7 +2736,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=self.LANGUAGE_CODE,
                     edited_by_reviewer=False,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
                 sugg = self.create_model(
@@ -2752,7 +2752,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     score_category='translation.X',
                     language_code=None,
                     edited_by_reviewer=False,
-                    created_on=datetime.datetime.utcnow(),
+                    created_on=utils.get_current_utc_datetime(),
                 )
                 models_to_put.append(sugg)
 
@@ -3093,7 +3093,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             score_category='translation.X',
             language_code='lang1',
             edited_by_reviewer=False,
-            created_on=datetime.datetime.utcnow(),
+            created_on=utils.get_current_utc_datetime(),
         )
         models_to_put.append(sugg)
 
@@ -3165,7 +3165,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             score_category='question.X',
             language_code=None,
             edited_by_reviewer=False,
-            created_on=datetime.datetime.utcnow(),
+            created_on=utils.get_current_utc_datetime(),
         )
         models_to_put.append(qsugg)
 

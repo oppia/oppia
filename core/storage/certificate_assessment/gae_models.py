@@ -330,10 +330,15 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
     # The ID of the learner who made this attempt.
     learner_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The ID of the certificate assessment being attempted.
+    certificate_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The total score achieved by the learner in this attempt.
     total_score = datastore_services.FloatProperty(required=True, indexed=True)
-    # The index of this attempt for the given learner (1-based, increasing
-    # with every new attempt made by the same learner).
+    # The index of this attempt for the given learner and certificate
+    # (1-based, increasing with every new submitted attempt made by the
+    # same learner for the same certificate).
     attempt_index = datastore_services.IntegerProperty(
         required=True, indexed=True
     )
@@ -403,6 +408,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         return {
             **super(cls, cls).get_export_policy(),
             'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'certificate_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_score': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_data': base_models.EXPORT_POLICY.EXPORTED,
@@ -474,6 +480,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     def create(
         cls,
         learner_id: str,
+        certificate_id: str,
         total_score: float,
         attempt_index: int,
         attempt_data: Dict[str, Dict[str, int]],
@@ -486,8 +493,11 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
         Args:
             learner_id: str. The ID of the learner making the attempt.
+            certificate_id: str. The ID of the certificate being attempted.
             total_score: float. The total score achieved in this attempt.
-            attempt_index: int. The index of this attempt for the learner.
+            attempt_index: int. The 1-based count of submitted attempts for
+                this learner and certificate. In-progress attempts should be
+                stored with a placeholder value until submission time.
             attempt_data: dict. Per-topic stats about questions answered.
             version_data: dict. Versions of the certificate, topics,
                 questions, and question-topic-links used for this attempt.
@@ -503,6 +513,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         attempt_instance = cls(
             id=instance_id,
             learner_id=learner_id,
+            certificate_id=certificate_id,
             total_score=total_score,
             attempt_index=attempt_index,
             attempt_data=attempt_data,
@@ -521,7 +532,12 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
     """Storage model for a single response submitted by a learner during
     a certificate assessment attempt.
 
-    The ID of instances of this class are in form of random hash of 12 chars.
+    The ID of an instance is the ID of the question the response answers, and
+    its parent is the CertificateAssessmentAttemptModel the response belongs
+    to. Using the question ID as the entity ID means a retried submission
+    overwrites the same entity instead of creating duplicates, and parenting
+    responses under their attempt keeps all of an attempt's responses in one
+    entity group.
     """
 
     # The ID of the CertificateAssessmentAttemptModel this response
@@ -609,31 +625,9 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         }
 
     @classmethod
-    def _get_new_id(cls) -> str:
-        """Generates a unique ID in the form of a random hash of 12 chars.
-
-        Returns:
-            str. ID of the new CertificateAssessmentResponseModel instance.
-
-        Raises:
-            Exception. The ID generator is producing too many collisions.
-        """
-        for _ in range(base_models.MAX_RETRIES):
-            new_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH,
-            )
-            if not cls.get_by_id(new_id):
-                return new_id
-
-        raise Exception(
-            'The id generator for CertificateAssessmentResponseModel '
-            'is producing too many collisions.'
-        )
-
-    @classmethod
     def create(
         cls,
+        attempt_key: datastore_services.Key,
         attempt_id: str,
         question_id: str,
         question_version: int,
@@ -643,6 +637,8 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         """Creates a new certificate assessment response instance.
 
         Args:
+            attempt_key: Key. The key of the CertificateAssessmentAttemptModel
+                this response belongs to.
             attempt_id: str. The ID of the attempt this response belongs to.
             question_id: str. The ID of the question being answered.
             question_version: int. The version of the question answered.
@@ -652,9 +648,9 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         Returns:
             CertificateAssessmentResponseModel. Instance of the new entry.
         """
-        instance_id = cls._get_new_id()
         response_instance = cls(
-            id=instance_id,
+            id=question_id,
+            parent=attempt_key,
             attempt_id=attempt_id,
             question_id=question_id,
             question_version=question_version,
@@ -669,11 +665,14 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
     @classmethod
     def create_multi(
         cls,
+        attempt_key: datastore_services.Key,
         response_dicts: List[CertificateAssessmentResponseCreateDict],
     ) -> List[CertificateAssessmentResponseModel]:
         """Creates and persists multiple certificate assessment responses.
 
         Args:
+            attempt_key: Key. The key of the CertificateAssessmentAttemptModel
+                these responses belong to.
             response_dicts: list(CertificateAssessmentResponseCreateDict).
                 The response payloads to persist.
 
@@ -683,7 +682,8 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         """
         response_instances = [
             cls(
-                id=cls._get_new_id(),
+                id=response_dict['question_id'],
+                parent=attempt_key,
                 attempt_id=response_dict['attempt_id'],
                 question_id=response_dict['question_id'],
                 question_version=response_dict['question_version'],

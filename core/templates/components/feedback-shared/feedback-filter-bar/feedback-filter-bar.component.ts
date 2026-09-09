@@ -15,12 +15,14 @@
  * @fileoverview Filter bar with Apply/Clear pattern. Emits
  * filter state on Apply only (not on every keystroke).
  */
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
 import {
   FeedbackStatus,
   TechnicalTeamType,
   FEEDBACK_STATUS_LABELS,
   TECHNICAL_TEAM_LABELS,
+  CreatorFeedbackType,
+  CREATOR_FEEDBACK_TYPE_LABELS,
 } from 'domain/feedback/feedback.model';
 import type {
   FeedbackFilterConfig,
@@ -33,21 +35,32 @@ import './feedback-filter-bar.component.css';
   templateUrl: './feedback-filter-bar.component.html',
   styleUrls: ['./feedback-filter-bar.component.css'],
 })
-export class FeedbackFilterBarComponent {
+export class FeedbackFilterBarComponent implements OnInit {
   @Input() config!: FeedbackFilterConfig;
   @Output() filterChange = new EventEmitter<FeedbackFilterState>();
 
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
-  readonly statusOptions = Object.values(FeedbackStatus);
+  readonly creatorFeedbackTypeLabels = CREATOR_FEEDBACK_TYPE_LABELS;
   readonly teamOptions = Object.values(TechnicalTeamType);
+  readonly creatorFeedbackTypeOptions = Object.values(CreatorFeedbackType);
 
   today: string = new Date().toISOString().split('T')[0];
-  selectedStatus: FeedbackStatus = FeedbackStatus.OPEN;
+  selectedStatus!: FeedbackStatus;
   searchText: string = '';
   fromDate: string = '';
   toDate: string = '';
   selectedTechnicalTeam: TechnicalTeamType = TechnicalTeamType.TECH_EXTERNAL;
+  selectedCreatorFeedbackType: CreatorFeedbackType =
+    CreatorFeedbackType.FEEDBACK;
+
+  ngOnInit(): void {
+    this.selectedStatus = this.config.statusOptions[0];
+  }
+
+  get statusOptions(): FeedbackStatus[] {
+    return this.config.statusOptions;
+  }
 
   applyFilters(): void {
     const dateRange = {
@@ -58,16 +71,18 @@ export class FeedbackFilterBarComponent {
       searchText: this.searchText,
       status: this.selectedStatus,
       technicalTeam: this.selectedTechnicalTeam,
+      creatorFeedbackType: this.selectedCreatorFeedbackType,
       dateRange,
     });
   }
 
   clearAllFilters(): void {
-    this.selectedStatus = FeedbackStatus.OPEN;
+    this.selectedStatus = this.config.statusOptions[0];
     this.searchText = '';
     this.fromDate = '';
     this.toDate = '';
     this.selectedTechnicalTeam = TechnicalTeamType.TECH_EXTERNAL;
+    this.selectedCreatorFeedbackType = CreatorFeedbackType.FEEDBACK;
     this.applyFilters();
   }
 }

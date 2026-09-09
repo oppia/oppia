@@ -28,6 +28,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './practice-session-page.component.css';
 
 enum PracticeSessionType {
   Lesson = 'lesson',
@@ -39,6 +40,7 @@ enum PracticeSessionType {
 @Component({
   selector: 'practice-session-page',
   templateUrl: './practice-session-page.component.html',
+  styleUrls: ['./practice-session-page.component.css'],
 })
 export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -176,7 +178,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       this.urlService.getTopicUrlFragmentFromLearnerUrl();
     const practiceSessionsDataUrl = this._getDataUrl();
     const practiceSessionsUrl = this._getRetryUrl();
-    const topicViewerUrl = this.urlInterpolationService.interpolateUrl(
+    let topicViewerUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
       {
         topic_url_fragment: topicUrlFragment,
@@ -184,6 +186,19 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
       }
     );
+
+    if (this.sessionType === PracticeSessionType.Arc && this.arcId) {
+      topicViewerUrl = this.urlService.addField(
+        topicViewerUrl,
+        'arc_mastered',
+        'true'
+      );
+      topicViewerUrl = this.urlService.addField(
+        topicViewerUrl,
+        'arc_id',
+        this.arcId
+      );
+    }
 
     this.practiceSessionsBackendApiService
       .fetchPracticeSessionsData(practiceSessionsDataUrl)

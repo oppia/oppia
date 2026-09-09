@@ -77,6 +77,10 @@ class UserSettingsModel(base_models.BaseModel):
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
     display_alias = datastore_services.StringProperty(default=None)
+    # Profile name to be shown on certificates.
+    profile_name_for_certificate = datastore_services.StringProperty(
+        default=None
+    )
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.
@@ -209,6 +213,7 @@ class UserSettingsModel(base_models.BaseModel):
                 'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
                 'display_alias': base_models.EXPORT_POLICY.EXPORTED,
                 'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name_for_certificate': base_models.EXPORT_POLICY.EXPORTED,
                 'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_site_language_code': base_models.EXPORT_POLICY.EXPORTED,
@@ -323,6 +328,7 @@ class UserSettingsModel(base_models.BaseModel):
             'has_viewed_lesson_info_modal_once': (
                 user.has_viewed_lesson_info_modal_once
             ),
+            'profile_name_for_certificate': user.profile_name_for_certificate,
         }
 
     @classmethod
@@ -950,7 +956,10 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
         if user_model is None:
-            return {}
+            return {
+                'exploration_ids': [],
+                'collection_ids': [],
+            }
 
         return {
             'exploration_ids': user_model.exploration_ids,
@@ -1064,6 +1073,12 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
     )
+    # Whether the user wants to receive Contributor Dashboard reviewer
+    # notification emails. This has no datastore-level default so that a None
+    # value can identify legacy entities and preserve their existing behavior.
+    contributor_dashboard_notifications = datastore_services.BooleanProperty(
+        indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1108,6 +1123,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
                 'editor_role_notifications': base_models.EXPORT_POLICY.EXPORTED,
                 'feedback_message_notifications': base_models.EXPORT_POLICY.EXPORTED,
                 'subscription_notifications': base_models.EXPORT_POLICY.EXPORTED,
+                'contributor_dashboard_notifications': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -1121,6 +1137,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
                 'editor_role_notifications': user_email_preferences.editor_role_notifications,
                 'feedback_message_notifications': user_email_preferences.feedback_message_notifications,
                 'subscription_notifications': user_email_preferences.subscription_notifications,
+                'contributor_dashboard_notifications': user_email_preferences.contributor_dashboard_notifications,
             }
         else:
             return {}

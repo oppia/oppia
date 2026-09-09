@@ -524,7 +524,7 @@ class SubmitCertificateAssessmentHandler(
                 attempt_id, answers
             )
         except utils.ValidationError as e:
-            raise self.InvalidInputException(e) from e
+            raise self.InvalidInputException(e) from
         self.render_json(
             {'attempt_id': attempt.attempt_id, 'is_submitted': True}
         )
@@ -556,6 +556,8 @@ class CertificateQuestionHandler(
                 'question_id': question_id,
                 'question_state_data': question_state_data,
             }
+        self.render_json(
+            {'attempt_id': attempt.attempt_id, 'is_submitted': True}
         )
 
 
@@ -644,6 +646,11 @@ class CertificateAssessmentAttemptsHandler(
         offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
             certificate_ids
         )
+        )
+        offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
+            certificate_ids
+        )
+
         # Here we use object because the attempt summary values are
         # heterogeneous JSON payloads (strings, floats, integers and booleans).
         attempt_summaries: List[Dict[str, object]] = []

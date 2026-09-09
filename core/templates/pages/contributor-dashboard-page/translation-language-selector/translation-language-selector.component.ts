@@ -34,6 +34,7 @@ import {
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import './translation-language-selector.component.css';
 
 interface Options {
   id: string;
@@ -43,6 +44,7 @@ interface Options {
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html',
+  styleUrls: ['./translation-language-selector.component.css'],
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

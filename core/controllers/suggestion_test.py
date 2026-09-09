@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -2734,6 +2734,129 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'This looks good!')
         self.logout()
 
+    def test_post_and_accept_skill_translation_suggestion(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description'
+        )
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                    'language_code': 'hi',
+                    'content_html': 'Skill description',
+                    'translation_html': 'Skill description in Hindi',
+                    'data_format': 'unicode',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        suggestion = suggestion_services.query_suggestions(
+            [('target_id', skill_id)]
+        )[0]
+        self.assertEqual(suggestion.target_type, feconf.ENTITY_TYPE_SKILL)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda *args: None,
+        ):
+            self.put_json(
+                '%s/skill/%s/%s'
+                % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    skill_id,
+                    suggestion.suggestion_id,
+                ),
+                {
+                    'action': 'accept',
+                    'review_message': 'Accepted skill translation!',
+                },
+                csrf_token=csrf_token,
+            )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
+        )
+        self.logout()
+
+    def test_reject_skill_translation_suggestion(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description'
+        )
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                    'language_code': 'hi',
+                    'content_html': 'Skill description',
+                    'translation_html': 'Skill description in Hindi',
+                    'data_format': 'unicode',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        suggestion = suggestion_services.query_suggestions(
+            [('target_id', skill_id)]
+        )[0]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/skill/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                skill_id,
+                suggestion.suggestion_id,
+            ),
+            {
+                'action': 'reject',
+                'review_message': 'Rejected skill translation',
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+        self.logout()
+
     def test_accept_question_suggestion_with_image_region_interactions(
         self,
     ) -> None:
@@ -3364,16 +3487,33 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         suggestion_id = suggestion_to_accept['suggestion_id']
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        # Create a mock suggestion with a different suggestion_type.
         class MockSuggestion:
             def __init__(
-                self, original_suggestion: suggestion_registry.BaseSuggestion
+                self,
+                original_suggestion: suggestion_registry.BaseSuggestion,
+                reviewer_id: str,
             ):
                 self.suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
                 self.target_id = original_suggestion.target_id
                 self.target_type = original_suggestion.target_type
+                self.author_id = original_suggestion.author_id
+                self.final_reviewer_id = reviewer_id
+                self.status = suggestion_models.STATUS_REJECTED
+                self.edited_by_reviewer = False
+                self.last_updated = utils.get_current_utc_datetime()
+                self.change_cmd = exp_domain.AddWrittenTranslationCmd(
+                    {
+                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                        'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                        'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                        'language_code': 'hi',
+                        'content_html': 'Skill description',
+                        'translation_html': 'Skill description in Hindi',
+                        'data_format': 'unicode',
+                    }
+                )
 
-        mock_suggestion = MockSuggestion(suggestion)
+        mock_suggestion = MockSuggestion(suggestion, self.admin_id)
 
         # Swap suggestion_services.get_suggestion_by_id to return our mock suggestion.
         swap_get_suggestion = self.swap(
@@ -3396,6 +3536,132 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             )
 
         self.logout()
+
+    def test_post_and_accept_skill_translation_suggestion(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': self.skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                    'language_code': 'hi',
+                    'content_html': 'Description',
+                    'translation_html': '<p>Skill description in Hindi</p>',
+                    'data_format': 'html',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        author_stats = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            'hi', self.author_id
+        )
+        assert author_stats is not None
+        self.assertEqual(author_stats.submitted_translations_count, 1)
+
+        all_suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.skill_id)]
+        )
+        suggestions = [
+            s
+            for s in all_suggestions
+            if s.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ]
+        self.assertEqual(len(suggestions), 1)
+        suggestion = suggestions[0]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/skill/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                self.skill_id,
+                suggestion.suggestion_id,
+            ),
+            {'action': 'accept', 'review_message': 'Accepted!'},
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        author_stats = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            'hi', self.author_id
+        )
+        assert author_stats is not None
+        self.assertEqual(author_stats.accepted_translations_count, 1)
+
+        reviewer_stats = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+            'hi', self.admin_id
+        )
+        assert reviewer_stats is not None
+        self.assertEqual(reviewer_stats.reviewed_translations_count, 1)
+
+    def test_reject_skill_translation_suggestion(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': self.skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                    'language_code': 'hi',
+                    'content_html': 'Description',
+                    'translation_html': '<p>Skill description in Hindi</p>',
+                    'data_format': 'html',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        all_suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.skill_id)]
+        )
+        suggestions = [
+            s
+            for s in all_suggestions
+            if s.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ]
+        self.assertEqual(len(suggestions), 1)
+        suggestion = suggestions[0]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/skill/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                self.skill_id,
+                suggestion.suggestion_id,
+            ),
+            {'action': 'reject', 'review_message': 'Rejected!'},
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        reviewer_stats = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+            'hi', self.admin_id
+        )
+        assert reviewer_stats is not None
+        self.assertEqual(reviewer_stats.reviewed_translations_count, 1)
 
 
 class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
@@ -3940,6 +4206,38 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             )
         self.assertEqual(len(response['suggestions']), 3)
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_none_opportunity_for_missing_card(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # A suggestion can outlive its translation opportunity, in which case no
+        # card is returned for its target and the target must still appear in
+        # the response mapped to None.
+        with self.swap_to_always_return(
+            opportunity_services,
+            'get_translation_opportunity_cards_by_entity_ids_with_new_models',
+            [],
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'], {self.EXP_ID: None}
+        )
+
     def test_skill_handler_returns_data(self) -> None:
         self.login(self.AUTHOR_EMAIL)
 
@@ -4005,7 +4303,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             response['target_id_to_opportunity_dict'][self.EXP_ID], None
         )
 
-    def test_get_translation_suggestions_returns_null_exploration_content_html_for_obsolete_suggestions(  # pylint: disable=line-too-long
+    def test_get_translation_suggestions_returns_null_entity_content_html_for_obsolete_suggestions(  # pylint: disable=line-too-long
         self,
     ) -> None:
         # Create a new exploration and linked story.
@@ -4072,7 +4370,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['suggestions']), 2)
         self.assertEqual(response['next_offset'], 2)
         suggestion = response['suggestions'][0]
-        self.assertEqual(suggestion['exploration_content_html'], 'Continue')
+        self.assertEqual(suggestion['entity_content_html'], 'Continue')
         self.logout()
 
         # Replace the Continue button text content ID.
@@ -4113,7 +4411,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['suggestions']), 2)
         self.assertEqual(response['next_offset'], 2)
         suggestion = response['suggestions'][0]
-        self.assertIsNone(suggestion['exploration_content_html'])
+        self.assertIsNone(suggestion['entity_content_html'])
 
     def test_translation_suggestions_fetches_extra_page_if_filtered_result_is_empty(  # pylint: disable=line-too-long
         self,
@@ -4509,10 +4807,146 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.REVIEWER_EMAIL)
 
+    def _create_skill_translation_suggestion(self) -> str:
+        """Submits a translation suggestion for the test skill's explanation
+        and returns its ID.
+        """
+        skill_services.update_skill(
+            self.owner_id,
+            self.SKILL_ID,
+            [
+                skill_domain.SkillChange(
+                    {
+                        'cmd': (
+                            skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY
+                        ),
+                        'property_name': (
+                            skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
+                        ),
+                        'old_value': {
+                            'content_id': (
+                                feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+                            ),
+                            'html': '',
+                        },
+                        'new_value': {
+                            'content_id': (
+                                feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+                            ),
+                            'html': '<p>skill explanation</p>',
+                        },
+                    }
+                )
+            ],
+            'Update explanation.',
+        )
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            self.SKILL_ID,
+            skill.version,
+            self.author_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
+                'language_code': 'hi',
+                'content_html': '<p>skill explanation</p>',
+                'translation_html': '<p>skill explanation in Hindi</p>',
+                'data_format': 'html',
+            },
+            'Adds skill translation',
+        )
+        return suggestion.suggestion_id
+
+    def test_handler_returns_every_target_type_when_all_is_requested(
+        self,
+    ) -> None:
+        skill_suggestion_id = self._create_skill_translation_suggestion()
+
+        response = self.get_json(
+            '/getreviewablesuggestions/all/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+
+        # The exploration suggestion made in setUp and the skill suggestion
+        # made above are both returned, each rendered with its own target type.
+        self.assertEqual(len(response['suggestions']), 2)
+        suggestion_id_to_target_type = {
+            suggestion['suggestion_id']: suggestion['target_type']
+            for suggestion in response['suggestions']
+        }
+        self.assertEqual(
+            suggestion_id_to_target_type[skill_suggestion_id],
+            feconf.ENTITY_TYPE_SKILL,
+        )
+        self.assertEqual(
+            sorted(suggestion_id_to_target_type.values()),
+            [feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL],
+        )
+        # Both targets have an opportunity dict, so the dashboard can label
+        # each suggestion in the mixed list.
+        self.assertEqual(
+            sorted(response['target_id_to_opportunity_dict'].keys()),
+            sorted([self.EXP_ID, self.SKILL_ID]),
+        )
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.SKILL_ID][
+                'skill_description'
+            ],
+            self.SKILL_DESCRIPTION,
+        )
+        self.assertEqual(response['next_offset'], 2)
+
+    def test_handler_returns_only_the_requested_target_type(self) -> None:
+        skill_suggestion_id = self._create_skill_translation_suggestion()
+
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['suggestions'][0]['suggestion_id'], skill_suggestion_id
+        )
+        self.assertEqual(
+            response['suggestions'][0]['target_type'], feconf.ENTITY_TYPE_SKILL
+        )
+
+    def test_handler_rejects_all_target_type_for_question_suggestions(
+        self,
+    ) -> None:
+        # A question suggestion always targets a skill, so there is nothing for
+        # the sentinel to span.
+        response = self.get_json(
+            '/getreviewablesuggestions/all/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'Invalid target_type: all is only supported for translate_content '
+            'suggestions',
+        )
+
     def test_exploration_handler_returns_data_with_no_exploration_id(
         self,
     ) -> None:
-        # If no exploration ID is provided, no suggestions are returned.
+        # If no exploration ID is provided, all reviewable suggestions are returned.
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content',
             {
@@ -4521,8 +4955,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
             },
         )
-        self.assertEqual(len(response['suggestions']), 0)
-        self.assertEqual(response['next_offset'], 0)
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
 
     def test_exploration_handler_returns_data_with_valid_exploration_id(
         self,
@@ -4530,7 +4964,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content',
             params={
-                'exploration_id': self.EXP_ID,
+                'entity_id': self.EXP_ID,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
@@ -4587,7 +5021,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content',
             params={
-                'exploration_id': self.EXP_ID,
+                'entity_id': self.EXP_ID,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
@@ -4724,7 +5158,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content',
             params={
-                'exploration_id': self.EXP_ID,
+                'entity_id': self.EXP_ID,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
             },

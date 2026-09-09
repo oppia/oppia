@@ -1,0 +1,21 @@
+<div class="assessment-modal-card">
+  <div class="assessment-modal-header">
+    <div class="assessment-modal-header-content">
+      <img class="assessment-modal-icon" src="/assets/images/certificates/time-up-icon.svg" alt="">
+
+      <div>
+        <h2 id="time-expired-modal-title" class="assessment-modal-title">{{ 'I18N_TIME_EXPIRED_MODAL_TITLE' | translate }}</h2>
+        <p id="time-expired-modal-message" class="assessment-modal-message" [innerHTML]="'I18N_TIME_EXPIRED_MODAL_MESSAGE' | translate">
+        </p>
+      </div>
+    </div>
+
+    <button type="button" class="btn-close" [attr.aria-label]="'I18N_TIME_EXPIRED_MODAL_CLOSE_BUTTON' | translate" (click)="dismiss()"></button>
+  </div>
+
+  <div class="assessment-modal-footer">
+    <button type="button" class="btn btn-primary assessment-modal-action-button" (click)="viewResults()">
+      {{ 'I18N_TIME_EXPIRED_MODAL_VIEW_RESULTS_BUTTON' | translate }}
+    </button>
+  </div>
+</div>

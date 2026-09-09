@@ -371,11 +371,49 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
     def test_validate_succeeds_for_valid_attempt(self) -> None:
         self._get_sample_attempt().validate()
 
+    def test_get_time_taken_in_minutes_returns_elapsed_time(self) -> None:
+        attempt = self._get_sample_attempt()
+
+        self.assertEqual(attempt.get_time_taken_in_minutes(), 20)
+
+    def test_get_time_taken_in_minutes_returns_none_for_unfinished_attempt(
+        self,
+    ) -> None:
+        attempt = self._get_sample_attempt()
+        attempt.finished_at = None
+
+        self.assertIsNone(attempt.get_time_taken_in_minutes())
+
     def test_validate_succeeds_when_finished_at_is_none(self) -> None:
         attempt = self._get_sample_attempt()
         attempt.finished_at = None
         attempt.is_submitted = False
         attempt.validate()
+
+    def test_validate_accepts_placeholder_values_for_unsubmitted_attempt(
+        self,
+    ) -> None:
+        attempt = certificate_assessment_domain.CertificateAssessmentAttempt(
+            attempt_id='attempt_abc123',
+            learner_id='learner_id_1',
+            total_score=0.0,
+            attempt_index=0,
+            attempt_data={},
+            version_data=self._get_sample_version_data(),
+            started_at=self.SAMPLE_STARTED_AT,
+            finished_at=None,
+            is_submitted=False,
+        )
+        attempt.validate()
+
+    def test_validate_rejects_non_dict_attempt_data(self) -> None:
+        attempt = self._get_sample_attempt()
+        # Here we use MyPy ignore because this test intentionally assigns an
+        # invalid value to exercise the validation branch.
+        attempt.attempt_data = None  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(Exception, 'attempt_data must be a dict.'):
+            attempt.validate()
 
     def test_validate_rejects_empty_attempt_id(self) -> None:
         attempt = self._get_sample_attempt()
@@ -757,18 +795,55 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
         ):
             response.validate()
 
-    def test_validate_rejects_empty_selected_answer(self) -> None:
+    def test_validate_allows_empty_selected_answer_for_unanswered(self) -> None:
         response = self._get_sample_response()
-        response.selected_answer = '   '
+        response.selected_answer = ''
+        response.validate()
+
+    def test_validate_rejects_non_string_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        setattr(response, 'selected_answer', None)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
         ):
             response.validate()
 
         response = self._get_sample_response()
-        setattr(response, 'selected_answer', None)
+        setattr(response, 'selected_answer', 42)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
+        ):
+            response.validate()
+
+    def test_validate_rejects_oversized_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
+        ):
+            response.validate()
+
+    def test_validate_accepts_answer_at_size_limit(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+        )
+        response.validate()
+
+    def test_validate_oversized_limit_is_byte_based(self) -> None:
+        # Non-ASCII characters encode to two bytes each in UTF-8, so a string
+        # below the character limit can still exceed the byte limit.
+        oversized_character_count = (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            // 2
+        ) + 1
+        response = self._get_sample_response()
+        response.selected_answer = '\u00e9' * oversized_character_count
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
         ):
             response.validate()
 

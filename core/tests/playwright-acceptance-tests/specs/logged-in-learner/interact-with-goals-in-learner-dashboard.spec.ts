@@ -128,7 +128,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should start and complete Chapter 1, then show updated progress (33%)', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
@@ -146,14 +146,14 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('What are the Place Values');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 33);
 
@@ -163,21 +163,21 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should complete Chapter 2 and update progress to 67%', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
 
     await loggedInUser.clickLessonCardButton('Find the Value of a Number');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 67);
@@ -188,7 +188,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should complete final chapter and move goal to Completed section', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
 
@@ -196,14 +196,14 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('Comparing Numbers');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 100);
@@ -220,7 +220,7 @@ test.describe('Logged-In Learner', function () {
   test('should display correctly on mobile viewport', async function () {
     await loggedInUser.setMobileViewport();
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalCardToBeVisible('Place Values');

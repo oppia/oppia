@@ -37,6 +37,7 @@ describe('Concept card object factory', () => {
           explanation: {},
         },
       },
+      skill_description: 'test description',
     };
   });
 
@@ -45,6 +46,19 @@ describe('Concept card object factory', () => {
     expect(conceptCard.getExplanation()).toEqual(
       SubtitledHtml.createDefault('test explanation', 'explanation')
     );
+    expect(conceptCard.getSkillDescription()).toEqual('test description');
+  });
+
+  it('should default the skill description when the backend omits it', () => {
+    // A skill's own contents reuse this dict shape and carry no description.
+    const dictWithoutDescription = {
+      explanation: conceptCardDict.explanation,
+      recorded_voiceovers: conceptCardDict.recorded_voiceovers,
+    };
+    const conceptCard = ConceptCard.createFromBackendDict(
+      dictWithoutDescription
+    );
+    expect(conceptCard.getSkillDescription()).toEqual('');
   });
 
   it('should set explanation', () => {

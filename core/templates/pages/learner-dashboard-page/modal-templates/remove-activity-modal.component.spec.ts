@@ -73,94 +73,6 @@ describe('Remove Activity Modal Component', function () {
   });
 
   it(
-    'should remove exploration in learner playlist when clicking on' +
-      ' remove button',
-    fakeAsync(() => {
-      const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-
-      component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      component.activityId = '0';
-      component.activityTitle = 'Title';
-      component.removeActivityUrl =
-        '/learnerplaylistactivityhandler/exploration/0';
-
-      component.remove();
-      flushMicrotasks();
-      fixture.detectChanges();
-
-      expect(closeSpy).toHaveBeenCalledWith(
-        '/learnerplaylistactivityhandler/exploration/0'
-      );
-    })
-  );
-
-  it(
-    'should not remove exploration in learner playlist' +
-      ' when clicking on cancel button',
-    fakeAsync(() => {
-      const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-
-      component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      component.activityId = '0';
-      component.activityTitle = 'Title';
-      component.removeActivityUrl =
-        '/learnerplaylistactivityhandler/exploration/0';
-
-      component.cancel();
-      flushMicrotasks();
-      fixture.detectChanges();
-
-      expect(dismissSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should remove collection in learner playlist when clicking on' +
-      ' remove button',
-    fakeAsync(() => {
-      const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-
-      component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      component.activityId = '0';
-      component.activityTitle = 'Title';
-      component.removeActivityUrl =
-        '/learnerplaylistactivityhandler/collection/0';
-
-      component.remove();
-      flushMicrotasks();
-      fixture.detectChanges();
-
-      expect(closeSpy).toHaveBeenCalledWith(
-        '/learnerplaylistactivityhandler/collection/0'
-      );
-    })
-  );
-
-  it(
-    'should not remove collection in learner playlist' +
-      ' when clicking on cancel button',
-    fakeAsync(() => {
-      const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-
-      component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      component.activityId = '0';
-      component.activityTitle = 'Title';
-      component.removeActivityUrl =
-        '/learnerplaylistactivityhandler/collection/0';
-
-      component.cancel();
-      flushMicrotasks();
-      fixture.detectChanges();
-
-      expect(dismissSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
     'should remove topic from current goals when clicking on' +
       ' remove button',
     fakeAsync(() => {
@@ -203,7 +115,7 @@ describe('Remove Activity Modal Component', function () {
   );
 
   it(
-    'should remove exploration in incomplete playlist when clicking on' +
+    'should remove exploration in incomplete list when clicking on' +
       ' remove button',
     fakeAsync(() => {
       const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
@@ -226,7 +138,7 @@ describe('Remove Activity Modal Component', function () {
   );
 
   it(
-    'should not remove exploration in incomplete playlist' +
+    'should not remove exploration in incomplete list' +
       ' when clicking on cancel button',
     fakeAsync(() => {
       const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
@@ -247,7 +159,7 @@ describe('Remove Activity Modal Component', function () {
   );
 
   it(
-    'should remove collection in incomplete playlist when clicking on' +
+    'should remove collection in incomplete list when clicking on' +
       ' remove button',
     fakeAsync(() => {
       const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
@@ -270,7 +182,7 @@ describe('Remove Activity Modal Component', function () {
   );
 
   it(
-    'should not remove collection in incomplete playlist' +
+    'should not remove collection in incomplete list' +
       ' when clicking on cancel button',
     fakeAsync(() => {
       const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();

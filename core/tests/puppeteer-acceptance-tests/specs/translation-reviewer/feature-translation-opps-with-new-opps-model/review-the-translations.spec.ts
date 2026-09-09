@@ -19,7 +19,6 @@
  * TR.CD. Review the translations.
  */
 
-import path from 'path';
 import testConstants from '../../../utilities/common/test-constants';
 import {UserFactory} from '../../../utilities/common/user-factory';
 import {Contributor} from '../../../utilities/user/contributor';
@@ -108,7 +107,7 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions'
+      'Exploration - Fractions'
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
@@ -138,7 +137,7 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
-      'Fractions'
+      'Exploration - Fractions'
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
@@ -160,7 +159,7 @@ describe('Translation Reviewer V2', function () {
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.expectScreenshotToMatch(
       'translationReviewerReviewTab',
-      path.join(__dirname, '..')
+      __dirname
     );
   });
 

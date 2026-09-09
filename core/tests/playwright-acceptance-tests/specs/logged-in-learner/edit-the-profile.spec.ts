@@ -144,7 +144,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.saveChangesInPreferencesPage();
 
     await loggedInLearner.page.waitForLoadState('networkidle');
-    await loggedInLearner.navigateToSplashPage(
+    await loggedInLearner.navigateToSplashPageAsLoggedInUser(
       'http://localhost:8181/creator-dashboard'
     );
   });
@@ -170,7 +170,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.playLessonFromSearchResults(
       'Solving problems without calculator'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedInLearner.openLessonInfoModal();
     await loggedInLearner.clickOnProfileIconInLessonInfoModel();

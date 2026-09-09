@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -75,7 +75,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     def test_creates_stats_model_from_one_in_review_suggestion(self) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -208,7 +208,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self,
     ) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -293,7 +293,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     ) -> None:
         # Define a fixed datetime.
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -378,7 +378,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self,
     ) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -463,7 +463,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self,
     ) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -635,7 +635,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self,
     ) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             first_suggestion_model = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -791,7 +791,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         # Define a fixed datetime.
         mocked_now = datetime.datetime(2024, 10, 28)
 
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             opportunity_model = self.create_model(
                 opportunity_models.ExplorationOpportunitySummaryModel,
                 id=self.EXP_1_ID,
@@ -1205,7 +1205,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self,
     ) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             topic_id = self._create_question()
 
         self.assert_job_output_is(
@@ -1283,7 +1283,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     def test_creates_stats_model_from_multiple_suggestions(self) -> None:
         mocked_now = datetime.datetime(2025, 1, 7)
-        with self.mock_datetime_utcnow(mocked_now):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: mocked_now):
             opportunity_model = self.create_model(
                 opportunity_models.ExplorationOpportunitySummaryModel,
                 id=self.EXP_1_ID,
@@ -2288,7 +2288,7 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             target_id=self.EXP_1_ID,
             target_version_at_submission=0,
             language_code=self.LANG_1,
-            last_updated=datetime.datetime.utcnow()
+            last_updated=utils.get_current_utc_datetime()
             - datetime.timedelta(days=1),
         )
         suggestion_2_model.update_timestamps(update_last_updated_time=False)
