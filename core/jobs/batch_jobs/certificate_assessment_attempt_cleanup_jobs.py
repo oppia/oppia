@@ -28,10 +28,10 @@ writing any changes, and DeleteAbandonedCertificateAssessmentAttemptsJob
 opts into deleting them. Since certificate assessments no longer impose a
 time limit, the age of the attempt alone decides whether it is abandoned:
 
-    started_at + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
+started_at + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES
 
-An in-progress attempt still present after this window is treated as
-abandoned.
+    An in-progress attempt still present after this window is treated as
+    abandoned.
 
 Both jobs only read from the datastore through Beam's NDB I/O transforms, so
 they are safe to run over large datasets.
@@ -57,11 +57,12 @@ if MYPY:  # pragma: no cover
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
-# The number of days after which an in-progress certificate assessment attempt
-# is considered abandoned and can be cleaned up. Learners may resume an
+# The number of minutes after which an in-progress certificate assessment
+# attempt is considered abandoned and can be cleaned up. Learners may resume an
 # in-progress attempt at their own pace, so an attempt that has not been
-# submitted within this window is treated as abandoned.
-ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS = 7
+# submitted within this window is treated as abandoned. Kept short for easy
+# testing of the cleanup flow.
+ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES = 5
 
 
 class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
@@ -93,7 +94,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
         abandonment_cutoff: datetime.datetime = (
             attempt_model.started_at
             + datetime.timedelta(
-                days=ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
+                minutes=ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES
             )
         )
         current_time = datetime.datetime.now(datetime.timezone.utc).replace(
