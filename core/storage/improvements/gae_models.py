@@ -60,7 +60,7 @@ class ExplorationStatsTaskEntryModel(base_models.BaseModel):
     """
 
     # Utility field which results in a 20% speedup compared to querying by each
-    # of the invididual fields used to compose it.
+    # of the individual fields used to compose it.
     # Value has the form: "[entity_type].[entity_id].[entity_version]".
     composite_entity_id = datastore_services.StringProperty(
         required=True, indexed=True

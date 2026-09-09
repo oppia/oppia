@@ -81,7 +81,7 @@ class FeaturedActivitiesHandler(
         ]
 
         try:
-            # Retrieve the list for each type of inavlid ID.
+            # Retrieve the list for each type of invalid ID.
             (
                 non_existent_exploration_ids,
                 non_existent_collection_ids,

@@ -280,7 +280,7 @@ class TranslatableContentsCollection:
         Args:
             translatable_object: BaseTranslatableObject. An instance of
                 BaseTranslatableObject class.
-            **kwargs: *. The keyword args for registring translatable object.
+            **kwargs: *. The keyword args for registering translatable object.
         """
         self.content_id_to_translatable_content.update(
             translatable_object.get_translatable_contents_collection(
@@ -381,7 +381,7 @@ class BaseTranslatableObject:
         entity_translation: EntityTranslation,
         override_metadata_feature_flag: bool = False,
     ) -> int:
-        """Returs the number of updated translations avialable.
+        """Returns the number of updated translations available.
 
         Args:
             entity_translation: EntityTranslation. The translation object
@@ -390,7 +390,7 @@ class BaseTranslatableObject:
                 metadata feature flag check.
 
         Returns:
-            int. The number of translatable contnet for which translations are
+            int. The number of translatable content for which translations are
             available in the given translation object.
         """
         count = 0
@@ -410,7 +410,7 @@ class BaseTranslatableObject:
         entity_translation: EntityTranslation,
         override_metadata_feature_flag: bool = False,
     ) -> bool:
-        """Whether the given EntityTranslation in the given lanaguage is
+        """Whether the given EntityTranslation in the given language is
         displayable.
 
         A language's translations are ready to be displayed if there are less
@@ -653,31 +653,31 @@ class EntityTranslation:
         """
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
-                'entity_type must be a string, recieved %r' % self.entity_type
+                'entity_type must be a string, received %r' % self.entity_type
             )
         if not isinstance(self.entity_id, str):
             raise utils.ValidationError(
-                'entity_id must be a string, recieved %r' % self.entity_id
+                'entity_id must be a string, received %r' % self.entity_id
             )
         if not isinstance(self.entity_version, int):
             raise utils.ValidationError(
-                'entity_version must be an int, recieved %r'
+                'entity_version must be an int, received %r'
                 % self.entity_version
             )
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
-                'language_code must be a string, recieved %r'
+                'language_code must be a string, received %r'
                 % self.language_code
             )
 
         for content_id, translated_content in self.translations.items():
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
-                    'content_id must be a string, recieved %r' % content_id
+                    'content_id must be a string, received %r' % content_id
                 )
             if not isinstance(translated_content.needs_update, bool):
                 raise utils.ValidationError(
-                    'needs_update must be a bool, recieved %r'
+                    'needs_update must be a bool, received %r'
                     % translated_content.needs_update
                 )
 

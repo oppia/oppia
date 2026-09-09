@@ -148,7 +148,7 @@ def establish_auth_session(
         max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         overwrite=True,
         # Toggles https vs http. The production server uses https, but the local
-        # developement server uses http.
+        # development server uses http.
         secure=(not constants.EMULATOR_MODE),
         # Using the HttpOnly flag when generating a cookie helps mitigate the
         # risk of client side script accessing the protected cookie (if the

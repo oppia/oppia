@@ -338,7 +338,7 @@ def get_exploration_summary_from_model(
             instance.
 
     Returns:
-        ExplorationSummary. The summary domain object correspoding to the
+        ExplorationSummary. The summary domain object corresponding to the
         given exploration summary model.
     """
 
@@ -612,7 +612,7 @@ def get_exploration_user_data(
 
     Returns:
         ExplorationUserData or None. The domain object corresponding to the
-        given user and exploration. If the model corresponsing to given user
+        given user and exploration. If the model corresponding to given user
         and exploration is not found, return None.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(

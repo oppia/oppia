@@ -1286,7 +1286,7 @@ def can_manage_contributors_role(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            UnauthorizedUserException. The user cannnot modify contributor's
+            UnauthorizedUserException. The user cannot modify contributor's
                 role for the contributor dashboard page.
         """
         if not self.user_id:

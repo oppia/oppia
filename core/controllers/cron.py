@@ -305,7 +305,7 @@ class CronAppFeedbackReportsScrubberHandlerPage(
         """Handles GET requests to scrub reports. This cron handler scrubs all
         app feedback report models that are expiring; expired reports have a
         created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
-        before tthe date this services is called.
+        before the date this services is called.
         """
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Funtions to create, accept, reject, update and perform other operations on
+"""Functions to create, accept, reject, update and perform other operations on
 suggestions.
 """
 
@@ -1742,7 +1742,7 @@ def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
         corresponding rte component name in square brackets.
 
         Args:
-            rte_tag: MatchObject. A matched object that contins the
+            rte_tag: MatchObject. A matched object that contains the
                 oppia-noninteractive rte tags.
 
         Returns:
@@ -1768,7 +1768,7 @@ def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
         # If the component name is more than word, connect the words with spaces
         # to create a single string.
         rte_component_name_string = ' '.join(rte_component_name_string_list)
-        # Captialize each word in the string.
+        # Capitalize each word in the string.
         capitalized_rte_component_name_string = (
             rte_component_name_string.title()
         )

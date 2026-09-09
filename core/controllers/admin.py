@@ -75,7 +75,7 @@ from core.domain import (
 
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
-# Platform paramters that we plan to show on the the release-coordinator page.
+# Platform parameters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
     [
         platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
@@ -3608,7 +3608,7 @@ class InteractionsByExplorationIdHandler(
         InteractionsByExplorationIdHandlerNormalizedRequestDict, Dict[str, str]
     ]
 ):
-    """Handler for admin to retrive the list of interactions used in
+    """Handler for admin to retrieve the list of interactions used in
     an exploration.
     """
 

@@ -1508,7 +1508,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             tags: list(str). The tags given to the exploration.
             blurb: str. The blurb of the exploration.
             author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
+            states_schema_version: int. The schema version of the exploration.
             init_state_name: str. The name for the initial state of the
                 exploration.
             states_dict: dict. A dict where each key-value pair represents,
@@ -1645,7 +1645,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
         'author_notes' are initialized to empty string; 'version' is
-        initializated to 0.
+        initialized to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -1752,7 +1752,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_name != init_state_name:
                 exploration.add_state(
                     state_name,
-                    # These are placeholder values which will be repalced with
+                    # These are placeholder values which will be replaced with
                     # correct values below.
                     '<placeholder1>',
                     '<placeholder2>',
@@ -3111,7 +3111,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
             init_state_name: str. Name of the first state.
 
@@ -3212,7 +3212,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 46 to 47. Version 52 deprecates
-        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        oppia-noninteractive-svgdiagram tag and converts existing occurrences of
         it to oppia-noninteractive-image tag.
 
         Args:
@@ -4827,7 +4827,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Fixes the TextInput interaction with following checks:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
-        - Text input height shoule be >= 1 and <= 10 else we will replace with
+        - Text input height should be >= 1 and <= 10 else we will replace with
         10
         - `Contains` should always come after another `Contains` rule where
         the first contains rule strings is a substring of the other contains
@@ -4865,7 +4865,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             int,
             state_dict['interaction']['customization_args']['rows']['value'],
         )
-        # Text input height shoule be >= 1 and <= 10.
+        # Text input height should be >= 1 and <= 10.
         if rows_value < 1:
             state_dict['interaction']['customization_args']['rows']['value'] = 1
         if rows_value > 10:
@@ -5697,7 +5697,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> VersionedExplorationDict:
         """Converts a v51 exploration dict into a v52 exploration dict.
         Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
-        existing occurences of it to oppia-noninteractive-image tag.
+        existing occurrences of it to oppia-noninteractive-image tag.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -7118,7 +7118,7 @@ class ExplorationMetadata:
             tags: list(str). The tags given to the exploration.
             blurb: str. The blurb of the exploration.
             author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
+            states_schema_version: int. The schema version of the exploration.
             init_state_name: str. The name for the initial state of the
                 exploration.
             param_specs: dict(str, ParamSpec). A dict where each key-value pair
