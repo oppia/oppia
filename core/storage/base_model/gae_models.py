@@ -2404,3 +2404,81 @@ class BaseFeedbackModel(BaseModel):
                 else raw_next_cursor
             )
         return results, next_cursor_str, more
+
+
+class BasePlatformParameterConfigModel(VersionedModel):
+    """Abstract base model for platform parameter configuration.
+
+    This model defines the common storage structure for platform parameters
+    across Web and Android. It must not be instantiated directly.
+
+    The id field represents the unique platform parameter name.
+
+    Fields:
+        id: str. Unique name of the platform parameter.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> DELETION_POLICY:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    @staticmethod
+    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+
+class BaseFeatureFlagConfigModel(BaseModel):
+    """Abstract base model for feature flag configuration.
+
+    This model defines the common structure for all feature flags across
+    Web and Android. It must not be instantiated directly.
+
+    The id field represents the globally unique feature flag name.
+
+    Fields:
+        id: str. Unique name of the feature flag.
+    """
+
+    @staticmethod
+    def get_deletion_policy() -> DELETION_POLICY:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    @staticmethod
+    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
