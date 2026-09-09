@@ -118,7 +118,7 @@ export class Contributor extends ExplorationEditor {
           getComputedStyle(placeholder).display === 'none'
         );
       },
-      {},
+      {timeout: 30000},
       opportunityLoadingPlaceholderSelector
     );
 
@@ -161,7 +161,7 @@ export class Contributor extends ExplorationEditor {
   private async findOpportunityItem(
     heading: string,
     subheading: string
-  ): Promise<ElementHandle | null> {
+  ): Promise<ElementHandle<Element> | null> {
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
       const opportunityItemHeading = await opportunityItemElement.evaluate(
@@ -195,7 +195,7 @@ export class Contributor extends ExplorationEditor {
     heading: string,
     subheading: string,
     visible: boolean = true
-  ): Promise<ElementHandle | null> {
+  ): Promise<ElementHandle<Element> | null> {
     await this.page.waitForNetworkIdle();
 
     // Handle the case where no translation opportunity is expected.
@@ -226,7 +226,7 @@ export class Contributor extends ExplorationEditor {
     // contain the target opportunity yet. Keep scanning until the target
     // opportunity shows up.
     const scanningTimeout = Date.now() + 30000;
-    while (true) {
+    while (Date.now() < scanningTimeout) {
       await this.waitForOpportunityListToStabilize();
       const opportunityItemElement = await this.findOpportunityItem(
         heading,
@@ -235,30 +235,29 @@ export class Contributor extends ExplorationEditor {
       if (opportunityItemElement !== null) {
         return opportunityItemElement;
       }
-      if (Date.now() >= scanningTimeout) {
-        let opportunityHeadings: string[] = [];
-        try {
-          const headings = await Promise.all(
-            (await this.page.$$(opportunityItemSelector)).map(item =>
-              item.evaluate(
-                (el: Element, sel: string) =>
-                  el.querySelector(sel)?.textContent?.trim() || '',
-                opportunityItemHeadingSelector
-              )
-            )
-          );
-          opportunityHeadings = headings.filter(text => text !== '');
-        } catch {
-          // The list was re-rendered while the diagnostics were being
-          // collected; report without them.
-        }
-        throw new Error(
-          `Translation opportunity for ${heading} in ${subheading} not found.` +
-            ` Found opportunity headings: [${opportunityHeadings.join(', ')}]`
-        );
-      }
       await this.page.waitForTimeout(200);
     }
+
+    let opportunityHeadings: string[] = [];
+    try {
+      const headings = await Promise.all(
+        (await this.page.$$(opportunityItemSelector)).map(item =>
+          item.evaluate(
+            (el: Element, sel: string) =>
+              el.querySelector(sel)?.textContent?.trim() || '',
+            opportunityItemHeadingSelector
+          )
+        )
+      );
+      opportunityHeadings = headings.filter(text => text !== '');
+    } catch {
+      // The list was re-rendered while the diagnostics were being
+      // collected; report without them.
+    }
+    throw new Error(
+      `Translation opportunity for ${heading} in ${subheading} not found.` +
+        ` Found opportunity headings: [${opportunityHeadings.join(', ')}]`
+    );
   }
 
   /**
