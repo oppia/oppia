@@ -236,17 +236,22 @@ export class Contributor extends ExplorationEditor {
         return opportunityItemElement;
       }
       if (Date.now() >= scanningTimeout) {
-        const opportunityHeadings = await this.page.$$eval(
-          opportunityItemSelector,
-          (elements: Element[], headingSelector: string): string[] =>
-            elements
-              .map(
-                el =>
-                  el.querySelector(headingSelector)?.textContent?.trim() || ''
+        let opportunityHeadings: string[] = [];
+        try {
+          const headings = await Promise.all(
+            (await this.page.$$(opportunityItemSelector)).map(item =>
+              item.evaluate(
+                (el: Element, sel: string) =>
+                  el.querySelector(sel)?.textContent?.trim() || '',
+                opportunityItemHeadingSelector
               )
-              .filter(text => text !== ''),
-          opportunityItemHeadingSelector
-        );
+            )
+          );
+          opportunityHeadings = headings.filter(text => text !== '');
+        } catch {
+          // The list was re-rendered while the diagnostics were being
+          // collected; report without them.
+        }
         throw new Error(
           `Translation opportunity for ${heading} in ${subheading} not found.` +
             ` Found opportunity headings: [${opportunityHeadings.join(', ')}]`
