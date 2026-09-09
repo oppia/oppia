@@ -38,7 +38,6 @@
     "core/templates/pages/blog-home-page/blog-home-page.component.css",
     "core/templates/pages/blog-post-page/blog-post-page.component.css",
     "core/tests/protractor-browserstack.conf.js",
-    "core/tests/wdio.conf.js",
     "data/README.md",
     "data/voiceovers/README.md",
     "extensions/README.md",

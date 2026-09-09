@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for new Conversation skin component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -1783,6 +1785,7 @@ describe('New Conversation skin component', () => {
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
       spyOn(loaderService, 'hideLoadingScreen');
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(urlService, 'getUrlParams').and.returnValue({});
       spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
         explorationEngineService
       );

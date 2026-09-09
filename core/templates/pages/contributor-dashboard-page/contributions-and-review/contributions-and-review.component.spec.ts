@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,

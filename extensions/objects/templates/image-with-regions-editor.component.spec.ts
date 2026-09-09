@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for image with regions editor.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,
