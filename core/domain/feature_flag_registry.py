@@ -121,7 +121,7 @@ class Registry:
             FeatureFlagConfig|None. The loaded instance, None if it's not found
             in storage.
         """
-        feature_flag_config_model = config_models.FeatureFlagConfigModel.get(
+        feature_flag_config_model = config_models.WebFeatureFlagConfigModel.get(
             name, strict=False
         )
 
@@ -148,11 +148,11 @@ class Registry:
             feature_flag.feature_flag_spec.feature_stage
         )
 
-        model_instance = config_models.FeatureFlagConfigModel.get(
+        model_instance = config_models.WebFeatureFlagConfigModel.get(
             feature_flag.name, strict=False
         )
         if model_instance is None:
-            model_instance = config_models.FeatureFlagConfigModel.create(
+            model_instance = config_models.WebFeatureFlagConfigModel.create(
                 feature_flag.name,
                 feature_flag.feature_flag_config.force_enable_for_all_users,
                 feature_flag.feature_flag_config.rollout_percentage,
