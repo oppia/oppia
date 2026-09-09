@@ -2420,13 +2420,29 @@ class BasePlatformParameterConfigModel(VersionedModel):
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:
-        """BasePlatformParameterConfigModel is not related to users."""
-        return DELETION_POLICY.NOT_APPLICABLE
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
 
     @staticmethod
     def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain user data."""
-        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
 
 
 class BaseFeatureFlagConfigModel(BaseModel):
@@ -2443,10 +2459,26 @@ class BaseFeatureFlagConfigModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:
-        """BaseFeatureFlagConfigModel is not related to users."""
-        return DELETION_POLICY.NOT_APPLICABLE
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
 
     @staticmethod
     def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain user data."""
-        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )

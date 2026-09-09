@@ -1519,30 +1519,54 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
 class BaseFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
     """Test BaseFeatureFlagConfigModel class."""
 
-    def test_get_deletion_policy_is_not_applicable(self) -> None:
-        self.assertEqual(
-            base_models.BaseFeatureFlagConfigModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
-        )
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeatureFlagConfigModel.get_deletion_policy()
 
-    def test_get_model_association_to_user(self) -> None:
-        self.assertEqual(
-            base_models.BaseFeatureFlagConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
-        )
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeatureFlagConfigModel.get_model_association_to_user()
 
 
 class BasePlatformParameterConfigModelTests(test_utils.GenericTestBase):
     """Test BasePlatformParameterConfigModel class."""
 
-    def test_get_deletion_policy_is_not_applicable(self) -> None:
-        self.assertEqual(
-            base_models.BasePlatformParameterConfigModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
-        )
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BasePlatformParameterConfigModel.get_deletion_policy()
 
-    def test_get_model_association_to_user(self) -> None:
-        self.assertEqual(
-            base_models.BasePlatformParameterConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
-        )
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BasePlatformParameterConfigModel.get_model_association_to_user()
