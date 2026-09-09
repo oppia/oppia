@@ -16,21 +16,96 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerStateService.
  */
 
-import {TestBed} from '@angular/core/testing';
-import {CertificateAssessmentAttemptData} from 'domain/certificate-assessment/certificate-assessment.model';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {
+  CertificateAssessmentAttemptData,
+  CertificateAssessmentOfferingData,
+} from 'domain/certificate-assessment/certificate-assessment.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 describe('CertificateAssessmentPlayerStateService', () => {
   let service: CertificateAssessmentPlayerStateService;
 
+  const mockOffering = new CertificateAssessmentOfferingData(
+    'cert-123',
+    'Everyday Arithmetic & Number Confidence',
+    'Certificate description.',
+    'math_classroom_01',
+    {topic_place_values: 1},
+    12,
+    60,
+    ['Understanding of numbers'],
+    'Available',
+    1
+  );
+
+  const mockStateData: StateBackendDict = {
+    classifier_model_id: null,
+    content: {content_id: 'c', html: '<p>prompt</p>'},
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {value: 1},
+        placeholder: {
+          value: {content_id: 'ca_placeholder_0', unicode_str: 'Type here'},
+        },
+        catchMisspellings: {value: false},
+      },
+      default_outcome: {
+        dest: 'final',
+        dest_if_really_stuck: null,
+        feedback: {content_id: 'f', html: '<p>f</p>'},
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      id: 'TextInput',
+      solution: null,
+    },
+    param_changes: [],
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    linked_skill_id: null,
+    inapplicable_skill_misconception_ids: [],
+  };
+
   const mockAttempt = CertificateAssessmentAttemptData.createFromBackendDict({
     attempt_id: 'attempt-1234',
     questions: [
-      {question_id: 'question_1', question_version: 1},
-      {question_id: 'question_2', question_version: 2},
+      {
+        question_id: 'question_1',
+        question_version: 1,
+        question_state_data: mockStateData,
+      },
+      {
+        question_id: 'question_2',
+        question_version: 2,
+        question_state_data: mockStateData,
+      },
     ],
   });
+
+  // The spies must call through so zone.js still schedules the interval on
+  // the fakeAsync clock; they only exist to count invocations. They are
+  // installed inside each test because installing them around the fakeAsync
+  // boundary makes the spied properties unrecognizable to matchers.
+  const spyOnTimers = (): void => {
+    spyOn(window, 'setInterval').and.callThrough();
+    spyOn(window, 'clearInterval').and.callThrough();
+  };
+
+  // Arms a fully running countdown: registers an attempt (which moves the
+  // learner to the questions stage) and applies the offering's one-hour
+  // time limit, which is what finally starts the interval.
+  const armCountdown = (): void => {
+    service.beginNewAttempt(mockAttempt);
+    service.configureForOffering(mockOffering.timeLimitInMinutes);
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,11 +114,16 @@ describe('CertificateAssessmentPlayerStateService', () => {
     service = TestBed.inject(CertificateAssessmentPlayerStateService);
   });
 
+  afterEach(() => {
+    service.ngOnDestroy();
+  });
+
   it('should initialize with a clean slate', () => {
     expect(service.currentStage).toBe(
       CertificateAssessmentPlayerPageConstants.STAGE_INTRO
     );
-    expect(service.showAssessmentInterruptCard).toBeFalse();
+    expect(service.remainingTimeInSeconds).toBe(0);
+    expect(service.isTimeExpired).toBe(false);
     expect(service.getAttempt()).toBeNull();
   });
 
@@ -65,40 +145,115 @@ describe('CertificateAssessmentPlayerStateService', () => {
   });
 
   describe('beginning a new attempt', () => {
-    it('should move to the questions stage', () => {
-      service.beginNewAttempt(mockAttempt);
+    it('should move to the questions stage and start a fresh window', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
 
       expect(service.currentStage).toBe(
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
       );
-      expect(service.getAttempt()).toEqual(mockAttempt);
-    });
+      expect(service.remainingTimeInSeconds).toBe(3600);
+      expect(window.setInterval).toHaveBeenCalledTimes(1);
+
+      tick(2000);
+      expect(service.remainingTimeInSeconds).toBe(3598);
+      service.ngOnDestroy();
+    }));
+
+    it('should derive the countdown from the deadline when callbacks are throttled', fakeAsync(() => {
+      armCountdown();
+
+      tick(60000);
+
+      expect(service.remainingTimeInSeconds).toBe(3540);
+      expect(service.isTimeExpired).toBe(false);
+      service.ngOnDestroy();
+    }));
+
+    it('should mark the window expired and stop at zero', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+
+      tick(3600000);
+
+      expect(service.remainingTimeInSeconds).toBe(0);
+      expect(service.isTimeExpired).toBe(true);
+      expect(window.clearInterval).toHaveBeenCalled();
+    }));
+
+    it('should wipe stale timing state from any previous attempt', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      tick(3600000);
+      expect(service.isTimeExpired).toBe(true);
+
+      armCountdown();
+
+      expect(service.isTimeExpired).toBe(false);
+      expect(service.remainingTimeInSeconds).toBe(3600);
+      expect(window.clearInterval).toHaveBeenCalled();
+      expect(window.setInterval).toHaveBeenCalledTimes(2);
+      service.ngOnDestroy();
+    }));
   });
 
-  describe('retry and resume after an interruption', () => {
-    it('should return to the intro on retry', () => {
-      service.beginNewAttempt(mockAttempt);
-      service.showAssessmentInterruptCard = true;
+  describe('starting the countdown', () => {
+    it('should not start before an attempt exists', () => {
+      spyOnTimers();
+      service.configureForOffering(mockOffering.timeLimitInMinutes);
 
-      service.returnToIntroAfterRetry();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_INTRO
-      );
+      expect(window.setInterval).not.toHaveBeenCalled();
+      expect(service.remainingTimeInSeconds).toBe(0);
     });
 
-    it('should return to the questions on resume', () => {
+    it('should not start without a positive time limit', () => {
+      spyOnTimers();
       service.beginNewAttempt(mockAttempt);
-      service.showAssessmentInterruptCard = true;
-      service.returnToIntroAfterRetry();
+      service.configureForOffering(0);
 
-      service.resumeQuestionsStage();
-
-      expect(service.showAssessmentInterruptCard).toBeFalse();
-      expect(service.currentStage).toBe(
-        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-      );
+      expect(window.setInterval).not.toHaveBeenCalled();
+      expect(service.remainingTimeInSeconds).toBe(0);
     });
+
+    it('should not start outside the questions stage', () => {
+      spyOnTimers();
+      service.beginNewAttempt(mockAttempt);
+      service.showIntro();
+      service.configureForOffering(mockOffering.timeLimitInMinutes);
+
+      expect(window.setInterval).not.toHaveBeenCalled();
+      expect(service.remainingTimeInSeconds).toBe(0);
+    });
+
+    it('should not restart a window that is already running', fakeAsync(() => {
+      spyOnTimers();
+      armCountdown();
+      service.configureForOffering(mockOffering.timeLimitInMinutes);
+
+      expect(window.setInterval).toHaveBeenCalledTimes(1);
+
+      tick(2000);
+      expect(service.remainingTimeInSeconds).toBe(3598);
+      service.ngOnDestroy();
+    }));
+  });
+
+  it('should stop the countdown when destroyed', fakeAsync(() => {
+    spyOnTimers();
+    armCountdown();
+    expect(service.remainingTimeInSeconds).toBe(3600);
+
+    service.ngOnDestroy();
+    tick(2000);
+
+    expect(service.remainingTimeInSeconds).toBe(3600);
+    expect(service.isTimeExpired).toBe(false);
+    expect(window.clearInterval).toHaveBeenCalled();
+  }));
+
+  it('should tolerate being destroyed without a running countdown', () => {
+    spyOnTimers();
+    expect(() => service.ngOnDestroy()).not.toThrowError();
+    expect(window.clearInterval).not.toHaveBeenCalled();
   });
 });
