@@ -429,13 +429,13 @@ def get_question_reviewer_total_stats(
 
 
 def get_all_translation_coordinator_stats(
-    sort: str,
+    sort: Optional[str],
 ) -> List[user_domain.TranslationCoordinatorStats]:
     """Gets all TranslationCoordinatorStats corresponding to the supplied
     user and converts them to their corresponding domain objects.
 
     Args:
-        sort: str. The sort order for coordinator counts.
+        sort: str|None. The sort order for coordinator counts.
 
     Returns:
         list(TranslationCoordinatorStats). TranslationCoordinatorStats domain
