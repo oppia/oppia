@@ -38,7 +38,6 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
-    general_feedback_services,
     opportunity_services,
 )
 from core.domain import platform_parameter_domain as parameter_domain
@@ -74,7 +73,7 @@ from core.domain import (
     wipeout_service,
 )
 
-from typing import Dict, List, Optional, TypedDict, Union, cast
+from typing import Callable, Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
@@ -293,9 +292,9 @@ class AdminHandler(
     ]
 
     # Tracks, for each dummy topic base name, how many topics have already been
-    # generated with a letter suffix in the current request. It is reset at the
-    # start of every generation.
-    _dummy_topic_letter_counts: List[int] = []
+    # generated with a letter suffix in the current request. The value is reset
+    # at the start of every generation.
+    _dummy_topic_letter_counts: List[int]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1335,31 +1334,6 @@ class AdminHandler(
             voiceover_services.save_language_accent_support(
                 {'en': {'en-US': True}}
             )
-            # Seed a site report routed to the technical-external dashboard so
-            # that the technical feedback dashboard and detail pages render
-            # real content during lighthouse runs.
-            existing_summaries, _, _ = (
-                general_feedback_services.get_platform_feedback_summaries(
-                    dashboard=feconf.DESTINATION_TECHNICAL,
-                    dashboard_id=(feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM),
-                    status_filter=None,
-                )
-            )
-            if not existing_summaries:
-                general_feedback_services.create_platform_report(
-                    feedback_text=(
-                        'A dummy technical feedback report for lighthouse '
-                        'runs.'
-                    ),
-                    source=feconf.SOURCE_APP,
-                    page_url=('https://www.oppia.org/explore/learn-something'),
-                    category=None,
-                    lesson_metadata=None,
-                    session_info=None,
-                    screenshot_filename=None,
-                    screenshot_entity_id=None,
-                    include_technical_logs=False,
-                )
         else:
             raise Exception('Cannot load new structures data in production.')
 
@@ -1850,67 +1824,118 @@ class AdminHandler(
                 raise Exception(
                     'User does not have enough rights to generate data.'
                 )
-            start_index = 0
-            while self._dummy_classroom_exists(start_index):
-                start_index += 1
-            last_index = start_index + num_classrooms - 1
-            last_suffix_length = len(
-                self._dummy_classroom_suffix_letters(last_index)
+            self._generate_resuming_dummy_classrooms(
+                num_classrooms,
+                base_url_fragment='math',
+                longest_component_word='multiplication',
+                max_fragment_length=self._MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH,
+                suffix_offset=0,
+                create_classroom_fn=self._create_dummy_classroom,
             )
-            longest_topic_fragment_length = (
-                len('multiplication') + 1 + last_suffix_length
-            )
-            if (
-                longest_topic_fragment_length
-                > self._MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH
-            ):
-                raise Exception(
-                    'Cannot generate more than %s dummy classrooms at once.'
-                    % num_classrooms
-                )
-            for i in range(start_index, start_index + num_classrooms):
-                self._create_dummy_classroom(i)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
-    def _dummy_classroom_suffix_letters(self, index: int) -> str:
-        """Returns the lowercase letter suffix used to disambiguate a dummy
-        classroom with the given index.
+    def _generate_resuming_dummy_classrooms(
+        self,
+        num_classrooms: int,
+        base_url_fragment: str,
+        longest_component_word: str,
+        max_fragment_length: int,
+        suffix_offset: int,
+        create_classroom_fn: Callable[[int], None],
+    ) -> None:
+        """Generates dummy classrooms resuming from the first missing index.
 
-        Index 0 maps to an empty suffix. Subsequent indices use a spreadsheet
-        column style encoding ('a', 'b', ..., 'z', 'aa', 'ab', ...) so that an
-        arbitrary number of classrooms can be generated while keeping the
-        resulting URL fragments valid (only lowercase characters).
+        Both the full classroom generation and the bare classroom generation
+        follow the same pattern: scan for the first index whose classroom does
+        not yet exist, verify that the requested count stays within the URL
+        fragment length limit, and then create each classroom starting from
+        that index.
 
         Args:
-            index: int. The zero-based index of the dummy classroom.
+            num_classrooms: int. The number of dummy classrooms to create.
+            base_url_fragment: str. The base URL fragment shared by the
+                classrooms of this scheme (e.g. 'math').
+            longest_component_word: str. The longest fixed word that appears in
+                any generated URL fragment; it is used to check the fragment
+                length limit.
+            max_fragment_length: int. The maximum allowed URL fragment length.
+            suffix_offset: int. The amount added to the index when encoding the
+                disambiguating suffix letters.
+            create_classroom_fn: Callable[[int], None]. The method that creates
+                a single classroom at the given index.
+
+        Raises:
+            Exception. The number of classrooms requested exceeds the number
+                of supported unique names and URL fragments.
+        """
+        start_index = 0
+        while self._dummy_classroom_exists(
+            start_index, base_url_fragment, suffix_offset
+        ):
+            start_index += 1
+        last_index = start_index + num_classrooms - 1
+        last_suffix_length = len(
+            self._dummy_column_letters(last_index, suffix_offset)
+        )
+        longest_fragment_length = (
+            len(longest_component_word) + 1 + last_suffix_length
+        )
+        if longest_fragment_length > max_fragment_length:
+            raise Exception(
+                'Cannot generate more than the supported number of dummy '
+                'classrooms at once because the resulting URL fragments would '
+                'exceed the %s-character maximum.' % max_fragment_length
+            )
+        for i in range(start_index, start_index + num_classrooms):
+            create_classroom_fn(i)
+
+    def _dummy_column_letters(self, index: int, offset: int = 0) -> str:
+        """Returns the lowercase spreadsheet column style letters for an index.
+
+        Indexes are encoded in the same style as spreadsheet columns
+        ('a', 'b', ..., 'z', 'aa', 'ab', ...) so that an arbitrary number of
+        dummy entities can be disambiguated while keeping their URL fragments
+        valid (only lowercase characters). A positive offset shifts the
+        encoding so that index 0 renders as 'a' instead of an empty string;
+        the bare science classrooms use this so that their first classroom
+        still carries a suffix.
+
+        Args:
+            index: int. The zero-based index of the entity to encode.
+            offset: int. A number added to the index before encoding.
 
         Returns:
-            str. The lowercase letter suffix for the given index.
+            str. The lowercase letters for the given index.
         """
-        if index == 0:
-            return ''
+        n = index + offset
         result = ''
-        n = index
         while n > 0:
             n, remainder = divmod(n - 1, 26)
             result = chr(ord('a') + remainder) + result
         return result
 
-    def _dummy_classroom_exists(self, index: int) -> bool:
+    def _dummy_classroom_exists(
+        self, index: int, base_url_fragment: str, suffix_offset: int
+    ) -> bool:
         """Returns whether a dummy classroom with the given index already
         exists.
 
         Args:
             index: int. The zero-based index of the classroom.
+            base_url_fragment: str. The base URL fragment without any suffix.
+            suffix_offset: int. The amount added to the index when encoding the
+                disambiguating suffix letters.
 
         Returns:
-            bool. Whether a dummy classroom with the given suffix already
-            exists in the database.
+            bool. Whether a dummy classroom matching the base URL fragment with
+            the given suffix already exists in the database.
         """
-        suffix_letters = self._dummy_classroom_suffix_letters(index)
-        url_fragment = 'math%s' % (
-            suffix_letters and '-%s' % suffix_letters or ''
+        suffix_letters = self._dummy_column_letters(index, suffix_offset)
+        url_fragment = (
+            base_url_fragment
+            if not suffix_letters
+            else '%s-%s' % (base_url_fragment, suffix_letters)
         )
         return (
             classroom_config_services.get_classroom_by_url_fragment(
@@ -1953,13 +1978,86 @@ class AdminHandler(
             topic, 1, 'thumbnail.svg'
         )
 
+    def _create_and_publish_dummy_topic_components(
+        self,
+        topic_id: str,
+        skill_id: str,
+        question_ids: List[str],
+        topic_name: str,
+        topic_url_fragment: str,
+        skill_name: str,
+        skill_explanation: str,
+        question_number_offset: int = 0,
+    ) -> None:
+        """Creates, saves, and publishes a dummy topic built around one skill.
+
+        The topic is given a thumbnail, a single subtopic named 'Title', and
+        its diagnostic test skill. Each of the given questions is created,
+        added, and linked to the skill with the default difficulty weight.
+
+        Args:
+            topic_id: str. The ID of the topic to create.
+            skill_id: str. The ID of the single skill the topic is built
+                around.
+            question_ids: list(str). The three question IDs to create and link
+                to the skill.
+            topic_name: str. The display name of the topic.
+            topic_url_fragment: str. The URL fragment of the topic.
+            skill_name: str. The display name of the skill.
+            skill_explanation: str. The explanation HTML of the skill.
+            question_number_offset: int. The number to add to the position of
+                each question when naming it, so that topics can share a single
+                globally sequential question numbering.
+        """
+        assert self.user_id is not None
+        questions = [
+            self._create_dummy_question(
+                question_ids[j],
+                'Question %d' % (question_number_offset + j + 1),
+                [skill_id],
+            )
+            for j in range(len(question_ids))
+        ]
+        skill = self._create_dummy_skill(
+            skill_id, skill_name, skill_explanation
+        )
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id,
+            topic_name,
+            topic_url_fragment,
+            'description',
+            'fragm',
+        )
+        topic.skill_ids_for_diagnostic_test = [skill_id]
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                [skill_id],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-three',
+            )
+        ]
+        topic.next_subtopic_id = 2
+
+        for question in questions:
+            question_services.add_question(self.user_id, question)
+        skill_services.save_new_skill(self.user_id, skill)
+        self._save_dummy_topic_thumbnail_image(topic)
+        topic_services.save_new_topic(self.user_id, topic)
+        topic_services.publish_topic(topic_id, self.user_id)
+        for question_id in question_ids:
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id, skill_id, 0.5
+            )
+
     def _create_dummy_classroom(self, index: int) -> None:
         """Creates and loads a single dummy classroom with its associated
         topics, skills, and questions.
-
-        If a classroom with the same URL fragment already exists, it is skipped
-        so that regenerating data does not fail on name or URL fragment
-        collisions.
 
         Args:
             index: int. The zero-based index of the classroom to create. It
@@ -1967,7 +2065,7 @@ class AdminHandler(
                 multiple classrooms can be created without collisions.
         """
         assert self.user_id is not None
-        suffix_letters = self._dummy_classroom_suffix_letters(index)
+        suffix_letters = self._dummy_column_letters(index)
         suffix = '' if not suffix_letters else '-%s' % suffix_letters
         classroom_name = (
             'math'
@@ -1975,329 +2073,51 @@ class AdminHandler(
             else ('Math %s' % suffix_letters.capitalize())
         )
         classroom_url_fragment = 'math%s' % suffix
-        if classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment
-        ):
-            logging.info(
-                '[ADMIN] Dummy classroom %s already exists; skipping.'
-                % classroom_url_fragment
-            )
-            return
         logging.info(
             '[ADMIN] %s generated dummy classroom %s.' % (self.user_id, index)
         )
-        topic_id_1 = topic_fetchers.get_new_topic_id()
-        topic_id_2 = topic_fetchers.get_new_topic_id()
-        topic_id_3 = topic_fetchers.get_new_topic_id()
-        topic_id_4 = topic_fetchers.get_new_topic_id()
-        topic_id_5 = topic_fetchers.get_new_topic_id()
 
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        skill_id_3 = skill_services.get_new_skill_id()
-        skill_id_4 = skill_services.get_new_skill_id()
-        skill_id_5 = skill_services.get_new_skill_id()
-
-        question_id_1 = question_services.get_new_question_id()
-        question_id_2 = question_services.get_new_question_id()
-        question_id_3 = question_services.get_new_question_id()
-        question_id_4 = question_services.get_new_question_id()
-        question_id_5 = question_services.get_new_question_id()
-        question_id_6 = question_services.get_new_question_id()
-        question_id_7 = question_services.get_new_question_id()
-        question_id_8 = question_services.get_new_question_id()
-        question_id_9 = question_services.get_new_question_id()
-        question_id_10 = question_services.get_new_question_id()
-        question_id_11 = question_services.get_new_question_id()
-        question_id_12 = question_services.get_new_question_id()
-        question_id_13 = question_services.get_new_question_id()
-        question_id_14 = question_services.get_new_question_id()
-        question_id_15 = question_services.get_new_question_id()
-
-        question_1 = self._create_dummy_question(
-            question_id_1, 'Question 1', [skill_id_1]
-        )
-        question_2 = self._create_dummy_question(
-            question_id_2, 'Question 2', [skill_id_1]
-        )
-        question_3 = self._create_dummy_question(
-            question_id_3, 'Question 3', [skill_id_1]
-        )
-        question_4 = self._create_dummy_question(
-            question_id_4, 'Question 4', [skill_id_2]
-        )
-        question_5 = self._create_dummy_question(
-            question_id_5, 'Question 5', [skill_id_2]
-        )
-        question_6 = self._create_dummy_question(
-            question_id_6, 'Question 6', [skill_id_2]
-        )
-        question_7 = self._create_dummy_question(
-            question_id_7, 'Question 7', [skill_id_3]
-        )
-        question_8 = self._create_dummy_question(
-            question_id_8, 'Question 8', [skill_id_3]
-        )
-        question_9 = self._create_dummy_question(
-            question_id_9, 'Question 9', [skill_id_3]
-        )
-        question_10 = self._create_dummy_question(
-            question_id_10, 'Question 10', [skill_id_4]
-        )
-        question_11 = self._create_dummy_question(
-            question_id_11, 'Question 11', [skill_id_4]
-        )
-        question_12 = self._create_dummy_question(
-            question_id_12, 'Question 12', [skill_id_4]
-        )
-        question_13 = self._create_dummy_question(
-            question_id_13, 'Question 13', [skill_id_5]
-        )
-        question_14 = self._create_dummy_question(
-            question_id_14, 'Question 14', [skill_id_5]
-        )
-        question_15 = self._create_dummy_question(
-            question_id_15, 'Question 15', [skill_id_5]
-        )
-
-        topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id_1,
-            'Addition%s' % suffix,
-            'add%s' % suffix,
-            'description',
-            'fragm',
-        )
-        topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
-        topic_1.thumbnail_filename = 'thumbnail.svg'
-        topic_1.thumbnail_bg_color = '#C6DCDA'
-        topic_1.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id_1],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
-            )
+        topic_ids = [topic_fetchers.get_new_topic_id() for _ in range(5)]
+        skill_ids = [skill_services.get_new_skill_id() for _ in range(5)]
+        question_id_groups = [
+            [question_services.get_new_question_id() for _ in range(3)]
+            for _ in range(5)
         ]
-        topic_1.next_subtopic_id = 2
 
-        topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id_2,
-            'Subtraction%s' % suffix,
-            'subtraction%s' % suffix,
-            'description',
-            'fragm',
-        )
-        topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
-        topic_2.thumbnail_filename = 'thumbnail.svg'
-        topic_2.thumbnail_bg_color = '#C6DCDA'
-        topic_2.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id_2],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
+        for topic_index in range(5):
+            self._create_and_publish_dummy_topic_components(
+                topic_ids[topic_index],
+                skill_ids[topic_index],
+                question_id_groups[topic_index],
+                '%s%s' % (self._DUMMY_TOPIC_NAMES[topic_index], suffix),
+                '%s%s'
+                % (
+                    self._DUMMY_TOPIC_URL_FRAGMENTS[topic_index],
+                    suffix,
+                ),
+                'Skill%d%s' % (topic_index + 1, suffix),
+                '<p>Dummy Explanation %d</p>' % (topic_index + 1),
+                question_number_offset=3 * topic_index,
             )
-        ]
-        topic_2.next_subtopic_id = 2
 
-        topic_3 = topic_domain.Topic.create_default_topic(
-            topic_id_3,
-            'Multiplication%s' % suffix,
-            'multiplication%s' % suffix,
-            'description',
-            'fragm',
-        )
-        topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
-        topic_3.thumbnail_filename = 'thumbnail.svg'
-        topic_3.thumbnail_bg_color = '#C6DCDA'
-        topic_3.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id_3],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
-            )
-        ]
-        topic_3.next_subtopic_id = 2
-
-        topic_4 = topic_domain.Topic.create_default_topic(
-            topic_id_4,
-            'Division%s' % suffix,
-            'division%s' % suffix,
-            'description',
-            'fragm',
-        )
-        topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
-        topic_4.thumbnail_filename = 'thumbnail.svg'
-        topic_4.thumbnail_bg_color = '#C6DCDA'
-        topic_4.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id_4],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
-            )
-        ]
-        topic_4.next_subtopic_id = 2
-
-        topic_5 = topic_domain.Topic.create_default_topic(
-            topic_id_5,
-            'Fraction%s' % suffix,
-            'fraction%s' % suffix,
-            'description',
-            'fragm',
-        )
-        topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
-        topic_5.thumbnail_filename = 'thumbnail.svg'
-        topic_5.thumbnail_bg_color = '#C6DCDA'
-        topic_5.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id_5],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
-            )
-        ]
-        topic_5.next_subtopic_id = 2
-
-        skill_1 = self._create_dummy_skill(
-            skill_id_1, 'Skill1%s' % suffix, '<p>Dummy Explanation 1</p>'
-        )
-        skill_2 = self._create_dummy_skill(
-            skill_id_2, 'Skill2%s' % suffix, '<p>Dummy Explanation 2</p>'
-        )
-        skill_3 = self._create_dummy_skill(
-            skill_id_3, 'Skill3%s' % suffix, '<p>Dummy Explanation 3</p>'
-        )
-        skill_4 = self._create_dummy_skill(
-            skill_id_4, 'Skill4%s' % suffix, '<p>Dummy Explanation 4</p>'
-        )
-        skill_5 = self._create_dummy_skill(
-            skill_id_5, 'Skill5%s' % suffix, '<p>Dummy Explanation 5</p>'
-        )
-
-        question_services.add_question(self.user_id, question_1)
-        question_services.add_question(self.user_id, question_2)
-        question_services.add_question(self.user_id, question_3)
-        question_services.add_question(self.user_id, question_4)
-        question_services.add_question(self.user_id, question_5)
-        question_services.add_question(self.user_id, question_6)
-        question_services.add_question(self.user_id, question_7)
-        question_services.add_question(self.user_id, question_8)
-        question_services.add_question(self.user_id, question_9)
-        question_services.add_question(self.user_id, question_10)
-        question_services.add_question(self.user_id, question_11)
-        question_services.add_question(self.user_id, question_12)
-        question_services.add_question(self.user_id, question_13)
-        question_services.add_question(self.user_id, question_14)
-        question_services.add_question(self.user_id, question_15)
-
-        skill_services.save_new_skill(self.user_id, skill_1)
-        skill_services.save_new_skill(self.user_id, skill_2)
-        skill_services.save_new_skill(self.user_id, skill_3)
-        skill_services.save_new_skill(self.user_id, skill_4)
-        skill_services.save_new_skill(self.user_id, skill_5)
-
-        self._save_dummy_topic_thumbnail_image(topic_1)
-        topic_services.save_new_topic(self.user_id, topic_1)
-        topic_services.publish_topic(topic_id_1, self.user_id)
-
-        self._save_dummy_topic_thumbnail_image(topic_2)
-        topic_services.save_new_topic(self.user_id, topic_2)
-        topic_services.publish_topic(topic_id_2, self.user_id)
-
-        self._save_dummy_topic_thumbnail_image(topic_3)
-        topic_services.save_new_topic(self.user_id, topic_3)
-        topic_services.publish_topic(topic_id_3, self.user_id)
-
-        self._save_dummy_topic_thumbnail_image(topic_4)
-        topic_services.save_new_topic(self.user_id, topic_4)
-        topic_services.publish_topic(topic_id_4, self.user_id)
-
-        self._save_dummy_topic_thumbnail_image(topic_5)
-        topic_services.save_new_topic(self.user_id, topic_5)
-        topic_services.publish_topic(topic_id_5, self.user_id)
-
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_1, skill_id_1, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_2, skill_id_1, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_3, skill_id_1, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_4, skill_id_2, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_5, skill_id_2, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_6, skill_id_2, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_7, skill_id_3, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_8, skill_id_3, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_9, skill_id_3, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_10, skill_id_4, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_11, skill_id_4, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_12, skill_id_4, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_13, skill_id_5, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_14, skill_id_5, 0.5
-        )
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id_15, skill_id_5, 0.5
-        )
-
-        classroom_id_1 = classroom_config_services.get_new_classroom_id()
-        topic_dependency_for_classroom_1: Dict[str, list[str]] = {
-            topic_id_1: [],
-            topic_id_2: [topic_id_1],
-            topic_id_3: [topic_id_1],
-            topic_id_4: [topic_id_2],
-            topic_id_5: [topic_id_2, topic_id_3],
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        topic_dependency_for_classroom: Dict[str, list[str]] = {
+            topic_ids[0]: [],
+            topic_ids[1]: [topic_ids[0]],
+            topic_ids[2]: [topic_ids[0]],
+            topic_ids[3]: [topic_ids[1]],
+            topic_ids[4]: [topic_ids[1], topic_ids[2]],
         }
 
         thumbnail_image = b''
         with open(
             'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
         ) as svg_file:
-            svg_file_content = svg_file.read()
-            thumbnail_image = svg_file_content.encode('ascii')
+            thumbnail_image = svg_file.read().encode('ascii')
         fs_services.save_original_and_compressed_versions_of_image(
             'thumbnail.svg',
             feconf.ENTITY_TYPE_CLASSROOM,
-            classroom_id_1,
+            classroom_id,
             thumbnail_image,
             'thumbnail',
             False,
@@ -2311,23 +2131,21 @@ class AdminHandler(
         fs_services.save_original_and_compressed_versions_of_image(
             'banner.png',
             feconf.ENTITY_TYPE_CLASSROOM,
-            classroom_id_1,
+            classroom_id,
             banner_image,
             'image',
             False,
         )
 
-        classroom_1 = classroom_config_domain.Classroom(
-            classroom_id=classroom_id_1,
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
             name=classroom_name,
             url_fragment=classroom_url_fragment,
             feedback_recipient_email='user@email.com',
             course_details='Math course  details',
             teaser_text='Math teaser text',
             topic_list_intro='Start with our first topic.',
-            topic_id_to_prerequisite_topic_ids=(
-                topic_dependency_for_classroom_1
-            ),
+            topic_id_to_prerequisite_topic_ids=(topic_dependency_for_classroom),
             is_published=True,
             diagnostic_test_is_enabled=False,
             thumbnail_data=classroom_config_domain.ImageData(
@@ -2339,7 +2157,7 @@ class AdminHandler(
             index=index,
         )
 
-        classroom_config_services.create_new_classroom(classroom_1)
+        classroom_config_services.create_new_classroom(classroom)
 
     def _generate_dummy_default_classroom(self, num_classrooms: int) -> None:
         """Generates and loads bare dummy classrooms that contain no topics,
@@ -2369,97 +2187,31 @@ class AdminHandler(
                 raise Exception(
                     'User does not have enough rights to generate data.'
                 )
-            start_index = 0
-            while self._dummy_default_classroom_exists(start_index):
-                start_index += 1
-            last_index = start_index + num_classrooms - 1
-            last_suffix_length = len(
-                self._dummy_default_classroom_suffix_letters(last_index)
+            self._generate_resuming_dummy_classrooms(
+                num_classrooms,
+                base_url_fragment='science',
+                longest_component_word='science',
+                max_fragment_length=self._MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH,
+                suffix_offset=1,
+                create_classroom_fn=self._create_dummy_default_classroom,
             )
-            longest_url_fragment_length = (
-                len('science') + 1 + last_suffix_length
-            )
-            if (
-                longest_url_fragment_length
-                > self._MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH
-            ):
-                raise Exception(
-                    'Cannot generate more than %s dummy default classrooms at'
-                    ' once.' % num_classrooms
-                )
-            for i in range(start_index, start_index + num_classrooms):
-                self._create_dummy_default_classroom(i)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
-
-    def _dummy_default_classroom_suffix_letters(self, index: int) -> str:
-        """Returns the lowercase column-style letters used to name a dummy
-        default classroom.
-
-        Index 0 maps to 'a', then progresses in spreadsheet column style
-        ('b', 'c', ..., 'z', 'aa', 'ab', ...) so that an arbitrary number of
-        classrooms can be created while keeping URL fragments valid (only
-        lowercase characters). The display name capitalizes these letters, so
-        index 0 renders as 'ScienceA', index 1 as 'ScienceB', and so on.
-
-        Args:
-            index: int. The zero-based index of the dummy default classroom.
-
-        Returns:
-            str. The lowercase spreadsheet-style letter suffix for the given
-            index.
-        """
-        result = ''
-        n = index + 1
-        while n > 0:
-            n, remainder = divmod(n - 1, 26)
-            result = chr(ord('a') + remainder) + result
-        return result
-
-    def _dummy_default_classroom_exists(self, index: int) -> bool:
-        """Returns whether a dummy default classroom with the given index
-        already exists.
-
-        Args:
-            index: int. The zero-based index of the dummy default classroom.
-
-        Returns:
-            bool. Whether a dummy default classroom with the given suffix
-            already exists in the database.
-        """
-        suffix_letters = self._dummy_default_classroom_suffix_letters(index)
-        url_fragment = 'science-%s' % suffix_letters
-        return (
-            classroom_config_services.get_classroom_by_url_fragment(
-                url_fragment
-            )
-            is not None
-        )
 
     def _create_dummy_default_classroom(self, index: int) -> None:
         """Creates and loads a single bare dummy classroom.
 
         The classroom is created with an empty topic dependency map and no
-        topics, skills, or questions. If a classroom with the same URL
-        fragment already exists, it is skipped so that regenerating data does
-        not fail on name or URL fragment collisions.
+        topics, skills, or questions.
 
         Args:
             index: int. The zero-based index of the classroom to create. It is
                 used to generate unique names and URL fragments.
         """
         assert self.user_id is not None
-        suffix_letters = self._dummy_default_classroom_suffix_letters(index)
+        suffix_letters = self._dummy_column_letters(index, offset=1)
         classroom_name = 'Science%s' % suffix_letters.capitalize()
         classroom_url_fragment = 'science-%s' % suffix_letters
-        if classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment
-        ):
-            logging.info(
-                '[ADMIN] Dummy default classroom %s already exists; skipping.'
-                % classroom_url_fragment
-            )
-            return
         classroom_id = classroom_config_services.get_new_classroom_id()
         classroom_config_services.create_new_default_classroom(
             classroom_id,
@@ -2538,59 +2290,24 @@ class AdminHandler(
         """
         assert self.user_id is not None
         suffix = self._get_next_dummy_topic_suffix(base_index)
-        topic_name = '%s%s' % (self._DUMMY_TOPIC_NAMES[base_index], suffix)
-        topic_url_fragment = '%s%s' % (
-            self._DUMMY_TOPIC_URL_FRAGMENTS[base_index],
-            suffix,
-        )
-
         topic_id = topic_fetchers.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()
         question_ids = [
             question_services.get_new_question_id() for _ in range(3)
         ]
-
-        questions = [
-            self._create_dummy_question(
-                question_ids[j],
-                'Question %d' % (j + 1),
-                [skill_id],
-            )
-            for j in range(3)
-        ]
-
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, topic_url_fragment, 'description', 'fragm'
+        self._create_and_publish_dummy_topic_components(
+            topic_id,
+            skill_id,
+            question_ids,
+            '%s%s' % (self._DUMMY_TOPIC_NAMES[base_index], suffix),
+            '%s%s'
+            % (
+                self._DUMMY_TOPIC_URL_FRAGMENTS[base_index],
+                suffix,
+            ),
+            'Skill1%s' % suffix,
+            '<p>Dummy Explanation 1</p>',
         )
-        topic.skill_ids_for_diagnostic_test = [skill_id]
-        topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                1,
-                'Title',
-                [skill_id],
-                'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                21131,
-                'dummy-subtopic-three',
-            )
-        ]
-        topic.next_subtopic_id = 2
-
-        for question in questions:
-            question_services.add_question(self.user_id, question)
-        skill = self._create_dummy_skill(
-            skill_id, 'Skill1%s' % suffix, '<p>Dummy Explanation 1</p>'
-        )
-        skill_services.save_new_skill(self.user_id, skill)
-        self._save_dummy_topic_thumbnail_image(topic)
-        topic_services.save_new_topic(self.user_id, topic)
-        topic_services.publish_topic(topic_id, self.user_id)
-        for question_id in question_ids:
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id, skill_id, 0.5
-            )
         return topic_id
 
     def _get_next_dummy_topic_suffix(self, base_index: int) -> str:
@@ -2615,7 +2332,7 @@ class AdminHandler(
         """
         count = self._dummy_topic_letter_counts[base_index] + 1
         while True:
-            suffix_letters = self._dummy_classroom_suffix_letters(count)
+            suffix_letters = self._dummy_column_letters(count)
             suffix = '' if not suffix_letters else '-%s' % suffix_letters
             proposed_name = '%s%s' % (
                 self._DUMMY_TOPIC_NAMES[base_index],

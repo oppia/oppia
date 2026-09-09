@@ -30,7 +30,6 @@ from core.domain import (
     exp_domain,
     exp_services,
     fs_services,
-    general_feedback_services,
     opportunity_services,
     platform_parameter_domain,
     platform_parameter_list,
@@ -771,18 +770,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             voiceover_services.get_all_language_accent_codes_for_voiceovers(),
             {'en': {'en-US': True}},
         )
-        technical_feedback_summaries, _, _ = (
-            general_feedback_services.get_platform_feedback_summaries(
-                dashboard=feconf.DESTINATION_TECHNICAL,
-                dashboard_id=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
-                status_filter=None,
-            )
-        )
-        self.assertEqual(len(technical_feedback_summaries), 1)
-        summary = technical_feedback_summaries[0]
-        self.assertEqual(summary['status'], feconf.STATUS_CHOICES_OPEN)
-        self.assertEqual(summary['source'], feconf.SOURCE_APP)
-        self.assertIsNone(summary['category'])
         self.logout()
 
     @test_utils.enable_feature_flags(
