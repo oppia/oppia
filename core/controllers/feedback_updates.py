@@ -84,7 +84,7 @@ class FeedbackUpdatesHandler(
     }
 
     @acl_decorators.can_access_feedback_updates
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -141,7 +141,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_feedback_updates
-    def get(self, thread_id: str) -> None:
+    def get(self, thread_id: str) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         messages = feedback_services.get_messages(thread_id)

@@ -56,7 +56,7 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self,
         activity_type: str,  # pylint: disable=unused-argument
         topic_id: str,
@@ -93,7 +93,7 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self,
         activity_type: str,  # pylint: disable=unused-argument
         topic_id: str,  # pylint: disable=unused-argument

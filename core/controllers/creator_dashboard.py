@@ -76,7 +76,7 @@ class OldContributorDashboardRedirectPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect('/contributor-dashboard', permanent=True)
 
@@ -90,7 +90,7 @@ class OldCreatorDashboardRedirectPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
@@ -127,7 +127,7 @@ class CreatorDashboardHandler(
     }
 
     @acl_decorators.can_access_creator_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
 
@@ -373,7 +373,7 @@ class CreatorDashboardHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Updates the creator dashboard display."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -412,7 +412,7 @@ class NewExplorationHandler(
     }
 
     @acl_decorators.can_create_exploration
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -434,7 +434,7 @@ class NewCollectionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_create_collection
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         new_collection_id = collection_services.get_new_collection_id()
@@ -467,7 +467,7 @@ class UploadExplorationHandler(
     }
 
     @acl_decorators.can_upload_exploration
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_request is not None

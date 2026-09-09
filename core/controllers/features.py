@@ -50,7 +50,9 @@ class ExplorationFeaturesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for an exploration's features.
 
         Args:

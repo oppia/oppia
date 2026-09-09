@@ -43,7 +43,7 @@ if MYPY:  # pragma: no cover
 class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate canonical name matching with lower case name."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, input_model: topic_models.TopicModel
     ) -> Iterator[topic_validation_errors.ModelCanonicalNameMismatchError]:
         """Function that validate that canonical name of the model is same as

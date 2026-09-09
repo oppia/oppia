@@ -33,7 +33,7 @@ class FeatureFlagsEvaluationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests. Evaluates and returns all feature flags."""
         result_dict = feature_flag_services.evaluate_all_feature_flag_configs(
             self.user_id
@@ -50,7 +50,7 @@ class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         # This handler is gated by the dummy_feature_flag_for_e2e_tests flag,
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.

@@ -50,7 +50,7 @@ class SubscribeHandler(
     }
 
     @acl_decorators.can_subscribe_to_users
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Subscribes the current user to another user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -89,7 +89,7 @@ class UnsubscribeHandler(
     }
 
     @acl_decorators.can_subscribe_to_users
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Unsubscribes the current user from another user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None

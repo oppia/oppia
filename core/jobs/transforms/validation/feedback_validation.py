@@ -46,7 +46,7 @@ if MYPY:  # pragma: no cover
 class ValidateEntityType(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the entity type."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, input_model: feedback_models.GeneralFeedbackThreadModel
     ) -> Iterator[feedback_validation_errors.InvalidEntityTypeError]:
         """Function that checks if the entity type is valid

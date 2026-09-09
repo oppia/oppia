@@ -91,7 +91,7 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id: str) -> None:
+    def get(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Checks whether the user can edit the description of a skill.
 
         Args:
@@ -172,7 +172,7 @@ class EditableSkillDataHandler(
     }
 
     @acl_decorators.open_access
-    def get(self, skill_id: str) -> None:
+    def get(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual skill page.
 
         Args:
@@ -227,7 +227,7 @@ class EditableSkillDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_skill
-    def put(self, skill_id: str) -> None:
+    def put(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given skill.
 
         Args:
@@ -275,7 +275,7 @@ class EditableSkillDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_skill
-    def delete(self, skill_id: str) -> None:
+    def delete(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Deletes a skill.
 
         Args:
@@ -315,7 +315,9 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, comma_separated_skill_ids: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on skill pages of the skill ids.
 
         Args:
@@ -345,7 +347,7 @@ class FetchSkillsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Returns all skill IDs linked to some topic."""
 
         skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
@@ -378,7 +380,9 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_skill
-    def get(self, skill_description: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, skill_description: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a skill description and checks whether
         a skill with the same description exists.
 
@@ -421,7 +425,7 @@ class DiagnosticTestSkillAssignmentHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id: str) -> None:
+    def get(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Returns a list of topic names for which the given skill is assigned
         to that topic's diagnostic test.
 

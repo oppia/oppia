@@ -80,7 +80,7 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
 class IndexExplorationSummaries(beam.DoFn):  # type: ignore[misc]
     """DoFn to index exploration summaries."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, exp_summary: List[exp_domain.ExplorationSummary]
     ) -> Iterable[result.Result[None, Exception]]:
         """Index exploration summaries and catch any errors.

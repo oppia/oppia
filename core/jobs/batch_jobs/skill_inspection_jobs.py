@@ -135,7 +135,7 @@ class CheckPrerequisiteExists(beam.DoFn):  # type: ignore[misc]
     skills and if it has a superseding skill.
     """
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         prerequisite_id: str,
         all_skill_ids: List[str],

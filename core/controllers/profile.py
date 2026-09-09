@@ -55,7 +55,7 @@ class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, username: str) -> None:
+    def get(self, username: str) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
 
         user_settings = user_services.get_user_settings_from_username(username)
@@ -148,7 +148,9 @@ class BulkEmailWebhookEndpoint(
     # decorator, and here we are getting 'secret' because the decorator always
     # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def get(self, unused_secret: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, unused_secret: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests. This is just an empty endpoint that is
         required since when the webhook is updated in the bulk email service
         provider, a GET request is sent initially to validate the endpoint.
@@ -160,7 +162,9 @@ class BulkEmailWebhookEndpoint(
     # decorator, and here we are getting 'secret' because the decorator always
     # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def post(self, unused_secret: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, unused_secret: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_request is not None
         mailchimp_audience_id = (
@@ -257,7 +261,7 @@ class MailingListSubscriptionHandler(
     }
 
     @acl_decorators.open_access
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT request."""
         assert self.normalized_payload is not None
         email = self.normalized_payload['email']
@@ -295,7 +299,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
 
     @acl_decorators.can_manage_own_account
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
@@ -362,7 +366,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         assert self.user_id is not None
         updates = self.payload['updates']
@@ -500,7 +504,7 @@ class SignupPage(
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         assert self.normalized_request is not None
@@ -563,7 +567,7 @@ class SignupHandler(
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
@@ -589,7 +593,7 @@ class SignupHandler(
         )
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -688,7 +692,7 @@ class DeleteAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
     @acl_decorators.can_manage_own_account
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Handles DELETE requests."""
         assert self.user_id is not None
         wipeout_service.pre_delete_user(self.user_id)
@@ -703,7 +707,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_manage_own_account
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         # Retrieve user data.
@@ -784,7 +788,7 @@ class UsernameCheckHandler(
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
@@ -831,7 +835,7 @@ class SiteLanguageHandler(
     }
 
     @acl_decorators.can_manage_own_account
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -868,7 +872,7 @@ class UserInfoHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         # The following headers are added to prevent caching of this response.
         self.response.cache_control.no_store = True
@@ -906,7 +910,7 @@ class UserInfoHandler(
             self.render_json({'user_is_logged_in': False})
 
     @acl_decorators.open_access
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         # In frontend, we are calling this put method iff the user is
         # logged-in, so here we sure that self.user_id is never going
@@ -947,7 +951,7 @@ class UrlHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
         if self.user_id:
             self.render_json({'login_url': None})

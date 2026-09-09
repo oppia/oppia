@@ -49,7 +49,9 @@ class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, generator_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, generator_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.response.write(
             value_generators_domain.Registry.get_generator_class_by_id(
@@ -74,7 +76,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
         feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
         feconf.ENTITY_TYPE_CLASSROOM,
-        feconf.ENTITY_TYPE_FEEDBACK,
+        feconf.ENTITY_TYPE_FEEDBACK_SCREENSHOT,
     ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -101,7 +103,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self,
         page_context: str,
         page_identifier: str,
@@ -187,7 +189,7 @@ class PromoBarHandler(
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves the configuration values for a promotional bar."""
         self.render_json(
             {
@@ -205,7 +207,7 @@ class PromoBarHandler(
         )
 
     @acl_decorators.can_access_release_coordinator_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the configuration values for a promotional bar."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -265,7 +267,7 @@ class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Redirects to correct favicon for particular deployment."""
         self.redirect(fs_services.get_static_asset_url('favicon.ico'))
 
@@ -278,7 +280,7 @@ class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Redirects to correct robots.txt for particular deployment."""
         self.redirect(fs_services.get_static_asset_url('robots.txt'))
 
@@ -294,7 +296,9 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, folder: str, filename: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, folder: str, filename: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Redirects to correct copyrighted image for particular deployment.
 
         Args:
