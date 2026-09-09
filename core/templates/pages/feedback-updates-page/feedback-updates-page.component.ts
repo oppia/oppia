@@ -44,7 +44,7 @@ import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
+import {SuggestionReviewModalComponent} from 'components/feedback-shared/suggestion-review/suggestion-review-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -422,7 +422,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   ): void {
     if (this.windowDimensionService.isWindowNarrow()) {
       const bottomSheetRef = this.bottomSheet.open(
-        LearnerDashboardSuggestionModalComponent
+        SuggestionReviewModalComponent
       );
       bottomSheetRef.instance.newContent = suggestionHtml ?? '';
       bottomSheetRef.instance.oldContent = currentContentHtml ?? '';
@@ -430,10 +430,9 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
       return;
     }
-    const modelRef = this.ngbModal.open(
-      LearnerDashboardSuggestionModalComponent,
-      {backdrop: 'static'}
-    );
+    const modelRef = this.ngbModal.open(SuggestionReviewModalComponent, {
+      backdrop: 'static',
+    });
     if (suggestionHtml) {
       modelRef.componentInstance.newContent = suggestionHtml;
     }

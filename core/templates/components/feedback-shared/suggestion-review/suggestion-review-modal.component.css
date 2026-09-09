@@ -1,0 +1,12 @@
+/**
+ * @fileoverview Styles for suggestion review modal component.
+ */
+
+.oppia-suggestion-review-modal-body .oppia-no-current-state {
+  color: red;
+}
+.oppia-suggestion-review-modal-body .oppia-suggestion-description-text {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 20px;
+}

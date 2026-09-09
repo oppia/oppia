@@ -52,6 +52,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {UserInfo} from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
@@ -200,6 +202,8 @@ describe('Feedback updates page', () => {
           MaterialModule,
           FormsModule,
           HttpClientTestingModule,
+          NgbModalModule,
+          MatBottomSheetModule,
         ],
         declarations: [
           FeedbackUpdatesPageComponent,
@@ -850,6 +854,8 @@ describe('Feedback updates page', () => {
           MaterialModule,
           FormsModule,
           HttpClientTestingModule,
+          NgbModalModule,
+          MatBottomSheetModule,
         ],
         declarations: [
           FeedbackUpdatesPageComponent,

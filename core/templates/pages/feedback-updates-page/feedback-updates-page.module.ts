@@ -27,8 +27,8 @@ import {CommonModule} from '@angular/common';
 import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
-import {LearnerDashboardSuggestionModalComponent} from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 
 @NgModule({
   imports: [
@@ -38,6 +38,7 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     RouterModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    FeedbackSharedModule,
     FeedbackUpdatesPageRoutingModule,
     Error404PageModule,
     MatBottomSheetModule,
@@ -45,12 +46,10 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
   declarations: [
     FeedbackUpdatesPageComponent,
     FeedbackUpdatesPageRootComponent,
-    LearnerDashboardSuggestionModalComponent,
   ],
   entryComponents: [
     FeedbackUpdatesPageComponent,
     FeedbackUpdatesPageRootComponent,
-    LearnerDashboardSuggestionModalComponent,
   ],
 })
 export class FeedbackUpdatesPageModule {}
