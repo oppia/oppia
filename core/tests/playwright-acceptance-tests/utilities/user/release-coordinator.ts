@@ -488,7 +488,12 @@ export class ReleaseCoordinator extends BaseUser {
     await this.expectElementToBeVisible(jobInputField);
     await this.clearAllTextFrom(jobInputField);
     await this.typeInInputField(jobInputField, jobName);
-    await this.page.keyboard.press('Enter');
+
+    const jobOption = this.page.getByRole('option', {
+      name: jobName,
+      exact: true,
+    });
+    await jobOption.click();
 
     await this.expectElementToBeVisible(startNewJobButton);
     await this.clickOnElementWithSelector(startNewJobButton);
