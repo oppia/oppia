@@ -36,8 +36,8 @@ import {CertificateAssessmentPlayerStateService} from './certificate-assessment-
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
-  // The state service is scoped to this component so that its countdown
-  // interval is torn down together with the page it belongs to.
+  // The state service is scoped to this component so that its state is
+  // torn down together with the page it belongs to.
   providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
@@ -87,11 +87,6 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   get attempt(): CertificateAssessmentAttemptData | null {
     return this.certificateAssessmentPlayerStateService.getAttempt();
-  }
-
-  get showAssessmentInterruptCard(): boolean {
-    return this.certificateAssessmentPlayerStateService
-      .showAssessmentInterruptCard;
   }
 
   async ngOnInit(): Promise<void> {
@@ -149,10 +144,8 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Starts a new attempt on the server. The learner only moves to the
-   * questions once the server confirms the attempt; that confirmation is
-   * also what arms a fresh time window for them (see
-   * `beginNewAttempt`), so a failed start leaves any existing timing
-   * state untouched.
+   * questions once the server confirms the attempt, so a failed start
+   * request leaves any existing state untouched.
    */
   async startAssessment(): Promise<void> {
     try {
@@ -197,7 +190,8 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   /**
-   * Submits the learner's final answers and navigates to the result page.
+   * Submits the learner's final answers exactly once and navigates to the
+   * result page.
    */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
@@ -226,14 +220,6 @@ export class CertificateAssessmentPlayerPageRootComponent
       }
     })();
     await this.pendingSubmission;
-  }
-
-  onRetryAssessment(): void {
-    this.certificateAssessmentPlayerStateService.returnToIntroAfterRetry();
-  }
-
-  onResumeAssessment(): void {
-    this.certificateAssessmentPlayerStateService.resumeQuestionsStage();
   }
 
   async onViewResults(): Promise<boolean> {

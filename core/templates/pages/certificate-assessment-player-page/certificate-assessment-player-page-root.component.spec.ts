@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -26,6 +26,7 @@ import {
   CertificateAssessmentOfferingData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {StateBackendDict} from 'domain/state/state.model';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
@@ -52,11 +53,52 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     1
   );
 
+  const mockStateData: StateBackendDict = {
+    classifier_model_id: null,
+    content: {content_id: 'c', html: '<p>prompt</p>'},
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {value: 1},
+        placeholder: {
+          value: {content_id: 'ca_placeholder_0', unicode_str: 'Type here'},
+        },
+        catchMisspellings: {value: false},
+      },
+      default_outcome: {
+        dest: 'final',
+        dest_if_really_stuck: null,
+        feedback: {content_id: 'f', html: '<p>f</p>'},
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      id: 'TextInput',
+      solution: null,
+    },
+    param_changes: [],
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    linked_skill_id: null,
+    inapplicable_skill_misconception_ids: [],
+  };
+
   const mockAttempt = CertificateAssessmentAttemptData.createFromBackendDict({
     attempt_id: 'attempt-1234',
     questions: [
-      {question_id: 'question_1', question_version: 1},
-      {question_id: 'question_2', question_version: 2},
+      {
+        question_id: 'question_1',
+        question_version: 1,
+        question_state_data: mockStateData,
+      },
+      {
+        question_id: 'question_2',
+        question_version: 2,
+        question_state_data: mockStateData,
+      },
     ],
   });
 
@@ -223,7 +265,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     resolveClassroom({classroomDict: {urlFragment: 'math'}});
     flushMicrotasks();
 
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
 
     component.onGoToAvailableCertificates();
     flushMicrotasks();
@@ -245,7 +287,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.ngOnInit();
     flushMicrotasks();
 
-    expect(component.hasError).toBeTrue();
+    expect(component.hasError).toBe(true);
     expect(
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
     ).not.toHaveBeenCalled();
@@ -262,7 +304,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -329,7 +371,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeTrue();
+    expect(component.showAssessmentUnavailableModal).toBe(true);
   }));
 
   it('should show a localized cooldown warning when the attempt is within the cooldown', fakeAsync(() => {
@@ -348,7 +390,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(component.showAssessmentUnavailableModal).toBe(false);
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
       {remainingMinutes: 2}
@@ -365,7 +407,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     component.onGoToAvailableCertificates();
     flushMicrotasks();
 
-    expect(component.showAssessmentUnavailableModal).toBeFalse();
+    expect(component.showAssessmentUnavailableModal).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
         ':classroomUrlFragment',
@@ -452,13 +494,13 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     });
     flushMicrotasks();
 
-    expect(viewResultsResolved).toBeFalse();
+    expect(viewResultsResolved).toBe(false);
     expect(router.navigate).not.toHaveBeenCalled();
 
     resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
     flushMicrotasks();
 
-    expect(viewResultsResolved).toBeTrue();
+    expect(viewResultsResolved).toBe(true);
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
       'attempt-1234',
@@ -485,26 +527,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       'attempt-1234',
     ]);
   }));
-
-  it('should reset to the intro stage on retry', () => {
-    playerStateService.showAssessmentInterruptCard = true;
-    playerStateService.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-
-    component.onRetryAssessment();
-
-    expect(component.showAssessmentInterruptCard).toBe(false);
-    expect(component.currentStage).toBe('intro');
-  });
-
-  it('should resume to the questions stage on resume', () => {
-    playerStateService.showAssessmentInterruptCard = true;
-
-    component.onResumeAssessment();
-
-    expect(component.showAssessmentInterruptCard).toBe(false);
-    expect(component.currentStage).toBe('questions');
-  });
 
   it('should switch to the intro stage on showIntro', () => {
     playerStateService.currentStage =
@@ -592,10 +614,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
   it('should initialize attempt as null', () => {
     expect(component.attempt).toBeNull();
-  });
-
-  it('should initialize showAssessmentInterruptCard as false', () => {
-    expect(component.showAssessmentInterruptCard).toBe(false);
   });
 
   it('should expose the certificateAssessmentPlayerPageConstants', () => {

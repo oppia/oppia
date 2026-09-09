@@ -44,10 +44,11 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import constants from 'assets/constants';
 import {StoryDomainConstants} from 'domain/story/story-domain.constants';
-
+import './story-editor.component.css';
 @Component({
   selector: 'oppia-story-editor',
   templateUrl: './story-editor.component.html',
+  styleUrls: ['./story-editor.component.css'],
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story!: Story;
@@ -311,7 +312,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.storyUpdateService.createArc(
       this.story,
       arcId,
-      'Adventure ' + (this.storyContents.getArcs().length + 1),
+      'Module ' + (this.storyContents.getArcs().length + 1),
       '',
       [nodesToMove[0]]
     );
