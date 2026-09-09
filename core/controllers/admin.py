@@ -1045,7 +1045,6 @@ class AdminHandler(
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
-            dummy_skill_ids = [skill_id_1, skill_id_2, skill_id_3]
 
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
@@ -1318,17 +1317,6 @@ class AdminHandler(
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
-            # Attach a matching dummy skill to each story node so that the node
-            # practice and end of arc test pages have questions to show during
-            # lighthouse runs.
-            skill_ids_by_node_id = {
-                '%s%d'
-                % (story_domain.NODE_ID_PREFIX, i + 1): [dummy_skill_ids[i]]
-                for i in range(len(story_node_dicts))
-            }
-            story_services.update_story_node_acquired_skill_ids_after_publish(
-                self.user_id, story_id, skill_ids_by_node_id
-            )
             # Seed a supported language accent pair so that the voiceover admin
             # page renders real content during lighthouse runs.
             voiceover_services.save_language_accent_support(

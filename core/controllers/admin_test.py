@@ -726,17 +726,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert story is not None
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
-        # Each story node should have a distinct dummy skill attached to it so
-        # that the node practice and end of arc test pages have questions.
-        node_skill_ids = [
-            node.acquired_skill_ids[0] for node in story.story_contents.nodes
-        ]
-        self.assertEqual(len(node_skill_ids), 3)
-        self.assertEqual(len(set(node_skill_ids)), 3)
-        self.assertEqual(
-            set(node_skill_ids),
-            {skill_summary.id for skill_summary in skill_summaries},
-        )
         questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10,
