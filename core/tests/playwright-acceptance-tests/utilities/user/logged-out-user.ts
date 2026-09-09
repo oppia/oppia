@@ -2127,6 +2127,9 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(
       'button.e2e-test-register-user:not([disabled])'
     );
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
     await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle'});
     await this.expectElementToBeVisible('button.e2e-test-register-user', false);
