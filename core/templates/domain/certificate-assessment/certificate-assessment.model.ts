@@ -89,6 +89,7 @@ export interface AvailableCertificateAssessmentOfferingBackendDict {
 export interface CertificateAssessmentAttemptQuestionBackendDict {
   question_id: string;
   question_version: number;
+  question_state_data: StateBackendDict;
 }
 
 export interface CertificateAssessmentAttemptBackendDict {
@@ -99,38 +100,7 @@ export interface CertificateAssessmentAttemptBackendDict {
 export interface CertificateAssessmentAttemptQuestion {
   questionId: string;
   questionVersion: number;
-}
-
-export interface CertificateAssessmentQuestionStateBackendDict {
-  question_id: string;
-  question_state_data: StateBackendDict;
-}
-
-export class CertificateAssessmentQuestionData {
-  _questionId: string;
-  _questionStateData: StateBackendDict;
-
-  constructor(questionId: string, questionStateData: StateBackendDict) {
-    this._questionId = questionId;
-    this._questionStateData = questionStateData;
-  }
-
-  get questionId(): string {
-    return this._questionId;
-  }
-
-  get questionStateData(): StateBackendDict {
-    return this._questionStateData;
-  }
-
-  static createFromBackendDict(
-    dict: CertificateAssessmentQuestionStateBackendDict
-  ): CertificateAssessmentQuestionData {
-    return new CertificateAssessmentQuestionData(
-      dict.question_id,
-      dict.question_state_data
-    );
-  }
+  questionStateData: StateBackendDict;
 }
 
 export class AvailableCertificateAssessmentOfferingData {
@@ -352,6 +322,7 @@ export class CertificateAssessmentAttemptData {
       certificateAssessmentAttemptBackendDict.questions.map(question => ({
         questionId: question.question_id,
         questionVersion: question.question_version,
+        questionStateData: question.question_state_data,
       }))
     );
   }
