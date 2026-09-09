@@ -191,10 +191,7 @@ const login = async function (browser, page) {
     }
 
     if (usernameInputElement === null) {
-      // The first load against a fresh datastore can be slow while the
-      // appserver warms up, so allow more than the default 30s for the
-      // post-login navigation.
-      await page.waitForSelector(navbarToggle, {timeout: 60000});
+      await page.waitForSelector(navbarToggle);
       return;
     }
 
@@ -209,14 +206,9 @@ const login = async function (browser, page) {
     ]);
     await page.waitForSelector(agreeToTermsCheckBox, {visible: true});
     await page.click(agreeToTermsCheckBox);
-    // The first registration against a fresh datastore can be slow while the
-    // appserver warms up, so allow more than the default 30s for the register
-    // button to become enabled.
-    await page.waitForSelector(registerUser, {timeout: 60000});
+    await page.waitForSelector(registerUser);
     await page.click(registerUser);
-    // The first registration against a fresh datastore can be slow while the
-    // appserver warms up, so allow more than the default 30s for the redirect.
-    await page.waitForSelector(navbarToggle, {timeout: 60000});
+    await page.waitForSelector(navbarToggle);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Login Failed');
@@ -608,9 +600,6 @@ const generateDataForClassroom = async function (browser, page) {
     await addThumbnailToTopic(page, 'Subtraction');
     await addThumbnailToTopic(page, 'Multiplication');
     await addThumbnailToTopic(page, 'Division');
-
-    // The certificate pages are not part of any Lighthouse shard, so no
-    // certificate offering or attempt is captured here.
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
