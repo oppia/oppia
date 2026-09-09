@@ -29,7 +29,6 @@ from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
     auth_services,
     blog_services,
-    certificate_assessment_services,
     classroom_config_domain,
     classroom_config_services,
     collection_services,
@@ -40,8 +39,6 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     general_feedback_services,
-    learner_group_fetchers,
-    learner_group_services,
     opportunity_services,
 )
 from core.domain import platform_parameter_domain as parameter_domain
@@ -1338,19 +1335,6 @@ class AdminHandler(
             voiceover_services.save_language_accent_support(
                 {'en': {'en-US': True}}
             )
-            # Seed a learner group with the current user as its facilitator so
-            # that the learner group creator, editor and viewer pages render
-            # real content during lighthouse runs.
-            learner_group_id = learner_group_fetchers.get_new_learner_group_id()
-            learner_group_services.create_learner_group(
-                learner_group_id,
-                'Dummy learner group',
-                'A dummy learner group created for lighthouse runs.',
-                [self.user_id],
-                [],
-                ['%s:1' % topic_id_1],
-                [story_id],
-            )
             # Seed a site report routed to the technical-external dashboard so
             # that the technical feedback dashboard and detail pages render
             # real content during lighthouse runs.
@@ -2357,9 +2341,6 @@ class AdminHandler(
 
         classroom_config_services.create_new_classroom(classroom_1)
 
-        if index == 0:
-            self._seed_dummy_certificate_assessment(classroom_1)
-
     def _generate_dummy_default_classroom(self, num_classrooms: int) -> None:
         """Generates and loads bare dummy classrooms that contain no topics,
         skills, or questions.
@@ -2492,103 +2473,6 @@ class AdminHandler(
         classroom = classroom_config_services.get_classroom_by_id(classroom_id)
         classroom.is_published = True
         classroom_config_services.update_classroom(classroom)
-
-    def _seed_dummy_certificate_assessment(
-        self, classroom: classroom_config_domain.Classroom
-    ) -> None:
-        """Seeds a certificate assessment offering and a starting attempt so
-        that the certificate pages render real content during lighthouse runs.
-
-        The offering is attached to the first dummy classroom (url fragment
-        'math') and uses the dummy topic created by
-        _load_dummy_new_structures_data, augmented with questions covering
-        every difficulty bucket required by the certificate validator.
-
-        Args:
-            classroom: classroom_config_domain.Classroom. The dummy classroom
-                the offering should be attached to.
-        """
-        assert self.user_id is not None
-        dummy_topic = topic_fetchers.get_topic_by_url_fragment(
-            'dummy-topic-one'
-        )
-        if dummy_topic is None:
-            return
-        # The certificate validator only counts questions whose skill
-        # difficulty falls exactly on the easy (0.3), medium (0.6) or hard
-        # (0.9) buckets, so dedicated questions cover the missing buckets
-        # before the offering is created.
-        self._add_certificate_difficulty_questions(dummy_topic)
-        certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
-            title='Dummy Certificate Assessment',
-            description=(
-                'A dummy certificate assessment created for lighthouse runs.'
-            ),
-            classroom_id=classroom.classroom_id,
-            topic_ids=[dummy_topic.id],
-            total_questions=3,
-            time_limit_in_minutes=30,
-            demonstrates=['Dummy Skill 1'],
-            async_status='Available',
-        )
-        attempts = certificate_assessment_services.get_certificate_attempts(
-            self.user_id
-        )
-        if not any(
-            attempt.version_data['certificate_id']
-            == certificate_offering.certificate_id
-            for attempt in attempts
-        ):
-            certificate_assessment_services.start_certificate_assessment_attempt(
-                certificate_offering.certificate_id, self.user_id
-            )
-
-    def _add_certificate_difficulty_questions(
-        self, topic: topic_domain.Topic
-    ) -> None:
-        """Adds questions covering the medium and hard difficulty buckets to
-        the given topic.
-
-        The certificate validator requires questions in every difficulty
-        bucket (easy 0.3, medium 0.6, hard 0.9). The dummy questions generated
-        by _load_dummy_new_structures_data only cover 0.3, 0.5 and 0.7, so
-        dedicated questions are added for the missing buckets. Existing links
-        are left untouched, which makes this safe to call repeatedly.
-
-        Args:
-            topic: topic_domain.Topic. The dummy topic to add questions to.
-        """
-        assert self.user_id is not None
-        desired_difficulties = {
-            'Dummy Skill 2': 0.6,
-            'Dummy Skill 3': 0.9,
-        }
-        skill_by_name: Dict[str, skill_domain.Skill] = {}
-        for skill_id in topic.get_all_skill_ids():
-            skill = skill_fetchers.get_skill_by_id(skill_id)
-            skill_by_name[skill.description] = skill
-        for description, difficulty in desired_difficulties.items():
-            matched_skill = skill_by_name.get(description)
-            if matched_skill is None:
-                continue
-            existing_difficulties = {
-                question_skill_link.skill_difficulty
-                for question_skill_link in question_services.get_question_skill_links_of_skill(
-                    matched_skill.id, matched_skill.description
-                )
-            }
-            if difficulty in existing_difficulties:
-                continue
-            question_id = question_services.get_new_question_id()
-            question = self._create_dummy_question(
-                question_id,
-                'Certificate %s question' % description,
-                [matched_skill.id],
-            )
-            question_services.add_question(self.user_id, question)
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id, matched_skill.id, difficulty
-            )
 
     def _generate_dummy_topics(
         self, num_topics: int, classroom_id: str
