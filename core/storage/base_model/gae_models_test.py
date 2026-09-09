@@ -970,7 +970,6 @@ class VersionedModelTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         all_model_classes = models.Registry.get_all_storage_model_classes()
-
         all_versioned_classes = [
             clazz
             for clazz in all_model_classes
