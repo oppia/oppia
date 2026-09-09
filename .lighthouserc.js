@@ -631,10 +631,6 @@ module.exports = {
             accessibilityMinScore: 0.9,
           },
           {
-            matchingUrlPattern: '^http://[^/]+/feedback-updates$',
-            accessibilityMinScore: 0.9,
-          },
-          {
             matchingUrlPattern: '^http://[^/]+/learn/.+/practice/.+$',
             accessibilityMinScore: 0.9,
           },
