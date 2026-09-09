@@ -148,10 +148,6 @@ describe('Logged-in User', function () {
       'This fraction model is awesome, but can we get more marble examples?'
     );
 
-    // Hide dynamic date/time values before taking the screenshot to
-    // prevent them from causing snapshot differences between test runs.
-    await loggedInLearner.removeMySuggestionsDynamicElements();
-
     await loggedInLearner.expectScreenshotToMatch(
       'mySuggestionsTabAfterClickingFeedbackListEntry',
       __dirname
@@ -177,7 +173,7 @@ describe('Logged-in User', function () {
       'This fraction model is awesome, but can we get more marble examples?'
     );
     await loggedInLearner.expectScreenshotToMatch(
-      'mySuggestionsTabAfterSubmittingFeedback',
+      'mySuggestionsTabAfterClickingFeedbackListEntry',
       __dirname
     );
 

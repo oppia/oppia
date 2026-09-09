@@ -206,7 +206,7 @@ describe('Lesson Creator', function () {
 
     await lessonCreator.clickFeedbackDetailBackButton();
     await lessonCreator.expectScreenshotToMatch(
-      'backToExplorationFeedbackList',
+      'newExplorationEditorFeedbackTab',
       __dirname
     );
 

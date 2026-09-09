@@ -5030,31 +5030,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Removes the dynamic elements from the My Suggestions tab.
-   */
-  async removeMySuggestionsDynamicElements(): Promise<void> {
-    const selectors = [
-      mySuggestionsTabDetailSubmittedOnValue,
-      mySuggestionsTabLearnerThreadDate,
-      mySuggestionsTabCreatorThreadDate,
-    ];
-
-    await this.page.evaluate((selectors: string[]) => {
-      selectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
-
-        elements.forEach(element => {
-          (element as HTMLElement).style.setProperty(
-            'display',
-            'none',
-            'important'
-          );
-        });
-      });
-    }, selectors);
-  }
-
-  /**
    * Verify the details section of the feedback detail page.
    * @param feedbackType - The type of feedback ('feedback' or 'report').
    * @param statusValue - The expected status value.
@@ -5375,7 +5350,6 @@ export class LoggedInUser extends BaseUser {
    * Clicks the back button in feedback detail page.
    */
   async clickFeedbackDetailBackButton(): Promise<void> {
-    await this.expectElementToBeClickable(feedbackDetailPageBackBtn, true);
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
   }
 

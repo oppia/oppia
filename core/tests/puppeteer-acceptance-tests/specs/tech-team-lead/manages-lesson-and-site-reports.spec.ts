@@ -16,9 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/spreadsheets/d/17Y5yOGuy0y5YFPPCUF5fZAZjEyY60bq6J0lik6yH3KE
  *
- * TL.1 can access the Technical Feedback Dashboard page, see the default list.
- * TL.2 can view every detail of a feedback report — message, screenshot, session logs, lesson context (when raised from a lesson), and the page URL.
- * Tl.3 can change the status of the feedback entries.
+ * TL.1 View and manage lesson and platform reports.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
