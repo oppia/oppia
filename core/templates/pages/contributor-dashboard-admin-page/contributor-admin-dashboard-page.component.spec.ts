@@ -63,6 +63,18 @@ describe('Contributor dashboard Admin page', () => {
   let fetchContributorAdminStatsSpy: jasmine.Spy;
   let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
+  let translationAdminInfo = new UserInfo(
+    ['USER_ROLE', 'TRANSLATION_ADMIN'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
+  );
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
     true,
@@ -332,6 +344,37 @@ describe('Contributor dashboard Admin page', () => {
 
       component.ngOnInit();
     });
+
+    it('should show the featured languages editor for a translation admin', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.isTranslationAdmin).toBeTrue();
+      expect(
+        fixture.debugElement.query(
+          By.css('oppia-featured-translation-languages-editor')
+        )
+      ).not.toBeNull();
+    }));
+
+    it('should hide the featured languages editor for a non-admin', fakeAsync(() => {
+      // FullAccessUserInfo has coordinator roles but NOT TRANSLATION_ADMIN.
+      getUserInfoSpy.and.returnValue(Promise.resolve(fullAccessUserInfo));
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.isTranslationAdmin).toBeFalse();
+      expect(
+        fixture.debugElement.query(
+          By.css('oppia-featured-translation-languages-editor')
+        )
+      ).toBeNull();
+    }));
 
     it(
       'should initialize the contributor admin stats table only' +
