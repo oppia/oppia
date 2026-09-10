@@ -102,8 +102,8 @@
     },
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/load-complete-and-restart-exploration-preview.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/load-complete-and-restart-exploration-preview.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/manage-exploration-misconceptions",

@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -120,6 +120,13 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const previewTabButton = '.e2e-test-preview-tab';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+const previewRestartButton = '.e2e-test-preview-restart-button';
+const stateConversationContent = '.e2e-test-conversation-content';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
+const previousCardButton = '.e2e-test-back-button';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
@@ -218,6 +225,77 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 } as const;
 
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Opens the exploration preview on desktop or mobile.
+   */
+  async navigateToPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.page.locator(mobileNavbarOptions).isVisible())) {
+        await this.page.locator(mobileOptionsButtonSelector).click();
+      }
+      if (!(await this.page.locator(`${mobileNavbarPane}.show`).isVisible())) {
+        await this.page.locator(mobileNavbarDropdown).click();
+      }
+      await this.page.locator(mobilePreviewTabButton).click();
+    } else {
+      await this.page.locator(previewTabButton).click();
+    }
+    await expect(this.page).toHaveURL(/#\/preview\//);
+    await expect(this.page.locator(previewTabContainer)).toBeVisible();
+  }
+
+  /**
+   * Checks the content of the current preview card.
+   * @param {string} cardName - The card name to include in assertion failures.
+   * @param {string} expectedCardContent - The expected card content.
+   */
+  async expectPreviewCardContentToBe(
+    cardName: string,
+    expectedCardContent: string
+  ): Promise<void> {
+    await expect(
+      this.page.locator(stateConversationContent),
+      `Preview content for ${cardName}`
+    ).toHaveText(expectedCardContent);
+  }
+
+  /**
+   * Submits a numeric answer in the exploration preview.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitNumberAnswerInPreview(answer: string): Promise<void> {
+    await this.page.locator(floatFormInput).fill(answer);
+    await this.page.locator(submitAnswerButton).click();
+  }
+
+  /**
+   * Checks the preview completion message and waits for it to disappear.
+   * @param {string} message - The expected completion message.
+   */
+  async expectPreviewCompletionToastMessage(message: string): Promise<void> {
+    const completionMessage = this.page.locator(
+      explorationCompletionToastMessage
+    );
+    await expect(completionMessage).toBeVisible();
+    await expect(completionMessage).toContainText(message);
+    await expect(completionMessage).toBeHidden();
+  }
+
+  /**
+   * Restarts the preview after completing the exploration.
+   */
+  async restartPreview(): Promise<void> {
+    // Collapse the mobile navigation bar so it does not cover Restart.
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await this.page.locator(mobileNavbarOptions).isVisible())
+    ) {
+      await this.page.locator(mobileOptionsButtonSelector).click();
+    }
+    await this.page.locator(previewRestartButton).click();
+    await expect(this.page.locator(previousCardButton)).toBeHidden();
+  }
+
   /**
    * Navigate to creator dashboard page.
    */
