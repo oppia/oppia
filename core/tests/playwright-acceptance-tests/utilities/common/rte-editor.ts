@@ -216,14 +216,14 @@ export class RTEEditor {
     const label = formatLabels[format];
     const comboArrow = 'a.cke_combo_button[title="Paragraph Format"]';
 
-    // 1. Open the Format combo box.
+    // Open the Format combo box.
     await this.user.expectElementToBeVisible(comboArrow);
     await this.user.clickOnElementWithSelector(comboArrow);
 
-    // 2. Wait for the dropdown panel to appear.
+    // Wait for the dropdown panel to appear.
     await this.user.expectElementToBeVisible('.cke_panel');
 
-    // 3. Click on the option using its text inside the panel's iframe.
+    // Click on the option using its text inside the panel's iframe.
     const optionLocator = this.user.page
       .frameLocator('.cke_panel_frame')
       .locator(`a:has-text("${label}")`)
