@@ -23,6 +23,7 @@ import './oppia-visualization-frequency-table.directive.css';
 @Component({
   selector: 'oppia-visualization-frequency-table',
   templateUrl: './oppia-visualization-frequency-table.directive.html',
+  styleUrls: ['./oppia-visualization-frequency-table.directive.css'],
 })
 export class OppiaVisualizationFrequencyTableComponent {
   @Input() data: {

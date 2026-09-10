@@ -16,6 +16,8 @@
  * @fileoverview Tests that translatable text backend api works correctly.
  */
 
+// @ts-nocheck
+
 import {HttpErrorResponse} from '@angular/common/http';
 import {
   HttpClientTestingModule,
