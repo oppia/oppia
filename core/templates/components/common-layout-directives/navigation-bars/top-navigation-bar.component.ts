@@ -379,6 +379,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
         this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+        // The available space on the right of the dropdowns changes when the
+        // window is resized, so recompute the offsets explicitly.
+        this.updateGetInvolvedMenuOffset();
+        this.updateLearnDropdownOffset();
         debounce(this.truncateNavbar, 500);
       })
     );
@@ -419,20 +423,36 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  ngAfterViewChecked(): void {
-    this.getInvolvedMenuOffset = this.getDropdownOffset(
-      '.get-involved',
-      '.get-involved-dropdown'
-    );
-    // The '.donate-tab' no longer has a dropdown, so
-    // offset calculation has been removed.
+  /**
+   * Recomputes the number of classrooms shown in the learn dropdown and the
+   * offset needed to keep the dropdown within the right edge of the page.
+   * This used to run on every change detection cycle via ngAfterViewChecked,
+   * but is now only called when the dropdown is opened or the window is
+   * resized.
+   */
+  updateLearnDropdownOffset(): void {
+    this.setClassroomSummariesLength();
+    // The number of classrooms changes the dropdown's width (via the
+    // 'two-columns'/'three-columns' classes), so the layout changes must be
+    // applied before measuring the space available on the right.
+    this.changeDetectorRef.detectChanges();
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab',
       '.classroom-enabled'
     );
-    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
-    this.changeDetectorRef.detectChanges();
-    this.setClassroomSummariesLength();
+  }
+
+  /**
+   * Recomputes the offset needed to keep the 'Get Involved' dropdown within
+   * the right edge of the page. This used to run on every change detection
+   * cycle via ngAfterViewChecked, but is now only called when the dropdown is
+   * opened or the window is resized.
+   */
+  updateGetInvolvedMenuOffset(): void {
+    this.getInvolvedMenuOffset = this.getDropdownOffset(
+      '.get-involved',
+      '.get-involved-dropdown'
+    );
   }
 
   // This function is required to shift the dropdown towards left if
@@ -520,6 +540,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    this.activeMenuName = this.navigationService.activeMenuName;
+    if (menuName === 'learnMenu') {
+      this.updateLearnDropdownOffset();
+    } else if (menuName === 'getInvolvedMenu') {
+      this.updateGetInvolvedMenuOffset();
+    }
   }
 
   closeSubmenu(evt: Event): void {

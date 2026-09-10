@@ -883,6 +883,7 @@ describe('TopNavigationBarComponent', () => {
 
   it('should check if dropdown offsets are updated', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(component, 'setClassroomSummariesLength').and.stub();
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', '.classroom-enabled')
       .and.returnValue(-10)
@@ -892,12 +893,69 @@ describe('TopNavigationBarComponent', () => {
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
 
-    component.ngAfterViewChecked();
+    component.updateLearnDropdownOffset();
+    component.updateGetInvolvedMenuOffset();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
   }));
+
+  it('should recompute the learn dropdown offset when the learn menu is opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'learnMenu');
+
+    expect(component.updateLearnDropdownOffset).toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).not.toHaveBeenCalled();
+  });
+
+  it('should recompute the get involved dropdown offset when the menu is opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'getInvolvedMenu');
+
+    expect(component.updateLearnDropdownOffset).not.toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).toHaveBeenCalled();
+  });
+
+  it('should not recompute dropdown offsets when other menus are opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'aboutMenu');
+
+    expect(component.updateLearnDropdownOffset).not.toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).not.toHaveBeenCalled();
+  });
+
+  it('should recompute the dropdown offsets when the window is resized', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    component.ngOnInit();
+    mockResizeEmitter.emit();
+
+    expect(component.updateLearnDropdownOffset).toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).toHaveBeenCalled();
+  });
+
+  it('should set the classroom summaries length before measuring the learn dropdown', () => {
+    spyOn(component, 'setClassroomSummariesLength').and.stub();
+    spyOn(component, 'getDropdownOffset').and.returnValue(-10);
+
+    component.updateLearnDropdownOffset();
+
+    expect(component.setClassroomSummariesLength).toHaveBeenCalled();
+    expect(component.getDropdownOffset).toHaveBeenCalledWith(
+      '.learn-tab',
+      '.classroom-enabled'
+    );
+    expect(component.learnDropdownOffset).toBe(-10);
+  });
 
   it('should handle non-numeric minWidth gracefully', () => {
     const dummyLearnTab = document.createElement('div');
