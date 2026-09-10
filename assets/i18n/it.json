@@ -143,6 +143,7 @@
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Questa scheda è piuttosto lunga, gli studenti potrebbero perdere interesse. Valuta la possibilità di abbreviarla, o dividerla in due schede.",
 	"I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_BACK_BUTTON": "Indietro",
 	"I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON": "Successivo",
+	"I18N_CERTIFICATE_ASSESSMENT_EXIT_CONFIRM": "Sei sicuro di voler uscire? Le tue risposte a questa valutazione non verranno salvate.",
 	"I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING": "Certificati disponibili",
 	"I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT": "Controlla punteggio",
 	"I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_NOT_ATTEMPTED_DESCRIPTION": "Ottieni questo certificato superando la valutazione.",
