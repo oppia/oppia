@@ -226,7 +226,7 @@ describe('Collection player page component', () => {
         is_topic_manager: false,
         summaries: [],
         user_email: 'tester@example.com',
-        username: false,
+        username: 'tester',
       })
     );
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
