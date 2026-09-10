@@ -288,7 +288,13 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             node_id: str. The node ID.
         """
         assert self.user_id is not None
-        story = story_fetchers.get_story_by_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            logging.error(
+                'Could not find a story corresponding to ' '%s id.' % story_id
+            )
+            self.render_json({})
+            return
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id

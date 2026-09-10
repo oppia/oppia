@@ -310,6 +310,9 @@ class ManageOwnAccountValidationHandler(
         pass
 
 
+# Here we use type Any because the decoded JSON payload contains a list of
+# strings, which BaseHandler's typed dictionary requires 'Any' to represent
+# accurately since other fields are strings.
 class PracticeSessionAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, Any]]
 ):
