@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for MasteryChallengeCardComponent.
  */
 
-import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
@@ -45,6 +51,7 @@ class MockWindowRef {
 
 describe('MasteryChallengeCardComponent', () => {
   let component: MasteryChallengeCardComponent;
+  let fixture: ComponentFixture<MasteryChallengeCardComponent>;
   let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
@@ -59,7 +66,7 @@ describe('MasteryChallengeCardComponent', () => {
       ],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(MasteryChallengeCardComponent);
+    fixture = TestBed.createComponent(MasteryChallengeCardComponent);
     component = fixture.componentInstance;
     windowRef = TestBed.inject(WindowRef);
   }));
@@ -68,7 +75,8 @@ describe('MasteryChallengeCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should navigate when action URL is provided', () => {
+  it('should navigate when the unlocked button is clicked', () => {
+    spyOn(component.buttonClicked, 'emit');
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.actionUrl = '/practice/session/1';
     component.isUnlocked = true;
@@ -78,26 +86,70 @@ describe('MasteryChallengeCardComponent', () => {
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
       '/practice/session/1'
     );
+    expect(component.buttonClicked.emit).not.toHaveBeenCalled();
   });
 
-  it('should not navigate when action URL is empty', () => {
-    spyOn(windowRef.nativeWindow.location, 'assign');
+  it('should emit buttonClicked when button is clicked even if locked', () => {
+    spyOn(component.buttonClicked, 'emit');
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+
+    expect(component.buttonClicked.emit).toHaveBeenCalled();
+  });
+
+  it('should show tooltip on mouseenter when locked', fakeAsync(() => {
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = false;
+
+    component.onButtonMouseEnter();
+
+    expect(component.showLockedTooltip).toBeTruthy();
+
+    tick(4999);
+    expect(component.showLockedTooltip).toBeTruthy();
+
+    tick(1);
+    expect(component.showLockedTooltip).toBeFalsy();
+  }));
+
+  it('should not show tooltip on mouseenter when unlocked', () => {
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = true;
+
+    component.onButtonMouseEnter();
+
+    expect(component.showLockedTooltip).toBeFalsy();
+  });
+
+  it('should hide tooltip on mouseleave', () => {
+    component.isUnlocked = false;
+    component.showLockedTooltip = true;
+
+    component.onButtonMouseLeave();
+
+    expect(component.showLockedTooltip).toBeFalsy();
+  });
+
+  it('should emit buttonClicked even when action URL is empty', () => {
+    spyOn(component.buttonClicked, 'emit');
     component.actionUrl = '';
     component.isUnlocked = true;
 
     component.onChallengeButtonClick();
 
-    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+    expect(component.buttonClicked.emit).toHaveBeenCalled();
   });
 
-  it('should not navigate when the default action URL placeholder is used', () => {
-    spyOn(windowRef.nativeWindow.location, 'assign');
+  it('should emit buttonClicked even when default action URL placeholder is used', () => {
+    spyOn(component.buttonClicked, 'emit');
     component.actionUrl = '#';
     component.isUnlocked = true;
 
     component.onChallengeButtonClick();
 
-    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+    expect(component.buttonClicked.emit).toHaveBeenCalled();
   });
 
   it('should report that the default placeholder is not an action URL', () => {
@@ -109,40 +161,31 @@ describe('MasteryChallengeCardComponent', () => {
     expect(component.hasActionUrl()).toBeTruthy();
   });
 
-  it('should report the action button as disabled for an unlocked placeholder URL', () => {
-    component.isUnlocked = true;
+  it('should report the action button as disabled when locked or when URL is placeholder', () => {
+    component.isUnlocked = false;
     component.actionUrl = '#';
-
     expect(component.isActionDisabled()).toBeTruthy();
 
+    component.isUnlocked = true;
+    component.actionUrl = '#';
+    expect(component.isActionDisabled()).toBeTruthy();
+
+    component.isUnlocked = false;
+    component.actionUrl = '/practice/session/1';
+    expect(component.isActionDisabled()).toBeTruthy();
+
+    component.isUnlocked = true;
     component.actionUrl = '/practice/session/1';
     expect(component.isActionDisabled()).toBeFalsy();
   });
 
-  it('should show helper tooltip for 5 seconds for a locked challenge', fakeAsync(() => {
-    spyOn(windowRef.nativeWindow.location, 'assign');
-    component.actionUrl = '/practice/session/1';
+  it('should reset helper tooltip timer on repeated mouseenter', fakeAsync(() => {
     component.isUnlocked = false;
 
-    component.onChallengeButtonClick();
-
-    expect(component.showLockedTooltip).toBeTruthy();
-    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
-
-    tick(4999);
-    expect(component.showLockedTooltip).toBeTruthy();
-
-    tick(1);
-    expect(component.showLockedTooltip).toBeFalsy();
-  }));
-
-  it('should reset helper tooltip timer when clicked again while locked', fakeAsync(() => {
-    component.isUnlocked = false;
-
-    component.onChallengeButtonClick();
+    component.onButtonMouseEnter();
     tick(3000);
 
-    component.onChallengeButtonClick();
+    component.onButtonMouseEnter();
     tick(3000);
     expect(component.showLockedTooltip).toBeTruthy();
 
@@ -150,10 +193,10 @@ describe('MasteryChallengeCardComponent', () => {
     expect(component.showLockedTooltip).toBeFalsy();
   }));
 
-  it('should keep tooltip visible after destroy clears the timer', fakeAsync(() => {
+  it('should clear tooltip timer on destroy', fakeAsync(() => {
     component.isUnlocked = false;
 
-    component.onChallengeButtonClick();
+    component.onButtonMouseEnter();
     expect(component.showLockedTooltip).toBeTruthy();
 
     component.ngOnDestroy();

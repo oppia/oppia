@@ -43,9 +43,10 @@
 }
 
 .topic-lesson-card-thumbnail {
-  align-self: stretch;
+  background-color: #8ebbb6;
   flex: 0 0 auto;
-  height: auto;
+  height: 248px;
+  max-height: 248px;
   overflow: hidden;
   width: 212px;
 }
@@ -53,7 +54,7 @@
 .topic-lesson-card-image {
   display: block;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   width: 100%;
 }
@@ -126,12 +127,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.topic-lesson-card.completed-collapsed .topic-lesson-card-title-with-labels {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .topic-lesson-card-new-label {
@@ -273,24 +268,10 @@
   overflow-wrap: break-word;
 }
 
-.topic-lesson-card-progress {
-  height: 24px;
-  margin-left: var(--lesson-card-header-offset);
-  max-width: 296px;
-  min-width: 160px;
-  width: calc(100% - var(--lesson-card-header-offset));
-}
-
 .topic-lesson-card-footer {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%;
-}
-
-.topic-lesson-card-progress oppia-checkpoint-bar {
-  display: block;
-  height: 100%;
   width: 100%;
 }
 
@@ -316,9 +297,9 @@
 .topic-lesson-card-secondary-button {
   align-items: center;
   background: #edf7f5;
-  border: 2px solid #0b776d;
+  border: 2px solid #00645c;
   border-radius: 4px;
-  color: #0b776d;
+  color: #00645c;
   display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
@@ -328,6 +309,35 @@
   justify-content: center;
   min-width: 88px;
   padding: 0 12px;
+}
+
+.topic-lesson-card-secondary-button:disabled {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.topic-lesson-card-practice-button:disabled {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #9ca3af;
+}
+
+img.topic-lesson-card-btn-icon {
+  height: 16px;
+  object-fit: contain;
+  width: 16px;
+}
+
+.topic-lesson-card-practice-button:disabled img.topic-lesson-card-btn-icon {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.topic-lesson-card-practice-button-wrapper {
+  display: inline-flex;
 }
 
 .topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,
@@ -345,6 +355,13 @@
 .topic-lesson-card-btn-icon {
   font-size: 16px;
   line-height: 1;
+}
+
+.topic-lesson-card-start-button .topic-lesson-card-btn-icon {
+  font-size: 24px;
+  height: 24px;
+  line-height: 1;
+  width: 24px;
 }
 
 .topic-lesson-card-actions {
@@ -644,6 +661,10 @@
 
   .topic-lesson-card-secondary-button {
     height: 40px;
+    width: 100%;
+  }
+
+  .topic-lesson-card-practice-button-wrapper {
     width: 100%;
   }
 
