@@ -19,7 +19,6 @@
  */
 
 import {Browser} from '@playwright/test';
-import testConstants from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
@@ -36,6 +35,9 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
+import {BlogPostEditor, BlogPostEditorFactory} from '../user/blog-post-editor';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,10 +54,12 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
+  ROLES.BLOG_POST_EDITOR,
   ROLES.TRANSLATION_REVIEWER,
   ROLES.VOICEOVER_SUBMITTER,
 ];
@@ -86,7 +90,7 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin & BlogAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -166,6 +170,13 @@ export class UserFactory {
       }
 
       switch (role) {
+        case ROLES.BLOG_POST_EDITOR:
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
         case ROLES.TOPIC_MANAGER:
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');
@@ -277,7 +288,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -288,9 +299,22 @@ export class UserFactory {
       browser
     );
 
+    const superAdminTemp = UserFactory.composeUserWithRoles(user, [
+      SuperAdminFactory(user.page),
+    ]);
+
+    await superAdminTemp.assignRoleToUser('superAdm', ROLES.BLOG_ADMIN);
+    await superAdminTemp.expectUserToHaveRole('superAdm', ROLES.BLOG_ADMIN);
+    await superAdminTemp.assignRoleToUser('superAdm', ROLES.VOICEOVER_ADMIN);
+    await superAdminTemp.expectUserToHaveRole(
+      'superAdm',
+      ROLES.VOICEOVER_ADMIN
+    );
+
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
+      BlogAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');
