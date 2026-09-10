@@ -414,11 +414,6 @@
                   M
             </span>
           </div>
-          <div *ngIf="unreadThreadsCount !== 0" class="oppia-unread-feedback-indicator">
-            <span class="oppia-unread-feedback-number">
-              {{ unreadThreadsCount }}
-            </span>
-          </div>
         </div>
       </a>
       <ul ngbDropdownMenu
@@ -541,7 +536,6 @@
           <a (click)="closeSubmenuIfNotMobile($event)"
              class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
-            <span *ngIf="unreadThreadsCount !== 0">({{ unreadThreadsCount }})</span>
           </a>
         </li>
         <hr class="oppia-top-right-menu-item-separator" *ngIf="isWebFeedbackModalEnabled">
