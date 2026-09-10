@@ -217,11 +217,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertTrue(
-            result_error.startswith(
-                'Connection failed (no connection to the remote host)'
-            )
-        )
+        self.assertEqual(result_error, mock_error_details)
 
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
