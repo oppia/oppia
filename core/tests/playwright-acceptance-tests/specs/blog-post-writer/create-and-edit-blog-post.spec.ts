@@ -187,7 +187,7 @@ test.describe('Blog Post Writer', function () {
     await blogPostWriter.expectPublishButtonToBeDisabled();
 
     // Publish button should be disabled with no title.
-    await blogPostWriter.uploadBlogPostThumbnailImage();
+    await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_SVG);
     await blogPostWriter.updateBlogPostTitle('');
     await blogPostWriter.expectPublishButtonToBeDisabled();
 

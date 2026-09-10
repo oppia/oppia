@@ -232,7 +232,7 @@ export class BlogPostEditor extends BaseUser {
     const rteEditor = new RTEEditor(this);
 
     // Heading paragraph.
-    await rteEditor.clickOnTextArea();
+    await this.clickOnElementWithSelector(editBlogBodySelector);
     await rteEditor.changeFormatTo('heading');
     await this.page.keyboard.type('Test Heading\n');
 

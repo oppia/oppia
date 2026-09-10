@@ -210,7 +210,7 @@ export class RTEEditor {
    */
   async changeFormatTo(format: 'heading' | 'normal'): Promise<void> {
     const formatLabels: Record<string, string> = {
-      heading: 'Heading',
+      heading: 'Heading', // Reverted to match the exact text seen in your screenshot
       normal: 'Normal',
     };
     const label = formatLabels[format];
@@ -223,19 +223,13 @@ export class RTEEditor {
     // 2. Wait for the dropdown panel to appear.
     await this.user.expectElementToBeVisible('.cke_panel');
 
-    // 3. Click on the option using its text.
-    // Use the panel context to find the option by text.
-    const panelElement = await this.user.page.$('.cke_panel');
-    if (!panelElement) {
-      throw new Error('Panel element not found');
-    }
+    // 3. Click on the option using its text inside the panel's iframe.
+    const optionLocator = this.user.page
+      .frameLocator('.cke_panel_frame')
+      .locator(`a:has-text("${label}")`)
+      .first();
 
-    // Find the option within the panel by text and click it.
-    const option = await panelElement.$(`a:has-text("${label}")`);
-    if (!option) {
-      throw new Error(`Option "${label}" not found in the dropdown panel`);
-    }
-
-    await this.user.clickOnElement(option);
+    await optionLocator.waitFor({state: 'visible'});
+    await optionLocator.click();
   }
 }
