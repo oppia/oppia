@@ -20,9 +20,6 @@ python_linter_test. This file has invalid syntax of todo comment.
 
 from __future__ import annotations
 
-# This string should not trigger the linter
-const_name = "TODO #123"
-
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
