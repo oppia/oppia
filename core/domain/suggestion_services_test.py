@@ -9694,13 +9694,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             numer_of_words: int. The number of translated words.
 
         Returns:
-            str. A string that represent the translatoin contribution hours.
+            float. The translation contribution hours.
         """
-        return str(round(numer_of_words / 300, 2))
+        return round(numer_of_words / 300, 2)
 
     def _calculate_question_contribution_hours(
         self, images_included: bool
-    ) -> str:
+    ) -> float:
         """Provides question contribution hours when number of questions
         are provided. We calculate the time taken to submit
         a question according to the following document.
@@ -9711,7 +9711,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 contains images.
 
         Returns:
-            str. A string that represent the question contribution hours.
+            float. The question contribution hours.
         """
         minutes_contributed = 0
 
@@ -9719,7 +9719,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-        return str(round(minutes_contributed / 60, 2))
+        return round(minutes_contributed / 60, 2)
 
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = '%s%sEnglish' % (
