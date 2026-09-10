@@ -712,7 +712,8 @@ describe('Site Analytics Service', () => {
       const delayedInitSas = new SiteAnalyticsService(
         ws,
         localStorageService,
-        userService
+        userService,
+        document
       );
 
       delayedInitSas.registerCommunityLessonStarted(explorationId);
