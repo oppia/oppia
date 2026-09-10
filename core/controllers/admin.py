@@ -259,18 +259,14 @@ class AdminHandler(
 ):
     """Handler for the admin page."""
 
-    # Maximum length, in characters, of a generated dummy topic URL fragment.
-    # Topic URL fragments only allow lowercase words separated by hyphens and
-    # are capped at this length, so the disambiguating suffix letters must keep
-    # every generated topic URL fragment within this limit.
-    _MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH = 20
+    # Maximum number of dummy classrooms that can be generated. The cap keeps
+    # the dummy data small enough for lighthouse runs while still exercising
+    # paginated and leveled classroom UI.
+    _MAX_DUMMY_CLASSROOMS = 100
 
-    # Maximum length, in characters, of a generated dummy default classroom
-    # URL fragment. Classroom URL fragments only allow lowercase words
-    # separated by hyphens and are capped at this length, so the disambiguating
-    # suffix letters must keep every generated classroom URL fragment within
-    # this limit.
-    _MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH = 20
+    # Maximum number of dummy topics that can be attached to a single
+    # classroom.
+    _MAX_DUMMY_TOPICS_PER_CLASSROOM = 100
 
     # Fixed base names and URL fragments for dummy topics. They are cycled
     # through (with an appended lowercase letter suffix) when a request asks to
@@ -1723,11 +1719,7 @@ class AdminHandler(
                     'Change category',
                 )
 
-            story_node_index = 0
-            if story.story_contents is not None:
-                story_node_index = (
-                    int(story.story_contents.next_node_id[5:]) - 1
-                )
+            story_node_index = int(story.story_contents.next_node_id[5:]) - 1
             if story_node_index > 0:
                 story.update_node_destination_node_ids(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, story_node_index),
@@ -1803,8 +1795,8 @@ class AdminHandler(
         Raises:
             Exception. Cannot generate dummy classroom in production.
             Exception. User does not have enough rights to generate data.
-            Exception. The number of classrooms requested exceeds the number
-                of supported unique names and URL fragments.
+            Exception. The total number of dummy classrooms would exceed the
+                supported maximum.
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
@@ -1815,8 +1807,6 @@ class AdminHandler(
             self._generate_resuming_dummy_classrooms(
                 num_classrooms,
                 base_url_fragment='math',
-                longest_component_word='multiplication',
-                max_fragment_length=self._MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH,
                 suffix_offset=0,
                 create_classroom_fn=self._create_dummy_classroom,
             )
@@ -1827,8 +1817,6 @@ class AdminHandler(
         self,
         num_classrooms: int,
         base_url_fragment: str,
-        longest_component_word: str,
-        max_fragment_length: int,
         suffix_offset: int,
         create_classroom_fn: Callable[[int], None],
     ) -> None:
@@ -1836,44 +1824,32 @@ class AdminHandler(
 
         Both the full classroom generation and the bare classroom generation
         follow the same pattern: scan for the first index whose classroom does
-        not yet exist, verify that the requested count stays within the URL
-        fragment length limit, and then create each classroom starting from
-        that index.
+        not yet exist, verify that the total number of dummy classrooms stays
+        within the supported maximum, and then create each classroom starting
+        from that index.
 
         Args:
             num_classrooms: int. The number of dummy classrooms to create.
             base_url_fragment: str. The base URL fragment shared by the
                 classrooms of this scheme (e.g. 'math').
-            longest_component_word: str. The longest fixed word that appears in
-                any generated URL fragment; it is used to check the fragment
-                length limit.
-            max_fragment_length: int. The maximum allowed URL fragment length.
             suffix_offset: int. The amount added to the index when encoding the
                 disambiguating suffix letters.
             create_classroom_fn: Callable[[int], None]. The method that creates
                 a single classroom at the given index.
 
         Raises:
-            Exception. The number of classrooms requested exceeds the number
-                of supported unique names and URL fragments.
+            Exception. The total number of dummy classrooms would exceed the
+                supported maximum.
         """
         start_index = 0
         while self._dummy_classroom_exists(
             start_index, base_url_fragment, suffix_offset
         ):
             start_index += 1
-        last_index = start_index + num_classrooms - 1
-        last_suffix_length = len(
-            self._dummy_column_letters(last_index, suffix_offset)
-        )
-        longest_fragment_length = (
-            len(longest_component_word) + 1 + last_suffix_length
-        )
-        if longest_fragment_length > max_fragment_length:
+        if start_index + num_classrooms > self._MAX_DUMMY_CLASSROOMS:
             raise Exception(
                 'Cannot generate more than the supported number of dummy '
-                'classrooms at once because the resulting URL fragments would '
-                'exceed the %s-character maximum.' % max_fragment_length
+                'classrooms at once.'
             )
         for i in range(start_index, start_index + num_classrooms):
             create_classroom_fn(i)
@@ -2168,6 +2144,8 @@ class AdminHandler(
         Raises:
             Exception. Cannot generate dummy classroom in production.
             Exception. User does not have enough rights to generate data.
+            Exception. The total number of dummy classrooms would exceed the
+                supported maximum.
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
@@ -2178,8 +2156,6 @@ class AdminHandler(
             self._generate_resuming_dummy_classrooms(
                 num_classrooms,
                 base_url_fragment='science',
-                longest_component_word='science',
-                max_fragment_length=self._MAX_DUMMY_CLASSROOM_URL_FRAGMENT_LENGTH,
                 suffix_offset=1,
                 create_classroom_fn=self._create_dummy_default_classroom,
             )
@@ -2236,6 +2212,8 @@ class AdminHandler(
             Exception. Cannot generate dummy topics in production.
             Exception. User does not have enough rights to generate data.
             Exception. The given classroom does not exist.
+            Exception. The total number of topics in the classroom would exceed
+                the supported maximum.
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
@@ -2253,6 +2231,17 @@ class AdminHandler(
             # Reset the per-base suffix counters for this new request so that
             # each run starts from the first unused suffix again.
             self._dummy_topic_letter_counts = [0] * len(self._DUMMY_TOPIC_NAMES)
+            # Reject requests that would push the total number of topics in the
+            # classroom beyond the supported maximum before creating any
+            # topics, so the loop below never has to write a huge amount of
+            # data only to fail.
+            if (
+                len(classroom.topic_id_to_prerequisite_topic_ids) + num_topics
+            ) > self._MAX_DUMMY_TOPICS_PER_CLASSROOM:
+                raise Exception(
+                    'Cannot generate more than the supported number of dummy '
+                    'topics per classroom at once.'
+                )
             generated_topic_ids: List[str] = []
             for i in range(num_topics):
                 generated_topic_ids.append(
@@ -2305,7 +2294,9 @@ class AdminHandler(
         The search scans letter suffixes (a, b, ..., z, aa, ...) until it finds
         one such that neither the proposed topic name nor its URL fragment
         already exists in the database. This lets a single run generate many
-        topics while keeping the resulting topics globally unique.
+        topics while keeping the resulting topics globally unique. The number
+        of topics is validated up front in _generate_dummy_topics, so the
+        search only ever scans a bounded set of suffixes.
 
         Args:
             base_index: int. The index of the dummy topic base name being used.
@@ -2313,10 +2304,6 @@ class AdminHandler(
         Returns:
             str. The lowercase letter suffix (including the leading hyphen) to
             append to the base name and URL fragment.
-
-        Raises:
-            Exception. The requested number of dummy topics would need a URL
-                fragment longer than the supported maximum.
         """
         count = self._dummy_topic_letter_counts[base_index] + 1
         while True:
@@ -2330,14 +2317,6 @@ class AdminHandler(
                 self._DUMMY_TOPIC_URL_FRAGMENTS[base_index],
                 suffix,
             )
-            if (
-                len(proposed_fragment)
-                > self._MAX_DUMMY_TOPIC_URL_FRAGMENT_LENGTH
-            ):
-                raise Exception(
-                    'Cannot generate more dummy topics with supported unique '
-                    'URL fragments at once.'
-                )
             if not (
                 topic_services.does_topic_with_name_exist(proposed_name)
                 or topic_services.does_topic_with_url_fragment_exist(

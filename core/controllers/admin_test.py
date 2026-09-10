@@ -618,6 +618,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_cannot_generate_default_classroom_data_in_production_mode(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy classroom in production.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler',
+                {'action': 'generate_dummy_default_classroom'},
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
     def test_non_admins_cannot_generate_dummy_skill_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -879,21 +896,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_generate_more_classrooms_than_supported_raises(self) -> None:
-        # A count whose final classroom index would need a suffix longer than
-        # five letters, which would make the longest generated topic URL
-        # fragment exceed the 20-character limit. 26**5 classrooms are
-        # supported before suffixes grow past five characters, so requesting
-        # one more than that triggers the guard.
-        num_classrooms = 26**5 + 1
+        # Two classrooms already exist, so requesting 99 more would push the
+        # total past the 100-classroom limit (2 + 99 = 101) without creating
+        # anything.
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
         with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
             self.post_json(
                 '/adminhandler',
                 {
                     'action': 'generate_dummy_classroom',
-                    'num_dummy_classrooms_to_generate': num_classrooms,
+                    'num_dummy_classrooms_to_generate': 99,
                 },
                 csrf_token=csrf_token,
             )
@@ -964,20 +986,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_generate_more_default_classrooms_than_supported_raises(
         self,
     ) -> None:
-        # A count whose final classroom index would need a suffix whose URL
-        # fragment length exceeds the 20-character classroom limit. 26**12
-        # classrooms are supported before suffixes grow past twelve letters,
-        # so requesting one more than that triggers the guard.
-        num_classrooms = 26**12 + 1
+        # Two bare classrooms already exist, so requesting 99 more would push
+        # the total past the 100-classroom limit (2 + 99 = 101) without
+        # creating anything.
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
         with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
             self.post_json(
                 '/adminhandler',
                 {
                     'action': 'generate_dummy_default_classroom',
-                    'num_dummy_classrooms_to_generate': num_classrooms,
+                    'num_dummy_classrooms_to_generate': 99,
                 },
                 csrf_token=csrf_token,
             )
@@ -1082,6 +1110,70 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'action': 'generate_dummy_topics',
                     'num_dummy_topics_to_generate': 2,
                     'dummy_topic_classroom_id': 'non_existent_classroom',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_dummy_topics_requires_classroom_id(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        # The default topic count of 1 is used when no count is provided, and
+        # the request is rejected because no classroom id was given.
+        with self.assertRaisesRegex(Exception, 'must be provided'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_cannot_generate_dummy_topics_in_production_mode(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy topics in production.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'non_existent_classroom',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_more_topics_than_supported_raises(self) -> None:
+        # Two topics are already attached to the classroom, so requesting 99
+        # more would push the total past the per-classroom limit
+        # (2 + 99 = 101) without creating anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_topics',
+                'num_dummy_topics_to_generate': 2,
+                'dummy_topic_classroom_id': classroom_id,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 99,
+                    'dummy_topic_classroom_id': classroom_id,
                 },
                 csrf_token=csrf_token,
             )
