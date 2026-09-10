@@ -1589,6 +1589,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     def test_handler_with_translatable_contents_in_rule_format_should_be_skipped(
         self,
     ) -> None:
+        self.login(self.OWNER_EMAIL)
         mock_get_translatable_text_return_value = {
             'Introduction': {
                 'content_01': translation_domain.TranslatableContent(
@@ -1639,6 +1640,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 },
             }
             self.assertEqual(output, expected_output)
+
+        self.logout()
 
     def test_handler_with_rule_format_should_be_returned_for_reviewer(
         self,
