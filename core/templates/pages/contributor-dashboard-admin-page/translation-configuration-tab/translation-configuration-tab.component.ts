@@ -126,7 +126,9 @@ export class TranslationConfigurationTabComponent implements OnInit {
       );
       this.alertsService.addSuccessMessage('Configuration saved successfully.');
     } catch (error) {
-      this.alertsService.addWarning(error.message || 'Failed to save configuration.');
+      this.alertsService.addWarning(
+        error.message || 'Failed to save configuration.'
+      );
     }
   }
 }

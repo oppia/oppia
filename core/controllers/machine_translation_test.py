@@ -142,7 +142,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
     def test_post_fails_if_provider_not_registered(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        def mock_generate(*args, **kwargs):
+        def mock_generate(*args, **kwargs) -> None:
             raise utils.ValidationError(
                 'The mapped provider class for azure is not registered.'
             )

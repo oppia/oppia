@@ -41,11 +41,9 @@ describe('TranslationConfigurationTabComponent', () => {
   let mockLanguageUtilService: jasmine.SpyObj<LanguageUtilService>;
   let mockAlertsService: jasmine.SpyObj<AlertsService>;
 
-  const MOCK_CONFIG = new TranslationAdminConfig(
-    {hi: 'azure'},
-    true,
-    [{id: 'azure', displayName: 'Azure Translator'}]
-  );
+  const MOCK_CONFIG = new TranslationAdminConfig({hi: 'azure'}, true, [
+    {id: 'azure', displayName: 'Azure Translator'},
+  ]);
 
   beforeEach(waitForAsync(() => {
     mockApiService = jasmine.createSpyObj(
@@ -59,7 +57,7 @@ describe('TranslationConfigurationTabComponent', () => {
       Promise.resolve(MOCK_CONFIG)
     );
     mockApiService.updateTranslationConfigurationAsync.and.returnValue(
-      Promise.resolve()
+      Promise.resolve(MOCK_CONFIG)
     );
 
     mockLanguageUtilService = jasmine.createSpyObj('LanguageUtilService', [
@@ -220,10 +218,12 @@ describe('TranslationConfigurationTabComponent', () => {
     component.providerMapping = {hi: 'azure'};
     component.isAutomaticTranslationEnabled = true;
 
-    // Trigger save via toggle
+    // Trigger save via toggle.
     component.toggleAutomaticTranslation();
     tick();
 
-    expect(mockAlertsService.addWarning).toHaveBeenCalledWith('Failed to update config.');
+    expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to update config.'
+    );
   }));
 });

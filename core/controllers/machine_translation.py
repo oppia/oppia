@@ -78,12 +78,12 @@ class MachineTranslationGenerateHandler(
                     source_language_code, target_language_code, source_text
                 )
             )
-        except utils.ValidationError:
+        except utils.ValidationError as e:
             raise self.InvalidInputException(
                 'The translation provider mapped for this language is '
                 'currently unavailable because its corresponding provider '
                 'class could not be found in the system registry.'
-            )
+            ) from e
         except Exception as e:
             raise self.InternalErrorException(str(e))
 

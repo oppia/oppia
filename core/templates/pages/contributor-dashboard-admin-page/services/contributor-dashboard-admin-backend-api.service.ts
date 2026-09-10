@@ -274,7 +274,10 @@ export class ContributorDashboardAdminBackendApiService {
       automatic_translation_is_enabled: isEnabled,
     };
     return this.http
-      .put<TranslationAdminConfigBackendDict>('/translation-provider-mapping', payload)
+      .put<TranslationAdminConfigBackendDict>(
+        '/translation-provider-mapping',
+        payload
+      )
       .toPromise()
       .then(
         response => {

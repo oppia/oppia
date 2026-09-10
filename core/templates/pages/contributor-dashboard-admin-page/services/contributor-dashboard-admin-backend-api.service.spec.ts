@@ -24,6 +24,7 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {ContributorDashboardAdminBackendApiService} from './contributor-dashboard-admin-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
+import {TranslationAdminConfig} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 describe('Contributor dashboard admin backend api service', () => {
   let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
