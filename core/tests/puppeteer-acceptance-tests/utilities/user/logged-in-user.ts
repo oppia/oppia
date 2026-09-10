@@ -420,6 +420,8 @@ const masteryChallengeHelperTitleSelector =
   '.e2e-test-mastery-challenge-helper-title';
 const masteryChallengeHelperDescriptionSelector =
   '.e2e-test-mastery-challenge-helper-description';
+const masteryChallengeLockedModalCancelButtonSelector =
+  '.mastery-challenge-locked-modal-cancel-button';
 const topicStudySkillsCtaSelector = '.e2e-test-study-skills-cta';
 const adventureGroupSelector = '.module-group';
 const adventureTitleSelector = '.module-title';
@@ -5215,7 +5217,8 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Verifies that clicking the locked Mastery Challenge button does not
-   * navigate away from the topic page.
+   * navigate away from the topic page, and then dismisses the locked modal
+   * that the click opens so that it does not obscure later test steps.
    */
   async expectClickingLockedMasteryChallengeButtonToNotNavigate(): Promise<void> {
     if (!(await this.isMasteryChallengeUnlocked())) {
@@ -5223,6 +5226,13 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(masteryChallengeButtonSelector);
       await this.page.waitForTimeout(500);
       expect(this.page.url()).toBe(urlBeforeClick);
+      await this.clickOnElementWithSelector(
+        masteryChallengeLockedModalCancelButtonSelector
+      );
+      await this.expectElementToBeVisible(
+        masteryChallengeLockedModalCancelButtonSelector,
+        false
+      );
     }
   }
 
@@ -5524,11 +5534,186 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the Play CTA of the active chapter and waits for the lesson player
-   * page to load.
+   * Logs the current topic page module/lesson state so that failures in
+   * clickOnActiveChapterStartButton can be diagnosed without re-running the
+   * full (very long) acceptance test.
+   */
+  private async logTopicPageModuleStateForDiagnostics(): Promise<void> {
+    const moduleGroups = await this.page.$$('.module-group');
+    const moduleStates: string[] = [];
+    for (const moduleGroup of moduleGroups) {
+      const state = await moduleGroup.evaluate(group => {
+        const title = group.querySelector('.module-title');
+        const header = group.querySelector('.module-header');
+        const lessons = group.querySelector('.module-lessons');
+        return (
+          `${title ? title.textContent : '?'} ` +
+          `aria-expanded=${header ? header.getAttribute('aria-expanded') : '?'} ` +
+          `lessons=${lessons ? 'present' : 'absent'}`
+        );
+      });
+      moduleStates.push(state);
+    }
+
+    const skippedCards = await this.page.$$('.skipped-module-card');
+    const skippedCardTitles: string[] = [];
+    for (const card of skippedCards) {
+      const title = await card.evaluate(el => {
+        const name = el.querySelector('.skipped-module-name');
+        return name ? name.textContent : '?';
+      });
+      skippedCardTitles.push(title || '?');
+    }
+
+    const lessonWrappers = await this.page.$$('[id^="lesson-"]');
+    const lessonStates: string[] = [];
+    for (const wrapper of lessonWrappers) {
+      const state = await wrapper.evaluate(el => {
+        const lessonCard = el.querySelector('.e2e-test-lesson-card');
+        const startButton = el.querySelector(
+          '.e2e-test-lesson-card-start-button'
+        );
+        return [
+          el.id,
+          lessonCard ? lessonCard.className : 'no-card',
+          startButton
+            ? `start[disabled=${String((startButton as HTMLButtonElement).disabled)}]`
+            : 'no-start',
+          el.closest('.e2e-test-coming-soon-chapters') ? 'coming-soon' : '',
+        ].join(' | ');
+      });
+      lessonStates.push(state);
+    }
+
+    console.warn(
+      `[DIAGNOSTIC] modules=${JSON.stringify(moduleStates)} ` +
+        `skipped=${JSON.stringify(skippedCardTitles)} ` +
+        `lessons=${JSON.stringify(lessonStates)} url=${this.page.url()}`
+    );
+  }
+
+  /**
+   * Clicks the Play CTA of the next incomplete chapter and waits for the
+   * lesson player page to load.
    */
   async clickOnActiveChapterStartButton(): Promise<void> {
-    await this.clickOnElementWithSelector(topicLessonCardStartButtonSelector);
+    // The learner must always play the true next chapter: the first card in
+    // story (DOM) order that is not yet completed. Clicking a later chapter
+    // out of order re-opens the module-skip confirmation and collapses the
+    // still-incomplete earlier modules, which leaves the remaining chapters
+    // unreachable. Coming-soon cards never match here: their wrappers use the
+    // coming-soon-lesson-* id prefix and their start buttons are disabled.
+    try {
+      await this.page.waitForFunction(
+        () => {
+          const lessonWrappers = Array.from(
+            document.querySelectorAll('[id^="lesson-"]')
+          );
+          const nextLessonCard = lessonWrappers
+            .map(wrapper => wrapper.querySelector('.e2e-test-lesson-card'))
+            .find((card): card is Element =>
+              Boolean(card && !card.classList.contains('completed-lesson'))
+            );
+          if (!nextLessonCard) {
+            return false;
+          }
+          const startButton = nextLessonCard.querySelector(
+            '.e2e-test-lesson-card-start-button'
+          );
+          if (startButton && !(startButton as HTMLButtonElement).disabled) {
+            return true;
+          }
+          const chevronButton = nextLessonCard.querySelector(
+            '.topic-lesson-card-chevron-badge'
+          );
+          return Boolean(
+            chevronButton && !chevronButton.hasAttribute('disabled')
+          );
+        },
+        {timeout: 30000}
+      );
+    } catch (error) {
+      await this.logTopicPageModuleStateForDiagnostics();
+      throw error;
+    }
+
+    const lessonWrappers = await this.page.$$('[id^="lesson-"]');
+    let nextLessonCard: puppeteer.ElementHandle<Element> | null = null;
+    for (const wrapper of lessonWrappers) {
+      const card = await wrapper.$('.e2e-test-lesson-card');
+      if (!card) {
+        continue;
+      }
+      const isCompleted = await card.evaluate(el =>
+        el.classList.contains('completed-lesson')
+      );
+      if (isCompleted) {
+        await card.dispose();
+        continue;
+      }
+      nextLessonCard = card;
+      break;
+    }
+
+    if (!nextLessonCard) {
+      await this.logTopicPageModuleStateForDiagnostics();
+      throw new Error('No incomplete lesson card was found on the topic page.');
+    }
+
+    // The next chapter is usually the active lesson, so its card is already
+    // expanded with an enabled start button. Directly after the skip and
+    // expand flows the card can still be collapsed, and a collapsed card
+    // renders no start button, so expand it via its chevron first if needed.
+    let startButton = await nextLessonCard.$(
+      topicLessonCardStartButtonSelector
+    );
+    if (!startButton) {
+      const chevronButton = await nextLessonCard.$(
+        '.topic-lesson-card-chevron-badge'
+      );
+      if (!chevronButton) {
+        await this.logTopicPageModuleStateForDiagnostics();
+        throw new Error(
+          'The next lesson card has neither a start button nor a chevron.'
+        );
+      }
+      await chevronButton.evaluate(el => {
+        const element = el as HTMLElement;
+        element.scrollIntoView({behavior: 'auto', block: 'center'});
+      });
+      await this.clickOnElement(chevronButton);
+      startButton = await nextLessonCard.waitForSelector(
+        topicLessonCardStartButtonSelector,
+        {timeout: 10000}
+      );
+    }
+    if (!startButton) {
+      throw new Error(
+        'The expanded lesson card did not render a start button.'
+      );
+    }
+
+    const isStartButtonDisabled = await startButton.evaluate(
+      el => (el as HTMLButtonElement).disabled
+    );
+    if (isStartButtonDisabled) {
+      await this.logTopicPageModuleStateForDiagnostics();
+      throw new Error('The next lesson card rendered a disabled start button.');
+    }
+
+    await startButton.evaluate(el => {
+      const element = el as HTMLElement;
+      element.scrollIntoView({behavior: 'auto', block: 'center'});
+    });
+    await this.clickOnElement(startButton);
+
+    // Clicking strictly in story order prevents the module-skip confirmation
+    // modal from appearing, but confirm it as a safety net if it shows so the
+    // learner still proceeds into the exploration.
+    if (await this.isElementVisible(arcSkipModalSelector, true, 3000)) {
+      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
+    }
+
     await this.waitForPageToFullyLoad();
   }
 
