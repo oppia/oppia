@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import itertools
-
 from core import feconf, utils
 from core.domain import (
     email_manager,
@@ -33,7 +31,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, Final, List, Optional, Tuple, Type, cast
+from typing import Dict, Final, List, Optional, Tuple, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -856,138 +854,6 @@ def _get_thread_from_model(
         thread_model.last_nonempty_message_text,
         thread_model.last_nonempty_message_author_id,
     )
-
-
-def get_exp_thread_summaries(
-    user_id: str, thread_ids: List[str]
-) -> Tuple[List[feedback_domain.FeedbackThreadSummary], int]:
-    """Returns a list of summaries corresponding to the exploration threads from
-    the given thread ids. Non-exploration threads are not included in the list.
-    It also returns the number of threads that are currently not read by the
-    user.
-
-    Args:
-        user_id: str. The id of the user.
-        thread_ids: list(str). The ids of the threads for which we have to fetch
-            the summaries.
-
-    Returns:
-        tuple(thread_summaries, number_of_unread_threads). Where:
-            thread_summaries: list(FeedbackThreadSummary).
-            number_of_unread_threads: int. The number of threads not read by the
-                user.
-    """
-    # We need to fetch the thread models first to filter out the threads which
-    # don't refer to an exploration.
-    exp_thread_models = [
-        model
-        for model in feedback_models.GeneralFeedbackThreadModel.get_multi(
-            thread_ids
-        )
-        if model and model.entity_type == feconf.ENTITY_TYPE_EXPLORATION
-    ]
-
-    exp_thread_user_model_ids = [
-        feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
-            user_id, model.id
-        )
-        for model in exp_thread_models
-    ]
-    exp_model_ids = [model.entity_id for model in exp_thread_models]
-
-    # Here we use cast because we are narrowing down the return type
-    # of following method from List[Optional[Model]] to List[Optional[
-    # exp_models.ExplorationModel]].
-    exp_thread_user_models, exploration_models = cast(
-        Tuple[
-            List[Optional[feedback_models.GeneralFeedbackThreadUserModel]],
-            List[Optional[exp_models.ExplorationModel]],
-        ],
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('GeneralFeedbackThreadUserModel', exp_thread_user_model_ids),
-                ('ExplorationModel', exp_model_ids),
-            ]
-        ),
-    )
-
-    threads = [_get_thread_from_model(m) for m in exp_thread_models]
-    flattened_last_two_message_models_of_threads = (
-        feedback_models.GeneralFeedbackMessageModel.get_multi(
-            list(
-                itertools.chain.from_iterable(
-                    t.get_last_two_message_ids() for t in threads
-                )
-            )
-        )
-    )
-    last_two_message_models_of_threads = [
-        flattened_last_two_message_models_of_threads[i : i + 2]
-        for i in range(0, len(flattened_last_two_message_models_of_threads), 2)
-    ]
-
-    thread_summaries = []
-    number_of_unread_threads = 0
-    for thread, last_two_message_models, thread_user_model, exp_model in zip(
-        threads,
-        last_two_message_models_of_threads,
-        exp_thread_user_models,
-        exploration_models,
-    ):
-        message_ids_read_by_user = (
-            ()
-            if thread_user_model is None
-            else thread_user_model.message_ids_read_by_user
-        )
-
-        last_message_model, second_last_message_model = last_two_message_models
-        # We don't need to check if the last message is None because all threads
-        # have at least one message.
-        # Ruling out the possibility of None for mypy type checking.
-        assert last_message_model is not None
-        last_message_is_read = (
-            last_message_model.message_id in message_ids_read_by_user
-        )
-        author_last_message = (
-            last_message_model.author_id
-            and user_services.get_username(last_message_model.author_id)
-        )
-        # The second-to-last message, however, might be None.
-        second_last_message_is_read = (
-            second_last_message_model is not None
-            and second_last_message_model.message_id in message_ids_read_by_user
-        )
-        author_second_last_message = None
-        if second_last_message_model is not None:
-            # TODO(#15621): The explicit declaration of type for ndb properties
-            # should be removed. Currently, these ndb properties are annotated
-            # with Any return type. Once we have proper return type we can
-            # remove this.
-            author_id: str = second_last_message_model.author_id
-            author_second_last_message = (
-                author_id and user_services.get_username(author_id)
-            )
-        # Ruling out the possibility of None for mypy type checking.
-        assert exp_model is not None
-        if not last_message_is_read:
-            number_of_unread_threads += 1
-        thread_summaries.append(
-            feedback_domain.FeedbackThreadSummary(
-                thread.status,
-                thread.original_author_id,
-                thread.last_updated,
-                last_message_model.text,
-                thread.message_count,
-                last_message_is_read,
-                second_last_message_is_read,
-                author_last_message,
-                author_second_last_message,
-                exp_model.title,
-                exp_model.id,
-                thread.id,
-            )
-        )
-    return thread_summaries, number_of_unread_threads
 
 
 def get_threads(

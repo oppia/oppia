@@ -56,9 +56,6 @@ import {FeedbackModalComponent} from '../../../base-components/feedback-modal.co
 
 class MockPlatformFeatureService {
   status = {
-    ShowFeedbackUpdatesInProfilePicDropdownMenu: {
-      isEnabled: false,
-    },
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
@@ -823,23 +820,6 @@ describe('TopNavigationBarComponent', () => {
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
-
-  it(
-    'should return correct value for show feedback updates' +
-      'in profile pic drop down menu feature flag',
-    () => {
-      expect(
-        component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBe(false);
-
-      mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
-        true;
-
-      expect(
-        component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBe(true);
-    }
-  );
 
   it(
     'should return correct value for show technical feedback dashboard page' +

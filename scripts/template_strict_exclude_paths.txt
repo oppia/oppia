@@ -56,7 +56,6 @@ core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin
 core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component.ts
 core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.ts
 core/templates/pages/exploration-player-page/new-lesson-player/sidebar-components/lesson-player-sidebar.component.ts
-core/templates/pages/feedback-updates-page/feedback-updates-page.component.ts
 core/templates/pages/learner-dashboard-page/card-display/card-display.component.ts
 core/templates/pages/learner-dashboard-page/goals-tab.component.ts
 core/templates/pages/learner-dashboard-page/home-tab.component.ts

@@ -190,7 +190,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ];
 
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
-  FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg'
   );
@@ -262,9 +261,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
       this.urlService.getPathname().includes(path)
     );
-
-    this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
-      this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
 
     this.isWebFeedbackModalEnabled =
       this.isWebFeedbackModalFeatureFlagEnabled();
@@ -646,11 +642,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       NavbarAndFooterGATrackingPages.BLOG
     );
     this.windowRef.nativeWindow.location.href = '/blog';
-  }
-
-  isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
-    return this.platformFeatureService.status
-      .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
   }
 
   isWebFeedbackModalFeatureFlagEnabled(): boolean {

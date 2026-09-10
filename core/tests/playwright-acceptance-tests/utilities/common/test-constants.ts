@@ -64,7 +64,6 @@ export default {
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
-    FeedbackUpdates: 'http://localhost:8181/feedback-updates',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     ImpactReport2022Url:
