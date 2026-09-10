@@ -145,7 +145,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          await this.page.setViewport({width: 1920, height: 1080});
+          this.page.setViewport({width: 1920, height: 1080});
         }
 
         // Enable Video Recording.
@@ -1347,11 +1347,7 @@ export class BaseUser {
     const runningInCI = __dirname.startsWith('/home/runner');
 
     try {
-      const screenshot = await currentPage.screenshot({
-        fullPage: false,
-        captureBeyondViewport: false,
-        ...screenshotOptions,
-      });
+      const screenshot = await currentPage.screenshot(screenshotOptions);
       expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
