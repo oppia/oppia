@@ -1,5 +1,4 @@
 core/templates/expressions/parser.js
-core/templates/google-analytics.initializer.ts
 integrations/*
 integrations_dev/*
 assets/scripts/*
