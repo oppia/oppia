@@ -567,8 +567,8 @@
     },
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "community-library-browser/subscribe-to-a-favourite-creator",
