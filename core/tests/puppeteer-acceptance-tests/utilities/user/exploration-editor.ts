@@ -5005,6 +5005,8 @@ export class ExplorationEditor extends BaseUser {
    * language selector and fallback info tooltip render on the redesigned topic
    * viewer page. The exploration must already be linked to a story so that the
    * translation-mode switcher is available in the translation tab.
+   * @param {string} explorationId - The ID of the published exploration to
+   *     which the Hindi translation is added.
    */
   async addHindiTranslationToExploration(explorationId: string): Promise<void> {
     await this.navigateToExplorationEditor(explorationId);

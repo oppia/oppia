@@ -2122,9 +2122,13 @@ export class BaseUser {
   /**
    * Performs a long-press on the element matching the given selector. On touch
    * devices Angular Material tooltips are shown after a long-press instead of
-   * a hover, because the `mouseenter` listener is not bound there. This helper
-   * dispatches touch events through the Chrome DevTools Protocol, holding the
-   * touch for longer than Material's `LONGPRESS_DELAY` (500 ms).
+   * a hover, because the `mouseenter` listener is not bound there.
+   *
+   * Puppeteer has no prebuilt long-press API: its `Touchscreen` class only
+   * exposes `tap`, which dispatches `touchstart` and `touchend` back to back
+   * with no way to hold the touch. Events are therefore dispatched directly
+   * through the Chrome DevTools Protocol, holding the touch for longer than
+   * Material's `LONGPRESS_DELAY` (500 ms).
    *
    * The element is scrolled into view before the touch is dispatched: the
    * touch coordinates are resolved relative to the layout viewport, so an

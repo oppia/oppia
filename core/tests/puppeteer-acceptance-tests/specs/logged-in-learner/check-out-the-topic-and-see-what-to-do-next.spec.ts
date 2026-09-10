@@ -352,7 +352,7 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.reloadTopicPage();
       await loggedInLearner.expectTextLanguageToBeSelected('hi');
 
-      await loggedInLearner.setSavedSessionLanguageToUnavailable('es');
+      await loggedInLearner.directlySetSavedSessionLanguageToUnavailable('es');
       await loggedInLearner.reloadTopicPage();
       await loggedInLearner.expectSelectedTextLanguageToBe('en');
       await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);

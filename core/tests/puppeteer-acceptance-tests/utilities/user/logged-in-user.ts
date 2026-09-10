@@ -394,6 +394,9 @@ const topicLessonCardStartButtonSelector = '.e2e-test-lesson-card-start-button';
 const topicLessonCardSecondaryButtonSelector =
   '.e2e-test-lesson-card-secondary-button';
 const topicLessonCardNewLabelSelector = '.topic-lesson-card-new-label';
+const topicLessonCardChevronBadgeSelector = '.topic-lesson-card-chevron-badge';
+const topicLessonCardWrapperIdSelector = '[id^="lesson-"]';
+const completedLessonClassName = 'completed-lesson';
 const topicLessonCardCompletedClassSelector =
   '.e2e-test-lesson-card.completed-lesson';
 const topicLessonCardCompletedCollapsedSelector =
@@ -5555,7 +5558,7 @@ export class LoggedInUser extends BaseUser {
       moduleStates.push(state);
     }
 
-    const skippedCards = await this.page.$$('.skipped-module-card');
+    const skippedCards = await this.page.$$(skippedAdventureCardSelector);
     const skippedCardTitles: string[] = [];
     for (const card of skippedCards) {
       const title = await card.evaluate(el => {
@@ -5565,7 +5568,7 @@ export class LoggedInUser extends BaseUser {
       skippedCardTitles.push(title || '?');
     }
 
-    const lessonWrappers = await this.page.$$('[id^="lesson-"]');
+    const lessonWrappers = await this.page.$$(topicLessonCardWrapperIdSelector);
     const lessonStates: string[] = [];
     for (const wrapper of lessonWrappers) {
       const state = await wrapper.evaluate(el => {
@@ -5605,56 +5608,53 @@ export class LoggedInUser extends BaseUser {
     // coming-soon-lesson-* id prefix and their start buttons are disabled.
     try {
       await this.page.waitForFunction(
-        () => {
+        (
+          lessonWrapperSelector: string,
+          lessonCardSelector: string,
+          startButtonSelector: string,
+          chevronButtonSelector: string,
+          completedClass: string
+        ) => {
           const lessonWrappers = Array.from(
-            document.querySelectorAll('[id^="lesson-"]')
+            document.querySelectorAll(lessonWrapperSelector)
           );
           const nextLessonCard = lessonWrappers
-            .map(wrapper => wrapper.querySelector('.e2e-test-lesson-card'))
+            .map(wrapper => wrapper.querySelector(lessonCardSelector))
             .find((card): card is Element =>
-              Boolean(card && !card.classList.contains('completed-lesson'))
+              Boolean(card && !card.classList.contains(completedClass))
             );
           if (!nextLessonCard) {
             return false;
           }
-          const startButton = nextLessonCard.querySelector(
-            '.e2e-test-lesson-card-start-button'
-          );
+          const startButton = nextLessonCard.querySelector(startButtonSelector);
           if (startButton && !(startButton as HTMLButtonElement).disabled) {
             return true;
           }
           const chevronButton = nextLessonCard.querySelector(
-            '.topic-lesson-card-chevron-badge'
+            chevronButtonSelector
           );
           return Boolean(
             chevronButton && !chevronButton.hasAttribute('disabled')
           );
         },
-        {timeout: 30000}
+        {timeout: 30000},
+        topicLessonCardWrapperIdSelector,
+        topicLessonCardSelector,
+        topicLessonCardStartButtonSelector,
+        topicLessonCardChevronBadgeSelector,
+        completedLessonClassName
       );
     } catch (error) {
       await this.logTopicPageModuleStateForDiagnostics();
       throw error;
     }
 
-    const lessonWrappers = await this.page.$$('[id^="lesson-"]');
-    let nextLessonCard: puppeteer.ElementHandle<Element> | null = null;
-    for (const wrapper of lessonWrappers) {
-      const card = await wrapper.$('.e2e-test-lesson-card');
-      if (!card) {
-        continue;
-      }
-      const isCompleted = await card.evaluate(el =>
-        el.classList.contains('completed-lesson')
-      );
-      if (isCompleted) {
-        await card.dispose();
-        continue;
-      }
-      nextLessonCard = card;
-      break;
-    }
-
+    // The `page.$` query selects the first non-completed lesson card in story
+    // (DOM) order, since the `:not(.completed-lesson)` filter combines with the
+    // `[id^="lesson-"]` wrapper id prefix in a single selector.
+    const nextLessonCard = await this.page.$(
+      `${topicLessonCardWrapperIdSelector} ${topicLessonCardSelector}:not(.${completedLessonClassName})`
+    );
     if (!nextLessonCard) {
       await this.logTopicPageModuleStateForDiagnostics();
       throw new Error('No incomplete lesson card was found on the topic page.');
@@ -5669,7 +5669,7 @@ export class LoggedInUser extends BaseUser {
     );
     if (!startButton) {
       const chevronButton = await nextLessonCard.$(
-        '.topic-lesson-card-chevron-badge'
+        topicLessonCardChevronBadgeSelector
       );
       if (!chevronButton) {
         await this.logTopicPageModuleStateForDiagnostics();
@@ -5945,10 +5945,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Persists a session fallback language that the lesson no longer offers.
+   * Directly writes a session fallback language to session storage, bypassing
+   * the language selector UI, so the learner is left with a fallback language
+   * that the lesson no longer offers.
    * @param {string} languageCode - The unavailable language code to persist.
    */
-  async setSavedSessionLanguageToUnavailable(
+  async directlySetSavedSessionLanguageToUnavailable(
     languageCode: string
   ): Promise<void> {
     await this.page.evaluate(
