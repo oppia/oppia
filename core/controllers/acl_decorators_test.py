@@ -21,12 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import (
-    android_validation_constants,
-    feature_flag_list,
-    feconf,
-    utils,
-)
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base, incoming_app_feedback_report
 from core.domain import (

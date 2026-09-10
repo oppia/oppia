@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import fs_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import web_feedback_cleanup_jobs
