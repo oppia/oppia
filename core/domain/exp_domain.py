@@ -3172,11 +3172,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'],
                     state_schema_version=45,
                 )
-                for ca_name in customisation_args:
+                for ca in customisation_args.values():
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
-                            customisation_args[ca_name].schema,
-                            customisation_args[ca_name].value,
+                            ca.schema,
+                            ca.value,
                             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
                             lambda subtitled_unicode: subtitled_unicode.content_id,
                         )
@@ -3435,10 +3435,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 interaction['customization_args'],
                 state_schema_version=state_schema,
             )
-            for ca_name in customisation_args:
-                content_id_list.extend(
-                    customisation_args[ca_name].get_content_ids()
-                )
+            for ca in customisation_args.values():
+                content_id_list.extend(ca.get_content_ids())
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -5495,6 +5493,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v57 to v58. Version 58 adds
+        allowExponentialNotation customization arg to NumericInput and sets it
+        to True for legacy states to preserve existing learner-facing behavior.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted v58
+            state dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            interaction = state_dict['interaction']
+            if interaction['id'] != 'NumericInput':
+                continue
+            customization_args = interaction['customization_args']
+            if 'allowExponentialNotation' not in customization_args:
+                customization_args['allowExponentialNotation'] = {'value': True}
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5560,7 +5584,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 62
+    CURRENT_EXP_SCHEMA_VERSION = 63
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5961,13 +5985,36 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v62.
         """
-        exploration_dict['schema_version'] = 61
+        exploration_dict['schema_version'] = 62
 
         exploration_dict['states'] = cls._convert_states_v56_dict_to_v57_dict(
             exploration_dict['states']
         )
         exploration_dict['states_schema_version'] = 57
 
+        return exploration_dict
+
+    @classmethod
+    def _convert_v62_dict_to_v63_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v62 exploration dict into a v63 exploration dict.
+        Version 63 adds a new customization arg to NumericInput allowing
+        creators to disable exponential notation.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v62.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v63.
+        """
+        exploration_dict['schema_version'] = 63
+        exploration_dict['states'] = cls._convert_states_v57_dict_to_v58_dict(
+            exploration_dict['states']
+        )
+        exploration_dict['states_schema_version'] = 58
         return exploration_dict
 
     @classmethod
@@ -6113,6 +6160,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
             )
             exploration_schema_version = 62
 
+        if exploration_schema_version == 62:
+            exploration_dict = cls._convert_v62_dict_to_v63_dict(
+                exploration_dict
+            )
+            exploration_schema_version = 63
+
         return exploration_dict
 
     @classmethod
@@ -6189,6 +6242,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
         }
         exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
         return exploration_dict_deepcopy
+
+    def to_dict_for_android(self) -> ExplorationDict:
+        """Returns a dict representing this Exploration domain object for
+        Android, with allowExponentialNotation reset to False on all
+        NumericInput interactions for backward compatibility.
+
+        Returns:
+            dict. A dict mapping all fields of Exploration instance, with
+            NumericInput customization args adjusted for Android.
+        """
+        exploration_dict = self.to_dict()
+        for state_dict in exploration_dict['states'].values():
+            interaction = state_dict['interaction']
+            if interaction['id'] != 'NumericInput':
+                continue
+            customization_args = interaction['customization_args']
+            if 'allowExponentialNotation' in customization_args:
+                customization_args['allowExponentialNotation']['value'] = True
+        return exploration_dict
 
     def serialize(self) -> str:
         """Returns the object serialized as a JSON string.

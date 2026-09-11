@@ -10611,6 +10611,39 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             )
         self.assertIsNone(updated_exploration)
 
+    def test_get_exp_with_draft_applied_upgrades_old_draft_successfully(
+        self,
+    ) -> None:
+        exp_migration_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                    'from_version': '57',
+                    'to_version': '58',
+                }
+            )
+        ]
+        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 58):
+            exp_services.update_exploration(
+                self.USER_ID,
+                self.EXP_ID1,
+                exp_migration_change_list,
+                'Ran Exploration Migration job.',
+            )
+
+        exp_services.create_or_update_draft(
+            self.EXP_ID1,
+            self.USER_ID,
+            self.draft_change_list,
+            2,
+            self.NEWER_DATETIME,
+        )
+
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID1, self.USER_ID
+        )
+        self.assertIsNotNone(updated_exploration)
+
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
@@ -13311,7 +13344,7 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'category': 'Algebra',
             'author_notes': '',
             'blurb': '',
-            'states_schema_version': 57,
+            'states_schema_version': 58,
             'init_state_name': 'Introduction',
             'language_code': 'en',
             'objective': '',
