@@ -16,30 +16,32 @@
  * @fileoverview Acceptance Test for topic manager to edit a topic.
  */
 
-import { test } from '@playwright/test';
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
-import { UserFactory } from '../../utilities/common/user-factory';
-import { TopicManager } from '../../utilities/user/topic-manager';
-import { CurriculumAdmin } from '../../utilities/user/curriculum-admin';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {TopicManager} from '../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const ROLES = testConstants.Roles;
 
-test.describe.configure({ timeout: 4800000 });
-
 test.describe('Topic Manager', () => {
+  test.describe.configure({timeout: 4800000});
+
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
+  let explorationEditor: ExplorationEditor;
 
-  test.beforeAll(async ({ browser }, testInfo) => {
+  test.beforeAll(async ({browser}, testInfo) => {
     testInfo.setTimeout(4800000);
 
     const warmupContext = await browser.newContext();
     const warmupPage = await warmupContext.newPage();
     try {
-      await warmupPage.goto('http://localhost:8181', { timeout: 120000 });
+      await warmupPage.goto('http://localhost:8181', {timeout: 120000});
       await warmupPage.waitForSelector(
         '.e2e-test-oppia-cookie-banner-accept-button',
-        { state: 'visible', timeout: 120000 }
+        {state: 'visible', timeout: 120000}
       );
     } catch (e) {
       // Warmup encountered an issue; proceed anyway.
@@ -55,8 +57,17 @@ test.describe('Topic Manager', () => {
       [ROLES.CURRICULUM_ADMIN]
     )) as CurriculumAdmin;
 
+    // 1. Create the exploration editor user.
+    explorationEditor = (await UserFactory.createNewUser(
+      'expEditor',
+      'exp_editor@example.com',
+      browser,
+      [ROLES.CURRICULUM_ADMIN] // Giving it admin rights just to be safe.
+    )) as ExplorationEditor;
+
+    // 2. Use explorationEditor instead of curriculumAdmin.
     const explorationId =
-      await curriculumAdmin.createAndPublishExplorationWithCards(
+      await explorationEditor.createAndPublishExplorationWithCards(
         'Solving problems without a calculator',
         'Mathematics',
         2,
@@ -147,7 +158,16 @@ test.describe('Topic Manager', () => {
         'AO 101',
         'Arithmetic Operations (New): This is the new topic description.'
       );
+
+      // Navigate to the practice tab.
       await topicManager.navigateToTabInPreview('Practice');
+
+      // Take the screenshot while the Practice tab is visible and save it directly.
+      await topicManager.page.screenshot({
+        path: 'core/tests/playwright-acceptance-tests/prod-desktop-screenshots/arithmeticOperationsWithPracticeTab.png',
+        fullPage: true,
+      });
+
       await topicManager.verifyTopicManagerTabTitle('Master Skills for AO 101');
       await topicManager.navigateToTabInPreview('Study');
       await topicManager.verifyTopicManagerTabTitle('Study Skills for AO 101');
