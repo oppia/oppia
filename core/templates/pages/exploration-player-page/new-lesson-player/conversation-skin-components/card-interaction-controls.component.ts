@@ -22,6 +22,7 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {
   InteractionSpecsConstants,
@@ -104,6 +105,7 @@ export class CardInteractionControlsComponent {
     private urlService: UrlService,
     private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
+    private currentInteractionService: CurrentInteractionService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
