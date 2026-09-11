@@ -746,8 +746,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/check-out-the-topic-and-see-what-to-do-next",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/check-out-the-topic-and-see-what-to-do-next.spec.ts",
+      "name": "logged-out-learner/check-out-the-topic-and-see-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/check-out-the-topic-and-see-what-to-do-next.spec.ts",
       "framework": "puppeteer"
     }
   ]

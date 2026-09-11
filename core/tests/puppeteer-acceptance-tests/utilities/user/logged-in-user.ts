@@ -369,8 +369,6 @@ const availableChapters = '.e2e-test-available-chapters';
 const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
 const chapterSelector = '.e2e-test-chapter-title';
 
-// Redesigned topic viewer page.
-
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -4607,13 +4605,6 @@ export class LoggedInUser extends BaseUser {
       expectedProfilePath
     );
   }
-
-  /**
-   * Opens the redesigned topic viewer page for the given classroom and topic
-   * and waits for the page to be fully loaded.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
-   * @param {string} topicUrlFragment - The topic URL fragment.
-   */
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
