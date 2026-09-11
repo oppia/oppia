@@ -37,6 +37,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -61,6 +62,7 @@ if MYPY:  # pragma: no cover
         question_models,
         skill_models,
         topic_models,
+        translation_models,
         user_models,
     )
 
@@ -1773,3 +1775,94 @@ def get_categorized_skill_ids_and_descriptions() -> (
                 )
 
     return categorized_skills
+
+
+class ConceptCardDict(skill_domain.SkillContentsDict):
+    """Dictionary representing a concept card shown to a learner. It carries
+    the skill description alongside the skill contents, because both are
+    displayed on the card and both are translatable.
+    """
+
+    skill_description: str
+
+
+def get_concept_card_dicts(
+    skills: List[skill_domain.Skill],
+    language_code: Optional[str] = None,
+) -> List[ConceptCardDict]:
+    """Returns the concept card dicts for the given skills, with the skill
+    description and explanation translated into the given language where a
+    translation exists.
+
+    Args:
+        skills: list(Skill). The skills whose concept cards are required.
+        language_code: str or None. The language code to display the concept
+            cards in. If None or English, the original content is returned.
+
+    Returns:
+        list(ConceptCardDict). The concept card dicts for the given skills.
+        Any content without an up-to-date translation falls back to English.
+    """
+    concept_card_dicts: List[ConceptCardDict] = []
+    for skill in skills:
+        skill_contents_dict = skill.skill_contents.to_dict()
+        # Every key of SkillContentsDict is listed explicitly because mypy
+        # rejects a ** spread into a TypedDict, so a field added to
+        # SkillContentsDict has to be added here as well.
+        concept_card_dicts.append(
+            {
+                'explanation': skill_contents_dict['explanation'],
+                'recorded_voiceovers': skill_contents_dict[
+                    'recorded_voiceovers'
+                ],
+                'written_translations': skill_contents_dict[
+                    'written_translations'
+                ],
+                'skill_description': skill.description,
+            }
+        )
+
+    if (
+        language_code is None
+        or language_code == constants.DEFAULT_LANGUAGE_CODE
+    ):
+        return concept_card_dicts
+
+    entity_references: List[
+        translation_models.EntityTranslationReferenceDict
+    ] = [
+        {
+            'entity_type': feconf.TranslatableEntityType.SKILL,
+            'entity_id': skill.id,
+            'entity_version': skill.version,
+            'language_code': language_code,
+        }
+        for skill in skills
+    ]
+    entity_translations = translation_fetchers.get_multiple_entity_translations(
+        entity_references
+    )
+
+    for skill, concept_card_dict, entity_translation in zip(
+        skills, concept_card_dicts, entity_translations
+    ):
+        if entity_translation is None:
+            continue
+
+        translated_description = (
+            translation_services.get_up_to_date_translation(
+                entity_translation, feconf.SKILL_DESCRIPTION_CONTENT_ID
+            )
+        )
+        if translated_description is not None:
+            concept_card_dict['skill_description'] = translated_description
+
+        translated_explanation = (
+            translation_services.get_up_to_date_translation(
+                entity_translation, skill.skill_contents.explanation.content_id
+            )
+        )
+        if translated_explanation is not None:
+            concept_card_dict['explanation']['html'] = translated_explanation
+
+    return concept_card_dicts

@@ -23,10 +23,9 @@ import {
   AvailableCertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentAttemptData,
+  CertificateAssessmentAttemptQuestionBackendDict,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
-  CertificateAssessmentQuestionStateBackendDict,
-  CertificateAssessmentQuestionData,
 } from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
@@ -103,17 +102,12 @@ interface GetCertificateAssessmentAttemptsBackendResponse {
   attempts: CertificateAssessmentAttemptSummaryBackendDict[];
 }
 
-interface CertificateAssessmentQuestionBackendDict {
-  question_id: string;
-  question_version: number;
-}
-
-// Response for starting a new assessment attempt. The question list is
-// represented by CertificateAssessmentQuestionBackendDict entries; the full
-// question state is fetched separately via the question handler.
+// Response for starting a new assessment attempt. Every question's full
+// pinned state data is returned up front, so the client can serve questions
+// from memory without further per-question requests.
 interface StartCertificateAssessmentBackendResponse {
   attempt_id: string;
-  questions: CertificateAssessmentQuestionBackendDict[];
+  questions: CertificateAssessmentAttemptQuestionBackendDict[];
 }
 
 export interface SubmitCertificateAssessmentAnswerBackendDict {
@@ -161,16 +155,6 @@ export class CertificateAssessmentOfferingBackendApiService {
       '<attempt_id>',
       attemptId
     );
-  }
-
-  private getCertificateQuestionHandlerUrl(
-    attemptId: string,
-    questionId: string
-  ): string {
-    return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
-      '<attempt_id>',
-      attemptId
-    ).replace('<question_id>', questionId);
   }
 
   async getCertificateAssessmentOfferingsAsync(): Promise<
@@ -408,7 +392,18 @@ export class CertificateAssessmentOfferingBackendApiService {
         questions: response.questions,
       });
     } catch (errorResponse) {
-      throw errorResponse?.error?.error || errorResponse.message;
+      // Propagate a structured backend error (with error_type and
+      // remaining_minutes) so the caller can translate it; otherwise fall
+      // back to the usual error string.
+      const backendError = errorResponse?.error;
+      if (
+        backendError &&
+        typeof backendError === 'object' &&
+        (backendError as {error_type?: string}).error_type !== undefined
+      ) {
+        throw backendError;
+      }
+      throw errorResponse?.error?.error || errorResponse?.message;
     }
   }
 
@@ -424,22 +419,6 @@ export class CertificateAssessmentOfferingBackendApiService {
         )
         .toPromise();
       return response;
-    } catch (errorResponse) {
-      throw errorResponse?.error?.error || errorResponse.message;
-    }
-  }
-
-  async getCertificateAssessmentQuestionAsync(
-    attemptId: string,
-    questionId: string
-  ): Promise<CertificateAssessmentQuestionData> {
-    try {
-      const response = await this.http
-        .get<CertificateAssessmentQuestionStateBackendDict>(
-          this.getCertificateQuestionHandlerUrl(attemptId, questionId)
-        )
-        .toPromise();
-      return CertificateAssessmentQuestionData.createFromBackendDict(response);
     } catch (errorResponse) {
       throw errorResponse?.error?.error || errorResponse.message;
     }

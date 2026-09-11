@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageRootComponent.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
@@ -26,17 +26,22 @@ import {
   CertificateAssessmentOfferingData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {StateBackendDict} from 'domain/state/state.model';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
+import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let component: CertificateAssessmentPlayerPageRootComponent;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
+  let playerStateService: CertificateAssessmentPlayerStateService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
+  let preventPageUnloadEventServiceSpy: jasmine.SpyObj<PreventPageUnloadEventService>;
 
   const mockOffering = new CertificateAssessmentOfferingData(
     'cert-123',
@@ -51,11 +56,52 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     1
   );
 
+  const mockStateData: StateBackendDict = {
+    classifier_model_id: null,
+    content: {content_id: 'c', html: '<p>prompt</p>'},
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {value: 1},
+        placeholder: {
+          value: {content_id: 'ca_placeholder_0', unicode_str: 'Type here'},
+        },
+        catchMisspellings: {value: false},
+      },
+      default_outcome: {
+        dest: 'final',
+        dest_if_really_stuck: null,
+        feedback: {content_id: 'f', html: '<p>f</p>'},
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      id: 'TextInput',
+      solution: null,
+    },
+    param_changes: [],
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    linked_skill_id: null,
+    inapplicable_skill_misconception_ids: [],
+  };
+
   const mockAttempt = CertificateAssessmentAttemptData.createFromBackendDict({
     attempt_id: 'attempt-1234',
     questions: [
-      {question_id: 'question_1', question_version: 1},
-      {question_id: 'question_2', question_version: 2},
+      {
+        question_id: 'question_1',
+        question_version: 1,
+        question_state_data: mockStateData,
+      },
+      {
+        question_id: 'question_2',
+        question_version: 2,
+        question_state_data: mockStateData,
+      },
     ],
   });
 
@@ -107,15 +153,24 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
+    preventPageUnloadEventServiceSpy = jasmine.createSpyObj(
+      'PreventPageUnloadEventService',
+      ['addListener', 'removeListener']
+    );
+    const playerStateServiceInstance =
+      new CertificateAssessmentPlayerStateService();
     component = new CertificateAssessmentPlayerPageRootComponent(
       TestBed.inject(ActivatedRoute),
       alertsServiceSpy,
       certificateAssessmentOfferingBackendApiServiceSpy,
+      playerStateServiceInstance,
       {} as ClassroomBackendApiService,
       {} as PageHeadService,
+      preventPageUnloadEventServiceSpy,
       routerSpy,
       translateServiceSpy
     );
+    playerStateService = playerStateServiceInstance;
     alertsService = alertsServiceSpy;
     certificateAssessmentOfferingBackendApiService =
       certificateAssessmentOfferingBackendApiServiceSpy;
@@ -154,6 +209,67 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.isLoading).toBe(false);
   }));
 
+  it('should register the page-unload guard on initialization', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(preventPageUnloadEventServiceSpy.addListener).toHaveBeenCalledWith(
+      jasmine.any(Function)
+    );
+  }));
+
+  it('should warn on page close only while an attempt is active', fakeAsync(() => {
+    let validationCallback: () => boolean = () => false;
+    preventPageUnloadEventServiceSpy.addListener.and.callFake(
+      (callback: () => boolean) => {
+        validationCallback = callback;
+      }
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(validationCallback()).toBe(false);
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(validationCallback()).toBe(true);
+    component.ngOnDestroy();
+  }));
+
+  it('should stop warning once the attempt has been submitted', fakeAsync(() => {
+    let validationCallback: () => boolean = () => false;
+    preventPageUnloadEventServiceSpy.addListener.and.callFake(
+      (callback: () => boolean) => {
+        validationCallback = callback;
+      }
+    );
+    playerStateService.beginNewAttempt(mockAttempt);
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(validationCallback()).toBe(true);
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+    flushMicrotasks();
+
+    expect(validationCallback()).toBe(false);
+    component.ngOnDestroy();
+  }));
+
+  it('should remove the page-unload guard on destroy', fakeAsync(() => {
+    component.ngOnInit();
+    flushMicrotasks();
+
+    component.ngOnDestroy();
+
+    expect(preventPageUnloadEventServiceSpy.removeListener).toHaveBeenCalled();
+  }));
+
   it('should start an attempt and switch to questions when the route is session', fakeAsync(async () => {
     await configureComponent('session');
     component.ngOnInit();
@@ -164,6 +280,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    component.ngOnDestroy();
   }));
 
   it('should keep the intro stage when the route path is unrecognized', fakeAsync(async () => {
@@ -172,6 +290,78 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
+  }));
+
+  it('should load the classroom fragment before starting a session attempt', fakeAsync(async () => {
+    await configureComponent('session');
+    const classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    let resolveClassroom!: (value: {
+      classroomDict: {urlFragment: string};
+    }) => void;
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.returnValue(
+      new Promise(resolve => {
+        resolveClassroom = resolve;
+      })
+    );
+
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.callFake(() => Promise.reject('Error'));
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      TestBed.inject(ActivatedRoute),
+      alertsService,
+      certificateAssessmentOfferingBackendApiService,
+      playerStateService,
+      classroomBackendApiServiceSpy,
+      {} as PageHeadService,
+      preventPageUnloadEventServiceSpy,
+      router,
+      translateService
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(
+      classroomBackendApiServiceSpy.getClassroomDataAsync
+    ).toHaveBeenCalled();
+
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
+
+    resolveClassroom({classroomDict: {urlFragment: 'math'}});
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBe(true);
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
+  }));
+
+  it('should not start a session attempt when the offering fails to load', fakeAsync(async () => {
+    await configureComponent('session');
+    (
+      certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.hasError).toBe(true);
+    expect(
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync
+    ).not.toHaveBeenCalled();
   }));
 
   it('should stay on the intro stage when the session route fails to start an attempt', fakeAsync(async () => {
@@ -185,12 +375,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
     expect(component.attempt).toBeNull();
     expect(component.currentStage).toBe('intro');
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
+    expect(component.showAssessmentUnavailableModal).toBe(true);
   }));
 
   it('should redirect to the 404 page when the offering fails to load', fakeAsync(() => {
@@ -241,7 +426,74 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
-  it('should show a warning when starting the attempt fails', fakeAsync(() => {
+  // Arms a fully running countdown through the state service: registers
+  // the attempt (moving the learner to the questions stage) and applies
+  // the offering's one-hour time limit, which starts the interval.
+  const armCountdown = (): void => {
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.configureForOffering(60);
+  };
+
+  it('should reset stale timing state only when a replacement attempt succeeds', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    spyOn(window, 'clearInterval').and.callThrough();
+    component.certificateId = 'cert-123';
+    armCountdown();
+    tick(3600000);
+    expect(component.isTimeExpired).toBe(true);
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.isTimeExpired).toBe(false);
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(window.clearInterval).toHaveBeenCalled();
+    expect(window.setInterval).toHaveBeenCalledTimes(2);
+    component.ngOnDestroy();
+  }));
+
+  it('should leave the existing time window untouched when starting a new attempt fails', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    component.certificateId = 'cert-123';
+    armCountdown();
+    tick(60000);
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    // A failed start request must neither wipe nor extend the current
+    // window: resetting is reserved for successfully begun attempts.
+    expect(component.isTimeExpired).toBe(false);
+    expect(playerStateService.getAttempt()).toEqual(mockAttempt);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+    );
+    component.ngOnDestroy();
+  }));
+
+  it('should clear the countdown timer on destroy', fakeAsync(() => {
+    spyOn(window, 'setInterval').and.callThrough();
+    armCountdown();
+    expect(component.remainingTimeInSeconds).toBe(3600);
+
+    component.ngOnDestroy();
+    tick(2000);
+
+    expect(component.remainingTimeInSeconds).toBe(3600);
+    expect(component.isTimeExpired).toBe(false);
+  }));
+
+  it('should not navigate to results when there is no attempt', fakeAsync(() => {
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  }));
+
+  it('should show the unavailable modal when starting the attempt fails', fakeAsync(() => {
     (
       certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -250,16 +502,53 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     flushMicrotasks();
 
     expect(component.currentStage).toBe('intro');
+    expect(component.showAssessmentUnavailableModal).toBe(true);
+  }));
+
+  it('should show a localized cooldown warning when the attempt is within the cooldown', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.reject({
+        error_type: 'cooldown',
+        remaining_minutes: 2,
+        error: 'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+        status_code: 429,
+      })
+    );
+
+    component.startAssessment();
+    flushMicrotasks();
+
+    expect(component.currentStage).toBe('intro');
+    expect(component.showAssessmentUnavailableModal).toBe(false);
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR',
+      {remainingMinutes: 2}
     );
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
+      'I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'
     );
   }));
 
+  it('should hide the unavailable modal and navigate to available certificates', fakeAsync(() => {
+    component.showAssessmentUnavailableModal = true;
+    component.classroomUrlFragment = 'math';
+
+    component.onGoToAvailableCertificates();
+    flushMicrotasks();
+
+    expect(component.showAssessmentUnavailableModal).toBe(false);
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_AVAILABLE.ROUTE.replace(
+        ':classroomUrlFragment',
+        'math'
+      )}`,
+    ]);
+  }));
+
   it('should submit the attempt and navigate to the result page on assessmentSubmitted', fakeAsync(() => {
-    component.attempt = mockAttempt;
+    playerStateService.beginNewAttempt(mockAttempt);
     const answers = [
       {question_id: 'question_1', is_correct: true, selected_answer: 'b'},
     ];
@@ -276,6 +565,44 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
+  it('should not suppress navigation when the timer expires during a pending submission', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    armCountdown();
+
+    const answers = [{question_id: 'question_1', is_correct: true}];
+    component.onAssessmentSubmitted(answers);
+    tick(3600000);
+    expect(component.isTimeExpired).toBe(true);
+
+    component.onAssessmentSubmitted(answers);
+    expect(
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
+    ).toHaveBeenCalledTimes(1);
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalled();
+  }));
+
+  it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
+    const answers = [{question_id: 'question_1', is_correct: true}];
+
+    component.onAssessmentSubmitted(answers);
+    flushMicrotasks();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  }));
+
   it('should not submit when there is no attempt', fakeAsync(() => {
     component.onAssessmentSubmitted([]);
     flushMicrotasks();
@@ -286,7 +613,7 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   }));
 
   it('should show a warning when submitting the attempt fails', fakeAsync(() => {
-    component.attempt = mockAttempt;
+    playerStateService.beginNewAttempt(mockAttempt);
     (
       certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
@@ -303,28 +630,87 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     );
   }));
 
-  it('should reset to the intro stage on retry', () => {
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'questions';
+  it('should navigate to the result page when view results is requested', fakeAsync(() => {
+    playerStateService.beginNewAttempt(mockAttempt);
 
-    component.onRetryAssessment();
+    component.onViewResults();
+    flushMicrotasks();
 
-    expect(component.showAssessmentInterruptCard).toBe(false);
-    expect(component.currentStage).toBe('intro');
-  });
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
 
-  it('should resume to the questions stage on resume', () => {
-    component.showAssessmentInterruptCard = true;
-    component.currentStage = 'intro';
+  it('should wait for an in-flight submission before navigating to results', fakeAsync(() => {
+    let resolveSubmit: (value: object) => void = () => {};
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveSubmit = resolve;
+      })
+    );
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
 
-    component.onResumeAssessment();
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
 
-    expect(component.showAssessmentInterruptCard).toBe(false);
-    expect(component.currentStage).toBe('questions');
-  });
+    let viewResultsResolved = false;
+    component.onViewResults().then(() => {
+      viewResultsResolved = true;
+    });
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBe(false);
+    expect(router.navigate).not.toHaveBeenCalled();
+
+    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
+    flushMicrotasks();
+
+    expect(viewResultsResolved).toBe(true);
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should navigate to results once a failed submission settles', fakeAsync(() => {
+    (
+      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
+    ).and.returnValue(Promise.reject('Error'));
+    playerStateService.beginNewAttempt(mockAttempt);
+    playerStateService.isTimeExpired = true;
+
+    component.onAssessmentSubmitted([
+      {question_id: 'question_1', is_correct: true},
+    ]);
+    flushMicrotasks();
+    expect(alertsService.addWarning).toHaveBeenCalled();
+
+    component.onViewResults();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      'attempt-1234',
+    ]);
+  }));
+
+  it('should navigate to the learner dashboard when the assessment is ended', fakeAsync(() => {
+    component.onAssessmentEnded();
+    flushMicrotasks();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
+    ]);
+  }));
 
   it('should switch to the intro stage on showIntro', () => {
-    component.currentStage = 'questions';
+    playerStateService.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
 
     component.showIntro();
 
@@ -344,8 +730,10 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       TestBed.inject(ActivatedRoute),
       alertsService,
       certificateAssessmentOfferingBackendApiService,
+      playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
+      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -372,8 +760,10 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       TestBed.inject(ActivatedRoute),
       alertsService,
       certificateAssessmentOfferingBackendApiService,
+      playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
+      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -406,10 +796,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
 
   it('should initialize attempt as null', () => {
     expect(component.attempt).toBeNull();
-  });
-
-  it('should initialize showAssessmentInterruptCard as false', () => {
-    expect(component.showAssessmentInterruptCard).toBe(false);
   });
 
   it('should expose the certificateAssessmentPlayerPageConstants', () => {

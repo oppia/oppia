@@ -187,6 +187,14 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.expectTotalQuestionReviewersToBe(0);
   });
 
+  it('should show the Question Coordinators tab with stats', async function () {
+    await questionCoordinator.navigateToContributorDashboardAdminPage();
+    await questionCoordinator.switchToTabInContributorAdminPage(
+      'Question Coordinators'
+    );
+    await questionCoordinator.expectStatsTableToBeVisible();
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

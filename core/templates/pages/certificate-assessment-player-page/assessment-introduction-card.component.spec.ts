@@ -192,7 +192,7 @@ describe('AssessmentIntroductionCardComponent', () => {
     await fixture.whenStable();
 
     expect(component.recommendedTopicSummaries).toEqual([]);
-    expect(component.isLoadingTopics).toBeFalse();
+    expect(component.isLoadingTopics).toBe(false);
   });
 
   it('should expose the correct i18n key for the demonstrates heading', () => {

@@ -22,6 +22,8 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import './unanswered-question-modal.component.css';
 
+export const SUBMIT_ANYWAY_RESULT = 'submit-anyway';
+
 @Component({
   selector: 'oppia-unanswered-question-modal',
   templateUrl: './unanswered-question-modal.component.html',
@@ -45,9 +47,9 @@ export class UnansweredQuestionModalComponent {
 
   submitAnyway(): void {
     if (this.ngbActiveModal) {
-      this.ngbActiveModal.close();
+      this.ngbActiveModal.close(SUBMIT_ANYWAY_RESULT);
     } else if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss();
+      this.bottomSheetRef.dismiss(SUBMIT_ANYWAY_RESULT);
     }
   }
 }
