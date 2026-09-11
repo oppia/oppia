@@ -44,7 +44,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Tuple, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -216,7 +216,7 @@ def _save_completed_activities(
         activities_completed: CompletedActivities. The activities
             completed domain object to be saved in the datastore.
     """
-    activities_completed_dict: Dict[str, Any] = {
+    activities_completed_dict = {
         'exploration_ids': (activities_completed.exploration_ids),
         'collection_ids': activities_completed.collection_ids,
         'story_ids': activities_completed.story_ids,
@@ -231,8 +231,9 @@ def _save_completed_activities(
         completed_activities_model.update_timestamps()
         completed_activities_model.put()
     else:
-        activities_completed_dict['id'] = activities_completed.id
-        user_models.CompletedActivitiesModel(**activities_completed_dict).put()
+        user_models.CompletedActivitiesModel(
+            id=activities_completed.id, **activities_completed_dict
+        ).put()
 
 
 def _save_incomplete_activities(
