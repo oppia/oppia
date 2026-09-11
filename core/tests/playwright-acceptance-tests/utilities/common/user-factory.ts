@@ -36,7 +36,7 @@ import {
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
-import {BlogPostEditor, BlogPostEditorFactory} from '../user/blog-post-editor';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 
 const ROLES = testConstants.Roles;

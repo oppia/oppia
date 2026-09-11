@@ -210,7 +210,7 @@ export class RTEEditor {
    */
   async changeFormatTo(format: 'heading' | 'normal'): Promise<void> {
     const formatLabels: Record<string, string> = {
-      heading: 'Heading', // Reverted to match the exact text seen in your screenshot
+      heading: 'Heading',
       normal: 'Normal',
     };
     const label = formatLabels[format];
