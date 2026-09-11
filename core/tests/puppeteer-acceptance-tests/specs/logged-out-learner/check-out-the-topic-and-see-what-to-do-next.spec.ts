@@ -378,12 +378,17 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.openTopicPage('math', 'fractions');
       await loggedOutLearner.expectStoryCardToBeVisible();
       await loggedOutLearner.expectStoryTitleToContain('The Fraction Journey');
+      // The CUJ Language Selector requires text and voiceover language
+      // selectors to render on chapter cards whose exploration has
+      // translations other than English.
       await loggedOutLearner.expectScreenshotToMatch(
         'languageStoryCard',
         __dirname
       );
 
       await loggedOutLearner.expectLessonLanguageSelectorToBeVisible();
+      // The language selector renders a dropdown for selecting the text
+      // language on the active chapter card.
       await loggedOutLearner.expectScreenshotToMatch(
         'languageSelectorOnLessonCard',
         __dirname
@@ -409,6 +414,9 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.expectSelectedTextLanguageToBe('en');
       await loggedOutLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);
       await loggedOutLearner.expectFallbackInfoIconToBeVisible();
+      // The CUJ Language Fallback requires an info tooltip to render when
+      // the lesson is not available in the preferred language, and the
+      // voiceover dropdown to be disabled.
       await loggedOutLearner.expectScreenshotToMatch(
         'languageEnglishNoVoiceoverFallback',
         __dirname
@@ -416,6 +424,9 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.selectLessonTextLanguage('hi');
       await loggedOutLearner.expectVoiceoverLanguageDropdownToBeDisabled(false);
       await loggedOutLearner.expectSelectedVoiceoverLanguageToBe('hi-IN');
+      // The CUJ Voiceover Dropdown requires the dropdown to be filtered to
+      // compatible languages and auto-select a matching voiceover when the
+      // text language is changed.
       await loggedOutLearner.expectScreenshotToMatch(
         'languageHindiVoiceoverSelected',
         __dirname
@@ -448,6 +459,8 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.expectActiveChapterCardToShowStartAndSecondaryActions(
         2
       );
+      // The next uncompleted chapter renders in the expanded state with its
+      // Play, Practice, and Study Guide actions after the language checks.
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterActiveCardWithActions',
         __dirname
@@ -460,18 +473,24 @@ describe('Logged-Out Learner', function () {
       );
       await loggedOutLearner.openTopicPage('math', 'fractions');
       await loggedOutLearner.expectCompletedLessonToBeVisible();
+      // The CUJ Lesson Progression requires the completed chapter to
+      // display a completion indicator on the timeline.
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterCompletedLessonProgression',
         __dirname
       );
 
       await loggedOutLearner.expectCompletedChapterToBeCollapsed();
+      // The CUJ Lesson Progression requires the completed chapter to
+      // collapse into a row with a Play Again action.
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterCompletedRowPlayAgain',
         __dirname
       );
 
       await loggedOutLearner.expectNextChapterToBeActive();
+      // The CUJ Lesson Progression requires the next chapter to become the
+      // active card after the previous lesson is completed.
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterNextChapterActive',
         __dirname
@@ -481,6 +500,8 @@ describe('Logged-Out Learner', function () {
 
       await loggedOutLearner.expectAdventureTitlesToBeVisible();
       await loggedOutLearner.expectAdventureCountToBeGreaterThanZero();
+      // The screenshot below captures the dock with the adventure titles
+      // and lesson nodes rendered after completing the first lesson.
       await loggedOutLearner.expectScreenshotToMatch(
         'arcTimelineAdventureTitles',
         __dirname
@@ -507,6 +528,8 @@ describe('Logged-Out Learner', function () {
       );
 
       await loggedOutLearner.expandSkippedAdventureByClickingStartCta();
+      // The CUJ Skipped Arc Visualization requires skipped arc cards to
+      // display a Start or Resume CTA so the learner can revisit them.
       await loggedOutLearner.expectScreenshotToMatch(
         'arcSkippedAdventureExpanded',
         __dirname
@@ -538,6 +561,8 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.openTopicPage('math', 'fractions');
 
       await loggedOutLearner.expectPracticeTestCardToBeVisible();
+      // The CUJ Mastery Challenge requires the practice test card to render
+      // on the topic page after the challenge has been unlocked and visited.
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterPracticeTestCard',
         __dirname
