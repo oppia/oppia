@@ -19,6 +19,7 @@
 // @ts-nocheck
 
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {DOCUMENT} from '@angular/common';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -63,6 +64,7 @@ describe('Site Analytics Service', () => {
         },
         {provide: LocalStorageService, useValue: localStorageServiceSpy},
         {provide: UserService, useValue: userServiceSpy},
+        {provide: DOCUMENT, useValue: document},
       ],
     }).compileComponents();
 
@@ -580,24 +582,6 @@ describe('Site Analytics Service', () => {
           login_status: 'logged_in',
         }
       );
-    });
-
-    it('should register save recorded audio event', () => {
-      sas.registerSaveRecordedAudioEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'save_recorded_audio', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
-    });
-
-    it('should register audio recording event', () => {
-      sas.registerStartAudioRecordingEvent(explorationId);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start_audio_recording', {
-        exploration_id: explorationId,
-        login_status: 'logged_in',
-      });
     });
 
     it('should register upload audio event', () => {

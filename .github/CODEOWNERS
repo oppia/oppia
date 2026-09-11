@@ -258,6 +258,7 @@
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/math-formula-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/copy-url/ @oppia/lace-frontend-reviewers
 
 
@@ -706,6 +707,7 @@
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
+/core/templates/google-analytics.initializer.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/base-components/ @oppia/lace-frontend-reviewers
 /core/templates/pages/footer_js_libs.html @oppia/lace-frontend-reviewers
 /core/templates/pages/header_css_libs.html @oppia/lace-frontend-reviewers

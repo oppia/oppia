@@ -179,6 +179,7 @@ import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-tem
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -440,6 +441,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
     ErrorModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   entryComponents: [
@@ -614,6 +616,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
     ErrorModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   exports: [
@@ -785,6 +788,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
     ErrorModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 })
 export class SharedComponentsModule {}

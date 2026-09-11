@@ -24,7 +24,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
+import {MathFormulaDetectionService} from 'services/math-formula-detection.service';
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {PageContextService} from 'services/page-context.service';
@@ -55,8 +55,10 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
 import './translation-modal.component.css';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
@@ -128,6 +130,7 @@ export class TranslationModalComponent {
   @Input() modifyTranslationOpportunity!: ModifyTranslationOpportunity;
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
+  mathWarningIsMinimized: boolean = false;
   activeContentType!: string;
   activeRuleDescription!: string;
   uploadingTranslation: boolean = false;
@@ -201,6 +204,7 @@ export class TranslationModalComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private mathFormulaDetectionService: MathFormulaDetectionService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService,
@@ -425,12 +429,12 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId,
+      interactionId as InteractionSpecsKey,
       this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
-      interactionId
+      interactionId as InteractionSpecsKey
     );
     this.updateTranslationErrors();
   }
@@ -465,6 +469,19 @@ export class TranslationModalComponent {
       child => child.localName === 'oppia-noninteractive-math'
     );
     return target.localName === 'p' && !mathElementsIncluded;
+  }
+
+  isFormulaAsText(htmlString: string | string[]): boolean {
+    if (
+      this.translationLanguageService.getActiveLanguageDirection() !== 'rtl'
+    ) {
+      return false;
+    }
+    return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
+  }
+
+  toggleMathWarning(): void {
+    this.mathWarningIsMinimized = !this.mathWarningIsMinimized;
   }
 
   isCopyModeActive(): boolean {
@@ -526,7 +543,7 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null,
+    interactionId?: InteractionSpecsKey | null,
     contentId?: string | null
   ): string {
     if (!contentType) {
@@ -570,7 +587,7 @@ export class TranslationModalComponent {
 
   getRuleDescription(
     ruleType?: string | null,
-    interactionId?: string | null
+    interactionId?: InteractionSpecsKey | null
   ): string {
     if (!ruleType || !interactionId) {
       return '';
@@ -617,44 +634,58 @@ export class TranslationModalComponent {
       return;
     }
 
-    if (!this.uploadingTranslation && !this.loadingData) {
-      this.siteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-        'Translation'
-      );
-      this.uploadingTranslation = true;
-      const imagesData = this.imageLocalStorageService.getStoredImagesData();
-      this.imageLocalStorageService.flushStoredImagesData();
-      this.translateTextService.suggestTranslatedText(
-        this.activeWrittenTranslation,
-        this.translationLanguageService.getActiveLanguageCode(),
-        imagesData,
-        this.activeDataFormat,
-        () => {
-          this.alertsService.addSuccessMessage(
-            'Submitted translation for review.'
-          );
-          this.clearTranslation();
-          this.uploadingTranslation = false;
+    const proceedWithSubmit = () => {
+      if (!this.uploadingTranslation && !this.loadingData) {
+        this.siteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+          'Translation'
+        );
+        this.uploadingTranslation = true;
+        const imagesData = this.imageLocalStorageService.getStoredImagesData();
+        this.imageLocalStorageService.flushStoredImagesData();
+        this.translateTextService.suggestTranslatedText(
+          this.activeWrittenTranslation,
+          this.translationLanguageService.getActiveLanguageCode(),
+          imagesData,
+          this.activeDataFormat,
+          () => {
+            this.alertsService.addSuccessMessage(
+              'Submitted translation for review.'
+            );
+            this.clearTranslation();
+            this.uploadingTranslation = false;
 
-          if (this.moreAvailable) {
-            this.skipActiveTranslation();
-            this.resetEditor();
-          } else {
+            if (this.moreAvailable) {
+              this.skipActiveTranslation();
+              this.resetEditor();
+            } else {
+              this.closeWithoutUnsavedCheck();
+            }
+          },
+          (errorReason: string) => {
+            this.uploadingTranslation = false;
+            this.pageContextService.resetImageSaveDestination();
+            this.alertsService.clearWarnings();
+            this.alertsService.addWarning(errorReason);
             this.closeWithoutUnsavedCheck();
           }
-        },
-        (errorReason: string) => {
-          this.uploadingTranslation = false;
-          this.pageContextService.resetImageSaveDestination();
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(errorReason);
-          this.closeWithoutUnsavedCheck();
-        }
+        );
+      }
+      if (!this.moreAvailable) {
+        this.pageContextService.resetImageSaveDestination();
+        this.closeWithoutUnsavedCheck();
+      }
+    };
+
+    if (this.isFormulaAsText(this.activeWrittenTranslation)) {
+      const modalRef = this.ngbModal.open(ConfirmFormulaAsTextModalComponent, {
+        backdrop: 'static',
+      });
+      modalRef.result.then(
+        () => proceedWithSubmit(),
+        () => {}
       );
-    }
-    if (!this.moreAvailable) {
-      this.pageContextService.resetImageSaveDestination();
-      this.closeWithoutUnsavedCheck();
+    } else {
+      proceedWithSubmit();
     }
   }
 
@@ -710,7 +741,19 @@ export class TranslationModalComponent {
     if (!this.canTranslatedTextBeSubmitted()) {
       return;
     }
-    this.activeModal.close(this.activeWrittenTranslation);
+    if (this.isFormulaAsText(this.activeWrittenTranslation)) {
+      const modalRef = this.ngbModal.open(ConfirmFormulaAsTextModalComponent, {
+        backdrop: 'static',
+      });
+      modalRef.result.then(
+        () => {
+          this.activeModal.close(this.activeWrittenTranslation);
+        },
+        () => {}
+      );
+    } else {
+      this.activeModal.close(this.activeWrittenTranslation);
+    }
   }
 
   ngOnDestroy(): void {
