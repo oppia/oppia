@@ -1261,28 +1261,60 @@ class TranslatableTopicNamesHandler(
         self.render_json(self.values)
 
 
+class TranslatableTopicDict(TypedDict):
+    """Dict for a translatable topic and its translation completeness."""
+
+    name: str
+    id: str
+    completeness: Optional[float]
+
+
 class TranslatableTopicNamesPerClassroomHandlerDict(TypedDict):
     """A dictionary representing all topics associated to classroom."""
 
     classroom: str
-    topics: List[str]
+    topics: List[TranslatableTopicDict]
+
+
+class TranslatableTopicNamesPerClassroomHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TranslatableTopicNamesPerClassroomHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: Optional[str]
 
 
 class TranslatableTopicNamesPerClassroomHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[
+        Dict[str, str],
+        TranslatableTopicNamesPerClassroomHandlerNormalizedRequestDict,
+    ]
 ):
     """Provides names of all translatable topics associated with classroom in
     the datastore."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                },
+                'default_value': None,
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Gets all translatable topics grouped by classroom.
-        Returns a JSON response containing topics organized by classroom name.
+        """Gets all translatable topics grouped by classroom, optionally.
+        annotated with each topic's translation completeness for a language.
         """
+        assert self.normalized_request is not None
+        language_code = self.normalized_request.get('language_code')
+
         # Build mapping of topic IDs to classroom names.
         topic_id_to_classroom = {
             topic_id: classroom.name
@@ -1290,14 +1322,34 @@ class TranslatableTopicNamesPerClassroomHandler(
             for topic_id in classroom.get_topic_ids()
         }
 
-        # Group topics by classroom and format response.
-        topics_per_classroom: Dict[str, List[str]] = {}
-        for summary in topic_fetchers.get_all_topic_summaries():
-            classroom_name = topic_id_to_classroom.get(summary.id, '')
-            topics_per_classroom.setdefault(classroom_name, []).append(
-                summary.name
+        topic_id_to_completeness: Dict[str, float] = {}
+        if language_code is not None:
+            topic_id_to_completeness = (
+                opportunity_services.get_topic_id_to_translation_completeness(
+                    language_code
+                )
             )
 
+        # Group topics by classroom and format response.
+        topics_per_classroom: Dict[str, List[TranslatableTopicDict]] = {}
+        for summary in topic_fetchers.get_all_topic_summaries():
+            classroom_name = topic_id_to_classroom.get(summary.id, '')
+            completeness = (
+                topic_id_to_completeness.get(summary.id, 0)
+                if language_code is not None
+                else None
+            )
+            topics_per_classroom.setdefault(classroom_name, []).append(
+                TranslatableTopicDict(
+                    name=summary.name, id=summary.id, completeness=completeness
+                )
+            )
+
+        if language_code is not None:
+            for topics in topics_per_classroom.values():
+                topics.sort(
+                    key=lambda topic: topic['completeness'] or 0, reverse=True
+                )
         self.values = {
             'topic_names_per_classroom': [
                 TranslatableTopicNamesPerClassroomHandlerDict(

@@ -1825,6 +1825,41 @@ def get_exploration_opportunity_summary_by_id(
     )
 
 
+def get_topic_id_to_translation_completeness(
+    language_code: str,
+) -> Dict[str, float]:
+    """Returns a map from topic id to translation completeness percentage
+    (0-100) for the given language, aggregated over all exploration
+    opportunity summaries in that topic.
+
+    Args:
+        language_code: str. The language to compute completeness for.
+
+    Returns:
+        dict(str, float). Map of topic id to completeness percentage.
+    """
+    all_summaries: Sequence[
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ] = opportunity_models.ExplorationOpportunitySummaryModel.get_all().fetch()
+
+    topic_id_to_content_count: Dict[str, int] = collections.defaultdict(int)
+    topic_id_to_translation_count: Dict[str, int] = collections.defaultdict(int)
+    for summary in all_summaries:
+        topic_id_to_content_count[summary.topic_id] += summary.content_count
+        topic_id_to_translation_count[summary.topic_id] += (
+            summary.translation_counts or {}
+        ).get(language_code, 0)
+
+    topic_id_to_completeness: Dict[str, float] = {}
+    for topic_id, content_count in topic_id_to_content_count.items():
+        topic_id_to_completeness[topic_id] = (
+            topic_id_to_translation_count[topic_id] / content_count * 100
+            if content_count > 0
+            else 0
+        )
+    return topic_id_to_completeness
+
+
 def get_exploration_opportunity_summaries_by_topic_id(
     topic_id: str,
 ) -> List[opportunity_domain.ExplorationOpportunitySummary]:

@@ -90,9 +90,15 @@ interface TopicNamesBackendDict {
   topic_names: string[];
 }
 
+export interface TranslatableTopic {
+  name: string;
+  id: string;
+  completeness: number | null;
+}
+
 interface TopicNamesPerClassroomDict {
   classroom: string;
-  topics: string[];
+  topics: TranslatableTopic[];
 }
 
 interface TopicNamesPerClassroomBackendDict {
@@ -375,13 +381,18 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchTranslatableTopicNamesPerClassroomAsync(): Promise<
-    TopicNamesPerClassroomDict[]
-  > {
+  async fetchTranslatableTopicNamesPerClassroomAsync(
+    languageCode?: string
+  ): Promise<TopicNamesPerClassroomDict[]> {
     try {
+      const params: {language_code?: string} = {};
+      if (languageCode) {
+        params.language_code = languageCode;
+      }
       const response = await this.http
         .get<TopicNamesPerClassroomBackendDict>(
-          '/gettranslatabletopicnamesperclassroom'
+          '/gettranslatabletopicnamesperclassroom',
+          {params}
         )
         .toPromise();
 
@@ -390,7 +401,14 @@ export class ContributionOpportunitiesBackendApiService {
           classroom,
           topics:
             classroom === ''
-              ? [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...topics]
+              ? [
+                  {
+                    name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
+                    id: '',
+                    completeness: null,
+                  },
+                  ...topics,
+                ]
               : topics,
         })
       );

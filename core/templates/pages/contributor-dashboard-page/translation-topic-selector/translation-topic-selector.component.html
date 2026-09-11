@@ -20,7 +20,12 @@
              (keydown.enter)="selectOption(option)"
              tabindex="0"
              [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
-          {{option}}
+          <span>{{option.name}}</span>
+          <span *ngIf="option.completeness !== null"
+                class="oppia-translation-topic-selector-completeness"
+                [ngClass]="{'oppia-translation-topic-selector-almost-complete' : option.completeness > 90}">
+            {{option.completeness | number: '1.0-0'}}%
+          </span>
         </div>
       </ng-container>
 
@@ -31,7 +36,12 @@
              (keydown.enter)="selectOption(option)"
              tabindex="0"
              [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
-          {{option}}
+          <span>{{option.name}}</span>
+          <span *ngIf="option.completeness !== null"
+                class="oppia-translation-topic-selector-completeness"
+                [ngClass]="{'oppia-translation-topic-selector-almost-complete' : option.completeness > 90}">
+            {{option.completeness | number: '1.0-0'}}%
+          </span>
         </div>
       </ng-template>
     </ng-container>
