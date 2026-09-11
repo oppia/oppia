@@ -1044,6 +1044,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_in_review_question_suggestions_by_skill_ids(
+        cls, skill_ids: List[str]
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review question suggestions matching the supplied
+        skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs matching the target ID of the
+                question suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            skill_ids.
+        """
+        return (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.status == STATUS_IN_REVIEW,
+                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    cls.target_id.IN(skill_ids),
+                )
+            )
+            .fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        )
+
+    @classmethod
     def get_in_review_question_suggestions_by_offset(
         cls,
         limit: int,

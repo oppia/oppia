@@ -190,6 +190,37 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             [created_suggestion_model],
         )
 
+    def test_get_in_review_question_suggestions_by_skill_ids(self) -> None:
+        model = suggestion_models.GeneralSuggestionModel
+        self.assertEqual(
+            model.get_in_review_question_suggestions_by_skill_ids(
+                [self.target_id]
+            ),
+            [],
+        )
+        suggestion_id = 'skill.skill1.thread_1'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            self.target_id,
+            self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW,
+            'author_1',
+            'reviewer_3',
+            self.change_cmd,
+            self.score_category,
+            suggestion_id,
+            constants.DEFAULT_LANGUAGE_CODE,
+        )
+
+        created_suggestion_model = model.get_by_id(suggestion_id)
+        self.assertEqual(
+            model.get_in_review_question_suggestions_by_skill_ids(
+                [self.target_id]
+            ),
+            [created_suggestion_model],
+        )
+
     def test_get_all_user_created_suggestions_of_given_suggestion_type(
         self,
     ) -> None:

@@ -101,12 +101,14 @@ describe('Question opportunities component', () => {
         skill_description: 'Skill description 1',
         topic_name: 'topic_1',
         question_count: 5,
+        questions_in_review_count: 0,
       }),
       SkillOpportunity.createFromBackendDict({
         id: '2',
         skill_description: 'Skill description 2',
         topic_name: 'topic_1',
         question_count: 2,
+        questions_in_review_count: 0,
       }),
     ];
   });
