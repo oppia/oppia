@@ -34,6 +34,7 @@ from core.domain import (
 )
 from core.jobs.batch_jobs import (
     blog_post_search_indexing_jobs,
+    certificate_assessment_attempt_cleanup_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
@@ -489,4 +490,25 @@ class CronPlatformFeedbackCleanupHandler(
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob
+        )
+
+
+class CronCertificateAssessmentAttemptCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for deleting abandoned in-progress certificate assessment
+    attempts that have been in progress for more than the abandonment
+    period."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                certificate_assessment_attempt_cleanup_jobs.DeleteAbandonedCertificateAssessmentAttemptsJob
+            )
         )
