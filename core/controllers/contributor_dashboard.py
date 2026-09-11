@@ -764,9 +764,8 @@ class TranslatableContentsHandlerV2(
 
         translatable_contents = []
         for content in contents_which_need_translation.values():
-            # Skip list-format content if the user does not have reviewer
-            # rights for the selected language. Translating list contents
-            # (such as answer choices) requires reviewer privileges.
+            # Skip reviewer-only content if the user does not have reviewer
+            # rights for the selected language.
             if (
                 language_code not in reviewable_language_codes
                 and content.is_reviewer_only()
