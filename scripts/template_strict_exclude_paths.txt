@@ -3,16 +3,6 @@
 # This list must be kept up-to-date manually and only shrink over time.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add new files to this list.
-core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/exploration-graph-modal.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component.ts
-core/templates/pages/exploration-editor-page/exploration-editor-page.component.ts
-core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts
-core/templates/pages/exploration-editor-page/history-tab/history-tab.component.ts
-core/templates/pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component.ts
-core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.ts
 core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts
 core/templates/pages/exploration-editor-page/preview-tab/preview-tab.component.ts
 core/templates/pages/exploration-editor-page/preview-tab/templates/preview-set-parameters-modal.component.ts

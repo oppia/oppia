@@ -39,8 +39,10 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     super(alertsService, changeListService, loggerService);
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getSupportedContentLanguages() {
+  getSupportedContentLanguages(): readonly {
+    code: string;
+    description: string;
+  }[] {
     if (this.pageContextService.isExplorationLinkedToStory()) {
       return AppConstants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
     }

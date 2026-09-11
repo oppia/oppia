@@ -152,6 +152,14 @@ describe('Add Or Update Solution Modal Component', () => {
       expect(component.data.answerIsExclusive).toBeFalse();
     });
 
+    it('should update the explanation html when it changes', () => {
+      component.data.explanationHtml = 'Old explanation html';
+
+      component.updateExplanationHtml('New explanation html');
+
+      expect(component.data.explanationHtml).toEqual('New explanation html');
+    });
+
     it('should update correct answer when submitting current interaction', () => {
       currentInteractionService.onSubmit('answer', mockInteractionRule);
 

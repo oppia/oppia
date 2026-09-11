@@ -70,8 +70,8 @@ export class ExplorationMetadataModalComponent
 
   constructor(
     private alertsService: AlertsService,
-    private explorationCategoryService: ExplorationCategoryService,
-    private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    public explorationCategoryService: ExplorationCategoryService,
+    public explorationLanguageCodeService: ExplorationLanguageCodeService,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,

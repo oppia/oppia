@@ -18,6 +18,7 @@
 
 import {Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {PageEvent} from '@angular/material/paginator';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import {CheckRevertExplorationModalComponent} from './modal-templates/check-revert-exploration-modal.component';
@@ -46,6 +47,7 @@ interface VersionMetadata {
   committerId: string;
   createdOnMsecsStr: string;
   commitMessage: string;
+  tooltipText?: string;
 }
 
 interface Metadata {
@@ -61,8 +63,8 @@ interface Metadata {
 export class HistoryTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion: string | null = null;
-  secondVersion: string | null = null;
+  firstVersion: VersionMetadata | null = null;
+  secondVersion: VersionMetadata | null = null;
   hideHistoryGraph: boolean = true;
   selectedVersionsArray: number[] = [];
   filteredVersionMetadata: VersionMetadata[] = [];
@@ -222,6 +224,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
                   ),
                 commitMessage: this.explorationSnapshots[i].commit_message,
                 versionNumber: this.explorationSnapshots[i].version_number,
+                tooltipText: this.dateTimeFormatService.getDateTimeInWords(
+                  this.explorationSnapshots[i].created_on_ms
+                ),
               };
               this.versionCheckboxArray.push({
                 vnum: this.explorationSnapshots[i].version_number,
@@ -417,12 +422,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  paginator(value: {
-    previousPageIndex: number;
-    pageIndex: number;
-    pageSize: number;
-    length: number;
-  }): void {
+  paginator(value: PageEvent): void {
     this.displayedCurrentPageNumber = value.pageIndex + 1;
 
     if (value.pageSize !== this.VERSIONS_PER_PAGE) {
@@ -530,8 +530,8 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     this.explorationVersionMetadata = null;
     this.versionCheckboxArray = [];
     this.username = '';
-    this.firstVersion = '';
-    this.secondVersion = '';
+    this.firstVersion = null;
+    this.secondVersion = null;
 
     this.displayedCurrentPageNumber = this.currentPage + 1;
     this.versionNumbersToDisplay = 0;
