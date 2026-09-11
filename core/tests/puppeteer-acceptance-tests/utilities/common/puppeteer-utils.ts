@@ -1351,7 +1351,11 @@ export class BaseUser {
     const runningInCI = __dirname.startsWith('/home/runner');
 
     try {
-      const screenshot = await currentPage.screenshot(screenshotOptions);
+      const screenshot = await currentPage.screenshot({
+        fullPage: false,
+        captureBeyondViewport: false,
+        ...screenshotOptions,
+      });
       expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
