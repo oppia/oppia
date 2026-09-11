@@ -368,7 +368,6 @@ const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const availableChapters = '.e2e-test-available-chapters';
 const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
 const chapterSelector = '.e2e-test-chapter-title';
-
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
