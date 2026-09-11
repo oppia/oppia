@@ -52,8 +52,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
-import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
-import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {NgbModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheet,
+  MatBottomSheetModule,
+} from '@angular/material/bottom-sheet';
 import {UserInfo} from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
@@ -843,6 +846,103 @@ describe('Feedback updates page', () => {
       fixture.detectChanges();
 
       expect(result).toBe('шеллы');
+    });
+
+    it('should open suggestion review modal with new content, old content and description when window is not narrow', () => {
+      const modalRef = jasmine.createSpyObj('modalRef', ['result']);
+      modalRef.componentInstance = {
+        newContent: null as string | null,
+        oldContent: null as string | null,
+        description: null as string | null,
+      };
+      modalRef.result = Promise.resolve({
+        then: (successCallback: Function, errorCallback: Function) => {
+          successCallback();
+        },
+      });
+      const ngbModal = TestBed.inject(NgbModal);
+      const ngbModalOpenSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+      component.showSuggestionModal(
+        '<p>New</p>',
+        '<p>Old</p>',
+        'Description text'
+      );
+
+      expect(ngbModalOpenSpy).toHaveBeenCalledWith(jasmine.any(Function), {
+        backdrop: 'static',
+      });
+      expect(modalRef.componentInstance.newContent).toBe('<p>New</p>');
+      expect(modalRef.componentInstance.oldContent).toBe('<p>Old</p>');
+      expect(modalRef.componentInstance.description).toBe('Description text');
+    });
+
+    it('should not set content properties when values are null and window is not narrow', () => {
+      const modalRef = jasmine.createSpyObj('modalRef', ['result']);
+      modalRef.componentInstance = {
+        newContent: null as string | null,
+        oldContent: null as string | null,
+        description: null as string | null,
+      };
+      modalRef.result = Promise.resolve({
+        then: (successCallback: Function, errorCallback: Function) => {
+          successCallback();
+        },
+      });
+      const ngbModal = TestBed.inject(NgbModal);
+      const ngbModalOpenSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+      component.showSuggestionModal(null, null, null);
+
+      expect(ngbModalOpenSpy).toHaveBeenCalled();
+    });
+
+    it('should open bottom sheet with suggestion review modal when window is narrow', () => {
+      const bottomSheet = TestBed.inject(MatBottomSheet);
+      const bottomSheetRef = jasmine.createSpyObj('bottomSheetRef', ['open']);
+      bottomSheetRef.instance = {
+        newContent: null as string | null,
+        oldContent: null as string | null,
+        description: null as string | null,
+      };
+      const bottomSheetOpenSpy = spyOn(bottomSheet, 'open').and.returnValue(
+        bottomSheetRef
+      );
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+
+      component.showSuggestionModal(
+        '<p>New</p>',
+        '<p>Old</p>',
+        'Description text'
+      );
+
+      expect(bottomSheetOpenSpy).toHaveBeenCalledWith(jasmine.any(Function));
+      expect(bottomSheetRef.instance.newContent).toBe('<p>New</p>');
+      expect(bottomSheetRef.instance.oldContent).toBe('<p>Old</p>');
+      expect(bottomSheetRef.instance.description).toBe('Description text');
+    });
+
+    it('should open bottom sheet with empty strings for null values when window is narrow', () => {
+      const bottomSheet = TestBed.inject(MatBottomSheet);
+      const bottomSheetRef = jasmine.createSpyObj('bottomSheetRef', ['open']);
+      bottomSheetRef.instance = {
+        newContent: null as string | null,
+        oldContent: null as string | null,
+        description: null as string | null,
+      };
+      const bottomSheetOpenSpy = spyOn(bottomSheet, 'open').and.returnValue(
+        bottomSheetRef
+      );
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+
+      component.showSuggestionModal(null, null, null);
+
+      expect(bottomSheetOpenSpy).toHaveBeenCalledWith(jasmine.any(Function));
+      expect(bottomSheetRef.instance.newContent).toBe('');
+      expect(bottomSheetRef.instance.oldContent).toBe('');
+      expect(bottomSheetRef.instance.description).toBe('');
     });
   });
 
