@@ -10,10 +10,10 @@
       <span *ngFor="let item of ruleDescriptionFragments" class="oppia-rule-editor-span e2e-test-answer-description-fragment">
         <span *ngIf="item.type == 'select'" class="text-dark">
           <span *ngIf="ruleDescriptionChoices.length === 1">
-            {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
+            {{ getFirstRuleDescriptionChoiceText() | convertToPlainText | truncate: 70 }}
           </span>
           <span *ngIf="ruleDescriptionChoices.length !== 1">
-            <oppia-html-select class="oppia-rule-description-choice" [options]="ruleDescriptionChoices" [(selectionId)]="rule.inputs[item.varName]" (onSelectionChange)="onSelectionChangeHtmlSelect($event, item)">
+            <oppia-html-select class="oppia-rule-description-choice" [options]="getRuleDescriptionChoiceList()" [selectionId]="getRuleInputAsString(item)" (onSelectionChange)="onSelectionChangeHtmlSelect($event, item)">
             </oppia-html-select>
           </span>
         </span>
@@ -22,29 +22,33 @@
           <span *ngIf="item.type == 'checkboxes'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'SetOfTranslatableHtmlContentIds'"
-                           [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(value)]="rule.inputs[item.varName]">
+                           [initArgs]="getRuleEditorInitArgs()"
+                           [value]="getRuleInputValue(item)"
+                           (valueChange)="setRuleInputValue($event, item)">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dropdown'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'ListOfSetsOfTranslatableHtmlContentIds'"
-                           [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(value)]="rule.inputs[item.varName]">
+                           [initArgs]="getRuleEditorInitArgs()"
+                           [value]="getRuleInputValue(item)"
+                           (valueChange)="setRuleInputValue($event, item)">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'TranslatableHtmlContentId'"
-                           [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(value)]="rule.inputs[item.varName]">
+                           [initArgs]="getRuleEditorInitArgs()"
+                           [value]="getRuleInputValue(item)"
+                           (valueChange)="setRuleInputValue($event, item)">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'DragAndDropPositiveInt'"
-                           [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(value)]="rule.inputs[item.varName]">
+                           [initArgs]="getRuleEditorInitArgs()"
+                           [value]="getRuleInputValue(item)"
+                           (valueChange)="setRuleInputValue($event, item)">
             </object-editor>
           </span>
           <span *ngIf="item.type != 'select' &&
@@ -55,9 +59,10 @@
                        item.type != 'checkboxes'">
             <object-editor [modalId]="modalId"
                            [objType]="item.type"
+                           [value]="getRuleInputValue(item)"
+                           (valueChange)="setRuleInputValue($event, item)"
                            [isEditable]="isEditable"
                            [alwaysEditable]="true"
-                           [(value)]="rule.inputs[item.varName]"
                            class="text-dark">
             </object-editor>
           </span>

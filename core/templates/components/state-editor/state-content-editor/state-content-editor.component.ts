@@ -36,10 +36,11 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import './state-content-editor.component.css';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: {
     rte_component_config_id: 'ALL_COMPONENTS';
     hide_complex_extensions: boolean;
@@ -165,6 +166,10 @@ export class StateContentEditorComponent implements OnInit {
 
   isContentEditable(): boolean {
     return this.editabilityService.isEditable();
+  }
+
+  updateContentHtml(contentHtml: SchemaDefaultValue): void {
+    this.stateContentService.displayed._html = String(contentHtml);
   }
 
   ngOnDestroy(): void {

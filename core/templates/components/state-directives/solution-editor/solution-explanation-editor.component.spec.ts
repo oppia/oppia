@@ -106,7 +106,7 @@ describe('Solution explanation editor', () => {
 
   it('should intitalize with default values', () => {
     const schema = {
-      type: 'html',
+      type: 'html' as const,
       ui_config: {
         rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
@@ -128,7 +128,7 @@ describe('Solution explanation editor', () => {
 
   it('should open shema based editor on user click', () => {
     const schema = {
-      type: 'html',
+      type: 'html' as const,
       ui_config: {
         rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
@@ -172,5 +172,12 @@ describe('Solution explanation editor', () => {
     expect(() => {
       component.saveThisExplanation();
     }).toThrowError('Solution is undefined');
+  });
+
+  it('should expose the solution properties from the injected service', () => {
+    expect(component.displayedSolution).toBe(stateSolutionService.displayed);
+    expect(component.solutionSavedMemento).toBe(
+      stateSolutionService.savedMemento
+    );
   });
 });

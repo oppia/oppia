@@ -715,6 +715,54 @@ describe('Rule Editor Component', () => {
     flush();
   }));
 
+  it('should get rule description choice list and first choice text', () => {
+    component.ruleDescriptionChoices = [
+      {id: '1', val: 'string choice'},
+      {id: '2', val: 42},
+    ];
+
+    expect(component.getRuleDescriptionChoiceList()).toEqual([
+      {id: '1', val: 'string choice'},
+      {id: '2', val: '42'},
+    ]);
+
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('string choice');
+
+    component.ruleDescriptionChoices = [{id: '1', val: 7}];
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('7');
+  });
+
+  it('should get and set rule input values', () => {
+    const item = {
+      type: 'html',
+      varName: 'x',
+    } as unknown as RuleDescriptionFragment;
+    component.rule = new Rule(
+      'Equals',
+      {x: 'old_val'} as unknown as RuleInputs,
+      {x: 'String'} as unknown as RuleInputTypes
+    );
+
+    expect(component.getRuleInputAsString(item)).toBe('old_val');
+    expect(component.getRuleInputValue(item) as string).toBe('old_val');
+
+    component.setRuleInputValue('new_val', item);
+    expect(component.rule.inputs.x).toBe('new_val');
+  });
+
+  it('should get rule editor init args', () => {
+    component.ruleDescriptionChoices = [{id: '1', val: 'choice val'}];
+    // The 'unknown' type is used here because the return type of the method
+    // is a recursive union that cannot be passed directly to 'expect' due to
+    // excessive type instantiation.
+    const initArgs = component.getRuleEditorInitArgs() as unknown as {
+      choices: {id: string; val: string}[];
+    };
+    expect(initArgs).toEqual({
+      choices: [{id: '1', val: 'choice val'}],
+    });
+  });
+
   it('should unsubscribe on destroy', () => {
     component.rule = new Rule(
       'Equals',

@@ -153,6 +153,12 @@ export class CustomizeInteractionModalComponent
     super(ngbActiveModal);
   }
 
+  // This getter is used by the component template to access the customization
+  // args while keeping the injected service private.
+  get customizationArgs(): InteractionCustomizationArgs {
+    return this.stateCustomizationArgsService.displayed;
+  }
+
   getTitle(interactionId: InteractionSpecsKey): string {
     return INTERACTION_SPECS[interactionId].name;
   }

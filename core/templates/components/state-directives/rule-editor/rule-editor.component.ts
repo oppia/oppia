@@ -42,7 +42,9 @@ import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defa
 import INTERACTION_SPECS from '../../../../../extensions/interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import './rule-editor.component.css';
 
 interface SelectItem {
@@ -230,6 +232,48 @@ export class RuleEditorComponent
     this.rule.inputs[item.varName] = selection;
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  getRuleDescriptionChoiceList(): {id: string; val: string}[] {
+    return this.ruleDescriptionChoices.map(choice => ({
+      id: choice.id,
+      val: typeof choice.val === 'string' ? choice.val : String(choice.val),
+    }));
+  }
+
+  getFirstRuleDescriptionChoiceText(): string {
+    const firstChoice = this.ruleDescriptionChoices[0];
+    return typeof firstChoice.val === 'string'
+      ? firstChoice.val
+      : String(firstChoice.val);
+  }
+
+  getRuleInputAsString(item: SelectItem): string {
+    return String(this.rule.inputs[item.varName]);
+  }
+
+  // The rule input value can be of any type of the interaction rule inputs,
+  // which is only determined at runtime, so a type assertion is used here to
+  // match the type accepted by the object editor.
+  getRuleInputValue(item: SelectItem): SchemaDefaultValue {
+    return this.rule.inputs[item.varName] as unknown as SchemaDefaultValue;
+  }
+
+  // The new value is emitted by the object editor as a schema default value,
+  // so a type assertion is used here to match the interaction rule input type.
+  setRuleInputValue(newValue: SchemaDefaultValue, item: SelectItem): void {
+    this.rule.inputs[item.varName] =
+      newValue as unknown as InteractionRuleInputs;
+  }
+
+  // The object editor passes the init args through to the underlying editor
+  // component, whose 'choices' property is the rule description choices, so a
+  // type assertion is used here to match the type accepted by the object
+  // editor.
+  getRuleEditorInitArgs(): SchemaDefaultValue {
+    return {
+      choices: this.ruleDescriptionChoices,
+    } as unknown as SchemaDefaultValue;
   }
 
   onSelectNewRuleType(newRuleType: string): void {
