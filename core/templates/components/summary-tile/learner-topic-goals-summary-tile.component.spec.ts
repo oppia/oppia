@@ -174,6 +174,27 @@ describe('Learner Topic Goals Summary Tile Component', () => {
     expect(component.storyName).toEqual('Story Title');
   });
 
+  it('should set storyCompleted to false when some chapters are incomplete', () => {
+    component.ngOnInit();
+
+    expect(component.storyCompleted).toBe(false);
+  });
+
+  it('should set storyCompleted to true when all chapters are completed', () => {
+    // When the completed chapter titles do not match any of the current node
+    // titles, the number of completed chapters equals the total number of
+    // chapters while the story still has incomplete chapters. This covers the
+    // branch where the story is treated as fully completed.
+    spyOn(
+      component.storySummaryToDisplay,
+      'getCompletedNodeTitles'
+    ).and.returnValue(['Chapter X', 'Chapter Y']);
+
+    component.ngOnInit();
+
+    expect(component.storyCompleted).toBe(true);
+  });
+
   it('should make the tile blurred if it is hovered', () => {
     component.cardIsHovered = true;
     expect(component.isCardHovered()).toBe(

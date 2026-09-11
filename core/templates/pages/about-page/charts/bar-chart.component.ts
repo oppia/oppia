@@ -43,8 +43,8 @@ interface ChartTick {
 })
 export class BarChartComponent implements OnInit, AfterViewInit {
   @Input() chartId!: string;
-  @Input() rawData!: DataPoint[];
-  @Input() ticks!: ChartTick[];
+  @Input() rawData!: readonly DataPoint[];
+  @Input() ticks!: readonly ChartTick[];
   @Input() barsColor!: string;
   @Input() annotationTextColor!: string;
   @Input() labelsColor!: string;

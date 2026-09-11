@@ -3,16 +3,6 @@
 # This list must be kept up-to-date manually and only shrink over time.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add new files to this list.
-core/templates/components/state-editor/state-hints-editor/state-hints-editor.component.ts
-core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.ts
-core/templates/components/state-editor/state-responses-editor/state-responses.component.ts
-core/templates/components/summary-tile/exploration-summary-tile.component.ts
-core/templates/components/summary-tile/learner-topic-goals-summary-tile.component.ts
-core/templates/components/summary-tile/story-summary-tile.component.ts
-core/templates/components/version-diff-visualization/version-diff-visualization.component.ts
-core/templates/pages/about-page/about-page.component.ts
-core/templates/pages/about-page/cta-section/cta-section.component.ts
-core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts
