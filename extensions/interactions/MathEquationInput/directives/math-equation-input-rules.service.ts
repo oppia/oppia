@@ -47,11 +47,14 @@ export class MathEquationInputRulesService {
 
     let positionOfTerms = inputs.y;
 
-    let splitAnswer = answer.split('=');
+    let splitAnswer = this._getEquationParts(answer);
+    let splitInput = this._getEquationParts(inputs.x);
+    if (splitAnswer === null || splitInput === null) {
+      return false;
+    }
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 
@@ -112,11 +115,14 @@ export class MathEquationInputRulesService {
 
     let positionOfTerms = inputs.y;
 
-    let splitAnswer = answer.split('=');
+    let splitAnswer = this._getEquationParts(answer);
+    let splitInput = this._getEquationParts(inputs.x);
+    if (splitAnswer === null || splitInput === null) {
+      return false;
+    }
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 
@@ -170,11 +176,14 @@ export class MathEquationInputRulesService {
     answer: MathEquationAnswer,
     inputs: MathEquationRuleInputsWithoutSide
   ): boolean {
-    let splitAnswer = answer.split('=');
+    let splitAnswer = this._getEquationParts(answer);
+    let splitInput = this._getEquationParts(inputs.x);
+    if (splitAnswer === null || splitInput === null) {
+      return false;
+    }
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 
@@ -226,5 +235,24 @@ export class MathEquationInputRulesService {
     }
     // If none of the checks pass, the answer is not equivalent.
     return false;
+  }
+
+  /**
+   * Splits an equation string into the left-hand side and right-hand side, or
+   * returns null if the string is not a well-formed equation (i.e. it does not
+   * contain exactly one '=' sign with non-empty sides). This prevents the rule
+   * functions from passing undefined sides to nerdamer or the
+   * MathInteractionsService, which would otherwise throw an error.
+   */
+  _getEquationParts(equation: string): string[] | null {
+    let splitEquation = equation.split('=');
+    if (
+      splitEquation.length !== 2 ||
+      splitEquation[0].trim().length === 0 ||
+      splitEquation[1].trim().length === 0
+    ) {
+      return null;
+    }
+    return splitEquation;
   }
 }

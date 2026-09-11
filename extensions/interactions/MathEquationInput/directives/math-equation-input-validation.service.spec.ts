@@ -310,6 +310,43 @@ describe('MathEquationInputValidationService', () => {
     ]);
   });
 
+  it('should warn and not throw if a rule input is not an equation', () => {
+    answerGroups[0].rules = [
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentTo',
+          inputs: {
+            x: 'v',
+          },
+        },
+        'MathEquationInput'
+      ),
+    ];
+
+    expect(() =>
+      validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      )
+    ).not.toThrow();
+    warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 1 from Oppia response 1 must be an equation ' +
+          "with a single '=' sign.",
+      },
+    ]);
+  });
+
   it('should warn if there are inputs with unsupported functions', function () {
     answerGroups[0].rules = [
       Rule.createFromBackendDict(

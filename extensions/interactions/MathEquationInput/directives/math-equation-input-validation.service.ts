@@ -106,6 +106,19 @@ export class MathEquationInputValidationService {
 
         let splitInput = currentInput.split('=');
 
+        if (splitInput.length !== 2) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message:
+              'Learner answer ' +
+              (j + 1) +
+              ' from Oppia response ' +
+              (i + 1) +
+              " must be an equation with a single '=' sign.",
+          });
+          continue;
+        }
+
         // Explicitly inserting '*' signs wherever necessary.
         splitInput[0] = mathInteractionsService.insertMultiplicationSigns(
           splitInput[0]
