@@ -553,7 +553,7 @@
   "I18N_ERROR_MODAL_SHOW_DETAILS": "Show Details",
   "I18N_ERROR_MODAL_SUBMIT_FAILED": "Failed to send the error report. Please try again.",
   "I18N_ERROR_MODAL_SUCCESS_MESSAGE": "Thank you! Your error report has been successfully sent to Oppia.",
-  "I18N_ERROR_MODAL_TITLE": "An Error has occurred",  
+  "I18N_ERROR_MODAL_TITLE": "An error has occurred",  
   "I18N_ERROR_NEXT_STEPS": "The best thing to do now is probably to return to the <a href=\"<[homeUrl]>\">home page</a>. However, if this issue recurs, and you think it shouldn't, please let us know on our <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Sorry about this.",
   "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE": "Error <[statusCode]> | Oppia",
   "I18N_ERROR_PAGE_TITLE_404": "Error 404 - Oppia",
