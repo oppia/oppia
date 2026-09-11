@@ -96,7 +96,7 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
     );
 
-    expect(canActivateResult).toBeTrue();
+    expect(canActivateResult).toBe(true);
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
@@ -112,7 +112,7 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
     );
 
-    expect(canActivateResult).toBeFalse();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
@@ -133,7 +133,7 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
     );
 
-    expect(canActivateResult).toBeFalse();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
@@ -154,7 +154,7 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
     );
 
-    expect(canActivateResult).toBeFalse();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
@@ -199,7 +199,7 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       {url: '/certificate-assessment/cert-1'} as RouterStateSnapshot
     );
 
-    expect(canActivateResult).toBeFalse();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);

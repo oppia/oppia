@@ -28,11 +28,12 @@ import {
 } from 'services/i18n-language-code.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
+import './story-viewer-navbar-breadcrumb.component.css';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-breadcrumb',
   templateUrl: './story-viewer-navbar-breadcrumb.component.html',
-  styleUrls: [],
+  styleUrls: ['./story-viewer-navbar-breadcrumb.component.css'],
 })
 export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
