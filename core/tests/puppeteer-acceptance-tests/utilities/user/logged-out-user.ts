@@ -707,7 +707,6 @@ const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
-const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 const formErrorContainer = '.e2e-test-form-error-container';
@@ -8839,14 +8838,14 @@ export class LoggedOutUser extends BaseUser {
       `${baseUrl}/learn/${classroomUrlFragment}/${topicUrlFragment}`
     );
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(topicViewerContainerSelector);
+    await this.expectElementToBeVisible(redesignedTopicViewerContainerSelector);
   }
 
   /**
    * Verifies that the redesigned topic viewer container is visible.
    */
   async expectTopicPageToBeFullyLoaded(): Promise<void> {
-    await this.expectElementToBeVisible(topicViewerContainerSelector);
+    await this.expectElementToBeVisible(redesignedTopicViewerContainerSelector);
   }
 
   /**
@@ -9558,7 +9557,9 @@ export class LoggedOutUser extends BaseUser {
 
       await this.goto(topicPageUrl);
       await this.waitForPageToFullyLoad();
-      await this.expectElementToBeVisible(topicViewerContainerSelector);
+      await this.expectElementToBeVisible(
+        redesignedTopicViewerContainerSelector
+      );
 
       await this.expectElementToBeVisible(skippedAdventureCardSelector);
       const skippedCards = await this.page.$$(skippedAdventureCardSelector);
@@ -10103,7 +10104,7 @@ export class LoggedOutUser extends BaseUser {
   async reloadTopicPage(): Promise<void> {
     await this.page.reload();
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(topicViewerContainerSelector);
+    await this.expectElementToBeVisible(redesignedTopicViewerContainerSelector);
   }
 
   /**
