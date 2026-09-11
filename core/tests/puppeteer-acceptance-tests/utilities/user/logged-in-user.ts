@@ -412,12 +412,8 @@ const mySuggestionsTabDetailSubmittedOnValue =
   '.e2e-test-my-suggestions-details-submitted-on-value';
 const mySuggestionsTabLearnerThreadHeader =
   '.e2e-test-my-suggestions-learner-thread-header';
-const mySuggestionsTabLearnerThreadDate =
-  '.e2e-test-my-suggestions-learner-thread-date';
 const mySuggestionsTabLearnerThreadText =
   '.e2e-test-my-suggestions-learner-thread-text';
-const mySuggestionsTabCreatorThreadDate =
-  '.e2e-test-my-suggestions-creator-thread-date';
 // Feedback-table row selectors.
 const feedbackTableRow = '.e2e-test-feedback-table-row';
 // Feedback-detail-page selectors, used accross exploration feedback tab and

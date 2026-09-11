@@ -205,10 +205,7 @@ describe('Lesson Creator', function () {
     await lessonCreator.verifyFeedbackDetailPageActionsSection(true);
 
     await lessonCreator.clickFeedbackDetailBackButton();
-    await lessonCreator.expectScreenshotToMatch(
-      'newExplorationEditorFeedbackTab',
-      __dirname
-    );
+    await lessonCreator.expectNewExplorationFeedbackTab();
 
     await lessonCreator.selectCreatorFeedbackType('report');
     await lessonCreator.clickApplyButton();
