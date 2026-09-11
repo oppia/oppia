@@ -28,10 +28,10 @@ writing any changes, and DeleteAbandonedCertificateAssessmentAttemptsJob
 opts into deleting them. Since certificate assessments no longer impose a
 time limit, the age of the attempt alone decides whether it is abandoned:
 
-started_at + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES
+    started_at + ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
 
-    An in-progress attempt still present after this window is treated as
-    abandoned.
+An in-progress attempt still present after this window is treated as
+abandoned.
 
 Both jobs only read from the datastore through Beam's NDB I/O transforms, so
 they are safe to run over large datasets.
@@ -57,12 +57,11 @@ if MYPY:  # pragma: no cover
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
-# The number of minutes after which an in-progress certificate assessment
-# attempt is considered abandoned and can be cleaned up. Learners may resume an
+# The number of days after which an in-progress certificate assessment attempt
+# is considered abandoned and can be cleaned up. Learners may resume an
 # in-progress attempt at their own pace, so an attempt that has not been
-# submitted within this window is treated as abandoned. Kept short for easy
-# testing of the cleanup flow.
-ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES = 5
+# submitted within this window is treated as abandoned.
+ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS = 7
 
 
 class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
@@ -94,7 +93,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
         abandonment_cutoff: datetime.datetime = (
             attempt_model.started_at
             + datetime.timedelta(
-                minutes=ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_MINUTES
+                days=ABANDONED_CERTIFICATE_ASSESSMENT_ATTEMPT_AGE_LIMIT_DAYS
             )
         )
         current_time = datetime.datetime.now(datetime.timezone.utc).replace(
@@ -190,15 +189,6 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
             | 'Log abandoned attempt models' >> beam.Map(self.delete_attempt)
         )
 
-        if self.DATASTORE_UPDATES_ALLOWED:
-            _ = (
-                abandoned_attempt_models
-                | 'Extract keys of abandoned attempts'
-                >> beam.Map(lambda model: model.key)
-                | 'Delete abandoned attempt keys from the datastore'
-                >> ndb_io.DeleteModels()
-            )
-
         count_run_result = (
             abandoned_attempt_models
             | 'Count abandoned attempts' >> beam.combiners.Count.Globally()
@@ -211,6 +201,15 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJob(base_jobs.JobBase):
             | 'Add abandoned attempt IDs to job run result'
             >> beam.Map(self.create_model_job_run_result)
         )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            _ = (
+                abandoned_attempt_models
+                | 'Extract keys of abandoned attempts'
+                >> beam.Map(lambda model: model.key)
+                | 'Delete abandoned attempt keys from the datastore'
+                >> ndb_io.DeleteModels()
+            )
 
         return (
             count_run_result,

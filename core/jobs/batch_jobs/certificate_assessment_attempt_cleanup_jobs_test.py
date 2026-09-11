@@ -91,7 +91,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         )
 
     def test_deletes_abandoned_in_progress_attempt(self) -> None:
-        """An in-progress attempt started more than five minutes ago should be
+        """An in-progress attempt started more than seven days ago should be
         deleted.
         """
         abandoned_attempt = _create_attempt_model(
@@ -127,7 +127,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=2),
+            datetime.datetime.utcnow() - datetime.timedelta(days=6),
         )
         self.put_multi([active_attempt])
 
@@ -150,7 +150,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=4),
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
         )
         self.put_multi([active_attempt])
 
@@ -192,7 +192,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
         self.assertIsNotNone(kept_model)
 
     def test_deletes_only_the_abandoned_attempts(self) -> None:
-        """When several attempts exist, only those started more than five minutes
+        """When several attempts exist, only those started more than seven days
         ago and still in progress should be deleted.
         """
         abandoned_attempt = _create_attempt_model(
@@ -205,7 +205,7 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=4),
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
         )
         submitted_attempt = _create_attempt_model(
             self,
