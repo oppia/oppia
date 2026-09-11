@@ -36,10 +36,12 @@ import {ExplorationWarningsService} from '../services/exploration-warnings.servi
 import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
+import './editor-navigation.component.css';
 
 @Component({
   selector: 'oppia-editor-navigation',
   templateUrl: './editor-navigation.component.html',
+  styleUrls: ['./editor-navigation.component.css'],
 })
 export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
