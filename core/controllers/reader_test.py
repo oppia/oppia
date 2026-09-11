@@ -1842,7 +1842,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
-        def _mock_none_function(_: str) -> None:
+        def _mock_none_function(_: str, strict: bool = True) -> None:
             """Mocks None."""
             return None
 

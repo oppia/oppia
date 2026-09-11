@@ -723,7 +723,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             mock_compile_and_check_typescript,
         )
 
-        def mock_compile_and_check_angular_templates(config_path: str) -> None:
+        def mock_compile_and_check_angular_templates(_config_path: str) -> None:
             self.fail(
                 'Template strict checks should not run without --strict_checks.'
             )
