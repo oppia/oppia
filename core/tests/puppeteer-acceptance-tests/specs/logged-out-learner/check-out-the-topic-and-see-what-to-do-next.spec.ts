@@ -215,9 +215,9 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.expectTopicPageTitleToContain('Fractions');
       await loggedOutLearner.expectTopicPageDescriptionToBePresent();
       // The CUJ Topic Header requires breadcrumbs in the format
-      // "Classrooms → Classroom → Topic", so verify both the root and the
+      // "Classroom → Classroom name → Topic", so verify both the root and the
       // classroom level appear.
-      await loggedOutLearner.expectTopicPageBreadcrumbToContain('Classrooms');
+      await loggedOutLearner.expectTopicPageBreadcrumbToContain('Classroom');
       await loggedOutLearner.expectTopicPageBreadcrumbToContain('Math');
       await loggedOutLearner.expectStoryCardToBeVisible();
       await loggedOutLearner.expectStoryTitleToContain('The Fraction Journey');
