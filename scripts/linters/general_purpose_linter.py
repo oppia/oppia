@@ -392,7 +392,7 @@ def check_bad_pattern_in_file(
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
 
-            # Check if the current pattern is specifically the TODO check
+            # Check if the current pattern is specifically the TODO check.
             is_todo_check = 'Please link TODO comments' in pattern['message']
 
             if is_todo_check:
