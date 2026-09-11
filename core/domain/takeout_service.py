@@ -49,6 +49,8 @@ def get_models_which_should_be_exported() -> List[Type[base_models.BaseModel]]:
         'BaseSnapshotContentModel',
         'BaseSnapshotMetadataModel',
         'VersionedModel',
+        'BaseFeatureFlagConfigModel',
+        'BasePlatformParameterConfigModel',
     ]
 
     return [
