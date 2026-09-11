@@ -14,7 +14,9 @@
 
 /**
  * @fileoverview Acceptance test for CUJ L.O.2:
- * Check out the topic and see what to do next.
+ * Check out the topic and see what to do next (logged-out learner).
+ * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=888982708#gid=888982708
+ * https://docs.google.com/document/d/1pkiGSLHYU2pTD26z--5WXo9JmWuCccIXyGNCCjgauFM/edit?tab=t.4t336fwwj9ly#heading=h.vm2p8m3c49f
  *
  * Covers:
  * - Topic page renders with correct title, breadcrumb navigation, and
@@ -53,7 +55,6 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
@@ -63,11 +64,11 @@ import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 const SPEC_TIMEOUT_MSECS = 6000000;
 const ROLES = testConstants.Roles;
 
-describe('Logged-in Learner', function () {
+describe('Logged-Out Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   let voiceoverAdmin: VoiceoverAdmin;
-  let loggedInLearner: LoggedInUser & LoggedOutUser;
+  let loggedOutLearner: LoggedOutUser;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -204,117 +205,119 @@ describe('Logged-in Learner', function () {
     );
     await curriculumAdmin.saveExplorationDraft();
 
-    loggedInLearner = await UserFactory.createNewUser(
-      'learner1',
-      'learner_topic_page1@example.com'
-    );
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
   }, SPEC_TIMEOUT_MSECS);
 
   it(
-    'should check out the topic and see what to do next',
+    'should be able to check out the topic and see what to do next',
     async function () {
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectTopicPageTitleToContain('Fractions');
-      await loggedInLearner.expectTopicPageDescriptionToBePresent();
-      await loggedInLearner.expectTopicPageBreadcrumbToContain('Math');
-      await loggedInLearner.expectStoryCardToBeVisible();
-      await loggedInLearner.expectStoryTitleToContain('The Fraction Journey');
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectTopicPageTitleToContain('Fractions');
+      await loggedOutLearner.expectTopicPageDescriptionToBePresent();
+      await loggedOutLearner.expectTopicPageBreadcrumbToContain('Math');
+      await loggedOutLearner.expectStoryCardToBeVisible();
+      await loggedOutLearner.expectStoryTitleToContain('The Fraction Journey');
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageStoryCard',
         __dirname
       );
 
-      await loggedInLearner.clickClassroomBreadcrumbLink();
-      await loggedInLearner.expectToBeOnClassroomPage('math');
-      await loggedInLearner.openTopicPage('math', 'fractions');
-
-      await loggedInLearner.expectAdventureNavigationDockToBeVisible();
-      await loggedInLearner.expectAdventureCountToBe(4);
-      await loggedInLearner.expectAdventureTitlesToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      // The Adventure Navigation Dock renders when Adventures exist: it shows
+      // a horizontal chapter-node track with left/right scroll arrows and the
+      // active node highlighted (verified in the assertions below).
+      await loggedOutLearner.expectAdventureNavigationDockToBeVisible();
+      await loggedOutLearner.expectAdventureCountToBe(4);
+      await loggedOutLearner.expectAdventureTitlesToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageNavigationDockBadges',
         __dirname
       );
 
-      await loggedInLearner.expectEachAdventureToHaveLessonCount(3);
+      await loggedOutLearner.expectEachAdventureToHaveLessonCount(3);
 
-      await loggedInLearner.expectDockToStickToTopWithActiveMilestoneHighlighted();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectDockToStickToTopWithActiveMilestoneHighlighted();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageDockStuckTopActiveMilestone',
         __dirname
       );
 
-      await loggedInLearner.expectDockScrollArrowsToBeShownOnlyWhenOverflowing();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectDockScrollArrowsToBeShownOnlyWhenOverflowing();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageDockScrollArrows',
         __dirname
       );
+    },
+    SPEC_TIMEOUT_MSECS
+  );
 
-      await loggedInLearner.expectFirstChapterCardToShowStartAndSecondaryActions();
-      await loggedInLearner.expectScreenshotToMatch(
+  it(
+    'should be able to look down the timeline and choose a lesson',
+    async function () {
+      await loggedOutLearner.expectFirstChapterCardToShowStartAndSecondaryActions();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageExpandedChapterCardActions',
         __dirname
       );
 
-      await loggedInLearner.expectNewLessonBadgeToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectNewLessonBadgeToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageNewLessonBadge',
         __dirname
       );
 
-      await loggedInLearner.scrollComingSoonSectionIntoView();
-      await loggedInLearner.expectComingSoonSectionToBeVisible();
-      await loggedInLearner.expectComingSoonSectionToShowLessonCard();
-      await loggedInLearner.expectComingSoonTitleToContain(
+      await loggedOutLearner.scrollComingSoonSectionIntoView();
+      await loggedOutLearner.expectComingSoonSectionToBeVisible();
+      await loggedOutLearner.expectComingSoonSectionToShowLessonCard();
+      await loggedOutLearner.expectComingSoonTitleToContain(
         'COMING SOON CHAPTERS'
       );
-      await loggedInLearner.expectComingSoonSectionToContainChapterCount(1);
-      await loggedInLearner.expectComingSoonDescriptionToContain(
+      await loggedOutLearner.expectComingSoonSectionToContainChapterCount(1);
+      await loggedOutLearner.expectComingSoonDescriptionToContain(
         'This chapter will be available soon.'
       );
-      await loggedInLearner.expectDockLessonNumbersToBe(12, [13, 14]);
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectDockLessonNumbersToBe(12, [13, 14]);
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageComingSoonSection',
         __dirname
       );
 
-      await loggedInLearner.clickComingSoonCardAndExpectNoNavigation(
+      await loggedOutLearner.clickComingSoonCardAndExpectNoNavigation(
         '/learn/math/fractions'
       );
 
-      await loggedInLearner.expectPageTextNotToContain('Mastering Fractions');
-      await loggedInLearner.expectComingSoonSectionToContainChapterCount(1);
+      await loggedOutLearner.expectPageTextNotToContain('Mastering Fractions');
+      await loggedOutLearner.expectComingSoonSectionToContainChapterCount(1);
 
-      await loggedInLearner.scrollToEndOfTopicPage();
-      await loggedInLearner.expectMasteryChallengeCardToBeVisible();
-      await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
-      await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.scrollToEndOfTopicPage();
+      await loggedOutLearner.expectMasteryChallengeCardToBeVisible();
+      await loggedOutLearner.expectMasteryChallengeTitleToBeVisible();
+      await loggedOutLearner.expectMasteryChallengeButtonToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageMasteryChallengeCard',
         __dirname
       );
 
-      await loggedInLearner.scrollMasteryChallengeCardIntoView();
-      await loggedInLearner.expectMasteryChallengeCardToShowDescription();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.scrollMasteryChallengeCardIntoView();
+      await loggedOutLearner.expectMasteryChallengeCardToShowDescription();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterMasteryChallengeLockedDescription',
         __dirname
       );
 
-      await loggedInLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
+      await loggedOutLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
 
-      await loggedInLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
+      await loggedOutLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
 
-      await loggedInLearner.scrollToTopOfTopicPage();
-      await loggedInLearner.expectStudySkillsCtaToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.scrollToTopOfTopicPage();
+      await loggedOutLearner.expectStudySkillsCtaToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'topicPageStoryCardWithStudySkillsCta',
         __dirname
       );
 
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectArcTitlesToBeVisibleOnTimeline();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectArcTitlesToBeVisibleOnTimeline();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterArcHeadersOnTimeline',
         __dirname
       );
@@ -323,113 +326,113 @@ describe('Logged-in Learner', function () {
       // translations other than English, which in this topic is only the first
       // chapter. The language checks therefore run while the first chapter is
       // still the active (uncompleted) lesson.
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectStoryCardToBeVisible();
-      await loggedInLearner.expectStoryTitleToContain('The Fraction Journey');
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectStoryCardToBeVisible();
+      await loggedOutLearner.expectStoryTitleToContain('The Fraction Journey');
+      await loggedOutLearner.expectScreenshotToMatch(
         'languageStoryCard',
         __dirname
       );
 
-      await loggedInLearner.expectLessonLanguageSelectorToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectLessonLanguageSelectorToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'languageSelectorOnLessonCard',
         __dirname
       );
 
-      await loggedInLearner.expectDefaultTextLanguageToBeSelected();
+      await loggedOutLearner.expectDefaultTextLanguageToBeSelected();
 
-      await loggedInLearner.expectFallbackInfoTooltipToBeShown();
+      await loggedOutLearner.expectFallbackInfoTooltipToBeShown();
 
-      await loggedInLearner.expectSessionLanguageToMatchSelectedLanguage();
+      await loggedOutLearner.expectSessionLanguageToMatchSelectedLanguage();
 
-      await loggedInLearner.clearSessionLanguage();
-      await loggedInLearner.setSiteLanguageInLocalStorage('pt-br');
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectFallbackInfoIconToBeVisible();
-      await loggedInLearner.expectSelectedTextLanguageToBe('en');
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.reloadTopicPage();
-      await loggedInLearner.expectTextLanguageToBeSelected('hi');
+      await loggedOutLearner.clearSessionLanguage();
+      await loggedOutLearner.setSiteLanguageInLocalStorage('pt-br');
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectFallbackInfoIconToBeVisible();
+      await loggedOutLearner.expectSelectedTextLanguageToBe('en');
+      await loggedOutLearner.selectLessonTextLanguage('hi');
+      await loggedOutLearner.reloadTopicPage();
+      await loggedOutLearner.expectTextLanguageToBeSelected('hi');
 
-      await loggedInLearner.directlySetSavedSessionLanguageToUnavailable('es');
-      await loggedInLearner.reloadTopicPage();
-      await loggedInLearner.expectSelectedTextLanguageToBe('en');
-      await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);
-      await loggedInLearner.expectFallbackInfoIconToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.directlySetSavedSessionLanguageToUnavailable('es');
+      await loggedOutLearner.reloadTopicPage();
+      await loggedOutLearner.expectSelectedTextLanguageToBe('en');
+      await loggedOutLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);
+      await loggedOutLearner.expectFallbackInfoIconToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'languageEnglishNoVoiceoverFallback',
         __dirname
       );
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(false);
-      await loggedInLearner.expectSelectedVoiceoverLanguageToBe('hi-IN');
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.selectLessonTextLanguage('hi');
+      await loggedOutLearner.expectVoiceoverLanguageDropdownToBeDisabled(false);
+      await loggedOutLearner.expectSelectedVoiceoverLanguageToBe('hi-IN');
+      await loggedOutLearner.expectScreenshotToMatch(
         'languageHindiVoiceoverSelected',
         __dirname
       );
 
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.startActiveChapterAndExpectLanguageParamsInStartUrl(
+      await loggedOutLearner.selectLessonTextLanguage('hi');
+      await loggedOutLearner.startActiveChapterAndExpectLanguageParamsInStartUrl(
         'hi',
         'hi-IN'
       );
 
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectStudySkillsCtaToBeVisible();
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectStudySkillsCtaToBeVisible();
 
-      await loggedInLearner.expectNewLessonBadgeToBeVisible();
+      await loggedOutLearner.expectNewLessonBadgeToBeVisible();
 
-      await loggedInLearner.scrollMasteryChallengeCardIntoView();
-      await loggedInLearner.expectMasteryChallengeCardToBeVisible();
-      await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
-      await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
+      await loggedOutLearner.scrollMasteryChallengeCardIntoView();
+      await loggedOutLearner.expectMasteryChallengeCardToBeVisible();
+      await loggedOutLearner.expectMasteryChallengeTitleToBeVisible();
+      await loggedOutLearner.expectMasteryChallengeButtonToBeVisible();
 
       // Restore the default site language and clear the persisted lesson
       // language so that the remaining sections (which do not test language
       // handling) run against the same English topic page as the baseline
       // screenshots.
-      await loggedInLearner.clearSessionLanguage();
-      await loggedInLearner.setSiteLanguageInLocalStorage('en');
-      await loggedInLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.clearSessionLanguage();
+      await loggedOutLearner.setSiteLanguageInLocalStorage('en');
+      await loggedOutLearner.openTopicPage('math', 'fractions');
 
-      await loggedInLearner.expectActiveChapterCardToShowStartAndSecondaryActions(
+      await loggedOutLearner.expectActiveChapterCardToShowStartAndSecondaryActions(
         2
       );
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterActiveCardWithActions',
         __dirname
       );
 
-      await loggedInLearner.clickOnActiveChapterStartButton();
-      await loggedInLearner.clickOnContinueButtonInInteractionCard();
-      await loggedInLearner.expectExplorationCompletionToastMessage(
+      await loggedOutLearner.clickOnActiveChapterStartButton();
+      await loggedOutLearner.clickOnContinueButtonInInteractionCard();
+      await loggedOutLearner.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectCompletedLessonToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+      await loggedOutLearner.expectCompletedLessonToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterCompletedLessonProgression',
         __dirname
       );
 
-      await loggedInLearner.expectCompletedChapterToBeCollapsed();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectCompletedChapterToBeCollapsed();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterCompletedRowPlayAgain',
         __dirname
       );
 
-      await loggedInLearner.expectNextChapterToBeActive();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectNextChapterToBeActive();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterNextChapterActive',
         __dirname
       );
 
-      await loggedInLearner.expectAdventureNavigationDockToBeVisible();
+      await loggedOutLearner.expectAdventureNavigationDockToBeVisible();
 
-      await loggedInLearner.expectAdventureTitlesToBeVisible();
-      await loggedInLearner.expectAdventureCountToBeGreaterThanZero();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectAdventureTitlesToBeVisible();
+      await loggedOutLearner.expectAdventureCountToBeGreaterThanZero();
+      await loggedOutLearner.expectScreenshotToMatch(
         'arcTimelineAdventureTitles',
         __dirname
       );
@@ -438,14 +441,24 @@ describe('Logged-in Learner', function () {
       // second adventure. The arcs group the 12 published lessons as 1-3,
       // 4-6, 7-9 and 10-12, so lesson 4 is the first lesson outside the first
       // (still incomplete) adventure and can trigger the skip flows.
-      await loggedInLearner.clickDockBadgeAndExpectSkipModalToShowThenCancel(3);
+      await loggedOutLearner.clickDockBadgeAndExpectSkipModalToShowThenCancel(
+        3
+      );
+    },
+    SPEC_TIMEOUT_MSECS
+  );
 
-      await loggedInLearner.skipToLaterArcAndExpectSkippedAdventureCards(3);
+  it(
+    'should be able to skip directly to an advanced Adventure and unlock harder lessons',
+    async function () {
+      await loggedOutLearner.skipToLaterArcAndExpectSkippedAdventureCards(3);
 
-      await loggedInLearner.navigateToLaterArcMilestoneAndExpectNoPageReload(3);
+      await loggedOutLearner.navigateToLaterArcMilestoneAndExpectNoPageReload(
+        3
+      );
 
-      await loggedInLearner.expandSkippedAdventureByClickingStartCta();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expandSkippedAdventureByClickingStartCta();
+      await loggedOutLearner.expectScreenshotToMatch(
         'arcSkippedAdventureExpanded',
         __dirname
       );
@@ -454,23 +467,29 @@ describe('Logged-in Learner', function () {
       // above, so complete the remaining 11. The Mastery Challenge unlocks
       // only after every published chapter is completed.
       for (let completedCount = 0; completedCount < 11; completedCount++) {
-        await loggedInLearner.waitForPageToFullyLoad();
-        await loggedInLearner.clickOnActiveChapterStartButton();
-        await loggedInLearner.clickOnContinueButtonInInteractionCard();
-        await loggedInLearner.expectExplorationCompletionToastMessage(
+        await loggedOutLearner.waitForPageToFullyLoad();
+        await loggedOutLearner.clickOnActiveChapterStartButton();
+        await loggedOutLearner.clickOnContinueButtonInInteractionCard();
+        await loggedOutLearner.expectExplorationCompletionToastMessage(
           'Congratulations for completing this lesson!'
         );
-        await loggedInLearner.openTopicPage('math', 'fractions');
-        await loggedInLearner.expectCompletedLessonToBeVisible();
+        await loggedOutLearner.openTopicPage('math', 'fractions');
+        await loggedOutLearner.expectCompletedLessonToBeVisible();
       }
+    },
+    SPEC_TIMEOUT_MSECS
+  );
 
-      await loggedInLearner.scrollMasteryChallengeCardIntoView();
-      await loggedInLearner.expectMasteryChallengeToBeUnlocked();
-      await loggedInLearner.clickMasteryChallengeAndNavigateToPracticeSession();
-      await loggedInLearner.openTopicPage('math', 'fractions');
+  it(
+    'should be able to take the Mastery Challenge',
+    async function () {
+      await loggedOutLearner.scrollMasteryChallengeCardIntoView();
+      await loggedOutLearner.expectMasteryChallengeToBeUnlocked();
+      await loggedOutLearner.clickMasteryChallengeAndNavigateToPracticeSession();
+      await loggedOutLearner.openTopicPage('math', 'fractions');
 
-      await loggedInLearner.expectPracticeTestCardToBeVisible();
-      await loggedInLearner.expectScreenshotToMatch(
+      await loggedOutLearner.expectPracticeTestCardToBeVisible();
+      await loggedOutLearner.expectScreenshotToMatch(
         'chapterPracticeTestCard',
         __dirname
       );
