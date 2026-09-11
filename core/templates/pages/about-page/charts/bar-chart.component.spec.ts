@@ -80,7 +80,9 @@ describe('BarChartComponent', () => {
     component.ngOnInit();
     component.ngAfterViewInit();
 
-    const tableElement = fixture.nativeElement.getElementsByClassName('bar')[0];
+    const tableElement = fixture.nativeElement.getElementsByClassName(
+      'oppia-bar-chart-table'
+    )[0];
     expect(tableElement.style.getPropertyValue('--color')).toBe('red');
   });
 });
