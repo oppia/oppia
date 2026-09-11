@@ -214,6 +214,10 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.openTopicPage('math', 'fractions');
       await loggedOutLearner.expectTopicPageTitleToContain('Fractions');
       await loggedOutLearner.expectTopicPageDescriptionToBePresent();
+      // The CUJ Topic Header requires breadcrumbs in the format
+      // "Classrooms → Classroom → Topic", so verify both the root and the
+      // classroom level appear.
+      await loggedOutLearner.expectTopicPageBreadcrumbToContain('Classrooms');
       await loggedOutLearner.expectTopicPageBreadcrumbToContain('Math');
       await loggedOutLearner.expectStoryCardToBeVisible();
       await loggedOutLearner.expectStoryTitleToContain('The Fraction Journey');
@@ -222,10 +226,21 @@ describe('Logged-Out Learner', function () {
         __dirname
       );
 
+      // The CUJ only requires the breadcrumbs to be rendered in the Topic
+      // Header, so clicking through to the classroom page is an extra check
+      // that additionally validates that the breadcrumb links actually
+      // navigate.
+      await loggedOutLearner.clickClassroomBreadcrumbLink();
+      await loggedOutLearner.expectToBeOnClassroomPage('math');
+      await loggedOutLearner.openTopicPage('math', 'fractions');
+
       // The Adventure Navigation Dock renders when Adventures exist: it shows
       // a horizontal chapter-node track with left/right scroll arrows and the
       // active node highlighted (verified in the assertions below).
       await loggedOutLearner.expectAdventureNavigationDockToBeVisible();
+      // The CUJ does not prescribe adventure or lesson counts, so these checks
+      // validate the fixture structure (four Adventures of three lessons each)
+      // that the later sections rely on.
       await loggedOutLearner.expectAdventureCountToBe(4);
       await loggedOutLearner.expectAdventureTitlesToBeVisible();
       await loggedOutLearner.expectScreenshotToMatch(
@@ -253,18 +268,32 @@ describe('Logged-Out Learner', function () {
   it(
     'should be able to look down the timeline and choose a lesson',
     async function () {
+      // The CUJ Timeline & Chapter Layout requires the active chapter card to
+      // render in an expanded state with the narrative description, Play
+      // Interactive Story CTA, Practice This Skill, and View Study Guide
+      // actions.
       await loggedOutLearner.expectFirstChapterCardToShowStartAndSecondaryActions();
+      // The topicPageExpandedChapterCardActions screenshot captures the expanded
+      // active chapter card with the Play, Practice, and Study Guide actions.
       await loggedOutLearner.expectScreenshotToMatch(
         'topicPageExpandedChapterCardActions',
         __dirname
       );
 
+      // The CUJ Lesson Metadata bullet requires a New badge on recently
+      // published lessons.
       await loggedOutLearner.expectNewLessonBadgeToBeVisible();
+      // The topicPageNewLessonBadge screenshot captures the New badge on a
+      // recently published lesson card.
       await loggedOutLearner.expectScreenshotToMatch(
         'topicPageNewLessonBadge',
         __dirname
       );
 
+      // The CUJ Coming Soon Presentation requires the Available Chapters and
+      // Coming Soon Chapters to be separate sections, with a single "Ready to
+      // Publish" placeholder card with a Coming Soon badge, and downstream
+      // draft/locked chapters suppressed.
       await loggedOutLearner.scrollComingSoonSectionIntoView();
       await loggedOutLearner.expectComingSoonSectionToBeVisible();
       await loggedOutLearner.expectComingSoonSectionToShowLessonCard();
@@ -276,6 +305,8 @@ describe('Logged-Out Learner', function () {
         'This chapter will be available soon.'
       );
       await loggedOutLearner.expectDockLessonNumbersToBe(12, [13, 14]);
+      // The topicPageComingSoonSection screenshot captures the Coming Soon section
+      // with its single placeholder card and badge.
       await loggedOutLearner.expectScreenshotToMatch(
         'topicPageComingSoonSection',
         __dirname
@@ -285,9 +316,17 @@ describe('Logged-Out Learner', function () {
         '/learn/math/fractions'
       );
 
+      // The CUJ Coming Soon Presentation requires downstream draft/locked
+      // chapters to be suppressed; "Mastering Fractions" is a draft chapter
+      // that must not appear, and only the single coming-soon chapter should
+      // be counted.
       await loggedOutLearner.expectPageTextNotToContain('Mastering Fractions');
       await loggedOutLearner.expectComingSoonSectionToContainChapterCount(1);
 
+      // Scrolling down the vertical timeline layout reaches the end of the
+      // story path, where the CUJ Mastery Challenge Card bullet requires the
+      // challenge card to be displayed; the section below verifies it and its
+      // locked-state helper behavior.
       await loggedOutLearner.scrollToEndOfTopicPage();
       await loggedOutLearner.expectMasteryChallengeCardToBeVisible();
       await loggedOutLearner.expectMasteryChallengeTitleToBeVisible();
@@ -304,11 +343,18 @@ describe('Logged-Out Learner', function () {
         __dirname
       );
 
+      // The CUJ says the helper tooltip appears when clicking the locked button,
+      // but the tooltip auto-dismisses after ~5 seconds, so the test both
+      // hovers (for a deterministic tooltip check) and verifies that a click
+      // does not navigate to the practice session.
       await loggedOutLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
 
       await loggedOutLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
 
       await loggedOutLearner.scrollToTopOfTopicPage();
+      // The CUJ Timeline & Chapter Layout requires the story card to show
+      // View Study Guide actions; the screenshot below captures the Study
+      // Skills CTA visible on the story card.
       await loggedOutLearner.expectStudySkillsCtaToBeVisible();
       await loggedOutLearner.expectScreenshotToMatch(
         'topicPageStoryCardWithStudySkillsCta',
@@ -316,6 +362,9 @@ describe('Logged-Out Learner', function () {
       );
 
       await loggedOutLearner.openTopicPage('math', 'fractions');
+      // The CUJ Timeline & Chapter Layout requires bold thematic Adventure
+      // headers along the vertical timeline; the screenshot below captures the
+      // arc headers on the timeline.
       await loggedOutLearner.expectArcTitlesToBeVisibleOnTimeline();
       await loggedOutLearner.expectScreenshotToMatch(
         'chapterArcHeadersOnTimeline',
