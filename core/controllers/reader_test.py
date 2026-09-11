@@ -1842,7 +1842,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
-        def _mock_none_function(_: str, strict: bool = True) -> None:
+        def _mock_none_function(
+            _: str, strict: bool = True  # pylint: disable=unused-argument
+        ) -> None:
             """Mocks None."""
             return None
 
@@ -2083,7 +2085,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         setattr(story, 'corresponding_topic_id', None)
 
-        with self.swap(story_fetchers, 'get_story_by_id', lambda _: story):
+        with self.swap(
+            story_fetchers,
+            'get_story_by_id',
+            lambda _, strict=True: story,  # pylint: disable=unused-argument
+        ):
             payload = {
                 'client_time_spent_in_secs': 0,
                 'params': {},
