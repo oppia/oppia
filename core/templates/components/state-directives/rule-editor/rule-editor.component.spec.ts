@@ -721,11 +721,6 @@ describe('Rule Editor Component', () => {
       {id: '2', val: 42},
     ];
 
-    expect(component.getRuleDescriptionChoiceList()).toEqual([
-      {id: '1', val: 'string choice'},
-      {id: '2', val: '42'},
-    ]);
-
     expect(component.getFirstRuleDescriptionChoiceText()).toBe('string choice');
 
     component.ruleDescriptionChoices = [{id: '1', val: 7}];
@@ -748,19 +743,6 @@ describe('Rule Editor Component', () => {
 
     component.setRuleInputValue('new_val', item);
     expect(component.rule.inputs.x).toBe('new_val');
-  });
-
-  it('should get rule editor init args', () => {
-    component.ruleDescriptionChoices = [{id: '1', val: 'choice val'}];
-    // The 'unknown' type is used here because the return type of the method
-    // is a recursive union that cannot be passed directly to 'expect' due to
-    // excessive type instantiation.
-    const initArgs = component.getRuleEditorInitArgs() as unknown as {
-      choices: {id: string; val: string}[];
-    };
-    expect(initArgs).toEqual({
-      choices: [{id: '1', val: 'choice val'}],
-    });
   });
 
   it('should unsubscribe on destroy', () => {

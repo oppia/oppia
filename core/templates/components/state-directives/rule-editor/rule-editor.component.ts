@@ -81,6 +81,8 @@ export class RuleEditorComponent
   ruleDescriptionFragments!: RuleDescriptionFragment[];
   currentInteractionId!: InteractionSpecsKey;
   ruleDescriptionChoices!: Choice[];
+  ruleDescriptionChoiceList: {id: string; val: string}[] = [];
+  ruleEditorInitArgs!: SchemaDefaultValue;
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
   // The 'unknown' type is used here because the record can contain any type of value.
@@ -223,6 +225,18 @@ export class RuleEditorComponent
     this.ruleDescriptionFragments = [];
     this.ngZone.run(() => {
       this.ruleDescriptionFragments = result;
+      // The rule description choices are only present when answer choices
+      // are available, so default to an empty list when they are not.
+      this.ruleDescriptionChoiceList = this.ruleDescriptionChoices
+        ? this.ruleDescriptionChoices.map(choice => ({
+            id: choice.id,
+            val:
+              typeof choice.val === 'string' ? choice.val : String(choice.val),
+          }))
+        : [];
+      this.ruleEditorInitArgs = {
+        choices: this.ruleDescriptionChoices || [],
+      } as unknown as SchemaDefaultValue;
     }, 10);
 
     return ruleDescription;
@@ -232,13 +246,6 @@ export class RuleEditorComponent
     this.rule.inputs[item.varName] = selection;
 
     this.changeDetectorRef.detectChanges();
-  }
-
-  getRuleDescriptionChoiceList(): {id: string; val: string}[] {
-    return this.ruleDescriptionChoices.map(choice => ({
-      id: choice.id,
-      val: typeof choice.val === 'string' ? choice.val : String(choice.val),
-    }));
   }
 
   getFirstRuleDescriptionChoiceText(): string {
@@ -264,16 +271,6 @@ export class RuleEditorComponent
   setRuleInputValue(newValue: SchemaDefaultValue, item: SelectItem): void {
     this.rule.inputs[item.varName] =
       newValue as unknown as InteractionRuleInputs;
-  }
-
-  // The object editor passes the init args through to the underlying editor
-  // component, whose 'choices' property is the rule description choices, so a
-  // type assertion is used here to match the type accepted by the object
-  // editor.
-  getRuleEditorInitArgs(): SchemaDefaultValue {
-    return {
-      choices: this.ruleDescriptionChoices,
-    } as unknown as SchemaDefaultValue;
   }
 
   onSelectNewRuleType(newRuleType: string): void {
