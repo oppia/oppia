@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import hashlib
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.domain import web_feature_flag_domain
-from core.domain import feature_flag_registry as registry
+from core.domain import web_feature_flag_registry as registry
 from core.platform import models
 
 from typing import Dict, List, Mapping, Optional, Set
@@ -135,12 +135,16 @@ def get_all_web_feature_flags() -> List[web_feature_flag_domain.FeatureFlag]:
         if feature_flag is not None:
             feature_flags.append(feature_flag)
         else:
-            feature_flag_spec = _get_web_feature_flag_spec(feature_flag_name)
-            feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
-                False, 0, [], None
+            web_feature_flag_spec = _get_web_feature_flag_spec(
+                feature_flag_name
+            )
+            web_feature_flag_config = (
+                web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None)
             )
             feature_flag = web_feature_flag_domain.FeatureFlag(
-                feature_flag_name, feature_flag_spec, feature_flag_config
+                feature_flag_name,
+                web_feature_flag_spec,
+                web_feature_flag_config,
             )
             feature_flags.append(feature_flag)
 
@@ -173,22 +177,24 @@ def load_web_feature_flags_from_storage(
 
     for web_feature_flag_config_model in web_feature_flag_config_models:
         if web_feature_flag_config_model:
-            feature_flag_spec = _get_web_feature_flag_spec(
+            web_feature_flag_spec = _get_web_feature_flag_spec(
                 web_feature_flag_config_model.id
             )
-            feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
-                web_feature_flag_config_model.force_enable_for_all_users,
-                web_feature_flag_config_model.rollout_percentage,
-                web_feature_flag_config_model.user_group_ids,
-                web_feature_flag_config_model.last_updated,
+            web_feature_flag_config = (
+                web_feature_flag_domain.WebFeatureFlagConfig(
+                    web_feature_flag_config_model.force_enable_for_all_users,
+                    web_feature_flag_config_model.rollout_percentage,
+                    web_feature_flag_config_model.user_group_ids,
+                    web_feature_flag_config_model.last_updated,
+                )
             )
 
             web_feature_flag_name_to_feature_flag_dict[
                 web_feature_flag_config_model.id
             ] = web_feature_flag_domain.FeatureFlag(
                 web_feature_flag_config_model.id,
-                feature_flag_spec,
-                feature_flag_config,
+                web_feature_flag_spec,
+                web_feature_flag_config,
             )
 
         for web_feature_flag_name in web_feature_flag_names_list:
@@ -227,14 +233,14 @@ def is_feature_flag_enabled(
 
     if (
         current_server == web_feature_flag_domain.ServerMode.TEST
-        and feature_flag.feature_flag_spec.feature_stage
+        and feature_flag.web_feature_flag_spec.feature_stage
         == web_feature_flag_domain.ServerMode.DEV
     ):
         return False
 
     if (
         current_server == web_feature_flag_domain.ServerMode.PROD
-        and feature_flag.feature_flag_spec.feature_stage
+        and feature_flag.web_feature_flag_spec.feature_stage
         in (
             web_feature_flag_domain.ServerMode.DEV,
             web_feature_flag_domain.ServerMode.TEST,
@@ -242,7 +248,7 @@ def is_feature_flag_enabled(
     ):
         return False
 
-    if feature_flag.feature_flag_config.force_enable_for_all_users:
+    if feature_flag.web_feature_flag_config.force_enable_for_all_users:
         return True
 
     if user_id is not None:
@@ -256,7 +262,9 @@ def is_feature_flag_enabled(
             user_group_model.id for user_group_model in user_group_models
         )
 
-        for user_group_id in feature_flag.feature_flag_config.user_group_ids:
+        for (
+            user_group_id
+        ) in feature_flag.web_feature_flag_config.user_group_ids:
             if user_group_id in user_group_models_ids:
                 return True
 
@@ -267,13 +275,13 @@ def is_feature_flag_enabled(
         hash_value = int(hashed_user_id, 16)
         mod_result = hash_value % 1000
         threshold = (
-            feature_flag.feature_flag_config.rollout_percentage / 100
+            feature_flag.web_feature_flag_config.rollout_percentage / 100
         ) * 1000
         return bool(mod_result < threshold)
     return False
 
 
-def evaluate_all_feature_flag_configs(
+def evaluate_all_web_feature_flag_configs(
     user_id: Optional[str],
 ) -> Dict[str, bool]:
     """Evaluates and returns the value of feature flags.

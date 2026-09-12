@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for feature flag registry."""
+"""Tests for web feature flag registry."""
 
 from __future__ import annotations
 
@@ -23,19 +23,19 @@ import enum
 from core import feconf, utils
 from core.constants import constants
 from core.domain import web_feature_flag_domain
-from core.domain import feature_flag_registry as registry
+from core.domain import web_feature_flag_registry as registry
 from core.tests import test_utils
 
 FeatureStages = web_feature_flag_domain.FeatureStages
 
 
-class FeatureNames(enum.Enum):
+class WebFeatureNames(enum.Enum):
     """Enum for parameter names."""
 
     FEATURE_A = 'feature_a'
 
 
-class FeatureFlagRegistryTests(test_utils.GenericTestBase):
+class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
     """Tests for the feature flag Registry."""
 
     def setUp(self) -> None:
@@ -44,7 +44,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.FEATURE_A.value: (
+                WebFeatureNames.FEATURE_A.value: (
                     'test description',
                     FeatureStages.DEV,
                 )
@@ -54,7 +54,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def test_get_feature_flag(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             feature_flag = registry.Registry.get_feature_flag(
-                FeatureNames.FEATURE_A.value
+                WebFeatureNames.FEATURE_A.value
             )
         self.assertIsNotNone(feature_flag)
         self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
@@ -68,62 +68,63 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def test_existing_feature_gets_updated(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             self.assertIsNone(
-                registry.Registry.load_feature_flag_config_from_storage(
-                    FeatureNames.FEATURE_A.value
+                registry.Registry.load_web_feature_flag_config_from_storage(
+                    WebFeatureNames.FEATURE_A.value
                 )
             )
             registry.Registry.update_web_feature_flag(
-                FeatureNames.FEATURE_A.value,
+                WebFeatureNames.FEATURE_A.value,
                 True,
                 50,
                 ['user_group_1', 'user_group_2'],
             )
             self.assertIsNotNone(
-                registry.Registry.load_feature_flag_config_from_storage(
-                    FeatureNames.FEATURE_A.value
+                registry.Registry.load_web_feature_flag_config_from_storage(
+                    WebFeatureNames.FEATURE_A.value
                 )
             )
             registry.Registry.update_web_feature_flag(
-                FeatureNames.FEATURE_A.value,
+                WebFeatureNames.FEATURE_A.value,
                 True,
                 100,
                 ['user_group_1', 'user_group_2', 'user_group_3'],
             )
 
             updated_feature_flag = registry.Registry.get_feature_flag(
-                FeatureNames.FEATURE_A.value
+                WebFeatureNames.FEATURE_A.value
             )
             self.assertTrue(
-                updated_feature_flag.feature_flag_config.force_enable_for_all_users
+                updated_feature_flag.web_feature_flag_config.force_enable_for_all_users
             )
             self.assertEqual(
-                updated_feature_flag.feature_flag_config.rollout_percentage, 100
+                updated_feature_flag.web_feature_flag_config.rollout_percentage,
+                100,
             )
             self.assertEqual(
-                updated_feature_flag.feature_flag_config.user_group_ids,
+                updated_feature_flag.web_feature_flag_config.user_group_ids,
                 ['user_group_1', 'user_group_2', 'user_group_3'],
             )
 
     def test_update_web_feature_flag(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             registry.Registry.update_web_feature_flag(
-                FeatureNames.FEATURE_A.value,
+                WebFeatureNames.FEATURE_A.value,
                 True,
                 50,
                 ['user_group_1', 'user_group_2'],
             )
 
             updated_feature_flag = registry.Registry.get_feature_flag(
-                FeatureNames.FEATURE_A.value
+                WebFeatureNames.FEATURE_A.value
             )
         self.assertTrue(
-            updated_feature_flag.feature_flag_config.force_enable_for_all_users
+            updated_feature_flag.web_feature_flag_config.force_enable_for_all_users
         )
         self.assertEqual(
-            updated_feature_flag.feature_flag_config.rollout_percentage, 50
+            updated_feature_flag.web_feature_flag_config.rollout_percentage, 50
         )
         self.assertEqual(
-            updated_feature_flag.feature_flag_config.user_group_ids,
+            updated_feature_flag.web_feature_flag_config.user_group_ids,
             ['user_group_1', 'user_group_2'],
         )
 
@@ -139,9 +140,9 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         'environment.',
                     ):
                         feature_flag = registry.Registry.get_feature_flag(
-                            FeatureNames.FEATURE_A.value
+                            WebFeatureNames.FEATURE_A.value
                         )
-                        feature_flag.feature_flag_config.validate(
+                        feature_flag.web_feature_flag_config.validate(
                             web_feature_flag_domain.ServerMode.DEV
                         )
 
@@ -157,9 +158,9 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         'environment.',
                     ):
                         feature_flag = registry.Registry.get_feature_flag(
-                            FeatureNames.FEATURE_A.value
+                            WebFeatureNames.FEATURE_A.value
                         )
-                        feature_flag.feature_flag_config.validate(
+                        feature_flag.web_feature_flag_config.validate(
                             web_feature_flag_domain.ServerMode.DEV
                         )
 
@@ -168,7 +169,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.FEATURE_A.value: (
+                WebFeatureNames.FEATURE_A.value: (
                     'test description',
                     FeatureStages.TEST,
                 )
@@ -185,30 +186,30 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         'environment.',
                     ):
                         feature_flag = registry.Registry.get_feature_flag(
-                            FeatureNames.FEATURE_A.value
+                            WebFeatureNames.FEATURE_A.value
                         )
-                        feature_flag.feature_flag_config.validate(
+                        feature_flag.web_feature_flag_config.validate(
                             web_feature_flag_domain.ServerMode.TEST
                         )
 
     def test_updated_feature_is_saved_in_storage(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             self.assertIsNone(
-                registry.Registry.load_feature_flag_config_from_storage(
-                    FeatureNames.FEATURE_A.value
+                registry.Registry.load_web_feature_flag_config_from_storage(
+                    WebFeatureNames.FEATURE_A.value
                 )
             )
 
             registry.Registry.update_web_feature_flag(
-                FeatureNames.FEATURE_A.value,
+                WebFeatureNames.FEATURE_A.value,
                 True,
                 50,
                 ['user_group_1', 'user_group_2'],
             )
 
             updated_feature_flag = (
-                registry.Registry.load_feature_flag_config_from_storage(
-                    FeatureNames.FEATURE_A.value
+                registry.Registry.load_web_feature_flag_config_from_storage(
+                    WebFeatureNames.FEATURE_A.value
                 )
             )
             self.assertIsNotNone(updated_feature_flag)

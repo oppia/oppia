@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     web_feature_flag_domain,
-    feature_flag_registry,
+    web_feature_flag_registry,
     feature_flag_services,
     platform_parameter_list,
     user_services,
@@ -358,7 +358,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
+            web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
@@ -393,20 +393,21 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
 
                 updated_feature_flag = (
-                    feature_flag_registry.Registry.get_feature_flag(
+                    web_feature_flag_registry.Registry.get_feature_flag(
                         FeatureNames.TEST_FEATURE_1.value
                     )
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.force_enable_for_all_users,
+                    updated_feature_flag.web_feature_flag_config.force_enable_for_all_users,
                     False,
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.rollout_percentage,
+                    updated_feature_flag.web_feature_flag_config.rollout_percentage,
                     50,
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.user_group_ids, []
+                    updated_feature_flag.web_feature_flag_config.user_group_ids,
+                    [],
                 )
 
         self.logout()
@@ -424,7 +425,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature_flag_services, 'ALL_WEB_FEATURES_NAMES_SET', set([])
         )
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
+            web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
@@ -459,7 +460,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
+            web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.TEST_FEATURE_2.value: (

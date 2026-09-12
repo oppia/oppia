@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the domain objects relating to feature flags."""
+"""Tests for the domain objects relating to web feature flags."""
 
 from __future__ import annotations
 
@@ -28,48 +28,48 @@ class WebFeatureFlagSpecTests(test_utils.GenericTestBase):
     """Tests for WebFeatureFlagSpec."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
                 'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
             }
         )
         self.assertIsInstance(
-            feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
         )
-        self.assertEqual(feature_flag_spec.description, 'for test')
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
         self.assertEqual(
-            feature_flag_spec.feature_stage,
+            web_feature_flag_spec.feature_stage,
             web_feature_flag_domain.FeatureStages.DEV,
         )
 
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
                 'feature_stage': web_feature_flag_domain.FeatureStages.TEST.value,
             }
         )
         self.assertIsInstance(
-            feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
         )
-        self.assertEqual(feature_flag_spec.description, 'for test')
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
         self.assertEqual(
-            feature_flag_spec.feature_stage,
+            web_feature_flag_spec.feature_stage,
             web_feature_flag_domain.FeatureStages.TEST,
         )
 
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
                 'feature_stage': web_feature_flag_domain.FeatureStages.PROD.value,
             }
         )
         self.assertIsInstance(
-            feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
         )
-        self.assertEqual(feature_flag_spec.description, 'for test')
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
         self.assertEqual(
-            feature_flag_spec.feature_stage,
+            web_feature_flag_spec.feature_stage,
             web_feature_flag_domain.FeatureStages.PROD,
         )
 
@@ -84,27 +84,27 @@ class WebFeatureFlagSpecTests(test_utils.GenericTestBase):
             )
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        feature_flag_spec_dict: (
+        web_feature_flag_spec_dict: (
             web_feature_flag_domain.WebFeatureFlagSpecDict
         ) = {
             'description': 'for test',
             'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
         }
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
             'for test', web_feature_flag_domain.FeatureStages.DEV
         )
         self.assertDictEqual(
-            feature_flag_spec.to_dict(), feature_flag_spec_dict
+            web_feature_flag_spec.to_dict(), web_feature_flag_spec_dict
         )
 
 
-class FeatureFlagConfigTests(test_utils.GenericTestBase):
-    """Tests for FeatureFlagConfig."""
+class WebFeatureFlagConfigTests(test_utils.GenericTestBase):
+    """Tests for WebFeatureFlagConfig."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
         current_time = utils.get_current_utc_datetime()
-        feature_flag_config = (
-            web_feature_flag_domain.FeatureFlagConfig.from_dict(
+        web_feature_flag_config = (
+            web_feature_flag_domain.WebFeatureFlagConfig.from_dict(
                 {
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 0,
@@ -117,17 +117,18 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         )
 
         self.assertIsInstance(
-            feature_flag_config, web_feature_flag_domain.FeatureFlagConfig
+            web_feature_flag_config,
+            web_feature_flag_domain.WebFeatureFlagConfig,
         )
-        self.assertFalse(feature_flag_config.force_enable_for_all_users)
-        self.assertEqual(feature_flag_config.rollout_percentage, 0)
-        self.assertEqual(feature_flag_config.user_group_ids, [])
-        self.assertEqual(feature_flag_config.last_updated, current_time)
+        self.assertFalse(web_feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(web_feature_flag_config.rollout_percentage, 0)
+        self.assertEqual(web_feature_flag_config.user_group_ids, [])
+        self.assertEqual(web_feature_flag_config.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
         current_time = utils.get_current_utc_datetime()
-        feature_flag_config_dict: (
-            web_feature_flag_domain.FeatureFlagConfigDict
+        web_feature_flag_config_dict: (
+            web_feature_flag_domain.WebFeatureFlagConfigDict
         ) = {
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
@@ -136,42 +137,45 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                 current_time
             ),
         }
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], current_time
         )
         self.assertDictEqual(
-            feature_flag_config.to_dict(), feature_flag_config_dict
+            web_feature_flag_config.to_dict(), web_feature_flag_config_dict
         )
 
     def test_set_object_values_correctly(self) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
         current_time = utils.get_current_utc_datetime()
-        feature_flag_config.set_force_enable_for_all_users(True)
-        feature_flag_config.set_rollout_percentage(50)
-        feature_flag_config.set_user_group_ids(['user_group_1', 'user_group_2'])
-        feature_flag_config.set_last_updated(current_time)
-
-        self.assertTrue(feature_flag_config.force_enable_for_all_users)
-        self.assertEqual(feature_flag_config.rollout_percentage, 50)
-        self.assertEqual(
-            feature_flag_config.user_group_ids, ['user_group_1', 'user_group_2']
+        web_feature_flag_config.set_force_enable_for_all_users(True)
+        web_feature_flag_config.set_rollout_percentage(50)
+        web_feature_flag_config.set_user_group_ids(
+            ['user_group_1', 'user_group_2']
         )
-        self.assertEqual(feature_flag_config.last_updated, current_time)
+        web_feature_flag_config.set_last_updated(current_time)
 
-    def test_validate_feature_flag_config_passes_without_exception(
+        self.assertTrue(web_feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(web_feature_flag_config.rollout_percentage, 50)
+        self.assertEqual(
+            web_feature_flag_config.user_group_ids,
+            ['user_group_1', 'user_group_2'],
+        )
+        self.assertEqual(web_feature_flag_config.last_updated, current_time)
+
+    def test_validate_web_feature_flag_config_passes_without_exception(
         self,
     ) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
-        feature_flag_config.validate(web_feature_flag_domain.ServerMode.DEV)
+        web_feature_flag_config.validate(web_feature_flag_domain.ServerMode.DEV)
 
     def test_validate_feature_flag_with_percentage_less_than_0_raises_exception(
         self,
     ) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, -1, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
@@ -179,12 +183,14 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             'Feature flag rollout-percentage should be between '
             '0 and 100 inclusive.',
         ):
-            feature_flag_config.validate(web_feature_flag_domain.ServerMode.DEV)
+            web_feature_flag_config.validate(
+                web_feature_flag_domain.ServerMode.DEV
+            )
 
     def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
         self,
     ) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 101, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
@@ -192,10 +198,12 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             'Feature flag rollout-percentage should be between '
             '0 and 100 inclusive.',
         ):
-            feature_flag_config.validate(web_feature_flag_domain.ServerMode.DEV)
+            web_feature_flag_config.validate(
+                web_feature_flag_domain.ServerMode.DEV
+            )
 
     def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
@@ -205,12 +213,12 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in test '
                     'environment.',
                 ):
-                    feature_flag_config.validate(
+                    web_feature_flag_config.validate(
                         web_feature_flag_domain.ServerMode.DEV
                     )
 
     def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
@@ -220,12 +228,12 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in prod '
                     'environment.',
                 ):
-                    feature_flag_config.validate(
+                    web_feature_flag_config.validate(
                         web_feature_flag_domain.ServerMode.DEV
                     )
 
     def test_validate_test_feature_for_prod_env_raises_exception(self) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
@@ -235,13 +243,13 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                     'Feature flag in test stage cannot be updated in prod '
                     'environment.',
                 ):
-                    feature_flag_config.validate(
+                    web_feature_flag_config.validate(
                         web_feature_flag_domain.ServerMode.TEST
                     )
 
 
-class FeatureFlagTests(test_utils.GenericTestBase):
-    """Tests for FeatureFlag."""
+class WebFeatureFlagTests(test_utils.GenericTestBase):
+    """Tests for WebFeatureFlag."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
         current_time = utils.get_current_utc_datetime()
@@ -261,29 +269,35 @@ class FeatureFlagTests(test_utils.GenericTestBase):
 
         self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
         self.assertEqual(feature_flag.name, 'feature_a')
-        self.assertEqual(feature_flag.feature_flag_spec.description, 'for test')
         self.assertEqual(
-            feature_flag.feature_flag_spec.feature_stage,
+            feature_flag.web_feature_flag_spec.description, 'for test'
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_spec.feature_stage,
             web_feature_flag_domain.FeatureStages.DEV,
         )
         self.assertFalse(
-            feature_flag.feature_flag_config.force_enable_for_all_users
+            feature_flag.web_feature_flag_config.force_enable_for_all_users
         )
-        self.assertEqual(feature_flag.feature_flag_config.rollout_percentage, 0)
-        self.assertEqual(feature_flag.feature_flag_config.user_group_ids, [])
         self.assertEqual(
-            feature_flag.feature_flag_config.last_updated, current_time
+            feature_flag.web_feature_flag_config.rollout_percentage, 0
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.user_group_ids, []
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.last_updated, current_time
         )
 
     def test_to_dict_returns_correct_dict(self) -> None:
         current_time = utils.get_current_utc_datetime()
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], current_time
         )
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
             'for test', web_feature_flag_domain.FeatureStages.DEV
         )
-        feature_flag_dict: web_feature_flag_domain.FeatureFlagDict = {
+        feature_flag_dict: web_feature_flag_domain.WebFeatureFlagDict = {
             'name': 'feature_a',
             'description': 'for test',
             'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
@@ -295,7 +309,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             ),
         }
         feature_flag = web_feature_flag_domain.FeatureFlag(
-            'feature_a', feature_flag_spec, feature_flag_config
+            'feature_a', web_feature_flag_spec, web_feature_flag_config
         )
         feature_flag.validate()
         self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
@@ -303,14 +317,14 @@ class FeatureFlagTests(test_utils.GenericTestBase):
     def test_validate_feature_flag_with_invalid_name_raises_exception(
         self,
     ) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 0, [], utils.get_current_utc_datetime()
         )
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
             'for test', web_feature_flag_domain.FeatureStages.DEV
         )
         feature_flag = web_feature_flag_domain.FeatureFlag(
-            'Invalid~Name', feature_flag_spec, feature_flag_config
+            'Invalid~Name', web_feature_flag_spec, web_feature_flag_config
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -321,14 +335,14 @@ class FeatureFlagTests(test_utils.GenericTestBase):
     def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
         self,
     ) -> None:
-        feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
             False, 101, [], utils.get_current_utc_datetime()
         )
-        feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
             'Feature Description', web_feature_flag_domain.ServerMode.DEV
         )
         feature_flag = web_feature_flag_domain.FeatureFlag(
-            'Feature', feature_flag_spec, feature_flag_config
+            'Feature', web_feature_flag_spec, web_feature_flag_config
         )
         with self.assertRaisesRegex(
             utils.ValidationError,

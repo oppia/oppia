@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for feature_flag_services.py."""
+"""Unit tests for web_feature_flag_services.py."""
 
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ import enum
 from core import feconf
 from core.constants import constants
 from core.domain import web_feature_flag_domain
-from core.domain import feature_flag_registry as registry
-from core.domain import feature_flag_services as feature_services
+from core.domain import web_feature_flag_registry as registry
+from core.domain import web_feature_flag_services as feature_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -154,21 +154,21 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
-            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.test_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_B.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in test stage', FeatureStages.TEST
             ),
-            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_C.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
-            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
 
         with self.swap_all_feature_names_set:
@@ -309,7 +309,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 ):
                     feature_services.get_all_web_feature_flags()
 
-    def test_get_feature_flag_configs_with_unknown_name_raises_error(
+    def test_get_web_feature_flag_configs_with_unknown_name_raises_error(
         self,
     ) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
@@ -340,7 +340,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     'unknown_feature', True, 0, []
                 )
 
-    def test_get_all_feature_flag_configs_in_dev_returns_correct_values(
+    def test_get_all_web_feature_flag_configs_in_dev_returns_correct_values(
         self,
     ) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
@@ -351,7 +351,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 constants, 'DEV_MODE', True
             ):
                 self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_configs(
+                    feature_services.evaluate_all_web_feature_flag_configs(
                         self.owner_id
                     ),
                     {
@@ -361,7 +361,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     },
                 )
 
-    def test_get_all_feature_flag_configs_in_test_returns_correct_values(
+    def test_get_all_web_feature_flag_configs_in_test_returns_correct_values(
         self,
     ) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
@@ -375,7 +375,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             with self.swap_name_to_description_feature_stage_dict:
                 with constants_swap, env_swap:
                     self.assertEqual(
-                        feature_services.evaluate_all_feature_flag_configs(
+                        feature_services.evaluate_all_web_feature_flag_configs(
                             self.owner_id
                         ),
                         {
@@ -385,7 +385,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         },
                     )
 
-    def test_get_all_feature_flag_configs_in_prod_returns_correct_values(
+    def test_get_all_web_feature_flag_configs_in_prod_returns_correct_values(
         self,
     ) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
@@ -397,7 +397,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             with self.swap_name_to_description_feature_stage_dict:
                 with constants_swap, env_swap:
                     self.assertEqual(
-                        feature_services.evaluate_all_feature_flag_configs(
+                        feature_services.evaluate_all_web_feature_flag_configs(
                             self.owner_id
                         ),
                         {
@@ -694,7 +694,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     )
                 )
 
-    def test_feature_flag_config_is_same_for_user_with_every_retrieval(
+    def test_web_feature_flag_config_is_same_for_user_with_every_retrieval(
         self,
     ) -> None:
         user_1_id, user_2_id, user_3_id = (

@@ -56,7 +56,7 @@ def get_server_mode() -> ServerMode:
     )
 
 
-class FeatureFlagDict(TypedDict):
+class WebFeatureFlagDict(TypedDict):
     """Dictionary representing FeatureFlag object."""
 
     name: str
@@ -76,12 +76,12 @@ class FeatureFlag:
     def __init__(
         self,
         name: str,
-        feature_flag_spec: WebFeatureFlagSpec,
-        feature_flag_config: FeatureFlagConfig,
+        web_feature_flag_spec: WebFeatureFlagSpec,
+        web_feature_flag_config: WebFeatureFlagConfig,
     ):
         self._name = name
-        self._feature_flag_spec = feature_flag_spec
-        self._feature_flag_config = feature_flag_config
+        self._web_feature_flag_spec = web_feature_flag_spec
+        self._web_feature_flag_config = web_feature_flag_config
 
     @property
     def name(self) -> str:
@@ -93,14 +93,14 @@ class FeatureFlag:
         return self._name
 
     @property
-    def feature_flag_spec(self) -> WebFeatureFlagSpec:
+    def web_feature_flag_spec(self) -> WebFeatureFlagSpec:
         """The WebFeatureFlagSpec property of FeatureFlag."""
-        return self._feature_flag_spec
+        return self._web_feature_flag_spec
 
     @property
-    def feature_flag_config(self) -> FeatureFlagConfig:
-        """The FeatureFlagConfig property of FeatureFlag."""
-        return self._feature_flag_config
+    def web_feature_flag_config(self) -> WebFeatureFlagConfig:
+        """The WebFeatureFlagConfig property of FeatureFlag."""
+        return self._web_feature_flag_config
 
     def validate(self) -> None:
         """Validates the FeatureFlag object."""
@@ -110,11 +110,11 @@ class FeatureFlag:
                 '%s.' % (self._name, self.FEATURE_NAME_REGEXP)
             )
 
-        self._feature_flag_config.validate(
-            self._feature_flag_spec.feature_stage
+        self._web_feature_flag_config.validate(
+            self._web_feature_flag_spec.feature_stage
         )
 
-    def to_dict(self) -> FeatureFlagDict:
+    def to_dict(self) -> WebFeatureFlagDict:
         """Returns a dict representation of the FeatureFlag domain object.
 
         Returns:
@@ -122,52 +122,56 @@ class FeatureFlag:
         """
         last_updated = (
             utils.convert_naive_datetime_to_string(
-                self._feature_flag_config.last_updated
+                self._web_feature_flag_config.last_updated
             )
-            if self._feature_flag_config.last_updated
+            if self._web_feature_flag_config.last_updated
             else None
         )
         return {
             'name': self._name,
-            'description': self._feature_flag_spec.description,
-            'feature_stage': self._feature_flag_spec.feature_stage.value,
+            'description': self._web_feature_flag_spec.description,
+            'feature_stage': self._web_feature_flag_spec.feature_stage.value,
             'force_enable_for_all_users': (
-                self._feature_flag_config.force_enable_for_all_users
+                self._web_feature_flag_config.force_enable_for_all_users
             ),
-            'rollout_percentage': self._feature_flag_config.rollout_percentage,
-            'user_group_ids': self._feature_flag_config.user_group_ids,
+            'rollout_percentage': self._web_feature_flag_config.rollout_percentage,
+            'user_group_ids': self._web_feature_flag_config.user_group_ids,
             'last_updated': last_updated,
         }
 
     @classmethod
-    def from_dict(cls, feature_dict: FeatureFlagDict) -> FeatureFlag:
+    def from_dict(cls, web_feature_dict: WebFeatureFlagDict) -> FeatureFlag:
         """Returns an FeatureFlag object from dictionary.
 
         Args:
-            feature_dict: dict. A dict mapping of all fields of
+            web_feature_dict: dict. A dict mapping of all fields of
                 FeatureFlag object.
 
         Returns:
             FeatureFlag. The corresponding FeatureFlag domain object.
         """
-        feature_flag_spec = WebFeatureFlagSpec.from_dict(
+        web_feature_flag_spec = WebFeatureFlagSpec.from_dict(
             {
-                'description': feature_dict['description'],
-                'feature_stage': feature_dict['feature_stage'],
+                'description': web_feature_dict['description'],
+                'feature_stage': web_feature_dict['feature_stage'],
             }
         )
-        feature_flag_config = FeatureFlagConfig.from_dict(
+        web_feature_flag_config = WebFeatureFlagConfig.from_dict(
             {
-                'force_enable_for_all_users': feature_dict[
+                'force_enable_for_all_users': web_feature_dict[
                     'force_enable_for_all_users'
                 ],
-                'rollout_percentage': feature_dict['rollout_percentage'],
-                'user_group_ids': feature_dict['user_group_ids'],
-                'last_updated': feature_dict['last_updated'],
+                'rollout_percentage': web_feature_dict['rollout_percentage'],
+                'user_group_ids': web_feature_dict['user_group_ids'],
+                'last_updated': web_feature_dict['last_updated'],
             }
         )
 
-        return cls(feature_dict['name'], feature_flag_spec, feature_flag_config)
+        return cls(
+            web_feature_dict['name'],
+            web_feature_flag_spec,
+            web_feature_flag_config,
+        )
 
 
 class WebFeatureFlagSpecDict(TypedDict):
@@ -215,12 +219,12 @@ class WebFeatureFlagSpec:
 
     @classmethod
     def from_dict(
-        cls, feature_dict: WebFeatureFlagSpecDict
+        cls, web_feature_dict: WebFeatureFlagSpecDict
     ) -> WebFeatureFlagSpec:
         """Returns an WebFeatureFlagSpec object from dictionary.
 
         Args:
-            feature_dict: dict. A dict mapping of all fields of
+            web_feature_dict: dict. A dict mapping of all fields of
                 WebFeatureFlagSpec object.
 
         Returns:
@@ -229,11 +233,11 @@ class WebFeatureFlagSpec:
         Raises:
             Exception. Invalid feature stage.
         """
-        if feature_dict['feature_stage'] == 'dev':
+        if web_feature_dict['feature_stage'] == 'dev':
             feature_stage = ServerMode.DEV
-        elif feature_dict['feature_stage'] == 'test':
+        elif web_feature_dict['feature_stage'] == 'test':
             feature_stage = ServerMode.TEST
-        elif feature_dict['feature_stage'] == 'prod':
+        elif web_feature_dict['feature_stage'] == 'prod':
             feature_stage = ServerMode.PROD
         else:
             raise Exception(
@@ -241,11 +245,11 @@ class WebFeatureFlagSpec:
                 'ServerMode.TEST or ServerMode.PROD.'
             )
 
-        return cls(feature_dict['description'], feature_stage)
+        return cls(web_feature_dict['description'], feature_stage)
 
 
-class FeatureFlagConfigDict(TypedDict):
-    """Dictionary representing FeatureFlagConfig object."""
+class WebFeatureFlagConfigDict(TypedDict):
+    """Dictionary representing WebFeatureFlagConfig object."""
 
     force_enable_for_all_users: bool
     rollout_percentage: int
@@ -253,8 +257,8 @@ class FeatureFlagConfigDict(TypedDict):
     last_updated: Optional[str]
 
 
-class FeatureFlagConfig:
-    """The FeatureFlagConfig domain object."""
+class WebFeatureFlagConfig:
+    """The WebFeatureFlagConfig domain object."""
 
     def __init__(
         self,
@@ -280,7 +284,7 @@ class FeatureFlagConfig:
     def set_force_enable_for_all_users(
         self, force_enable_for_all_users: bool
     ) -> None:
-        """Sets the force_enable_for_all_users of FeatureFlagConfig.
+        """Sets the force_enable_for_all_users of WebFeatureFlagConfig.
 
         Args:
             force_enable_for_all_users: bool. The new value of
@@ -298,7 +302,7 @@ class FeatureFlagConfig:
         return self._rollout_percentage
 
     def set_rollout_percentage(self, rollout_percentage: int) -> None:
-        """Sets the rollout_percentage of FeatureFlagConfig.
+        """Sets the rollout_percentage of WebFeatureFlagConfig.
 
         Args:
             rollout_percentage: int. The new value of rollout_percentage.
@@ -315,7 +319,7 @@ class FeatureFlagConfig:
         return self._user_group_ids
 
     def set_user_group_ids(self, user_group_ids: List[str]) -> None:
-        """Sets the user_group_ids of FeatureFlagConfig.
+        """Sets the user_group_ids of WebFeatureFlagConfig.
 
         Args:
             user_group_ids: List[str]. The new value of user_group_ids.
@@ -334,7 +338,7 @@ class FeatureFlagConfig:
         return self._last_updated
 
     def set_last_updated(self, last_updated: datetime.datetime) -> None:
-        """Sets the last_updated field of the FeatureFlagConfig.
+        """Sets the last_updated field of the WebFeatureFlagConfig.
 
         Args:
             last_updated: datetime.datetime. The new value of last_updated.
@@ -342,7 +346,7 @@ class FeatureFlagConfig:
         self._last_updated = last_updated
 
     def validate(self, feature_stage: ServerMode) -> None:
-        """Validates the FeatureFlagConfig object."""
+        """Validates the WebFeatureFlagConfig object."""
         if self._rollout_percentage < 0 or self._rollout_percentage > 100:
             raise utils.ValidationError(
                 'Feature flag rollout-percentage should be between '
@@ -364,11 +368,11 @@ class FeatureFlagConfig:
                 'in %s environment.' % (feature_stage.value, server_mode.value)
             )
 
-    def to_dict(self) -> FeatureFlagConfigDict:
-        """Returns a dict representation of the FeatureFlagConfig domain object.
+    def to_dict(self) -> WebFeatureFlagConfigDict:
+        """Returns a dict representation of the WebFeatureFlagConfig domain object.
 
         Returns:
-            dict. A dict mapping of all fields of FeatureFlagConfig object.
+            dict. A dict mapping of all fields of WebFeatureFlagConfig object.
         """
         last_updated = (
             utils.convert_naive_datetime_to_string(self.last_updated)
@@ -384,28 +388,28 @@ class FeatureFlagConfig:
 
     @classmethod
     def from_dict(
-        cls, feature_flag_config_dict: FeatureFlagConfigDict
-    ) -> FeatureFlagConfig:
-        """Returns an FeatureFlagConfig object from dictionary.
+        cls, web_feature_flag_config_dict: WebFeatureFlagConfigDict
+    ) -> WebFeatureFlagConfig:
+        """Returns an WebFeatureFlagConfig object from dictionary.
 
         Args:
-            feature_flag_config_dict: dict. A dict mapping of all fields of
-                FeatureFlagConfig object.
+            web_feature_flag_config_dict: dict. A dict mapping of all fields of
+                WebFeatureFlagConfig object.
 
         Returns:
-            FeatureFlagConfig. The corresponding FeatureFlagConfig domain
+            WebFeatureFlagConfig. The corresponding WebFeatureFlagConfig domain
             object.
         """
         last_updated = (
             utils.convert_string_to_naive_datetime_object(
-                feature_flag_config_dict['last_updated']
+                web_feature_flag_config_dict['last_updated']
             )
-            if isinstance(feature_flag_config_dict['last_updated'], str)
+            if isinstance(web_feature_flag_config_dict['last_updated'], str)
             else None
         )
         return cls(
-            feature_flag_config_dict['force_enable_for_all_users'],
-            feature_flag_config_dict['rollout_percentage'],
-            feature_flag_config_dict['user_group_ids'],
+            web_feature_flag_config_dict['force_enable_for_all_users'],
+            web_feature_flag_config_dict['rollout_percentage'],
+            web_feature_flag_config_dict['user_group_ids'],
             last_updated,
         )

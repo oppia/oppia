@@ -24,7 +24,7 @@ import re
 from core import feature_flag_list
 from core.domain import (
     web_feature_flag_domain,
-    feature_flag_registry,
+    web_feature_flag_registry,
     platform_parameter_list,
 )
 from core.tests import test_utils
@@ -120,11 +120,11 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.DEV_FEATURES_LIST:
-            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+            feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
             if (
-                feature_flag.feature_flag_spec.feature_stage
+                feature_flag.web_feature_flag_spec.feature_stage
                 != web_feature_flag_domain.FeatureStages.DEV
             ):
                 invalid_feature_names.append(feature.value)
@@ -137,11 +137,11 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
     def test_all_entries_in_test_features_list_are_in_test_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.TEST_FEATURES_LIST:
-            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+            feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
             if (
-                feature_flag.feature_flag_spec.feature_stage
+                feature_flag.web_feature_flag_spec.feature_stage
                 != web_feature_flag_domain.FeatureStages.TEST
             ):
                 invalid_feature_names.append(feature.value)
@@ -154,11 +154,11 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.PROD_FEATURES_LIST:
-            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+            feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
             if (
-                feature_flag.feature_flag_spec.feature_stage
+                feature_flag.web_feature_flag_spec.feature_stage
                 != web_feature_flag_domain.FeatureStages.PROD
             ):
                 invalid_feature_names.append(feature.value)

@@ -20,7 +20,7 @@ import enum
 
 from core import feature_flag_list
 from core.domain import web_feature_flag_domain
-from core.domain import feature_flag_registry as registry
+from core.domain import web_feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
@@ -71,14 +71,14 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
-            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_B.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
-            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         with self.swap_name_to_description_feature_stage_registry_dict:
             registry.Registry.update_web_feature_flag(
