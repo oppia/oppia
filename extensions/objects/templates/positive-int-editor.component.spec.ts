@@ -46,4 +46,13 @@ describe('PositiveInt', function () {
     component.updateValue(2);
     expect(component.value).toEqual(2);
   });
+
+  it('should not update the value when the input is not a number', () => {
+    component.updateValue(2);
+    expect(component.value).toEqual(2);
+
+    component.updateValue('foo');
+
+    expect(component.value).toEqual(2);
+  });
 });

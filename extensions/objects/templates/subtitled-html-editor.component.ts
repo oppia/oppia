@@ -25,10 +25,13 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Schema} from 'services/schema-default-value.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
 interface SubtitledHtmlEditorSchema {
-  type: string;
+  type: 'html';
   ui_config: Schema | {};
 }
 
@@ -62,7 +65,12 @@ export class SubtitledHtmlEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: string): void {
+  updateValue(newValue: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only html strings are accepted.
+    if (typeof newValue !== 'string') {
+      return;
+    }
     if (this.value) {
       if (this.value.html === newValue) {
         return;

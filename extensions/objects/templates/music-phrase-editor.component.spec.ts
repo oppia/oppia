@@ -114,6 +114,14 @@ describe('MusicPhraseEditorComponent', () => {
     expect(component.localValue).toEqual(['C4']);
   });
 
+  it('should not execute updateValue when the input is not a string array', () => {
+    component.localValue = ['C4'];
+
+    component.updateValue('C4');
+
+    expect(component.localValue).toEqual(['C4']);
+  });
+
   it('should return schema when called', () => {
     expect(component.getSchema()).toEqual({
       type: 'list',
