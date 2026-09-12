@@ -575,4 +575,34 @@ describe('FeedbackDetailPageComponent', () => {
       '/create/exp1#/feedback/lesson_feedback/parent1'
     );
   });
+
+  it('should return early false if feedbackDetailResponse is null', () => {
+    component.feedbackDetailResponse = null;
+
+    expect(component.shouldShowStatusOption(FeedbackStatus.COMPLIMENT)).toBe(
+      false
+    );
+  });
+
+  it('should hide Compliment status option for Typo category', () => {
+    component.feedbackDetailResponse = {
+      ...mockPlatformFeedbackDetailResponse,
+      category: ReportAnIssueCategory.TYPO,
+    };
+
+    expect(component.shouldShowStatusOption(FeedbackStatus.COMPLIMENT)).toBe(
+      false
+    );
+  });
+
+  it('should show status option when condition is not met', () => {
+    component.feedbackDetailResponse = {
+      ...mockPlatformFeedbackDetailResponse,
+      category: ReportAnIssueCategory.OTHER_OR_NOT_SURE,
+    };
+
+    expect(component.shouldShowStatusOption(FeedbackStatus.COMPLIMENT)).toBe(
+      true
+    );
+  });
 });

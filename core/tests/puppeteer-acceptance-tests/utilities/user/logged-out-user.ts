@@ -675,6 +675,7 @@ const cancelFeedbackUploadButtonSelector =
 const feedbackScreenshotPreviewSelector =
   '.e2e-test-feedback-screenshot-preview';
 const feedbackModalSubHeader = '.e2e-test-modal-subHeader';
+const feedbackModalMicrocopy = '.e2e-test-lesson-feedback-microcopy';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6491,6 +6492,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks on the include technical log checkbox.
+   */
+  async clickOnIncludetechnicalLogCheckbox(): Promise<void> {
+    await this.expectElementToBeClickable(technicalLogsSelector, true);
+    await this.clickOnElementWithSelector(technicalLogsSelector);
+  }
+
+  /**
    * Waits for the Cloudflare Turnstile iframe to finish loading.
    * This avoids interacting with the captcha before the third-party
    * iframe has been fully initialized.
@@ -6703,6 +6712,17 @@ export class LoggedOutUser extends BaseUser {
   async expectFeedbackModalSubHeaderToBe(expectedText: string): Promise<void> {
     await this.expectElementToBeVisible(feedbackModalSubHeader);
     await this.expectTextContentToContain(feedbackModalSubHeader, expectedText);
+  }
+
+  /**
+   * Checks if the microcopy of the lesson feedback modal matches the expected text.
+   * @param expectedText - The expected text of the microcopy.
+   */
+  async expectLessonFeedbackModalmicrocopyToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackModalMicrocopy);
+    await this.expectTextContentToContain(feedbackModalMicrocopy, expectedText);
   }
 
   /**
