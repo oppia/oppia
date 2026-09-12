@@ -304,7 +304,6 @@ const googleGroupSignUpLinkInTermsPage =
 const emailLinkSelector = '.oppia-contact-mail';
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
-const classroomNameHeading = '.e2e-test-classroom-name';
 const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
@@ -3723,10 +3722,10 @@ export class LoggedOutUser extends BaseUser {
    * This function verifies that the user is on the correct classroom page.
    */
   async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
-    await this.page.waitForSelector(classroomNameHeading);
+    await this.page.waitForSelector(classroomNameSelector);
 
     const buttonText = await this.page.$eval(
-      classroomNameHeading,
+      classroomNameSelector,
       element => (element as HTMLHeadElement).innerText
     );
 
