@@ -16,7 +16,8 @@
  * @fileoverview Component for the attribution guide.
  */
 
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {AttributionService} from 'services/attribution.service';
@@ -39,6 +40,10 @@ export class AttributionGuideComponent implements OnInit {
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
   printAttributionLink: string = '';
+  @ViewChild('htmlAttributionTooltip', {static: false})
+  htmlAttributionTooltip!: NgbTooltip;
+  @ViewChild('printAttributionTooltip', {static: false})
+  printAttributionTooltip!: NgbTooltip;
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
@@ -115,8 +120,18 @@ export class AttributionGuideComponent implements OnInit {
     selection?.addRange(range);
     document.execCommand('copy');
     selection?.removeAllRanges();
-    codeDiv.setAttribute('title', 'Copied!');
-    codeDiv.dispatchEvent(new Event('mouseenter'));
-    setTimeout(() => codeDiv.removeAttribute('title'), 1000);
+    this.showCopiedTooltip(className);
+  }
+
+  private showCopiedTooltip(className: string): void {
+    const tooltip =
+      className === 'attribution-html-code'
+        ? this.htmlAttributionTooltip
+        : this.printAttributionTooltip;
+    if (!tooltip) {
+      return;
+    }
+    tooltip.open();
+    setTimeout(() => tooltip.close(), 1000);
   }
 }
