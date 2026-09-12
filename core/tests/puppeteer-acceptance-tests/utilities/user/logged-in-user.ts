@@ -5359,9 +5359,14 @@ export class LoggedInUser extends BaseUser {
    * @param {number} arcNodeIndex - The zero-based index of the dock lesson
    *   badge for the later arc.
    */
-  async clickDockBadgeAndExpectSkipModalToShowThenCancel(
-    arcNodeIndex: number
-  ): Promise<void> {
+  /**
+   * Clicks the dock badge at the given index and then the Start button of the
+   * selected lesson. Starting a lesson of a later, incomplete adventure
+   * triggers the skip confirmation modal.
+   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later arc.
+   */
+  async clickDockBadge(arcNodeIndex: number): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
       const targetBadge = circleBadges[arcNodeIndex];
@@ -5376,13 +5381,26 @@ export class LoggedInUser extends BaseUser {
 
       const startButtonSelector = `#lesson-${targetLessonNumber} .e2e-test-lesson-card-start-button`;
       await this.clickOnElementWithSelector(startButtonSelector);
-
-      await this.expectElementToBeVisible(arcSkipModalSelector);
-      await this.expectElementToBeVisible(arcSkipCancelButtonSelector);
-      await this.expectElementToBeVisible(arcSkipProceedButtonSelector);
-      await this.clickOnElementWithSelector(arcSkipCancelButtonSelector);
-      await this.expectElementToBeVisible(arcSkipModalSelector, false);
     }
+  }
+
+  /**
+   * Expects the skip confirmation modal, with its Cancel and Continue buttons,
+   * to be visible.
+   */
+  async expectSkipConfirmationModalToShow(): Promise<void> {
+    await this.expectElementToBeVisible(arcSkipModalSelector);
+    await this.expectElementToBeVisible(arcSkipCancelButtonSelector);
+    await this.expectElementToBeVisible(arcSkipProceedButtonSelector);
+  }
+
+  /**
+   * Clicks the Cancel button of the skip confirmation modal and verifies that
+   * the modal closes.
+   */
+  async cancelSkipConfirmationModal(): Promise<void> {
+    await this.clickOnElementWithSelector(arcSkipCancelButtonSelector);
+    await this.expectElementToBeVisible(arcSkipModalSelector, false);
   }
 
   /**

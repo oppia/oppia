@@ -261,6 +261,10 @@ describe('Logged-in Learner', function () {
       );
 
       await loggedInLearner.expectDockScrollArrowsToBeShownOnlyWhenOverflowing();
+      // The CUJ "Sticky Progress Dock displays chapter nodes as a horizontal
+      // navigation track"; "Coming Soon" lessons are not displayed in it, so
+      // the topicPageDockScrollArrows screenshot captures only the published
+      // lessons' node track and its overflow scroll arrows.
       await loggedInLearner.expectScreenshotToMatch(
         'topicPageDockScrollArrows',
         __dirname
@@ -309,8 +313,11 @@ describe('Logged-in Learner', function () {
         'This chapter will be available soon.'
       );
       await loggedInLearner.expectDockLessonNumbersToBe(12, [13, 14]);
-      // The topicPageComingSoonSection screenshot captures the Coming Soon section
-      // with its single placeholder card and badge.
+      // The CUJ requires the Coming Soon section to "Display a single 'Ready
+      // to Publish' placeholder card with a Coming Soon badge" and to
+      // "Suppress downstream draft/locked chapters", so the
+      // topicPageComingSoonSection screenshot captures the single placeholder
+      // card on the page with the downstream draft/locked chapters absent.
       await loggedInLearner.expectScreenshotToMatch(
         'topicPageComingSoonSection',
         __dirname
@@ -318,6 +325,11 @@ describe('Logged-in Learner', function () {
 
       await loggedInLearner.clickComingSoonCardAndExpectNoNavigation(
         '/learn/math/fractions'
+      );
+      // The CUJ requires the clicked Coming Soon placeholder card to display
+      // the message "This chapter will be available soon".
+      await loggedInLearner.expectComingSoonDescriptionToContain(
+        'This chapter will be available soon.'
       );
 
       // The CUJ Coming Soon Presentation requires downstream draft/locked
@@ -515,7 +527,9 @@ describe('Logged-in Learner', function () {
       // second adventure. The arcs group the 12 published lessons as 1-3,
       // 4-6, 7-9 and 10-12, so lesson 4 is the first lesson outside the first
       // (still incomplete) adventure and can trigger the skip flows.
-      await loggedInLearner.clickDockBadgeAndExpectSkipModalToShowThenCancel(3);
+      await loggedInLearner.clickDockBadge(3);
+      await loggedInLearner.expectSkipConfirmationModalToShow();
+      await loggedInLearner.cancelSkipConfirmationModal();
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -548,6 +562,14 @@ describe('Logged-in Learner', function () {
         await loggedInLearner.openTopicPage('math', 'fractions');
         await loggedInLearner.expectCompletedLessonToBeVisible();
       }
+
+      // The CUJ "Complete Lesson 13 and return to the topic page" requires the
+      // completed chapter (the final published lesson in this fixture) to be
+      // marked as completed with the ✅ indicator, collapse into a compact row,
+      // and display the "Play Again" quick action.
+      await loggedInLearner.openTopicPage('math', 'fractions');
+      await loggedInLearner.expectCompletedLessonToBeVisible();
+      await loggedInLearner.expectCompletedChapterToBeCollapsed();
     },
     SPEC_TIMEOUT_MSECS
   );
@@ -555,9 +577,17 @@ describe('Logged-in Learner', function () {
   it(
     'should be able to take the Mastery Challenge',
     async function () {
+      // The CUJ Locked Challenge Helper step (clicking the button shows a
+      // helper tooltip that auto-dismisses after ~5s instead of navigating)
+      // is covered in the second test above, where the story is still
+      // incomplete. Here the story is fully completed, so the challenge is
+      // unlocked and clicking it navigates to the practice session.
       await loggedInLearner.scrollMasteryChallengeCardIntoView();
       await loggedInLearner.expectMasteryChallengeToBeUnlocked();
       await loggedInLearner.clickMasteryChallengeAndNavigateToPracticeSession();
+      // Return to the topic page to verify that it now renders the
+      // adventure's practice test card (with its Practice Test CTA) after the
+      // challenge was unlocked and visited.
       await loggedInLearner.openTopicPage('math', 'fractions');
 
       await loggedInLearner.expectPracticeTestCardToBeVisible();
