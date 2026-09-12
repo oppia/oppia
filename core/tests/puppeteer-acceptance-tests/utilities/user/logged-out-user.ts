@@ -6662,11 +6662,7 @@ export class LoggedOutUser extends BaseUser {
    * @param feedback - The feedback to submit.
    */
   async submitFeedbackInTextArea(feedback: string): Promise<void> {
-    showMessage(`Before textarea click: ${await this.page.url()}`);
-
     await this.clickOnElementWithSelector(feedbackModaltextarea);
-
-    showMessage(`After textarea click: ${await this.page.url()}`);
     await this.typeInInputField(feedbackModaltextarea, feedback);
   }
 
