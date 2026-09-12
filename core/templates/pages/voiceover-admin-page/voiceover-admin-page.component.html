@@ -1,31 +1,47 @@
 <mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
   <h3 class="header-text">Update language/accent pairs that learners and voice artists can select</h3>
   <div class="card-content">
-    <div *ngIf="!pageIsInitialized">
-      <p>Loading ...</p>
+    <div *ngIf="!pageIsInitialized" class="oppia-voiceover-admin-loading-container">
+      <p>Loading<loading-dots></loading-dots></p>
     </div>
 
     <div *ngIf="pageIsInitialized">
-      <p class="oppia-supported-language-pair-heading"
+      <p class="oppia-supported-language-pair-heading-with-no-language"
          *ngIf="!languageAccentCodeIsPresent">
         No language/accent pairs added!
       </p>
       <p class="oppia-supported-language-pair-heading"
          *ngIf="languageAccentCodeIsPresent">
-        <span class="language-accent-header">
+        <span class="language-accent-status-column-header" aria-hidden="true"></span>
+        <span class="language-accent-description-header">
           Supported language/accent pairs
         </span>
-        <span>
+        <span class="language-accent-autogeneration-header">
           Supports autogeneration?
         </span>
+        <span class="language-accent-action-header" aria-hidden="true"></span>
       </p>
     </div>
-
     <div *ngIf="pageIsInitialized">
       <div>
         <mat-list class="oppia-supported-language-list">
           <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
             <div class="oppia-language-accent-list">
+              <span class="language-accent-status-column">
+                <mat-spinner *ngIf="languageAccentCodeBeingUpdated === languageAccentCodeToDescription.key"
+                             class="language-accent-job-status-spinner"
+                             color="accent"
+                             [diameter]="20">
+                </mat-spinner>
+                <mat-icon *ngIf="languageAccentCodeBeingUpdated !== languageAccentCodeToDescription.key && getBeamJobStateIcon(languageAccentCodeToDescription.key) as icon"
+                          class="language-accent-job-status"
+                          [class.error-icon]="getBeamJobStateIcon(languageAccentCodeToDescription.key) === 'error'"
+                          [matTooltip]="getBeamJobStateTooltip(languageAccentCodeToDescription.key)"
+                          [color]="getBeamJobStateMaterialThemeColor(languageAccentCodeToDescription.key)">
+                  {{icon}}
+                </mat-icon>
+
+              </span>
               <span class="language-accent-description">
                 {{languageAccentCodeToDescription.value}}
               </span>
@@ -50,6 +66,7 @@
                 </mat-form-field>
               </span>
               <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                      class="language-accent-remove-button"
                       mat-icon-button
                       mat-button>
                 <mat-icon>close</mat-icon>

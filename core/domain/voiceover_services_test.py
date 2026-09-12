@@ -24,7 +24,12 @@ import uuid
 from types import SimpleNamespace
 
 from core import constants, feconf, schema_utils
-from core.domain import exp_domain, exp_fetchers, exp_services
+from core.domain import (
+    beam_job_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+)
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
@@ -743,6 +748,129 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             retrieved_language_codes_mapping, language_codes_mapping
         )
+
+
+class LanguageAccentCodeToBeamJobRunServicesTests(test_utils.GenericTestBase):
+    def test_save_language_accent_code_to_beam_job_run_model(self) -> None:
+        voiceover_services.save_language_accent_code_to_beam_job_run_model(
+            'en-US', 'beam-job-run-id'
+        )
+
+        model = voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+            'en-US'
+        )
+        assert model is not None
+        self.assertEqual(model.language_accent_code, 'en-US')
+        self.assertEqual(model.beam_job_run_id, 'beam-job-run-id')
+
+    def test_save_language_accent_code_to_beam_job_run_model_updates_existing(
+        self,
+    ) -> None:
+        voiceover_services.save_language_accent_code_to_beam_job_run_model(
+            'en-US', 'beam-job-run-id-1'
+        )
+
+        model = voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+            'en-US'
+        )
+        assert model is not None
+        self.assertEqual(model.beam_job_run_id, 'beam-job-run-id-1')
+        initial_created_on = model.created_on
+        initial_last_updated = model.last_updated
+
+        voiceover_services.save_language_accent_code_to_beam_job_run_model(
+            'en-US', 'beam-job-run-id-2'
+        )
+
+        updated_model = (
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+                'en-US'
+            )
+        )
+        assert updated_model is not None
+        self.assertEqual(updated_model.language_accent_code, 'en-US')
+        self.assertEqual(updated_model.beam_job_run_id, 'beam-job-run-id-2')
+        self.assertEqual(updated_model.created_on, initial_created_on)
+        self.assertGreaterEqual(
+            updated_model.last_updated, initial_last_updated
+        )
+
+    def test_get_language_accent_code_to_beam_job_run_status(
+        self,
+    ) -> None:
+        en_us_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        en_us_beam_job_run_model.latest_job_state = 'RUNNING'
+        en_us_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'en-US', en_us_beam_job_run_model.id
+        ).put()
+
+        hi_in_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        hi_in_beam_job_run_model.latest_job_state = 'FAILED'
+        hi_in_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'hi-IN', hi_in_beam_job_run_model.id
+        ).put()
+
+        status = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
+        )
+
+        self.assertDictEqual(status, {'en-US': 'RUNNING', 'hi-IN': 'FAILED'})
+
+    def test_get_language_accent_code_to_beam_job_run_status_when_missing(
+        self,
+    ) -> None:
+        status = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
+        )
+
+        self.assertDictEqual(status, {})
+
+    def test_get_language_accent_code_to_beam_job_run_status_with_done_state(
+        self,
+    ) -> None:
+        en_us_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        en_us_beam_job_run_model.latest_job_state = 'DONE'
+        en_us_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'en-US', en_us_beam_job_run_model.id
+        ).put()
+
+        hi_in_beam_job_run_model = beam_job_services.create_beam_job_run_model(
+            'VoiceoverSynthesisByAccentJob'
+        )
+        hi_in_beam_job_run_model.latest_job_state = 'RUNNING'
+        hi_in_beam_job_run_model.put()
+        voiceover_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            'hi-IN', hi_in_beam_job_run_model.id
+        ).put()
+
+        status = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
+        )
+
+        self.assertDictEqual(status, {'en-US': 'DONE', 'hi-IN': 'RUNNING'})
+
+        en_us_model_after_status_check = (
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+                'en-US'
+            )
+        )
+        self.assertIsNone(en_us_model_after_status_check)
+
+        hi_in_model_after_status_check = (
+            voiceover_models.LanguageAccentCodeToBeamJobRunModel.get_model(
+                'hi-IN'
+            )
+        )
+        self.assertIsNotNone(hi_in_model_after_status_check)
 
     def test_get_and_set_azure_config_for_automatic_voiceovers(self) -> None:
         voiceover_autogeneration_policy_model = (
