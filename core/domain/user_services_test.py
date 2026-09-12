@@ -1187,7 +1187,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'EDIT_ANY_SUBTOPIC_PAGE',
                 'VISIT_ANY_QUESTION_EDITOR_PAGE',
                 'ACCESS_LEARNER_DASHBOARD',
-                'ACCESS_FEEDBACK_UPDATES',
                 'EDIT_ANY_ACTIVITY',
                 'VISIT_ANY_TOPIC_EDITOR_PAGE',
                 'SUGGEST_CHANGES',
