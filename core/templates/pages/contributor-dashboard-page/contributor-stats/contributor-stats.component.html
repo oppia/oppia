@@ -193,7 +193,7 @@
         </button>
       </div>
       <div class="certificate-download-button-container"
-           *ngIf="type == 'translationContribution'">
+           *ngIf="type == 'translationContribution' || type == 'translationReview'">
         <button class="btn btn-success certificate-download-button"
                 (click)="openCertificateDownloadModal('translate_content', translationStatByLanguageAndTopic.key)">
           <span>
@@ -341,7 +341,7 @@
         </button>
       </div>
       <div class="certificate-download-button-container"
-           *ngIf="type == 'questionContribution'">
+           *ngIf="type == 'questionContribution' || type == 'questionReview'">
         <button class="btn btn-success certificate-download-button"
                 (click)="openCertificateDownloadModal('add_question', null)">
           <span>
