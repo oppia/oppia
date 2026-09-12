@@ -182,9 +182,21 @@ describe('Contribution Opportunities backend API service', function () {
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
   const sampleTopicsPerClassroomBackendDict = {
     topic_names_per_classroom: [
-      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-      {classroom: 'Class 2', topics: ['Topic 3']},
-      {classroom: '', topics: ['Topic 4']},
+      {
+        classroom: 'Class 1',
+        topics: [
+          {name: 'Topic 1', id: 't1', completeness: 20},
+          {name: 'Topic 2', id: 't2', completeness: 80},
+        ],
+      },
+      {
+        classroom: 'Class 2',
+        topics: [{name: 'Topic 3', id: 't3', completeness: 50}],
+      },
+      {
+        classroom: '',
+        topics: [{name: 'Topic 4', id: 't4', completeness: 30}],
+      },
     ],
   };
 
@@ -1139,15 +1151,51 @@ describe('Contribution Opportunities backend API service', function () {
     flushMicrotasks();
 
     const expectedResponse = [
-      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-      {classroom: 'Class 2', topics: ['Topic 3']},
+      {
+        classroom: 'Class 1',
+        topics: [
+          {name: 'Topic 1', id: 't1', completeness: 20},
+          {name: 'Topic 2', id: 't2', completeness: 80},
+        ],
+      },
+      {
+        classroom: 'Class 2',
+        topics: [{name: 'Topic 3', id: 't3', completeness: 50}],
+      },
       {
         classroom: '',
-        topics: [AppConstants.TOPIC_SENTINEL_NAME_ALL, 'Topic 4'],
+        topics: [
+          {
+            name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
+            id: '',
+            completeness: null,
+          },
+          {name: 'Topic 4', id: 't4', completeness: 30},
+        ],
       },
     ];
 
     expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should pass language_code when fetching topics for a language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicNamesPerClassroomAsync('hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletopicnamesperclassroom?language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(sampleTopicsPerClassroomBackendDict);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
