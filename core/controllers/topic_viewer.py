@@ -26,8 +26,6 @@ from core.domain import (
     email_manager,
     exp_fetchers,
     feature_flag_services,
-    platform_parameter_list,
-    platform_parameter_services,
     skill_services,
     story_domain,
     story_fetchers,
@@ -344,15 +342,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with '
+                'id %s' % (deleted_skills_string, topic.id),
             )
-            if server_can_send_emails:
-                email_manager.send_mail_to_admin(
-                    'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (deleted_skills_string, topic.id),
-                )
 
         if self.user_id:
             degrees_of_mastery = skill_services.get_multi_user_skill_mastery(

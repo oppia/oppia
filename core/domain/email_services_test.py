@@ -35,6 +35,20 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.system_email_address = 'system@example.com'
 
     @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
+    def test_is_email_sending_allowed_returns_true_when_enabled(self) -> None:
+        self.assertTrue(email_services.is_email_sending_allowed())
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+    )
+    def test_is_email_sending_allowed_returns_false_when_disabled(
+        self,
+    ) -> None:
+        self.assertFalse(email_services.is_email_sending_allowed())
+
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),

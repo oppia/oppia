@@ -261,6 +261,85 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_server_can_send_emails_restriction_bad_pattern(self) -> None:
+        message = (
+            'Direct access to SERVER_CAN_SEND_EMAILS is restricted to '
+            'email_services.py. Upstream code should use '
+            'email_services.is_email_sending_allowed() or '
+            'email_services.send_mail().'
+        )
+
+        # 1. Normal production usage is rejected.
+        def mock_prod_file(unused_filepath: str) -> Tuple[str, ...]:
+            return (
+                'from core.domain import platform_parameter_list',
+                'param = platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS',
+            )
+
+        with self.swap(FILE_CACHE, 'readlines', mock_prod_file):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                ['core/domain/wipeout_service.py'], FILE_CACHE
+            )
+            lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            [f'Line 2: {message}'],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertTrue(lint_task_report.failed)
+
+        # 2. Aliased access is rejected.
+        def mock_alias_file(unused_filepath: str) -> Tuple[str, ...]:
+            return (
+                'from core.domain import platform_parameter_list as P',
+                'param = P.SERVER_CAN_SEND_EMAILS',
+            )
+
+        with self.swap(FILE_CACHE, 'readlines', mock_alias_file):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                ['core/controllers/cron.py'], FILE_CACHE
+            )
+            lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            [f'Line 2: {message}'],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertTrue(lint_task_report.failed)
+
+        # 3. Allowed files (email_services, platform_parameter_list, platform_parameter_registry, pre_commit_hook, _test.py, test_utils.py).
+        allowed_files = [
+            'core/domain/email_services.py',
+            'core/domain/platform_parameter_list.py',
+            'core/domain/platform_parameter_registry.py',
+            'scripts/pre_commit_hook.py',
+            'core/domain/feedback_services_test.py',
+            'core/tests/test_utils.py',
+        ]
+
+        def mock_allowed_content(unused_filepath: str) -> Tuple[str, ...]:
+            return (
+                'param = platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS',
+            )
+
+        with self.swap(FILE_CACHE, 'readlines', mock_allowed_content):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                allowed_files, FILE_CACHE
+            )
+            lint_task_report = linter.check_bad_patterns()
+        self.assertFalse(lint_task_report.failed)
+
+        # 4. Lowercase occurrence is not flagged.
+        def mock_lowercase_content(unused_filepath: str) -> Tuple[str, ...]:
+            return (
+                'server_can_send_emails = email_services.is_email_sending_allowed()',
+            )
+
+        with self.swap(FILE_CACHE, 'readlines', mock_lowercase_content):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                ['core/controllers/profile.py'], FILE_CACHE
+            )
+            lint_task_report = linter.check_bad_patterns()
+        self.assertFalse(lint_task_report.failed)
+
 
 class GeneralLintTests(test_utils.LinterTestBase):
     """Test all other general lint functions."""

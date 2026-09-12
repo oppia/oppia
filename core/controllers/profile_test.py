@@ -879,8 +879,22 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'sub',
             ),  # pylint: disable=line-too-long
             (
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                'body',
+            ),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
             ),
         ]
     )
