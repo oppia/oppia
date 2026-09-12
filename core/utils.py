@@ -877,6 +877,51 @@ def require_valid_name(
             )
 
 
+def require_valid_title(
+    title: str, title_type: str, max_length: int = 50, allow_empty: bool = False
+) -> None:
+    """Generic title validation for display titles.
+
+    Args:
+        title: str. The title to validate.
+        title_type: str. A human-readable string, like 'the collection title'.
+            This will be shown in error messages.
+        max_length: int. The maximum allowed length for the title.
+        allow_empty: bool. If True, empty strings are allowed.
+
+    Raises:
+        ValidationError. Title isn't a string.
+        ValidationError. The length of the title_type isn't between
+            1 and max_length.
+        ValidationError. Title starts or ends with whitespace.
+        ValidationError. Adjacent whitespace in title_type isn't collapsed.
+    """
+    if not isinstance(title, str):
+        raise ValidationError(
+            'Expected %s to be a string, received %s' % (title_type, title)
+        )
+
+    if allow_empty and title == '':
+        return
+
+    if len(title) > max_length or len(title) < 1:
+        raise ValidationError(
+            'The length of %s should be between 1 and %d '
+            'characters; received %s' % (title_type, max_length, title)
+        )
+
+    if title[0] in string.whitespace or title[-1] in string.whitespace:
+        raise ValidationError(
+            '%s should not start or end with whitespace.'
+            % (title_type.capitalize())
+        )
+
+    if re.search(r'\s\s+', title):
+        raise ValidationError(
+            'Adjacent whitespace in %s should be collapsed.' % title_type
+        )
+
+
 def require_valid_url_fragment(
     name: str, name_type: str, allowed_length: int
 ) -> None:
