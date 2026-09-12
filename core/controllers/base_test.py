@@ -1025,6 +1025,12 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(call_counter.times_called, 1)
 
+    def test_head_request_is_treated_same_as_get(self) -> None:
+        """A HEAD request should be handled the same way as a GET request,
+        without raising errors"""
+        response = self.testapp.head('/')
+        self.assertEqual(response.status_int, 200)
+
 
 class SessionEndHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_end handler."""
