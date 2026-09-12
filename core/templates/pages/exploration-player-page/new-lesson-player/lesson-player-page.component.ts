@@ -29,6 +29,10 @@ import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customiz
 import {UrlService} from 'services/contextual/url.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import './lesson-player-page.component.css';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
@@ -72,10 +76,12 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     private i18nService: I18nService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private playerTranscriptService: PlayerTranscriptService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
     let explorationId = this.pageContextService.getExplorationId();
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(explorationId, null)
