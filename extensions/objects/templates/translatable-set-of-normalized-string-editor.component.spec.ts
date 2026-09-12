@@ -61,6 +61,17 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
     expect(component.valueChanged.emit).not.toHaveBeenCalled();
   }));
 
+  it('should not update value when the value is unchanged', fakeAsync(() => {
+    component.value = {normalizedStrSet: ['random val']};
+    tick();
+    spyOn(component.valueChanged, 'emit');
+
+    component.updateValue(component.value.normalizedStrSet);
+
+    expect(component.value.normalizedStrSet).toEqual(['random val']);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
+  }));
+
   it('should initialize the schema property value', fakeAsync(() => {
     expect(component.value.normalizedStrSet).toEqual([]);
   }));

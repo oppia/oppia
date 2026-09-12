@@ -57,6 +57,16 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     expect(component.value.unicodeStrSet).toEqual(['random val']);
   });
 
+  it('should not update the value when the value is unchanged', () => {
+    component.value = {unicodeStrSet: ['random val']};
+    spyOn(component.valueChanged, 'emit');
+
+    component.updateValue(component.value.unicodeStrSet);
+
+    expect(component.value.unicodeStrSet).toEqual(['random val']);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
+  });
+
   it('should initialize the schema property value', () => {
     expect(component.value.unicodeStrSet).toEqual([]);
   });
