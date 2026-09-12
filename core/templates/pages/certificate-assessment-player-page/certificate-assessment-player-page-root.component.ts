@@ -32,13 +32,14 @@ import {PageHeadService} from 'services/page-head.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
-  // The state service is scoped to this component so that its countdown
-  // interval is torn down together with the page it belongs to.
+  // The state service is scoped to this component so its state resets
+  // together with the page it belongs to.
   providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
@@ -78,6 +79,7 @@ export class CertificateAssessmentPlayerPageRootComponent
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private router: Router,
@@ -92,14 +94,6 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   get attempt(): CertificateAssessmentAttemptData | null {
     return this.certificateAssessmentPlayerStateService.getAttempt();
-  }
-
-  get isTimeExpired(): boolean {
-    return this.certificateAssessmentPlayerStateService.isTimeExpired;
-  }
-
-  get remainingTimeInSeconds(): number {
-    return this.certificateAssessmentPlayerStateService.remainingTimeInSeconds;
   }
 
   async ngOnInit(): Promise<void> {
@@ -122,9 +116,6 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       await this.loadClassroomUrlFragment();
-      this.certificateAssessmentPlayerStateService.configureForOffering(
-        this.certificateOffering.timeLimitInMinutes
-      );
     } catch {
       this.hasError = true;
       await this.redirectToNotFound();
@@ -163,10 +154,8 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Starts a new attempt on the server. The learner only moves to the
-   * questions once the server confirms the attempt; that confirmation is
-   * also what arms a fresh time window for them (see
-   * `beginNewAttempt`), so a failed start leaves any existing timing
-   * state untouched.
+   * questions once the server confirms the attempt; a failed start leaves
+   * them back on the intro to try again.
    */
   async startAssessment(): Promise<void> {
     try {
@@ -211,9 +200,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   /**
-   * Submits the learner's final answers exactly once and navigates to the
-   * result page, unless the submission raced against the expiry of the
-   * time window (in which case the auto-submit keeps them on the page).
+   * Submits the learner's final answers and navigates to the result page.
    */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
@@ -222,7 +209,6 @@ export class CertificateAssessmentPlayerPageRootComponent
     if (attempt === null || this.isSubmissionInProgress) {
       return;
     }
-    const submittedBeforeExpiry = !this.isTimeExpired;
     const attemptId = attempt.attemptId;
     this.isSubmissionInProgress = true;
     this.pendingSubmission = (async () => {
@@ -232,15 +218,21 @@ export class CertificateAssessmentPlayerPageRootComponent
           answers
         );
         this.attemptIsSubmitted = true;
-        if (submittedBeforeExpiry) {
-          await this.navigateToResultPage();
-        }
+        await this.navigateToResultPage();
       } catch {
-        this.alertsService.addWarning(
-          this.translateService.instant(
-            'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
-          )
-        );
+        if (!this.internetConnectivityService.isOnline()) {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_NETWORK_WARNING'
+            )
+          );
+        } else {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+            )
+          );
+        }
       } finally {
         this.isSubmissionInProgress = false;
       }
@@ -253,21 +245,9 @@ export class CertificateAssessmentPlayerPageRootComponent
     return this.navigateToResultPage();
   }
 
-  onAssessmentEnded(): Promise<boolean> {
-    return this.navigateToLearnerDashboard();
-  }
-
   ngOnDestroy(): void {
-    // Stops the countdown before the base class unsubscribes its listeners.
-    this.certificateAssessmentPlayerStateService.ngOnDestroy();
     this.preventPageUnloadEventService.removeListener();
     super.ngOnDestroy();
-  }
-
-  private async navigateToLearnerDashboard(): Promise<boolean> {
-    return this.router.navigate([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
-    ]);
   }
 
   private async navigateToResultPage(): Promise<boolean> {

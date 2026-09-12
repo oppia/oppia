@@ -2,6 +2,7 @@
   background: #e9edeb;
   border-radius: 30px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  margin: 0 auto;
   max-width: 520px;
   padding: 28px 28px 24px;
   width: 100%;
@@ -82,4 +83,26 @@
 }
 .assessment-modal-action-button:hover {
   background: #0a4f48;
+}
+
+@media (max-width: 600px) {
+  .assessment-modal-card {
+    border-radius: 20px;
+    margin: 16px auto;
+    max-width: 95%;
+    padding: 20px 16px;
+  }
+
+  .assessment-modal-message {
+    margin-left: 0;
+  }
+
+  .assessment-modal-actions {
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .assessment-modal-action-button {
+    min-width: 180px;
+  }
 }

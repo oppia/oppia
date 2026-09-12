@@ -22,7 +22,7 @@
       {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_INTRO_TEXT' | translate }}
     </p>
 
-    <h2>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING' | translate }}</h2>
+    <h2 class="e2e-test-available-certificate-heading-text">{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING' | translate }}</h2>
     <p class="oppia-certificate-offering-available-page-intro">
       {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_SUBHEADING_TEXT' | translate }}
     </p>
@@ -38,27 +38,21 @@
     </p>
 
     <div class="oppia-certificate-offering-available-page-tiles">
-      <article class="oppia-certificate-offering-available-page-tile"
+      <article class="oppia-certificate-offering-available-page-tile e2e-test-certificate-tile"
                *ngFor="let certificate of availableCertificates">
         <div class="oppia-certificate-offering-available-page-tile-top">
           <div class="oppia-certificate-offering-available-page-tile-heading">
-            <!-- TODO(#24717-M2.25): Replace this placeholder badge icon with the final design from the mocks.
-                 Mock reference: https://canva.link/iyyjva1dn36ymuc -->
             <span class="oppia-certificate-offering-available-page-badge-icon"
                   aria-hidden="true">
-              <svg viewBox="0 0 64 64" width="85" height="85">
-                <circle cx="32" cy="24" r="15" fill="#F1C44C" stroke="#B88914" stroke-width="2"></circle>
-                <circle cx="32" cy="24" r="10" fill="#F9E39B"></circle>
-                <path d="M22 36L15 56L32 47L49 56L42 36Z" fill="#0B7A62"></path>
-                <path d="M27.5 23.5L30.5 26.5L37 20" fill="none" stroke="#B88914" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
+              <img src="/assets/images/certificate-assessment/certificate badge.png"
+                   alt="" height="85">
             </span>
             <div>
-              <h3 class="oppia-certificate-offering-available-page-tile-heading-text">{{ certificate.title }}</h3>
+              <h3 class="oppia-certificate-offering-available-page-tile-heading-text e2e-test-certificate-tile-title">{{ certificate.title }}</h3>
             </div>
           </div>
 
-          <div class="oppia-certificate-offering-available-page-status-wrapper"
+          <div class="oppia-certificate-offering-available-page-status-wrapper e2e-test-certificate-tile-status"
                [ngSwitch]="certificate.status">
             <span *ngSwitchCase="'passed'"
                   class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
@@ -89,11 +83,12 @@
           <ng-container *ngSwitchCase="'passed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_PASSED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary">
+<button type="button" class="btn btn-primary"
+                      [routerLink]="certificate.resultRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
-                      class="btn btn-outline-primary"
+                      class="btn btn-outline-primary e2e-test-retry-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
@@ -103,11 +98,12 @@
           <ng-container *ngSwitchCase="'failed'">
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FAILED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-primary">
+<button type="button" class="btn btn-primary"
+                      [routerLink]="certificate.resultRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
-                      class="btn btn-outline-primary"
+                      class="btn btn-outline-primary e2e-test-retry-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
@@ -118,7 +114,7 @@
             <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_NOT_ATTEMPTED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button"
-                      class="btn btn-primary"
+                      class="btn btn-primary e2e-test-continue-to-assessment-button"
                       [routerLink]="certificate.assessmentRoute">
                 {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>

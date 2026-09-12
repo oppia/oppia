@@ -12,18 +12,38 @@
 
     <ul class="instructions-list">
       <li>
-        {{ timeLimitInstructionI18nKey | translate: { minutes: timeLimitInMinutes } }}
+        {{ questionCountInstructionI18nKey | translate: { questions: totalQuestions } }}
       </li>
       <li>
-        {{ questionCountInstructionI18nKey | translate: { questions: totalQuestions } }}
+        {{ indexNavigationInstructionI18nKey | translate }}
       </li>
       <li *ngFor="let instructionKey of staticInstructionI18nKeys">
         {{ instructionKey | translate }}
       </li>
     </ul>
 
+    <div class="index-preview-section">
+      <div class="index-preview-description">
+        {{ indexPreviewDescriptionI18nKey | translate }}
+      </div>
+      <div class="index-preview-rows">
+        <div class="index-preview-row">
+          <div class="index-preview-box attempted">1</div>
+          <span class="index-preview-label">{{ indexAttemptedLegendI18nKey | translate }}</span>
+        </div>
+        <div class="index-preview-row">
+          <div class="index-preview-box unvisited">2</div>
+          <span class="index-preview-label">{{ indexNotVisitedLegendI18nKey | translate }}</span>
+        </div>
+        <div class="index-preview-row">
+          <div class="index-preview-box visited">3</div>
+          <span class="index-preview-label">{{ indexAnsweredLegendI18nKey | translate }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="cta-row">
-      <button type="button" class="continue-button"
+      <button type="button" class="continue-button e2e-test-start-assessment-button"
               (click)="onStartAssessment()">
         {{ startAssessmentButtonI18nKey | translate }}
       </button>

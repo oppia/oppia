@@ -48,6 +48,8 @@ export default {
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
+    CertificateCreatorDashboard:
+      'http://localhost:8181/certificate-creator-dashboard',
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
@@ -77,6 +79,8 @@ export default {
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
+    CertificateOfferingAvailableForMathClassroom:
+      'http://localhost:8181/learn/math/certificate-offering-available',
     ModeratorPage: 'http://localhost:8181/moderator',
     Partnerships: 'http://localhost:8181/partnerships',
     PartnershipsBrochure:

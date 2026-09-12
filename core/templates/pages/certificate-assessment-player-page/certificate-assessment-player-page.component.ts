@@ -19,13 +19,11 @@
 import {
   Component,
   EventEmitter,
-  OnChanges,
   Input,
   OnDestroy,
   OnInit,
   Optional,
   Output,
-  SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Router} from '@angular/router';
@@ -50,12 +48,12 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {
   UnansweredQuestionModalComponent,
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -66,16 +64,13 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent
-  implements OnInit, OnChanges, OnDestroy
+  implements OnInit, OnDestroy
 {
   @Input() attempt: CertificateAssessmentAttemptData | null = null;
   @Input() classroomUrlFragment = '';
-  @Input() isTimeExpired = false;
   @Output() assessmentSubmitted = new EventEmitter<
     SubmitCertificateAssessmentAnswerBackendDict[]
   >();
-  @Output() viewResults = new EventEmitter<void>();
-  @Output() assessmentEnded = new EventEmitter<void>();
 
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
@@ -85,16 +80,17 @@ export class CertificateAssessmentPlayerPageComponent
   answers: {[questionId: string]: InteractionAnswer | null} = {};
   interactions: {[questionId: string]: Interaction} = {};
   interactionHtmls: {[questionId: string]: string} = {};
+  questionStatuses: {[index: number]: string} = {};
   focusLabel = '';
   currentQuestion: AssessmentQuestion | null = null;
   totalQuestionCount = 0;
-  progressPercentage = 0;
   isLastQuestion = false;
-  hasHandledTimeExpiry = false;
   private handleSubmitFn: OnSubmitFn;
 
   constructor(
     @Optional() private bottomSheet: MatBottomSheet,
+    private alertsService: AlertsService,
+    private internetConnectivityService: InternetConnectivityService,
     @Optional() private ngbModal: NgbModal,
     private router: Router,
     private translateService: TranslateService,
@@ -113,18 +109,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.buildQuestions();
     this.refreshComputedFields();
-    if (this.isTimeExpired) {
-      this.handleTimeExpiry();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.isTimeExpired?.currentValue === true &&
-      !changes.isTimeExpired?.previousValue
-    ) {
-      this.handleTimeExpiry();
-    }
   }
 
   ngOnDestroy(): void {
@@ -141,6 +125,7 @@ export class CertificateAssessmentPlayerPageComponent
         attemptQuestion.questionId,
         attemptQuestion.questionStateData
       );
+      this.questionStatuses[index] = 'unvisited';
     });
   }
 
@@ -173,40 +158,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   private isMobileScreenSize(): boolean {
     return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
-  }
-
-  openTimeExpiredModal(): void {
-    if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        } else {
-          this.assessmentEnded.emit();
-        }
-      });
-      return;
-    }
-    const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-    modalRef.result
-      .then(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        }
-      })
-      .catch(() => {
-        this.assessmentEnded.emit();
-      });
   }
 
   openUnansweredQuestionModal(
@@ -276,6 +227,18 @@ export class CertificateAssessmentPlayerPageComponent
     this.refreshComputedFields();
   }
 
+  navigateToQuestion(index: number): void {
+    if (index < 0 || index >= this.getTotalQuestionCount()) {
+      return;
+    }
+    this.currentQuestionIndex = index;
+    this.refreshComputedFields();
+  }
+
+  getQuestionIndexes(): number[] {
+    return Array.from({length: this.getTotalQuestionCount()}, (_, i) => i);
+  }
+
   private collectAnswers(): SubmitCertificateAssessmentAnswerBackendDict[] {
     const loadedQuestions = this.questions.filter(
       (question): question is AssessmentQuestion => question !== undefined
@@ -311,6 +274,14 @@ export class CertificateAssessmentPlayerPageComponent
   }
 
   submitAssessment(): void {
+    if (!this.internetConnectivityService.isOnline()) {
+      this.alertsService.addWarning(
+        this.translateService.instant(
+          'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_NETWORK_WARNING'
+        )
+      );
+      return;
+    }
     const answers = this.collectAnswers();
     const unansweredQuestionIndexes = this.questions
       .map((question, index) => ({question, index}))
@@ -337,21 +308,13 @@ export class CertificateAssessmentPlayerPageComponent
     );
   }
 
-  private handleTimeExpiry(): void {
-    if (this.hasHandledTimeExpiry) {
-      return;
-    }
-    this.hasHandledTimeExpiry = true;
-    this.openTimeExpiredModal();
-    this.assessmentSubmitted.emit(this.collectAnswers());
-  }
-
   handleInteractionSubmit(answer: InteractionAnswer): void {
     const question = this.getCurrentQuestion();
     if (question === null) {
       return;
     }
     this.answers[question.id] = answer;
+    this.questionStatuses[this.currentQuestionIndex] = 'attempted';
     this.refreshComputedFields();
   }
 
@@ -368,15 +331,6 @@ export class CertificateAssessmentPlayerPageComponent
       return answer;
     }
     return JSON.stringify(answer);
-  }
-
-  getProgressPercentage(): number {
-    if (this.getTotalQuestionCount() === 0) {
-      return 0;
-    }
-    return Math.round(
-      ((this.currentQuestionIndex + 1) / this.getTotalQuestionCount()) * 100
-    );
   }
 
   getCurrentQuestion(): AssessmentQuestion | null {
@@ -400,7 +354,9 @@ export class CertificateAssessmentPlayerPageComponent
   private refreshComputedFields(): void {
     this.currentQuestion = this.getCurrentQuestion();
     this.totalQuestionCount = this.getTotalQuestionCount();
-    this.progressPercentage = this.getProgressPercentage();
     this.isLastQuestion = this.isCurrentQuestionLast();
+    if (this.questionStatuses[this.currentQuestionIndex] !== 'attempted') {
+      this.questionStatuses[this.currentQuestionIndex] = 'visited';
+    }
   }
 }

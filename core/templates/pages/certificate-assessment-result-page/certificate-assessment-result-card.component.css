@@ -22,8 +22,9 @@
   z-index: 1;
 }
 
-.result-card--failed {
-  --oppia-result-accent: #b3261e;
+.result-card--failed .result-card-score {
+  color: #b3261e;
+  font-weight: 400;
 }
 
 .result-card-heading {
@@ -33,6 +34,10 @@
   font-weight: 800;
   margin-bottom: 20px;
   text-align: center;
+}
+
+.result-card--failed .result-card-heading {
+  font-weight: 400;
 }
 
 .result-card-earned-banner {
@@ -98,13 +103,16 @@
 }
 
 .result-card-retry-btn:hover {
-  background: var(--oppia-teal-pale);
+  background: var(--oppia-teal-dark);
+  border-color: var(--oppia-teal-dark);
+  color: #fff;
 }
 
 @media (max-width: 640px) {
   .result-card {
     margin: -120px 16px 32px;
     padding: 28px 20px 24px;
+    top: 125px;
   }
 
   .result-card-summary {

@@ -2,11 +2,11 @@
 <div class="container position-relative oppia-certificate-creator-dashboard">
   <div class="oppia-certificate-creator-hero">
     <div class="oppia-certificate-creator-title-block">
-      <h1 tabindex="0">
+      <h1 tabindex="0" class="e2e-test-certificate-offering-dashboard-title">
         Certificate Creator Dashboard
       </h1>
     </div>
-    <button type="button" class="btn btn-primary oppia-new-certificate-btn"
+    <button type="button" class="btn btn-primary oppia-new-certificate-btn e2e-test-new-certificate-btn"
             [routerLink]="createCertificateOfferingRoute">
       + New Certificate
     </button>
@@ -42,7 +42,6 @@
             <tr>
               <th scope="col" class="oppia-title-th" >Certificate Title</th>
               <th scope="col">Topics</th>
-              <th scope="col">Time</th>
               <th scope="col">Status</th>
               <th scope="col">Actions</th>
             </tr>
@@ -52,11 +51,10 @@
               <td class="oppia-title-cell">
                 <span class="oppia-certificate-title">{{ certificateOffering.title }}</span>
               </td>
-              <td>
+              <td class="e2e-test-certificate-time-cell">
                 <span class="oppia-topics-count">{{ certificateOffering.topicsLabel }}</span>
               </td>
-              <td>{{ certificateOffering.timeLabel }}</td>
-              <td class="oppia-status-cell">
+<td class="oppia-status-cell">
                 <span class="badge oppia-status-badge" [ngClass]="{
                     'oppia-status-available': certificateOffering.status.toLowerCase().includes('available'),
                     'oppia-status-blocked': certificateOffering.status.toLowerCase().includes('blocked'),
@@ -67,11 +65,11 @@
               </td>
               <td class="oppia-actions-cell">
                 <div class="d-flex justify-content-center gap-2 oppia-action-buttons">
-                  <button type="button" class="btn btn-sm oppia-edit-btn"
+                  <button type="button" class="btn btn-sm oppia-edit-btn e2e-test-edit-certificate-btn"
                           [routerLink]="getEditCertificateOfferingRoute(certificateOffering.certificateId)">
                     Edit
                   </button>
-                  <button type="button" class="btn btn-sm oppia-delete-btn"
+                  <button type="button" class="btn btn-sm oppia-delete-btn e2e-test-delete-certificate-btn"
                           (click)="openDeleteCertificateOfferingModal(certificateOffering.certificateId)">
                     Delete
                   </button>
