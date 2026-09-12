@@ -1188,7 +1188,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         ):
             with self.assertRaisesRegex(
                 Exception,
-                'No collection summary model exists for the given id: collection_id',
+                'No collection summary model exists for the given '
+                'id: collection_id',
             ):
                 collection_services.publish_collection_and_update_user_profiles(
                     self.owner, 'collection_id'

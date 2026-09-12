@@ -33,7 +33,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
-  let explorationId: string | null;
+  let explorationId: string | null = null;
 
   test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(

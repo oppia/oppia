@@ -2123,7 +2123,6 @@ def update_exploration(
 
     datastore_services.update_timestamps_multi(models_to_put)
     datastore_services.put_multi(models_to_put)
-    index_explorations_given_ids([exploration_id])
     # Explicitly clear the cache for explorations after putting the new
     # version.
     caching_services.delete_multi(
@@ -2578,11 +2577,6 @@ def save_exploration_summary(
     )
     exp_summary_model.update_timestamps()
     exp_summary_model.put()
-    # The index should be updated after saving the exploration
-    # summary instead of after saving the exploration since the
-    # index contains documents computed on basis of exploration
-    # summary.
-    index_explorations_given_ids([exp_summary.id])
 
 
 def delete_exploration_summaries(exploration_ids: List[str]) -> None:
@@ -2927,8 +2921,6 @@ def load_demo(exploration_id: str) -> None:
         user_services.get_system_user(), exploration_id
     )
 
-    index_explorations_given_ids([exploration_id])
-
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
@@ -3093,17 +3085,6 @@ def get_scaled_average_rating(ratings: Dict[str, int]) -> float:
     b = z * math.sqrt(((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
     wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
-
-
-def index_explorations_given_ids(
-    exp_ids: List[str],  # pylint: disable=unused-argument
-) -> None:
-    """No-op. Previously indexed explorations into Elasticsearch.
-
-    Args:
-        exp_ids: list(str). List of ids of the explorations (unused).
-    """
-    pass
 
 
 def is_voiceover_change_list(

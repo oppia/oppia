@@ -149,6 +149,10 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to play an exploration and interact with pop-ups, modals and buttons', async function () {
+    // Navigate to community library.
+    await loggedInUser1.navigateToCommunityLibraryPage();
+    await loggedInUser1.verifyPageIsRTL();
+
     // Check lesson player.
     await loggedInUser1.playExplorationAsLoggedInUser(explorationId);
     await loggedInUser1.verifyPageIsRTL();

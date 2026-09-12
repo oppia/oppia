@@ -238,7 +238,6 @@ class CollectionPublishHandler(
         collection_services.publish_collection_and_update_user_profiles(
             self.user, collection_id
         )
-        collection_services.index_collections_given_ids([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False

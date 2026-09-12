@@ -350,7 +350,11 @@ class MainTests(unittest.TestCase):
             mock_print.assert_called_with(
                 [
                     'ERROR',
-                    'Could not start new server. The following ports are already in use and need to be available: 8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), 6379 (Redis server), 9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)',
+                    'Could not start new server. The following ports are '
+                    'already in use and need to be available: 8181 (GAE dev '
+                    'appserver), 8000 (GAE dev appserver admin port), 6379 '
+                    '(Redis server), 9099 (Firebase auth emulator), 8089 '
+                    '(Cloud Datastore emulator)',
                 ]
             )
 

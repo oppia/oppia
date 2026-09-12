@@ -965,7 +965,6 @@ def _save_collection(
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id]
     )
-    index_collections_given_ids([collection.id])
 
     collection.version += 1
 
@@ -1515,8 +1514,6 @@ def load_demo(collection_id: str) -> None:
     system_user = user_services.get_system_user()
     publish_collection_and_update_user_profiles(system_user, collection_id)
 
-    index_collections_given_ids([collection_id])
-
     # Now, load all of the demo explorations that are part of the collection.
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
@@ -1525,14 +1522,3 @@ def load_demo(collection_id: str) -> None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
-
-
-def index_collections_given_ids(
-    collection_ids: List[str],  # pylint: disable=unused-argument
-) -> None:
-    """A no-op that accepts the given collection ids.
-
-    Args:
-        collection_ids: list(str). List of collection ids.
-    """
-    pass

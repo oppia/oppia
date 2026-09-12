@@ -65,6 +65,9 @@ test.describe('Logged-In Learner', function () {
       'Algebra',
       3
     );
+    if (!explorationId1) {
+      throw new Error('Exploration ID is null or undefined.');
+    }
     await curriculumAdmin.createAndPublishExplorationWithCards(
       'Explore Title 2',
       'Algebra',

@@ -672,7 +672,6 @@ class ExplorationStatusHandler(
         exp_services.publish_exploration_and_update_user_profiles(
             self.user, exploration_id
         )
-        exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id: str) -> None:
