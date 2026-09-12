@@ -41,27 +41,27 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
   }));
 
   it('should initialize the schema', fakeAsync(() => {
-    component.value = {normalizedStrSet: 'random val'};
+    component.value = {normalizedStrSet: ['random val']};
     tick();
 
-    component.updateValue('random val');
+    component.updateValue(['random val']);
     component.getSchema();
-    component.updateValue('abc');
-    expect(component.value.normalizedStrSet).toBe('abc');
+    component.updateValue(['abc']);
+    expect(component.value.normalizedStrSet).toEqual(['abc']);
   }));
 
-  it('should not update value when the input is not a string', fakeAsync(() => {
-    component.value = {normalizedStrSet: 'random val'};
+  it('should not update value when the input is not an array', fakeAsync(() => {
+    component.value = {normalizedStrSet: ['random val']};
     tick();
     spyOn(component.valueChanged, 'emit');
 
     component.updateValue(5);
 
-    expect(component.value.normalizedStrSet).toBe('random val');
+    expect(component.value.normalizedStrSet).toEqual(['random val']);
     expect(component.valueChanged.emit).not.toHaveBeenCalled();
   }));
 
   it('should initialize the schema property value', fakeAsync(() => {
-    expect(component.value.normalizedStrSet).toBe('');
+    expect(component.value.normalizedStrSet).toEqual([]);
   }));
 });

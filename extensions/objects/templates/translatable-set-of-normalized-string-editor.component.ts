@@ -41,7 +41,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() value!: {normalizedStrSet: string};
+  @Input() value!: {normalizedStrSet: string[]};
   @Output() valueChanged = new EventEmitter();
   schema: TranslatableSetOfStringSchema = {
     type: 'list',
@@ -60,21 +60,21 @@ export class TranslatableSetOfNormalizedStringEditorComponent
   ngOnInit(): void {
     if (this.value === undefined) {
       this.value = {
-        normalizedStrSet: '',
+        normalizedStrSet: [],
       };
     }
   }
 
   updateValue(val: SchemaDefaultValue): void {
     // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
-    // ensure only normalized strings are accepted.
-    if (typeof val !== 'string') {
+    // ensure only normalized string arrays are accepted.
+    if (!Array.isArray(val)) {
       return;
     }
     if (this.value.normalizedStrSet === val) {
       return;
     }
-    this.value.normalizedStrSet = val;
+    this.value.normalizedStrSet = val as string[];
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }
