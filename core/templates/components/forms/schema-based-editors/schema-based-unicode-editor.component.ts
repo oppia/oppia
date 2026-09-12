@@ -78,6 +78,7 @@ export class SchemaBasedUnicodeEditor
         rows: string[];
         placeholder: string;
         coding_mode: string;
+        languageDirection?: string;
       }
     | undefined;
 
@@ -221,6 +222,10 @@ export class SchemaBasedUnicodeEditor
     } else {
       return this.uiConfig.coding_mode;
     }
+  }
+
+  getLanguageDirection(): string {
+    return this.uiConfig?.languageDirection ?? 'auto';
   }
 
   ngOnDestroy(): void {
