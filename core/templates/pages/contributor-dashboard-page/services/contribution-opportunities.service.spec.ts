@@ -66,6 +66,7 @@ describe('Contribution Opportunities Service', () => {
         translation_in_review_counts: {
           hi: 20,
         },
+        translation_missing_reasons: {},
         language_code: 'hi',
         is_pinned: false,
         reviewer_only_content_count: 0,

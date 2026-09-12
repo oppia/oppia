@@ -176,6 +176,7 @@ describe('Translation opportunities component', () => {
         translation_in_review_counts: {
           en: 2,
         },
+        translation_missing_reasons: {},
         language_code: 'en',
         is_pinned: false,
         reviewer_only_content_count: 0,
@@ -192,6 +193,7 @@ describe('Translation opportunities component', () => {
         translation_in_review_counts: {
           en: 4,
         },
+        translation_missing_reasons: {},
         language_code: 'en',
         is_pinned: false,
         reviewer_only_content_count: 0,
@@ -284,6 +286,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: ['new'],
         },
         {
           id: '1',
@@ -296,6 +299,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: [],
         },
       ]);
     }
@@ -329,6 +333,7 @@ describe('Translation opportunities component', () => {
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        translationMissingReasons: [],
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -341,6 +346,7 @@ describe('Translation opportunities component', () => {
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        translationMissingReasons: ['new'],
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -360,6 +366,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: [],
         },
         {
           id: '2',
@@ -372,6 +379,7 @@ describe('Translation opportunities component', () => {
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+          translationMissingReasons: ['new'],
         },
       ]);
     }
@@ -400,6 +408,7 @@ describe('Translation opportunities component', () => {
           translation_in_review_counts: {
             en: 0,
           },
+          translation_missing_reasons: {},
           language_code: 'en',
           is_pinned: false,
           reviewer_only_content_count: 4,
@@ -442,6 +451,7 @@ describe('Translation opportunities component', () => {
           translation_in_review_counts: {
             en: 0,
           },
+          translation_missing_reasons: {},
           language_code: 'en',
           is_pinned: false,
           reviewer_only_content_count: 4,

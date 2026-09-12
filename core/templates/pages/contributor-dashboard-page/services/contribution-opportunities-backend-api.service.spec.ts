@@ -83,6 +83,7 @@ describe('Contribution Opportunities backend API service', function () {
       translation_in_review_counts: {
         hi: 15,
       } as TranslationCountsDict,
+      translation_missing_reasons: {},
       language_code: 'hi',
       is_pinned: true,
       reviewer_only_content_count: 0,
@@ -99,6 +100,7 @@ describe('Contribution Opportunities backend API service', function () {
       translation_in_review_counts: {
         da: 2,
       } as TranslationCountsDict,
+      translation_missing_reasons: {},
       language_code: 'da',
       is_pinned: false,
       reviewer_only_content_count: 0,
@@ -127,6 +129,7 @@ describe('Contribution Opportunities backend API service', function () {
         translation_in_review_counts: {
           hi: 15,
         } as TranslationCountsDict,
+        translation_missing_reasons: {},
       },
       {
         topic_ids: ['topic_id_2'],
@@ -144,6 +147,7 @@ describe('Contribution Opportunities backend API service', function () {
         translation_in_review_counts: {
           da: 2,
         } as TranslationCountsDict,
+        translation_missing_reasons: {},
       },
     ];
   const translationOpportunityResponseV2 = {
@@ -451,7 +455,7 @@ describe('Contribution Opportunities backend API service', function () {
       '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor='
     );
     expect(req.request.method).toEqual('GET');
-    expect(req.request.params.has('entity_type')).toBeFalse();
+    expect(req.request.params.has('entity_type')).toBe(false);
     req.flush(translationOpportunityResponseV2);
     flushMicrotasks();
 

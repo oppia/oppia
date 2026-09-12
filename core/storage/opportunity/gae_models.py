@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -52,6 +52,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True
     )
     translation_counts = datastore_services.JsonProperty(
+        default={}, indexed=False
+    )
+    translation_missing_reasons = datastore_services.JsonProperty(
         default={}, indexed=False
     )
     language_codes_with_assigned_voice_artists = (
@@ -92,6 +95,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translation_missing_reasons': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_with_assigned_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_needing_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'reviewer_only_content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -307,6 +311,10 @@ class TranslationOpportunityModel(base_models.BaseModel):
     translation_counts = datastore_services.JsonProperty(
         required=True, indexed=True
     )
+    # Dict mapping language codes to a list of translation missing reasons.
+    translation_missing_reasons = datastore_services.JsonProperty(
+        default={}, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -332,6 +340,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translation_missing_reasons': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
@@ -487,6 +496,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         content_count: int,
         incomplete_translation_language_codes: Sequence[str],
         translation_counts: Dict[str, int],
+        translation_missing_reasons: Dict[str, List[str]],
     ) -> TranslationOpportunityModel:
         """Creates and returns a new TranslationOpportunityModel instance.
 
@@ -499,6 +509,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 incomplete translation.
             translation_counts: dict(str, int). Map of language codes to
                 completed translation counts.
+            translation_missing_reasons: dict(str, list(str)). Map of language codes to
+                missing reasons for translation.
 
         Returns:
             TranslationOpportunityModel. A newly created model instance.
@@ -513,6 +525,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
                 incomplete_translation_language_codes
             ),
             translation_counts=translation_counts,
+            translation_missing_reasons=translation_missing_reasons,
         )
 
 
