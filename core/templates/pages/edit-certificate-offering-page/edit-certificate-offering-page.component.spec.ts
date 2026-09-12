@@ -154,7 +154,6 @@ describe('Edit Certificate Offering Page Component', () => {
       'loaded_classroom',
       {topic_1: 1},
       3,
-      15,
       [],
       'Available',
       1

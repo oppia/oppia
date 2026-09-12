@@ -178,7 +178,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=8,
-            time_limit_in_minutes=45,
             demonstrates=['Historical reasoning'],
             async_status='Available',
         )
@@ -193,7 +192,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -217,7 +215,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -236,7 +233,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=8,
-            time_limit_in_minutes=40,
             demonstrates=['Living systems'],
             async_status='Blocked',
         )
@@ -321,7 +317,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -394,7 +389,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -764,7 +758,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -845,7 +838,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -918,7 +910,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -970,7 +961,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -1056,7 +1046,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -1396,7 +1385,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -1406,7 +1394,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -1440,7 +1427,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -1501,7 +1487,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1511,7 +1496,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1521,7 +1505,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Blocked',
         )
@@ -1531,7 +1514,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.other_classroom_id,
             topic_ids=[self.other_topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1554,7 +1536,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1564,7 +1545,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1574,7 +1554,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1619,6 +1598,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             ),
         )
         self.assertIsNone(offering_by_title['Passed']['failed_on_date'])
+        self.assertTrue(offering_by_title['Passed']['attempt_id'])
         self.assertEqual(
             offering_by_title['Not Passed']['failed_on_date'],
             utils.get_time_in_millisecs(
@@ -1626,8 +1606,10 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             ),
         )
         self.assertIsNone(offering_by_title['Not Passed']['passed_on_date'])
+        self.assertTrue(offering_by_title['Not Passed']['attempt_id'])
         self.assertIsNone(offering_by_title['Not Attempted']['passed_on_date'])
         self.assertIsNone(offering_by_title['Not Attempted']['failed_on_date'])
+        self.assertIsNone(offering_by_title['Not Attempted']['attempt_id'])
 
     def test_get_certificate_offerings_for_classroom_uses_most_recent_attempt(
         self,
@@ -1638,7 +1620,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1682,7 +1663,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1736,7 +1716,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
