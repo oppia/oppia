@@ -1024,6 +1024,54 @@ describe('Exploration engine service ', () => {
       }
     );
 
+    it('should not stay stuck if answer classification throws an error', fakeAsync(() => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let lastCard = StateCard.createNewCard(
+        'Card 1',
+        'Content html',
+        'Interaction text',
+        jasmine.createSpyObj('Interaction', ['']),
+        'content_id'
+      );
+
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.throwError(
+        "Cannot read properties of undefined (reading 'replace')"
+      );
+
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        initSuccessCb
+      );
+      tick();
+
+      const isAnswerCorrect = explorationEngineService.submitAnswer(
+        answer,
+        textInputService,
+        submitAnswerSuccessCb
+      );
+
+      expect(isAnswerCorrect).toBeFalse();
+      // The processing flag must be reset so that the learner is not
+      // permanently stuck on the card in a loading state.
+      expect(explorationEngineService.answerIsBeingProcessed).toBeFalse();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Something went wrong while processing your answer. Please try again.'
+      );
+      expect(submitAnswerSuccessCb).not.toHaveBeenCalled();
+    }));
+
     it('should show warning if interaction for the next state if stuck is not defined', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 

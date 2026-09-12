@@ -536,4 +536,37 @@ describe('Math equation input rules service', () => {
       meirs.IsEquivalentTo('(13 + 2*w)^2 = 1156', {x: inputString})
     ).toBeFalse();
   });
+
+  it('should not throw when the answer or input is not an equation', () => {
+    // A learner's answer can reach the rules service without an '=' sign if
+    // validation is bypassed (for example when the answer is submitted via
+    // the Enter key). A rule input can also lack an '=' sign if it was
+    // created before the editor validation existed. These cases should be
+    // handled gracefully rather than crashing with an error.
+    expect(() =>
+      meirs.MatchesExactlyWith('v', {x: 'v=1', y: 'rhs'})
+    ).not.toThrow();
+    expect(meirs.MatchesExactlyWith('v', {x: 'v=1', y: 'rhs'})).toBeFalse();
+    expect(meirs.MatchesExactlyWith('v=1', {x: 'v', y: 'rhs'})).toBeFalse();
+    expect(
+      meirs.MatchesExactlyWith('v', {x: 'v=1', y: 'irrelevant'})
+    ).toBeFalse();
+
+    expect(() =>
+      meirs.MatchesUpToTrivialManipulations('v', {x: 'v=1', y: 'rhs'})
+    ).not.toThrow();
+    expect(
+      meirs.MatchesUpToTrivialManipulations('v', {x: 'v=1', y: 'rhs'})
+    ).toBeFalse();
+    expect(
+      meirs.MatchesUpToTrivialManipulations('v=1', {x: 'v', y: 'rhs'})
+    ).toBeFalse();
+
+    expect(() => meirs.IsEquivalentTo('v', {x: 'v=1'})).not.toThrow();
+    expect(meirs.IsEquivalentTo('v', {x: 'v=1'})).toBeFalse();
+    expect(meirs.IsEquivalentTo('v=1', {x: 'v'})).toBeFalse();
+    // Equations with an empty side are also treated as invalid.
+    expect(meirs.IsEquivalentTo('=v', {x: 'v=1'})).toBeFalse();
+    expect(meirs.IsEquivalentTo('v=1', {x: 'v='})).toBeFalse();
+  });
 });

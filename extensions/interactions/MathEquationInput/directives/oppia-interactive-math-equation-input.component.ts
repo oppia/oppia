@@ -63,10 +63,7 @@ export class InteractiveMathEquationInput implements OnInit {
   isCurrentAnswerValid(checkForTouched = true): boolean {
     let activeGuppyObject =
       this.guppyInitializationService.findActiveGuppyObject();
-    if (
-      (!checkForTouched || this.hasBeenTouched) &&
-      activeGuppyObject === undefined
-    ) {
+    if (!checkForTouched || this.hasBeenTouched) {
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
@@ -76,7 +73,15 @@ export class InteractiveMathEquationInput implements OnInit {
         this.value,
         this.guppyInitializationService.getAllowedVariables()
       );
-      this.warningText = this.mathInteractionsService.getWarningText();
+      // Show the warning text only when the learner has finished typing
+      // (i.e., the guppy editor is no longer focused) or when they are
+      // submitting their answer. This avoids distracting them while they are
+      // still entering the answer.
+      if (activeGuppyObject === undefined || !checkForTouched) {
+        this.warningText = this.mathInteractionsService.getWarningText();
+      } else {
+        this.warningText = '';
+      }
       this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }

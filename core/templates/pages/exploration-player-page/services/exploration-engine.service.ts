@@ -725,13 +725,25 @@ export class ExplorationEngineService {
     let oldStateName: string = this.playerTranscriptService.getLastStateName();
     let oldState: State = this.exploration.getState(oldStateName);
     let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
-    let classificationResult: AnswerClassificationResult =
-      this.answerClassificationService.getMatchingClassificationResult(
-        oldStateName,
-        oldStateCard.getInteraction(),
-        answer,
-        interactionRulesService
+    let classificationResult: AnswerClassificationResult;
+    try {
+      classificationResult =
+        this.answerClassificationService.getMatchingClassificationResult(
+          oldStateName,
+          oldStateCard.getInteraction(),
+          answer,
+          interactionRulesService
+        );
+    } catch (e: unknown) {
+      // Reset the processing flag so that the learner is not left stuck on the
+      // card if classification throws an error (for example, due to a rule
+      // function crashing on a malformed answer).
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning(
+        'Something went wrong while processing your answer. Please try again.'
       );
+      return false;
+    }
     let answerIsCorrect: boolean =
       classificationResult.outcome.labelledAsCorrect;
 

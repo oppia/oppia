@@ -160,6 +160,31 @@ describe('MathEquationInputInteractive', () => {
     expect(component.hasBeenTouched).toBeTrue();
   });
 
+  it('should not submit an expression even when guppy is still focused', function () {
+    // Submitting via the Enter key (the guppy 'done' event) keeps the guppy
+    // editor focused, so findActiveGuppyObject returns a guppy object. The
+    // answer must still be validated in this case, otherwise an expression
+    // without an '=' sign would be sent to the rules service and crash it.
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject
+    );
+    component.hasBeenTouched = true;
+    component.value = 'v';
+
+    spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(mockCurrentInteractionService, 'updateAnswerIsValid');
+    component.submitAnswer();
+    expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(
+      mockCurrentInteractionService.updateAnswerIsValid
+    ).toHaveBeenCalledWith(false);
+    expect(component.warningText).toBe(
+      'It looks like you have entered an expression. ' +
+        'Please enter an equation instead.'
+    );
+    expect(component.hasBeenTouched).toBeTrue();
+  });
+
   it('should correctly validate current answer', function () {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
