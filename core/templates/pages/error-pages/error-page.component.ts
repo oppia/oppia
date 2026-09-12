@@ -16,7 +16,15 @@
  * @fileoverview Component for the error page.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -27,17 +35,22 @@ import './error-page.component.css';
   templateUrl: './error-page.component.html',
   styleUrls: ['./error-page.component.css'],
 })
-export class ErrorPageComponent implements OnInit {
+export class ErrorPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // This property is initialized using Angular lifecycle hooks.
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() statusCode!: string;
 
   customErrorMessage: string | null = null;
+  private usingKeyboard = false;
+  private unlistenFns: (() => void)[] = [];
+  private mutationObserver: MutationObserver | null = null;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -56,11 +69,86 @@ export class ErrorPageComponent implements OnInit {
     }
   }
 
+  private attachFocusListeners(links: NodeListOf<HTMLElement>): void {
+    this.unlistenFns.push(
+      this.renderer.listen('window', 'keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Tab') {
+          this.usingKeyboard = true;
+        }
+      })
+    );
+    this.unlistenFns.push(
+      this.renderer.listen('window', 'mousedown', () => {
+        this.usingKeyboard = false;
+      })
+    );
+
+    links.forEach(link => {
+      this.unlistenFns.push(
+        this.renderer.listen(link, 'focus', () => {
+          if (this.usingKeyboard) {
+            this.renderer.setStyle(link, 'outline', '2px solid #0844aa');
+            this.renderer.setStyle(link, 'outline-offset', '2px');
+          }
+        })
+      );
+      this.unlistenFns.push(
+        this.renderer.listen(link, 'blur', () => {
+          this.renderer.removeStyle(link, 'outline');
+          this.renderer.removeStyle(link, 'outline-offset');
+        })
+      );
+    });
+  }
+
+  ngAfterViewInit(): void {
+    const container: HTMLElement | null =
+      this.elementRef.nativeElement.querySelector('.oppia-wide-panel-content');
+
+    if (!container) {
+      return;
+    }
+
+    const existingLinks: NodeListOf<HTMLElement> =
+      container.querySelectorAll('a');
+
+    if (existingLinks.length > 0) {
+      this.attachFocusListeners(existingLinks);
+    } else {
+      // The links are injected asynchronously via [innerHTML] once the
+      // translation resolves, so we observe the DOM until they appear.
+      this.mutationObserver = new MutationObserver(() => {
+        const links: NodeListOf<HTMLElement> = container.querySelectorAll('a');
+        if (links.length > 0) {
+          this.attachFocusListeners(links);
+          this.mutationObserver?.disconnect();
+          this.mutationObserver = null;
+        }
+      });
+      this.mutationObserver.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   getStatusCode(): number {
     return Number(this.statusCode);
+  }
+
+  ngOnDestroy(): void {
+    // Clean up all window/element listeners so they don't leak beyond this
+    // component's lifetime and interfere with other parts of the app.
+    this.unlistenFns.forEach(unlisten => unlisten());
+    this.unlistenFns = [];
+
+    // Disconnect the MutationObserver if it's still active (e.g. if the
+    // links never appeared before the component was destroyed).
+    this.mutationObserver?.disconnect();
+    this.mutationObserver = null;
   }
 }
