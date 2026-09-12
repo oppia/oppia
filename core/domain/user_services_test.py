@@ -116,6 +116,42 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)
         )
 
+    def test_get_user_roles_from_id_for_nonexistent_user_returns_guest_role(
+        self,
+    ) -> None:
+        """Test that getting roles for a nonexistent user returns the guest role."""
+        roles = user_services.get_user_roles_from_id('nonexistent_user_id_123')
+        self.assertEqual(roles, [feconf.ROLE_ID_GUEST])
+
+    def test_get_usernames_with_nonexistent_user_returns_none_in_list(
+        self,
+    ) -> None:
+        """Test that getting usernames for a nonexistent user returns a list with None."""
+        usernames = user_services.get_usernames(
+            ['nonexistent_user_id_123'], strict=False
+        )
+        self.assertEqual(usernames, [None])
+
+    def test_record_user_created_an_exploration_with_nonexistent_user(
+        self,
+    ) -> None:
+        """Test that recording exploration creation for a nonexistent user exits gracefully."""
+        user_services.record_user_created_an_exploration(
+            'nonexistent_user_id_123'
+        )
+
+    def test_migrate_dashboard_stats_with_valid_schema_exits_gracefully(
+        self,
+    ) -> None:
+        """Test that a valid schema version exits without raising an exception."""
+        valid_stats_model = user_models.UserStatsModel(
+            id='user_1',
+            schema_version=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+        )
+        user_services.migrate_dashboard_stats_to_latest_schema(
+            valid_stats_model
+        )
+
     def test_set_and_get_username(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -2625,6 +2661,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_user_id', 'exp_1', strict=True
             )
 
+    def test_get_checkpoints_in_order_with_no_default_outcome_returns_gracefully(
+        self,
+    ) -> None:
+        """Test get_checkpoints_in_order when default_outcome is None."""
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1'
+        )
+        state.interaction.default_outcome = None
+        states = {'Introduction': state}
+        checkpoints = user_services.get_checkpoints_in_order(
+            'Introduction', states
+        )
+        self.assertEqual(checkpoints, [])
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -3042,6 +3092,116 @@ title: Title
         self.assertIsNone(
             exp_user_data.most_recently_reached_checkpoint_state_name
         )
+
+    def test_update_checkpoint_progress_with_same_version(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        self.logout()
+
+    def test_update_checkpoint_progress_when_checkpoint_deleted(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                    'new_value': False,
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, 'remove checkpoint'
+        )
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 2
+        )
+        self.logout()
+
+    def test_clear_checkpoint_progress_for_nonexistent_model(self) -> None:
+        user_services.clear_learner_checkpoint_progress('fake_user', 'fake_exp')
+
+    def test_update_checkpoint_progress_when_checkpoint_exists_in_new_version(
+        self,
+    ) -> None:
+        self.login(self.VIEWER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'new objective',
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, 'update obj'
+        )
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 2
+        )
+        self.logout()
+
+    def test_sync_checkpoint_no_change_in_new_version(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'new objective',
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, 'update obj'
+        )
+        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+            self.viewer_id, self.EXP_ID
+        )
+        self.logout()
+
+    def test_update_checkpoint_progress_earlier_state_new_version(self) -> None:
+        from unittest import mock
+
+        self.login(self.VIEWER_EMAIL)
+        with mock.patch(
+            'core.domain.user_services.get_checkpoints_in_order'
+        ) as mock_checkpoints:
+            mock_checkpoints.return_value = ['Introduction', 'Second State']
+            user_services.update_learner_checkpoint_progress(
+                self.viewer_id, self.EXP_ID, 'Second State', 1
+            )
+            change_list = [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'objective',
+                        'new_value': 'newer objective',
+                    }
+                )
+            ]
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, change_list, 'update obj'
+            )
+            user_services.update_learner_checkpoint_progress(
+                self.viewer_id, self.EXP_ID, 'Introduction', 2
+            )
+        self.logout()
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
@@ -3974,6 +4134,26 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     REVIEWER_1_EMAIL: Final = 'reviewer1@community.org'
     REVIEWER_2_EMAIL: Final = 'reviewer2@community.org'
 
+    def test_remove_translation_rights_with_multiple_reviewers_keeps_count_above_zero(
+        self,
+    ) -> None:
+        """Test that removing a translation reviewer doesn't delete the language if others exist."""
+        user_services.allow_user_to_review_translation_in_language(
+            'user_1', 'es'
+        )
+        user_services.allow_user_to_review_translation_in_language(
+            'user_2', 'es'
+        )
+
+        user_services.remove_translation_review_rights_in_language(
+            'user_1', 'es'
+        )
+
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self.assertEqual(
+            stats_model.translation_reviewer_counts_by_lang_code['es'], 1
+        )
+
     def _assert_community_contribution_stats_is_in_default_state(self) -> None:
         """Checks if the community contribution stats is in its default
         state.
@@ -4114,12 +4294,15 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en'
         )
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi'
+        )
         # Assert that the translation reviewer count increased by one.
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1}
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 2, 'en': 1}
         )
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code, {}
@@ -4135,7 +4318,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {'en': 1}
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1}
         )
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code, {}
@@ -4825,6 +5008,10 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
         )
         self.assertEqual(usernames, [self.QUESTION_SUBMITTER_USERNAME])
+
+    def test_remove_contribution_reviewer_with_nonexistent_user(self) -> None:
+        """Test that removing a nonexistent contribution reviewer exits gracefully."""
+        user_services.remove_contribution_reviewer('nonexistent_user_id_123')
 
     def test_remove_question_submit_rights(self) -> None:
         auth_id = 'someUser'
