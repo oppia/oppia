@@ -463,7 +463,6 @@ const audioSliderSelector = 'oppia-audio-slider mat-slider';
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
-const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 
 // Exploration Player Selectors.
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
@@ -617,6 +616,7 @@ const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 const formErrorContainer = '.e2e-test-form-error-container';
@@ -3748,6 +3748,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector(classroomNameSelector);
+
+    const buttonText = await this.page.$eval(
+      classroomNameSelector,
+      element => (element as HTMLHeadElement).innerText
+    );
+
+    if (buttonText !== classroomName) {
+      throw new Error(
+        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
+      );
+    } else {
+      showMessage(`The ${classroomName} classroom name is visible.`);
+    }
+  }
+
+  /**
    * This function verifies that the classroom cards in classrooms page.
    */
   async expectClassroomCountInClassroomsPageUrlToBe(
@@ -4558,26 +4578,6 @@ export class LoggedOutUser extends BaseUser {
       {},
       `${testConstants.URLs.ClassroomsPage}/${classroomURLFragment}`
     );
-  }
-
-  /**
-   * This function verifies that the user is on the correct classroom page.
-   */
-  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
-    await this.page.waitForSelector(classroomNameSelector);
-
-    const buttonText = await this.page.$eval(
-      classroomNameSelector,
-      element => (element as HTMLHeadElement).innerText
-    );
-
-    if (buttonText !== classroomName) {
-      throw new Error(
-        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
-      );
-    } else {
-      showMessage(`The ${classroomName} classroom name is visible.`);
-    }
   }
 
   /**
