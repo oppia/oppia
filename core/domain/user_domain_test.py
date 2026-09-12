@@ -1855,6 +1855,36 @@ class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(actual_stats.to_dict(), self.expected_stats_dict)
 
+    def test_validate_with_valid_stats(self) -> None:
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en', ['user1', 'user2'], 2
+        )
+        actual_stats.validate()
+
+    def test_validate_with_invalid_coordinator_ids_type(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en', 'user1', 2  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected coordinator_ids to be a list, received user1.',
+        ):
+            actual_stats.validate()
+
+    def test_validate_with_mismatching_coordinators_count(self) -> None:
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en', ['user1', 'user2'], 3
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected coordinators_count to match the number of '
+            'coordinator_ids, but got 3 and 2 respectively.',
+        ):
+            actual_stats.validate()
+
 
 class UserContributionRightsUnitTest(test_utils.GenericTestBase):
     """Tests for the UserContributionRights class."""
