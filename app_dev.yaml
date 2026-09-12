@@ -53,6 +53,13 @@ handlers:
     # This is replaced by a specific origin when doing a deployment.
     Access-Control-Allow-Origin: "*"
   expiration: "0"
+- url: /assets/third_party_static
+  static_dir: dist/oppia-angular/assets/third_party_static
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
 - url: /assets/audio
   static_dir: assets/audio
   secure: always

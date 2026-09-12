@@ -29,8 +29,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import './edit-profile-picture-modal.component.css';
-require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-edit-profile-picture-modal',
@@ -59,7 +62,8 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal,
     private windowDimensionService: WindowDimensionsService,
-    private svgSanitizerService: SvgSanitizerService
+    private svgSanitizerService: SvgSanitizerService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {
     super(ngbActiveModal);
   }
@@ -147,6 +151,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CROPPER);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {

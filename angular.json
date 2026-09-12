@@ -55,6 +55,36 @@
                 "output": "/assets/mathjax"
               },
               {
+                "glob": "guppy-default.min.css",
+                "input": "node_modules/guppy-dev/build/",
+                "output": "/assets/third_party_static/guppy/"
+              },
+              {
+                "glob": "fonts/*",
+                "input": "node_modules/guppy-dev/build/",
+                "output": "/assets/third_party_static/guppy/"
+              },
+              {
+                "glob": "icons/*",
+                "input": "node_modules/guppy-dev/build/",
+                "output": "/assets/third_party_static/guppy/"
+              },
+              {
+                "glob": "cropper.min.css",
+                "input": "node_modules/cropperjs/dist/",
+                "output": "/assets/third_party_static/cropper/"
+              },
+              {
+                "glob": "codemirror.css",
+                "input": "node_modules/codemirror/lib/",
+                "output": "/assets/third_party_static/codemirror/"
+              },
+              {
+                "glob": "merge.css",
+                "input": "node_modules/codemirror/addon/merge/",
+                "output": "/assets/third_party_static/codemirror/"
+              },
+              {
                 "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
@@ -90,11 +120,7 @@
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css",
-              "node_modules/guppy-dev/build/guppy-default.min.css",
-              "node_modules/cropperjs/dist/cropper.min.css",
-              "node_modules/codemirror/lib/codemirror.css",
-              "node_modules/codemirror/addon/merge/merge.css"
+              "core/templates/css/shepherd-overrides.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
@@ -203,11 +229,7 @@
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css",
-              "node_modules/guppy-dev/build/guppy-default.min.css",
-              "node_modules/cropperjs/dist/cropper.min.css",
-              "node_modules/codemirror/lib/codemirror.css",
-              "node_modules/codemirror/addon/merge/merge.css"
+              "core/templates/css/shepherd-overrides.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
