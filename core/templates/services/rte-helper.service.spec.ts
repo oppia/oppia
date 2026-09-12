@@ -72,8 +72,7 @@ describe('Rte Helper Service', () => {
         customizationArgSpecs: [
           {
             name: 'filepath',
-            description:
-              'The image (Allowed extensions: gif, jpeg, jpg, png, svg)',
+            description: 'The image (Allowed extensions: svg)',
             schema: {
               type: 'custom',
               obj_type: 'Filepath',
