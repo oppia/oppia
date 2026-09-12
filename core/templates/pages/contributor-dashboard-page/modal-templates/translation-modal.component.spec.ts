@@ -902,7 +902,11 @@ describe('Translation Modal Component', () => {
       flushMicrotasks();
     }));
 
-    it('should correctly submit a translation suggestion', fakeAsync(() => {
+    it('should correctly submit a translation suggestion and continue when more are available', fakeAsync(() => {
+      spyOn(component.activeModal, 'close');
+      spyOn(component, 'resetEditor');
+      component.moreAvailable = true;
+
       component.suggestTranslatedText();
       tick();
 
@@ -913,6 +917,9 @@ describe('Translation Modal Component', () => {
       );
       req.flush({});
       flushMicrotasks();
+
+      expect(component.resetEditor).toHaveBeenCalled();
+      expect(component.activeModal.close).not.toHaveBeenCalled();
     }));
 
     describe('when already uploading a translation', () => {

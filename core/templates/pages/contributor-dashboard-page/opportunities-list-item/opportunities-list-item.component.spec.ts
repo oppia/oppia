@@ -22,6 +22,7 @@ import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {of} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SimpleChange} from '@angular/core';
 
 import {
   ExplorationOpportunity,
@@ -142,6 +143,31 @@ describe('Opportunities List Item Component', () => {
 
       it('should initialize progressPercentage to 0%', () => {
         expect(component.progressPercentage).toBe('0%');
+      });
+
+      it('should not set progressPercentage if it is undefined', () => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        Object.defineProperty(opportunity, 'progressPercentage', {
+          value: undefined,
+        });
+        component.progressPercentage = 'default';
+        fixture.detectChanges();
+        component.ngOnInit();
+        expect(component.progressPercentage).toBe('default');
+      });
+
+      it('should not set progressPercentage if it is null', () => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        Object.defineProperty(opportunity, 'progressPercentage', {
+          value: null,
+        });
+        component.progressPercentage = 'default';
+        fixture.detectChanges();
+        component.ngOnInit();
+        expect(component.progressPercentage).toBe('default');
+      });
+
+      it('should initialize progressBarStyle to 0%', () => {
         expect(component.progressBarStyle).toEqual({
           width: '0%',
         });
@@ -361,6 +387,126 @@ describe('Opportunities List Item Component', () => {
       expect(spy).toHaveBeenCalledWith({
         topic_name: expectedTopicName,
         exploration_id: '1',
+      });
+    });
+
+    describe('when all remaining content is reviewer-only', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 3;
+        opportunity.reviewerOnlyContentCount = 2;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should calculate cardsAvailable correctly', () => {
+        expect(component.cardsAvailable).toBe(2);
+      });
+
+      it('should disable the button and show the correct generic tooltip', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.'
+        );
+      });
+    });
+
+    describe('when totalCount is 0', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 0;
+        opportunity.translationsCount = 0;
+        opportunity.inReviewCount = 0;
+        opportunity.reviewerOnlyContentCount = 0;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should set progressPercentage to 100% to avoid division by zero', () => {
+        expect(component.progressPercentage).toBe('100%');
+        expect(component.cardsAvailable).toBe(0);
+      });
+    });
+
+    describe('when button is disabled and there is no reviewer-only content', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = 0;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should disable the button and show the default tooltip when all translations are in review', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
+
+    describe('when button is disabled and user is a reviewer', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = 5;
+        opportunity.userIsReviewer = true;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should show the default tooltip because reviewer can still review', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
+
+    describe('when button is disabled and reviewerOnlyContentCount is undefined', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = undefined;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should show the default tooltip when reviewer count is not present', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
+
+    describe('ngOnChanges', () => {
+      it('should call initOpportunityData when opportunity changes', () => {
+        spyOn(component, 'initOpportunityData');
+        component.ngOnChanges({
+          opportunity: new SimpleChange(null, 'new value', false),
+        });
+        expect(component.initOpportunityData).toHaveBeenCalled();
+      });
+
+      it('should not call initOpportunityData when opportunity does not change', () => {
+        spyOn(component, 'initOpportunityData');
+        component.ngOnChanges({
+          otherProperty: new SimpleChange(null, 'new value', false),
+        });
+        expect(component.initOpportunityData).not.toHaveBeenCalled();
       });
     });
   });
