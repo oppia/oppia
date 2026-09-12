@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for pieChart.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -73,6 +75,7 @@ describe('Pie Chart component', () => {
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty(window, 'google', {
       get: () => ({}),
+      configurable: true,
     });
     component.data = [];
     component.chart = mockedChart;

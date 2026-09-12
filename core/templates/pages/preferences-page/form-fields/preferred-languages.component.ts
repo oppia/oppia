@@ -32,10 +32,12 @@ import {
 } from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
 import {LanguageIdAndText} from 'domain/utilities/language-util.service';
+import './preferred-languages.component.css';
 
 @Component({
   selector: 'oppia-preferred-languages',
   templateUrl: './preferred-languages.component.html',
+  styleUrls: ['./preferred-languages.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
