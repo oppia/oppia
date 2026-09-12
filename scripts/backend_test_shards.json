@@ -438,6 +438,7 @@
         "core.controllers.certificate_assessment_test",
         "core.domain.certificate_assessment_services_test",
         "core.jobs.batch_jobs.classroom_migration_jobs_test",
-        "core.jobs.batch_jobs.user_activities_stale_exploration_cleanup_jobs_test"
+        "core.jobs.batch_jobs.user_activities_stale_exploration_cleanup_jobs_test",
+        "core.jobs.batch_jobs.legacy_feedback_migration_jobs_test"
     ]
 }
