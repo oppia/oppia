@@ -62,6 +62,29 @@
   justify-content: center;
   max-width: 50%;
 }
+.oppia-dropdown-pagination-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.oppia-page-selector {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  margin: 0 10px;
+  padding: 5px 10px;
+}
+.oppia-page-selector-label {
+  color: #333;
+  font-size: 16px;
+}
+.oppia-pagination-button-icon-only {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-width: 40px;
+}
 .oppia-pagination-button:hover {
   border: 2px solid #009688;
   border-radius: 5px;

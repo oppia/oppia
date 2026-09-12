@@ -216,6 +216,32 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
+    def test_count_translation_opportunities(self) -> None:
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+                'hi', None
+            ),
+            6,
+        )
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+                'hi', 'a_topic name'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+                'ar', None
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+                'fr', None
+            ),
+            0,
+        )
+
     def test_get_by_topic(self) -> None:
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
@@ -303,6 +329,12 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[1].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
+
+    def test_count_skill_opportunities(self) -> None:
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel.count_skill_opportunities(),
+            2,
+        )
 
     def test_get_skill_opportunities_pagination(self) -> None:
         results, cursor, more = (
@@ -538,6 +570,75 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(results), 0)
+
+    def test_count_by_entity_type_and_topic(self) -> None:
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp1',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp2',
+            topic_ids=['topic1', 'topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='skill',
+            entity_id='skill1',
+            topic_ids=['topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                'exploration', 'topic1', 'hi'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                'exploration', None, 'hi'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                'exploration', 'topic2', 'hi'
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                'exploration', 'topic1', 'en'
+            ),
+            0,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                'skill', 'topic2', 'hi'
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                None, 'topic2', 'hi'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+                None, None, 'hi'
+            ),
+            3,
+        )
 
     def test_get_by_entity_type_and_topic_pagination(self) -> None:
         for i in range(5):

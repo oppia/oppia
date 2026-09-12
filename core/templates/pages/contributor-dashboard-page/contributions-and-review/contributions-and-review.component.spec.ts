@@ -108,6 +108,9 @@ class MockPlatformFeatureService {
     EnableTranslationOppsWithNewOppModels: {
       isEnabled: false,
     },
+    EnableDropdownPagination: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -1936,6 +1939,28 @@ describe('Contributions and review component', () => {
         } as unknown as Opportunity,
       ]);
       expect(response.more).toEqual(false);
+    }));
+
+    it('should get reviewable translation opportunities count correctly', fakeAsync(() => {
+      const expectedCount = 5;
+      spyOn(translationTopicService, 'getActiveTopicName').and.returnValue(
+        'Topic 1'
+      );
+      component.languageCode = 'en';
+      const countSpy = spyOn(
+        contributionOpportunitiesService,
+        'getReviewableTranslationOpportunitiesCountAsync'
+      ).and.returnValue(Promise.resolve(expectedCount));
+
+      let resolvedCount = null;
+      component.loadReviewableTranslationOpportunitiesCount().then(count => {
+        resolvedCount = count;
+      });
+
+      flushMicrotasks();
+
+      expect(countSpy).toHaveBeenCalledWith('Topic 1', 'en');
+      expect(resolvedCount).toEqual(expectedCount);
     }));
 
     it('should fetch suggestions using the entity type of the opened opportunity', fakeAsync(() => {

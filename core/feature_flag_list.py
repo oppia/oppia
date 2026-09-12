@@ -111,6 +111,7 @@ class FeatureNames(enum.Enum):
         'technical_feedback_dashboard_enabled'
     )
     STORY_EDITOR_ARCS = 'story_editor_arcs'
+    ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -141,6 +142,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -394,6 +396,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables arc-based chapter groupings in the story editor, '
             'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
+        (
+            'This flag enables dropdown-based page navigation on the '
+            'Contributor Dashboard, replacing the simple Previous/Next '
+            'pagination buttons with a page selector dropdown.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }

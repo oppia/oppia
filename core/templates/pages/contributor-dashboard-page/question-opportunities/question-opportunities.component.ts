@@ -137,6 +137,12 @@ export class QuestionOpportunitiesComponent implements OnInit {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
+  loadOpportunitiesCount(searchQuery: string = ''): Promise<number> {
+    return this.contributionOpportunitiesService.getSkillOpportunitiesCountAsync(
+      searchQuery
+    );
+  }
+
   loadOpportunities(searchQuery: string = ''): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;

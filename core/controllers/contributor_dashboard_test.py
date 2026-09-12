@@ -3744,3 +3744,130 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
                 % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
             )
             self.assertEqual(len(response['translatable_contents']), 1)
+
+
+class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
+    """Unit tests for the OpportunitiesCountHandler."""
+
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]
+    ) -> None:
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-three',
+            )
+        ]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = uncategorized_skill_ids
+        topic.uncategorized_skill_ids = uncategorized_skill_ids
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        # Create a skill opportunity.
+        self.save_new_skill('skill_1', self.owner_id, description='A skill')
+
+        # Create an exploration for translation opportunity.
+        self.save_new_valid_exploration(
+            'exp_1',
+            self.owner_id,
+            title='title 1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_1')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'topic', 'abbrev', 'description', 'fragm'
+        )
+        self._publish_valid_topic(topic, ['skill_1'])
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_1', 'topic_id_1', 'exp_1'
+        )
+
+        # Add the skill opportunity to a classroom so it shows up in counts.
+        self.classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=self.classroom_id,
+            topic_id_to_prerequisite_topic_ids={'topic_id_1': []},
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_skill_opportunities_count(self) -> None:
+        response = self.get_json('/opportunitiescounthandler/skill')
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_opportunities_count(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/translation?language_code=hi'
+        )
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_reviewable_translation_count(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/reviewable_translation?language_code=hi'
+        )
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_count_missing_language_code(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/translation', expected_status_int=400
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_reviewable_translation_count_missing_language_code(
+        self,
+    ) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/reviewable_translation',
+            expected_status_int=400,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_invalid_opportunity_type(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/invalid_type', expected_status_int=404
+        )
+
+    def test_feature_flag_disabled(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/skill', expected_status_int=404
+        )
