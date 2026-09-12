@@ -24,11 +24,12 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import './allowed-variables-editor.component.css';
 
 @Component({
   selector: 'allowed-variables-editor',
   templateUrl: './allowed-variables-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./allowed-variables-editor.component.css'],
 })
 export class AllowedVariablesEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

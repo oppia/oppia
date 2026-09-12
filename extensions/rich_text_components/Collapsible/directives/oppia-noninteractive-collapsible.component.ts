@@ -42,11 +42,12 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import './collapsible.component.css';
 
 @Component({
   selector: 'oppia-noninteractive-collapsible',
   templateUrl: './collapsible.component.html',
-  styleUrls: [],
+  styleUrls: ['./collapsible.component.css'],
 })
 export class NoninteractiveCollapsible implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

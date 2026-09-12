@@ -22,10 +22,12 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import './set-input-response.component.css';
 
 @Component({
   selector: 'oppia-response-set-input',
   templateUrl: './set-input-response.component.html',
+  styleUrls: ['./set-input-response.component.css'],
 })
 export class ResponseSetInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

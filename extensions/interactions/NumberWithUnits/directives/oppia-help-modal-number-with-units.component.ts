@@ -20,10 +20,12 @@ import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './number-with-units-help-modal.component.css';
 
 @Component({
   selector: 'oppia-help-modal-number-with-units',
   templateUrl: './number-with-units-help-modal.component.html',
+  styleUrls: ['./number-with-units-help-modal.component.css'],
 })
 export class HelpModalNumberWithUnitsComponent extends ConfirmOrCancelModal {
   constructor(

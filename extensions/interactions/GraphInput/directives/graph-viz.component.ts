@@ -42,6 +42,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UtilsService} from 'services/utils.service';
 import {EdgeCentre, GraphDetailService} from './graph-detail.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './graph-viz.component.css';
 
 const debounce = (delay = 5): MethodDecorator => {
   return (
@@ -76,7 +77,7 @@ interface GraphOption {
 @Component({
   selector: 'graph-viz',
   templateUrl: './graph-viz.component.html',
-  styleUrls: [],
+  styleUrls: ['./graph-viz.component.css'],
 })
 export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() graph!: GraphAnswer;

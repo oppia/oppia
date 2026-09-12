@@ -42,11 +42,12 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import './workedexample.component.css';
 
 @Component({
   selector: 'oppia-noninteractive-workedexample',
   templateUrl: './workedexample.component.html',
-  styleUrls: [],
+  styleUrls: ['./workedexample.component.css'],
 })
 export class NoninteractiveWorkedexample implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

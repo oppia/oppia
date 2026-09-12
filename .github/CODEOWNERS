@@ -373,6 +373,7 @@
 /extensions/objects/ @oppia/lace-backend-reviewers
 /extensions/objects/templates/*.ts @oppia/lace-frontend-reviewers
 /extensions/objects/templates/*.html @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.css @oppia/lace-frontend-reviewers
 /extensions/value_generators/ @oppia/lace-backend-reviewers
 /extensions/value_generators/templates/*.ts @oppia/lace-frontend-reviewers
 /extensions/value_generators/templates/*.html @oppia/lace-frontend-reviewers

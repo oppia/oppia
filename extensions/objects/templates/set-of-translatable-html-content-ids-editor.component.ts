@@ -24,6 +24,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import './set-of-translatable-html-content-ids-editor.component.css';
 
 interface Choice {
   val: string;
@@ -32,7 +33,7 @@ interface Choice {
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./set-of-translatable-html-content-ids-editor.component.css'],
 })
 export class SetOfTranslatableHtmlContentIdsEditorComponent
   implements OnInit, OnChanges

@@ -20,10 +20,12 @@ import {Ratio} from 'domain/objects/ratio.model';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import './ratio-expression-editor.component.css';
 
 @Component({
   selector: 'ratio-expression-editor',
   templateUrl: './ratio-expression-editor.component.html',
+  styleUrls: ['./ratio-expression-editor.component.css'],
 })
 export class RatioExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
