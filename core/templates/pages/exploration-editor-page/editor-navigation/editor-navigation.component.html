@@ -10,7 +10,7 @@
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
         <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.dropdown]="countWarnings()">
-            <a href="#" ngbTooltip="Editor" [placement]="countWarnings() ? 'left' : 'bottom'" (click)="selectMainTab()"
+            <a href="#" ngbTooltip="Editor" [placement]="countWarnings() ? 'left' : 'bottom'" (click)="selectMainTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
               <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
@@ -22,42 +22,42 @@
             </div>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-translation-tab" *ngIf="isUserLoggedIn()" [class.active]="getActiveTabName() === 'translation'">
-            <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
+            <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-microphone oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [class.active]="getActiveTabName() === 'preview'">
-            <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
+            <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-preview-button">
               <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [class.active]="getActiveTabName() === 'settings'">
-            <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
+            <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-settings-button">
               <i class="fa fa-cog oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-stats-button" [class.active]="getActiveTabName() === 'stats'">
-            <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab()"
+            <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-poll oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.active]="getActiveTabName() === 'improvements'" *ngIf="isImprovementsTabEnabled()">
-            <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab()"
+            <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-arrow-trend-up oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.active]="getActiveTabName() === 'history'">
-            <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
+            <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab(); $event.preventDefault()"
                disabled="ExplorationRightsService.isCloned()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-history-button">
               <i class="fa fa-clock oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -65,7 +65,7 @@
             </a>
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-feedback-button" [class.active]="getActiveTabName() === 'feedback'">
-            <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
+            <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab(); $event.preventDefault()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
