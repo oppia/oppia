@@ -91,33 +91,6 @@ describe('Logged-out User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should be able to search blog posts by tags',
-    async function () {
-      await loggedOutUser.filterBlogPostsByTag('Community');
-      await loggedOutUser.expectBlogSearchResultsToHaveTag('Community');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search blog posts by keywords',
-    async function () {
-      await loggedOutUser.filterBlogPostsByKeyword('Education');
-      await loggedOutUser.expectBlogSearchResultsToContain('Education');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search blog posts by body content',
-    async function () {
-      await loggedOutUser.filterBlogPostsByKeyword('Pineapple');
-      await loggedOutUser.expectBlogSearchResultsToContain('Recipe Post');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

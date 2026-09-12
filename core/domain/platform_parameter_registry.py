@@ -569,20 +569,6 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.ES_CLOUD_ID,
-    'ID for elastic search service.',
-    platform_parameter_domain.DataTypes.STRING,
-    default='',
-)
-
-Registry.create_platform_parameter(
-    ParamName.ES_USERNAME,
-    'Username for elastic search service.',
-    platform_parameter_domain.DataTypes.STRING,
-    default='',
-)
-
-Registry.create_platform_parameter(
     ParamName.OPPIA_SITE_URL_FOR_EMAILS,
     'Oppia site URL used in emails.',
     platform_parameter_domain.DataTypes.STRING,

@@ -25,7 +25,6 @@ export const AppConstants = {
     I18N_LIBRARY_LOADING: 'Loading',
     I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
     I18N_SIGNUP_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Oppia',
-    I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
     I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
     I18N_LIBRARY_LANGUAGES_EN: 'English',
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
@@ -336,8 +335,7 @@ export const AppConstants = {
     'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
-  TEACHER_STORY_TAGGED_BLOGS_LINK:
-    '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+  TEACHER_STORY_TAGGED_BLOGS_LINK: '/blog',
   VOLUNTEER_EXPECTATIONS: [
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',

@@ -65,12 +65,13 @@ test.describe('Logged-Out Learner', function () {
     );
   });
 
-  test('should be able to search for an exploration of an interest', async function () {
+  test('should be able to find an exploration of an interest by browsing the community library', async function () {
     await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
 
-    await loggedOutLearner.searchForLessonInSearchBar('Geometry');
+    // Both published explorations of the same interest are listed in
+    // the community library.
     await loggedOutLearner.expectSearchResultsToContain(['Geometry']);
-    await loggedOutLearner.expectSearchResultsToContain(['Fractions'], false);
+    await loggedOutLearner.expectSearchResultsToContain(['Fractions']);
 
     await loggedOutLearner.expectLessonsToHaveRating(5, 'Geometry');
     await loggedOutLearner.expectLessonViewsToBe(1, 'Geometry');

@@ -279,50 +279,6 @@ def managed_firebase_auth_emulator(
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
-    """Returns a context manager for ElasticSearch server for running tests
-    in development mode and running a local dev server. This is only required
-    in a development environment.
-
-    Yields:
-        psutil.Process. The ElasticSearch server process.
-    """
-    # Clear previous data stored in the local cluster.
-    if os.path.exists(common.ES_PATH_DATA_DIR):
-        shutil.rmtree(common.ES_PATH_DATA_DIR)
-
-    es_args = [
-        '%s/bin/elasticsearch' % common.ES_PATH,
-        # -q is the quiet flag.
-        '-q',
-        '-E',
-        # Disable security for the local ElasticSearch server.
-        'xpack.security.enabled=false',
-        # Disable the disk threshold checks. These checks can cause issues on
-        # machines with low disk space.
-        '-E',
-        'cluster.routing.allocation.disk.threshold_enabled=false',
-    ]
-    # Override the default path to ElasticSearch config files.
-    es_env = {
-        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
-        # Set the minimum heap size to 100 MB and maximum to 500 MB.
-        'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-    }
-    # OK to use shell=True here because we are passing string literals and
-    # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(
-        es_args,
-        human_readable_name='ElasticSearch Server',
-        env=es_env,
-        shell=True,
-    )
-    with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
-        yield proc
-
-
-@contextlib.contextmanager
 def managed_cloud_datastore_emulator(
     clear_datastore: bool = False,
 ) -> Iterator[psutil.Process]:

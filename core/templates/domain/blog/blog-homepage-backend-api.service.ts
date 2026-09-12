@@ -41,24 +41,10 @@ export interface BlogAuthorProfilePageBackendResponse {
   summary_dicts: BlogPostSummaryBackendDict[];
 }
 
-export interface SearchResponseBackendDict {
-  search_offset: number | null;
-  blog_post_summaries_list: BlogPostSummaryBackendDict[];
-  list_of_default_tags: string[];
-  total_matching_blog_posts: number;
-}
-
 export interface BlogPostPageBackendResponse {
   author_username: string;
   blog_post_dict: BlogPostBackendDict;
   summary_dicts: BlogPostSummaryBackendDict[];
-}
-
-export interface SearchResponseData {
-  searchOffset: number | null;
-  blogPostSummariesList: BlogPostSummary[];
-  listOfDefaultTags: string[];
-  totalMatchingBlogPosts: number;
 }
 
 export interface BlogHomePageData {
@@ -144,35 +130,6 @@ export class BlogHomePageBackendApiService {
               displayedAuthorName:
                 response.author_details.displayed_author_name,
               authorBio: response.author_details.author_bio,
-            });
-          },
-          errorResponse => {
-            reject(errorResponse);
-          }
-        );
-    });
-  }
-
-  async fetchBlogPostSearchResultAsync(
-    searchQuery: string
-  ): Promise<SearchResponseData> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .get<SearchResponseBackendDict>(
-          BlogHomePageConstants.BLOG_SEARCH_DATA_URL + searchQuery
-        )
-        .toPromise()
-        .then(
-          response => {
-            resolve({
-              searchOffset: response.search_offset,
-              listOfDefaultTags: response.list_of_default_tags,
-              blogPostSummariesList: response.blog_post_summaries_list.map(
-                blogPostSummary => {
-                  return BlogPostSummary.createFromBackendDict(blogPostSummary);
-                }
-              ),
-              totalMatchingBlogPosts: response.total_matching_blog_posts ?? 0,
             });
           },
           errorResponse => {

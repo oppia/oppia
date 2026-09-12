@@ -7443,24 +7443,6 @@ export default {
         }
       ]
     },
-    "LIBRARY_SEARCH": {
-      "ROUTE": "search/find",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
-        }
-      ]
-    },
     "PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/session",
       "TITLE": "Practice Session Page",
@@ -7743,24 +7725,6 @@ export default {
     },
     "BLOG_HOMEPAGE": {
       "ROUTE": "blog",
-      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        }
-      ]
-    },
-    "BLOG_HOMEPAGE_SEARCH": {
-      "ROUTE": "blog/search/find",
       "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
       "META": [
         {
