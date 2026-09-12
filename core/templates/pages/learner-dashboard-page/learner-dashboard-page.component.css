@@ -716,3 +716,8 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   padding-left: 15px;
   padding-right: 15px;
 }
+
+.oppia-learner-dash-sidebar_btn .fa-lg {
+  line-height: 0.75em;
+  vertical-align: -0.0667em;
+}
