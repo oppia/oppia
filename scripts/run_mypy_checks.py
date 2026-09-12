@@ -54,9 +54,6 @@ EXCLUDED_DIRECTORIES: Final = [
 NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'extensions/objects/models/objects.py',
     'core/schema_utils.py',
-    'core/storage/user/gae_models.py',
-    'core/storage/suggestion/gae_models.py',
-    'core/storage/blog/gae_models.py',
     'core/domain/html_validation_service.py',
     'core/domain/story_domain.py',
     'core/domain/draft_upgrade_services.py',
@@ -80,7 +77,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/controllers/access_validators.py',
     'scripts/run_typescript_checks_test.py',
     'scripts/run_frontend_tests_test.py',
-    'core/storage/base_model/gae_models_test.py',
     'core/domain/user_services_test.py',
     'core/domain/takeout_service_test.py',
     'core/domain/question_fetchers_test.py',
