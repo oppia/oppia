@@ -307,11 +307,6 @@ class ExplorationDisplayableSummariesTest(
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             needs_update=False,
         )
-        translated_category = translation_domain.TranslatedContent(
-            'Exploration 2 Hindi Category',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
-            needs_update=False,
-        )
         translated_tag_0 = translation_domain.TranslatedContent(
             'Hindi Tag 1',
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
@@ -338,14 +333,6 @@ class ExplorationDisplayableSummariesTest(
             'hi',
             feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
             translated_objective,
-        )
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.EXP_ID_2,
-            exp_summary_2.version,
-            'hi',
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID,
-            translated_category,
         )
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
@@ -387,13 +374,11 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual(
             exp2_summary['objective'], 'Exploration 2 Hindi Objective'
         )
-        self.assertEqual(
-            exp2_summary['category'], 'Exploration 2 Hindi Category'
-        )
+        self.assertEqual(exp2_summary['category'], 'Algebra')
         self.assertEqual(exp2_summary['tags'], ['Hindi Tag 1', 'math'])
         self.assertEqual(
             exp2_summary['translated_metadata_fields'],
-            ['title', 'objective', 'category', 'tags'],
+            ['title', 'objective', 'tags'],
         )
 
     def test_get_displayable_exp_summary_dicts_with_partially_translated_metadata(

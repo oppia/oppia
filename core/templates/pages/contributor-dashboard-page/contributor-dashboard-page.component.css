@@ -45,11 +45,12 @@
 .oppia-dropdown-container {
   display: flex;
   margin-bottom: 20px;
-  width: 50%;
+  width: 75%;
 }
 .oppia-dropdown-row {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   width: 100%;
 }
 button.oppia-autofocus:focus {
@@ -67,8 +68,8 @@ button.oppia-autofocus:focus {
   align-items: flex-start;
   display: flex;
   flex-direction: column;
-  margin-left: 10%;
-  width: 100%;
+  margin-left: 2%;
+  width: 250px;
 }
 .oppia-opportunity-language-selector {
   background: white;
@@ -96,11 +97,13 @@ button.oppia-autofocus:focus {
 .oppia-short-contributor-username-container,
 .oppia-long-contributor-username-container {
   color: #009688;
+  flex-shrink: 0;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 24px;
   height: 30%;
   min-width: 0;
   padding-top: 10px;
+  white-space: nowrap;
 }
 .oppia-short-contributor-username-container {
   min-width: 100px;
@@ -252,7 +255,7 @@ button.oppia-autofocus:focus {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
-  width: 100%;
+  width: 250px;
 }
 @media (max-width:700px) {
   .oppia-opportunities-tabs-explanation h1,
@@ -266,14 +269,22 @@ button.oppia-autofocus:focus {
   }
 }
 @media only screen and (max-width: 700px) {
+  .oppia-contributor-home {
+    position: static;
+  }
+  .oppia-opportunities-tabs {
+    background-color: #fff;
+    padding-bottom: 10px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 56px;
+    z-index: 3;
+  }
   .oppia-opportunities-tabs-explanation {
     font-size: 18px;
   }
   .oppia-opportunities-tabs-explanation-before {
     font-size: 20px;
-  }
-  .oppia-opportunities-tabs {
-    padding-bottom: 10px;
   }
   .oppia-user-and-rights {
     border-bottom: 1px solid rgba(151, 151, 151, 0.5);

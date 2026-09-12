@@ -32,25 +32,31 @@
   width: 100%;
 }
 
-.oppia-content-language-selector-container {
+oppia-content-language-selector {
   float: right;
   margin-bottom: 12px;
+}
+.oppia-content-language-selector-container {
+  align-items: center;
+  display: inline-flex;
   margin-right: 0;
 }
-.oppia-content-language-selector-icon {
+/* stylelint-disable selector-pseudo-element-no-unknown */
+::ng-deep .oppia-content-language-selector-icon {
   color: rgb(75, 74, 74);
-  font-size: 25px;
-  margin-right: 4px;
+  font-size: 20px;
+  margin-right: 6px;
 }
-.oppia-content-language-selector {
-  border-radius: 9px;
+::ng-deep .oppia-content-language-selector {
+  border-radius: 4px;
   font-size: 15px;
-  margin-left: 5px;
+  margin-left: 6px;
   padding-left: 3px;
 }
-.oppia-exploration-language {
-  padding: 0 5px 0 5px;
+::ng-deep .oppia-exploration-language {
+  padding: 0 4px;
 }
+/* stylelint-enable selector-pseudo-element-no-unknown */
 
 .oppia-learner-view-card-content {
   word-wrap: break-word;

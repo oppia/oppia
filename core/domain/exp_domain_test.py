@@ -3928,12 +3928,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             exploration.get_content_html(
-                'Generic Content', 'exploration_category'
-            ),
-            'Algebra',
-        )
-        self.assertEqual(
-            exploration.get_content_html(
                 'Generic Content', 'exploration_tag_0'
             ),
             'algebra',
@@ -5012,9 +5006,7 @@ title: Title
         self.assertNotIn(
             feconf.EXPLORATION_OBJECTIVE_CONTENT_ID, translatable_contents
         )
-        self.assertNotIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
         self.assertNotIn('exploration_tag_0', translatable_contents)
         self.assertNotIn('exploration_tag_1', translatable_contents)
 
@@ -5081,27 +5073,7 @@ title: Title
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
         )
 
-        self.assertIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_value,
-            'Category',
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_type,
-            translation_domain.ContentType.METADATA,
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_format,
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
 
         self.assertIn('exploration_tag_0', translatable_contents)
         self.assertEqual(
