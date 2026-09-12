@@ -55,6 +55,8 @@ module.exports = async (browser, context) => {
     await createExplorations(context, page);
   } else if (context.url.includes('blog-dashboard')) {
     await setRole(page, 'BLOG_ADMIN');
+  } else if (context.url.includes('blog-admin')) {
+    await setRole(page, 'BLOG_ADMIN');
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
   await page.close();
@@ -192,6 +194,7 @@ const setRole = async function (page, role) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    throw e;
   }
 };
 

@@ -24,6 +24,7 @@ from core.constants import constants
 from core.domain import (
     blog_services,
     caching_services,
+    classroom_config_domain,
     classroom_config_services,
     collection_services,
     exp_domain,
@@ -44,6 +45,7 @@ from core.domain import (
     story_fetchers,
     story_services,
     study_guide_services,
+    subtopic_page_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
@@ -616,6 +618,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_cannot_generate_default_classroom_data_in_production_mode(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy classroom in production.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler',
+                {'action': 'generate_dummy_default_classroom'},
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
     def test_non_admins_cannot_generate_dummy_skill_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -719,9 +738,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             .canonical_story_references[0]
             .story_id
         )
-        self.assertIsNotNone(
-            story_fetchers.get_story_by_id(story_id, strict=False)
-        )
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        self.assertIsNotNone(story)
+        assert story is not None
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
         questions, _ = (
@@ -744,6 +763,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', '', None)
         )
         self.assertEqual(len(translation_opportunities), 3)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_summaries[0].id, 1, strict=False
+        )
+        self.assertIsNotNone(subtopic_page)
+        assert subtopic_page is not None
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>Dummy subtopic page content.</p>',
+        )
+        self.assertEqual(
+            voiceover_services.get_all_language_accent_codes_for_voiceovers(),
+            {'en': {'en-US': True}},
+        )
         self.logout()
 
     @test_utils.enable_feature_flags(
@@ -821,11 +853,544 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        self.logout()
+
+    def test_generate_dummy_classroom_data_with_default_count(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
             {'action': 'generate_dummy_classroom'},
             csrf_token=csrf_token,
         )
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
+        self.logout()
+
+    def test_generate_dummy_classroom_data_resumes_from_first_missing(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_classroom',
+                    'num_dummy_classrooms_to_generate': 3,
+                },
+                csrf_token=csrf_token,
+            )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 6)
+        self.logout()
+
+    def test_generate_more_classrooms_than_supported_raises(self) -> None:
+        # Two classrooms already exist, so requesting 99 more would push the
+        # total past the 100-classroom limit (2 + 99 = 101) without creating
+        # anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_classroom',
+                    'num_dummy_classrooms_to_generate': 99,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_dummy_classroom_schemes_share_index_but_name_independently(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(len(classroom_indices), 4)
+        # The math and science schemes cannot collide on Classroom.index
+        # values: the two math classrooms take indices 0 and 1, so the science
+        # classrooms continue from shared index 2.
+        self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3])
+        # Naming is independent per scheme: the science classrooms always
+        # start at 'ScienceA' regardless of how many math classrooms exist.
+        science_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-a')
+        )
+        assert science_classroom is not None
+        self.assertEqual(science_classroom.name, 'ScienceA')
+        science_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-b')
+        )
+        assert science_classroom is not None
+        self.assertEqual(science_classroom.name, 'ScienceB')
+        # The math scheme likewise resumes from its own scheme counter: the
+        # next math classroom is created at shared index 4.
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3, 4])
+        self.assertIsNotNone(
+            classroom_config_services.get_classroom_by_url_fragment('math-b')
+        )
+        self.logout()
+
+    def test_generate_non_positive_dummy_classrooms_raises(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': -1,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The number of classrooms to generate must be greater than 0.',
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 0)
+        self.logout()
+
+    def test_generate_dummy_default_classroom_data(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 3)
+        # The generated classrooms are bare: they hold no topics and are
+        # published with an empty topic dependency map.
+        for classroom in classrooms:
+            self.assertEqual(classroom.topic_id_to_prerequisite_topic_ids, {})
+            self.assertTrue(classroom.is_published)
+        # The default classroom names and URL fragments use the requested
+        # scheme ('ScienceA' -> 'science-a', and so on).
+        math_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-a')
+        )
+        assert math_classroom is not None
+        self.assertEqual(math_classroom.name, 'ScienceA')
+        # The classrooms render stock images so their tiles and banners do not
+        # 404 on the classroom dashboard.
+        self.assertEqual(
+            math_classroom.thumbnail_data.filename, 'thumbnail.svg'
+        )
+        self.assertEqual(math_classroom.banner_data.filename, 'banner.png')
+        self.logout()
+
+    def test_generate_dummy_default_classroom_data_with_default_count(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {'action': 'generate_dummy_default_classroom'},
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 1)
+        self.logout()
+
+    def test_generate_dummy_default_classroom_data_resumes_from_first_missing(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': 3,
+                },
+                csrf_token=csrf_token,
+            )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 6)
+        self.logout()
+
+    def test_generate_math_then_science_classrooms_name_independently(
+        self,
+    ) -> None:
+        # Generating a math classroom that consumes shared index 0 must not
+        # shift the bare science scheme's naming: the science classrooms still
+        # start at 'ScienceA' although their persisted indices continue from
+        # the math classroom's index.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 10,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 11)
+        # The single math classroom keeps its bare name and URL fragment.
+        math_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('math')
+        )
+        assert math_classroom is not None
+        self.assertEqual(math_classroom.name, 'math')
+        # The science classrooms always start their scheme at 'ScienceA'.
+        for i in range(10):
+            expected_suffix_letters = chr(ord('a') + i)
+            science_classroom = (
+                classroom_config_services.get_classroom_by_url_fragment(
+                    'science-%s' % expected_suffix_letters
+                )
+            )
+            assert science_classroom is not None
+            self.assertEqual(
+                science_classroom.name,
+                'Science%s' % expected_suffix_letters.capitalize(),
+            )
+        # Persisted indices remain unique across both schemes.
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(len(set(classroom_indices)), 11)
+        self.logout()
+
+    def test_generate_more_default_classrooms_than_supported_raises(
+        self,
+    ) -> None:
+        # Two bare classrooms already exist, so requesting 99 more would push
+        # the total past the 100-classroom limit (2 + 99 = 101) without
+        # creating anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': 99,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_more_dummy_classrooms_than_supported_raises_across_schemes(
+        self,
+    ) -> None:
+        # Two math classrooms already exist, so requesting 99 bare science
+        # classrooms would push the combined dummy count past the 100-classroom
+        # limit (2 + 99 = 101) without creating anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': 99,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_non_positive_default_dummy_classrooms_raises(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 0,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The number of classrooms to generate must be greater than 0.',
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 0)
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_default_classroom_data(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler',
+                {'action': 'generate_dummy_default_classroom'},
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def _create_dummy_classroom_for_topics_test(self) -> str:
+        """Creates a single dummy math classroom and returns its ID."""
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
+            name='math',
+            url_fragment='math',
+            feedback_recipient_email='user@email.com',
+            course_details='Math course details',
+            teaser_text='Math teaser text',
+            topic_list_intro='Start with our first topic.',
+            topic_id_to_prerequisite_topic_ids={},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg', 'transparent', 1000
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.png', 'transparent', 1000
+            ),
+            index=0,
+        )
+        classroom_config_services.create_new_classroom(classroom)
+        return classroom_id
+
+    def test_generate_dummy_topics_data(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_topics',
+                'num_dummy_topics_to_generate': 2,
+                'dummy_topic_classroom_id': classroom_id,
+            },
+            csrf_token=csrf_token,
+        )
+        topics = topic_fetchers.get_all_topics()
+        self.assertEqual(len(topics), 2)
+        topic_ids = [topic.id for topic in topics]
+        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        topic_id_to_prerequisite_topic_ids = (
+            classroom.topic_id_to_prerequisite_topic_ids
+        )
+        for topic_id in topic_ids:
+            self.assertIn(topic_id, topic_id_to_prerequisite_topic_ids)
+        self.logout()
+
+    def test_generate_dummy_topics_data_is_idempotent(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': classroom_id,
+                },
+                csrf_token=csrf_token,
+            )
+        topics = topic_fetchers.get_all_topics()
+        # The two runs generate distinct topics because each reuses the base
+        # names with an appended letter suffix (Addition-a, Subtraction-a,
+        # Addition-b, Subtraction-b, ...).
+        self.assertEqual(len(topics), 4)
+        self.logout()
+
+    def test_generate_dummy_topics_requires_existing_classroom(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(Exception, 'does not exist'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'non_existent_classroom',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_dummy_topics_requires_classroom_id(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        # The default topic count of 1 is used when no count is provided, and
+        # the request is rejected because no classroom id was given.
+        with self.assertRaisesRegex(Exception, 'must be provided'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_cannot_generate_dummy_topics_in_production_mode(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy topics in production.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'non_existent_classroom',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_more_topics_than_supported_raises(self) -> None:
+        # Two topics are already attached to the classroom, so requesting 99
+        # more would push the total past the per-classroom limit
+        # (2 + 99 = 101) without creating anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_id = self._create_dummy_classroom_for_topics_test()
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_topics',
+                'num_dummy_topics_to_generate': 2,
+                'dummy_topic_classroom_id': classroom_id,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 99,
+                    'dummy_topic_classroom_id': classroom_id,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_topics_data(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_topics',
+                    'num_dummy_topics_to_generate': 2,
+                    'dummy_topic_classroom_id': 'math',
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     @test_utils.enable_feature_flags(

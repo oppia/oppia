@@ -109,6 +109,14 @@ ROOT_FILES_CONFIG_FILE_PATH: Final = os.path.join(
 LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
+# Maps each Lighthouse shard to the pages it audits. This explicit mapping
+# keeps every shard's page-to-setup relationship stable: pages are only ever
+# reassigned by editing this file, never by automatic re-partitioning based on
+# page counts, so a page is never silently moved into a shard whose setup it
+# does not require.
+LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH: Final = os.path.join(
+    'core', 'tests', 'lighthouse-shards.json'
+)
 CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'ci-test-suite-configs'
 )
@@ -117,7 +125,6 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'test-modules-mappings'
 )
 
-LIGHTHOUSE_PAGES_PER_SHARD: Final = 12
 LIGHTHOUSE_MODULES: Final = (
     '.lighthouserc.js',
     '.lighthouserc-desktop.js',
@@ -304,35 +311,107 @@ def get_lighthouse_pages_from_config() -> List[LighthousePageDict]:
     return lighthouse_pages
 
 
-def partition_lighthouse_pages_into_test_suites(
-    lighthouse_module: str, lighthouse_pages: List[LighthousePageDict]
+def get_lighthouse_shards_config() -> dict[str, List[str]]:
+    """Gets the explicit mapping of Lighthouse shards to their pages.
+
+    Returns:
+        dict(str, list(str)). Maps each shard name to the names of the pages
+        it audits.
+    """
+    with open(LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
+        shards_config = json.load(f)
+        return {name: list(pages) for name, pages in shards_config.items()}
+
+
+def get_lighthouse_test_suites(
+    lighthouse_module: str, pages_to_run: Set[str]
 ) -> List[LighthouseTestSuiteDict]:
-    """Partitions the Lighthouse pages into test suites.
+    """Builds Lighthouse test suites from the explicit shard config.
+
+    The shard boundaries are fixed in ``lighthouse-shards.json`` and are never
+    recomputed from page counts, so a page can only reach a shard by being
+    listed for that shard in the config. This keeps each shard's set of pages
+    aligned with the setup steps its shard function performs.
 
     Args:
         lighthouse_module: str. The Lighthouse module.
-        lighthouse_pages: list(dict). The list of Lighthouse pages.
+        pages_to_run: set(str). The names of the pages that should actually be
+            run. When this is the full set of configured pages, every shard
+            and page is included; otherwise only the shards that list at least
+            one affected page are returned, with each such shard reduced to its
+            affected pages.
 
     Returns:
-        list(dict). The test suites to run.
+        list(dict). The Lighthouse test suites to run.
     """
     lighthouse_test_suites: List[LighthouseTestSuiteDict] = []
-    current_lighthouse_test_suite: LighthouseTestSuiteDict | None = None
-    for i, page in enumerate(lighthouse_pages):
-        if i % LIGHTHOUSE_PAGES_PER_SHARD == 0:
-            if current_lighthouse_test_suite:
-                lighthouse_test_suites.append(current_lighthouse_test_suite)
-            current_lighthouse_test_suite = {
-                'name': '%s' % (str(i // LIGHTHOUSE_PAGES_PER_SHARD + 1)),
+    shards_config = get_lighthouse_shards_config()
+    configured_pages = {
+        page['name'] for page in get_lighthouse_pages_from_config()
+    }
+    _validate_shard_page_membership(shards_config, configured_pages)
+    for shard_name in sorted(shards_config, key=int):
+        pages_in_shard = [
+            page for page in shards_config[shard_name] if page in pages_to_run
+        ]
+        if not pages_in_shard:
+            continue
+        lighthouse_test_suites.append(
+            {
+                'name': shard_name,
                 'module': lighthouse_module,
                 'environment': 'python',
-                'pages_to_run': [],
+                'pages_to_run': pages_in_shard,
             }
-        assert current_lighthouse_test_suite is not None
-        current_lighthouse_test_suite['pages_to_run'].append(page['name'])
-    if current_lighthouse_test_suite:
-        lighthouse_test_suites.append(current_lighthouse_test_suite)
+        )
     return lighthouse_test_suites
+
+
+def _validate_shard_page_membership(
+    shards_config: dict[str, List[str]], configured_pages: Set[str]
+) -> None:
+    """Raises if the shard config does not cover every configured page.
+
+    Every page in ``lighthouse-pages.json`` must be listed in exactly one
+    shard in ``lighthouse-shards.json``. This catches a page that was added to
+    the pages config but forgotten in a shard (leaving it unrun), or a page
+    that was accidentally listed in two shards.
+
+    Args:
+        shards_config: dict(str, list(str)). The explicit shard-to-pages
+            mapping.
+        configured_pages: set(str). The names of all configured Lighthouse
+            pages.
+
+    Raises:
+        ValueError. A configured page is missing from or duplicated across the
+            shard config, or a shard lists an unknown page.
+    """
+    listed_pages: List[str] = []
+    for shard_name in sorted(shards_config, key=int):
+        for page in shards_config[shard_name]:
+            if page not in configured_pages:
+                raise ValueError(
+                    'Page `%s` is listed in lighthouse-shards.json but is not '
+                    'present in lighthouse-pages.json.' % page
+                )
+            listed_pages.append(page)
+
+    missing_pages = sorted(configured_pages - set(listed_pages))
+    if missing_pages:
+        raise ValueError(
+            'Pages %s are present in lighthouse-pages.json but are missing '
+            'from lighthouse-shards.json.' % ', '.join(missing_pages)
+        )
+
+    duplicate_pages = sorted(
+        {page for page in listed_pages if listed_pages.count(page) > 1}
+    )
+    if duplicate_pages:
+        raise ValueError(
+            'Pages %s are listed in more than one shard in '
+            'lighthouse-shards.json.' % ', '.join(duplicate_pages)
+        )
 
 
 def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
@@ -349,8 +428,9 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_test_suites = partition_lighthouse_pages_into_test_suites(
-        LIGHTHOUSE_MODULE, get_lighthouse_pages_from_config()
+    lighthouse_test_suites = get_lighthouse_test_suites(
+        LIGHTHOUSE_MODULE,
+        {page['name'] for page in get_lighthouse_pages_from_config()},
     )
 
     return {
@@ -609,9 +689,14 @@ def get_ci_test_suites_to_run(
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_test_suites = partition_lighthouse_pages_into_test_suites(
+    lighthouse_test_suites = get_lighthouse_test_suites(
         LIGHTHOUSE_MODULE,
-        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_MODULES),
+        {
+            page['name']
+            for page in get_affected_lighthouse_pages(
+                modified_root_files, LIGHTHOUSE_MODULES
+            )
+        },
     )
 
     return create_ci_test_suites_to_run_dict(

@@ -1,0 +1,55 @@
+{
+  "1": [
+    "splash",
+    "about",
+    "android",
+    "contact",
+    "creator-guidelines",
+    "donate",
+    "get-started",
+    "license",
+    "partnerships",
+    "privacy-policy",
+    "teach",
+    "terms",
+    "thanks",
+    "volunteer"
+  ],
+  "2": [
+    "admin",
+    "blog-dashboard",
+    "blog-home",
+    "release-coordinator",
+    "contributor-dashboard",
+    "blog-admin",
+    "delete-account",
+    "blog-post",
+    "moderator",
+    "preferences",
+    "profile",
+    "contributor-admin-dashboard"
+  ],
+  "3": [
+    "classroom-admin",
+    "classrooms",
+    "classroom",
+    "creator-dashboard",
+    "exploration-editor",
+    "exploration-player",
+    "community-library",
+    "pending-account-deletion",
+    "voiceover-admin"
+  ],
+  "4": [
+    "topics-and-skills-dashboard",
+    "topic-viewer",
+    "story-viewer",
+    "topic-editor",
+    "skill-editor",
+    "story-editor",
+    "learner-dashboard",
+    "diagnostic-test-player",
+    "practice-session",
+    "subtopic-viewer"
+  ]
+}
