@@ -88,6 +88,15 @@ describe('Math equation input rules service', () => {
         y: positionOfTerms,
       })
     ).toBeFalse();
+    expect(
+      meirs.MatchesExactlyWith('x', {x: inputString, y: positionOfTerms})
+    ).toBeFalse();
+    expect(
+      meirs.MatchesExactlyWith('v', {x: inputString, y: positionOfTerms})
+    ).toBeFalse();
+    expect(
+      meirs.MatchesExactlyWith('y=m*x+c', {x: 'x', y: positionOfTerms})
+    ).toBeFalse();
 
     positionOfTerms = 'rhs';
     // Accepted cases.
@@ -535,5 +544,8 @@ describe('Math equation input rules service', () => {
     expect(
       meirs.IsEquivalentTo('(13 + 2*w)^2 = 1156', {x: inputString})
     ).toBeFalse();
+    expect(meirs.IsEquivalentTo('x', {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo('v', {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo('13 + 2*w = 34', {x: 'x'})).toBeFalse();
   });
 });

@@ -326,6 +326,10 @@ export class MathInteractionsService {
     equationString: string,
     validVariablesList: string[]
   ): boolean {
+    if (!equationString) {
+      this.warningText = 'Please enter an answer before submitting.';
+      return false;
+    }
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -396,6 +400,9 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
+    if (!expressionString) {
+      return '';
+    }
     let greekLetters = Object.keys(AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
@@ -483,6 +490,9 @@ export class MathInteractionsService {
   }
 
   replaceAbsSymbolWithText(expressionString: string): string {
+    if (!expressionString) {
+      return '';
+    }
     // The guppy editor outputs abs as a symbol '|x|' but that is incompatible
     // with nerdamer and the backend validations. Both of them need 'abs(x)',
     // hence the replacement.
@@ -583,6 +593,9 @@ export class MathInteractionsService {
     expressionString: string,
     replaceZero = true
   ): string {
+    if (!expressionString) {
+      return '';
+    }
     // Multiple instances of the same constant will be replaced by the same
     // variable.
 

@@ -47,11 +47,20 @@ export class MathEquationInputRulesService {
 
     let positionOfTerms = inputs.y;
 
+    if (!answer || !inputs || !inputs.x) {
+      return false;
+    }
+
     let splitAnswer = answer.split('=');
+    let splitInput = inputs.x.split('=');
+
+    if (splitAnswer.length !== 2 || splitInput.length !== 2) {
+      return false;
+    }
+
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 
@@ -112,11 +121,20 @@ export class MathEquationInputRulesService {
 
     let positionOfTerms = inputs.y;
 
+    if (!answer || !inputs || !inputs.x) {
+      return false;
+    }
+
     let splitAnswer = answer.split('=');
+    let splitInput = inputs.x.split('=');
+
+    if (splitAnswer.length !== 2 || splitInput.length !== 2) {
+      return false;
+    }
+
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 
@@ -170,11 +188,20 @@ export class MathEquationInputRulesService {
     answer: MathEquationAnswer,
     inputs: MathEquationRuleInputsWithoutSide
   ): boolean {
+    if (!answer || !inputs || !inputs.x) {
+      return false;
+    }
+
     let splitAnswer = answer.split('=');
+    let splitInput = inputs.x.split('=');
+
+    if (splitAnswer.length !== 2 || splitInput.length !== 2) {
+      return false;
+    }
+
     let lhsAnswer = splitAnswer[0];
     let rhsAnswer = splitAnswer[1];
 
-    let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0];
     let rhsInput = splitInput[1];
 

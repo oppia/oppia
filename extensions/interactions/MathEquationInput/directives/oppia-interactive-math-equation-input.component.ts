@@ -64,13 +64,16 @@ export class InteractiveMathEquationInput implements OnInit {
     let activeGuppyObject =
       this.guppyInitializationService.findActiveGuppyObject();
     if (
-      (!checkForTouched || this.hasBeenTouched) &&
-      activeGuppyObject === undefined
+      !checkForTouched ||
+      (this.hasBeenTouched && activeGuppyObject === undefined)
     ) {
+      if (activeGuppyObject !== undefined) {
+        this.value = activeGuppyObject.guppyInstance.asciimath();
+      }
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
-        this.value
+        this.value || ''
       );
       let answerIsValid = this.mathInteractionsService.validateEquation(
         this.value,
