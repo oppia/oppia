@@ -56,6 +56,7 @@ import {
 } from 'services/insert-script.service';
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 interface TurnstileApi {
   render: (
@@ -90,7 +91,7 @@ export class FeedbackModalComponent implements OnInit {
   @ViewChild('turnstileContainer')
   turnstileContainer!: ElementRef<HTMLDivElement>;
   turnstileWidgetId: string | null = null;
-  isUserLoggedIn: boolean = false;
+  isUserLoggedIn: boolean | null = null;
   feedbackText: string = '';
   formError: string | null = null;
   category: ReportAnIssueCategory | null = null;
@@ -107,6 +108,7 @@ export class FeedbackModalComponent implements OnInit {
   captchaLoadError: string | null = null;
   captchaSubmitError: string | null = null;
   isSubmittingFeedback: boolean = false;
+  feedbackTextareaFocusLabel!: string;
 
   constructor(
     private userService: UserService,
@@ -121,6 +123,7 @@ export class FeedbackModalComponent implements OnInit {
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
+    private focusManagerService: FocusManagerService,
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional()
     private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
@@ -209,6 +212,8 @@ export class FeedbackModalComponent implements OnInit {
         }
       });
     }
+    this.feedbackTextareaFocusLabel =
+      this.focusManagerService.generateFocusLabel();
     this.showTechnicalLogsCheckbox = true;
 
     switch (this.feedbackModalType) {
@@ -238,6 +243,9 @@ export class FeedbackModalComponent implements OnInit {
 
     if (!this.isLessonFeedbackMode) {
       await this.initializeCaptchaIfRequired();
+    }
+    if (this.isLessonIssueMode) {
+      this.focusManagerService.setFocus(this.feedbackTextareaFocusLabel);
     }
   }
 
@@ -303,6 +311,7 @@ export class FeedbackModalComponent implements OnInit {
       this.formError = this.translateService.instant(
         'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED'
       );
+      this.focusManagerService.setFocus(this.feedbackTextareaFocusLabel);
       return false;
     }
 

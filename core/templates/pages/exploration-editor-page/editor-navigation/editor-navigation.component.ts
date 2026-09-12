@@ -34,6 +34,7 @@ import {ExplorationRightsService} from '../services/exploration-rights.service';
 import {ExplorationSaveService} from '../services/exploration-save.service';
 import {ExplorationWarningsService} from '../services/exploration-warnings.service';
 import {RouterService} from '../services/router.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 
@@ -55,9 +56,11 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
   saveIsInProcess: boolean = false;
   publishIsInProcess: boolean = false;
   loadingDotsAreShown: boolean = false;
+  newCreatorFeedbackTabIsEnabled = false;
 
   constructor(
     private changeListService: ChangeListService,
+    private platformFeatureService: PlatformFeatureService,
     private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private explorationImprovementsService: ExplorationImprovementsService,
@@ -256,6 +259,8 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
         this.isPublishButtonEnabled = permissions.canPublish;
       });
 
+    this.newCreatorFeedbackTabIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled;
     this.screenIsLarge = this.windowDimensionsService.getWidth() >= 1024;
 
     this.directiveSubscriptions.add(

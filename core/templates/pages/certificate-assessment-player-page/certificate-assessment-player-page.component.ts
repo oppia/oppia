@@ -32,7 +32,6 @@ import {Router} from '@angular/router';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
   AssessmentQuestion,
   CertificateAssessmentAttemptData,
@@ -82,9 +81,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
-  isLoadingQuestion = false;
-  loadError = false;
-  private inflightIndexes = new Set<number>();
   answers: {[questionId: string]: InteractionAnswer | null} = {};
   interactions: {[questionId: string]: Interaction} = {};
   interactionHtmls: {[questionId: string]: string} = {};
@@ -103,7 +99,6 @@ export class CertificateAssessmentPlayerPageComponent
     private translateService: TranslateService,
     private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
-    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private answerClassificationService: AnswerClassificationService,
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -115,7 +110,7 @@ export class CertificateAssessmentPlayerPageComponent
 
   ngOnInit(): void {
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
-    this.loadQuestion(0);
+    this.buildQuestions();
     this.refreshComputedFields();
     if (this.isTimeExpired) {
       this.handleTimeExpiry();
@@ -135,42 +130,17 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.clearOnSubmitFn(this.handleSubmitFn);
   }
 
-  private loadQuestion(index: number): void {
-    if (
-      this.attempt === null ||
-      this.questions[index] !== undefined ||
-      this.inflightIndexes.has(index)
-    ) {
+  private buildQuestions(): void {
+    if (this.attempt === null) {
       return;
     }
-    const attemptQuestion = this.attempt.questions[index];
-    if (attemptQuestion === undefined) {
-      return;
-    }
-    this.inflightIndexes.add(index);
-    this.isLoadingQuestion = true;
-    this.loadError = false;
-    this.certificateAssessmentOfferingBackendApiService
-      .getCertificateAssessmentQuestionAsync(
-        this.attempt.attemptId,
-        attemptQuestion.questionId
-      )
-      .then(response => {
-        this.buildQuestionFromStateData(
-          index,
-          response.questionId,
-          response.questionStateData
-        );
-        this.loadError = false;
-        this.refreshComputedFields();
-      })
-      .catch(() => {
-        this.loadError = true;
-      })
-      .finally(() => {
-        this.isLoadingQuestion = false;
-        this.inflightIndexes.delete(index);
-      });
+    this.attempt.questions.forEach((attemptQuestion, index) => {
+      this.buildQuestionFromStateData(
+        index,
+        attemptQuestion.questionId,
+        attemptQuestion.questionStateData
+      );
+    });
   }
 
   private buildQuestionFromStateData(
@@ -280,7 +250,6 @@ export class CertificateAssessmentPlayerPageComponent
       return;
     }
     this.currentQuestionIndex += 1;
-    this.loadQuestion(this.currentQuestionIndex);
     this.refreshComputedFields();
   }
 
@@ -425,10 +394,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   private getTotalQuestionCount(): number {
     return this.attempt?.questions.length ?? this.questions.length;
-  }
-
-  retryLoadQuestion(): void {
-    this.loadQuestion(this.currentQuestionIndex);
   }
 
   private refreshComputedFields(): void {
