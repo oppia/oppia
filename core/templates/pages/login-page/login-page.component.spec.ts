@@ -149,7 +149,7 @@ describe('Login Page', () => {
   });
 
   it('should be in emulator mode by default', () => {
-    expect(loginPageComponent.emulatorModeIsEnabled).toBeTrue();
+    expect(loginPageComponent.emulatorModeIsEnabled).toBe(true);
   });
 
   it('should redirect to home page when already logged in', fakeAsync(() => {

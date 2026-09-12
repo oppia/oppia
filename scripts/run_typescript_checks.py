@@ -49,6 +49,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.spec.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
     'core/templates/services/rte-helper-modal.component.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
