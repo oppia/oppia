@@ -141,7 +141,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     const steps = [
       {
         id: 'editorTabTourContainer',
-        attachTo: {element: '#editorTabTourContainer', on: 'top'},
         title: 'Creating in Oppia',
         text: this.getTourContent('editorTabTourContainer'),
         buttons: [
@@ -155,7 +154,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       },
       {
         id: 'editorTabTourContentEditorTab',
-        attachTo: {element: '#editorTabTourContentEditorTab', on: 'top'},
+        attachTo: {element: '#editorTabTourContentEditorTab', on: 'bottom'},
         title: 'Content',
         text: this.getTourContent('editorTabTourContentEditorTab'),
         buttons: [
@@ -172,7 +171,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourSlideStateInteractionEditorTab',
         attachTo: {
           element: '#editorTabTourSlideStateInteractionEditorTab',
-          on: 'top',
+          on: 'bottom',
         },
         title: 'Interaction',
         text: this.getTourContent(
@@ -190,7 +189,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       },
       {
         id: 'editorTabTourStateResponsesTab',
-        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'top'},
+        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'bottom'},
         title: 'Responses',
         text: this.getTourContent('editorTabTourStateResponsesTab'),
         buttons: [
@@ -209,7 +208,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       },
       {
         id: 'editorTabTourPreviewTab',
-        attachTo: {element: '#tutorialPreviewTab', on: 'top'},
+        attachTo: {element: '#tutorialPreviewTab', on: 'bottom'},
         title: 'Preview',
         text: this.getTourContent('editorTabTourPreviewTab'),
         buttons: [
@@ -224,7 +223,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       },
       {
         id: 'editorTabTourSaveDraft',
-        attachTo: {element: '#editorTabTourSaveDraft', on: 'top'},
+        attachTo: {element: '#editorTabTourSaveDraft', on: 'bottom'},
         title: 'Save',
         text: this.getTourContent('editorTabTourSaveDraft'),
         buttons: [
@@ -243,7 +242,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       },
       {
         id: 'editorTabTourTutorialComplete',
-        attachTo: {element: '#editorTabTourTutorialComplete', on: 'top'},
         title: 'Tutorial Complete',
         text: this.getTourContent('editorTabTourTutorialComplete'),
         buttons: [
@@ -272,6 +270,16 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.shepherdService.defaultStepOptions = {
       scrollTo: false,
       cancelIcon: {enabled: true},
+      popperOptions: {
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [0, 12],
+            },
+          },
+        ],
+      },
     };
     this.shepherdService.modal = true;
     this.shepherdService.addSteps(steps);
