@@ -270,7 +270,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': True,
             'public_classrooms_count': 1,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_get_classroom_data_with_topic_without_summary_skips_topic(
         self,
@@ -335,7 +335,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': True,
             'public_classrooms_count': 1,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_get_multiple_classrooms_counts_all_published_unmatching_classrooms(
         self,
@@ -407,7 +407,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': True,
             'public_classrooms_count': 2,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_get_fails_for_invalid_classroom_name(self) -> None:
         self.get_json(

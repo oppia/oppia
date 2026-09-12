@@ -1394,7 +1394,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', mock_testapp):
             params = {'param1': 'value1', 'param2': 'value2'}
             result = self.get_json('/mock?param1=value1&param2=value2')
-            self.assertDictContainsSubset(params, result)
+            self.assertEqual(result, result | params)
             params = {
                 'param1': 'value with space',
                 'param2': 'value with & + - /',
@@ -1405,7 +1405,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
                 'param2=value%20with%20%26%20%2B%20-%20/&'
                 'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E'
             )
-            self.assertDictContainsSubset(params, result)
+            self.assertEqual(result, result | params)
 
 
 class ControllerClassNameTests(test_utils.GenericTestBase):

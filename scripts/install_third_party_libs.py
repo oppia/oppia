@@ -94,8 +94,8 @@ def test_python_version() -> None:
         Exception. The Python version does not match the expected prefix.
     """
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.10.16':
-        print('Please use Python 3.10.16. Exiting...')
+    if running_python_version != '3.12.13':
+        print('Please use Python 3.12.13. Exiting...')
         raise Exception('No suitable python version found.')
 
 
@@ -109,9 +109,12 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """
     common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
-    # TODO(#21906): Add parameter filter = 'data'
-    # after updating to Python 3.12.
-    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+    # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
+    # doesn't yet know about the filter parameter added in 3.12.
+    tar.extractall(  # type: ignore[call-arg]
+        path=common.OPPIA_TOOLS_DIR, filter='data'
+    )
     tar.close()
     rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
     os.remove(filename)
@@ -253,12 +256,14 @@ def install_gcloud_sdk() -> None:
 
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
-        # TODO(#21906): Add parameter filter = 'data'
-        # after updating to Python 3.12.
-        tar.extractall(
+        # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+        # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
+        # doesn't yet know about the filter parameter added in 3.12.
+        tar.extractall(  # type: ignore[call-arg]
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'
-            )
+            ),
+            filter='data',
         )
         tar.close()
 
@@ -358,9 +363,13 @@ def download_and_untar_files(
         with contextlib.closing(
             tarfile.open(name=TMP_UNZIP_PATH, mode='r:gz')
         ) as tfile:
-            # TODO(#21906): Add parameter filter = 'data'
-            # after updating to Python 3.12.
-            tfile.extractall(target_parent_dir)
+            # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+            # Python 3.12 and its bundled typeshed stub for
+            # TarFile.extractall() doesn't yet know about the filter
+            # parameter added in 3.12.
+            tfile.extractall(  # type: ignore[call-arg]
+                target_parent_dir, filter='data'
+            )
         os.remove(TMP_UNZIP_PATH)
 
         # Rename the target directory.

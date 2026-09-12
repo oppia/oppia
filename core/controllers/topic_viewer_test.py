@@ -211,7 +211,7 @@ class TopicPageDataHandlerTests(
             'classroom_name': 'math',
         }
 
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
         # Test with no classroom assigned.
         self.math_classroom.topic_id_to_prerequisite_topic_ids = {}
@@ -222,7 +222,7 @@ class TopicPageDataHandlerTests(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
         )
 
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     @test_utils.set_platform_parameters(
         [
@@ -302,7 +302,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': False,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
         self.logout()
 
@@ -706,7 +706,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': False,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
 
     def test_get_with_five_or_more_questions(self) -> None:
         number_of_questions = 6
@@ -769,7 +769,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': True,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
         self.logout()
 
     def test_get_with_twenty_or_more_questions(self) -> None:
@@ -835,7 +835,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': True,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
         self.logout()
 
     def test_get_with_twenty_or_more_questions_with_multiple_skills(
@@ -900,7 +900,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': True,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
         self.logout()
 
     def test_get_with_lesser_questions_with_fifty_or_more_skills(self) -> None:
@@ -964,7 +964,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': False,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
         self.logout()
 
     def test_get_with_more_questions_with_fifty_or_more_skills(self) -> None:
@@ -1030,7 +1030,7 @@ class TopicPageDataHandlerTests(
             'practice_tab_is_displayed': True,
             'classroom_name': None,
         }
-        self.assertDictContainsSubset(expected_dict, json_response)
+        self.assertEqual(json_response, json_response | expected_dict)
         self.logout()
 
     @test_utils.enable_feature_flags(

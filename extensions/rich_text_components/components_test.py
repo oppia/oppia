@@ -426,7 +426,9 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
         ]
         defined_components = []
         for name, obj in inspect.getmembers(components):
-            if inspect.isclass(obj):
+            if inspect.isclass(obj) and issubclass(
+                obj, components.BaseRteComponent
+            ):
                 defined_components.append(name)
         defined_components.remove('BaseRteComponent')
         self.assertEqual(set(defined_components), set(actual_components))

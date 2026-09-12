@@ -54,7 +54,13 @@ class Registry:
                 base_class.__name__ for base_class in inspect.getmro(clazz)
             ]
 
-            assert 'BaseObject' in ancestor_names
+            # Module-level classes that are not actually subclasses of
+            # BaseObject can end up here incidentally (e.g. typing.Any,
+            # which became a real class in Python 3.11+ and is imported at
+            # module level in extensions/objects/models/objects.py). Skip
+            # them instead of asserting, since they are not object types.
+            if 'BaseObject' not in ancestor_names:
+                continue
             cls.objects_dict[clazz.__name__] = clazz
 
     @classmethod
