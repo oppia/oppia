@@ -277,6 +277,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 + b'https://oppia.org/topic_editor/4\n'
                 + b'https://oppia.org/story_editor/4\n'
                 + b'https://oppia.org/skill_editor/4\n'
+                + b'https://oppia.org/random_page/4\n'
             )
             stderr = io.BytesIO(b'Task output.')
 
@@ -714,6 +715,89 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'for more information.\033[0m',
             self.print_arr,
         )
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr
+        )
+
+    def test_run_lighthouse_checks_succeeds_with_empty_stderr(self) -> None:
+        class MockTask:
+            returncode = 0
+
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
+                return (b'Task output', b'')
+
+        def mock_popen(
+            *unused_args: str, **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+
+        swap_popen = self.swap_with_checks(
+            subprocess,
+            'Popen',
+            mock_popen,
+            expected_args=(
+                (self.lighthouse_check_bash_command,),
+                (self.lighthouse_desktop_check_bash_command,),
+            ),
+        )
+
+        os.environ['ALL_LIGHTHOUSE_URLS'] = (
+            'http://localhost:8181/,'
+            'http://localhost:8181/about,'
+            'http://localhost:8181/contact'
+        )
+        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
+            'http://localhost:8181/, http://localhost:8181/about'
+        )
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks()
+
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr
+        )
+
+    def test_run_lighthouse_checks_succeeds_with_warning_only_stderr(
+        self,
+    ) -> None:
+        class MockTask:
+            returncode = 0
+
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
+                return (
+                    b'Task output',
+                    '\u26a0\ufe0f warning message\n'.encode('utf-8'),
+                )
+
+        def mock_popen(
+            *unused_args: str, **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+
+        swap_popen = self.swap_with_checks(
+            subprocess,
+            'Popen',
+            mock_popen,
+            expected_args=(
+                (self.lighthouse_check_bash_command,),
+                (self.lighthouse_desktop_check_bash_command,),
+            ),
+        )
+
+        os.environ['ALL_LIGHTHOUSE_URLS'] = (
+            'http://localhost:8181/,'
+            'http://localhost:8181/about,'
+            'http://localhost:8181/contact'
+        )
+        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
+            'http://localhost:8181/, http://localhost:8181/about'
+        )
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks()
+
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr
         )
