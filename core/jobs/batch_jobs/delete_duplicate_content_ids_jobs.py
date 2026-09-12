@@ -224,8 +224,8 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
-                new_content_id = content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT
+                new_content_id = _generate_matching_content_id(
+                    duplicate_id, content_id_generator
                 )
 
                 _replace_content_id_in_state(
@@ -253,6 +253,51 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 'fixed_content_ids': fixed_content_ids,
                 'fixed_model': updated_model,
             }
+
+
+def _generate_matching_content_id(
+    existing_content_id: str,
+    content_id_generator: translation_domain.ContentIdGenerator,
+) -> str:
+    """Generates a replacement content ID matching the existing ID prefix.
+
+    Args:
+        existing_content_id: str. The existing content ID that is duplicated.
+        content_id_generator: ContentIdGenerator. Generator used to create
+            unique content IDs.
+
+    Returns:
+        str. A newly generated content ID that preserves the same content type
+        prefix as the existing content ID.
+    """
+    content_type = translation_domain.ContentType.CONTENT
+    extra_prefix = None
+
+    for possible_content_type in translation_domain.ContentType:
+        type_prefix = f'{possible_content_type.value}_'
+        if existing_content_id.startswith(type_prefix):
+            content_type = possible_content_type
+            break
+
+    if content_type == translation_domain.ContentType.CUSTOMIZATION_ARG:
+        # Customization arg content IDs can contain an additional prefix
+        # between the content type and numeric index. For example:
+        #
+        #   ca_choices_12
+        #
+        # where:
+        #   - "ca" is the CUSTOMIZATION_ARG content type prefix
+        #   - "choices" is the customization arg name
+        #   - "12" is the generated index
+        #
+        # While regenerating duplicate IDs we preserve the customization arg
+        # portion ("choices") so the new ID retains the same structure and
+        # remains compatible with existing content references.
+        content_id_parts = existing_content_id.split('_')
+        if len(content_id_parts) >= 3:
+            extra_prefix = '_'.join(content_id_parts[1:-1])
+
+    return content_id_generator.generate(content_type, extra_prefix)
 
 
 def _replace_content_id_in_state(
