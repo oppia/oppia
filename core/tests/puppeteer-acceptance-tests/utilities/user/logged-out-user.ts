@@ -463,9 +463,7 @@ const audioSliderSelector = 'oppia-audio-slider mat-slider';
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
-
-const redesignedTopicViewerContainerSelector =
-  '.e2e-test-redesigned-topic-viewer-container';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 
 // Exploration Player Selectors.
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
@@ -4458,9 +4456,7 @@ export class LoggedOutUser extends BaseUser {
             name.click(),
           ]);
 
-          await this.expectElementToBeVisible(
-            redesignedTopicViewerContainerSelector
-          );
+          await this.expectElementToBeVisible(topicViewerContainerSelector);
           showMessage(`Topic ${topicName} is opened successfully.`);
           return;
         }
@@ -4564,10 +4560,24 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
-  async expectToBeOnClassroomPage(classroomUrlFragment: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    const url = this.page.url();
-    expect(url).toContain(`/learn/${classroomUrlFragment}`);
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector(classroomNameSelector);
+
+    const buttonText = await this.page.$eval(
+      classroomNameSelector,
+      element => (element as HTMLHeadElement).innerText
+    );
+
+    if (buttonText !== classroomName) {
+      throw new Error(
+        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
+      );
+    } else {
+      showMessage(`The ${classroomName} classroom name is visible.`);
+    }
   }
 
   /**
