@@ -100,6 +100,15 @@ export class GuppyInitializationService {
     }
   }
 
+  activate(): void {
+    if (this.guppyInstances.length === 0) {
+      return;
+    }
+    const mostRecentGuppyObject =
+      this.guppyInstances[this.guppyInstances.length - 1];
+    mostRecentGuppyObject.guppyInstance.activate();
+  }
+
   getShowOSK(): boolean {
     return this.onScreenKeyboardShown;
   }

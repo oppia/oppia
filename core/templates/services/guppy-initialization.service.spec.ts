@@ -32,6 +32,7 @@ class MockGuppy {
   asciimath(): string {
     return 'Dummy value';
   }
+  activate(): void {}
 
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
@@ -84,8 +85,27 @@ describe('GuppyInitializationService', () => {
 
   it('should correctly change and get the value of showOSK var', function () {
     guppyInitializationService.setShowOSK(true);
-    expect(guppyInitializationService.getShowOSK()).toBeTrue();
+    expect(guppyInitializationService.getShowOSK()).toBe(true);
     guppyInitializationService.setShowOSK(false);
-    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    expect(guppyInitializationService.getShowOSK()).toBe(false);
+  });
+
+  it('should activate the most recent guppy instance', function () {
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
+
+    const activateSpy = spyOn(MockGuppy.prototype, 'activate');
+    guppyInitializationService.activate();
+
+    expect(activateSpy).toHaveBeenCalled();
+  });
+
+  it('should do nothing when activate is called with no guppy instances', function () {
+    expect(() => {
+      guppyInitializationService.activate();
+    }).not.toThrowError();
   });
 });

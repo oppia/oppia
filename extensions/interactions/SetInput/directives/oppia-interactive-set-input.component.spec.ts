@@ -205,4 +205,9 @@ describe('InteractiveSetInputComponent', () => {
 
     expect(component.answer).toEqual(['test1']);
   });
+
+  it('should return the label for focus target', () => {
+    component.labelForFocusTarget = 'test-label';
+    expect(component.getLabelForFocusTarget()).toBe('test-label');
+  });
 });

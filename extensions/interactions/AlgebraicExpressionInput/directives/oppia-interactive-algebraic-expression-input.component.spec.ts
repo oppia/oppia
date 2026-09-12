@@ -61,6 +61,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     asciimath() {
       return asciiDummyValue;
     }
+    activate(): void {}
 
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
@@ -109,6 +110,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    spyOn(guppyInitializationService, 'activate').and.stub();
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(
       AlgebraicExpressionInputInteractionComponent

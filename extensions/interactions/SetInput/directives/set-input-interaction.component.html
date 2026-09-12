@@ -5,6 +5,7 @@
 <div>
   <schema-based-editor [schema]="getSchema()"
                        [localValue]="answer"
+                       [labelForFocusTarget]="getLabelForFocusTarget()"
                        (localValueChange)="updateAnswer($event)">
   </schema-based-editor>
 </div>
