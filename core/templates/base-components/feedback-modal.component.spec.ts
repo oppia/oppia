@@ -37,6 +37,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FeedbackModalComponent} from './feedback-modal.component';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {PageContextService} from 'services/page-context.service';
@@ -214,6 +215,7 @@ describe('FeedbackModalComponent', () => {
   let translateService: jasmine.SpyObj<TranslateService>;
   let alertService: jasmine.SpyObj<AlertsService>;
   let sas: jasmine.SpyObj<SiteAnalyticsService>;
+  let focusManagerService: jasmine.SpyObj<FocusManagerService>;
 
   const createComponent = (
     modalType: FeedbackModalType = FeedbackModalType.LESSON_FEEDBACK
@@ -305,6 +307,12 @@ describe('FeedbackModalComponent', () => {
       }
     );
 
+    focusManagerService = jasmine.createSpyObj('FocusManagerService', [
+      'generateFocusLabel',
+      'setFocus',
+    ]);
+
+    focusManagerService.generateFocusLabel.and.returnValue('feedback-textarea');
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule, RouterTestingModule],
       declarations: [
@@ -355,6 +363,10 @@ describe('FeedbackModalComponent', () => {
         {
           provide: SiteAnalyticsService,
           useValue: sas,
+        },
+        {
+          provide: FocusManagerService,
+          useValue: focusManagerService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
