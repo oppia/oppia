@@ -25,6 +25,7 @@ import {StateHintsService} from 'components/state-editor/state-editor-properties
 import {Hint} from 'domain/exploration/hint-object.model';
 import {PageContextService} from 'services/page-context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import './add-hint-modal.component.css';
 import {
@@ -33,7 +34,7 @@ import {
 } from 'services/html-length.service';
 
 interface HintFormSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -92,9 +93,10 @@ export class AddHintModalComponent
     );
   }
 
-  updateLocalHint($event: string): void {
-    if (this.tmpHint !== $event) {
-      this.tmpHint = $event;
+  updateLocalHint($event: SchemaDefaultValue): void {
+    const tempHint = String($event);
+    if (this.tmpHint !== tempHint) {
+      this.tmpHint = tempHint;
       this.changeDetectorRef.detectChanges();
     }
   }

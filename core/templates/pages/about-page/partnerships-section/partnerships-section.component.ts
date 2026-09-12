@@ -29,7 +29,7 @@ import {AboutPartnerData} from '../data.model';
   encapsulation: ViewEncapsulation.None,
 })
 export class PartnershipsSectionComponent {
-  @Input() partnersData: AboutPartnerData[] = [];
+  @Input() partnersData: readonly AboutPartnerData[] = [];
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 

@@ -166,6 +166,12 @@ describe('StateHintsEditorComponent', () => {
     expect(component.saveStateContent.emit).toHaveBeenCalled();
   });
 
+  it('should update content html on local value change', function () {
+    stateContentService.displayed = _getContent('content', 'old html');
+    component.updateContentHtml('new html');
+    expect(stateContentService.displayed._html).toBe('new html');
+  });
+
   it('should emit onExternalRteSave before saving content', function () {
     spyOn(externalRteSaveService.onExternalRteSave, 'emit');
 

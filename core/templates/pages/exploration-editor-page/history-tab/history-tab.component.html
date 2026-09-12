@@ -126,7 +126,7 @@
         </div>
         <div class="state-changes-container">
           <div>Changes in exploration states:</div>
-          <oppia-version-diff-visualization [diffData]="diffData"
+          <oppia-version-diff-visualization [diffData]="$any(diffData)"
                                             [earlierVersionHeader]="earlierVersionHeader"
                                             [laterVersionHeader]="laterVersionHeader">
           </oppia-version-diff-visualization>

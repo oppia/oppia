@@ -715,6 +715,36 @@ describe('Rule Editor Component', () => {
     flush();
   }));
 
+  it('should get rule description choice list and first choice text', () => {
+    component.ruleDescriptionChoices = [
+      {id: '1', val: 'string choice'},
+      {id: '2', val: 42},
+    ];
+
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('string choice');
+
+    component.ruleDescriptionChoices = [{id: '1', val: 7}];
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('7');
+  });
+
+  it('should get and set rule input values', () => {
+    const item = {
+      type: 'html',
+      varName: 'x',
+    } as unknown as RuleDescriptionFragment;
+    component.rule = new Rule(
+      'Equals',
+      {x: 'old_val'} as unknown as RuleInputs,
+      {x: 'String'} as unknown as RuleInputTypes
+    );
+
+    expect(component.getRuleInputAsString(item)).toBe('old_val');
+    expect(component.getRuleInputValue(item) as string).toBe('old_val');
+
+    component.setRuleInputValue('new_val', item);
+    expect(component.rule.inputs.x).toBe('new_val');
+  });
+
   it('should unsubscribe on destroy', () => {
     component.rule = new Rule(
       'Equals',
