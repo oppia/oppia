@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The services file for the feature flags."""
+"""The services file for the web feature flags."""
 
 from __future__ import annotations
 
 import hashlib
 
 from core import feature_flag_list
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
 
@@ -36,18 +36,18 @@ if MYPY:  # pragma: no cover
 )
 
 
-ALL_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
+ALL_WEB_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
     feature_flag_list.DEV_FEATURES_LIST
     + feature_flag_list.TEST_FEATURES_LIST
     + feature_flag_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURE_FLAGS
+ALL_WEB_FEATURES_NAMES_SET: Set[str] = set(
+    feature.value for feature in ALL_WEB_FEATURE_FLAGS
 )
 
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
 
 
@@ -57,16 +57,16 @@ class WebFeatureFlagNotFoundException(Exception):
     pass
 
 
-def update_feature_flag(
-    feature_flag_name: str,
+def update_web_feature_flag(
+    web_feature_flag_name: str,
     force_enable_for_all_users: bool,
     rollout_percentage: int,
     user_group_ids: List[str],
 ) -> None:
-    """Updates the feature flag.
+    """Updates the web feature flag.
 
     Args:
-        feature_flag_name: str. The name of the feature flag to update.
+        web_feature_flag_name: str. The name of the web feature flag to update.
         force_enable_for_all_users: bool. Whether the feature flag is
             force-enabled for all the users.
         rollout_percentage: int. The percentage of logged-in users for which
@@ -78,40 +78,42 @@ def update_feature_flag(
         WebFeatureFlagNotFoundException. Feature flag trying to update does
             not exist.
     """
-    if feature_flag_name not in ALL_FEATURES_NAMES_SET:
+    if web_feature_flag_name not in ALL_WEB_FEATURES_NAMES_SET:
         raise WebFeatureFlagNotFoundException(
-            'Unknown feature flag: %s.' % feature_flag_name
+            'Unknown feature flag: %s.' % web_feature_flag_name
         )
 
-    registry.Registry.update_feature_flag(
-        feature_flag_name,
+    registry.Registry.update_web_feature_flag(
+        web_feature_flag_name,
         force_enable_for_all_users,
         rollout_percentage,
         user_group_ids,
     )
 
 
-def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
-    """Returns FeatureFlagSpec domain object.
+def _get_web_feature_flag_spec(
+    name: str,
+) -> web_feature_flag_domain.WebFeatureFlagSpec:
+    """Returns WebFeatureFlagSpec domain object.
 
-    name: str. The name of the feature flag.
+    name: str. The name of the web feature flag.
 
     Returns:
-        FeatureFlagSpec. The FeatureFlagSpec domain object.
+        WebFeatureFlagSpec. The WebFeatureFlagSpec domain object.
 
     Raises:
         Exception. Feature flag does not exists.
     """
-    if name not in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
-        raise Exception('Feature flag not found: %s.' % name)
+    if name not in WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
+        raise Exception('Web Feature flag not found: %s.' % name)
 
-    return feature_flag_domain.FeatureFlagSpec(
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
+    return web_feature_flag_domain.WebFeatureFlagSpec(
+        WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
+        WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
     )
 
 
-def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
+def get_all_web_feature_flags() -> List[web_feature_flag_domain.FeatureFlag]:
     """Returns all feature flags. This method is used for providing detailed
     feature flags information to the release coordinator page.
 
@@ -119,10 +121,10 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
         feature_flags: list(FeatureFlag). A list containing the dict mappings
         of all fields of the feature flags.
     """
-    feature_flags: List[feature_flag_domain.FeatureFlag] = []
+    feature_flags: List[web_feature_flag_domain.FeatureFlag] = []
     feature_flags_to_fetch_from_storage = []
 
-    for feature_flag_name_enum in ALL_FEATURE_FLAGS:
+    for feature_flag_name_enum in ALL_WEB_FEATURE_FLAGS:
         feature_flags_to_fetch_from_storage.append(feature_flag_name_enum.value)
 
     feature_flags_from_storage = load_web_feature_flags_from_storage(
@@ -133,11 +135,11 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
         if feature_flag is not None:
             feature_flags.append(feature_flag)
         else:
-            feature_flag_spec = _get_feature_flag_spec(feature_flag_name)
-            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            feature_flag_spec = _get_web_feature_flag_spec(feature_flag_name)
+            feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
                 False, 0, [], None
             )
-            feature_flag = feature_flag_domain.FeatureFlag(
+            feature_flag = web_feature_flag_domain.FeatureFlag(
                 feature_flag_name, feature_flag_spec, feature_flag_config
             )
             feature_flags.append(feature_flag)
@@ -147,7 +149,7 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
 
 def load_web_feature_flags_from_storage(
     web_feature_flag_names_list: List[str],
-) -> Mapping[str, Optional[feature_flag_domain.FeatureFlag]]:
+) -> Mapping[str, Optional[web_feature_flag_domain.FeatureFlag]]:
     """Loads web feature flags from the storage layer.
 
     Args:
@@ -161,7 +163,7 @@ def load_web_feature_flags_from_storage(
         layer otherwise None.
     """
     web_feature_flag_name_to_feature_flag_dict: Dict[
-        str, Optional[feature_flag_domain.FeatureFlag]
+        str, Optional[web_feature_flag_domain.FeatureFlag]
     ] = {}
     web_feature_flag_config_models = (
         config_models.WebFeatureFlagConfigModel.get_multi(
@@ -171,10 +173,10 @@ def load_web_feature_flags_from_storage(
 
     for web_feature_flag_config_model in web_feature_flag_config_models:
         if web_feature_flag_config_model:
-            feature_flag_spec = _get_feature_flag_spec(
+            feature_flag_spec = _get_web_feature_flag_spec(
                 web_feature_flag_config_model.id
             )
-            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
                 web_feature_flag_config_model.force_enable_for_all_users,
                 web_feature_flag_config_model.rollout_percentage,
                 web_feature_flag_config_model.user_group_ids,
@@ -183,7 +185,7 @@ def load_web_feature_flags_from_storage(
 
             web_feature_flag_name_to_feature_flag_dict[
                 web_feature_flag_config_model.id
-            ] = feature_flag_domain.FeatureFlag(
+            ] = web_feature_flag_domain.FeatureFlag(
                 web_feature_flag_config_model.id,
                 feature_flag_spec,
                 feature_flag_config,
@@ -203,7 +205,7 @@ def load_web_feature_flags_from_storage(
 def is_feature_flag_enabled(
     feature_flag_name: str,
     user_id: Optional[str],
-    feature_flag: Optional[feature_flag_domain.FeatureFlag] = None,
+    feature_flag: Optional[web_feature_flag_domain.FeatureFlag] = None,
 ) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
@@ -221,21 +223,21 @@ def is_feature_flag_enabled(
     if feature_flag is None:
         feature_flag = registry.Registry.get_feature_flag(feature_flag_name)
 
-    current_server = feature_flag_domain.get_server_mode()
+    current_server = web_feature_flag_domain.get_server_mode()
 
     if (
-        current_server == feature_flag_domain.ServerMode.TEST
+        current_server == web_feature_flag_domain.ServerMode.TEST
         and feature_flag.feature_flag_spec.feature_stage
-        == feature_flag_domain.ServerMode.DEV
+        == web_feature_flag_domain.ServerMode.DEV
     ):
         return False
 
     if (
-        current_server == feature_flag_domain.ServerMode.PROD
+        current_server == web_feature_flag_domain.ServerMode.PROD
         and feature_flag.feature_flag_spec.feature_stage
         in (
-            feature_flag_domain.ServerMode.DEV,
-            feature_flag_domain.ServerMode.TEST,
+            web_feature_flag_domain.ServerMode.DEV,
+            web_feature_flag_domain.ServerMode.TEST,
         )
     ):
         return False
@@ -284,7 +286,7 @@ def evaluate_all_feature_flag_configs(
         results of corresponding flags.
     """
     result_dict = {}
-    feature_flags = get_all_feature_flags()
+    feature_flags = get_all_web_feature_flags()
     for feature_flag in feature_flags:
         feature_flag_status = is_feature_flag_enabled(
             feature_flag.name, user_id, feature_flag=feature_flag

@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feature_flag_list
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.platform import models
 
 from typing import List, Optional
@@ -31,8 +31,8 @@ if MYPY:  # pragma: no cover
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 FeatureNames = feature_flag_list.FeatureNames
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
 
 
@@ -40,7 +40,7 @@ class Registry:
     """Registry for all feature flags."""
 
     @classmethod
-    def get_feature_flag(cls, name: str) -> feature_flag_domain.FeatureFlag:
+    def get_feature_flag(cls, name: str) -> web_feature_flag_domain.FeatureFlag:
         """Returns the instance of the specified name of the feature flag.
 
         Args:
@@ -56,30 +56,30 @@ class Registry:
             cls.load_feature_flag_config_from_storage(name)
         )
         feature_flag_spec_values = (
-            FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)
+            WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)
         )
 
         if feature_flag_spec_values is not None:
-            feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+            feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
                 feature_flag_spec_values[0], feature_flag_spec_values[1]
             )
         else:
             raise Exception('Feature flag not found: %s.' % name)
 
         if feature_flag_config_from_storage is not None:
-            return feature_flag_domain.FeatureFlag(
+            return web_feature_flag_domain.FeatureFlag(
                 name, feature_flag_spec, feature_flag_config_from_storage
             )
         else:
-            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            feature_flag_config = web_feature_flag_domain.FeatureFlagConfig(
                 False, 0, [], None
             )
-            return feature_flag_domain.FeatureFlag(
+            return web_feature_flag_domain.FeatureFlag(
                 name, feature_flag_spec, feature_flag_config
             )
 
     @classmethod
-    def update_feature_flag(
+    def update_web_feature_flag(
         cls,
         name: str,
         force_enable_for_all_users: bool,
@@ -106,12 +106,12 @@ class Registry:
         )
         feature_flag.feature_flag_config.set_user_group_ids(user_group_ids)
 
-        cls._update_feature_flag_storage_model(feature_flag)
+        cls._update_web_feature_flag_storage_model(feature_flag)
 
     @classmethod
     def load_feature_flag_config_from_storage(
         cls, name: str
-    ) -> Optional[feature_flag_domain.FeatureFlagConfig]:
+    ) -> Optional[web_feature_flag_domain.FeatureFlagConfig]:
         """Loads feature flag config from storage, if not present returns None.
 
         Args:
@@ -126,7 +126,7 @@ class Registry:
         )
 
         if feature_flag_config_model is not None:
-            return feature_flag_domain.FeatureFlagConfig(
+            return web_feature_flag_domain.FeatureFlagConfig(
                 feature_flag_config_model.force_enable_for_all_users,
                 feature_flag_config_model.rollout_percentage,
                 feature_flag_config_model.user_group_ids,
@@ -136,8 +136,8 @@ class Registry:
             return None
 
     @classmethod
-    def _update_feature_flag_storage_model(
-        cls, feature_flag: feature_flag_domain.FeatureFlag
+    def _update_web_feature_flag_storage_model(
+        cls, feature_flag: web_feature_flag_domain.FeatureFlag
     ) -> None:
         """Updates feature flag storage model.
 

@@ -51,7 +51,7 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    feature_flag_domain,
+    web_feature_flag_domain,
     feature_flag_services,
     interaction_registry,
     object_registry,
@@ -376,7 +376,7 @@ def swap_is_feature_flag_enabled_function(
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
         feature_flag: Optional[  # pylint: disable=unused-argument
-            feature_flag_domain.FeatureFlag
+            web_feature_flag_domain.FeatureFlag
         ] = None,
         user_id: Optional[str] = None,  # pylint: disable=unused-argument
     ) -> bool:

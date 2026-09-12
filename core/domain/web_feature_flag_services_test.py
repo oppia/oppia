@@ -23,7 +23,7 @@ import enum
 
 from core import feconf
 from core.constants import constants
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
 from core.platform import models
@@ -50,7 +50,7 @@ class FeatureNames(enum.Enum):
     FEATURE_THREE = 'feature_three'
 
 
-FeatureStages = feature_flag_domain.FeatureStages
+FeatureStages = web_feature_flag_domain.FeatureStages
 
 
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
@@ -64,7 +64,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         """Returns swap iterator for the registry variable."""
         return self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.FEATURE_A.value: (
                     'a feature in dev stage',
@@ -89,11 +89,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ]:
         """Returns the tuple of swap iterator of feature flags."""
         swap_all_feature_flags = self.swap(
-            feature_services, 'ALL_FEATURE_FLAGS', self.feature_name_enums
+            feature_services, 'ALL_WEB_FEATURE_FLAGS', self.feature_name_enums
         )
 
         swap_all_feature_names_set = self.swap(
-            feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
+            feature_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set(self.feature_names),
         )
 
         return (swap_all_feature_flags, swap_all_feature_names_set)
@@ -115,7 +117,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ]
 
         self.swap_all_feature_names_set = self.swap(
-            feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
+            feature_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set(self.feature_names),
         )
 
         swapped_value = {
@@ -135,51 +139,53 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         self.swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             swapped_value,
         )
 
         self.swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             swapped_value,
         )
 
-        self.dev_feature_flag = feature_flag_domain.FeatureFlag(
+        self.dev_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_A.value,
-            feature_flag_domain.FeatureFlagSpec(
+            web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
-            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
-        self.test_feature_flag = feature_flag_domain.FeatureFlag(
+        self.test_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_B.value,
-            feature_flag_domain.FeatureFlagSpec(
+            web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in test stage', FeatureStages.TEST
             ),
-            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
-        self.prod_feature_flag = feature_flag_domain.FeatureFlag(
+        self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_C.value,
-            feature_flag_domain.FeatureFlagSpec(
+            web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
-            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
 
         with self.swap_all_feature_names_set:
             with self.swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, True, 0, []
                 )
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.test_feature_flag.name, True, 0, []
                 )
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.prod_feature_flag.name, True, 0, []
                 )
 
-    def test_get_all_feature_flags_returns_correct_feature_flags(self) -> None:
+    def test_get_all_web_feature_flags_returns_correct_feature_flags(
+        self,
+    ) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry()
         )
@@ -203,7 +209,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 self.assertEqual(
                     [
                         feature_flag.to_dict()
-                        for feature_flag in feature_services.get_all_feature_flags()
+                        for feature_flag in feature_services.get_all_web_feature_flags()
                     ],
                     expected_feature_flags_dict,
                 )
@@ -247,14 +253,16 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ]
         feature_flag_names = ['feature_one', 'feature_two', 'feature_three']
         swap_all_feature_flags = self.swap(
-            feature_services, 'ALL_FEATURE_FLAGS', feature_flag_name_enums
+            feature_services, 'ALL_WEB_FEATURE_FLAGS', feature_flag_name_enums
         )
         swap_all_feature_names_set = self.swap(
-            feature_services, 'ALL_FEATURES_NAMES_SET', set(feature_flag_names)
+            feature_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set(feature_flag_names),
         )
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.FEATURE_ONE.value: (
                     'feature flag one',
@@ -276,7 +284,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 self.assertEqual(
                     [
                         feature_flag.to_dict()
-                        for feature_flag in feature_services.get_all_feature_flags()
+                        for feature_flag in feature_services.get_all_web_feature_flags()
                     ],
                     expected_feature_flags_dict,
                 )
@@ -286,7 +294,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ) -> None:
         swap_all_feature_flags = self.swap(
             feature_services,
-            'ALL_FEATURE_FLAGS',
+            'ALL_WEB_FEATURE_FLAGS',
             [
                 FeatureNames.FEATURE_A,
                 FeatureNames.FEATURE_B,
@@ -299,7 +307,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 with self.assertRaisesRegex(
                     Exception, 'Feature flag not found: feature_d'
                 ):
-                    feature_services.get_all_feature_flags()
+                    feature_services.get_all_web_feature_flags()
 
     def test_get_feature_flag_configs_with_unknown_name_raises_error(
         self,
@@ -328,7 +336,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 Exception, 'Unknown feature flag: unknown_feature'
             ):
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     'unknown_feature', True, 0, []
                 )
 
@@ -608,7 +616,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         _, swap_all_feature_names_set = self._swap_feature_flags_list()
         with swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 0, []
                 )
                 self.assertFalse(
@@ -658,7 +666,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         _, swap_all_feature_names_set = self._swap_feature_flags_list()
         with swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name,
                     False,
                     0,
@@ -677,7 +685,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         _, swap_all_feature_names_set = self._swap_feature_flags_list()
         with swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 0, [self.USER_GROUP_2]
                 )
                 self.assertFalse(
@@ -703,7 +711,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         _, swap_all_feature_names_set = self._swap_feature_flags_list()
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 50, []
                 )
                 initial_user1_value = feature_services.is_feature_flag_enabled(
@@ -752,7 +760,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 5, []
                 )
                 for user_id in user_ids_list:
@@ -780,7 +788,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     count_feature_flag_enabled_for_5_perc in list(range(22, 78))
                 )
 
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 10, []
                 )
                 for user_id in user_ids_list:
@@ -822,7 +830,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         feature_status_for_users = []
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 0, []
                 )
                 for user_id in user_ids:
@@ -847,7 +855,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     self.dev_feature_flag.name, False, 100, []
                 )
                 for user_id in user_ids:

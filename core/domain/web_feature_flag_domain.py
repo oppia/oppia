@@ -76,7 +76,7 @@ class FeatureFlag:
     def __init__(
         self,
         name: str,
-        feature_flag_spec: FeatureFlagSpec,
+        feature_flag_spec: WebFeatureFlagSpec,
         feature_flag_config: FeatureFlagConfig,
     ):
         self._name = name
@@ -93,8 +93,8 @@ class FeatureFlag:
         return self._name
 
     @property
-    def feature_flag_spec(self) -> FeatureFlagSpec:
-        """The FeatureFlagSpec property of FeatureFlag."""
+    def feature_flag_spec(self) -> WebFeatureFlagSpec:
+        """The WebFeatureFlagSpec property of FeatureFlag."""
         return self._feature_flag_spec
 
     @property
@@ -150,7 +150,7 @@ class FeatureFlag:
         Returns:
             FeatureFlag. The corresponding FeatureFlag domain object.
         """
-        feature_flag_spec = FeatureFlagSpec.from_dict(
+        feature_flag_spec = WebFeatureFlagSpec.from_dict(
             {
                 'description': feature_dict['description'],
                 'feature_stage': feature_dict['feature_stage'],
@@ -170,15 +170,15 @@ class FeatureFlag:
         return cls(feature_dict['name'], feature_flag_spec, feature_flag_config)
 
 
-class FeatureFlagSpecDict(TypedDict):
-    """Dictionary representing FeatureFlagSpec object."""
+class WebFeatureFlagSpecDict(TypedDict):
+    """Dictionary representing WebFeatureFlagSpec object."""
 
     description: str
     feature_stage: str
 
 
-class FeatureFlagSpec:
-    """The FeatureFlagSpec domain object."""
+class WebFeatureFlagSpec:
+    """The WebFeatureFlagSpec domain object."""
 
     def __init__(self, description: str, feature_stage: ServerMode) -> None:
         self._description = description
@@ -202,11 +202,11 @@ class FeatureFlagSpec:
         """
         return self._feature_stage
 
-    def to_dict(self) -> FeatureFlagSpecDict:
-        """Returns a dict representation of the FeatureFlagSpec domain object.
+    def to_dict(self) -> WebFeatureFlagSpecDict:
+        """Returns a dict representation of the WebFeatureFlagSpec domain object.
 
         Returns:
-            dict. A dict mapping of all fields of FeatureFlagSpec object.
+            dict. A dict mapping of all fields of WebFeatureFlagSpec object.
         """
         return {
             'description': self._description,
@@ -214,15 +214,17 @@ class FeatureFlagSpec:
         }
 
     @classmethod
-    def from_dict(cls, feature_dict: FeatureFlagSpecDict) -> FeatureFlagSpec:
-        """Returns an FeatureFlagSpec object from dictionary.
+    def from_dict(
+        cls, feature_dict: WebFeatureFlagSpecDict
+    ) -> WebFeatureFlagSpec:
+        """Returns an WebFeatureFlagSpec object from dictionary.
 
         Args:
             feature_dict: dict. A dict mapping of all fields of
-                FeatureFlagSpec object.
+                WebFeatureFlagSpec object.
 
         Returns:
-            FeatureFlagSpec. The corresponding FeatureFlagSpec domain object.
+            WebFeatureFlagSpec. The corresponding WebFeatureFlagSpec domain object.
 
         Raises:
             Exception. Invalid feature stage.

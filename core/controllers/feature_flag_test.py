@@ -19,12 +19,12 @@ from __future__ import annotations
 import enum
 
 from core import feature_flag_list
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
-FeatureStages = feature_flag_domain.FeatureStages
+FeatureStages = web_feature_flag_domain.FeatureStages
 
 
 class FeatureNames(enum.Enum):
@@ -42,8 +42,10 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.original_feature_list = feature_services.ALL_FEATURE_FLAGS
-        self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
+        self.original_feature_list = feature_services.ALL_WEB_FEATURE_FLAGS
+        self.original_feature_name_set = (
+            feature_services.ALL_WEB_FEATURES_NAMES_SET
+        )
 
         feature_names = ['feature_a', 'feature_b']
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
@@ -60,53 +62,55 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         }
         self.swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             self.swapped_value,
         )
 
-        self.dev_feature_flag = feature_flag_domain.FeatureFlag(
+        self.dev_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_A.value,
-            feature_flag_domain.FeatureFlagSpec(
+            web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
-            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
-        self.prod_feature_flag = feature_flag_domain.FeatureFlag(
+        self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_B.value,
-            feature_flag_domain.FeatureFlagSpec(
+            web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
-            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
+            web_feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
         with self.swap_name_to_description_feature_stage_registry_dict:
-            registry.Registry.update_feature_flag(
+            registry.Registry.update_web_feature_flag(
                 self.prod_feature_flag.name, True, 0, []
             )
 
-        # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
+        # Here we use MyPy ignore because the expected type of ALL_WEB_FEATURE_FLAGS
         # is a list of 'feature_flag_list.FeatureNames' Enum, but here for
         # testing purposes we are providing a list of custom 'FeatureNames'
         # enums for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
-        feature_services.ALL_FEATURE_FLAGS = feature_name_enums  # type: ignore[assignment]
-        feature_services.ALL_FEATURES_NAMES_SET = set(feature_names)
+        feature_services.ALL_WEB_FEATURE_FLAGS = feature_name_enums  # type: ignore[assignment]
+        feature_services.ALL_WEB_FEATURES_NAMES_SET = set(feature_names)
 
     def tearDown(self) -> None:
         super().tearDown()
 
-        feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
-        feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
+        feature_services.ALL_WEB_FEATURE_FLAGS = self.original_feature_list
+        feature_services.ALL_WEB_FEATURES_NAMES_SET = (
+            self.original_feature_name_set
+        )
 
     def test_feature_flag_evaluation_is_correct(self) -> None:
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             self.swapped_value,
         )
         swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             self.swapped_value,
         )
 

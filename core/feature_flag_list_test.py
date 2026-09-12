@@ -23,7 +23,7 @@ import re
 
 from core import feature_flag_list
 from core.domain import (
-    feature_flag_domain,
+    web_feature_flag_domain,
     feature_flag_registry,
     platform_parameter_list,
 )
@@ -73,7 +73,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+                feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
             ):
                 missing_names.append(feature.value)
         self.assertTrue(
@@ -125,7 +125,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
             )
             if (
                 feature_flag.feature_flag_spec.feature_stage
-                != feature_flag_domain.FeatureStages.DEV
+                != web_feature_flag_domain.FeatureStages.DEV
             ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
@@ -142,7 +142,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
             )
             if (
                 feature_flag.feature_flag_spec.feature_stage
-                != feature_flag_domain.FeatureStages.TEST
+                != web_feature_flag_domain.FeatureStages.TEST
             ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
@@ -159,7 +159,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
             )
             if (
                 feature_flag.feature_flag_spec.feature_stage
-                != feature_flag_domain.FeatureStages.PROD
+                != web_feature_flag_domain.FeatureStages.PROD
             ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(

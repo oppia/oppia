@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import operator
 
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.jobs import base_jobs, job_utils
 from core.jobs.io import firebase_io
 from core.jobs.transforms import firebase_transforms, job_result_transforms
@@ -49,8 +49,8 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         if (
             not self.DRY_RUN
-            and feature_flag_domain.get_server_mode()
-            == feature_flag_domain.ServerMode.PROD
+            and web_feature_flag_domain.get_server_mode()
+            == web_feature_flag_domain.ServerMode.PROD
         ):
             raise PermissionError(
                 'Refusing to mutate production Firebase authentication server.'

@@ -22,11 +22,11 @@ import enum
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import feature_flag_domain
+from core.domain import web_feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.tests import test_utils
 
-FeatureStages = feature_flag_domain.FeatureStages
+FeatureStages = web_feature_flag_domain.FeatureStages
 
 
 class FeatureNames(enum.Enum):
@@ -42,7 +42,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         super().setUp()
         self.swap_name_to_description_feature_stage_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.FEATURE_A.value: (
                     'test description',
@@ -57,7 +57,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_A.value
             )
         self.assertIsNotNone(feature_flag)
-        self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
+        self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
 
     def test_get_non_existing_feature_failure(self) -> None:
         with self.assertRaisesRegex(
@@ -72,7 +72,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     FeatureNames.FEATURE_A.value
                 )
             )
-            registry.Registry.update_feature_flag(
+            registry.Registry.update_web_feature_flag(
                 FeatureNames.FEATURE_A.value,
                 True,
                 50,
@@ -83,7 +83,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     FeatureNames.FEATURE_A.value
                 )
             )
-            registry.Registry.update_feature_flag(
+            registry.Registry.update_web_feature_flag(
                 FeatureNames.FEATURE_A.value,
                 True,
                 100,
@@ -104,9 +104,9 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 ['user_group_1', 'user_group_2', 'user_group_3'],
             )
 
-    def test_update_feature_flag(self) -> None:
+    def test_update_web_feature_flag(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
-            registry.Registry.update_feature_flag(
+            registry.Registry.update_web_feature_flag(
                 FeatureNames.FEATURE_A.value,
                 True,
                 50,
@@ -142,7 +142,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                             FeatureNames.FEATURE_A.value
                         )
                         feature_flag.feature_flag_config.validate(
-                            feature_flag_domain.ServerMode.DEV
+                            web_feature_flag_domain.ServerMode.DEV
                         )
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
@@ -160,13 +160,13 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                             FeatureNames.FEATURE_A.value
                         )
                         feature_flag.feature_flag_config.validate(
-                            feature_flag_domain.ServerMode.DEV
+                            web_feature_flag_domain.ServerMode.DEV
                         )
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
         swap_name_to_description_feature_stage_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.FEATURE_A.value: (
                     'test description',
@@ -188,7 +188,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                             FeatureNames.FEATURE_A.value
                         )
                         feature_flag.feature_flag_config.validate(
-                            feature_flag_domain.ServerMode.TEST
+                            web_feature_flag_domain.ServerMode.TEST
                         )
 
     def test_updated_feature_is_saved_in_storage(self) -> None:
@@ -199,7 +199,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 )
             )
 
-            registry.Registry.update_feature_flag(
+            registry.Registry.update_web_feature_flag(
                 FeatureNames.FEATURE_A.value,
                 True,
                 50,
