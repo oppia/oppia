@@ -60,6 +60,48 @@ if MYPY:  # pragma: no cover
 
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
+TOPIC_COMMANDS_THAT_REQUIRE_CONTRIBUTOR_STATS_REGENERATION = [
+    topic_domain.CMD_ADD_CANONICAL_STORY,
+    topic_domain.CMD_DELETE_CANONICAL_STORY,
+    topic_domain.CMD_ADD_ADDITIONAL_STORY,
+    topic_domain.CMD_DELETE_ADDITIONAL_STORY,
+    topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID,
+    topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+]
+
+
+def _should_regenerate_contributor_stats(
+    change_list: Sequence[change_domain.BaseChange],
+) -> bool:
+    """Returns whether contributor stats should be regenerated.
+
+    Args:
+        change_list: list(BaseChange). The list of topic/subtopic changes.
+
+    Returns:
+        bool. Whether contributor stats should be regenerated.
+    """
+    for change in change_list:
+        if not isinstance(change, topic_domain.TopicChange):
+            continue
+
+        if (
+            change.cmd
+            in TOPIC_COMMANDS_THAT_REQUIRE_CONTRIBUTOR_STATS_REGENERATION
+        ):
+            return True
+        if (
+            change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY
+            and change.property_name
+            in [
+                topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
+                topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
+            ]
+        ):
+            return True
+
+    return False
+
 
 def _create_topic(
     committer_id: str,
@@ -1530,6 +1572,9 @@ def update_topic_and_subtopic_pages(
             updated_topic.id, updated_topic.name
         )
 
+    if _should_regenerate_contributor_stats(change_list):
+        suggestion_services.regenerate_contributor_stats()
+
 
 def delete_uncategorized_skill(
     user_id: str, topic_id: str, uncategorized_skill_id: str
@@ -1732,6 +1777,7 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     opportunity_services.add_new_exploration_opportunities(
         story_id, linked_exp_ids
     )
+    suggestion_services.regenerate_contributor_stats()
 
 
 def _cleanup_permanently_unpublished_story(
@@ -1748,6 +1794,7 @@ def _cleanup_permanently_unpublished_story(
     """
     opportunity_services.delete_exploration_opportunities(exp_ids)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+    suggestion_services.regenerate_contributor_stats()
 
 
 def unpublish_story(
