@@ -921,7 +921,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         self.logout()
 
-    def test_dummy_classroom_schemes_share_one_index_sequence(self) -> None:
+    def test_dummy_classroom_schemes_share_index_but_name_independently(
+        self,
+    ) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -950,10 +952,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # values: the two math classrooms take indices 0 and 1, so the science
         # classrooms continue from shared index 2.
         self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3])
-        self.assertIsNotNone(
-            classroom_config_services.get_classroom_by_url_fragment('science-c')
+        # Naming is independent per scheme: the science classrooms always
+        # start at 'ScienceA' regardless of how many math classrooms exist.
+        science_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-a')
         )
-        # The math scheme likewise resumes past the science classrooms: the
+        assert science_classroom is not None
+        self.assertEqual(science_classroom.name, 'ScienceA')
+        science_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('science-b')
+        )
+        assert science_classroom is not None
+        self.assertEqual(science_classroom.name, 'ScienceB')
+        # The math scheme likewise resumes from its own scheme counter: the
         # next math classroom is created at shared index 4.
         self.post_json(
             '/adminhandler',
@@ -969,7 +980,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
         self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3, 4])
         self.assertIsNotNone(
-            classroom_config_services.get_classroom_by_url_fragment('math-d')
+            classroom_config_services.get_classroom_by_url_fragment('math-b')
         )
         self.logout()
 
@@ -1020,6 +1031,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         assert math_classroom is not None
         self.assertEqual(math_classroom.name, 'ScienceA')
+        # The classrooms render stock images so their tiles and banners do not
+        # 404 on the classroom dashboard.
+        self.assertEqual(
+            math_classroom.thumbnail_data.filename, 'thumbnail.svg'
+        )
+        self.assertEqual(math_classroom.banner_data.filename, 'banner.png')
         self.logout()
 
     def test_generate_dummy_default_classroom_data_with_default_count(
@@ -1054,6 +1071,61 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 6)
+        self.logout()
+
+    def test_generate_math_then_science_classrooms_name_independently(
+        self,
+    ) -> None:
+        # Generating a math classroom that consumes shared index 0 must not
+        # shift the bare science scheme's naming: the science classrooms still
+        # start at 'ScienceA' although their persisted indices continue from
+        # the math classroom's index.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 10,
+            },
+            csrf_token=csrf_token,
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 11)
+        # The single math classroom keeps its bare name and URL fragment.
+        math_classroom = (
+            classroom_config_services.get_classroom_by_url_fragment('math')
+        )
+        assert math_classroom is not None
+        self.assertEqual(math_classroom.name, 'math')
+        # The science classrooms always start their scheme at 'ScienceA'.
+        for i in range(10):
+            expected_suffix_letters = chr(ord('a') + i)
+            science_classroom = (
+                classroom_config_services.get_classroom_by_url_fragment(
+                    'science-%s' % expected_suffix_letters
+                )
+            )
+            assert science_classroom is not None
+            self.assertEqual(
+                science_classroom.name,
+                'Science%s' % expected_suffix_letters.capitalize(),
+            )
+        # Persisted indices remain unique across both schemes.
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(len(set(classroom_indices)), 11)
         self.logout()
 
     def test_generate_more_default_classrooms_than_supported_raises(

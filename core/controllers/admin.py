@@ -1831,18 +1831,19 @@ class AdminHandler(
         num_classrooms: int,
         create_classroom_fn: Callable[[int], None],
     ) -> None:
-        """Generates dummy classrooms resuming from the first missing shared
-        index.
+        """Generates dummy classrooms using the first available shared index.
 
         Both the full- and the bare-classroom generation follow the same
-        pattern: scan for the first index at which neither the math nor the
-        science scheme has a classroom, verify that the total number of dummy
-        classrooms across both schemes stays within the supported maximum, and
-        then create each classroom starting from that shared index.
+        pattern: count the existing dummy classrooms across both schemes to
+        find the next available shared index, verify that the total number of
+        dummy classrooms stays within the supported maximum, and then create
+        each classroom starting from that shared index.
 
-        Using one index sequence for both schemes guarantees that the two
-        schemes never persist the same Classroom.index and that the combined
-        classroom count is capped.
+        The schemes share a single index sequence only to keep their persisted
+        Classroom.index values unique; each scheme's names and URL fragments
+        are derived independently, so that, for example, generating math
+        classrooms before bare science classrooms does not shift the science
+        names past 'ScienceA'.
 
         Args:
             num_classrooms: int. The number of dummy classrooms to create.
@@ -1853,16 +1854,16 @@ class AdminHandler(
             Exception. The total number of dummy classrooms would exceed the
                 supported maximum.
         """
-        start_index = 0
-        while self._dummy_classroom_exists(start_index):
-            start_index += 1
-        if start_index + num_classrooms > self._MAX_DUMMY_CLASSROOMS:
+        total_classrooms = self._dummy_classroom_count_with_prefix(
+            'math'
+        ) + self._dummy_classroom_count_with_prefix('science')
+        if total_classrooms + num_classrooms > self._MAX_DUMMY_CLASSROOMS:
             raise Exception(
                 'Cannot generate more than the supported number of dummy '
                 'classrooms at once.'
             )
-        for i in range(start_index, start_index + num_classrooms):
-            create_classroom_fn(i)
+        for index in range(total_classrooms, total_classrooms + num_classrooms):
+            create_classroom_fn(index)
 
     def _dummy_column_letters(self, index: int, offset: int = 0) -> str:
         """Returns the lowercase spreadsheet column style letters for an index.
@@ -1889,49 +1890,28 @@ class AdminHandler(
             result = chr(ord('a') + remainder) + result
         return result
 
-    def _dummy_classroom_url_fragments(self, index: int) -> List[str]:
-        """Returns the candidate dummy classroom URL fragments for a shared
-        index in both dummy schemes.
+    def _dummy_classroom_count_with_prefix(self, prefix: str) -> int:
+        """Returns the number of dummy classrooms with the given URL prefix.
 
-        The math scheme renders the index with no offset ('math', 'math-a',
-        ...), while the science scheme renders it with an offset of one so
-        that its first classroom still carries a suffix ('science-a', ...).
-        Both schemes share the same index sequence, so both fragments must be
-        checked to determine whether a given index is already taken.
+        Dummy classrooms identify their generating scheme in their URL fragment
+        ('math', 'math-a', ... for the full scheme and 'science-a', ... for the
+        bare scheme), so each scheme can be counted independently to derive its
+        own naming sequence.
 
         Args:
-            index: int. The zero-based shared index of the classroom.
+            prefix: str. The scheme prefix ('math' or 'science').
 
         Returns:
-            list(str). The candidate classroom URL fragments for the math and
-            science schemes at the given index.
+            int. The number of classrooms whose URL fragment starts with the
+            prefix.
         """
-        math_letters = self._dummy_column_letters(index)
-        science_letters = self._dummy_column_letters(index, offset=1)
-        return [
-            'math' if not math_letters else 'math-%s' % math_letters,
-            'science-%s' % science_letters,
-        ]
-
-    def _dummy_classroom_exists(self, index: int) -> bool:
-        """Returns whether a dummy classroom exists at a given shared index.
-
-        Args:
-            index: int. The zero-based shared index of the classroom.
-
-        Returns:
-            bool. Whether the math or the science scheme already has a
-            classroom at the given index.
-        """
-        for url_fragment in self._dummy_classroom_url_fragments(index):
-            if (
-                classroom_config_services.get_classroom_by_url_fragment(
-                    url_fragment
-                )
-                is not None
-            ):
-                return True
-        return False
+        return len(
+            [
+                classroom
+                for classroom in classroom_config_services.get_all_classrooms()
+                if classroom.url_fragment.startswith(prefix)
+            ]
+        )
 
     def _save_dummy_topic_thumbnail_image(
         self, topic: topic_domain.Topic
@@ -2044,22 +2024,66 @@ class AdminHandler(
                 self.user_id, question_id, skill_id, 0.5
             )
 
+    def _save_dummy_classroom_images(self, classroom_id: str) -> None:
+        """Saves the stock thumbnail and banner images for a dummy classroom.
+
+        Classroom tiles and banners only render once the corresponding image
+        files have been written to storage, so this writes the thumbnail.svg
+        and banner.png files used by all dummy classrooms. It should be called
+        before the classroom is saved so that the image filenames referenced by
+        the classroom's ImageData can be resolved.
+
+        Args:
+            classroom_id: str. The ID of the classroom the images belong to.
+        """
+        thumbnail_image = b''
+        with open(
+            'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+        ) as svg_file:
+            thumbnail_image = svg_file.read().encode('ascii')
+        fs_services.save_original_and_compressed_versions_of_image(
+            'thumbnail.svg',
+            feconf.ENTITY_TYPE_CLASSROOM,
+            classroom_id,
+            thumbnail_image,
+            'thumbnail',
+            False,
+        )
+
+        banner_image = b''
+        with open(
+            'core/tests/data/classroom-banner.png', 'rb', encoding=None
+        ) as png_file:
+            banner_image = png_file.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            'banner.png',
+            feconf.ENTITY_TYPE_CLASSROOM,
+            classroom_id,
+            banner_image,
+            'image',
+            False,
+        )
+
     def _create_dummy_classroom(self, index: int) -> None:
         """Creates and loads a single dummy classroom with its associated
         topics, skills, and questions.
 
         Args:
-            index: int. The zero-based index of the classroom to create. It
-                is used to generate unique names and URL fragments so that
-                multiple classrooms can be created without collisions.
+            index: int. The zero-based shared index assigned to the classroom
+                to keep its persisted Classroom.index unique across both dummy
+                schemes. Names and URL fragments are derived from an
+                independent per-scheme counter, so they are not affected by
+                how many classrooms the other scheme has produced.
         """
         assert self.user_id is not None
-        suffix_letters = self._dummy_column_letters(index)
-        suffix = '' if not suffix_letters else '-%s' % suffix_letters
+        scheme_letters = self._dummy_column_letters(
+            self._dummy_classroom_count_with_prefix('math')
+        )
+        suffix = '' if not scheme_letters else '-%s' % scheme_letters
         classroom_name = (
             'math'
-            if not suffix_letters
-            else ('Math %s' % suffix_letters.capitalize())
+            if not scheme_letters
+            else ('Math %s' % scheme_letters.capitalize())
         )
         classroom_url_fragment = 'math%s' % suffix
         logging.info(
@@ -2098,33 +2122,7 @@ class AdminHandler(
             topic_ids[4]: [topic_ids[1], topic_ids[2]],
         }
 
-        thumbnail_image = b''
-        with open(
-            'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
-        ) as svg_file:
-            thumbnail_image = svg_file.read().encode('ascii')
-        fs_services.save_original_and_compressed_versions_of_image(
-            'thumbnail.svg',
-            feconf.ENTITY_TYPE_CLASSROOM,
-            classroom_id,
-            thumbnail_image,
-            'thumbnail',
-            False,
-        )
-
-        banner_image = b''
-        with open(
-            'core/tests/data/classroom-banner.png', 'rb', encoding=None
-        ) as png_file:
-            banner_image = png_file.read()
-        fs_services.save_original_and_compressed_versions_of_image(
-            'banner.png',
-            feconf.ENTITY_TYPE_CLASSROOM,
-            classroom_id,
-            banner_image,
-            'image',
-            False,
-        )
+        self._save_dummy_classroom_images(classroom_id)
 
         classroom = classroom_config_domain.Classroom(
             classroom_id=classroom_id,
@@ -2201,13 +2199,18 @@ class AdminHandler(
         topics, skills, or questions.
 
         Args:
-            index: int. The zero-based index of the classroom to create. It is
-                used to generate unique names and URL fragments.
+            index: int. The zero-based shared index assigned to the classroom
+                to keep its persisted Classroom.index unique across both dummy
+                schemes. The name and URL fragment come from the bare scheme's
+                independent counter, so they always start at 'ScienceA' no
+                matter how many math classrooms already exist.
         """
         assert self.user_id is not None
-        suffix_letters = self._dummy_column_letters(index, offset=1)
-        classroom_name = 'Science%s' % suffix_letters.capitalize()
-        classroom_url_fragment = 'science-%s' % suffix_letters
+        scheme_letters = self._dummy_column_letters(
+            self._dummy_classroom_count_with_prefix('science'), offset=1
+        )
+        classroom_name = 'Science%s' % scheme_letters.capitalize()
+        classroom_url_fragment = 'science-%s' % scheme_letters
         classroom_id = classroom_config_services.get_new_classroom_id()
         classroom_config_services.create_new_default_classroom(
             classroom_id,
@@ -2215,15 +2218,23 @@ class AdminHandler(
             classroom_url_fragment,
             'user@email.com',
         )
-        # The default classroom is created unpublished, so it is made public
-        # here to ensure it shows up as a populated classroom on the classroom
-        # dashboard and classroom routes during lighthouse runs. Its index is
-        # also synchronized to the shared dummy index allocated by the resume
-        # scan, since create_new_default_classroom derives it from the total
+        self._save_dummy_classroom_images(classroom_id)
+        # The default classroom is created unpublished with no images, so it is
+        # made public and given the stock thumbnail and banner here to ensure
+        # it shows up as a populated classroom on the classroom dashboard and
+        # classroom routes during lighthouse runs. Its index is also
+        # synchronized to the shared dummy index allocated by the resume scan,
+        # since create_new_default_classroom derives it from the total
         # classroom count.
         classroom = classroom_config_services.get_classroom_by_id(classroom_id)
         classroom.is_published = True
         classroom.index = index
+        classroom.thumbnail_data = classroom_config_domain.ImageData(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        classroom.banner_data = classroom_config_domain.ImageData(
+            'banner.png', 'transparent', 1000
+        )
         classroom_config_services.update_classroom(classroom)
 
     def _generate_dummy_topics(
