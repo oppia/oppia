@@ -20,6 +20,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {By} from '@angular/platform-browser';
 import {MaterialModule} from 'modules/material.module';
 
 import {
@@ -667,6 +668,19 @@ describe('Admin dev mode activities tab', () => {
         );
       });
     }));
+    it('should disable the generate button when count is non-positive', () => {
+      const generateButton = fixture.debugElement.query(
+        By.css('.load-dummy-math-classroom')
+      ).nativeElement as HTMLButtonElement;
+
+      component.numDummyClassroomsToGenerate = 0;
+      fixture.detectChanges();
+      expect(generateButton.disabled).toBeTrue();
+
+      component.numDummyClassroomsToGenerate = -1;
+      fixture.detectChanges();
+      expect(generateButton.disabled).toBeTrue();
+    });
   });
 
   describe('.generateNewDefaultClassrooms', () => {
@@ -714,6 +728,19 @@ describe('Admin dev mode activities tab', () => {
         );
       });
     }));
+    it('should disable the generate button when count is non-positive', () => {
+      const generateButton = fixture.debugElement.query(
+        By.css('.load-dummy-default-classroom')
+      ).nativeElement as HTMLButtonElement;
+
+      component.numDummyDefaultClassroomsToGenerate = 0;
+      fixture.detectChanges();
+      expect(generateButton.disabled).toBeTrue();
+
+      component.numDummyDefaultClassroomsToGenerate = -1;
+      fixture.detectChanges();
+      expect(generateButton.disabled).toBeTrue();
+    });
   });
 
   describe('.generateNewTopics', () => {

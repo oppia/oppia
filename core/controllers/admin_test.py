@@ -921,6 +921,79 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_dummy_classroom_schemes_share_one_index_sequence(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(len(classroom_indices), 4)
+        # The math and science schemes cannot collide on Classroom.index
+        # values: the two math classrooms take indices 0 and 1, so the science
+        # classrooms continue from shared index 2.
+        self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3])
+        self.assertIsNotNone(
+            classroom_config_services.get_classroom_by_url_fragment('science-c')
+        )
+        # The math scheme likewise resumes past the science classrooms: the
+        # next math classroom is created at shared index 4.
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        classroom_indices = [
+            classroom.index
+            for classroom in classroom_config_services.get_all_classrooms()
+        ]
+        self.assertEqual(sorted(classroom_indices), [0, 1, 2, 3, 4])
+        self.assertIsNotNone(
+            classroom_config_services.get_classroom_by_url_fragment('math-d')
+        )
+        self.logout()
+
+    def test_generate_non_positive_dummy_classrooms_raises(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': -1,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The number of classrooms to generate must be greater than 0.',
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 0)
+        self.logout()
+
     def test_generate_dummy_default_classroom_data(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1009,6 +1082,57 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 },
                 csrf_token=csrf_token,
             )
+        self.logout()
+
+    def test_generate_more_dummy_classrooms_than_supported_raises_across_schemes(
+        self,
+    ) -> None:
+        # Two math classrooms already exist, so requesting 99 bare science
+        # classrooms would push the combined dummy count past the 100-classroom
+        # limit (2 + 99 = 101) without creating anything.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_classroom',
+                'num_dummy_classrooms_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+        with self.assertRaisesRegex(Exception, 'Cannot generate more than'):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_default_classroom',
+                    'num_dummy_classrooms_to_generate': 99,
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+    def test_generate_non_positive_default_dummy_classrooms_raises(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_default_classroom',
+                'num_dummy_classrooms_to_generate': 0,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The number of classrooms to generate must be greater than 0.',
+        )
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 0)
         self.logout()
 
     def test_non_admins_cannot_generate_dummy_default_classroom_data(

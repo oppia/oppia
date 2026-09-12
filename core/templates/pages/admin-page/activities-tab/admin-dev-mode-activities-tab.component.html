@@ -159,7 +159,7 @@
         <button type="button"
                 class="btn btn-primary oppia-generate-exploration-text load-dummy-math-classroom"
                 (click)="generateNewClassroom()"
-                [disabled]="!numDummyClassroomsToGenerate">
+                [disabled]="numDummyClassroomsToGenerate <= 0">
           Generate Math Classrooms
         </button>
       </span>
@@ -185,7 +185,7 @@
         <button type="button"
                 class="btn btn-primary oppia-generate-exploration-text load-dummy-default-classroom"
                 (click)="generateNewDefaultClassrooms()"
-                [disabled]="!numDummyDefaultClassroomsToGenerate">
+                [disabled]="numDummyDefaultClassroomsToGenerate <= 0">
           Generate Default Classrooms
         </button>
       </span>

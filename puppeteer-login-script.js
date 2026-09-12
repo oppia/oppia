@@ -194,6 +194,7 @@ const setRole = async function (page, role) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    throw e;
   }
 };
 

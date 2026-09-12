@@ -47,7 +47,7 @@ ENTITY_MATCHER: Final = r'\{\{(.*?)\}\}'
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
-    python -m scripts.run_lighthouse_tests
+    python -m scripts.run_lighthouse_tests --shard <shard_number>
 Note that the root folder MUST be named 'oppia'.
 """
 )

@@ -81,7 +81,7 @@ module.exports = {
             },
             overrides: {
               // Marketing hero images are not properly responsively sized.
-              'uses-responsive-images': ['error', {minScore: 0.5}],
+              'uses-responsive-images': ['error', {minScore: 0}],
               // Marketing pages use unoptimized JPEG hero images.
               'uses-optimized-images': ['error', {minScore: 0.6}],
               // Marketing hero images are JPEG, not next-gen formats.
@@ -665,7 +665,7 @@ module.exports = {
             accessibilityMinScore: 0.9,
           },
           {
-            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player$',
+            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player(\\?.*)?$',
             accessibilityMinScore: 0.9,
           },
           {

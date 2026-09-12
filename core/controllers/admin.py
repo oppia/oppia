@@ -259,9 +259,12 @@ class AdminHandler(
 ):
     """Handler for the admin page."""
 
-    # Maximum number of dummy classrooms that can be generated. The cap keeps
-    # the dummy data small enough for lighthouse runs while still exercising
-    # paginated and leveled classroom UI.
+    # Maximum total number of dummy classrooms that can be generated across
+    # both the math and the science scheme. The two schemes share a single
+    # index sequence, so increasing the count beyond this limit is rejected
+    # regardless of which scheme the request targets. The cap keeps the dummy
+    # data small enough for lighthouse runs while still exercising paginated
+    # and leveled classroom UI.
     _MAX_DUMMY_CLASSROOMS = 100
 
     # Maximum number of dummy topics that can be attached to a single
@@ -509,6 +512,8 @@ class AdminHandler(
                 generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
+            InvalidInputException. The number of classrooms to generate must
+                be greater than 0.
             Exception. The data must be provided when the action is
                 upload_topic_similarities.
             Exception. The topic_id must be provided when the action is
@@ -621,6 +626,11 @@ class AdminHandler(
                 )
                 if num_dummy_classrooms_to_generate is None:
                     num_dummy_classrooms_to_generate = 1
+                if num_dummy_classrooms_to_generate <= 0:
+                    raise self.InvalidInputException(
+                        'The number of classrooms to generate must be '
+                        'greater than 0.'
+                    )
                 self._generate_dummy_classroom(num_dummy_classrooms_to_generate)
             elif action == 'generate_dummy_default_classroom':
                 num_dummy_classrooms_to_generate = self.normalized_payload.get(
@@ -628,6 +638,11 @@ class AdminHandler(
                 )
                 if num_dummy_classrooms_to_generate is None:
                     num_dummy_classrooms_to_generate = 1
+                if num_dummy_classrooms_to_generate <= 0:
+                    raise self.InvalidInputException(
+                        'The number of classrooms to generate must be '
+                        'greater than 0.'
+                    )
                 self._generate_dummy_default_classroom(
                     num_dummy_classrooms_to_generate
                 )
@@ -1806,8 +1821,6 @@ class AdminHandler(
                 )
             self._generate_resuming_dummy_classrooms(
                 num_classrooms,
-                base_url_fragment='math',
-                suffix_offset=0,
                 create_classroom_fn=self._create_dummy_classroom,
             )
         else:
@@ -1816,35 +1829,32 @@ class AdminHandler(
     def _generate_resuming_dummy_classrooms(
         self,
         num_classrooms: int,
-        base_url_fragment: str,
-        suffix_offset: int,
         create_classroom_fn: Callable[[int], None],
     ) -> None:
-        """Generates dummy classrooms resuming from the first missing index.
+        """Generates dummy classrooms resuming from the first missing shared
+        index.
 
-        Both the full classroom generation and the bare classroom generation
-        follow the same pattern: scan for the first index whose classroom does
-        not yet exist, verify that the total number of dummy classrooms stays
-        within the supported maximum, and then create each classroom starting
-        from that index.
+        Both the full- and the bare-classroom generation follow the same
+        pattern: scan for the first index at which neither the math nor the
+        science scheme has a classroom, verify that the total number of dummy
+        classrooms across both schemes stays within the supported maximum, and
+        then create each classroom starting from that shared index.
+
+        Using one index sequence for both schemes guarantees that the two
+        schemes never persist the same Classroom.index and that the combined
+        classroom count is capped.
 
         Args:
             num_classrooms: int. The number of dummy classrooms to create.
-            base_url_fragment: str. The base URL fragment shared by the
-                classrooms of this scheme (e.g. 'math').
-            suffix_offset: int. The amount added to the index when encoding the
-                disambiguating suffix letters.
             create_classroom_fn: Callable[[int], None]. The method that creates
-                a single classroom at the given index.
+                a single classroom at the given shared index.
 
         Raises:
             Exception. The total number of dummy classrooms would exceed the
                 supported maximum.
         """
         start_index = 0
-        while self._dummy_classroom_exists(
-            start_index, base_url_fragment, suffix_offset
-        ):
+        while self._dummy_classroom_exists(start_index):
             start_index += 1
         if start_index + num_classrooms > self._MAX_DUMMY_CLASSROOMS:
             raise Exception(
@@ -1879,34 +1889,49 @@ class AdminHandler(
             result = chr(ord('a') + remainder) + result
         return result
 
-    def _dummy_classroom_exists(
-        self, index: int, base_url_fragment: str, suffix_offset: int
-    ) -> bool:
-        """Returns whether a dummy classroom with the given index already
-        exists.
+    def _dummy_classroom_url_fragments(self, index: int) -> List[str]:
+        """Returns the candidate dummy classroom URL fragments for a shared
+        index in both dummy schemes.
+
+        The math scheme renders the index with no offset ('math', 'math-a',
+        ...), while the science scheme renders it with an offset of one so
+        that its first classroom still carries a suffix ('science-a', ...).
+        Both schemes share the same index sequence, so both fragments must be
+        checked to determine whether a given index is already taken.
 
         Args:
-            index: int. The zero-based index of the classroom.
-            base_url_fragment: str. The base URL fragment without any suffix.
-            suffix_offset: int. The amount added to the index when encoding the
-                disambiguating suffix letters.
+            index: int. The zero-based shared index of the classroom.
 
         Returns:
-            bool. Whether a dummy classroom matching the base URL fragment with
-            the given suffix already exists in the database.
+            list(str). The candidate classroom URL fragments for the math and
+            science schemes at the given index.
         """
-        suffix_letters = self._dummy_column_letters(index, suffix_offset)
-        url_fragment = (
-            base_url_fragment
-            if not suffix_letters
-            else '%s-%s' % (base_url_fragment, suffix_letters)
-        )
-        return (
-            classroom_config_services.get_classroom_by_url_fragment(
-                url_fragment
-            )
-            is not None
-        )
+        math_letters = self._dummy_column_letters(index)
+        science_letters = self._dummy_column_letters(index, offset=1)
+        return [
+            'math' if not math_letters else 'math-%s' % math_letters,
+            'science-%s' % science_letters,
+        ]
+
+    def _dummy_classroom_exists(self, index: int) -> bool:
+        """Returns whether a dummy classroom exists at a given shared index.
+
+        Args:
+            index: int. The zero-based shared index of the classroom.
+
+        Returns:
+            bool. Whether the math or the science scheme already has a
+            classroom at the given index.
+        """
+        for url_fragment in self._dummy_classroom_url_fragments(index):
+            if (
+                classroom_config_services.get_classroom_by_url_fragment(
+                    url_fragment
+                )
+                is not None
+            ):
+                return True
+        return False
 
     def _save_dummy_topic_thumbnail_image(
         self, topic: topic_domain.Topic
@@ -2123,6 +2148,15 @@ class AdminHandler(
 
         classroom_config_services.create_new_classroom(classroom)
 
+        # create_new_classroom derives the persisted index from the total
+        # classroom count, so it is synchronized here to the shared dummy
+        # index allocated by the resume scan.
+        persisted_classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id
+        )
+        persisted_classroom.index = index
+        classroom_config_services.update_classroom(persisted_classroom)
+
     def _generate_dummy_default_classroom(self, num_classrooms: int) -> None:
         """Generates and loads bare dummy classrooms that contain no topics,
         skills, or questions.
@@ -2155,8 +2189,6 @@ class AdminHandler(
                 )
             self._generate_resuming_dummy_classrooms(
                 num_classrooms,
-                base_url_fragment='science',
-                suffix_offset=1,
                 create_classroom_fn=self._create_dummy_default_classroom,
             )
         else:
@@ -2185,9 +2217,13 @@ class AdminHandler(
         )
         # The default classroom is created unpublished, so it is made public
         # here to ensure it shows up as a populated classroom on the classroom
-        # dashboard and classroom routes during lighthouse runs.
+        # dashboard and classroom routes during lighthouse runs. Its index is
+        # also synchronized to the shared dummy index allocated by the resume
+        # scan, since create_new_default_classroom derives it from the total
+        # classroom count.
         classroom = classroom_config_services.get_classroom_by_id(classroom_id)
         classroom.is_published = True
+        classroom.index = index
         classroom_config_services.update_classroom(classroom)
 
     def _generate_dummy_topics(

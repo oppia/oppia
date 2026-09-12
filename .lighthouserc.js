@@ -627,7 +627,7 @@ module.exports = {
             accessibilityMinScore: 0.9,
           },
           {
-            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player$',
+            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player(\\?.*)?$',
             accessibilityMinScore: 0.9,
           },
           {

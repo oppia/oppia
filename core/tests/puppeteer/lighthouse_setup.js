@@ -756,6 +756,7 @@ const reloadAllInteractionsExploration = async function (browser, page) {
     // slow render of the activity rows fails loudly instead of hanging.
     await page.waitForSelector(reloadExplorationRow, {timeout: 60000});
     const reloadButtons = await page.$$(reloadExplorationButton);
+    let reloadStarted = false;
     for (let i = 0; i < reloadButtons.length; i++) {
       const title = await page.evaluate(
         (el, sel, titleSelector) =>
@@ -766,8 +767,14 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       );
       if (title === 'all_interactions') {
         await reloadButtons[i].click();
+        reloadStarted = true;
         break;
       }
+    }
+    if (!reloadStarted) {
+      throw new Error(
+        'The all_interactions demo exploration reload button was not found.'
+      );
     }
 
     const successMessage = 'Data reloaded successfully.';
