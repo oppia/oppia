@@ -28,6 +28,9 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
+// This throws "TS7016". We need to suppress this error because the
+// module has no declaration file.
+// @ts-ignore
 import * as dmpModule from 'diff_match_patch/lib/diff_match_patch';
 
 @Component({
