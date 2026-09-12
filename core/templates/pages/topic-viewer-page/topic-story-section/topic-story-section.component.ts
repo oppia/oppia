@@ -18,14 +18,11 @@
 
 import {
   Component,
-  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  QueryList,
   SimpleChanges,
-  ViewChildren,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Subscription} from 'rxjs';
@@ -33,66 +30,33 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
-import {AppConstants} from 'app.constants';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import {StoryDomainConstants} from 'domain/story/story-domain.constants';
-import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
+import {TopicStorySectionBackendDataService} from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 
-import constants from 'assets/constants';
 import './topic-story-section.component.css';
+import {MasteryChallengeLockedModalComponent} from './mastery-challenge-locked-modal.component';
 
-import {AdventureMasteredModalComponent} from './adventure-mastered-modal.component';
-import {ArcSkipConfirmationModalComponent} from './arc-skip-confirmation-modal.component';
-import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
-import {LessonProgressStatus} from './topic-lesson-card/topic-lesson-card.component';
+import {ModuleMasteredModalComponent} from './module-mastered-modal.component';
+import {ModuleSkipConfirmationModalComponent} from './module-skip-confirmation-modal.component';
+import {ModuleNavigationLessonSelection} from './module-navigation.component';
+import {
+  LessonCardData,
+  ModuleGroupData,
+} from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 
-const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
-const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
-const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';
 const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
 const ARC_ID_QUERY_PARAM = 'arc_id';
 const MOBILE_SCREEN_BREAKPOINT = 480;
-
-interface LessonCardData {
-  lessonNumber: number;
-  lessonTitle: string;
-  lessonDescription: string;
-  thumbnailUrl: string;
-  startUrl: string;
-  practiceUrl: string;
-  nodeId: string;
-  lessonProgressStatus: LessonProgressStatus;
-  totalCheckpointsCount: number;
-  visitedCheckpointsCount: number;
-  isComingSoon: boolean;
-  isPublished: boolean;
-  isNewLabelVisible: boolean;
-  availableTextLanguageCodes: string[];
-  availableVoiceoverLanguageCodes: string[];
-  availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
-}
-
-interface AdventureGroupData {
-  adventureTitle: string;
-  adventureDescription: string;
-  lessonCards: LessonCardData[];
-  accentColor: string;
-  iconBg: string;
-  headerBackgroundColor: string;
-  headerBorderColor: string;
-  arcId: string;
-}
+const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
+const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
+const DEFAULT_PRACTICE_ACCENT_COLOR = '#0b776d';
+const COMING_SOON_ACCENT_COLOR = '#6b7280';
 
 interface PracticeCardData {
   practiceTitle: string;
@@ -100,9 +64,10 @@ interface PracticeCardData {
   thumbnailUrl: string;
   studyUrl: string;
   practiceUrl: string;
+  hasPracticeQuestions: boolean;
 }
 
-interface AdventureNavigationGroupData {
+interface ModuleNavigationGroupData {
   lessons: {
     lessonNumber: number;
     isCompleted: boolean;
@@ -127,11 +92,12 @@ export class TopicStorySectionComponent
   @Input() classroomUrlFragment: string = '';
   @Input() topicUrlFragment: string = '';
   @Input() practiceSubtopicIds: number[] = [];
+  @Input() topicName: string = '';
 
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
   // True when this section is rendered inside the topic editor's preview tab.
-  // Used to offset the sticky adventure navigation below the editor's fixed
+  // Used to offset the sticky module navigation below the editor's fixed
   // header bar.
   @Input() isInTopicEditorPreview: boolean = false;
 
@@ -140,319 +106,315 @@ export class TopicStorySectionComponent
   lessonCards: LessonCardData[] = [];
   availableLessonCards: LessonCardData[] = [];
   comingSoonLessonCards: LessonCardData[] = [];
-  adventureGroups: AdventureGroupData[] = [];
-  visibleAdventureGroups: AdventureGroupData[] = [];
-  comingSoonAdventureGroups: AdventureGroupData[] = [];
-  adventureNavigationGroups: AdventureNavigationGroupData[] = [];
+  moduleGroups: ModuleGroupData[] = [];
+  visibleModuleGroups: ModuleGroupData[] = [];
+  comingSoonModuleGroups: ModuleGroupData[] = [];
+  moduleNavigationGroups: ModuleNavigationGroupData[] = [];
   activeLessonNumber: number | null = null;
+  activePracticeArcId: string = '';
   practiceCard: PracticeCardData = {
     practiceTitle: '',
     practiceDescription: '',
     thumbnailUrl: '',
     studyUrl: '#',
     practiceUrl: '#',
+    hasPracticeQuestions: false,
   };
   masteryChallengeUrl: string = '#';
+  isMasteryUnlocked: boolean = false;
   isPracticeCardVisible: boolean = false;
-  _expandedAdventureIndices: Set<number> = new Set();
-  skippedAdventureIndices: Set<number> = new Set();
+  readonly defaultFallbackAccentColor = DEFAULT_FALLBACK_ACCENT_COLOR;
+  readonly defaultPracticeBgColor = DEFAULT_PRACTICE_BG_COLOR;
+  readonly defaultPracticeAccentColor = DEFAULT_PRACTICE_ACCENT_COLOR;
+  readonly comingSoonAccentColor = COMING_SOON_ACCENT_COLOR;
+  _expandedModuleIndices: Set<number> = new Set();
+  skippedModuleIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
-  showArcSkipConfirmationModal: boolean = false;
-  showAdventureMasteredModal: boolean = false;
-  masteredAdventureIndex: number | null = null;
-  pendingArcSkipTargetLabel: string = '';
+  showModuleSkipConfirmationModal: boolean = false;
+  showModuleMasteredModal: boolean = false;
+  masteredModuleIndex: number | null = null;
+  pendingModuleSkipTargetLabel: string = '';
   private pendingNavigationLessonNumber: number | null = null;
-  private pendingNavigationAdventureIndex: number | null = null;
-  private completedAdventurePracticeArcIds: Set<string> = new Set();
+  private pendingNavigationModuleIndex: number | null = null;
+  private pendingStartUrl: string = '';
+  private completedModulePracticeArcIds: Set<string> = new Set();
   private hasHandledArcMasteredQueryParams: boolean = false;
-  private arcSkipModalRef: NgbModalRef | null = null;
-  private adventureMasteredModalRef: NgbModalRef | null = null;
+  private moduleSkipModalRef: NgbModalRef | null = null;
+  private moduleMasteredModalRef: NgbModalRef | null = null;
 
-  @ViewChildren('lessonWrapper')
-  lessonWrappers!: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('practiceWrapper')
-  practiceWrappers!: QueryList<ElementRef<HTMLElement>>;
-
+  private practiceAvailabilityRequestId: number = 0;
+  practiceAvailabilityPending: Promise<void> | null = null;
   private directiveSubscriptions: Subscription = new Subscription();
 
-  isAdventureExpanded(index: number): boolean {
-    return this._expandedAdventureIndices.has(index);
+  isModuleExpanded(index: number): boolean {
+    return this._expandedModuleIndices.has(index);
   }
 
-  toggleAdventure(index: number): void {
-    if (this._expandedAdventureIndices.has(index)) {
-      this._expandedAdventureIndices.delete(index);
+  toggleModule(index: number): void {
+    if (this._expandedModuleIndices.has(index)) {
+      this._expandedModuleIndices.delete(index);
     } else {
-      this._expandedAdventureIndices.add(index);
-      if (this.skippedAdventureIndices.delete(index)) {
-        this.persistSkippedAdventures();
+      this._expandedModuleIndices.add(index);
+      if (this.skippedModuleIndices.delete(index)) {
+        this.persistSkippedModules();
       }
     }
   }
 
-  onNavigationLessonSelected(
-    selection: AdventureNavigationLessonSelection
-  ): void {
+  onNavigationLessonSelected(selection: ModuleNavigationLessonSelection): void {
     const lessonNumber = selection.lessonNumber;
-    const adventureIndex = selection.adventureIndex;
+    const moduleIndex = selection.moduleIndex;
 
-    if (adventureIndex !== -1 && this.shouldConfirmArcSkip(adventureIndex)) {
-      this.pendingNavigationLessonNumber = lessonNumber;
-      this.pendingNavigationAdventureIndex = adventureIndex;
-      this.pendingArcSkipTargetLabel = this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
-        {adventureNumber: adventureIndex + 1}
-      );
-      this.openArcSkipConfirmationModal();
-      return;
-    }
-
-    this.selectLessonFromNavigation(lessonNumber, adventureIndex);
+    // Clicking a lesson circle in the navbar should only scroll to that
+    // lesson's card. Any confirmation is handled when starting the lesson.
+    this.selectLessonFromNavigation(lessonNumber, moduleIndex);
   }
 
-  onArcSkipConfirmationCancel(): void {
-    this.arcSkipModalRef = null;
+  onModuleSkipConfirmationCancel(): void {
+    this.moduleSkipModalRef = null;
     this.pendingNavigationLessonNumber = null;
-    this.pendingNavigationAdventureIndex = null;
-    this.pendingArcSkipTargetLabel = '';
+    this.pendingNavigationModuleIndex = null;
+    this.pendingStartUrl = '';
+    this.pendingModuleSkipTargetLabel = '';
   }
 
-  onArcSkipConfirmationProceed(): void {
+  onModuleSkipConfirmationProceed(): void {
     if (
       this.pendingNavigationLessonNumber === null ||
-      this.pendingNavigationAdventureIndex === null
+      this.pendingNavigationModuleIndex === null
     ) {
-      this.onArcSkipConfirmationCancel();
+      this.onModuleSkipConfirmationCancel();
       return;
     }
 
-    this.arcSkipModalRef = null;
-    this.selectLessonFromNavigation(
-      this.pendingNavigationLessonNumber,
-      this.pendingNavigationAdventureIndex
-    );
+    const lessonNumber = this.pendingNavigationLessonNumber;
+    const moduleIndex = this.pendingNavigationModuleIndex;
+    const startUrl = this.pendingStartUrl;
 
+    this.moduleSkipModalRef = null;
     this.pendingNavigationLessonNumber = null;
-    this.pendingNavigationAdventureIndex = null;
-    this.pendingArcSkipTargetLabel = '';
+    this.pendingNavigationModuleIndex = null;
+    this.pendingStartUrl = '';
+    this.pendingModuleSkipTargetLabel = '';
+
+    if (moduleIndex !== -1) {
+      this.markSkippedModulesBefore(moduleIndex);
+      this._expandedModuleIndices.add(moduleIndex);
+    }
+    this.activeLessonNumber = lessonNumber;
+    this.navigatedLessonNumber = lessonNumber;
+
+    if (startUrl) {
+      this.windowRef.nativeWindow.location.assign(startUrl);
+    }
   }
 
-  private openArcSkipConfirmationModal(): void {
+  private openModuleSkipConfirmationModal(): void {
     if (this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT) {
       const bottomSheetRef = this.bottomSheet.open(
-        ArcSkipConfirmationModalComponent,
+        ModuleSkipConfirmationModalComponent,
         {
           data: {
-            adventureLabel: this.pendingArcSkipTargetLabel,
-            confirmationMessage: this.getArcSkipConfirmationMessage(),
+            moduleLabel: this.pendingModuleSkipTargetLabel,
+            confirmationMessage: this.getModuleSkipConfirmationMessage(),
           },
         }
       );
       bottomSheetRef.afterDismissed().subscribe((result: string) => {
         if (result === 'confirm') {
-          this.onArcSkipConfirmationProceed();
+          this.onModuleSkipConfirmationProceed();
         } else {
-          this.onArcSkipConfirmationCancel();
+          this.onModuleSkipConfirmationCancel();
         }
       });
     } else {
-      this.arcSkipModalRef = this.ngbModal.open(
-        ArcSkipConfirmationModalComponent,
+      this.moduleSkipModalRef = this.ngbModal.open(
+        ModuleSkipConfirmationModalComponent,
         {
           backdrop: 'static',
-          windowClass: 'oppia-arc-skip-confirmation-modal',
+          windowClass: 'oppia-module-skip-confirmation-modal',
         }
       );
-      this.arcSkipModalRef.componentInstance.adventureLabel =
-        this.pendingArcSkipTargetLabel;
-      this.arcSkipModalRef.componentInstance.confirmationMessage =
-        this.getArcSkipConfirmationMessage();
-      this.arcSkipModalRef.result.then(
-        () => this.onArcSkipConfirmationProceed(),
-        () => this.onArcSkipConfirmationCancel()
+      this.moduleSkipModalRef.componentInstance.moduleLabel =
+        this.pendingModuleSkipTargetLabel;
+      this.moduleSkipModalRef.componentInstance.confirmationMessage =
+        this.getModuleSkipConfirmationMessage();
+      this.moduleSkipModalRef.result.then(
+        () => this.onModuleSkipConfirmationProceed(),
+        () => this.onModuleSkipConfirmationCancel()
       );
     }
   }
 
-  private openAdventureMasteredModal(): void {
+  private openModuleMasteredModal(): void {
     if (this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT) {
       const bottomSheetRef = this.bottomSheet.open(
-        AdventureMasteredModalComponent,
+        ModuleMasteredModalComponent,
         {
           data: {
-            title: this.getAdventureMasteredTitle(),
-            message: this.getAdventureMasteredSubtitle(),
+            title: this.getModuleMasteredTitle(),
+            message: this.getModuleMasteredSubtitle(),
           },
         }
       );
       bottomSheetRef.afterDismissed().subscribe((result: string) => {
         if (result === 'confirm') {
-          this.onAdventureMasteredContinue();
+          this.onModuleMasteredContinue();
         } else {
-          this.adventureMasteredModalRef = null;
+          this.moduleMasteredModalRef = null;
         }
       });
     } else {
-      this.adventureMasteredModalRef = this.ngbModal.open(
-        AdventureMasteredModalComponent,
+      this.moduleMasteredModalRef = this.ngbModal.open(
+        ModuleMasteredModalComponent,
         {
           backdrop: 'static',
-          windowClass: 'oppia-adventure-mastered-modal',
+          windowClass: 'oppia-module-mastered-modal',
         }
       );
-      this.adventureMasteredModalRef.componentInstance.title =
-        this.getAdventureMasteredTitle();
-      this.adventureMasteredModalRef.componentInstance.message =
-        this.getAdventureMasteredSubtitle();
-      this.adventureMasteredModalRef.result.then(
-        () => this.onAdventureMasteredContinue(),
+      this.moduleMasteredModalRef.componentInstance.title =
+        this.getModuleMasteredTitle();
+      this.moduleMasteredModalRef.componentInstance.message =
+        this.getModuleMasteredSubtitle();
+      this.moduleMasteredModalRef.result.then(
+        () => this.onModuleMasteredContinue(),
         () => {
-          this.adventureMasteredModalRef = null;
+          this.moduleMasteredModalRef = null;
         }
       );
     }
   }
 
-  onAdventureMasteredContinue(): void {
-    if (this.masteredAdventureIndex !== null) {
-      this._expandedAdventureIndices.delete(this.masteredAdventureIndex);
+  onModuleMasteredContinue(): void {
+    if (this.masteredModuleIndex !== null) {
+      this._expandedModuleIndices.delete(this.masteredModuleIndex);
 
-      const nextAdventureIndex = this.masteredAdventureIndex + 1;
-      if (nextAdventureIndex < this.visibleAdventureGroups.length) {
-        this._expandedAdventureIndices.add(nextAdventureIndex);
-        const nextAdventureFirstLesson =
-          this.visibleAdventureGroups[nextAdventureIndex].lessonCards[0];
-        if (nextAdventureFirstLesson) {
-          this.activeLessonNumber = nextAdventureFirstLesson.lessonNumber;
-          this.navigatedLessonNumber = nextAdventureFirstLesson.lessonNumber;
+      const nextModuleIndex = this.masteredModuleIndex + 1;
+      if (nextModuleIndex < this.visibleModuleGroups.length) {
+        this._expandedModuleIndices.add(nextModuleIndex);
+        const nextModuleFirstLesson =
+          this.visibleModuleGroups[nextModuleIndex].lessonCards[0];
+        if (nextModuleFirstLesson) {
+          this.activeLessonNumber = nextModuleFirstLesson.lessonNumber;
+          this.navigatedLessonNumber = nextModuleFirstLesson.lessonNumber;
         }
       }
     }
-    this.adventureMasteredModalRef = null;
-    this.masteredAdventureIndex = null;
+    this.moduleMasteredModalRef = null;
+    this.masteredModuleIndex = null;
     this.hasHandledArcMasteredQueryParams = true;
   }
 
-  getAdventureMasteredTitle(): string {
-    if (this.masteredAdventureIndex === null) {
+  getModuleMasteredTitle(): string {
+    if (this.masteredModuleIndex === null) {
       return this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE'
+        'I18N_TOPIC_VIEWER_MODULE_MASTERED_TITLE'
       );
     }
     return this.translateService.instant(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE',
-      {adventureNumber: this.masteredAdventureIndex + 1}
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_NUMBER_TITLE',
+      {moduleNumber: this.masteredModuleIndex + 1}
     );
   }
 
-  getAdventureMasteredSubtitle(): string {
-    if (this.masteredAdventureIndex === null) {
+  getModuleMasteredSubtitle(): string {
+    if (this.masteredModuleIndex === null) {
       return this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+        'I18N_TOPIC_VIEWER_MODULE_MASTERED_MOMENTUM_SUBTITLE'
       );
     }
 
-    const unlockedAdventureNumber = this.masteredAdventureIndex + 2;
-    if (unlockedAdventureNumber <= this.visibleAdventureGroups.length) {
+    const unlockedModuleNumber = this.masteredModuleIndex + 2;
+    if (unlockedModuleNumber <= this.visibleModuleGroups.length) {
       return this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE',
-        {adventureNumber: unlockedAdventureNumber}
+        'I18N_TOPIC_VIEWER_MODULE_MASTERED_UNLOCKED_SUBTITLE',
+        {moduleNumber: unlockedModuleNumber}
       );
     }
 
     return this.translateService.instant(
-      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+      'I18N_TOPIC_VIEWER_MODULE_MASTERED_ALL_COMPLETE_SUBTITLE'
     );
   }
 
-  getArcSkipConfirmationMessage(): string {
-    if (this.pendingNavigationAdventureIndex === null) {
+  getModuleSkipConfirmationMessage(): string {
+    if (this.pendingNavigationModuleIndex === null) {
       return '';
     }
 
-    const skippedAdventureNumbers: number[] = [];
-    for (let index = 0; index < this.pendingNavigationAdventureIndex; index++) {
-      if (!this.isAdventureCompleted(index)) {
-        skippedAdventureNumbers.push(index + 1);
+    const skippedModuleNumbers: number[] = [];
+    for (let index = 0; index < this.pendingNavigationModuleIndex; index++) {
+      if (!this.areAllLessonsCompleted(index)) {
+        skippedModuleNumbers.push(index + 1);
       }
     }
 
-    if (skippedAdventureNumbers.length === 0) {
+    if (skippedModuleNumbers.length === 0) {
       return '';
     }
 
     return this.translateService.instant(
-      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      'I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_MESSAGE',
       {
-        count: skippedAdventureNumbers.length,
-        adventureNumbers: this.joinAdventureNumbers(skippedAdventureNumbers),
+        count: skippedModuleNumbers.length,
+        moduleNumbers:
+          this.topicStorySectionBackendDataService.joinModuleNumbers(
+            skippedModuleNumbers
+          ),
         messageFormat: true,
       }
     );
   }
 
-  private joinAdventureNumbers(numbers: number[]): string {
-    if (numbers.length === 1) {
-      return String(numbers[0]);
-    }
-    if (numbers.length === 2) {
-      return numbers.join(' and ');
-    }
-    return (
-      numbers.slice(0, -1).join(', ') + ', and ' + numbers[numbers.length - 1]
-    );
+  isModuleSkipped(moduleIndex: number): boolean {
+    return this.skippedModuleIndices.has(moduleIndex);
   }
 
-  isAdventureSkipped(adventureIndex: number): boolean {
-    return this.skippedAdventureIndices.has(adventureIndex);
-  }
-
-  getSkippedAdventureButtonLabel(adventureIndex: number): string {
-    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
-    if (!adventureGroup) {
+  getSkippedModuleButtonLabel(moduleIndex: number): string {
+    const moduleGroup = this.visibleModuleGroups[moduleIndex];
+    if (!moduleGroup) {
       return this.translateService.instant(
-        'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+        'I18N_TOPIC_VIEWER_MODULE_START_BUTTON'
       );
     }
 
-    const hasStarted = adventureGroup.lessonCards.some(
+    const hasStarted = moduleGroup.lessonCards.some(
       card => card.lessonProgressStatus !== 'not_started'
     );
     return hasStarted
-      ? this.translateService.instant(
-          'I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON'
-        )
-      : this.translateService.instant(
-          'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
-        );
+      ? this.translateService.instant('I18N_TOPIC_VIEWER_MODULE_RESUME_BUTTON')
+      : this.translateService.instant('I18N_TOPIC_VIEWER_MODULE_START_BUTTON');
   }
 
-  isAdventureCompleted(adventureIndex: number): boolean {
-    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
-    if (!adventureGroup || adventureGroup.lessonCards.length === 0) {
+  isModuleCompleted(moduleIndex: number): boolean {
+    const moduleGroup = this.visibleModuleGroups[moduleIndex];
+    if (!moduleGroup || moduleGroup.lessonCards.length === 0) {
       return false;
     }
 
-    return this.areAllLessonsCompleted(adventureIndex);
+    return (
+      this.areAllLessonsCompleted(moduleIndex) &&
+      this.isModulePracticeCompleted(moduleIndex)
+    );
   }
 
-  areAllLessonsCompleted(adventureIndex: number): boolean {
-    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
-    if (!adventureGroup || adventureGroup.lessonCards.length === 0) {
+  areAllLessonsCompleted(moduleIndex: number): boolean {
+    const moduleGroup = this.visibleModuleGroups[moduleIndex];
+    if (!moduleGroup || moduleGroup.lessonCards.length === 0) {
       return false;
     }
 
-    return adventureGroup.lessonCards.every(
+    return moduleGroup.lessonCards.every(
       card => card.lessonProgressStatus === 'completed'
     );
   }
 
-  isAdventurePracticeCompleted(adventureIndex: number): boolean {
-    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
-    if (!adventureGroup) {
+  isModulePracticeCompleted(moduleIndex: number): boolean {
+    const moduleGroup = this.visibleModuleGroups[moduleIndex];
+    if (!moduleGroup) {
       return false;
     }
-    return this.completedAdventurePracticeArcIds.has(adventureGroup.arcId);
+    return this.completedModulePracticeArcIds.has(moduleGroup.arcId);
   }
 
   isStoryCompleted(): boolean {
@@ -467,128 +429,209 @@ export class TopicStorySectionComponent
 
   private selectLessonFromNavigation(
     lessonNumber: number,
-    adventureIndex: number
+    moduleIndex: number
   ): void {
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activePracticeArcId = '';
 
-    if (adventureIndex !== -1) {
-      this.markSkippedAdventuresBefore(adventureIndex);
-      this._expandedAdventureIndices.add(adventureIndex);
+    if (moduleIndex !== -1) {
+      this._expandedModuleIndices.add(moduleIndex);
     }
 
-    // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
-      const lessonEl = this.lessonWrappers?.find(ref => {
-        const elId = ref.nativeElement.id;
-        return (
-          elId === 'lesson-' + lessonNumber ||
-          elId === 'coming-soon-lesson-' + lessonNumber
-        );
-      });
-      if (lessonEl) {
-        lessonEl.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
+      this.scrollToElementById('lesson-' + lessonNumber);
+      this.scrollToElementById('coming-soon-lesson-' + lessonNumber);
     }, 300);
   }
 
-  private shouldConfirmArcSkip(targetAdventureIndex: number): boolean {
-    if (targetAdventureIndex <= 0) {
+  onLessonStartClick(selection: {
+    lessonNumber: number;
+    startUrl: string;
+  }): void {
+    const {lessonNumber, startUrl} = selection;
+    const moduleIndex = this.visibleModuleGroups.findIndex(group =>
+      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
+    );
+
+    if (moduleIndex !== -1 && this.shouldConfirmModuleSkip(moduleIndex)) {
+      this.pendingNavigationLessonNumber = lessonNumber;
+      this.pendingNavigationModuleIndex = moduleIndex;
+      this.pendingStartUrl = startUrl;
+      this.pendingModuleSkipTargetLabel = this.translateService.instant(
+        'I18N_TOPIC_VIEWER_MODULE_NUMBER_LABEL',
+        {moduleNumber: moduleIndex + 1}
+      );
+      this.openModuleSkipConfirmationModal();
+      return;
+    }
+
+    if (moduleIndex !== -1) {
+      this._expandedModuleIndices.add(moduleIndex);
+    }
+    this.activeLessonNumber = lessonNumber;
+    this.navigatedLessonNumber = lessonNumber;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activePracticeArcId = '';
+
+    if (startUrl) {
+      this.windowRef.nativeWindow.location.assign(startUrl);
+    }
+  }
+
+  onNavigationMasteryChallengeClicked(): void {
+    this.openMasteryChallengeModal();
+  }
+
+  onMasteryChallengeCardClicked(): void {
+    if (this.isMasteryUnlocked) {
+      if (this.masteryChallengeUrl !== '#') {
+        this.windowRef.nativeWindow.location.assign(this.masteryChallengeUrl);
+      }
+      return;
+    }
+
+    this.openMasteryChallengeModal();
+  }
+
+  private openMasteryChallengeModal(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      MasteryChallengeLockedModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'mastery-locked-modal',
+      }
+    );
+    modalRef.result.then(
+      () => {
+        this.isMasteryUnlocked = true;
+        this.scrollToMasteryChallenge();
+      },
+      () => {}
+    );
+  }
+
+  private shouldConfirmModuleSkip(moduleIndex: number): boolean {
+    if (moduleIndex <= 0) {
       return false;
     }
 
-    for (let index = 0; index < targetAdventureIndex; index++) {
-      if (!this.isAdventureCompleted(index)) {
+    for (let index = 0; index < moduleIndex; index++) {
+      if (!this.areAllLessonsCompleted(index)) {
         return true;
       }
     }
     return false;
   }
 
-  private markSkippedAdventuresBefore(targetAdventureIndex: number): void {
-    if (targetAdventureIndex <= 0) {
+  private markSkippedModulesBefore(targetModuleIndex: number): void {
+    if (targetModuleIndex <= 0) {
       return;
     }
 
-    for (let index = 0; index < targetAdventureIndex; index++) {
-      if (!this.isAdventureCompleted(index)) {
-        this.skippedAdventureIndices.add(index);
-        this._expandedAdventureIndices.delete(index);
+    for (let index = 0; index < targetModuleIndex; index++) {
+      if (!this.isModuleCompleted(index)) {
+        this.skippedModuleIndices.add(index);
+        this._expandedModuleIndices.delete(index);
       }
     }
-    this.persistSkippedAdventures();
+    this.persistSkippedModules();
   }
 
-  private restoreSkippedAdventures(): void {
+  private restoreSkippedModules(): void {
     const storyId = this.storySummary.getId();
     if (!storyId) {
       return;
     }
-    this.skippedAdventureIndices = new Set(
-      this.localStorageService.getSkippedAdventures(storyId)
+    this.skippedModuleIndices = new Set(
+      this.localStorageService.getSkippedModules(storyId)
     );
   }
 
-  private persistSkippedAdventures(): void {
+  private persistSkippedModules(): void {
     const storyId = this.storySummary.getId();
     if (!storyId) {
       return;
     }
-    this.localStorageService.updateSkippedAdventures(
+    this.localStorageService.updateSkippedModules(
       storyId,
-      Array.from(this.skippedAdventureIndices)
+      Array.from(this.skippedModuleIndices)
     );
   }
 
-  private restoreMasteredAdventures(): void {
+  private restoreMasteredModules(): void {
     const storyId = this.storySummary.getId();
     if (!storyId) {
       return;
     }
-    this.completedAdventurePracticeArcIds = new Set(
-      this.localStorageService.getMasteredAdventures(storyId)
+    this.completedModulePracticeArcIds = new Set(
+      this.localStorageService.getMasteredModules(storyId)
     );
   }
 
-  private persistMasteredAdventures(): void {
+  private persistMasteredModules(): void {
     const storyId = this.storySummary.getId();
     if (!storyId) {
       return;
     }
-    this.localStorageService.updateMasteredAdventures(
+    this.localStorageService.updateMasteredModules(
       storyId,
-      Array.from(this.completedAdventurePracticeArcIds)
+      Array.from(this.completedModulePracticeArcIds)
     );
   }
 
   onNavigationPracticeSelected(arcId: string): void {
-    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
+    this.activePracticeArcId = arcId;
+    // Only one circle should appear filled in the navbar at a time.
+    this.activeLessonNumber = null;
     setTimeout(() => {
-      const practiceEl = this.practiceWrappers?.find(
-        ref => ref.nativeElement.id === 'practice-card-' + arcId
-      );
-      if (practiceEl) {
-        practiceEl.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
+      this.scrollToElementById('practice-card-' + arcId);
     }, 300);
   }
 
+  scrollToMasteryChallenge(): void {
+    setTimeout(() => {
+      const el = this.windowRef.nativeWindow.document.querySelector(
+        '.mastery-challenge-card'
+      );
+      if (el) {
+        this.scrollToElement(el);
+      }
+    }, 50);
+  }
+
+  private scrollToElementById(id: string): void {
+    const el = this.windowRef.nativeWindow.document.getElementById(id);
+    if (el) {
+      this.scrollToElement(el);
+    }
+  }
+
+  private scrollToElement(el: Element): void {
+    const navbarHeight = 56;
+    const moduleNav = this.windowRef.nativeWindow.document.querySelector(
+      '.module-navigation-container'
+    );
+    const moduleNavHeight = moduleNav
+      ? moduleNav.getBoundingClientRect().height
+      : 0;
+    const offset = navbarHeight + moduleNavHeight + 16;
+    const top =
+      el.getBoundingClientRect().top +
+      this.windowRef.nativeWindow.scrollY -
+      offset;
+    this.windowRef.nativeWindow.scrollTo({top, behavior: 'smooth'});
+  }
+
   constructor(
-    private assetsBackendApiService: AssetsBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
-    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
-    private localStorageService: LocalStorageService,
+    private topicStorySectionBackendDataService: TopicStorySectionBackendDataService,
+    private windowRef: WindowRef,
     private ngbModal: NgbModal,
+    private localStorageService: LocalStorageService,
     private bottomSheet: MatBottomSheet,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService
@@ -596,7 +639,6 @@ export class TopicStorySectionComponent
 
   ngOnInit(): void {
     this.populateFromInputs();
-    void this.loadChapterProgress();
     this.directiveSubscriptions.add(
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         this.topicSessionFallbackLanguageService.clearSelection();
@@ -620,185 +662,42 @@ export class TopicStorySectionComponent
     ) {
       this.populateFromInputs();
     }
-    if (changes.storySummary && !changes.storySummary.firstChange) {
-      void this.loadChapterProgress();
+    if (changes.practiceSubtopicIds) {
+      this.practiceCard = this.getPracticeCardData();
     }
   }
 
   onAvatarImageError(): void {
-    if (this.oppiaAvatarImageUrl !== this.getFallbackAvatarImageUrl()) {
-      this.oppiaAvatarImageUrl = this.getFallbackAvatarImageUrl();
+    if (
+      this.oppiaAvatarImageUrl !==
+      this.topicStorySectionBackendDataService.getFallbackAvatarImageUrl()
+    ) {
+      this.oppiaAvatarImageUrl =
+        this.topicStorySectionBackendDataService.getFallbackAvatarImageUrl();
     }
   }
 
-  getLessonCountText(): string {
-    return this.lessonCount === 1
-      ? this.lessonCount + ' lesson'
-      : this.lessonCount + ' lessons';
+  shouldShowModuleEndTestCard(moduleIndex: number): boolean {
+    return Boolean(this.visibleModuleGroups[moduleIndex]?.lessonCards.length);
   }
 
-  getPracticeCountText(): string {
-    return this.practiceCount === 1
-      ? this.practiceCount + ' practice'
-      : this.practiceCount + ' practices';
-  }
-
-  getStoryMetaText(): string {
-    return this.getLessonCountText();
-  }
-
-  getStoryMetaAriaLabel(): string {
-    return this.getLessonCountText() + ' available';
-  }
-
-  shouldShowAdventureEndTestCard(adventureIndex: number): boolean {
-    return this.isPracticeCardVisible;
-  }
-
-  getAdventureCompletionText(adventureIndex: number): string {
-    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
-    if (!adventureGroup) {
+  getModuleCompletionText(moduleIndex: number): string {
+    const moduleGroup = this.visibleModuleGroups[moduleIndex];
+    if (!moduleGroup) {
       return '';
     }
-    const completedCount = adventureGroup.lessonCards.filter(
+    const completedCount = moduleGroup.lessonCards.filter(
       card => card.lessonProgressStatus === 'completed'
     ).length;
-    const totalCount = adventureGroup.lessonCards.length;
-    return `${completedCount} of ${totalCount} completed`;
+    const totalCount = moduleGroup.lessonCards.length;
+    return this.topicStorySectionBackendDataService.getModuleCompletionText(
+      completedCount,
+      totalCount
+    );
   }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
-  private getLessonProgressStatus(node: StoryNode): LessonProgressStatus {
-    if (this.isChapterDisplayedAsComingSoon(node) || !node.getExplorationId()) {
-      return 'coming_soon';
-    }
-
-    const nodeTitle = node.getTitle();
-    if (this.storySummary.isNodeCompleted(nodeTitle)) {
-      return 'completed';
-    }
-
-    const visitedChapterTitles = this.storySummary.getVisitedChapterTitles();
-    if (
-      visitedChapterTitles &&
-      visitedChapterTitles.indexOf(nodeTitle) !== -1
-    ) {
-      return 'in_progress';
-    }
-
-    return 'not_started';
-  }
-
-  private async loadChapterProgress(): Promise<void> {
-    const explorationIds = this.storySummary
-      .getAllNodes()
-      .map(node => node.getExplorationId())
-      .filter(id => id !== null) as string[];
-
-    if (explorationIds.length === 0) {
-      return;
-    }
-
-    try {
-      await this.chapterProgressLoaderService.loadChapterProgressForStory(
-        this.storySummary.getId(),
-        explorationIds
-      );
-    } catch {
-      return;
-    }
-
-    this.lessonCards = this.storySummary
-      .getAllNodes()
-      .map((node: StoryNode, index: number) => {
-        const explorationId = node.getExplorationId();
-        const lessonProgressStatus = this.getLessonProgressStatus(node);
-        let totalCheckpoints = 0;
-        let visitedCheckpoints = 0;
-
-        if (explorationId) {
-          const summary =
-            this.chapterProgressLoaderService.getChapterProgressSummary(
-              explorationId
-            );
-          if (summary) {
-            totalCheckpoints = summary.totalCheckpoints;
-            visitedCheckpoints = summary.visitedCheckpoints;
-          }
-        }
-
-        return {
-          lessonNumber: index + 1,
-          lessonTitle: node.getTitle(),
-          lessonDescription: node.getDescription(),
-          thumbnailUrl: this.getLessonThumbnailUrl(node),
-          startUrl:
-            lessonProgressStatus === 'coming_soon'
-              ? '#'
-              : this.getLessonStartUrl(node),
-          practiceUrl:
-            lessonProgressStatus === 'coming_soon'
-              ? '#'
-              : this.getLessonPracticeUrl(node.getId().split('_').pop() || ''),
-          lessonProgressStatus,
-          totalCheckpointsCount: totalCheckpoints,
-          visitedCheckpointsCount: visitedCheckpoints,
-          nodeId: node.getId(),
-          isComingSoon: lessonProgressStatus === 'coming_soon',
-          isPublished: this.isChapterPublished(node),
-          isNewLabelVisible: this.isNewChapterLabelVisible(node),
-          availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-          availableVoiceoverLanguageCodes:
-            node.getAvailableVoiceoverLanguageCodes(),
-          availableVoiceoverLanguageAccentDescriptions:
-            node.getAvailableVoiceoverLanguageAccentDescriptions(),
-        };
-      });
-
-    const allNodes = this.storySummary.getAllNodes();
-    this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.restoreSkippedAdventures();
-    this.updateVisibleSections();
-    this.maybeShowAdventureMasteredModal();
-  }
-
-  private buildAdventureGroups(allNodes: StoryNode[]): AdventureGroupData[] {
-    const arcs = this.storySummary.getArcs();
-    if (!arcs || arcs.length === 0) {
-      return [];
-    }
-
-    const nodeIndexMap = new Map<string, number>();
-    allNodes.forEach((node, index) => {
-      nodeIndexMap.set(node.getId(), index);
-    });
-
-    return arcs.map((arc, adventureIndex) => {
-      const adventureLessonCards: LessonCardData[] = [];
-      const paletteColor = this.getAdventurePaletteColor(adventureIndex);
-      arc.node_ids.forEach(nodeId => {
-        const nodeIndex = nodeIndexMap.get(nodeId);
-        if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
-          adventureLessonCards.push(this.lessonCards[nodeIndex]);
-        }
-      });
-      // The backend maps an arc to its 1-based position among the topic's
-      // story arcs, so pass the position rather than a parsed arc id.
-      const arcId = String(adventureIndex + 1);
-      return {
-        adventureTitle: arc.title,
-        adventureDescription: arc.description,
-        lessonCards: adventureLessonCards,
-        accentColor: paletteColor.rowAccent,
-        iconBg: paletteColor.iconBg,
-        headerBackgroundColor: paletteColor.headerBg,
-        headerBorderColor: paletteColor.headerBorder,
-        arcId,
-      };
-    });
   }
 
   private populateFromInputs(): void {
@@ -811,161 +710,144 @@ export class TopicStorySectionComponent
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
     }
 
-    this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
-    this.studyGuideUrl = this.getStudyGuideUrl();
+    this.oppiaAvatarImageUrl =
+      this.topicStorySectionBackendDataService.getPrimaryAvatarImageUrl();
+    this.studyGuideUrl =
+      this.topicStorySectionBackendDataService.getStudyGuideUrl(
+        this.classroomUrlFragment,
+        this.topicUrlFragment
+      );
 
     this.storyTitle = this.storySummary.getTitle();
     this.storyDescription = this.storySummary.getDescription() || '';
     this.lessonCount = this.storySummary.getNodeTitles().length;
     const allNodes = this.storySummary.getAllNodes();
-    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
-      const explorationId = node.getExplorationId();
-      const lessonProgressStatus = this.getLessonProgressStatus(node);
-      const progressSummary = explorationId
-        ? this.chapterProgressLoaderService.getChapterProgressSummary(
-            explorationId
-          )
-        : null;
-      const nodeNumber = node.getId().split('_').pop() || '';
+    this.lessonCards =
+      this.topicStorySectionBackendDataService.buildLessonCards(
+        allNodes,
+        this.storySummary,
+        this.classroomUrlFragment,
+        this.topicUrlFragment
+      );
 
-      return {
-        lessonNumber: index + 1,
-        lessonTitle: node.getTitle(),
-        lessonDescription: node.getDescription(),
-        thumbnailUrl: this.getLessonThumbnailUrl(node),
-        startUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonStartUrl(node),
-        practiceUrl:
-          lessonProgressStatus === 'coming_soon'
-            ? '#'
-            : this.getLessonPracticeUrl(nodeNumber),
-        nodeId: node.getId(),
-        lessonProgressStatus,
-        totalCheckpointsCount: progressSummary
-          ? progressSummary.totalCheckpoints
-          : 0,
-        visitedCheckpointsCount: progressSummary
-          ? progressSummary.visitedCheckpoints
-          : 0,
-        isComingSoon: lessonProgressStatus === 'coming_soon',
-        isPublished: this.isChapterPublished(node),
-        isNewLabelVisible: this.isNewChapterLabelVisible(node),
-        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
-        availableVoiceoverLanguageCodes:
-          node.getAvailableVoiceoverLanguageCodes(),
-        availableVoiceoverLanguageAccentDescriptions:
-          node.getAvailableVoiceoverLanguageAccentDescriptions(),
-      };
-    });
-
-    this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.restoreSkippedAdventures();
-    this.restoreMasteredAdventures();
+    this.moduleGroups =
+      this.topicStorySectionBackendDataService.buildModuleGroups(
+        allNodes,
+        this.storySummary,
+        this.lessonCards
+      );
+    this.restoreSkippedModules();
+    this.restoreMasteredModules();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
-    this.maybeShowAdventureMasteredModal();
+    this.expandModuleForActiveLesson();
+    this.maybeShowModuleMasteredModal();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getMasteryChallengeUrl();
+    this.isMasteryUnlocked = this.isStoryCompleted();
+    this.practiceAvailabilityPending = this.loadPracticeQuestionAvailability();
   }
 
   private getPracticeCardData(): PracticeCardData {
     const firstArcId =
-      this.adventureGroups.length > 0 ? this.adventureGroups[0].arcId : '';
+      this.moduleGroups.length > 0 ? this.moduleGroups[0].arcId : '';
 
     return {
-      practiceTitle: 'Adventure 1 Review & Test',
-      practiceDescription:
-        this.adventureGroups.length > 1
-          ? 'Test what you have learned in Adventure 1 to unlock Adventure 2.'
-          : 'Test what you have learned in Adventure 1.',
-      thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
+      practiceTitle: this.getPracticeTitle(0),
+      practiceDescription: this.getPracticeDescription(0),
+      thumbnailUrl:
+        this.topicStorySectionBackendDataService.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
-      practiceUrl: firstArcId ? this.getEndOfArcUrl(firstArcId) : '#',
+      practiceUrl: firstArcId
+        ? this.getEndOfArcUrl(firstArcId)
+        : this.topicStorySectionBackendDataService.getGeneralPracticeUrl(
+            this.practiceSubtopicIds,
+            this.classroomUrlFragment,
+            this.topicUrlFragment
+          ),
+      hasPracticeQuestions: false,
     };
   }
 
-  getPracticeTitle(adventureIndex: number): string {
-    return `Adventure ${adventureIndex + 1} Review & Test`;
+  private async loadPracticeQuestionAvailability(): Promise<void> {
+    const requestId = ++this.practiceAvailabilityRequestId;
+    const lessonCards = this.lessonCards;
+    const moduleGroups = this.moduleGroups;
+
+    const lessonAvailability = await Promise.all(
+      lessonCards.map(card =>
+        this.topicStorySectionBackendDataService.checkIfQuestionsExist(
+          card.skillIds
+        )
+      )
+    );
+
+    if (requestId !== this.practiceAvailabilityRequestId) {
+      return;
+    }
+
+    // The availability for each module and for the whole story is a union
+    // of its lessons' skill sets, so it can be derived from the per-lesson
+    // results without issuing redundant backend requests.
+    const availabilityByLessonNumber = new Map<number, boolean>();
+    lessonCards.forEach((card, index) => {
+      card.hasPracticeQuestions = lessonAvailability[index];
+      availabilityByLessonNumber.set(
+        card.lessonNumber,
+        lessonAvailability[index]
+      );
+    });
+    moduleGroups.forEach(group => {
+      group.hasPracticeQuestions = group.lessonCards.some(
+        card => availabilityByLessonNumber.get(card.lessonNumber) === true
+      );
+    });
+    this.practiceCard.hasPracticeQuestions = lessonAvailability.some(
+      available => available
+    );
+
+    this.visibleModuleGroups = this.visibleModuleGroups.map(group => {
+      const updated = moduleGroups.find(g => g.arcId === group.arcId);
+      return updated ? {...updated, lessonCards: group.lessonCards} : group;
+    });
   }
 
-  getPracticeDescription(adventureIndex: number): string {
-    const adventureNumber = adventureIndex + 1;
-    const nextAdventureNumber = adventureNumber + 1;
-    if (adventureIndex < this.visibleAdventureGroups.length - 1) {
-      return `Test what you have learned in Adventure ${adventureNumber} to unlock Adventure ${nextAdventureNumber}.`;
-    }
-    return `Test what you have learned in Adventure ${adventureNumber}.`;
+  getPracticeTitle(moduleIndex: number): string {
+    return this.topicStorySectionBackendDataService.getPracticeTitle(
+      moduleIndex
+    );
+  }
+
+  getPracticeDescription(moduleIndex: number): string {
+    return this.topicStorySectionBackendDataService.getPracticeDescription(
+      moduleIndex,
+      moduleIndex >= this.visibleModuleGroups.length - 1
+    );
   }
 
   getLessonPracticeUrl(nodeId: string): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.LESSON_PRACTICE_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        node_id: nodeId,
-      }
+    return this.topicStorySectionBackendDataService.getLessonPracticeUrl(
+      nodeId,
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
   }
 
   getEndOfArcUrl(arcId: string): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.END_OF_ARC_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        arc_id: arcId,
-      }
+    return this.topicStorySectionBackendDataService.getEndOfArcUrl(
+      arcId,
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
   }
 
   private getMasteryChallengeUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.MASTERY_CHALLENGE_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-      }
+    return this.topicStorySectionBackendDataService.getMasteryChallengeUrl(
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
-  }
-
-  private getLessonThumbnailUrl(node: StoryNode): string {
-    const thumbnailFilename = node.getThumbnailFilename();
-    const storyId = this.storySummary.getId();
-    if (thumbnailFilename) {
-      if (!storyId) {
-        return this.getFallbackLessonThumbnailUrl();
-      }
-      return this.assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.STORY,
-        storyId,
-        thumbnailFilename
-      );
-    }
-    return this.getFallbackLessonThumbnailUrl();
-  }
-
-  private getAdventurePaletteColor(adventureIndex: number): {
-    headerBg: string;
-    headerBorder: string;
-    iconBg: string;
-    rowAccent: string;
-  } {
-    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
-    return palette[adventureIndex % palette.length];
   }
 
   private getActiveLessonNumber(): number | null {
@@ -988,6 +870,37 @@ export class TopicStorySectionComponent
       : null;
   }
 
+  // Expands the module that contains the currently active (next) lesson so
+  // that when the learner returns after completing a lesson and a new lesson
+  // becomes active, its chapter is already expanded rather than collapsed.
+  private expandModuleForActiveLesson(): void {
+    if (this.activeLessonNumber === null) {
+      return;
+    }
+
+    const activeLesson = this.lessonCards.find(
+      lesson => lesson.lessonNumber === this.activeLessonNumber
+    );
+    if (
+      !activeLesson ||
+      activeLesson.isComingSoon ||
+      (activeLesson.lessonProgressStatus !== 'in_progress' &&
+        activeLesson.lessonProgressStatus !== 'not_started')
+    ) {
+      return;
+    }
+
+    const moduleIndex = this.visibleModuleGroups.findIndex(group =>
+      group.lessonCards.some(
+        card => card.lessonNumber === this.activeLessonNumber
+      )
+    );
+    if (moduleIndex === -1 || this.skippedModuleIndices.has(moduleIndex)) {
+      return;
+    }
+    this._expandedModuleIndices.add(moduleIndex);
+  }
+
   private updateVisibleSections(): void {
     this.availableLessonCards = this.lessonCards.filter(
       lesson => !lesson.isComingSoon
@@ -996,7 +909,7 @@ export class TopicStorySectionComponent
       lesson => lesson.isComingSoon
     );
 
-    this.visibleAdventureGroups = this.adventureGroups
+    this.visibleModuleGroups = this.moduleGroups
       .map(group => {
         return {
           ...group,
@@ -1005,7 +918,7 @@ export class TopicStorySectionComponent
       })
       .filter(group => group.lessonCards.length > 0);
 
-    this.comingSoonAdventureGroups = this.adventureGroups
+    this.comingSoonModuleGroups = this.moduleGroups
       .map(group => {
         return {
           ...group,
@@ -1014,11 +927,15 @@ export class TopicStorySectionComponent
       })
       .filter(group => group.lessonCards.length > 0);
 
-    this.adventureNavigationGroups = this.adventureGroups
+    this.moduleNavigationGroups = this.moduleGroups
       .map(group => {
         const visibleLessons = group.lessonCards.filter(
           card => !card.isComingSoon && card.isPublished
         );
+
+        const isPracticeCompleted =
+          visibleLessons.length > 0 &&
+          this.completedModulePracticeArcIds.has(group.arcId);
 
         return {
           lessons: visibleLessons.map(card => {
@@ -1029,32 +946,39 @@ export class TopicStorySectionComponent
           }),
           accentColor: group.accentColor,
           showPractice: visibleLessons.length > 0,
-          isPracticeCompleted:
-            visibleLessons.length > 0 &&
-            this.completedAdventurePracticeArcIds.has(group.arcId),
+          isPracticeCompleted,
           arcId: group.arcId,
         };
       })
       .filter(group => group.lessons.length > 0);
 
     if (
-      this.visibleAdventureGroups.length &&
-      this._expandedAdventureIndices.size === 0
+      this.visibleModuleGroups.length &&
+      this._expandedModuleIndices.size === 0
     ) {
-      // Do not auto-expand an adventure that was previously skipped; expand
-      // the first adventure that was not skipped instead.
-      const firstNonSkippedIndex = this.visibleAdventureGroups.findIndex(
-        (_group, index) => !this.skippedAdventureIndices.has(index)
+      const firstNonSkippedIncompleteIndex = this.visibleModuleGroups.findIndex(
+        (_group, index) =>
+          !this.skippedModuleIndices.has(index) &&
+          !this.isModuleCompleted(index)
       );
-      this._expandedAdventureIndices = new Set([
-        firstNonSkippedIndex === -1 ? 0 : firstNonSkippedIndex,
-      ]);
+      const firstIncompleteIndex = this.visibleModuleGroups.findIndex(
+        (_group, index) => !this.isModuleCompleted(index)
+      );
+      const moduleIndexToExpand =
+        firstNonSkippedIncompleteIndex === -1
+          ? firstIncompleteIndex
+          : firstNonSkippedIncompleteIndex;
+      if (moduleIndexToExpand !== -1) {
+        this._expandedModuleIndices.add(moduleIndexToExpand);
+      }
     }
+
+    this.isMasteryUnlocked = this.isStoryCompleted();
   }
 
-  private maybeShowAdventureMasteredModal(): void {
+  private maybeShowModuleMasteredModal(): void {
     if (
-      this.adventureMasteredModalRef !== null ||
+      this.moduleMasteredModalRef !== null ||
       this.hasHandledArcMasteredQueryParams
     ) {
       return;
@@ -1079,21 +1003,21 @@ export class TopicStorySectionComponent
       return;
     }
 
-    const adventureIndex = this.visibleAdventureGroups.findIndex(
+    const moduleIndex = this.visibleModuleGroups.findIndex(
       group => group.arcId === masteredArcId
     );
 
-    if (adventureIndex === -1 || !this.areAllLessonsCompleted(adventureIndex)) {
+    if (moduleIndex === -1 || !this.areAllLessonsCompleted(moduleIndex)) {
       return;
     }
 
-    this.completedAdventurePracticeArcIds.add(masteredArcId);
-    this.persistMasteredAdventures();
+    this.completedModulePracticeArcIds.add(masteredArcId);
+    this.persistMasteredModules();
     this.updateVisibleSections();
 
     this.hasHandledArcMasteredQueryParams = true;
-    this.masteredAdventureIndex = adventureIndex;
-    this.openAdventureMasteredModal();
+    this.masteredModuleIndex = moduleIndex;
+    this.openModuleMasteredModal();
   }
 
   private normalizeArcIdFromQueryValue(rawArcId: string): string | null {
@@ -1107,132 +1031,5 @@ export class TopicStorySectionComponent
     }
 
     return match[0];
-  }
-
-  private isChapterReadyToPublish(node: StoryNode): boolean {
-    try {
-      return (
-        this.hasStoryNodeStatus(
-          node,
-          constants.STORY_NODE_STATUS_READY_TO_PUBLISH
-        ) || this.hasStoryNodeStatus(node, 'Ready To Publish')
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private isChapterPublished(node: StoryNode): boolean {
-    try {
-      return (
-        this.hasStoryNodeStatus(node, constants.STORY_NODE_STATUS_PUBLISHED) ||
-        this.hasStoryNodeStatus(node, 'Published')
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private hasStoryNodeStatus(node: StoryNode, expectedStatus: string): boolean {
-    const status = node.getStatus();
-    if (!status) {
-      return false;
-    }
-
-    return (
-      this.normalizeStoryNodeStatus(status) ===
-      this.normalizeStoryNodeStatus(expectedStatus)
-    );
-  }
-
-  private normalizeStoryNodeStatus(status: string): string {
-    return status.trim().toLowerCase().replace(/\s+/g, ' ');
-  }
-
-  private isChapterDisplayedAsComingSoon(node: StoryNode): boolean {
-    if (this.isChapterReadyToPublish(node)) {
-      return true;
-    }
-
-    return !node.getExplorationId();
-  }
-
-  private isNewChapterLabelVisible(node: StoryNode): boolean {
-    if (this.isChapterDisplayedAsComingSoon(node)) {
-      return false;
-    }
-
-    try {
-      return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
-        node,
-        this.storySummary
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  private getLessonStartUrl(node: StoryNode): string {
-    const explorationId = node.getExplorationId();
-    if (
-      !explorationId ||
-      !this.classroomUrlFragment ||
-      !this.topicUrlFragment
-    ) {
-      return '#';
-    }
-
-    let lessonUrl = this.urlInterpolationService.interpolateUrl(
-      '/explore/<exp_id>',
-      {exp_id: explorationId}
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'topic_url_fragment',
-      this.topicUrlFragment
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'classroom_url_fragment',
-      this.classroomUrlFragment
-    );
-    lessonUrl = this.urlService.addField(
-      lessonUrl,
-      'story_url_fragment',
-      this.storySummary.getUrlFragment()
-    );
-    lessonUrl = this.urlService.addField(lessonUrl, 'node_id', node.getId());
-    return lessonUrl;
-  }
-
-  private getStudyGuideUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE.replace(
-      '<classroom_url_fragment>',
-      encodeURIComponent(this.classroomUrlFragment)
-    ).replace(
-      '<topic_url_fragment>',
-      encodeURIComponent(this.topicUrlFragment)
-    );
-  }
-
-  private getPrimaryAvatarImageUrl(): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      PRIMARY_AVATAR_IMAGE_PATH
-    );
-  }
-
-  private getFallbackAvatarImageUrl(): string {
-    return this.urlInterpolationService.getStaticCopyrightedImageUrl(
-      FALLBACK_AVATAR_IMAGE_PATH
-    );
-  }
-
-  private getFallbackLessonThumbnailUrl(): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      FALLBACK_LESSON_THUMBNAIL_PATH
-    );
   }
 }

@@ -47,6 +47,7 @@ topic-viewer-page-root .topic-viewer-page-content {
 
 topic-viewer-page-root .oppia-navbar {
   box-shadow: none;
+  top: 0;
 }
 
 topic-viewer-page-root .oppia-topic-viewer-container .background-banner-position {
