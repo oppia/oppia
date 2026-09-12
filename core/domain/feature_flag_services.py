@@ -51,7 +51,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
 )
 
 
-class FeatureFlagNotFoundException(Exception):
+class WebFeatureFlagNotFoundException(Exception):
     """Exception thrown when an unknown feature flag is requested."""
 
     pass
@@ -75,11 +75,11 @@ def update_feature_flag(
         user_group_ids: List[str]. The list of ids of UserGroupModel.
 
     Raises:
-        FeatureFlagNotFoundException. Feature flag trying to update does
+        WebFeatureFlagNotFoundException. Feature flag trying to update does
             not exist.
     """
     if feature_flag_name not in ALL_FEATURES_NAMES_SET:
-        raise FeatureFlagNotFoundException(
+        raise WebFeatureFlagNotFoundException(
             'Unknown feature flag: %s.' % feature_flag_name
         )
 

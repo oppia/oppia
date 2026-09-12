@@ -246,7 +246,7 @@ class FeatureFlagsHandler(
                 )
             except (
                 utils.ValidationError,
-                feature_services.FeatureFlagNotFoundException,
+                feature_services.WebFeatureFlagNotFoundException,
             ) as e:
                 raise self.InvalidInputException(e)
 
