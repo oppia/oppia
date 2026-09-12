@@ -54,7 +54,11 @@ test.describe('Logged-Out Learner', function () {
     );
 
     await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
-    await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
+    await curriculumAdmin.createTopic(
+      'Introduction to Oppia',
+      'intro-oppia',
+      true
+    );
     await curriculumAdmin.createSkillForTopic(
       'Math',
       'Introduction to Oppia',

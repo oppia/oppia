@@ -86,7 +86,8 @@ test.describe('Logged-In Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Algebra I',
       'Negative Numbers',
-      'Negative Numbers'
+      'Negative Numbers',
+      true
     );
 
     await curriculumAdmin.createAndPublishClassroom(
