@@ -53,7 +53,6 @@ import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './add-answer-group-modal.component.css';
 
 interface TaggedMisconception {
   skillId: string | null;

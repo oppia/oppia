@@ -28,7 +28,6 @@ import {ResponsesService} from '../services/responses.service';
 import {TrainingDataService} from './training-data.service';
 import {AppConstants} from 'app.constants';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import './training-panel.component.css';
 
 interface ClassificationInterface {
   answerGroupIndex: number;

@@ -29,7 +29,6 @@ import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
-import './solution-explanation-editor.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,

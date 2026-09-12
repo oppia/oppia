@@ -45,7 +45,6 @@ import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-su
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 
-import './add-syllabus-items.component.css';
 import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 
 interface SearchDropDownItems {

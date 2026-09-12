@@ -22,7 +22,6 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
-import './topic-header.component.css';
 
 @Component({
   selector: 'topic-header',

@@ -22,7 +22,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import './certificate-assessment-conversation-skin.component.css';
 
 @Component({
   selector: 'oppia-certificate-assessment-conversation-skin',

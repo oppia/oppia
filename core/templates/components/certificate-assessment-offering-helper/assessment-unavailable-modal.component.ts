@@ -26,7 +26,6 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import './assessment-unavailable-modal.component.css';
 
 @Component({
   selector: 'oppia-assessment-unavailable-modal',

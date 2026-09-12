@@ -25,7 +25,6 @@ import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-l
 import {AppConstants} from 'app.constants';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import './opportunities-list.component.css';
 
 type ExplorationOpportunitiesFetcherFunction = (
   searchQuery?: string

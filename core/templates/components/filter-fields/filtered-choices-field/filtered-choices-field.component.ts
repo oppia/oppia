@@ -24,8 +24,6 @@ import {
   Output,
 } from '@angular/core';
 
-import './filtered-choices-field.component.css';
-
 @Component({
   selector: 'oppia-filtered-choices-field',
   templateUrl: './filtered-choices-field.component.html',

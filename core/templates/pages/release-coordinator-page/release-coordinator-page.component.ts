@@ -40,7 +40,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
 import {LoaderService} from 'services/loader.service';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
-import './release-coordinator-page.component.css';
 
 interface MemoryCacheProfile {
   totalAllocatedInBytes: string;

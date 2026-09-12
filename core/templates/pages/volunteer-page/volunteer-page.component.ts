@@ -29,8 +29,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
-import './volunteer-page.component.css';
-
 @Component({
   selector: 'volunteer-page',
   templateUrl: './volunteer-page.component.html',

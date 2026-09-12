@@ -24,7 +24,6 @@ import {LoaderService} from 'services/loader.service';
 import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
-import './search-results.component.css';
 
 @Component({
   selector: 'oppia-search-results',

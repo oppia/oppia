@@ -20,7 +20,6 @@ import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import './flag-lesson-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {PageContextService} from 'services/page-context.service';
 import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';

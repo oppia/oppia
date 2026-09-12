@@ -41,7 +41,6 @@ import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
-import './schema-based-float-editor.component.css';
 
 @Component({
   selector: 'schema-based-float-editor',

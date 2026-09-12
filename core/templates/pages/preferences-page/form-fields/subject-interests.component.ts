@@ -33,7 +33,6 @@ import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
-import './subject-interests.component.css';
 
 @Component({
   selector: 'oppia-subject-interests',

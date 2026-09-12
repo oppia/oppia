@@ -18,7 +18,6 @@
 
 import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './lesson-feedback-modal.component.css';
 import {FeedbackPopupBackendApiService} from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import {UserService} from 'services/user.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';

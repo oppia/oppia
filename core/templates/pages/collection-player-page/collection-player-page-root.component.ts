@@ -20,8 +20,6 @@ import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
-import './collection-player-page-root.component.css';
-
 @Component({
   selector: 'oppia-collection-player-page-root',
   templateUrl: './collection-player-page-root.component.html',

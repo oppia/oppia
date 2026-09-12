@@ -22,7 +22,6 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
-import './admin-misc-tab.component.css';
 
 @Component({
   selector: 'oppia-admin-misc-tab',

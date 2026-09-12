@@ -24,7 +24,6 @@ import {
   ReportAnIssueCategory,
   CATEGORY_LABELS,
 } from '../../../domain/feedback/feedback.model';
-import './feedback-chip.component.css';
 
 @Component({
   selector: 'oppia-feedback-chip',

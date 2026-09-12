@@ -19,7 +19,6 @@
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
-import './blog-dashboard-page-root.component.css';
 
 @Component({
   selector: 'oppia-blog-dashboard-page-root',

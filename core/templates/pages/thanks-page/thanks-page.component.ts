@@ -19,7 +19,6 @@
 import {Component} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './thanks-page.component.css';
 
 @Component({
   selector: 'thanks-page',

@@ -21,7 +21,6 @@ import {NgForm} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AppConstants} from 'app.constants';
-import './create-feedback-thread-modal.component.css';
 
 @Component({
   selector: 'oppia-create-feedback-thread-modal',

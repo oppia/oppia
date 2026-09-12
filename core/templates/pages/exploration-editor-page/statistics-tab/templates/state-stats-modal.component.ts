@@ -22,8 +22,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 
-import './state-stats-modal.component.css';
-
 interface PieChartOpitons {
   chartAreaWidth: number;
   colors: string[];

@@ -31,7 +31,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 
-import './about-page.component.css';
 import {AccordionPanelData} from './data.model';
 
 @Component({

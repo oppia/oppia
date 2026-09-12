@@ -23,8 +23,6 @@ import {sum} from 'd3-array';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {UtilsService} from 'services/utils.service';
 
-import './oppia-visualization-sorted-tiles.component.css';
-
 @Component({
   selector: 'oppia-visualization-sorted-tiles',
   templateUrl: './oppia-visualization-sorted-tiles.component.html',

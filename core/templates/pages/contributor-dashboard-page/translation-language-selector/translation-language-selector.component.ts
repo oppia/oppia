@@ -34,7 +34,6 @@ import {
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import './translation-language-selector.component.css';
 
 interface Options {
   id: string;

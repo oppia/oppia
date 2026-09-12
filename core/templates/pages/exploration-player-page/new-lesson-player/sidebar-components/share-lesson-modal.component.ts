@@ -17,7 +17,6 @@
  */
 
 import {Component, Inject, Optional} from '@angular/core';
-import './share-lesson-modal.component.css';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
 import {UrlService} from 'services/contextual/url.service';

@@ -29,7 +29,6 @@ import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customiz
 import {UrlService} from 'services/contextual/url.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
-import './lesson-player-page.component.css';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';

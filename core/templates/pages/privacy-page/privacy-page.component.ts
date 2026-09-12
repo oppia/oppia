@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import './privacy-page.component.css';
 
 @Component({
   selector: 'oppia-privacy-page',

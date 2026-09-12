@@ -20,7 +20,6 @@ import {Component, Inject} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import './ck-editor-copy-toolbar.component.css';
 
 @Component({
   selector: 'ck-editor-copy-toolbar',

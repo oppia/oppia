@@ -22,7 +22,6 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {AlertsService} from 'services/alerts.service';
 
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
-import './certificate-creator-dashboard-page.component.css';
 interface CertificateSummary {
   certificateId: string;
   title: string;

@@ -23,7 +23,6 @@ import {
   STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
 } from 'domain/story/editable-story-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './story-editor-unpublish-modal.component.css';
 
 @Component({
   selector: 'oppia-story-editor-unpublish-modal',

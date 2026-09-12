@@ -26,8 +26,6 @@ import {UserService} from 'services/user.service';
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {AppConstants} from 'app.constants';
 
-import './create-activity-button.component.css';
-
 @Component({
   selector: 'oppia-create-activity-button',
   templateUrl: './create-activity-button.component.html',

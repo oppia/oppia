@@ -26,7 +26,6 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './contributor-admin-dashboard-page.component.css';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {
   ContributorDashboardAdminStatsBackendApiService,

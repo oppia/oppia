@@ -18,7 +18,6 @@
 
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {NewEndChapterConfettiComponent} from '../conversation-display-components/new-end-chapter-confetti.component';
-import './checkpoint-celebration-footer.component.css';
 
 @Component({
   selector: 'oppia-checkpoint-celebration-footer',

@@ -56,7 +56,6 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import './state-interaction-editor.component.css';
 
 export interface InitializeAnswerGroups {
   interactionId: InteractionSpecsKey | null;

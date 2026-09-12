@@ -18,7 +18,6 @@
 
 import {Component, OnInit, Optional} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-import './lesson-player-sidebar.component.css';
 import {PageContextService} from 'services/page-context.service';
 import {
   I18nLanguageCodeService,

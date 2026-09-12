@@ -21,7 +21,6 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ThreadStatusDisplayService} from '../services/thread-status-display.service';
-import './thread-table.component.css';
 
 @Component({
   selector: 'oppia-thread-table',

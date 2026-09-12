@@ -35,7 +35,6 @@ import {ParamDict} from 'services/suggestion-modal.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import './question-suggestion-review.component.css';
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;

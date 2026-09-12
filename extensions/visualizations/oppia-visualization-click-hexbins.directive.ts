@@ -39,8 +39,6 @@ import {
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 
-import './oppia-visualization-click-hexbins.directive.css';
-
 export interface ClickOnImageAnswer {
   answer: {
     clickPosition: [number, number];

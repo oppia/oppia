@@ -22,8 +22,6 @@ import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 
-import './collection-footer.component.css';
-
 @Component({
   selector: 'collection-footer',
   templateUrl: './collection-footer.component.html',

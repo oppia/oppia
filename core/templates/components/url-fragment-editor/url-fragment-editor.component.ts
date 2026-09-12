@@ -18,7 +18,6 @@
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import './url-fragment-editor.component.css';
 
 @Component({
   selector: 'url-fragment-editor-component',

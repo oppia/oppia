@@ -23,7 +23,6 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
-import './solution-editor.component.css';
 
 interface ExplanationFormSchema {
   type: string;

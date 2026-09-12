@@ -26,7 +26,6 @@ import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
 import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import './view-beam-job-output-dialog.component.css';
 
 @Component({
   selector: 'view-beam-job-output-dialog',

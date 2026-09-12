@@ -30,7 +30,6 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {Subscription} from 'rxjs';
 import {GraphInputRulesService} from './graph-input-rules.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import './graph-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-graph-input',
