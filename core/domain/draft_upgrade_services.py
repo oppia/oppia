@@ -183,16 +183,14 @@ class DraftUpgradeUtil:
                     # and every customization arg that has a 'choices' key will
                     # contain values of type List[SubtitledHtmlDict].
                     subtitled_html_new_value_dicts = cast(
-                        List[state_domain.SubtitledHtmlDict],
+                        List[Union[state_domain.SubtitledHtmlDict, str]],
                         new_value['choices']['value'],
                     )
                     for value_index, value in enumerate(
                         subtitled_html_new_value_dicts
                     ):
                         if isinstance(value, dict) and 'html' in value:
-                            subtitled_html_new_value_dicts[value_index][
-                                'html'
-                            ] = conversion_fn(value['html'])
+                            value['html'] = conversion_fn(value['html'])
                         elif isinstance(value, str):
                             subtitled_html_new_value_dicts[value_index] = (
                                 conversion_fn(value)
@@ -1071,15 +1069,23 @@ class DraftUpgradeUtil:
                 change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ID
                 and (change.new_value == 'MathExpressionInput')
             )
-            answer_groups_change_condition = (
+            answer_groups_change_condition = False
+            if (
                 change.property_name
                 == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                and isinstance(change.new_value, list)
-                and (
-                    change.new_value[0]['rule_specs'][0]['rule_type']
-                    == ('IsMathematicallyEquivalentTo')
+            ):
+                # Here we use cast because Mypy cannot narrow change to
+                # EditExpStatePropertyInteractionAnswerGroupsCmd from the property name.
+                edit_interaction_answer_groups_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
+                    change,
                 )
-            )
+                answer_groups = edit_interaction_answer_groups_cmd.new_value
+                answer_groups_change_condition = (
+                    bool(answer_groups)
+                    and answer_groups[0]['rule_specs'][0]['rule_type']
+                    == 'IsMathematicallyEquivalentTo'
+                )
             if interaction_id_change_condition or (
                 answer_groups_change_condition
             ):
