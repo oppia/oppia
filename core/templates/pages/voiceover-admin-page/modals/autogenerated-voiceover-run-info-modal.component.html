@@ -7,10 +7,17 @@
       <span>Cloud task name:</span>
     </div>
     <div class="messages-container">
-      {{cloudTaskRun.cloudTaskName}}
+      <a *ngIf="cloudTaskUrl; else plainCloudTaskName"
+         [href]="cloudTaskUrl"
+         target="_blank"
+         rel="noopener noreferrer">
+        {{cloudTaskRun.cloudTaskName}}
+      </a>
+      <ng-template #plainCloudTaskName>
+        {{cloudTaskRun.cloudTaskName}}
+      </ng-template>
     </div>
   </div>
-
   <div class="data-container">
     <div class="data-type-title">
       <span>Event: </span>
@@ -19,7 +26,6 @@
       {{cloudTaskRun.getEventName()}}
     </div>
   </div>
-
   <div class="data-container">
     <div class="data-type-title">
       <span>Current state:</span>
@@ -28,7 +34,6 @@
       {{cloudTaskRun.latestJobState}}
     </div>
   </div>
-
   <div class="data-container">
     <div class="data-type-title">
       <span>Created on:</span>
@@ -37,7 +42,6 @@
       {{cloudTaskRun.createdOn | date:'medium'}}
     </div>
   </div>
-
   <div class="data-container">
     <div class="data-type-title">
       <span>Last updated:</span>
@@ -46,7 +50,6 @@
       {{cloudTaskRun.lastUpdated | date:'medium'}}
     </div>
   </div>
-
   <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
     <div class="data-type-title">
       <span>Error messages:</span>
