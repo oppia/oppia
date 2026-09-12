@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the about page.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AboutPageComponent} from './about-page.component';
@@ -126,15 +124,18 @@ describe('About Page', () => {
 
   it('should subscribe to translateService, windowDimensionsService on init', () => {
     spyOn(translateService.onLangChange, 'subscribe');
+    const resizeEventObservable = of(new Event('resize'));
+    spyOn(resizeEventObservable, 'subscribe');
     const getResizeEventSpy = spyOn(
       windowDimensionsService,
       'getResizeEvent'
-    ).and.returnValue({subscribe: jasmine.createSpy()});
+    ).and.returnValue(resizeEventObservable);
 
     component.ngOnInit();
 
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    expect(getResizeEventSpy().subscribe).toHaveBeenCalled();
+    expect(getResizeEventSpy).toHaveBeenCalled();
+    expect(resizeEventObservable.subscribe).toHaveBeenCalled();
   });
 
   it('should initialize with correct screen type and partnerships form link', () => {

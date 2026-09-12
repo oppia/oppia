@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
-// @ts-nocheck
-
 import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
@@ -45,6 +43,7 @@ import {
   SearchResponseData,
 } from 'domain/blog/blog-homepage-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
+import {of} from 'rxjs';
 import {Subject} from 'rxjs/internal/Subject';
 import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import {TagFilterComponent} from './tag-filter/tag-filter.component';
@@ -105,6 +104,7 @@ describe('Blog home page component', () => {
   let component: BlogHomePageComponent;
   let fixture: ComponentFixture<BlogHomePageComponent>;
   let router: Router;
+  let activatedRoute: ActivatedRoute;
   let mockOnInitialSearchResultsLoaded = new EventEmitter<SearchResponseData>();
 
   let blogPostSummary: BlogPostSummaryBackendDict = {
@@ -157,6 +157,7 @@ describe('Blog home page component', () => {
     fixture = TestBed.createComponent(BlogHomePageComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+    activatedRoute = TestBed.inject(ActivatedRoute);
     searchService = TestBed.inject(BlogPostSearchService);
     alertsService = TestBed.inject(AlertsService);
     blogHomePageBackendApiService = TestBed.inject(
@@ -195,17 +196,12 @@ describe('Blog home page component', () => {
 
     spyOn(component, 'loadPage');
 
-    spyOn(
-      (component as unknown as {route: ActivatedRoute}).route.queryParams,
-      'subscribe'
-    ).and.callFake((fn: (params: {q: string; tags: string}) => void) => {
-      fn(params);
-    });
+    activatedRoute.queryParams = of(params);
 
     component.ngOnInit();
 
-    expect(component.filterWasUsed).toBeTrue();
-    expect(component.searchPageIsActive).toBeTrue();
+    expect(component.filterWasUsed).toBe(true);
+    expect(component.searchPageIsActive).toBe(true);
     expect(component.searchQuery).toBe('search query');
     expect(component.selectedTags).toEqual(['Community']);
     expect(component.loadPage).toHaveBeenCalled();
