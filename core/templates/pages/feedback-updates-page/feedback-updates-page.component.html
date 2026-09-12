@@ -179,6 +179,7 @@
                         <button *ngIf="message.currentContentHtml"
                                 class="btn btn-primary oppia-dashboard-view-suggestion-button"
                                 (click)="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
+                                type="button"
                                 [innerHTML]="'I18N_FEEDBACK_UPDATES_VIEW_SUGGESTION' | translate">
                         </button>
                       </div>

@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for learner dashboard suggestion modal.
+ * @fileoverview Component for suggestion review modal.
+ * This modal displays a side-by-side comparison of current and suggested content.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './learner-dashboard-suggestion-modal.component.css';
+import './suggestion-review-modal.component.css';
 
 @Component({
-  selector: 'oppia-learner-dashboard-suggestion-modal',
-  templateUrl: './learner-dashboard-suggestion-modal.component.html',
-  styleUrls: ['./learner-dashboard-suggestion-modal.component.css'],
+  selector: 'oppia-suggestion-review-modal',
+  templateUrl: './suggestion-review-modal.component.html',
+  styleUrls: ['./suggestion-review-modal.component.css'],
 })
-export class LearnerDashboardSuggestionModalComponent extends ConfirmOrCancelModal {
+export class SuggestionReviewModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -35,11 +37,15 @@ export class LearnerDashboardSuggestionModalComponent extends ConfirmOrCancelMod
   @Input() oldContent!: string;
   @Input() description!: string;
 
-  constructor(private activeModal: NgbActiveModal) {
-    super(activeModal);
+  constructor(
+    @Optional() activeModal: NgbActiveModal,
+    @Optional()
+    bottomSheetRef: MatBottomSheetRef<SuggestionReviewModalComponent>
+  ) {
+    super(activeModal, bottomSheetRef);
   }
 
   cancel(): void {
-    this.activeModal.dismiss('cancel');
+    super.cancel('cancel');
   }
 }

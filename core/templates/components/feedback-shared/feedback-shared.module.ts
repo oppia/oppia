@@ -27,6 +27,7 @@ import {FeedbackTableComponent} from './feedback-table/feedback-table.component'
 import {FeedbackChipComponent} from './feedback-status-chip/feedback-chip.component';
 import {FeedbackDetailPageComponent} from './feedback-detail-page/feedback-detail-page.component';
 import {FeedbackDetailSectionComponent} from './feedback-detail-page/feedback-detail-section/feedback-detail-section.component';
+import {SuggestionReviewModalComponent} from './suggestion-review/suggestion-review-modal.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, SharedComponentsModule],
@@ -37,6 +38,7 @@ import {FeedbackDetailSectionComponent} from './feedback-detail-page/feedback-de
     FeedbackChipComponent,
     FeedbackDetailPageComponent,
     FeedbackDetailSectionComponent,
+    SuggestionReviewModalComponent,
   ],
   exports: [
     FeedbackEmptyStateComponent,
@@ -45,6 +47,7 @@ import {FeedbackDetailSectionComponent} from './feedback-detail-page/feedback-de
     FeedbackChipComponent,
     FeedbackDetailPageComponent,
     FeedbackDetailSectionComponent,
+    SuggestionReviewModalComponent,
   ],
 })
 export class FeedbackSharedModule {}
