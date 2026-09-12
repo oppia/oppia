@@ -1387,6 +1387,54 @@ export class SuperAdmin extends BaseUser {
 
     return platformParameterContainerElements[index];
   }
+
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto('/contributor-dashboard-admin');
+  }
+
+  async enableAutoTranslation(): Promise<void> {
+    // The Material slide toggle renders its actual checkbox input as
+    // cdk-visually-hidden (off-screen), overlapped by the thumb div.
+    // Puppeteer's clickability check blocks clicks on the hidden input, so
+    // we read the checked state from the input but click the visible label.
+    const inputSelector = '.e2e-test-auto-translation-toggle input';
+    const labelSelector = '.e2e-test-auto-translation-toggle label';
+    await this.page.waitForSelector(inputSelector);
+    const isChecked = await this.page.$eval(
+      inputSelector,
+      el => (el as HTMLInputElement).checked
+    );
+    if (!isChecked) {
+      await this.clickOnElementWithSelector(labelSelector);
+    }
+  }
+
+  async addTranslationProviderMapping(
+    languageCode: string,
+    providerId: string
+  ): Promise<void> {
+    const langDropdown = '.e2e-test-language-dropdown';
+    const providerDropdown = '.e2e-test-provider-dropdown';
+    const addButton = '.e2e-test-add-mapping-btn';
+
+    await this.page.waitForSelector(langDropdown);
+    await this.page.select(langDropdown, languageCode);
+
+    await this.page.waitForSelector(providerDropdown);
+    await this.page.select(providerDropdown, providerId);
+
+    await this.clickOnElementWithSelector(addButton);
+  }
+
+  async removeTranslationProviderMapping(languageCode: string): Promise<void> {
+    const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.clickOnElementWithSelector(removeButton);
+  }
+
+  async getProviderMappingRowCount(): Promise<number> {
+    const rows = await this.page.$$('.e2e-test-mapping-row');
+    return rows.length;
+  }
 }
 
 export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();
