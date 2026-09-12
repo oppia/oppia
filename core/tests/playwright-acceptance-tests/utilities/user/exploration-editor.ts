@@ -110,6 +110,25 @@ const textInputInteractionOption =
   'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const intEditorField = '.e2e-test-editor-int';
 
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const explorationFeedbackTabContentSelector = '.e2e-test-exploration-feedback-card';
+const explorationFeedbackCardActiveSelector =
+  '.e2e-test-exploration-feedback-card-active';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
+const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const startNewFeedbackButtonSelector = '.e2e-test-start-new-thread-button';
+const newFeedbackThreadModalSelector = 'oppia-create-feedback-thread-modal';
+const feedbackSubjectSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} input`;
+const feedbackSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} textarea`;
+const createThreadButtonSelector = '.e2e-test-create-new-feedback-btn';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = 'button.e2e-test-add-new-response';
@@ -1204,6 +1223,184 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(translationTabContainer);
+  }
+
+  /**
+   * Function to navigate to the feedback tab.
+   */
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickAndWaitForNavigation(mobileFeedbackTabButton, true);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.clickOnElementWithSelector(dropdownToggleIcon);
+      }
+    } else {
+      await this.clickOnElementWithSelector(feedBackButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Starts a new feedback thread on the exploration.
+   * @param {string} subject - The subject of the feedback thread.
+   * @param {string} feedback - The feedback message.
+   */
+  async startAFeedbackThread(subject: string, feedback: string): Promise<void> {
+    await this.expectElementToBeVisible(startNewFeedbackButtonSelector);
+    await this.clickOnElementWithSelector(startNewFeedbackButtonSelector);
+
+    await this.expectElementToBeVisible(newFeedbackThreadModalSelector);
+    await this.typeInInputField(
+      feedbackSubjectSelectorInNewFeedbackModal,
+      subject
+    );
+    await this.typeInInputField(feedbackSelectorInNewFeedbackModal, feedback);
+
+    await this.clickOnElementWithSelector(createThreadButtonSelector);
+    await this.expectElementToBeVisible(newFeedbackThreadModalSelector, false);
+  }
+
+  /**
+   * Verifies that a feedback thread with the given subject is present.
+   * @param {string} feedbackSubject - The feedback subject to verify.
+   */
+  async expectFeedbackThreadToBePresent(
+    feedbackSubject: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$eval(
+      feedbackSubjectSelector,
+      subjects => subjects.map(subject => subject.textContent)
+    );
+
+    if (!feedbackSubjects.includes(feedbackSubject)) {
+      throw new Error(
+        `Feedback thread with subject "${feedbackSubject}" not found.`
+      );
+    }
+  }
+
+  /**
+   * Views a feedback thread.
+   * @param {number} expectedThread - The 1-indexed position of the expected thread.
+   */
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
+    // Reloading to make sure the feedback threads are updated.
+    await this.reloadPage();
+    await this.expectElementToBeVisible(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
+      await this.clickOnElement(feedbackSubjects[expectedThread - 1]);
+      await this.expectElementToBeVisible(explorationFeedbackCardActiveSelector);
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Replies to a feedback thread.
+   * @param {string} reply - The reply message.
+   */
+  async replyToSuggestion(reply: string): Promise<void> {
+    await this.expectElementToBeVisible(responseTextareaSelector);
+    await this.typeInInputField(responseTextareaSelector, reply);
+    await this.clickOnElementWithSelector(sendButtonSelector);
+    await this.expectElementToBeClickable(sendButtonSelector, false);
+  }
+
+  /**
+   * Navigates back to the feedback tab from a feedback thread.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTabBackButtonSelector);
+    await this.clickOnElementWithSelector(feedbackTabBackButtonSelector);
+    await this.expectElementToBeVisible(feedbackTabBackButtonSelector, false);
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    await this.expectElementToBeVisible(responseTextareaSelector);
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.typeInInputField(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+  }
+
+  /**
+   * Verifies that a feedback thread at the specified index has the expected status.
+   * @param {number} threadIndex - The 1-indexed position of the feedback thread.
+   * @param {string} expectedStatus - The status text expected for the feedback thread.
+   */
+  async expectFeedbackStatusInList(
+    threadIndex: number,
+    expectedStatus: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTabRowSelector);
+    await this.page.waitForFunction(
+      ({
+        selector,
+        elementNumber,
+        expectedText,
+      }: {
+        selector: string;
+        elementNumber: number;
+        expectedText: string;
+      }) => {
+        const elements = document.querySelectorAll(selector);
+        return elements[elementNumber - 1]?.textContent?.trim() === expectedText;
+      },
+      {
+        selector: feedbackStatusSelector,
+        elementNumber: threadIndex,
+        expectedText: expectedStatus,
+      }
+    );
+  }
+
+  /**
+   * Verifies that the feedback author is as expected.
+   * @param {string} expectedAuthor - The expected author.
+   */
+  async expectFeedbackAuthorToBe(expectedAuthor: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    const feedbackAuthors = await this.page.$$(feedbackAuthorSelector);
+
+    if (feedbackAuthors.length === 0) {
+      throw new Error('Feedback author not found.');
+    }
+
+    const authorText = await feedbackAuthors[0].evaluate(el =>
+      el.textContent?.trim()
+    );
+
+    if (authorText !== expectedAuthor) {
+      throw new Error(
+        `Expected feedback author to be "${expectedAuthor}", but found "${authorText}".`
+      );
+    }
   }
 
   /**
