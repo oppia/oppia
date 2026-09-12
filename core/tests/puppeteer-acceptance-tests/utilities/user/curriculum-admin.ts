@@ -2123,6 +2123,7 @@ export class CurriculumAdmin extends TopicManager {
           });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
@@ -2138,6 +2139,7 @@ export class CurriculumAdmin extends TopicManager {
             throw new Error('Delete button not found');
           }
 
+          await this.waitForElementToStabilize(confirmSkillDeletionButton);
           const confirmButton = await this.page.$(confirmSkillDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
