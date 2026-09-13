@@ -19,14 +19,14 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     exp_domain,
     exp_fetchers,
-    feature_flag_services,
+    web_feature_flag_services,
     opportunity_domain,
     opportunity_services,
     skill_domain,
@@ -351,8 +351,8 @@ class ContributionOpportunitiesHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -558,8 +558,8 @@ class ReviewableOpportunitiesHandlerV2(
     def get(self) -> None:
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -688,8 +688,8 @@ class TranslatableContentsHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException

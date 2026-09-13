@@ -18,10 +18,10 @@ from __future__ import annotations
 
 import enum
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.domain import web_feature_flag_domain
 from core.domain import web_feature_flag_registry as registry
-from core.domain import feature_flag_services as feature_services
+from core.domain import web_feature_flag_services as feature_services
 from core.tests import test_utils
 
 FeatureStages = web_feature_flag_domain.FeatureStages
@@ -86,7 +86,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             )
 
         # Here we use MyPy ignore because the expected type of ALL_WEB_FEATURE_FLAGS
-        # is a list of 'feature_flag_list.FeatureNames' Enum, but here for
+        # is a list of 'web_feature_flag_list.FeatureNames' Enum, but here for
         # testing purposes we are providing a list of custom 'FeatureNames'
         # enums for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
@@ -130,7 +130,7 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagDummyHandler."""
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+        [web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
     )
     def test_get_with_dummy_feature_flag_enabled_returns_true(self) -> None:
         result = self.get_json(

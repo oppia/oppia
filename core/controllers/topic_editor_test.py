@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import os
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     platform_parameter_list,
@@ -155,7 +155,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_handler_updates_story_summary_dicts(self) -> None:
@@ -404,7 +404,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_handler_returns_completed_node_titles_from_user_progress(
@@ -756,7 +756,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def setUp(self) -> None:
         super().setUp()

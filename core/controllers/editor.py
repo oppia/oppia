@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as objects_validator
@@ -29,7 +29,7 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    feature_flag_services,
+    web_feature_flag_services,
     fs_services,
     image_validation_services,
     question_services,
@@ -371,8 +371,8 @@ class EntityTranslationsBulkHandler(
         entity_id: str,
         entity_version: int,
     ) -> None:
-        exploration_editor_can_modify_translations = feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
+        exploration_editor_can_modify_translations = web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
             self.user_id,
         )
 

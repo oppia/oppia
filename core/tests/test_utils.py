@@ -37,7 +37,7 @@ import string
 import unittest
 
 import main
-from core import feature_flag_list, feconf, schema_utils, utils
+from core import web_feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import (
@@ -52,7 +52,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     web_feature_flag_domain,
-    feature_flag_services,
+    web_feature_flag_services,
     interaction_registry,
     object_registry,
     param_domain,
@@ -359,7 +359,7 @@ def generate_random_hexa_str() -> str:
 
 @contextlib.contextmanager
 def swap_is_feature_flag_enabled_function(
-    feature_flag_names: List[feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.FeatureNames],
 ) -> Iterator[None]:
     """Mocks is_feature_flag_enabled function within the context of a
     'with' statement. is_feature_flag_enabled will return True for all
@@ -399,10 +399,10 @@ def swap_is_feature_flag_enabled_function(
         )
 
     original_is_feature_flag_enabled = getattr(
-        feature_flag_services, 'is_feature_flag_enabled'
+        web_feature_flag_services, 'is_feature_flag_enabled'
     )
     setattr(
-        feature_flag_services,
+        web_feature_flag_services,
         'is_feature_flag_enabled',
         mock_is_feature_flag_enabled,
     )
@@ -410,14 +410,14 @@ def swap_is_feature_flag_enabled_function(
         yield
     finally:
         setattr(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             original_is_feature_flag_enabled,
         )
 
 
 def enable_feature_flags(
-    feature_flag_names: List[feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.FeatureNames],
 ) -> Callable[
     [Callable[..., _GenericHandlerFunctionReturnType]],
     Callable[..., _GenericHandlerFunctionReturnType],
@@ -426,7 +426,7 @@ def enable_feature_flags(
     scope of the test.
 
     Args:
-        feature_flag_names: List[feature_flag_list.FeatureNames]. The list
+        feature_flag_names: List[web_feature_flag_list.FeatureNames]. The list
             of the names of the feature flags that will be enabled.
 
     Returns:

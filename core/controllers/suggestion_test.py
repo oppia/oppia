@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -3891,7 +3891,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_exploration_handler_returns_data_with_new_opportunity_models(
@@ -3927,7 +3927,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_exploration_handler_returns_data_with_new_opportunity_models_coverage_edge_cases(
@@ -4208,7 +4208,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_exploration_handler_returns_none_opportunity_for_missing_card(
@@ -4520,7 +4520,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_exploration_handler_returns_data_with_v2_feature_flag_enabled(
@@ -5007,7 +5007,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_exploration_handler_returns_data_with_new_opportunity_models(

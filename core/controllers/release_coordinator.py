@@ -21,7 +21,7 @@ import logging
 from core import feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import caching_services, web_feature_flag_domain
-from core.domain import feature_flag_services as feature_services
+from core.domain import web_feature_flag_services as feature_services
 from core.domain import user_services
 
 from typing import Dict, List, TypedDict

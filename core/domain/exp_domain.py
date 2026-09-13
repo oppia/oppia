@@ -30,12 +30,12 @@ import json
 import re
 import string
 
-from core import feature_flag_list, feconf, schema_utils, utils
+from core import web_feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
-    feature_flag_services,
+    web_feature_flag_services,
     html_validation_service,
     interaction_registry,
     param_domain,
@@ -1592,8 +1592,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         if (
             override_metadata_feature_flag
-            or feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            or web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
                 None,
             )
         ):

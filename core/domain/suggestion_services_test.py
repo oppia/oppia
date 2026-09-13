@@ -20,7 +20,7 @@ import datetime
 import random
 import string
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
@@ -874,7 +874,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_accepting_skill_translation_updates_translation_counts(
@@ -8626,7 +8626,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_accept_translation_suggestion_lowers_translation_suggestion_count(
         self,

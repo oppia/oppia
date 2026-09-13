@@ -26,7 +26,7 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    feature_flag_services,
+    web_feature_flag_services,
     fs_services,
     html_validation_service,
     opportunity_services,
@@ -2051,13 +2051,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
 
         with self.swap(
-            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+            web_feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args: True,
         ):
             suggestion.pre_accept_validate()
 
         suggestion.change_cmd.content_id = 'invalid_metadata_content_id'
         with self.swap(
-            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+            web_feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args: True,
         ):
             with self.assertRaisesRegex(
                 utils.ValidationError,

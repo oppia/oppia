@@ -22,12 +22,12 @@ import collections
 import copy
 import logging
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
-    feature_flag_services,
+    web_feature_flag_services,
     opportunity_domain,
     question_fetchers,
     skill_domain,
@@ -300,8 +300,8 @@ def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
     # Asynchronously regenerates voiceovers for exploration contents in English
     # and other available translations when the exploration is linked to a
     # story.
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
         None,
     ):
         taskqueue_services.defer(
@@ -894,8 +894,8 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list
     )
 
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         create_translation_opportunity(
@@ -1087,8 +1087,8 @@ def update_translation_opportunity_with_accepted_suggestion(
                 [exp_opportunity_summary]
             )
 
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{entity_type}.{entity_id}'
@@ -2191,8 +2191,8 @@ def regenerate_opportunities_related_to_topic(
         # and new TranslationOpportunityModel records are maintained in parallel to
         # support safe fallback. Thus, we delete the V2 models here alongside the
         # V1 summary models when topic opportunities are being regenerated.
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             None,
         ):
             translation_opportunity_models = (
@@ -2247,8 +2247,8 @@ def regenerate_opportunities_related_to_topic(
     # During the migration phase, we also create the corresponding V2
     # TranslationOpportunityModel records when creating exploration opportunities,
     # ensuring data consistency across both V1 and V2 models.
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         create_translation_opportunity(

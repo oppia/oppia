@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -426,7 +426,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_creates_translation_opportunity_model_with_new_opp_models_flag_enabled(

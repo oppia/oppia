@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.domain import (
     web_feature_flag_domain,
     web_feature_flag_registry,
@@ -46,15 +46,15 @@ ENUM_MEMBER_REGEXP: Final = re.compile(
 
 
 class FeatureFlagListTest(test_utils.GenericTestBase):
-    """Tests for feature flags listed in feature_flag_list.py."""
+    """Tests for feature flags listed in web_feature_flag_list.py."""
 
     def setUp(self) -> None:
         super().setUp()
 
         self.all_features_list = (
-            feature_flag_list.DEV_FEATURES_LIST
-            + feature_flag_list.TEST_FEATURES_LIST
-            + feature_flag_list.PROD_FEATURES_LIST
+            web_feature_flag_list.DEV_FEATURES_LIST
+            + web_feature_flag_list.TEST_FEATURES_LIST
+            + web_feature_flag_list.PROD_FEATURES_LIST
         )
         self.all_features_set = set(self.all_features_list)
 
@@ -73,7 +73,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+                web_feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
             ):
                 missing_names.append(feature.value)
         self.assertTrue(
@@ -95,7 +95,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
 
     def test_no_duplicate_names_in_deprecated_names_list(self) -> None:
         duplicate_names = []
-        deprecated_features = feature_flag_list.DEPRECATED_FEATURE_NAMES
+        deprecated_features = web_feature_flag_list.DEPRECATED_FEATURE_NAMES
         for feature in set(deprecated_features):
             if deprecated_features.count(feature) > 1:
                 duplicate_names.append(feature.value)
@@ -106,7 +106,9 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         )
 
     def test_no_deprecated_names_in_features_lists(self) -> None:
-        deprecated_names_set = set(feature_flag_list.DEPRECATED_FEATURE_NAMES)
+        deprecated_names_set = set(
+            web_feature_flag_list.DEPRECATED_FEATURE_NAMES
+        )
         found_deprecated_names = []
         for feature in self.all_features_set:
             if feature in deprecated_names_set:
@@ -119,7 +121,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self) -> None:
         invalid_feature_names = []
-        for feature in feature_flag_list.DEV_FEATURES_LIST:
+        for feature in web_feature_flag_list.DEV_FEATURES_LIST:
             feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
@@ -136,7 +138,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_test_features_list_are_in_test_stage(self) -> None:
         invalid_feature_names = []
-        for feature in feature_flag_list.TEST_FEATURES_LIST:
+        for feature in web_feature_flag_list.TEST_FEATURES_LIST:
             feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
@@ -153,7 +155,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self) -> None:
         invalid_feature_names = []
-        for feature in feature_flag_list.PROD_FEATURES_LIST:
+        for feature in web_feature_flag_list.PROD_FEATURES_LIST:
             feature_flag = web_feature_flag_registry.Registry.get_feature_flag(
                 feature.value
             )
@@ -200,7 +202,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_names = []
-        for feature_flag_enum in feature_flag_list.FeatureNames:
+        for feature_flag_enum in web_feature_flag_list.FeatureNames:
             feature_flag_names.append(feature_flag_enum.name)
         for platform_param_enum in platform_parameter_list.ParamName:
             self.assertFalse(platform_param_enum.name in feature_flag_names)

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.domain import (
     rights_domain,
     rights_manager,
@@ -229,7 +229,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_draft_updated_version_valid(self) -> None:
@@ -282,7 +282,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_draft_updated_version_invalid(self) -> None:

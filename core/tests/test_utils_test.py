@@ -23,11 +23,11 @@ import os
 import re
 from unittest import mock
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     auth_domain,
-    feature_flag_services,
+    web_feature_flag_services,
     param_domain,
     platform_parameter_list,
     platform_parameter_services,
@@ -47,31 +47,33 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
     """Tests for testing test_utils.enable_feature_flags."""
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+        [web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
     )
     def test_enable_feature_flags_decorator(self) -> None:
         """Tests if single feature-flag is enabled."""
         self.assertTrue(
-            feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_services.is_feature_flag_enabled(
                 'dummy_feature_flag_for_e2e_tests', None
             )
         )
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-            feature_flag_list.FeatureNames.BLOG_PAGES,
+            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+            web_feature_flag_list.FeatureNames.BLOG_PAGES,
         ]
     )
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
         self.assertTrue(
-            feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_services.is_feature_flag_enabled(
                 'dummy_feature_flag_for_e2e_tests', None
             )
         )
         self.assertTrue(
-            feature_flag_services.is_feature_flag_enabled('blog_pages', None)
+            web_feature_flag_services.is_feature_flag_enabled(
+                'blog_pages', None
+            )
         )
 
 

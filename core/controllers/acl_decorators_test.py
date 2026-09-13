@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import android_validation_constants, feature_flag_list, feconf
+from core import android_validation_constants, web_feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, incoming_app_feedback_report
 from core.domain import (
@@ -3725,7 +3725,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI]
+        [web_feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI]
     )
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self,
@@ -3743,7 +3743,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI]
+        [web_feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI]
     )
     def test_question_coordinator_can_access_new_cd_admin_page(self) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
@@ -6169,7 +6169,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_can_access_subtopic_when_topic_is_published_with_flag(
         self,
@@ -6212,7 +6212,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_can_access_subtopic_when_all_url_fragments_are_valid_with_flag(
         self,
@@ -6261,7 +6261,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_fall_back_to_studyguide_page_when_study_guide_does_not_exist(
         self,

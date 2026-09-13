@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.controllers import acl_decorators, base
-from core.domain import feature_flag_services
+from core.domain import web_feature_flag_services
 
 from typing import Dict
 
@@ -36,7 +36,7 @@ class FeatureFlagsEvaluationHandler(
     def get(self) -> None:
         """Handles GET requests. Evaluates and returns all feature flags."""
         result_dict = (
-            feature_flag_services.evaluate_all_web_feature_flag_configs(
+            web_feature_flag_services.evaluate_all_web_feature_flag_configs(
                 self.user_id
             )
         )
@@ -57,12 +57,12 @@ class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
         dummy_feature_flag_for_e2e_tests = (
-            feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
         )
         self.render_json(
             {
                 'msg': 'ok',
-                'is_enabled': feature_flag_services.is_feature_flag_enabled(
+                'is_enabled': web_feature_flag_services.is_feature_flag_enabled(
                     dummy_feature_flag_for_e2e_tests, self.user_id
                 ),
             }

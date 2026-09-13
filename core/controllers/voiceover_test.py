@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from core import constants, feature_flag_list, feconf
+from core import constants, web_feature_flag_list, feconf
 from core.domain import (
     cloud_task_domain,
     exp_domain,
@@ -81,7 +81,9 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
     """
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_put_language_accent_codes_mapping_correctly(self) -> None:
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
@@ -387,7 +389,9 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_should_be_able_to_regenerate_voiceovers(self) -> None:
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -713,8 +717,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_exploration_added_to_topic(self) -> None:
@@ -837,8 +841,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_exploration_update(self) -> None:
@@ -1035,8 +1039,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_translation_addition(self) -> None:
@@ -1253,8 +1257,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_translation_suggestion_acceptance(
@@ -1377,8 +1381,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_should_not_regenerate_voiceovers_on_translation_suggestion_rejection(
@@ -1734,7 +1738,9 @@ class RegenerateVoiceoversForExplorationHandlerTests(
         pass
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_regenerate_voiceovers_for_exploration(self) -> None:
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)

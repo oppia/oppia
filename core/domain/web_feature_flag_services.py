@@ -36,10 +36,10 @@ if MYPY:  # pragma: no cover
 )
 
 
-ALL_WEB_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
-    feature_flag_list.DEV_FEATURES_LIST
-    + feature_flag_list.TEST_FEATURES_LIST
-    + feature_flag_list.PROD_FEATURES_LIST
+ALL_WEB_FEATURE_FLAGS: List[web_feature_flag_list.FeatureNames] = (
+    web_feature_flag_list.DEV_FEATURES_LIST
+    + web_feature_flag_list.TEST_FEATURES_LIST
+    + web_feature_flag_list.PROD_FEATURES_LIST
 )
 
 ALL_WEB_FEATURES_NAMES_SET: Set[str] = set(
@@ -47,7 +47,7 @@ ALL_WEB_FEATURES_NAMES_SET: Set[str] = set(
 )
 
 WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+    web_feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
 
 

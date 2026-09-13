@@ -23,7 +23,7 @@ from core.constants import constants
 from core.domain import (
     web_feature_flag_domain,
     web_feature_flag_registry,
-    feature_flag_services,
+    web_feature_flag_services,
     platform_parameter_list,
     user_services,
 )
@@ -314,7 +314,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
@@ -324,12 +324,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_1.value]),
         )
@@ -368,12 +368,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_1.value]),
         )
@@ -419,10 +419,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature_list_ctx = self.swap(
-            feature_flag_services, 'ALL_WEB_FEATURE_FLAGS', []
+            web_feature_flag_services, 'ALL_WEB_FEATURE_FLAGS', []
         )
         feature_set_ctx = self.swap(
-            feature_flag_services, 'ALL_WEB_FEATURES_NAMES_SET', set([])
+            web_feature_flag_services, 'ALL_WEB_FEATURES_NAMES_SET', set([])
         )
         swap_name_to_description_feature_stage_dict = self.swap(
             web_feature_flag_registry,
@@ -470,12 +470,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_2],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_2.value]),
         )
