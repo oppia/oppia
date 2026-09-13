@@ -21,6 +21,7 @@ import {
   CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingData,
 } from 'domain/certificate-assessment/certificate-assessment.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
@@ -40,11 +41,52 @@ describe('CertificateAssessmentPlayerStateService', () => {
     1
   );
 
+  const mockStateData: StateBackendDict = {
+    classifier_model_id: null,
+    content: {content_id: 'c', html: '<p>prompt</p>'},
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {value: 1},
+        placeholder: {
+          value: {content_id: 'ca_placeholder_0', unicode_str: 'Type here'},
+        },
+        catchMisspellings: {value: false},
+      },
+      default_outcome: {
+        dest: 'final',
+        dest_if_really_stuck: null,
+        feedback: {content_id: 'f', html: '<p>f</p>'},
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      id: 'TextInput',
+      solution: null,
+    },
+    param_changes: [],
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    linked_skill_id: null,
+    inapplicable_skill_misconception_ids: [],
+  };
+
   const mockAttempt = CertificateAssessmentAttemptData.createFromBackendDict({
     attempt_id: 'attempt-1234',
     questions: [
-      {question_id: 'question_1', question_version: 1},
-      {question_id: 'question_2', question_version: 2},
+      {
+        question_id: 'question_1',
+        question_version: 1,
+        question_state_data: mockStateData,
+      },
+      {
+        question_id: 'question_2',
+        question_version: 2,
+        question_state_data: mockStateData,
+      },
     ],
   });
 
@@ -81,7 +123,7 @@ describe('CertificateAssessmentPlayerStateService', () => {
       CertificateAssessmentPlayerPageConstants.STAGE_INTRO
     );
     expect(service.remainingTimeInSeconds).toBe(0);
-    expect(service.isTimeExpired).toBeFalse();
+    expect(service.isTimeExpired).toBe(false);
     expect(service.getAttempt()).toBeNull();
   });
 
@@ -124,7 +166,7 @@ describe('CertificateAssessmentPlayerStateService', () => {
       tick(60000);
 
       expect(service.remainingTimeInSeconds).toBe(3540);
-      expect(service.isTimeExpired).toBeFalse();
+      expect(service.isTimeExpired).toBe(false);
       service.ngOnDestroy();
     }));
 
@@ -135,7 +177,7 @@ describe('CertificateAssessmentPlayerStateService', () => {
       tick(3600000);
 
       expect(service.remainingTimeInSeconds).toBe(0);
-      expect(service.isTimeExpired).toBeTrue();
+      expect(service.isTimeExpired).toBe(true);
       expect(window.clearInterval).toHaveBeenCalled();
     }));
 
@@ -143,11 +185,11 @@ describe('CertificateAssessmentPlayerStateService', () => {
       spyOnTimers();
       armCountdown();
       tick(3600000);
-      expect(service.isTimeExpired).toBeTrue();
+      expect(service.isTimeExpired).toBe(true);
 
       armCountdown();
 
-      expect(service.isTimeExpired).toBeFalse();
+      expect(service.isTimeExpired).toBe(false);
       expect(service.remainingTimeInSeconds).toBe(3600);
       expect(window.clearInterval).toHaveBeenCalled();
       expect(window.setInterval).toHaveBeenCalledTimes(2);
@@ -205,7 +247,7 @@ describe('CertificateAssessmentPlayerStateService', () => {
     tick(2000);
 
     expect(service.remainingTimeInSeconds).toBe(3600);
-    expect(service.isTimeExpired).toBeFalse();
+    expect(service.isTimeExpired).toBe(false);
     expect(window.clearInterval).toHaveBeenCalled();
   }));
 
