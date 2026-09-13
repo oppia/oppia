@@ -167,53 +167,45 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 author_ids[0], strict=True
             )
             suggestion_summary: SuggestionSummaryDict
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             if isinstance(
                 suggestion, suggestion_registry.SuggestionEditStateContent
             ):
-                exploration = exp_fetchers.get_exploration_by_id(exploration_id)
                 current_content_html = exploration.states[
                     suggestion.change_cmd.state_name
                 ].content.html
-                suggestion_summary = {
-                    'suggestion_html': suggestion.change_cmd.new_value['html'],
-                    'current_content_html': current_content_html,
-                    'description': suggestion_thread.subject,
-                    'author_username': suggestion_author_setting.username,
-                    'created_on_msecs': utils.get_time_in_millisecs(
-                        messages[0].created_on
-                    ),
-                }
+                suggestion_html = suggestion.change_cmd.new_value['html']
             elif isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             ):
-                exploration = exp_fetchers.get_exploration_by_id(exploration_id)
                 translate_current_content_html = exploration.get_content_html(
                     suggestion.change_cmd.state_name,
                     suggestion.change_cmd.content_id,
                 )
-                translate_suggestion_html = (
-                    suggestion.change_cmd.translation_html
-                )
                 # translate_current_content_html can be str or List[str],
                 # but SuggestionSummaryDict expects str. Convert to str if needed.
                 if isinstance(translate_current_content_html, list):
-                    translate_current_content_html = ' '.join(
+                    current_content_html = ' '.join(
                         translate_current_content_html
                     )
-                suggestion_summary = {
-                    'suggestion_html': translate_suggestion_html,
-                    'current_content_html': translate_current_content_html,
-                    'description': suggestion_thread.subject,
-                    'author_username': suggestion_author_setting.username,
-                    'created_on_msecs': utils.get_time_in_millisecs(
-                        messages[0].created_on
-                    ),
-                }
+                else:
+                    current_content_html = translate_current_content_html
+                suggestion_html = suggestion.change_cmd.translation_html
             else:
                 raise Exception(
-                    'No edit state content suggestion found for the given '
+                    'Unrecognized suggestion type for the given '
                     'thread_id: %s' % thread_id
                 )
+
+            suggestion_summary = {
+                'suggestion_html': suggestion_html,
+                'current_content_html': current_content_html,
+                'description': suggestion_thread.subject,
+                'author_username': suggestion_author_setting.username,
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on
+                ),
+            }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
             authors_settings.pop(0)
