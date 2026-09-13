@@ -18,9 +18,11 @@
 
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -62,11 +64,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() startUrl: string = '';
   @Input() studyUrl: string = '';
   @Input() practiceUrl: string = '';
-  @Input() adventureAccentColor: string = '#00645c';
+  @Input() hasPracticeQuestions: boolean = false;
+  @Input() moduleAccentColor: string = '#00645c';
   @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus: LessonProgressStatus = 'not_started';
-  @Input() totalCheckpointsCount: number = 0;
-  @Input() visitedCheckpointsCount: number = 0;
   @Input() availableTextLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageAccentDescriptions: {
@@ -75,6 +76,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() isNewLessonLabelVisible: boolean = false;
   @Input() isComingSoonSectionCard: boolean = false;
   @Input() navigatedLessonNumber: number | null = null;
+  @Output() startLessonClick = new EventEmitter<{
+    lessonNumber: number;
+    startUrl: string;
+  }>();
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
@@ -94,10 +99,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
-    // Expand the first lesson by default, or the navigated lesson.
+    // Expand the active (next) lesson, the navigated lesson, or the first
+    // lesson by default so that the next chapter is already expanded.
     this.isExpanded =
       !this.isComingSoonSectionCard &&
-      (this.navigatedLessonNumber === this.lessonNumber ||
+      (this.isActiveLesson ||
+        this.navigatedLessonNumber === this.lessonNumber ||
         (this.lessonNumber === 1 && this.lessonProgressStatus !== 'completed'));
     this.previousLessonProgressStatus = this.lessonProgressStatus;
   }
@@ -133,13 +140,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     }
   }
 
-  get showCheckpointBar(): boolean {
-    return (
-      this.lessonProgressStatus !== 'coming_soon' &&
-      this.totalCheckpointsCount > 0
-    );
-  }
-
   get isComingSoonLesson(): boolean {
     return this.lessonProgressStatus === 'coming_soon';
   }
@@ -159,24 +159,24 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       return;
     }
 
-    if (!this.selectedTextLanguageCode) {
-      this.navigateTo(this.startUrl);
-      return;
-    }
+    const resolvedUrl = this.selectedTextLanguageCode
+      ? this.getLessonStartUrlWithLanguageSelection(
+          this.selectedTextLanguageCode,
+          this.selectedVoiceoverLanguageCode
+        )
+      : this.startUrl;
 
-    this.navigateTo(
-      this.getLessonStartUrlWithLanguageSelection(
-        this.selectedTextLanguageCode,
-        this.selectedVoiceoverLanguageCode
-      )
-    );
+    this.startLessonClick.emit({
+      lessonNumber: this.lessonNumber,
+      startUrl: resolvedUrl,
+    });
   }
 
   onPracticeButtonClick(): void {
-    if (this.isComingSoonLesson) {
+    if (this.isComingSoonLesson || !this.hasPracticeQuestions) {
       return;
     }
-    this.navigateTo(this.practiceUrl || this.startUrl);
+    this.navigateTo(this.practiceUrl);
   }
 
   onStudyButtonClick(): void {
@@ -194,7 +194,23 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onPlayAgainClick(): void {
-    this.onStartButtonClick();
+    if (!this.startUrl || this.isComingSoonLesson) {
+      return;
+    }
+
+    const resolvedUrl = this.selectedTextLanguageCode
+      ? this.getLessonStartUrlWithLanguageSelection(
+          this.selectedTextLanguageCode,
+          this.selectedVoiceoverLanguageCode
+        )
+      : this.startUrl;
+
+    const separator = resolvedUrl.includes('?') ? '&' : '?';
+    const restartUrl = `${resolvedUrl}${separator}restart=1`;
+    this.startLessonClick.emit({
+      lessonNumber: this.lessonNumber,
+      startUrl: restartUrl,
+    });
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {
@@ -424,5 +440,9 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     return this.urlInterpolationService.getStaticImageUrl(
       FALLBACK_THUMBNAIL_IMAGE_PATH
     );
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

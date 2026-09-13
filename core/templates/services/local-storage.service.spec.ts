@@ -367,181 +367,171 @@ describe('LocalStorageService', () => {
       ).toBeNull();
     });
 
-    it('should correctly save and retrieve skipped adventures', () => {
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    it('should correctly save and retrieve skipped modules', () => {
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
 
-      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+      localStorageService.updateSkippedModules('story_1', [0, 1]);
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([
-        0, 1,
-      ]);
-      expect(localStorageService.getSkippedAdventures('story_2')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([0, 1]);
+      expect(localStorageService.getSkippedModules('story_2')).toEqual([]);
     });
 
-    it('should overwrite existing skipped adventures for a story', () => {
-      localStorageService.updateSkippedAdventures('story_3', [0, 1]);
-      localStorageService.updateSkippedAdventures('story_3', [2, 3]);
+    it('should overwrite existing skipped modules for a story', () => {
+      localStorageService.updateSkippedModules('story_3', [0, 1]);
+      localStorageService.updateSkippedModules('story_3', [2, 3]);
 
-      expect(localStorageService.getSkippedAdventures('story_3')).toEqual([
-        2, 3,
-      ]);
+      expect(localStorageService.getSkippedModules('story_3')).toEqual([2, 3]);
     });
 
-    it('should not save skipped adventures when storage is not available', () => {
+    it('should not save skipped modules when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 
-      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+      localStorageService.updateSkippedModules('story_1', [0, 1]);
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
     });
 
-    it('should handle corrupt skipped adventures data in storage', () => {
+    it('should handle corrupt skipped modules data in storage', () => {
       localStorage.setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         '{invalid json'
       );
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
 
-      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+      localStorageService.updateSkippedModules('story_1', [0, 1]);
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([
-        0, 1,
-      ]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([0, 1]);
     });
 
     it('should return an empty list when the stored value is not an array', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         JSON.stringify({story_4: 'not-an-array'})
       );
 
-      expect(localStorageService.getSkippedAdventures('story_4')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_4')).toEqual([]);
     });
 
-    it('should return an empty dict when skipped adventures root is null', () => {
+    it('should return an empty dict when skipped modules root is null', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         'null'
       );
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when skipped adventures root is a number', () => {
+    it('should return an empty dict when skipped modules root is a number', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         '42'
       );
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when skipped adventures root is an array', () => {
+    it('should return an empty dict when skipped modules root is an array', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         '[1, 2, 3]'
       );
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when skipped adventures root is a boolean', () => {
+    it('should return an empty dict when skipped modules root is a boolean', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.SKIPPED_ADVENTURES_KEY,
+        localStorageService.SKIPPED_MODULES_KEY,
         'true'
       );
 
-      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getSkippedModules('story_1')).toEqual([]);
     });
 
-    it('should correctly save and retrieve mastered adventures', () => {
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+    it('should correctly save and retrieve mastered modules', () => {
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
 
-      localStorageService.updateMasteredAdventures('story_1', ['1', '2']);
+      localStorageService.updateMasteredModules('story_1', ['1', '2']);
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([
         '1',
         '2',
       ]);
-      expect(localStorageService.getMasteredAdventures('story_2')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_2')).toEqual([]);
     });
 
-    it('should overwrite existing mastered adventures for a story', () => {
-      localStorageService.updateMasteredAdventures('story_3', ['1', '2']);
-      localStorageService.updateMasteredAdventures('story_3', ['3']);
+    it('should overwrite existing mastered modules for a story', () => {
+      localStorageService.updateMasteredModules('story_3', ['1', '2']);
+      localStorageService.updateMasteredModules('story_3', ['3']);
 
-      expect(localStorageService.getMasteredAdventures('story_3')).toEqual([
-        '3',
-      ]);
+      expect(localStorageService.getMasteredModules('story_3')).toEqual(['3']);
     });
 
-    it('should not save mastered adventures when storage is not available', () => {
+    it('should not save mastered modules when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 
-      localStorageService.updateMasteredAdventures('story_1', ['1']);
+      localStorageService.updateMasteredModules('story_1', ['1']);
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
 
-    it('should handle corrupt mastered adventures data in storage', () => {
+    it('should handle corrupt mastered modules data in storage', () => {
       localStorage.setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         '{invalid json'
       );
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
 
-      localStorageService.updateMasteredAdventures('story_1', ['1']);
+      localStorageService.updateMasteredModules('story_1', ['1']);
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([
-        '1',
-      ]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual(['1']);
     });
 
     it('should return an empty list when the stored mastered value is not an array', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         JSON.stringify({story_4: 'not-an-array'})
       );
 
-      expect(localStorageService.getMasteredAdventures('story_4')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_4')).toEqual([]);
     });
 
-    it('should return an empty dict when mastered adventures root is null', () => {
+    it('should return an empty dict when mastered modules root is null', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         'null'
       );
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when mastered adventures root is a number', () => {
+    it('should return an empty dict when mastered modules root is a number', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         '42'
       );
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when mastered adventures root is an array', () => {
+    it('should return an empty dict when mastered modules root is an array', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         '[1, 2, 3]'
       );
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
 
-    it('should return an empty dict when mastered adventures root is a boolean', () => {
+    it('should return an empty dict when mastered modules root is a boolean', () => {
       (localStorageService.storage as Storage).setItem(
-        localStorageService.MASTERED_ADVENTURES_KEY,
+        localStorageService.MASTERED_MODULES_KEY,
         'false'
       );
 
-      expect(localStorageService.getMasteredAdventures('story_1')).toEqual([]);
+      expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
   });
 });

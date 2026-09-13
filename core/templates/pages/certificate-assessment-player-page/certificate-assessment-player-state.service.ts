@@ -20,7 +20,7 @@
  * Every "fresh start" decision lives here on purpose so that components
  * cannot drift apart: a timing window belongs to exactly one attempt. It
  * is wiped once, when a replacement attempt successfully begins (see
- * `beginNewAttempt`), and never by mere navigation like retry or resume.
+ * `beginNewAttempt`), and never by mere navigation.
  */
 
 import {Injectable, OnDestroy} from '@angular/core';
@@ -34,7 +34,6 @@ import {
 export class CertificateAssessmentPlayerStateService implements OnDestroy {
   currentStage: CertificateAssessmentStage =
     CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
-  showAssessmentInterruptCard = false;
   remainingTimeInSeconds = 0;
   isTimeExpired = false;
 
@@ -82,30 +81,6 @@ export class CertificateAssessmentPlayerStateService implements OnDestroy {
   /** Returns the learner to the intro stage. */
   showIntro(): void {
     this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
-  }
-
-  /**
-   * Handles "retry" after an interruption: the learner goes back to the
-   * intro to start over. Timing state is deliberately left untouched here,
-   * because the old window only ends when the replacement attempt begins
-   * (see `beginNewAttempt`); partial answers need no explicit cleanup since
-   * they live inside the questions component, which the stage change
-   * destroys along with them.
-   */
-  returnToIntroAfterRetry(): void {
-    this.showAssessmentInterruptCard = false;
-    this.showIntro();
-  }
-
-  /**
-   * Handles "resume" after an interruption: the learner returns to the
-   * questions of their existing attempt, picking up whatever time remains.
-   */
-  resumeQuestionsStage(): void {
-    this.showAssessmentInterruptCard = false;
-    this.currentStage =
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    this.startTimerIfReady();
   }
 
   ngOnDestroy(): void {
