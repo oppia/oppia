@@ -862,6 +862,32 @@ describe('Translation status service', () => {
   );
 
   it(
+    'should ignore untranslated content when coloring active state' +
+      ' components in voiceover mode',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      tss.refresh();
+
+      // Untranslated content ids are dropped, so the content component
+      // has nothing left to color.
+      expect(tss.getActiveStateComponentStatusColor('content')).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+      // Only feedback_3 has a Hindi translation. The fixture still uses
+      // English en-US voiceovers, so that remaining feedback item is
+      // treated as fully voiced.
+      expect(tss.getActiveStateComponentStatusColor('feedback')).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+      expect(tss.getActiveStateComponentNeedsUpdateStatus('feedback')).toBe(
+        false
+      );
+    }
+  );
+
+  it(
     'should treat an unset exploration language as the original language' +
       ' for voiceover counts',
     () => {
