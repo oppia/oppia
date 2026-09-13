@@ -21,14 +21,15 @@ import logging
 import os
 import re
 import urllib.request
-import yaml
 
 from core.constants import constants
 
 import sentence_transformers
+import yaml
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
+# Here we use type Any because the parsed JSON/YAML object is highly dynamic.
 def _extract_yaml_strings(data: Any, target_keys: Tuple[str, ...]) -> Set[str]:
     """Recursively extracts strings from specific keys in parsed YAML data."""
     extracted = set()
