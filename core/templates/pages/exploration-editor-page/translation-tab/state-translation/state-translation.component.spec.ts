@@ -49,6 +49,7 @@ import {ContinueRulesService} from 'interactions/Continue/directives/continue-ru
 import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {PageContextService} from 'services/page-context.service';
@@ -310,6 +311,7 @@ describe('State translation component', () => {
     );
     explorationStatesService.init(explorationState1, false);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
@@ -406,6 +408,55 @@ describe('State translation component', () => {
           );
           expect(defaultRow).toBeNull();
         });
+
+        it('should hide answer group cards when their feedback is empty', () => {
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          expect(
+            fixture.nativeElement.querySelector('.e2e-test-feedback-0')
+          ).toBeNull();
+          expect(
+            fixture.nativeElement.querySelector('.e2e-test-feedback-1')
+          ).toBeNull();
+        });
+
+        it('should select a specified feedback card when initActiveContentId is set', () => {
+          component.initActiveContentId = 'feedback_1';
+          component.initActiveIndex = 0;
+          spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+          component.onTabClick('feedback');
+
+          expect(
+            translationTabActiveContentIdService.setActiveContent
+          ).toHaveBeenCalledWith('feedback_1', 'html');
+        });
+
+        it('should select a specified hint when initActiveContentId is set', () => {
+          component.initActiveContentId = 'hint_2';
+          component.initActiveIndex = 1;
+          spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+          component.onTabClick('hint');
+
+          expect(
+            translationTabActiveContentIdService.setActiveContent
+          ).toHaveBeenCalledWith('hint_2', 'html');
+        });
+
+        it('should fall back to the first hint when all hints are empty', () => {
+          component.stateHints.forEach(hint => {
+            hint.hintContent.html = '';
+          });
+          spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+          component.onTabClick('hint');
+
+          expect(
+            translationTabActiveContentIdService.setActiveContent
+          ).toHaveBeenCalledWith('hint_1', 'html');
+        });
       });
 
       it('should broadcast copy to ck editor when clicking on content', () => {
@@ -456,7 +507,7 @@ describe('State translation component', () => {
             translationTabActiveContentIdService.setActiveContent
           ).toHaveBeenCalledWith('ca_placeholder', 'unicode');
           expect(component.tabStatusColorStyle('ca')).toEqual({
-            'border-top-color': '#D14836',
+            'border-top-color': '#16A765',
           });
           expect(component.tabNeedUpdatesStatus('ca')).toBe(false);
           expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
@@ -476,13 +527,13 @@ describe('State translation component', () => {
         expect(component.isDisabled('feedback')).toBe(false);
         expect(
           translationTabActiveContentIdService.setActiveContent
-        ).toHaveBeenCalledWith('feedback_1', 'html');
+        ).toHaveBeenCalledWith('default_outcome', 'html');
         expect(component.tabStatusColorStyle('feedback')).toEqual({
-          'border-top-color': '#D14836',
+          'border-top-color': '#16A765',
         });
         expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
-        expect(component.contentIdNeedUpdates('feedback_1')).toBe(false);
-        expect(component.contentIdStatusColorStyle('feedback_1')).toEqual({
+        expect(component.contentIdNeedUpdates('default_outcome')).toBe(false);
+        expect(component.contentIdStatusColorStyle('default_outcome')).toEqual({
           'border-left': '3px solid #D14836',
         });
       });
@@ -615,6 +666,7 @@ describe('State translation component', () => {
           ' index provided is equal to answer groups length',
         () => {
           component.onTabClick('feedback');
+          component.changeActiveAnswerGroupIndex(1);
 
           spyOn(translationTabActiveContentIdService, 'setActiveContent');
           component.changeActiveAnswerGroupIndex(2);
@@ -625,11 +677,13 @@ describe('State translation component', () => {
         }
       );
 
-      it('should not change active hint index if it is equal to the current one', () => {
+      it('should not change active answer group index if it is equal to the current one', () => {
         component.onTabClick('feedback');
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.changeActiveAnswerGroupIndex(0);
+        component.changeActiveAnswerGroupIndex(
+          component.activeAnswerGroupIndex as number
+        );
 
         expect(
           translationTabActiveContentIdService.setActiveContent
@@ -663,9 +717,23 @@ describe('State translation component', () => {
       });
 
       it(
-        "should get empty content message when text translations haven't" +
-          ' been added yet',
+        'should get empty content message when original-language text is' +
+          ' empty in voiceover mode',
         () => {
+          expect(component.getEmptyContentMessage()).toBe(
+            'This field is empty, so a voiceover is not required.'
+          );
+        }
+      );
+
+      it(
+        'should get empty content message when a translation is missing in' +
+          ' voiceover mode',
+        () => {
+          (
+            translationLanguageService.getActiveLanguageCode as jasmine.Spy
+          ).and.returnValue('hi');
+
           expect(component.getEmptyContentMessage()).toBe(
             'The translation for this section has not been created yet.' +
               ' Switch to translation mode to add a text translation.'
@@ -942,6 +1010,7 @@ describe('State translation component', () => {
     explorationStatesService.init(explorationState1, false);
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
@@ -1423,6 +1492,7 @@ describe('State translation component', () => {
     explorationStatesService.init(explorationState1, false);
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
@@ -1617,7 +1687,10 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation available', () => {
-    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+    (
+      translationLanguageService.getActiveLanguageCode as jasmine.Spy
+    ).and.returnValue('hi');
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1628,6 +1701,22 @@ describe('State translation component', () => {
 
     expect(htmlData).toBe('Translated HTML');
   });
+
+  it(
+    'should return empty html when a non-original-language translation is' +
+      ' missing in voiceover mode',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+
+      const htmlData = component.getRequiredHtml(
+        new SubtitledHtml('<p>HTML data</p>', 'content_0')
+      );
+
+      expect(htmlData).toBe('');
+    }
+  );
 
   it('should return unicode when translation is empty in voiceover mode', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
@@ -1656,7 +1745,10 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
-    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+    (
+      translationLanguageService.getActiveLanguageCode as jasmine.Spy
+    ).and.returnValue('hi');
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
@@ -1666,6 +1758,111 @@ describe('State translation component', () => {
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
     expect(unicodeData).toBe('Translated UNICODE');
+  });
+
+  it(
+    'should return empty unicode when a non-original-language translation' +
+      ' is missing in voiceover mode',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+      let subtitledObject = SubtitledUnicode.createFromBackendDict({
+        content_id: 'content_1',
+        unicode_str: 'This is the unicode',
+      });
+
+      expect(component.getRequiredUnicode(subtitledObject)).toBe('');
+    }
+  );
+
+  it(
+    'should return empty html when content id is missing in a' +
+      ' non-original language',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+
+      expect(
+        component.getRequiredHtml(new SubtitledHtml('<p>HTML data</p>', ''))
+      ).toBe('');
+    }
+  );
+
+  it(
+    'should return empty unicode when content id is missing in a' +
+      ' non-original language',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+      const subtitledObject = SubtitledUnicode.createFromBackendDict({
+        content_id: '',
+        unicode_str: 'This is the unicode',
+      });
+
+      expect(component.getRequiredUnicode(subtitledObject)).toBe('');
+    }
+  );
+
+  it(
+    'should return empty html when the written translation is an empty' +
+      ' string',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
+        new EntityTranslation('entityId', 'entityType', 1, 'hi', {
+          content_0: new TranslatedContent('', 'html', false),
+        });
+
+      expect(
+        component.getRequiredHtml(
+          new SubtitledHtml('<p>HTML data</p>', 'content_0')
+        )
+      ).toBe('');
+    }
+  );
+
+  it(
+    'should return empty html when no entity translations exist for the' +
+      ' active language',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('fr');
+
+      expect(
+        component.getRequiredHtml(
+          new SubtitledHtml('<p>HTML data</p>', 'content_0')
+        )
+      ).toBe('');
+    }
+  );
+
+  it('should treat an unset exploration language as the original language', () => {
+    TestBed.inject(ExplorationLanguageCodeService).displayed = null;
+
+    expect(component.isVoiceoveringOriginalLanguage()).toBe(true);
+  });
+
+  it('should treat an empty exploration language as the original language', () => {
+    TestBed.inject(ExplorationLanguageCodeService).displayed = '';
+
+    expect(component.isVoiceoveringOriginalLanguage()).toBe(true);
+  });
+
+  it('should hide empty answer-group feedback cards in voiceover mode', () => {
+    component.onTabClick('feedback');
+    fixture.detectChanges();
+
+    const feedbackCards = fixture.nativeElement.querySelectorAll(
+      '.e2e-test-translation-feedback'
+    );
+    // Both answer groups have empty feedback; only the default outcome remains.
+    expect(feedbackCards.length).toBe(1);
   });
 
   describe('when rules input tab is accessed but with no rules', () => {
@@ -2110,6 +2307,7 @@ describe('State translation component', () => {
       ExplorationHtmlFormatterService
     );
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
