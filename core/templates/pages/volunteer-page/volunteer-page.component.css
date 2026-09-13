@@ -11,6 +11,8 @@
   margin: 0 auto;
   min-height: 44px;
   min-width: 240px;
+  padding-left: 2.4rem;
+  padding-right: 2.4rem;
 }
 
 .volunteer-page .oppia-volunteer-banner-content .volunteer-btn {

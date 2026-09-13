@@ -1,0 +1,149 @@
+.explore-version-history-button {
+  font-weight: bold;
+}
+
+.oppia-settings-tab-error-message {
+  color: #f00;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.oppia-advanced-features-card .oppia-on-off-switch-label,
+.oppia-feedback-card .oppia-on-off-switch-label {
+  height: 24px;
+  width: auto;
+}
+
+.oppia-advanced-features-card .oppia-feature-separator {
+  margin: 20px 0 20px 0;
+}
+
+.oppia-advanced-features-card .form-horizontal > label,
+.oppia-feedback-card .form-horizontal > label {
+  float: left;
+  height: auto;
+  padding-right: 0;
+  width: 610px;
+}
+
+.oppia-settings-container {
+  margin: 0 auto;
+  width: 45%;
+}
+
+.oppia-settings-card-container h3 {
+  margin-top: 0;
+}
+
+.oppia-settings-card-container {
+  border: 1px solid #707070;
+  box-shadow: none;
+  padding: 30px 55px;
+}
+
+.oppia-settings-input-group {
+  padding: 12px 0;
+}
+
+.oppia-features-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.oppia-roles-container {
+  position: relative;
+}
+
+.oppia-edit-roles-btn-container {
+  position: absolute;
+  right: 0;
+  text-align: right;
+}
+
+.oppia-edit-roles-btn {
+  color: #009c8a;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.oppia-permissions-card {
+  color: #666;
+}
+
+.oppia-delete-button {
+  background-color: #aa391d;
+  color: #fff;
+}
+
+.secondary-info-text {
+  font-size: smaller;
+}
+
+.oppia-basic-settings-header i {
+  display: none;
+}
+
+.oppia-role-select {
+  width: 250px;
+}
+
+.oppia-info-icon {
+  padding-left: 4px;
+  vertical-align: text-top;
+}
+
+@media screen and (max-width: 1200px) {
+  .oppia-settings-container {
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .oppia-settings-container {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-settings-container {
+    width: 100%;
+  }
+  .oppia-basic-settings-header i {
+    display: block;
+  }
+  .oppia-settings-card-container {
+    border: 0;
+    padding: 0;
+  }
+  .oppia-basic-settings-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-settings-card-container h3 {
+    margin-bottom: 0;
+  }
+}
+
+.oppia-user-list-item {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+  width: 50%;
+}
+
+.oppia-user-list-item:hover {
+  background-color: rgba(189, 189, 189, 0.678);
+}
+
+.oppia-no-voice-artist-message {
+  text-align: left;
+}
+
+.error-message {
+  color: #f00;
+}

@@ -138,6 +138,7 @@ describe('Classroom Page Component', () => {
       Promise.resolve({
         isCurriculumAdmin: () => false,
         isModerator: () => false,
+        isLoggedIn: () => true,
       } as UserInfo)
     );
   });
@@ -303,6 +304,7 @@ describe('Classroom Page Component', () => {
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
     );
+    component.isUserLoggedIn = true;
 
     spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
@@ -333,6 +335,7 @@ describe('Classroom Page Component', () => {
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
     );
+    component.isUserLoggedIn = true;
 
     spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
@@ -443,6 +446,7 @@ describe('Classroom Page Component', () => {
     let userInfo = {
       isCurriculumAdmin: () => true,
       isModerator: () => false,
+      isLoggedIn: () => true,
     } as UserInfo;
     (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
       Promise.resolve(userInfo)
@@ -518,6 +522,91 @@ describe('Classroom Page Component', () => {
     tick();
 
     expect(component.showPrivateClassroomBanner).toBe(false);
+  }));
+
+  it('should hide certificate assessment for logged-out learners', fakeAsync(() => {
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+        isLoggedIn: () => false,
+      } as UserInfo)
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroomUrlFragment'
+    );
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      'user@email.com',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      false,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(classroomData));
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isUserLoggedIn).toBe(false);
+  }));
+
+  it('should set isUserLoggedIn to true for logged-in learners', fakeAsync(() => {
+    let userInfo = {
+      isCurriculumAdmin: () => false,
+      isModerator: () => false,
+      isLoggedIn: () => true,
+    } as UserInfo;
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
+      Promise.resolve(userInfo)
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroomUrlFragment'
+    );
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      'user@email.com',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      false,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(classroomData));
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isUserLoggedIn).toBe(true);
   }));
 
   it(

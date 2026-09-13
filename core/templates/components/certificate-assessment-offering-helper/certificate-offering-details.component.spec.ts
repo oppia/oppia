@@ -27,7 +27,7 @@ import {
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 
 describe('Certificate Offering Details Component', () => {

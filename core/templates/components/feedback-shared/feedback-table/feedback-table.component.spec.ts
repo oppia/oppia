@@ -21,6 +21,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FeedbackTableComponent} from './feedback-table.component';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
+  FeedbackStatus,
   ReportAnIssueCategory,
   ReportType,
 } from '../../../domain/feedback/feedback.model';
@@ -71,5 +72,43 @@ describe('FeedbackTableComponent', () => {
   it('should return source label for the given source', () => {
     expect(component.getSourceLabel(ReportType.APP)).toBe('App');
     expect(component.getSourceLabel(ReportType.LESSON)).toBe('Lesson');
+  });
+
+  it('should return correct feedback description and correct category for the given PlatformFeedbackSummary', () => {
+    const expectedFeedbackDescription = 'This is a test feedback';
+    component.feedbackSummaries = [
+      {
+        id: 'test_feedback_id',
+        category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
+        source: ReportType.APP,
+        status: FeedbackStatus.OPEN,
+        report_message_preview: expectedFeedbackDescription,
+      },
+    ];
+    expect(
+      component.getFeedbackDescription(component.feedbackSummaries[0])
+    ).toBe(expectedFeedbackDescription);
+    expect(component.getFeedbackCategory(component.feedbackSummaries[0])).toBe(
+      ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE
+    );
+  });
+
+  it('should return correct feedback description and null category for the given LessonFeedbackSummary', () => {
+    const expectedFeedbackDescription = 'This is a test feedback';
+    component.feedbackSummaries = [
+      {
+        id: 'test_feedback_id',
+        source: ReportType.APP,
+        status: FeedbackStatus.OPEN,
+        feedback_text_preview: expectedFeedbackDescription,
+        unread_response_count: 1,
+      },
+    ];
+    expect(
+      component.getFeedbackDescription(component.feedbackSummaries[0])
+    ).toBe(expectedFeedbackDescription);
+    expect(component.getFeedbackCategory(component.feedbackSummaries[0])).toBe(
+      null
+    );
   });
 });

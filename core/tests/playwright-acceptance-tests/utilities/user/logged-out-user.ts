@@ -21,13 +21,14 @@ import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
+import {NavigationUtils} from '../common/navigation-utils';
+import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
 
 const aboutUrl = testConstants.URLs.About;
 const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
-const splashPageUrl = testConstants.URLs.splash;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -572,39 +573,13 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to navigate to the next card in the preview tab.
+   * @param {boolean} skipVerification - Whether to skip verification of the card content.
    */
-  async continueToNextCard(): Promise<void> {
-    const currentCardContentSelector = `${stateConversationContent} p`;
-    await this.expectElementToBeVisible(currentCardContentSelector);
-    const currentCardContent = await this.page.$eval(
-      currentCardContentSelector,
-      el => el.textContent
-    );
-    try {
-      await this.expectElementToBeVisible(
-        nextCardButton,
-        true,
-        this.page,
-        7000
-      );
-      await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('Timeout')) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
-    }
-
-    // Wait until card content changes.
-    await this.page.waitForFunction(
-      ({selector, value}: {selector: string; value: string}) => {
-        const element = document.querySelector(selector);
-        const text = element?.textContent?.trim();
-        return !!text && text !== value?.trim();
-      },
-      {selector: currentCardContentSelector, value: currentCardContent}
-    );
+  async continueToNextCardAsLoggedOutUser(
+    skipVerification: boolean = false
+  ): Promise<void> {
+    const explorationPlayerUtils = new ExplorationEditorUtils(this);
+    await explorationPlayerUtils.continueToNextCard(skipVerification);
   }
 
   /**
@@ -1688,18 +1663,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Verifies that the current page URL includes the expected page pathname.
    */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    const url = this.page.url();
-
-    // Replace spaces in the expectedPage with hyphens.
-    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
-
-    if (!url.includes(expectedPageInUrl)) {
-      throw new Error(
-        `Expected to be on page ${expectedPage}, but found ${url}`
-      );
-    }
+  async expectToBeOnPageAsLoggedOutUser(expectedPage: string): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.expectToBeOnPage(expectedPage);
   }
 
   /**
@@ -2288,14 +2254,11 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the splash page.
    * @param {string} expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
-  async navigateToSplashPage(
+  async navigateToSplashPageAsLoggedOutUser(
     expectedURL: string = `${baseUrl}/`
   ): Promise<void> {
-    // We explicitly check for expected URL instead of verifying it through
-    // BaseUser.goto as /splash redirects user to a different page.
-    await this.goto(splashPageUrl, false);
-
-    expect(this.page.url()).toBe(expectedURL);
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToSplashPage(expectedURL);
   }
 
   /**
@@ -2429,8 +2392,11 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to and plays an exploration by its ID.
    * @param {string | null} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string | null): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  async playExplorationAsLoggedOutUser(
+    explorationId: string | null
+  ): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.playExploration(baseUrl, explorationId);
   }
 
   /**

@@ -196,11 +196,9 @@
 
 .oppia-feedback-detail-actions-bar {
   background-color: #fff;
-  bottom: 0;
-  margin-top: auto;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 14px;
   padding-top: 14px;
-  position: sticky;
-  z-index: 10;
 }
 
 .oppia-feedback-detail-status-note {
@@ -259,5 +257,55 @@
 }
 
 .oppia-feedback-detail-replies-bar {
-  flex: 1;
+  flex: 0 0 auto;
+}
+
+.oppia-feedback-response-empty {
+  color: #767676;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 20px;
+}
+
+.oppia-feedback-response-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oppia-feedback-response {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.oppia-feedback-response-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.oppia-feedback-response-author {
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.oppia-feedback-response-date {
+  color: #767676;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.oppia-feedback-response-text {
+  color: #262626;
+  font-size: 14px;
+  line-height: 21px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

@@ -50,6 +50,7 @@ export class OpportunitiesListComponent {
 
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
+  @Input() disableButtonOnComplete: boolean = true;
 
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;

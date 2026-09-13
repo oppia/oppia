@@ -56,8 +56,8 @@ test.describe('Logged-Out Learner', function () {
         'Mathematics'
       );
 
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.continueToNextCard();
+    await explorationEditor.playExplorationAsLoggedInUser(explorationId);
+    await explorationEditor.continueToNextCardAsExplorationEditor();
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',

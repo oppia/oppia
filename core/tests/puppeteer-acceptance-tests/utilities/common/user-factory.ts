@@ -68,6 +68,10 @@ import {
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
+import {
+  CollectionEditor,
+  CollectionEditorFactory,
+} from '../user/collection-editor';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -90,6 +94,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
+  [ROLES.COLLECTION_EDITOR]: CollectionEditorFactory,
 } as const;
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
@@ -124,7 +129,8 @@ type BasicRolesUser = LoggedOutUser &
   Contributor &
   ContributorAdmin &
   PracticeQuestionReviewer &
-  VoiceoverSubmitter;
+  VoiceoverSubmitter &
+  CollectionEditor;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -302,6 +308,7 @@ export class UserFactory {
       ContributorAdminFactory(),
       PracticeQuestionReviewerFactory(),
       VoiceoverSubmitterFactory(),
+      CollectionEditorFactory(),
     ]);
 
     user.username = username;

@@ -2969,3 +2969,28 @@ def get_all_published_story_exploration_ids(
     )
 
     return list(set(exp_ids))
+
+
+def get_topic_ids_for_exploration_id(
+    exploration_id: str,
+) -> List[str]:
+    """Returns a list of topic ids for which the given exploration is a part of.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+
+    Returns:
+        list(str). A list of topic ids.
+    """
+    topic_ids = []
+    topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+    for topic_summary in topic_summaries:
+        for (
+            exploration_ids
+        ) in topic_summary.published_story_exploration_mapping.values():
+            if exploration_id in exploration_ids:
+                topic_ids.append(topic_summary.id)
+                break
+
+    return topic_ids

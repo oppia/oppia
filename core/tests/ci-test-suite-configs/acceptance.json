@@ -1,13 +1,13 @@
 {
   "suites": [
     {
-      "name": "logged-in-learner/serial-chapter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts",
+      "name": "serial-chapter-launch/serial-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/serial-chapter-launch/serial-chapter.spec.ts",
       "framework": "puppeteer"
     },
     {
-      "name": "topic-manager/track-upcoming-delayed-publish-chapter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/track-upcoming-delayed-publish-chapter.spec.ts",
+      "name": "serial-chapter-launch/track-upcoming-delayed-publish-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/serial-chapter-launch/track-upcoming-delayed-publish-chapter.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -386,6 +386,11 @@
       "framework": "playwright"
     },
     {
+      "name": "logged-out-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/view-a-collection.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
       "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts",
       "framework": "playwright"
@@ -606,6 +611,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "topic-manager/manage-story-adventures",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/manage-story-adventures.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "topic-manager/create-and-edit-questions-in-skill-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-edit-questions-in-skill-dashboard.spec.ts",
       "framework": "puppeteer"
@@ -713,6 +723,16 @@
     {
       "name": "exploration-editor/delete-lesson-creators-user-profile",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/delete-lesson-creators-user-profile.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "collection-creator/create-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts",
       "framework": "puppeteer"
     }
   ]

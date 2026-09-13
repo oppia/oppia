@@ -692,3 +692,28 @@ indexes:
   - name: status
   - name: created_on
     direction: desc
+
+- kind: CertificateAssessmentAttemptModel
+  properties:
+  - name: learner_id
+  - name: certificate_id
+  - name: is_submitted
+  - name: attempt_index
+    direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: destination_dashboard
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc

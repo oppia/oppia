@@ -28,6 +28,7 @@ import {ResponsesService} from '../services/responses.service';
 import {TrainingDataService} from './training-data.service';
 import {AppConstants} from 'app.constants';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import './training-panel.component.css';
 
 interface ClassificationInterface {
   answerGroupIndex: number;
@@ -37,6 +38,7 @@ interface ClassificationInterface {
 @Component({
   selector: 'oppia-training-panel',
   templateUrl: './training-panel.component.html',
+  styleUrls: ['./training-panel.component.css'],
 })
 export class TrainingPanelComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

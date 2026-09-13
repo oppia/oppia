@@ -1422,7 +1422,7 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(component.getDashboardTabHeading()).toBe(
-        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION_HEADING'
       );
     });
 

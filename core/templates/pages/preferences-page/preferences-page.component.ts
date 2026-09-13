@@ -58,6 +58,7 @@ interface AudioLanguageChoice {
 const BACKEND_UPDATE_TYPE_DICT: {[key: string]: BackendPreferenceUpdateType} = {
   profilePicturePngDataUrl: 'profile_picture_data_url',
   userBio: 'user_bio',
+  profileNameForCertificate: 'profile_name_for_certificate',
   defaultDashboard: 'default_dashboard',
   subjectInterests: 'subject_interests',
   preferredLanguageCodes: 'preferred_language_codes',
@@ -265,6 +266,9 @@ export class PreferencesPageComponent {
           profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
           profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
           userBio: new FormControl(preferencesData.user_bio),
+          profileNameForCertificate: new FormControl(
+            preferencesData.profile_name_for_certificate
+          ),
           defaultDashboard: new FormControl(preferencesData.default_dashboard),
           subjectInterests: new FormControl(preferencesData.subject_interests),
           preferredLanguageCodes: new FormControl(

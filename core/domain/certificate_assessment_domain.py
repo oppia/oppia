@@ -33,6 +33,11 @@ MAX_TIME_LIMIT_IN_MINUTES = 60
 MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
 
+# Maximum size in bytes of a serialized selected_answer for a certificate
+# assessment. Each response is stored in its own Datastore entity, so this
+# bound keeps a single answer well below the entity size limit (1 MB).
+MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES = 10 * 1024
+
 # Keys that must be present in a version_data dict for an attempt.
 REQUIRED_VERSION_DATA_KEYS: List[str] = [
     'certificate_id',
@@ -334,7 +339,7 @@ class CertificateAssessmentAttempt:
             total_score: float. The total score achieved in this
                 attempt.
             attempt_index: int. The index of this attempt for the
-                given learner (1-based).
+                given learner and certificate (1-based).
             attempt_data: dict. Maps topic_id to a dict containing
                 'total_related_questions' and
                 'total_correct_questions' for that topic.
@@ -357,6 +362,18 @@ class CertificateAssessmentAttempt:
         self.finished_at = finished_at
         self.is_submitted = is_submitted
 
+    def get_time_taken_in_minutes(self) -> Optional[int]:
+        """Returns how long the attempt took, in whole minutes.
+
+        Returns:
+            int|None. The elapsed time between the attempt start and
+            finish, in minutes, or None if the attempt has not been
+            finished yet.
+        """
+        if self.finished_at is None:
+            return None
+        return int((self.finished_at - self.started_at).total_seconds() / 60)
+
     def _validate_ids_and_scores(self) -> None:
         """Validates the attempt identity and score fields."""
         if not isinstance(self.attempt_id, str) or not self.attempt_id:
@@ -375,18 +392,25 @@ class CertificateAssessmentAttempt:
             raise utils.ValidationError(
                 'total_score must be a non-negative number.'
             )
+        # In-progress attempts are stored with a placeholder index of 0 until
+        # they are submitted, at which point the real 1-based index is set.
+        min_attempt_index = 1 if self.is_submitted else 0
         if (
             isinstance(self.attempt_index, bool)
             or not isinstance(self.attempt_index, int)
-            or self.attempt_index < 1
+            or self.attempt_index < min_attempt_index
         ):
             raise utils.ValidationError(
-                'attempt_index must be a positive integer.'
+                'attempt_index must be a %s integer.'
+                % ('positive' if self.is_submitted else 'non-negative')
             )
 
     def _validate_attempt_data(self) -> None:
         """Validates the per-topic attempt statistics."""
-        if not isinstance(self.attempt_data, dict) or not self.attempt_data:
+        if not isinstance(self.attempt_data, dict):
+            raise utils.ValidationError('attempt_data must be a dict.')
+        # In-progress attempts have empty per-topic stats until submission.
+        if not self.attempt_data and self.is_submitted:
             raise utils.ValidationError(
                 'attempt_data must contain stats for at least one topic.'
             )
@@ -565,6 +589,12 @@ class CertificateAssessmentResponseDict(TypedDict):
 class CertificateAssessmentResponse:
     """Domain object representing a single response submitted by a
     learner to a question during a certificate assessment attempt.
+
+    The service builds and validates one of these for each submitted answer
+    right before the response is persisted, so this is the gate that keeps
+    malformed or oversized data out of the Datastore. selected_answer holds
+    the already-serialized string form of the learner's answer; an empty
+    string means the question was unanswered.
     """
 
     def __init__(
@@ -583,7 +613,8 @@ class CertificateAssessmentResponse:
             question_id: str. The ID of the question being answered.
             question_version: int. The version of the question that
                 was answered.
-            selected_answer: str. The answer selected by the learner.
+            selected_answer: str. The serialized answer selected by the
+                learner. An empty string means the question was unanswered.
             is_correct: bool. Whether the selected answer was correct.
         """
         self.attempt_id = attempt_id
@@ -594,6 +625,13 @@ class CertificateAssessmentResponse:
 
     def validate(self) -> None:
         """Validates the CertificateAssessmentResponse domain object.
+
+        The learner's browser already grades each answer and sends the
+        is_correct flag, so this method does not re-score anything. Its job
+        is to make sure the serialized answer can be stored safely: the ids
+        must be non-empty, is_correct must genuinely be a boolean (otherwise
+        bool('false') would silently count as correct), and the serialized
+        answer must fit well below the Datastore entity size limit.
 
         Raises:
             utils.ValidationError. If any field is invalid.
@@ -614,12 +652,15 @@ class CertificateAssessmentResponse:
             raise utils.ValidationError(
                 'question_version must be a positive integer.'
             )
+        if not isinstance(self.selected_answer, str):
+            raise utils.ValidationError('selected_answer must be a string.')
         if (
-            not isinstance(self.selected_answer, str)
-            or not self.selected_answer.strip()
+            len(self.selected_answer.encode('utf-8'))
+            > MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
         ):
             raise utils.ValidationError(
-                'selected_answer must be a non-empty string.'
+                'selected_answer must be at most %d bytes when '
+                'serialized.' % MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
             )
         if not isinstance(self.is_correct, bool):
             raise utils.ValidationError('is_correct must be a boolean.')

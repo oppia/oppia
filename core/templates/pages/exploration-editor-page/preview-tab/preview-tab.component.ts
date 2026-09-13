@@ -48,10 +48,12 @@ import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-dr
 import {ChangeListService} from '../services/change-list.service';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
+import './preview-tab.component.css';
 
 @Component({
   selector: 'oppia-preview-tab',
   templateUrl: './preview-tab.component.html',
+  styleUrls: ['./preview-tab.component.css'],
 })
 export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

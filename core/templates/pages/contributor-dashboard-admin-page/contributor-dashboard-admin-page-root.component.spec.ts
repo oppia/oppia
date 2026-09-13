@@ -25,7 +25,7 @@ import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
 import {ContributorDashboardAdminPageRootComponent} from './contributor-dashboard-admin-page-root.component';
 
-describe('AdminPageRootComponent', () => {
+describe('ContributorDashboardAdminPageRootComponent', () => {
   let fixture: ComponentFixture<ContributorDashboardAdminPageRootComponent>;
   let component: ContributorDashboardAdminPageRootComponent;
 

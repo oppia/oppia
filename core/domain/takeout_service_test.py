@@ -1074,6 +1074,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=self.USER_ID_1,
+            certificate_id='cert_abc123',
             total_score=84.5,
             attempt_index=1,
             attempt_data={
@@ -1290,6 +1291,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_translation_language_code': None,
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
+            'profile_name_for_certificate': None,
         }
         user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
@@ -1927,6 +1929,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'profile_name_for_certificate': None,
         }
 
         expected_subscriptions_data = {
@@ -2507,6 +2510,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS_2,
+            'profile_name_for_certificate': None,
         }
         user_skill_data = {self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2}
         completed_activities_data = {

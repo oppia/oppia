@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import os
+from unittest import mock
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -4898,6 +4899,55 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             )
 
         self.assertItemsEqual(story_exp_ids, topic_exp_ids)
+
+    def test_get_topic_ids_for_exploration_id(self) -> None:
+        topic_summary_1 = mock.Mock()
+        topic_summary_2 = mock.Mock()
+
+        topic_summary_1.id = 'topic_1'
+        topic_summary_1.published_story_exploration_mapping = {
+            'story_1': ['exp_1', 'exp_2'],
+        }
+        topic_summary_2.id = 'topic_2'
+        topic_summary_2.published_story_exploration_mapping = {
+            'story_2': ['exp_3', 'exp_4'],
+        }
+
+        get_all_topic_summaries_mock = mock.Mock(
+            return_value=[topic_summary_1, topic_summary_2]
+        )
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            get_all_topic_summaries_mock,
+        ):
+            topic_ids = topic_services.get_topic_ids_for_exploration_id('exp_3')
+
+        get_all_topic_summaries_mock.assert_called_once_with()
+        self.assertEqual(topic_ids, ['topic_2'])
+
+    def test_get_topic_ids_for_exploration_id_returns_empty_list_when_not_found(
+        self,
+    ) -> None:
+        topic_summary = mock.Mock()
+        topic_summary.id = 'topic_1'
+        topic_summary.published_story_exploration_mapping = {
+            'story_1': ['other_exp_id'],
+        }
+
+        get_all_topic_summaries_mock = mock.Mock(return_value=[topic_summary])
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            get_all_topic_summaries_mock,
+        ):
+            topic_ids = topic_services.get_topic_ids_for_exploration_id(
+                'exp_id'
+            )
+
+        self.assertEqual(topic_ids, [])
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class

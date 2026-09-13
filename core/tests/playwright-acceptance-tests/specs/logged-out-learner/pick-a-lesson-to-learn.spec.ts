@@ -140,10 +140,10 @@ test.describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectCardContentToMatch(
       'Hello, World! This is a test.'
     );
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -194,7 +194,7 @@ test.describe('Logged-Out Learner', function () {
     // Progress Info.
     await loggedOutLearner.expectNoSaveProgressBeforeCheckpointInfo();
     await loggedOutLearner.closeLessonInfoModal();
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.openLessonInfoModal();
     await loggedOutLearner.saveProgress();
@@ -209,7 +209,7 @@ test.describe('Logged-Out Learner', function () {
 
   test('should be able to go to the next lesson', async function () {
     await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

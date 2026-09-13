@@ -55,6 +55,7 @@ class UserSettingsDict(TypedDict):
     preferred_translation_language_code: Optional[str]
     pin: Optional[str]
     display_alias: Optional[str]
+    profile_name_for_certificate: Optional[str]
     deleted: bool
     created_on: Optional[datetime.datetime]
 
@@ -129,6 +130,7 @@ class UserSettings:
         preferred_translation_language_code: Optional[str] = None,
         pin: Optional[str] = None,
         display_alias: Optional[str] = None,
+        profile_name_for_certificate: Optional[str] = None,
         deleted: bool = False,
         created_on: Optional[datetime.datetime] = None,
     ) -> None:
@@ -176,6 +178,8 @@ class UserSettings:
             display_alias: str or None. Display name of a user who is logged
                 into the Android app. None when the request is coming from
                 web because we don't use it there.
+            profile_name_for_certificate: str or None. Profile name to be shown
+                on the translation certificate.
             deleted: bool. Whether the user has requested removal of their
                 account.
             created_on: datetime.datetime. When the user was created on.
@@ -209,6 +213,7 @@ class UserSettings:
         )
         self.pin = pin
         self.display_alias = display_alias
+        self.profile_name_for_certificate = profile_name_for_certificate
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
@@ -312,6 +317,21 @@ class UserSettings:
                 'Expected display_alias to be a string, received %s'
                 % self.display_alias
             )
+
+        if self.profile_name_for_certificate is not None:
+            if not isinstance(self.profile_name_for_certificate, str):
+                raise utils.ValidationError(
+                    'Expected profile_name_for_certificate to be a string, received %s'
+                    % self.profile_name_for_certificate
+                )
+            if (
+                len(self.profile_name_for_certificate)
+                > constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE
+            ):
+                raise utils.ValidationError(
+                    'Profile name for certificates should be at most %s characters long.'
+                    % constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE
+                )
 
         if not isinstance(self.email, str):
             raise utils.ValidationError(
@@ -437,6 +457,7 @@ class UserSettings:
             ),
             'pin': self.pin,
             'display_alias': self.display_alias,
+            'profile_name_for_certificate': self.profile_name_for_certificate,
             'deleted': self.deleted,
             'created_on': self.created_on,
             'has_viewed_lesson_info_modal_once': (

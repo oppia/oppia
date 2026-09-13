@@ -19,6 +19,11 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from './save-pending-changes-modal.component';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 describe('Save pending changes modal', () => {
   let componentInstance: SavePendingChangesModalComponent;
@@ -41,5 +46,45 @@ describe('Save pending changes modal', () => {
   // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+});
+
+describe('Save pending changes modal in bottom sheet mode', () => {
+  let componentInstance: SavePendingChangesModalComponent;
+  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+
+  beforeEach(waitForAsync(() => {
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(
+      new Subject<KeyboardEvent>().asObservable()
+    );
+
+    TestBed.configureTestingModule({
+      declarations: [SavePendingChangesModalComponent],
+      providers: [
+        NgbActiveModal,
+        {
+          provide: MatBottomSheetRef,
+          useValue: bottomSheetRef,
+        },
+        {
+          provide: MAT_BOTTOM_SHEET_DATA,
+          useValue: {body: 'Test body text'},
+        },
+      ],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SavePendingChangesModalComponent);
+    componentInstance = fixture.componentInstance;
+  });
+
+  it('should set the body from the injected bottom sheet data', () => {
+    expect(componentInstance.body).toBe('Test body text');
   });
 });

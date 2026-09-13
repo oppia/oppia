@@ -179,6 +179,7 @@ describe('User Backend Api Service', () => {
       preferred_audio_language_code: 'en',
       default_dashboard: 'learner',
       user_bio: '',
+      profile_name_for_certificate: 'test_name',
       subject_interests: '',
       can_receive_email_updates: true,
       can_receive_editor_role_email: true,

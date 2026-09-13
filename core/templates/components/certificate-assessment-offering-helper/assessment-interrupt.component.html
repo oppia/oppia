@@ -1,0 +1,32 @@
+<div class="assessment-interrupt-card"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="assessment-interrupt-title"
+     aria-describedby="assessment-interrupt-message"
+     tabindex="-1">
+  <h2 id="assessment-interrupt-title" class="assessment-interrupt-title">{{ 'I18N_ASSESSMENT_INTERRUPT_TITLE' | translate }}</h2>
+
+  <p id="assessment-interrupt-message" class="assessment-interrupt-message">
+    {{ 'I18N_ASSESSMENT_INTERRUPT_SESSION_ENDED' | translate }}
+  </p>
+
+  <p class="assessment-interrupt-message">
+    {{ 'I18N_ASSESSMENT_INTERRUPT_RETRY_MESSAGE' | translate }}
+  </p>
+
+  <div class="assessment-interrupt-note">
+    <span aria-hidden="true" class="assessment-interrupt-note-icon">i</span>
+    <p class="assessment-interrupt-note-text">
+      {{ 'I18N_ASSESSMENT_INTERRUPT_NOTE_TEXT' | translate }}
+    </p>
+  </div>
+
+  <div class="assessment-interrupt-actions">
+    <button type="button" class="btn btn-secondary assessment-interrupt-action-button" (click)="onRetryAssessment()">
+      {{ 'I18N_ASSESSMENT_INTERRUPT_RETRY_BUTTON' | translate }}
+    </button>
+    <button type="button" class="btn btn-primary assessment-interrupt-action-button" (click)="onResumeAssessment()">
+      {{ 'I18N_ASSESSMENT_INTERRUPT_RESUME_BUTTON' | translate }}
+    </button>
+  </div>
+</div>

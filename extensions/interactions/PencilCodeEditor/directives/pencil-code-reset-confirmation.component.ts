@@ -16,21 +16,42 @@
  * @fileoverview Component for the Pencil code reset confirmation modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'oppia-pencil-code-reset-confirmation',
   templateUrl: './pencil-code-reset-confirmation.component.html',
 })
 export class PencilCodeResetConfirmation {
-  constructor(private ngbActiveModal: NgbActiveModal) {}
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private pencilCodeResetBottomSheetRef?: MatBottomSheetRef<PencilCodeResetConfirmation>
+  ) {
+    if (this.pencilCodeResetBottomSheetRef) {
+      this.pencilCodeResetBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.pencilCodeResetBottomSheetRef?.dismiss();
+        }
+      });
+    }
+  }
 
   confirm(): void {
-    this.ngbActiveModal.close();
+    if (this.pencilCodeResetBottomSheetRef) {
+      this.pencilCodeResetBottomSheetRef.dismiss(true);
+    } else {
+      this.ngbActiveModal.close();
+    }
   }
 
   cancel(): void {
-    this.ngbActiveModal.dismiss();
+    if (this.pencilCodeResetBottomSheetRef) {
+      this.pencilCodeResetBottomSheetRef.dismiss(false);
+    } else {
+      this.ngbActiveModal.dismiss();
+    }
   }
 }

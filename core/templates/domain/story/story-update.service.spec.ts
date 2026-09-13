@@ -21,6 +21,7 @@ import {TestBed} from '@angular/core/testing';
 
 import {Story} from 'domain/story/story.model';
 import {StoryUpdateService} from 'domain/story/story-update.service';
+import {ArcModel} from 'domain/story/story-contents-object.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -29,6 +30,9 @@ import {PlatformFeatureService} from '../../services/platform-feature.service';
 class MockPlatformFeatureService {
   status = {
     SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false,
+    },
+    StoryEditorArcs: {
       isEnabled: false,
     },
   };
@@ -117,6 +121,7 @@ describe('Story update service', () => {
       'emit'
     ).and.stub();
 
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
     _sampleStory = Story.createFromBackendDict(sampleStoryBackendObject);
   });
 
@@ -527,6 +532,66 @@ describe('Story update service', () => {
         cmd: 'add_story_node',
         node_id: 'node_3',
         title: 'Title 2',
+      },
+    ]);
+  });
+
+  it('should create default arc when adding first chapter with arcs enabled', () => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+
+    _sampleStory.getStoryContents()._nodes = [];
+    _sampleStory.getStoryContents()._arcs = [];
+    _sampleStory.getStoryContents()._initialNodeId = null;
+    _sampleStory.getStoryContents()._nextNodeId = 'node_1';
+
+    storyUpdateService.addStoryNode(_sampleStory, 'Title 1');
+
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe(
+      'arc_default'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+    ]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'add_story_node',
+        node_id: 'node_1',
+        title: 'Title 1',
+      },
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_default',
+        title: 'All Chapters',
+        description: '',
+        node_ids: ['node_1'],
+      },
+    ]);
+  });
+
+  it('should move new chapter to last arc when arcs enabled', () => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+    _sampleStory
+      .getStoryContents()
+      .addArc(ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2']));
+
+    storyUpdateService.addStoryNode(_sampleStory, 'Title 3');
+
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+      'node_2',
+      'node_3',
+    ]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'add_story_node',
+        node_id: 'node_3',
+        title: 'Title 3',
+      },
+      {
+        cmd: 'move_node_to_arc',
+        node_id: 'node_3',
+        to_arc_id: 'arc_1',
       },
     ]);
   });

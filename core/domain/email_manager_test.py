@@ -19,13 +19,16 @@ from __future__ import annotations
 import datetime
 import logging
 import types
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants
 from core.domain import (
+    classroom_config_services,
     email_manager,
     email_services,
     exp_domain,
+    general_feedback_domain,
     html_cleaner,
     platform_parameter_domain,
 )
@@ -39,6 +42,7 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     taskqueue_services,
+    topic_services,
     translation_domain,
     user_services,
 )
@@ -57,6 +61,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 MYPY = False
@@ -181,6 +186,12 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 False,
             ),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (True, False, True, False),
+            feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION: (
+                True,
+                False,
+                False,
+                False,
+            ),
         }
 
         for intent, results in expected_validation_results.items():
@@ -1829,6 +1840,608 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model1.email_hash, sent_email_model3.email_hash
             )
+
+
+class GeneralFeedbackEmailManagerUnitTests(test_utils.EmailTestBase):
+    """Tests for general feedback emails."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = user_services.create_new_user(
+            'auth_id',
+            'test@example.com',
+        )
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
+        )
+        self.can_not_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        )
+        self.log_new_error_counter = test_utils.CallCounter(logging.error)
+        self.log_new_error_ctx = self.swap(
+            logging, 'error', self.log_new_error_counter
+        )
+
+    def _get_lesson_metadata(
+        self,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': 'answer',
+        }
+
+    def _get_lesson_feedback(
+        self,
+    ) -> general_feedback_domain.LessonFeedback:
+        """Returns a lesson feedback domain object."""
+        return general_feedback_domain.LessonFeedback(
+            feedback_id='feedback_id',
+            author_id=self.user.user_id,
+            feedback_text='The hint was useful.',
+            status=feconf.STATUS_CHOICES_OPEN,
+            lesson_metadata=self._get_lesson_metadata(),
+            response_list=[],
+            unread_response_count=0,
+            created_on_msecs=0,
+        )
+
+    def _get_platform_feedback(
+        self,
+        destination_dashboard: str,
+        category: str | None = None,
+        lesson_metadata: general_feedback_domain.LessonMetadataDict | None = (
+            None
+        ),
+    ) -> general_feedback_domain.PlatformFeedback:
+        """Returns a platform feedback domain object."""
+        return general_feedback_domain.PlatformFeedback(
+            report_id='report_id',
+            report_message='The page did not load.',
+            source=feconf.SOURCE_APP,
+            platform='web',
+            destination_dashboard=destination_dashboard,
+            status=feconf.STATUS_CHOICES_OPEN,
+            include_technical_logs=False,
+            created_on_msecs=0,
+            page_url='https://www.oppia.org/learn/math',
+            category=category,
+            lesson_metadata=lesson_metadata,
+        )
+
+    def _assert_feedback_email_is_sent(
+        self,
+        mock_send_email: mock.Mock,
+        recipient_id: str,
+        email_subject: str,
+        recipient_email: str | None = None,
+    ) -> str:
+        """Asserts that a feedback notification email was sent."""
+        expected_kwargs = (
+            {'recipient_email': recipient_email}
+            if recipient_email is not None
+            else {}
+        )
+        mock_send_email.assert_called_once_with(
+            recipient_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION,
+            email_subject,
+            mock.ANY,
+            'system@example.com',
+            **expected_kwargs,
+        )
+        # Here we use cast because the mocked call arguments are not typed,
+        # so that the email body is recognized as a string.
+        return cast(str, mock_send_email.call_args[0][4])
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_submission_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_submission_email(feedback)
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_submission_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_lesson_feedback_submission_email(self) -> None:
+        feedback = self._get_lesson_feedback()
+        classroom = mock.Mock(feedback_recipient_email='feedback@example.com')
+        mock_send_email = mock.Mock()
+        mock_get_topic_ids = mock.Mock(return_value=['topic_id'])
+        mock_get_classroom = mock.Mock(return_value=classroom)
+
+        topic_ids_swap = self.swap(
+            topic_services,
+            'get_topic_ids_for_exploration_id',
+            mock_get_topic_ids,
+        )
+        classroom_swap = self.swap(
+            classroom_config_services,
+            'get_classroom_by_topic_id',
+            mock_get_classroom,
+        )
+        send_email_swap = self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        )
+
+        with (
+            topic_ids_swap
+        ), classroom_swap, send_email_swap, self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        mock_get_topic_ids.assert_called_once_with('exp_id')
+        mock_get_classroom.assert_called_once_with('topic_id')
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            'lesson-creation-team',
+            'New Lesson Feedback Suggestion submitted for exp_id on Oppia',
+            recipient_email='feedback@example.com',
+        )
+        self.assertIn('The hint was useful.', email_body)
+        self.assertIn(
+            'https://www.oppia.org/create/exp_id#/feedback/'
+            'lesson_feedback/feedback_id',
+            email_body,
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_curriculum_platform_feedback_submission_email(self) -> None:
+        feedback = self._get_platform_feedback(
+            feconf.DESTINATION_CURRICULUM,
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        mock_send_email = mock.Mock()
+        mock_get_topic_ids = mock.Mock(return_value=[])
+
+        topic_ids_swap = self.swap(
+            topic_services,
+            'get_topic_ids_for_exploration_id',
+            mock_get_topic_ids,
+        )
+        send_email_swap = self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        )
+
+        with topic_ids_swap, send_email_swap, self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        mock_get_topic_ids.assert_called_once_with('exp_id')
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            'lesson-creation-team',
+            'New Lesson Feedback Report submitted for exp_id on Oppia',
+            recipient_email=feconf.DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL,
+        )
+        self.assertIn('The page did not load.', email_body)
+        self.assertIn('<b>Category:</b> typo', email_body)
+        self.assertIn(
+            'https://www.oppia.org/create/exp_id#/feedback/'
+            'lesson_issue/report_id',
+            email_body,
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_technical_external_platform_feedback_email(self) -> None:
+        feedback = self._get_platform_feedback(
+            feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+        )
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            'web-leap-leads',
+            'New Technical Feedback Report submitted for Oppia',
+            recipient_email=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM_EMAIL,
+        )
+        self.assertIn('Hi LEAP Team!', email_body)
+        self.assertIn('The page did not load.', email_body)
+        self.assertIn('https://www.oppia.org/learn/math', email_body)
+        self.assertIn(
+            'https://www.oppia.org/technical-feedback-dashboard/%s/report_id'
+            % feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+            email_body,
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_technical_internal_platform_feedback_email(self) -> None:
+        feedback = self._get_platform_feedback(
+            feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
+            category='Incorrect answer',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_submission_email(feedback)
+
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            'web-core-leads',
+            'New Technical Feedback Report submitted for Oppia',
+            recipient_email=feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM_EMAIL,
+        )
+        self.assertIn('Hi CORE Team!', email_body)
+        self.assertIn(
+            'categorized as <b>Incorrect answer</b> for this exploration '
+            '<b>exp_id</b>',
+            email_body,
+        )
+        self.assertIn(
+            'https://www.oppia.org/technical-feedback-dashboard/%s/report_id'
+            % feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
+            email_body,
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            )
+        ]
+    )
+    def test_submission_email_with_invalid_dashboard_raises_error(
+        self,
+    ) -> None:
+        feedback = self._get_platform_feedback('invalid-dashboard')
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_send_feedback_email_ctx:
+            with self.assertRaisesRegex(
+                utils.InvalidInputException,
+                'Invalid destination dashboard: invalid-dashboard',
+            ):
+                email_manager.send_feedback_submission_email(feedback)
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_status_change_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_status_change_email(
+                    feedback,
+                    self.user.user_id,
+                )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_status_change_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_status_change_email(
+                feedback,
+                self.user.user_id,
+            )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_feedback_status_change_email(self) -> None:
+        feedback = self._get_lesson_feedback()
+        feedback.status = feconf.STATUS_CHOICES_FIXED
+        mock_send_email = mock.Mock()
+
+        username_swap = self.swap(
+            user_services,
+            'get_username',
+            mock.Mock(return_value='learner'),
+        )
+        send_email_swap = self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        )
+
+        with username_swap, send_email_swap, self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_status_change_email(
+                feedback, self.user.user_id
+            )
+
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            self.user.user_id,
+            'Your Lesson Feedback Status Has Been Updated for exp_id on Oppia',
+        )
+        self.assertIn('Hi <b>learner</b>!', email_body)
+        self.assertIn('updated to <b>fixed</b>', email_body)
+        self.assertIn(
+            'https://www.oppia.org/learner-dashboard?active_tab='
+            'my-suggestions&feedback_id=feedback_id',
+            email_body,
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                False,
+            ),
+        ]
+    )
+    def test_reply_email_not_sent_when_server_cannot_send_emails(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.swap(
+                email_manager,
+                '_send_email',
+                mock_send_email,
+            ), self.log_new_error_ctx:
+                email_manager.send_feedback_reply_email(
+                    feedback,
+                    'Thanks for the suggestion.',
+                    self.user.user_id,
+                )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(logs[0], 'This app cannot send emails to users.')
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_reply_email_not_sent_when_transactional_emails_are_disabled(
+        self,
+    ) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        with self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        ), self.can_not_send_feedback_email_ctx:
+            email_manager.send_feedback_reply_email(
+                feedback,
+                'Thanks for the suggestion.',
+                self.user.user_id,
+            )
+
+        mock_send_email.assert_not_called()
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.SERVER_CAN_SEND_EMAILS,
+                True,
+            ),
+        ]
+    )
+    def test_sends_feedback_reply_email(self) -> None:
+        feedback = self._get_lesson_feedback()
+        mock_send_email = mock.Mock()
+
+        username_swap = self.swap(
+            user_services,
+            'get_username',
+            mock.Mock(return_value='learner'),
+        )
+        send_email_swap = self.swap(
+            email_manager,
+            '_send_email',
+            mock_send_email,
+        )
+
+        with username_swap, send_email_swap, self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_reply_email(
+                feedback, 'Thanks for the suggestion.', self.user.user_id
+            )
+
+        email_body = self._assert_feedback_email_is_sent(
+            mock_send_email,
+            self.user.user_id,
+            'A Creator Has Responded to Your Feedback on exp_id',
+        )
+        self.assertIn('Hi <b>learner</b>!', email_body)
+        self.assertIn('Thanks for the suggestion.', email_body)
+        self.assertIn(
+            'https://www.oppia.org/learner-dashboard?active_tab='
+            'my-suggestions&feedback_id=feedback_id',
+            email_body,
+        )
 
 
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
