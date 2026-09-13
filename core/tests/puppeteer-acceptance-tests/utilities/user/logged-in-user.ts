@@ -5149,11 +5149,15 @@ export class LoggedInUser extends BaseUser {
    * Scrolls the Mastery Challenge card into view.
    */
   async scrollMasteryChallengeCardIntoView(): Promise<void> {
+    // Scroll the card so that its bottom edge aligns with the bottom of the
+    // viewport. A smooth scrollIntoView leaves a non-settled,
+    // environment-dependent scroll offset, which produces screenshots whose
+    // captured frame flips between two scroll anchors across runs; an instant
+    // bottom-aligned scroll pins the frame to a single deterministic anchor.
     await this.page.evaluate(cardSelector => {
-      document
-        .querySelector(cardSelector)
-        ?.scrollIntoView({behavior: 'smooth'});
+      document.querySelector(cardSelector)?.scrollIntoView(false);
     }, masteryChallengeCardSelector);
+    await this.page.waitForTimeout(200);
   }
 
   /**
