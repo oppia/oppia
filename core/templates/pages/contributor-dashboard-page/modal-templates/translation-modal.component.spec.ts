@@ -59,6 +59,7 @@ import {ConfirmTranslationExitModalComponent} from 'components/translation-sugge
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 enum ExpansionTabType {
@@ -647,7 +648,17 @@ describe('Translation Modal Component', () => {
           successCallback()
       );
       component.ngOnInit();
+      component.activeWrittenTranslation = 'مرحبا بالجميع';
+
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
+      expect(component.getUnicodeSchema().ui_config?.languageDirection).toBe(
+        'rtl'
+      );
+      expect(
+        (component.getSetOfStringsSchema().items as UnicodeSchema).ui_config
+          ?.languageDirection
+      ).toBe('rtl');
+      expect(component.activeWrittenTranslationAsString).toBe('مرحبا بالجميع');
     }));
 
     it('should get the unicode schema', () => {
