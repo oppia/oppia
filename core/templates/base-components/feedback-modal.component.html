@@ -1,4 +1,4 @@
-<ng-container *ngIf="isLessonFeedbackMode && !isUserLoggedIn">
+<ng-container *ngIf="isLessonFeedbackMode && isUserLoggedIn === false">
 
   <div class="oppia-guest-feedback">
     <div class="modal-header
@@ -32,7 +32,7 @@
 
 </ng-container>
 
-<ng-container *ngIf="!isLessonFeedbackMode || isUserLoggedIn">
+<ng-container *ngIf="!isLessonFeedbackMode || isUserLoggedIn === true">
   <div class="oppia-feedback-modal">
     <div class="modal-header oppia-flag-lesson-header">
       <div class="oppia-flag-lesson-header-left">
@@ -114,6 +114,7 @@
                 [(ngModel)]="feedbackText"
                 (ngModelChange)="clearFormError()"
                 [ngModelOptions]="{standalone: true}"
+                [oppiaFocusOn]="feedbackTextareaFocusLabel"
                 [placeholder]="textarePlaceholder | translate"
                 class="oppia-feedback-textarea e2e-test-feedback-modal-textarea">
       </textarea>
