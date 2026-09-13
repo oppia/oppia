@@ -132,7 +132,7 @@ def clean_text(text: str, template_lines: Set[str]) -> str:
         # Strip common markdown list and checkbox artifacts (e.g. "- [x] ", "* ")
         stripped_line = re.sub(r'^[-*]\s+(\[[ xX]\]\s+)?', '', stripped_line)
 
-        if stripped_line and stripped_line.lower() not in template_lines:
+        if not stripped_line or stripped_line.lower() not in template_lines:
             cleaned_lines.append(line)
     return '\n'.join(cleaned_lines)
 
