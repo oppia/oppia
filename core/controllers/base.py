@@ -712,6 +712,10 @@ class BaseHandler(
         # writing bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
+    # Here we use type Any because the values dict is a generic substitution
+    # map for template variables, and its values can be either plain strings
+    # or arbitrary serializable objects (e.g. evaluated feature flags), which
+    # are JSON-encoded before substitution.
     def render_template(
         self,
         filepath: str,
