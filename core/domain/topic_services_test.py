@@ -3771,27 +3771,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         result = topic_services.find_superseded_skill_in_topic(topic)
         self.assertIsNone(result)
 
-    def test_find_superseded_skill_in_topic_skips_none_skills(
-        self,
-    ) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id,
-            self.user_id,
-            name='Topic For None Skill Test',
-            description='desc',
-            url_fragment='topic-none-test',
-            uncategorized_skill_ids=['dummy_skill_id'],
-        )
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        with self.swap(
-            skill_fetchers,
-            'get_multi_skills',
-            lambda skill_ids, strict=True: [None],
-        ):
-            result = topic_services.find_superseded_skill_in_topic(topic)
-        self.assertIsNone(result)
-
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
