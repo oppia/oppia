@@ -103,7 +103,11 @@ export class BaseUser {
      * tests to fail while running in non headless mode (see
      * https://github.com/puppeteer/puppeteer/issues/7050).
      */
-    if (!headless) {
+    const skipSiteIsolationWorkaround = [
+      'logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page',
+      'logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue',
+    ].includes(specName ?? '');
+    if (!headless && !skipSiteIsolationWorkaround) {
       args.push('--disable-site-isolation-trials');
     }
 
@@ -2294,7 +2298,10 @@ export class BaseUser {
    * Expects the text content of the toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
-  async expectToastMessage(expectedMessage: string): Promise<void> {
+  async expectToastMessage(
+    expectedMessage: string,
+    timeout?: number
+  ): Promise<void> {
     // The toast message disappears after a few seconds, so we need to process
     // the toastMessageElement as soon as we receive it. Otherwise, the text
     // within it may no longer be showing at the time of evaluation.
@@ -2319,6 +2326,68 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the currently visible toast notification shows the expected
+   * message, has a small manual "X" dismiss button, and auto-fades after the
+   * expected timeout if left untouched.
+   * @param {string} expectedMessage - The expected message of the toast.
+   * @param {number} timeoutMilliseconds - The expected auto-fade duration.
+   */
+  async expectToastMessageWithDismissButtonToAutoDismiss(
+    expectedMessage: string,
+    timeoutMilliseconds: number
+  ): Promise<void> {
+    const toastMessageElement = await this.page.waitForSelector(
+      toastMessageSelector,
+      {visible: true}
+    );
+    const startTimeInMilliseconds = Date.now();
+
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+
+    const hasDismissButton = await this.page.evaluate(
+      (messageSelector: string) => {
+        const messageElement = document.querySelector(messageSelector);
+        const toastElement = messageElement?.closest('.ngx-toastr, .toast');
+        return Boolean(
+          toastElement?.querySelector('button.toast-close-button')
+        );
+      },
+      toastMessageSelector
+    );
+    if (!hasDismissButton) {
+      throw new Error(
+        'Expected the toast notification to have a small "X" dismiss button, ' +
+          'but it was not found.'
+      );
+    }
+
+    await this.page.waitForSelector(toastMessageSelector, {
+      hidden: true,
+      timeout: 10000,
+    });
+    const autoDismissTimeInMilliseconds = Date.now() - startTimeInMilliseconds;
+    if (
+      autoDismissTimeInMilliseconds < timeoutMilliseconds - 1000 ||
+      autoDismissTimeInMilliseconds > timeoutMilliseconds + 5000
+    ) {
+      throw new Error(
+        `Expected the toast notification to auto-fade after ${timeoutMilliseconds} ms, but it lasted ${autoDismissTimeInMilliseconds} ms.`
+      );
+    }
+    showMessage(
+      `Verified that the toast notification auto-fades after ${autoDismissTimeInMilliseconds} ms.`
+    );
+  }
+
+  /**
    * Expects the text content of any toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
@@ -2339,10 +2408,12 @@ export class BaseUser {
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
+   * @param expectModalToClose - Whether to expect the modal to close after clicking the button.
    */
   async clickButtonInModal(
     title: string,
-    action: 'confirm' | 'cancel'
+    action: 'confirm' | 'cancel',
+    expectModalToClose: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToBe(commonModalTitleSelector, title);
@@ -2354,7 +2425,10 @@ export class BaseUser {
     await this.expectElementToBeVisible(currentActionBtnSelector);
     await this.clickOnElementWithSelector(currentActionBtnSelector);
 
-    await this.expectElementToBeVisible(currentActionBtnSelector, false);
+    await this.expectElementToBeVisible(
+      currentActionBtnSelector,
+      !expectModalToClose
+    );
   }
 
   /**

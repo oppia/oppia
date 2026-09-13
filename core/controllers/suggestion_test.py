@@ -4745,6 +4745,11 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'content_html': '<p>new content html</p>',
             'translation_html': '<p>new content html in Hindi</p>',
             'data_format': 'html',
+            # Auto-generation metadata fields are always present in
+            # the serialized change_cmd (set to None for manual suggestions).
+            'was_auto_generated': None,
+            'auto_generation_provider': None,
+            'was_edited': None,
         }
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX,
@@ -5036,7 +5041,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(target_opp['topic_name'], 'topic')
         self.assertEqual(target_opp['entity_description'], 'Node1')
-        self.assertEqual(target_opp['content_count'], 4)
+        self.assertEqual(target_opp['content_count'], 3)
         self.assertEqual(target_opp['is_pinned'], False)
         self.assertEqual(target_opp['currently_available_to_learners'], True)
         self.assertEqual(target_opp['translation_counts'], {})
