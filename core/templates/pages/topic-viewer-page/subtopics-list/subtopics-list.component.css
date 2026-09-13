@@ -64,10 +64,112 @@ subtopics-list .subtopics-container {
   }
 }
 
+/* Redesigned topic viewer overrides — applied when the parent binds
+   [class.redesigned-view]="true" on the <subtopics-list> host element. */
+.redesigned-view .oppia-page-card {
+  margin-top: 0;
+}
+
+.redesigned-view .oppia-page-card.oppia-long-text {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.redesigned-view .oppia-subtopics-list-container {
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
+}
+
+.redesigned-view .oppia-page-card,
+.redesigned-view .oppia-page-card.oppia-long-text {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  max-width: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+.redesigned-view .tab-title {
+  color: #00645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.redesigned-view .subtopic-subheading {
+  color: #4a4a4a;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-bottom: 24px;
+}
+
+.redesigned-view .subtopics-container {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
+  justify-content: start;
+  margin-top: 0;
+}
+
+.redesigned-view .subtopic-summary-tile {
+  margin-right: 0;
+}
+
 subtopics-list.topic-preview-mode .oppia-page-card.oppia-long-text {
   box-sizing: border-box;
   margin: 0;
   padding-bottom: 30px;
   padding-top: 24px;
   width: 100%;
+}
+
+@media(max-width: 1024px) {
+  .redesigned-view .tab-title {
+    font-size: 34px;
+  }
+
+  .redesigned-view .subtopic-subheading {
+    font-size: 18px;
+  }
+}
+
+@media(max-width: 768px) {
+  .redesigned-view .tab-title {
+    font-size: 28px;
+  }
+
+  .redesigned-view .subtopic-subheading {
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
+
+  .redesigned-view .subtopics-container {
+    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media(max-width: 500px) {
+  .redesigned-view .tab-title {
+    font-size: 25px;
+    line-height: 1.25;
+  }
+
+  .redesigned-view .subtopic-subheading {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .redesigned-view .subtopics-container {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
 }

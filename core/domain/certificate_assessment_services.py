@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import datetime
 import json
+import math
 import secrets
 import sys
 
@@ -29,6 +30,7 @@ from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
     classroom_config_services,
+    question_domain,
     question_fetchers,
     question_services,
     skill_fetchers,
@@ -78,10 +80,39 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
+class CertificateAssessmentQuestionDict(TypedDict):
+    """Dict representation of a single question in the start-assessment response.
+
+    The start handler returns every question's pinned state data up-front so
+    that the client can serve questions without further per-question requests.
+    """
+
+    question_id: str
+    question_version: int
+    question_state_data: state_domain.StateDict
+
+
 class CertificateAssessmentAttemptNotReadyException(Exception):
     """Raised when the certificate question pool is no longer valid."""
 
     pass
+
+
+class CertificateAssessmentAttemptCooldownException(Exception):
+    """Raised when a learner starts a new attempt during the cooldown window.
+
+    The message here is server-side only and intentionally not user-facing
+    English: the HTTP handler converts this into a structured response
+    (I18N key + remaining_minutes) so the frontend can render a translated
+    message via its translate pipes.
+    """
+
+    def __init__(self, remaining_minutes: int) -> None:
+        super().__init__(
+            'Assessment attempt blocked by cooldown; %d minute(s) remaining.'
+            % remaining_minutes
+        )
+        self.remaining_minutes = remaining_minutes
 
 
 class CertificateOfferingClassroomSummary(TypedDict):
@@ -441,27 +472,29 @@ def _build_version_data(
     }
 
 
-def _get_in_progress_attempt_for_learner(
-    learner_id: str,
+def _get_most_recent_attempt_for_learner_and_certificate(
+    learner_id: str, certificate_id: str
 ) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
-    """Returns the learner's in-progress assessment attempt, if any."""
-    return gae_models.CertificateAssessmentAttemptModel.query(
-        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id,
-        gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
-        == False,
-    ).get()
+    """Returns the learner's most recent attempt for a certificate, if any.
 
-
-def _get_active_attempt_for_learner(
-    learner_id: str,
-) -> gae_models.CertificateAssessmentAttemptModel:
-    """Returns the learner's active assessment attempt or raises."""
-    attempt_model = _get_in_progress_attempt_for_learner(learner_id)
-    if attempt_model is None:
-        raise utils.ValidationError(
-            'No active certificate assessment attempt was found.'
+    Attempts are ordered by their creation time. We would prefer to sort by
+    started_at, but that property is not indexed (see
+    CertificateAssessmentAttemptModel.started_at) and Datastore cannot order
+    by a computed expression such as IF(started_at, -started_at,
+    -created_on), so started_at cannot be used as a query sort key. Since
+    attempts are created when they start, creation order matches start order,
+    so ordering by created_on yields the most recently started attempt.
+    """
+    return (
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.certificate_id
+            == certificate_id,
         )
-    return attempt_model
+        .order(-gae_models.CertificateAssessmentAttemptModel.created_on)
+        .get()
+    )
 
 
 def _get_certificate_assessment_attempt_model(
@@ -535,7 +568,7 @@ def start_certificate_assessment_attempt(
     certificate_id: str, learner_id: str
 ) -> Tuple[
     certificate_assessment_domain.CertificateAssessmentAttempt,
-    List[Dict[str, Union[str, int]]],
+    List[CertificateAssessmentQuestionDict],
 ]:
     """Starts a new DB-backed certificate assessment attempt.
 
@@ -545,23 +578,45 @@ def start_certificate_assessment_attempt(
 
     Returns:
         tuple(domain.CertificateAssessmentAttempt, list(dict)). The created
-        attempt and the question/version payload for the client.
+        attempt and the pinned question state for every question in the
+        attempt, for the client.
 
     Raises:
         CertificateAssessmentAttemptNotReadyException. If the assessment can no
             longer be started because the question pool is invalid.
-        utils.ValidationError. If the learner already has an in-progress
-            attempt.
+        CertificateAssessmentAttemptCooldownException. If the learner started an attempt for this
+            certificate less than MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES minutes
+            ago.
     """
 
     def _start_txn() -> Tuple[
         certificate_assessment_domain.CertificateAssessmentAttempt,
-        List[Dict[str, Union[str, int]]],
+        List[CertificateAssessmentQuestionDict],
     ]:
-        if _get_in_progress_attempt_for_learner(learner_id) is not None:
-            raise utils.ValidationError(
-                'You already have an in-progress certificate assessment attempt.'
+        most_recent_attempt = (
+            _get_most_recent_attempt_for_learner_and_certificate(
+                learner_id, certificate_id
             )
+        )
+        if most_recent_attempt is not None:
+            cooldown = datetime.timedelta(
+                minutes=(
+                    certificate_assessment_domain.MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES
+                )
+            )
+            remaining_cooldown = cooldown - (
+                datetime.datetime.utcnow() - most_recent_attempt.started_at
+            )
+            if remaining_cooldown > datetime.timedelta(seconds=0):
+                # Round up so the reported wait never lapses before the actual
+                # cooldown expires, and never drop below one minute.
+                remaining_minutes = max(
+                    1,
+                    int(math.ceil(remaining_cooldown.total_seconds() / 60)),
+                )
+                raise CertificateAssessmentAttemptCooldownException(
+                    remaining_minutes
+                )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             certificate_id=certificate_id,
@@ -584,18 +639,30 @@ def start_certificate_assessment_attempt(
         )
         attempt = _attempt_model_to_domain(attempt_model)
         attempt.validate()
-        return (
-            attempt,
+        id_version_pairs = [
+            (question_id, version_data['question_versions'][question_id])
+            for question_id, _ in selected_questions
+        ]
+        questions = question_services.get_questions_by_ids_and_versions(
+            id_version_pairs
+        )
+        # Here we use cast because the list comprehension builds plain dicts
+        # which mypy infers as List[Dict[str, object]], while the function
+        # signature expects List[CertificateAssessmentQuestionDict].
+        pinned_questions = cast(
+            List[CertificateAssessmentQuestionDict],
             [
                 {
                     'question_id': question_id,
-                    'question_version': version_data['question_versions'][
-                        question_id
-                    ],
+                    'question_version': version,
+                    'question_state_data': _pin_question_state(question),
                 }
-                for question_id, _ in selected_questions
+                for (question_id, version), question in zip(
+                    id_version_pairs, questions
+                )
             ],
         )
+        return (attempt, pinned_questions)
 
     offering = get_certificate_assessment_offering(certificate_id)
     validation_result = validate_certificate_assessment_offering(
@@ -633,10 +700,34 @@ def start_certificate_assessment_attempt(
     return cast(
         Tuple[
             certificate_assessment_domain.CertificateAssessmentAttempt,
-            List[Dict[str, Union[str, int]]],
+            List[CertificateAssessmentQuestionDict],
         ],
         transaction_services.run_in_transaction_wrapper(_start_txn)(),
     )
+
+
+def _pin_question_state(
+    question: question_domain.Question,
+) -> state_domain.StateDict:
+    """Returns pinned question state data with the solution and hints removed.
+
+    The learner receives the full question state (interaction, content, etc.)
+    while the assessment is in progress, but never the solution or hints, so
+    they cannot see the answer before submitting.
+
+    Args:
+        question: Question. The question domain object to pin.
+
+    Returns:
+        dict. The question's state data with its interaction solution and
+        hints removed.
+    """
+    question_state_data = question.question_state_data.to_dict()
+    # Do not leak the solution (including correct_answer) or hints to the
+    # learner while the assessment is still in progress.
+    question_state_data['interaction']['solution'] = None
+    question_state_data['interaction']['hints'] = []
+    return question_state_data
 
 
 def _create_responses_in_attempt_entity_group(
@@ -801,54 +892,6 @@ def submit_certificate_assessment_attempt(
         certificate_assessment_domain.CertificateAssessmentAttempt,
         transaction_services.run_in_transaction_wrapper(_submit_txn)(),
     )
-
-
-def get_question_state_data_for_assessment_attempt(
-    learner_id: str,
-    attempt_id: str,
-    question_id: str,
-) -> state_domain.StateDict:
-    """Returns pinned question state data for an in-progress attempt.
-
-    Args:
-        learner_id: str. The ID of the learner requesting the question.
-        attempt_id: str. The ID of the active assessment attempt.
-        question_id: str. The ID of the question to fetch.
-
-    Returns:
-        dict. The pinned question state data for the requested question, with
-        the interaction solution and hints removed so the learner cannot see
-        the answer before submitting the assessment.
-
-    Raises:
-        utils.ValidationError. If the attempt does not exist, does not belong
-            to the learner, has already been submitted, or does not contain
-            the requested question.
-    """
-    attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
-    if attempt_model.learner_id != learner_id:
-        raise utils.ValidationError(
-            'This attempt does not belong to the current learner.'
-        )
-    if attempt_model.is_submitted:
-        raise utils.ValidationError(
-            'This assessment has already been submitted.'
-        )
-
-    question_version = attempt_model.version_data['question_versions'].get(
-        question_id
-    )
-    if question_version is None:
-        raise utils.ValidationError('Question is not part of this attempt.')
-    question = question_services.get_question_by_id_and_version(
-        question_id, question_version
-    )
-    question_state_data = question.question_state_data.to_dict()
-    # Do not leak the solution (including correct_answer) or hints to the
-    # learner while the assessment is still in progress.
-    question_state_data['interaction']['solution'] = None
-    question_state_data['interaction']['hints'] = []
-    return question_state_data
 
 
 def validate_certificate_assessment_offering(

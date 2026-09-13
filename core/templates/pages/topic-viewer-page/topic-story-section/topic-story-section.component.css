@@ -5,7 +5,6 @@
   padding: 0;
   width: 100%;
 }
-
 .story-callout-row {
   align-items: flex-start;
   display: flex;
@@ -59,7 +58,7 @@
 
 .story-card {
   background: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   margin-top: 16px;
   max-width: 960px;
@@ -69,6 +68,7 @@
 .story-card-header {
   align-items: center;
   background: #00645c;
+  border-radius: 8px 8px 0 0;
   color: #fff;
   display: flex;
   justify-content: space-between;
@@ -139,20 +139,130 @@
 }
 
 .story-card-body {
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 484px;
   padding: 0 24px 24px;
 }
 
-.adventure-group {
+.skipped-module-card {
+  background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+  border: 1px solid #dce4f2;
+  border-radius: 14px;
+  margin-top: 16px;
+  padding: 16px 22px 18px;
+}
+
+.skipped-module-header-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.skipped-module-left-cluster {
+  align-items: center;
+  display: inline-flex;
+  gap: 14px;
+  min-width: 0;
+}
+
+.skipped-module-icon {
+  align-items: center;
+  background: #ece9ff;
+  border-radius: 50%;
+  color: #4e39c3;
+  display: inline-flex;
+  flex: 0 0 52px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.skipped-module-icon .material-icons {
+  font-size: 27px;
+}
+
+.skipped-module-name {
+  color: #1f2937;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0;
+}
+
+.skipped-module-badge {
+  background: #eae7ff;
+  border-radius: 999px;
+  color: #4c38be;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  padding: 9px 20px;
+}
+
+.skipped-module-body-row {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.skipped-module-message {
+  color: #374151;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.28;
+  margin: 0;
+}
+
+.skipped-module-start-cta {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #5641c7;
+  border-radius: 14px;
+  color: #4830b4;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 11px;
+  justify-content: center;
+  line-height: 1.15;
+  margin-left: auto;
+  min-height: 54px;
+  min-width: 184px;
+  padding: 10px 18px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.skipped-module-start-cta .material-icons {
+  font-size: 22px;
+}
+
+.skipped-module-start-cta:hover {
+  background: #f8f6ff;
+  border-color: #4d39bc;
+}
+
+.skipped-module-start-cta:focus-visible {
+  box-shadow: 0 0 0 3px rgba(75, 53, 182, 0.2);
+  outline: none;
+}
+
+.module-group {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-top: 16px;
   overflow: hidden;
 }
 
-.adventure-header {
+.module-header {
   align-items: center;
   background: #f5fafa;
   cursor: pointer;
@@ -163,16 +273,16 @@
   user-select: none;
 }
 
-.adventure-header:hover {
+.module-header:hover {
   background: #eaf6f8;
 }
 
-.adventure-header:focus {
+.module-header:focus {
   outline: 2px solid #00645c;
   outline-offset: -2px;
 }
 
-.adventure-header-left {
+.module-header-left {
   align-items: center;
   display: flex;
   flex: 1;
@@ -180,7 +290,7 @@
   min-width: 0;
 }
 
-.adventure-flag-icon {
+.module-flag-icon {
   align-items: center;
   border-radius: 50%;
   color: #fff;
@@ -192,19 +302,26 @@
   width: 52px;
 }
 
-.adventure-flag-icon .material-icons {
-  font-size: 24px;
+.module-flag-icon .material-icons,
+.module-flag-icon-img {
+  font-size: 32px;
+  height: 32px;
   line-height: 1;
+  width: 32px;
 }
 
-.adventure-header-text {
+.module-flag-icon-completed .material-icons {
+  font-size: 28px;
+}
+
+.module-header-text {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
 }
 
-.adventure-title {
+.module-title {
   color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
   font-size: 24px;
@@ -214,7 +331,7 @@
   overflow-wrap: break-word;
 }
 
-.adventure-completion-text {
+.module-completion-text {
   color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
   font-size: 13px;
@@ -224,7 +341,7 @@
   opacity: 0.8;
 }
 
-.adventure-chevron-badge {
+.module-chevron-badge {
   align-items: center;
   background: #fff;
   border: 1.5px solid #e8ebef;
@@ -238,16 +355,16 @@
   width: 46px;
 }
 
-.adventure-chevron-badge .material-icons {
+.module-chevron-badge .material-icons {
   font-size: 30px;
   line-height: 1;
 }
 
-.adventure-chevron-badge.expanded {
+.module-chevron-badge.expanded {
   transform: rotate(180deg);
 }
 
-.adventure-description {
+.module-description {
   border-top: 1px solid #e0e0e0;
   color: #555;
   font-family: Roboto, Arial, sans-serif;
@@ -257,7 +374,7 @@
   padding: 12px 18px;
 }
 
-.adventure-lessons {
+.module-lessons {
   border-top: 1px solid #e0e0e0;
   padding: 12px 18px;
 }
@@ -270,11 +387,11 @@
   width: 100%;
 }
 
-.adventure-lessons .story-lesson-card-wrapper {
+.module-lessons .story-lesson-card-wrapper {
   margin-top: 12px;
 }
 
-.adventure-lessons .story-lesson-card-wrapper:first-child {
+.module-lessons .story-lesson-card-wrapper:first-child {
   margin-top: 0;
 }
 
@@ -342,6 +459,13 @@
 
 topic-mastery-challenge-card {
   display: block;
+}
+
+.module-navigation-sticky-wrapper {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 56px;
+  z-index: 30;
 }
 
 @media (max-width: 768px) {
@@ -413,8 +537,64 @@ topic-mastery-challenge-card {
     padding: 0 14px 14px;
   }
 
-  .adventure-group {
+  .module-group {
     margin-top: 12px;
+  }
+
+  .skipped-module-card {
+    margin-top: 12px;
+    padding: 12px 12px 14px;
+  }
+
+  .skipped-module-header-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .skipped-module-left-cluster {
+    gap: 10px;
+  }
+
+  .skipped-module-icon {
+    flex: 0 0 36px;
+    height: 36px;
+    width: 36px;
+  }
+
+  .skipped-module-icon .material-icons {
+    font-size: 20px;
+  }
+
+  .skipped-module-name {
+    font-size: 18px;
+  }
+
+  .skipped-module-badge {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .skipped-module-body-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .skipped-module-message {
+    font-size: 14px;
+  }
+
+  .skipped-module-start-cta {
+    font-size: 16px;
+    min-height: 52px;
+    min-width: 0;
+    padding: 10px 14px;
+    width: 100%;
+  }
+
+  .skipped-module-start-cta .material-icons {
+    font-size: 22px;
   }
 
   .coming-soon-chapters-title {
@@ -450,50 +630,53 @@ topic-mastery-challenge-card {
     font-size: 26px;
   }
 
-  .adventure-header {
+  .module-header {
     padding: 12px 14px;
   }
 
-  .adventure-header-left {
+  .module-header-left {
     gap: 12px;
   }
 
-  .adventure-flag-icon {
+  .module-flag-icon {
     flex: 0 0 38px;
     height: 38px;
     min-width: 38px;
     width: 38px;
   }
 
-  .adventure-flag-icon .material-icons {
-    font-size: 18px;
+  .module-flag-icon .material-icons,
+  .module-flag-icon-img {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
   }
 
-  .adventure-title {
+  .module-title {
     font-size: 20px;
     line-height: 24px;
   }
 
-  .adventure-completion-text {
+  .module-completion-text {
     font-size: 12px;
   }
 
-  .adventure-chevron-badge {
+  .module-chevron-badge {
     flex: 0 0 38px;
     height: 38px;
     width: 38px;
   }
 
-  .adventure-chevron-badge .material-icons {
+  .module-chevron-badge .material-icons {
     font-size: 24px;
   }
 
-  .adventure-description {
+  .module-description {
     font-size: 13px;
     padding: 10px 14px;
   }
 
-  .adventure-lessons {
+  .module-lessons {
     padding: 10px 14px;
   }
 
@@ -586,8 +769,7 @@ topic-mastery-challenge-card {
   }
 
   .story-card-body {
-    display: flex;
-    flex-direction: column;
+    display: block;
     min-height: 462px;
   }
 
@@ -638,4 +820,5 @@ topic-mastery-challenge-card {
   .story-practice-card-wrapper {
     margin-top: 8px;
   }
+
 }

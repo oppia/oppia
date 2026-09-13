@@ -19,6 +19,7 @@
 import {Component, Input} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateVersionHistoryModalComponent} from 'pages/exploration-editor-page/modal-templates/state-version-history-modal.component';
+import './state-version-history.component.css';
 import {
   StateDiffData,
   VersionHistoryService,
@@ -27,6 +28,7 @@ import {
 @Component({
   selector: 'oppia-state-version-history',
   templateUrl: './state-version-history.component.html',
+  styleUrls: ['./state-version-history.component.css'],
 })
 export class StateVersionHistoryComponent {
   @Input() validationErrorIsShown!: boolean;

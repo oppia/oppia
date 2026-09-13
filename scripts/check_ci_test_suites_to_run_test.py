@@ -120,13 +120,16 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'login',
         'contact',
         'donate',
+    ],
+    '2': [
         'get-started',
         'teach',
         'thanks',
         'volunteer',
         'contributor-dashboard',
+        'learner-dashboard',
+        'email-dashboard',
     ],
-    '2': ['learner-dashboard', 'email-dashboard'],
 }
 
 LIGHTHOUSE_PAGES: List[check_ci_test_suites_to_run.LighthousePageDict] = [
@@ -169,9 +172,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'exploration-player/view-exploration.spec.ts': [
                             'exploration-player/view-exploration.spec.ts'
                         ],
-                        '.lighthouserc-performance.js': [
-                            '.lighthouserc-performance.js'
+                        '.lighthouserc.js': ['.lighthouserc.js'],
+                        '.lighthouserc-desktop.js': [
+                            '.lighthouserc-desktop.js'
                         ],
+                        '.lighthouserc-base.js': ['.lighthouserc-base.js'],
                     }
                 )
             )
@@ -225,31 +230,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 'framework': 'playwright',
                             },
                         ],
-                    }
-                )
-            )
-        with open(
-            os.path.join(ci_test_suite_configs_directory, 'e2e.json'),
-            'w',
-            encoding='utf-8',
-        ) as f:
-            f.write(
-                json.dumps(
-                    {
-                        'suites': [
-                            {
-                                'name': 'accessibility',
-                                'module': 'accessibility.js',
-                            },
-                            {
-                                'name': 'additionalEditorFeatures',
-                                'module': 'additionalEditorFeatures.js',
-                            },
-                            {
-                                'name': 'additionalEditorFeaturesModals',
-                                'module': 'additionalEditorFeaturesModals.js',
-                            },
-                        ]
                     }
                 )
             )
@@ -389,49 +369,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     },
                 ],
             },
-            'e2e': {
-                'count': 3,
-                'suites': [
-                    {'name': 'accessibility', 'module': 'accessibility.js'},
-                    {
-                        'name': 'additionalEditorFeatures',
-                        'module': 'additionalEditorFeatures.js',
-                    },
-                    {
-                        'name': 'additionalEditorFeaturesModals',
-                        'module': 'additionalEditorFeaturesModals.js',
-                    },
-                ],
-            },
-            'lighthouse_accessibility': {
+            'lighthouse': {
                 'count': 2,
                 'suites': [
                     {
                         'name': '1',
-                        'module': '.lighthouserc-accessibility.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                     },
                     {
                         'name': '2',
-                        'module': '.lighthouserc-accessibility.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
-                    },
-                ],
-            },
-            'lighthouse_performance': {
-                'count': 2,
-                'suites': [
-                    {
-                        'name': '1',
-                        'module': '.lighthouserc-performance.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
-                    },
-                    {
-                        'name': '2',
-                        'module': '.lighthouserc-performance.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                     },
@@ -625,12 +574,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', lighthouse_pages
+                '.lighthouserc.js', lighthouse_pages
             ),
             [
                 {
                     'name': '1',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': [
                         'splash',
@@ -648,18 +597,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     ) -> None:
         self.assertEqual(
             check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', LIGHTHOUSE_PAGES
+                '.lighthouserc.js', LIGHTHOUSE_PAGES
             ),
             [
                 {
                     'name': '1',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                 },
                 {
                     'name': '2',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                 },
@@ -756,7 +705,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),  # pylint: disable=line-too-long
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -765,11 +713,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -828,7 +772,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [
@@ -849,28 +792,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 1,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',  # pylint: disable=line-too-long
-                                            'environment': 'python',
-                                            'pages_to_run': [
-                                                'about',
-                                                'exploration-player',
-                                                'splash',
-                                                'terms',
-                                            ],
-                                        }
-                                    ],
-                                },
-                                'lighthouse_accessibility': {
-                                    'count': 1,
-                                    'suites': [
-                                        {
-                                            'name': '1',
-                                            'module': '.lighthouserc-accessibility.js',  # pylint: disable=line-too-long
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': [
                                                 'about',
@@ -908,7 +835,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [
@@ -929,11 +855,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -949,7 +871,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
-                        lambda *args: ['.lighthouserc-performance.js'],
+                        lambda *args: ['.lighthouserc.js'],
                     ):
                         check_ci_test_suites_to_run.main(
                             [
@@ -962,7 +884,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 0,
                                     'suites': [],
@@ -971,16 +892,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 2,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '1'
@@ -988,7 +905,115 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         },
                                         {
                                             'name': '2',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '2'
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_desktop_module(
+        self,
+    ) -> None:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: ['.lighthouserc-desktop.js'],
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref',
+                                'base',
+                                '--github_head_ref',
+                                'head',
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'lighthouse': {
+                                    'count': 2,
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '1'
+                                            ],
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '2'
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_base_module(
+        self,
+    ) -> None:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: ['.lighthouserc-base.js'],
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref',
+                                'base',
+                                '--github_head_ref',
+                                'head',
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'lighthouse': {
+                                    'count': 2,
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '1'
+                                            ],
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '2'
@@ -1037,7 +1062,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
-                                'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
                                     'count': 1,
                                     'suites': [
@@ -1052,11 +1076,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },

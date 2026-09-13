@@ -27,7 +27,7 @@ from core.domain import (
     topic_fetchers,
 )
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 
 class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
@@ -153,26 +153,50 @@ class PracticeSessionsPageDataHandler(
                 return node.acquired_skill_ids
         return []
 
+    def _get_story_and_arc_for_arc_id(
+        self, topic: topic_domain.Topic, arc_id: str
+    ) -> Optional[Tuple[story_domain.Story, story_domain.Arc]]:
+        """Returns the story-arc pair matching the given arc ID.
+
+        The arc_id parameter is a 1-based index that maps to the nth arc in
+        the first published story of the topic (e.g., '1' maps to the first
+        arc).
+
+        Args:
+            topic: Topic. The topic object.
+            arc_id: str. The arc ID (1-based index).
+
+        Returns:
+            tuple(Story, Arc) or None. The matching story-arc pair, or None
+            if no matching arc is found.
+        """
+        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
+            topic
+        )
+        if arc_id.isascii() and arc_id.isdigit():
+            arc_index = int(arc_id)
+            if 1 <= arc_index <= len(arcs_with_stories):
+                return arcs_with_stories[arc_index - 1]
+        return None
+
     def _get_skill_ids_for_arc(
         self, topic: topic_domain.Topic, arc_id: str
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
-        The arc_id parameter maps to an arc by its ID suffix (e.g., '1'
-        maps to 'arc_1').
+        The arc_id parameter is a 1-based index that maps to the nth arc in
+        the first published story of the topic (e.g., '1' maps to the first
+        arc).
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1').
+            arc_id: str. The arc ID (1-based index).
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
         """
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic
-        )
-        target_arc_id = 'arc_%s' % arc_id
-        for story, arc in arcs_with_stories:
-            if arc.id == target_arc_id:
-                return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
-        return []
+        story_arc = self._get_story_and_arc_for_arc_id(topic, arc_id)
+        if story_arc is None:
+            return []
+        story, arc = story_arc
+        return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)

@@ -258,6 +258,9 @@ def update_cloud_task_run_model(
     cloud_task_model.current_retry_attempt = (
         cloud_task_run_domain_instance.current_retry_attempt
     )
+    cloud_task_model.additional_contextual_information = (
+        cloud_task_run_domain_instance.additional_contextual_information
+    )
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
 
@@ -353,6 +356,9 @@ def convert_cloud_task_run_model_to_domain_object(
         'current_retry_attempt': cloud_task_model.current_retry_attempt,
         'last_updated': cloud_task_model.last_updated.isoformat(),
         'created_on': cloud_task_model.created_on.isoformat(),
+        'additional_contextual_information': (
+            cloud_task_model.additional_contextual_information
+        ),
     }
     cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(model_dict)
     return cloud_task_run
@@ -387,6 +393,12 @@ def get_cloud_task_run_by_given_params(
             start_datetime
             <= model.last_updated.replace(tzinfo=datetime.timezone.utc)
             <= end_datetime
+        )
+        and (
+            model.function_id
+            != feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+            ]
         )
     ]
     return [

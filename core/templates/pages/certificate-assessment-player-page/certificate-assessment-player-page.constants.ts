@@ -20,6 +20,9 @@ export const CertificateAssessmentPlayerPageConstants = {
   STAGE_INTRO: 'intro',
   STAGE_INSTRUCTIONS: 'instructions',
   STAGE_QUESTIONS: 'questions',
+  // Result token emitted when the learner chooses to view their results from
+  // the time-expired modal, and consumed by the player page that opened it.
+  VIEW_RESULTS_RESULT: 'view-results',
 } as const;
 
 export type CertificateAssessmentStage =

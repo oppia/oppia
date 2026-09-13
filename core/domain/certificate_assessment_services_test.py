@@ -39,7 +39,7 @@ from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
-from typing import Sequence, TypedDict
+from typing import Sequence, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -356,13 +356,69 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(
-            questions,
-            [
-                {'question_id': question_id_1, 'question_version': 1},
-                {'question_id': question_id_2, 'question_version': 1},
-                {'question_id': question_id_3, 'question_version': 1},
-            ],
+            [question['question_id'] for question in questions],
+            [question_id_1, question_id_2, question_id_3],
         )
+        self.assertEqual(
+            [question['question_version'] for question in questions],
+            [1, 1, 1],
+        )
+        for question in questions:
+            question_state_data = question['question_state_data']
+            self.assertIn('content', question_state_data)
+            self.assertIn('interaction', question_state_data)
+
+    def test_start_attempt_strips_solution_and_hints(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer 1', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Pinned Check',
+            description='Checks that question state is pinned.',
+            classroom_id=self.classroom_id,
+            topic_ids=[topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        with mock.patch.object(
+            secrets.SystemRandom,
+            'sample',
+            side_effect=lambda items, count: items[:count],
+        ):
+            _, questions = (
+                certificate_assessment_services.start_certificate_assessment_attempt(
+                    created_offering.certificate_id,
+                    owner_id,
+                )
+            )
+
+        self.assertEqual(len(questions), 3)
+        for question in questions:
+            question_state_data = question['question_state_data']
+            self.assertIsNone(question_state_data['interaction']['solution'])
+            self.assertEqual(question_state_data['interaction']['hints'], [])
+            # The question still carries its content so it can be served to the
+            # learner without a further per-question request.
+            self.assertIn('content', question_state_data)
 
     def test_get_topic_question_ids_by_difficulty_groups_by_difficulty(
         self,
@@ -528,17 +584,17 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
 
-    def test_get_active_attempt_for_learner_returns_or_raises(self) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'No active certificate assessment attempt was found.',
-        ):
+    def test_get_most_recent_attempt_returns_latest_for_learner_and_certificate(
+        self,
+    ) -> None:
+        self.assertIsNone(
             getattr(
                 certificate_assessment_services,
-                '_get_active_attempt_for_learner',
-            )('learner_1')
+                '_get_most_recent_attempt_for_learner_and_certificate',
+            )('learner_1', 'cert_1')
+        )
 
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+        gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
             certificate_id='cert_1',
             total_score=0.0,
@@ -555,12 +611,49 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             finished_at=None,
             is_submitted=False,
         )
+        most_recent_attempt = (
+            gae_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_1',
+                certificate_id='cert_1',
+                total_score=0.0,
+                attempt_index=2,
+                attempt_data={},
+                version_data={
+                    'certificate_id': 'cert_1',
+                    'certificate_version': 1,
+                    'topic_versions': {'topic_1': 1},
+                    'question_versions': {'question_1': 1},
+                    'question_topic_links': {'question_1': ['topic_1']},
+                },
+                started_at=datetime.datetime.utcnow(),
+                finished_at=None,
+                is_submitted=False,
+            )
+        )
+        # An attempt for a different certificate is not considered.
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            certificate_id='cert_2',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_2',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
         self.assertEqual(
             getattr(
                 certificate_assessment_services,
-                '_get_active_attempt_for_learner',
-            )('learner_1').id,
-            attempt.id,
+                '_get_most_recent_attempt_for_learner_and_certificate',
+            )('learner_1', 'cert_1').id,
+            most_recent_attempt.id,
         )
 
     def test_get_next_attempt_index_uses_highest_submitted_index(
@@ -636,115 +729,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             1,
         )
 
-    def test_get_question_state_data_for_assessment_attempt_raises_for_invalid_cases(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Attempt does not exist.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', 'missing_attempt', 'question_1'
-            )
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'This attempt does not belong to the current learner.',
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'other_learner', attempt.id, 'question_1'
-            )
-        attempt.is_submitted = True
-        attempt.update_timestamps()
-        attempt.put()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'This assessment has already been submitted.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'question_1'
-            )
-
-    def test_get_question_state_data_for_assessment_attempt_strips_solution_and_hints(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        question = mock.Mock()
-        question.question_state_data.to_dict.return_value = {
-            'content': {'html': '<p>Question</p>'},
-            'interaction': {'solution': 'solution', 'hints': ['hint']},
-        }
-        with mock.patch.object(
-            question_services,
-            'get_question_by_id_and_version',
-            return_value=question,
-        ) as get_question_mock:
-            result = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'question_1'
-            )
-
-        get_question_mock.assert_called_once_with('question_1', 1)
-        self.assertIsNone(result['interaction']['solution'])
-        self.assertEqual(result['interaction']['hints'], [])
-        self.assertEqual(result['content'], {'html': '<p>Question</p>'})
-
-    def test_get_question_state_data_for_assessment_attempt_raises_for_question_not_in_attempt(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Question is not part of this attempt.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'unrelated_question'
-            )
-
     def test_get_certificate_assessment_attempt_raises_for_missing_attempt(
         self,
     ) -> None:
@@ -755,7 +739,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'missing_attempt_id'
             )
 
-    def test_start_certificate_assessment_attempt_rejects_in_progress_attempt(
+    def test_start_certificate_assessment_attempt_rejects_attempt_within_cooldown(
         self,
     ) -> None:
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -785,24 +769,25 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             async_status='Available',
         )
 
-        in_progress_attempt = (
-            gae_models.CertificateAssessmentAttemptModel.create(
-                learner_id=owner_id,
-                certificate_id=created_offering.certificate_id,
-                total_score=0.0,
-                attempt_index=1,
-                attempt_data={},
-                version_data={
-                    'certificate_id': created_offering.certificate_id,
-                    'certificate_version': 1,
-                    'topic_versions': {topic_id: 1},
-                    'question_versions': {'dummy_question_id': 1},
-                    'question_topic_links': {'dummy_question_id': [topic_id]},
-                },
-                started_at=datetime.datetime.utcnow(),
-                finished_at=None,
-                is_submitted=False,
-            )
+        recent_attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id=created_offering.certificate_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {topic_id: 1},
+                'question_versions': {'dummy_question_id': 1},
+                'question_topic_links': {'dummy_question_id': [topic_id]},
+            },
+            started_at=(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(minutes=4, seconds=30)
+            ),
+            finished_at=None,
+            is_submitted=False,
         )
 
         with mock.patch.object(
@@ -810,19 +795,170 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'validate_certificate_assessment_offering',
             return_value={'is_valid': True},
         ), self.assertRaisesRegex(
-            utils.ValidationError,
-            'You already have an in-progress certificate assessment attempt.',
-        ):
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+            # The remaining wait is about 5 minutes and 30 seconds, so it
+            # must be reported rounded up to 6 minutes.
+            r'Assessment attempt blocked by cooldown; 6 minute\(s\) remaining\.',
+        ) as context:
             certificate_assessment_services.start_certificate_assessment_attempt(
                 created_offering.certificate_id,
                 owner_id,
             )
+        self.assertEqual(
+            # Here we use cast because context.exception is typed as BaseException
+            # and needs to be narrowed to access the remaining_minutes attribute.
+            cast(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                context.exception,
+            ).remaining_minutes,
+            6,
+        )
 
         self.assertIsNotNone(
             gae_models.CertificateAssessmentAttemptModel.get_by_id(
-                in_progress_attempt.id
+                recent_attempt.id
             )
         )
+
+    def test_start_certificate_assessment_attempt_rejects_attempt_with_seconds_of_cooldown_left(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id=created_offering.certificate_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {topic_id: 1},
+                'question_versions': {'dummy_question_id': 1},
+                'question_topic_links': {'dummy_question_id': [topic_id]},
+            },
+            started_at=(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(minutes=9, seconds=30)
+            ),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value={'is_valid': True},
+        ), self.assertRaisesRegex(
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+            r'Assessment attempt blocked by cooldown; 1 minute\(s\) remaining\.',
+        ) as context:
+            certificate_assessment_services.start_certificate_assessment_attempt(
+                created_offering.certificate_id,
+                owner_id,
+            )
+        self.assertEqual(
+            # Here we use cast because context.exception is typed as BaseException
+            # and needs to be narrowed to access the remaining_minutes attribute.
+            cast(
+                certificate_assessment_services.CertificateAssessmentAttemptCooldownException,
+                context.exception,
+            ).remaining_minutes,
+            1,
+        )
+
+    def test_start_certificate_assessment_attempt_allows_attempt_after_cooldown(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            certificate_id=created_offering.certificate_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {topic_id: 1},
+                'question_versions': {'dummy_question_id': 1},
+                'question_topic_links': {'dummy_question_id': [topic_id]},
+            },
+            started_at=(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(minutes=10, seconds=1)
+            ),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value={'is_valid': True},
+        ):
+            attempt, _ = (
+                certificate_assessment_services.start_certificate_assessment_attempt(
+                    created_offering.certificate_id,
+                    owner_id,
+                )
+            )
+
+        self.assertEqual(attempt.attempt_index, 0)
+        self.assertFalse(attempt.is_submitted)
+        self.assertIsNotNone(attempt.started_at)
 
     def test_start_certificate_assessment_attempt_blocks_invalid_offering(
         self,

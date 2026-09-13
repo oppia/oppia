@@ -49,6 +49,14 @@ export class QuestionPlayerConceptCardModalComponent
     this.modalHeader = this.skills[this.index];
   }
 
+  // The backend returns the skill description translated into the learner's
+  // language, so it is preferred over the untranslated description passed in.
+  onSkillDescriptionLoaded(skillDescription: string): void {
+    if (skillDescription) {
+      this.modalHeader = skillDescription;
+    }
+  }
+
   isLastConceptCard(): boolean {
     return this.index === this.skills.length - 1;
   }

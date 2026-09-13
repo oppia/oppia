@@ -16,7 +16,6 @@
  * @fileoverview Puppeteer script to collects dynamic urls for lighthouse tests.
  */
 
-var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 const {PuppeteerScreenRecorder} = require('puppeteer-screen-recorder');
@@ -565,8 +564,6 @@ const addThumbnailToTopic = async function (page, topicName) {
 };
 
 const main = async function () {
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'firebase:9099';
-  FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
     headless: true,

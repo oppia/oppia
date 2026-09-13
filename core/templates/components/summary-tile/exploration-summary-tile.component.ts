@@ -20,7 +20,10 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
-import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
+import {
+  ExplorationRatings,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -75,6 +78,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
   @Input() tags: string[] = [];
+  // The metadata fields that the backend already returned translated into the
+  // learner's site language. Fields that are absent are still in English, so
+  // the hardcoded translation bundle is used for them instead.
+  @Input() translatedMetadataFields: TranslatableExplorationMetadataField[] =
+    [];
 
   activityType!: string;
   resizeSubscription!: Subscription;
@@ -252,18 +260,20 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expTitleTranslationKey,
+      this.translatedMetadataFields.includes(
+        TranslatableExplorationMetadataField.TITLE
+      )
     );
   }
 
   isHackyExpObjectiveTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.expObjectiveTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+      this.expObjectiveTranslationKey,
+      this.translatedMetadataFields.includes(
+        TranslatableExplorationMetadataField.OBJECTIVE
+      )
     );
   }
 

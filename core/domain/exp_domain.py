@@ -431,7 +431,26 @@ class ExplorationChange(change_domain.BaseChange):
                 'translation_html',
                 'data_format',
             ],
-            'optional_attribute_names': [],
+            'optional_attribute_names': [
+                # Auto-generation metadata fields. When a translation
+                # suggestion is created manually (without AI), BaseChange
+                # sets each of these to None upon initialization (since
+                # change_dict.get() returns None for absent keys). As a
+                # result, manual suggestions serialize all three keys with
+                # None values rather than omitting them entirely.
+                #
+                # Contract for downstream consumers
+                # (suggestion_services, backend handlers, frontend models):
+                #   - was_auto_generated is None  → manual suggestion
+                #   - was_auto_generated is True   → AI-generated suggestion
+                #   - was_auto_generated is False  → should not occur;
+                #     treat the same as None (manual) for safety.
+                # auto_generation_provider and was_edited are only
+                # meaningful when was_auto_generated is True.
+                'was_auto_generated',
+                'auto_generation_provider',
+                'was_edited',
+            ],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},

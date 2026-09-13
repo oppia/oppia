@@ -31,7 +31,7 @@ class MockWindowRef {
   nativeWindow = {
     location: {
       assign: (url: string) => {},
-      origin: 'https://www.oppia.org',
+      origin: 'http://localhost:8181',
     },
   };
 }
@@ -164,6 +164,19 @@ describe('TopicLessonCardComponent', () => {
     expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
   });
 
+  it('should return the static image url for the provided image path', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/icons/practice-pencil-icon.svg'
+    );
+
+    expect(component.getStaticImageUrl('/icons/practice-pencil-icon.svg')).toBe(
+      '/assets/icons/practice-pencil-icon.svg'
+    );
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      '/icons/practice-pencil-icon.svg'
+    );
+  });
+
   it('should execute navigateTo when url is provided', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
 
@@ -194,32 +207,6 @@ describe('TopicLessonCardComponent', () => {
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });
 
-  it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 5;
-    expect(component.showCheckpointBar).toBeTrue();
-
-    component.lessonProgressStatus = 'in_progress';
-    component.totalCheckpointsCount = 3;
-    expect(component.showCheckpointBar).toBeTrue();
-
-    component.lessonProgressStatus = 'completed';
-    component.totalCheckpointsCount = 1;
-    expect(component.showCheckpointBar).toBeTrue();
-  });
-
-  it('should return false when lesson is coming_soon', () => {
-    component.lessonProgressStatus = 'coming_soon';
-    component.totalCheckpointsCount = 5;
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
-  it('should return false when totalCheckpointsCount is 0', () => {
-    component.lessonProgressStatus = 'not_started';
-    component.totalCheckpointsCount = 0;
-    expect(component.showCheckpointBar).toBeFalse();
-  });
-
   it('should expose isComingSoonLesson based on lesson progress status', () => {
     component.lessonProgressStatus = 'coming_soon';
     expect(component.isComingSoonLesson).toBeTrue();
@@ -228,46 +215,73 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isComingSoonLesson).toBeFalse();
   });
 
+  it('should emit startLessonClick with lesson number and startUrl on start button click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.lessonNumber = 3;
+    component.selectedTextLanguageCode = null;
+
+    component.onStartButtonClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl: '/explore/123',
+    });
+  });
+
+  it('should expose isCompletedLesson based on lesson progress status', () => {
+    component.lessonProgressStatus = 'completed';
+    expect(component.isCompletedLesson).toBeTrue();
+
+    component.lessonProgressStatus = 'in_progress';
+    expect(component.isCompletedLesson).toBeFalse();
+  });
+
   it('should navigate to startUrl directly when no fallback is needed', () => {
-    spyOn(component, 'navigateTo');
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.selectedTextLanguageCode = null;
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl: '/explore/123',
+    });
   });
 
-  it('should navigate with language query params when fallback CTA is needed', () => {
-    spyOn(component, 'navigateTo');
+  it('should emit startLessonClick with language query params when language is selected', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.selectedTextLanguageCode = 'fr';
     component.selectedVoiceoverLanguageCode = 'fr';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).toHaveBeenCalledWith(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr'
-    );
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl:
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr',
+    });
   });
 
-  it('should not navigate when startUrl is empty', () => {
-    spyOn(component, 'navigateTo');
+  it('should not emit startLessonClick when startUrl is empty', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).not.toHaveBeenCalled();
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
   });
 
-  it('should not navigate when lesson is coming soon', () => {
-    spyOn(component, 'navigateTo');
+  it('should not emit startLessonClick when lesson is coming soon', () => {
+    spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.lessonProgressStatus = 'coming_soon';
 
     component.onStartButtonClick();
 
-    expect(component.navigateTo).not.toHaveBeenCalled();
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
   });
 
   it('should update selectedTextLanguageCode', () => {
@@ -677,7 +691,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     expect(result).toBe(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr'
+      'http://localhost:8181/explore/123?initialContentLanguageCode=fr'
     );
   });
 
@@ -690,23 +704,17 @@ describe('TopicLessonCardComponent', () => {
     );
 
     expect(result).toBe(
-      'https://www.oppia.org/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA'
+      'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA'
     );
   });
 
-  it('should toggle isExpanded from false to true', () => {
+  it('should toggle isExpanded in both directions', () => {
     component.isExpanded = false;
 
     component.toggleExpanded();
-
     expect(component.isExpanded).toBeTrue();
-  });
-
-  it('should toggle isExpanded from true to false', () => {
-    component.isExpanded = true;
 
     component.toggleExpanded();
-
     expect(component.isExpanded).toBeFalse();
   });
 
@@ -722,28 +730,17 @@ describe('TopicLessonCardComponent', () => {
   it('should navigate to practiceUrl when provided', () => {
     spyOn(component, 'navigateTo');
     component.practiceUrl = '/practice/123';
-    component.startUrl = '/explore/123';
+    component.hasPracticeQuestions = true;
 
     component.onPracticeButtonClick();
 
     expect(component.navigateTo).toHaveBeenCalledWith('/practice/123');
   });
 
-  it('should fallback to startUrl when practiceUrl is empty', () => {
+  it('should not navigate when practice questions are unavailable', () => {
     spyOn(component, 'navigateTo');
-    component.practiceUrl = '';
-    component.startUrl = '/explore/123';
-
-    component.onPracticeButtonClick();
-
-    expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
-  });
-
-  it('should not navigate when lesson is coming soon', () => {
-    spyOn(component, 'navigateTo');
-    component.lessonProgressStatus = 'coming_soon';
     component.practiceUrl = '/practice/123';
-    component.startUrl = '/explore/123';
+    component.hasPracticeQuestions = false;
 
     component.onPracticeButtonClick();
 
@@ -781,6 +778,70 @@ describe('TopicLessonCardComponent', () => {
     expect(component.navigateTo).not.toHaveBeenCalled();
   });
 
+  it('should start the lesson again from the beginning on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.lessonNumber = 3;
+    component.selectedTextLanguageCode = null;
+    component.isExpanded = true;
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl: '/explore/123?restart=1',
+    });
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should append restart param to an existing query string on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123?node_id=x&lang=en';
+    component.selectedTextLanguageCode = null;
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl: '/explore/123?node_id=x&lang=en&restart=1',
+    });
+  });
+
+  it('should append restart param to the language-selected url on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.selectedTextLanguageCode = 'fr';
+    component.selectedVoiceoverLanguageCode = 'fr';
+    component.lessonNumber = 3;
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 3,
+      startUrl:
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr&restart=1',
+    });
+  });
+
+  it('should not start the lesson again when startUrl is empty on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '';
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
+  });
+
+  it('should not start the lesson again for a coming soon lesson on play again click', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.lessonProgressStatus = 'coming_soon';
+
+    component.onPlayAgainClick();
+
+    expect(component.startLessonClick.emit).not.toHaveBeenCalled();
+  });
+
   it('should auto-expand when navigatedLessonNumber matches lessonNumber', () => {
     component.lessonNumber = 3;
     component.navigatedLessonNumber = 3;
@@ -816,6 +877,62 @@ describe('TopicLessonCardComponent', () => {
     });
 
     expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should collapse expanded lesson when progress becomes completed', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('in_progress', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should not collapse when lesson is already completed', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('not_started', 'completed', false),
+    });
+    expect(component.isExpanded).toBeFalse();
+
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('completed', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not collapse completed lesson when isComingSoonSectionCard is true', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+    component.isComingSoonSectionCard = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('not_started', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not collapse when progress changes to a non-completed status', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange(
+        'not_started',
+        'in_progress',
+        false
+      ),
+    });
+
+    expect(component.isExpanded).toBeTrue();
   });
 
   it('should use DEFAULT_LANGUAGE_CODE when selectedTextLanguageCode is null', () => {
@@ -929,6 +1046,42 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isExpanded).toBeTrue();
   });
 
+  it('should expand the active non-first lesson', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = true;
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not expand a non-active non-first lesson', () => {
+    component.lessonNumber = 2;
+    component.isActiveLesson = false;
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should not expand first lesson by default when it is completed', () => {
+    component.lessonNumber = 1;
+    component.lessonProgressStatus = 'completed';
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should expand first lesson when it is not completed', () => {
+    component.lessonNumber = 1;
+    component.lessonProgressStatus = 'in_progress';
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
   it('should return raw code when all description services return empty string', () => {
     languageUtilService.getContentLanguageDescription
       .withArgs('xx')
@@ -938,5 +1091,75 @@ describe('TopicLessonCardComponent', () => {
       .and.returnValue('');
 
     expect(componentRef.getLanguageDescription('xx')).toBe('xx');
+  });
+
+  it('should emit startLessonClick with voiceover language query param when voiceover is selected', () => {
+    spyOn(component.startLessonClick, 'emit');
+    component.startUrl = '/explore/123';
+    component.selectedTextLanguageCode = 'fr';
+    component.selectedVoiceoverLanguageCode = 'fr-CA';
+
+    component.onStartButtonClick();
+
+    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
+      lessonNumber: 1,
+      startUrl:
+        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA',
+    });
+  });
+
+  it('should create URL with only content language code when voiceover is null', () => {
+    component.startUrl = '/explore/123';
+
+    const result = componentRef.getLessonStartUrlWithLanguageSelection(
+      'es',
+      null
+    );
+
+    expect(result).toBe(
+      'http://localhost:8181/explore/123?initialContentLanguageCode=es'
+    );
+  });
+
+  it('should use session fallback voiceover only when it is in available list', () => {
+    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
+
+    expect(componentRef.getInitialVoiceoverLanguageCode('fr', 'en')).toBe('fr');
+  });
+
+  it('should use compatible voiceover from related codes when session fallback is not available', () => {
+    component.availableVoiceoverLanguageCodes = ['es', 'de'];
+    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
+      .withArgs('es')
+      .and.returnValue(['fr']);
+
+    expect(componentRef.getInitialVoiceoverLanguageCode('pt', 'fr')).toBe('es');
+  });
+
+  it('should return first available voiceover when no compatible found and no English', () => {
+    component.availableVoiceoverLanguageCodes = ['fr', 'de'];
+
+    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'zh')).toBe('fr');
+  });
+
+  it('should return English text language code as fallback when available', () => {
+    component.availableTextLanguageCodes = ['en', 'fr'];
+
+    expect(componentRef.getFallbackTextLanguageCode()).toBe('en');
+  });
+
+  it('should return first text language when English is not available', () => {
+    component.availableTextLanguageCodes = ['fr', 'es'];
+
+    expect(componentRef.getFallbackTextLanguageCode()).toBe('fr');
+  });
+
+  it('should handle onSelectedTextLanguageCodeChange with null value', () => {
+    component.onSelectedTextLanguageCodeChange(null);
+
+    expect(component.selectedTextLanguageCode).toBeNull();
+    expect(
+      topicSessionFallbackLanguageService.saveFallbackSelection
+    ).not.toHaveBeenCalled();
   });
 });

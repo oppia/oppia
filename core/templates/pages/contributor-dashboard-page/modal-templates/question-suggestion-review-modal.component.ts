@@ -79,7 +79,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   author_name: string;
   change_cmd: SuggestionChangeDict;
-  exploration_content_html: string | string[] | null;
+  entity_content_html: string | string[] | null;
   language_code: string;
   last_updated_msecs: number;
   status: string;

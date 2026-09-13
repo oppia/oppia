@@ -41,11 +41,12 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {DragAndDropAnswer} from 'interactions/answer-defs';
 
 import {Subscription} from 'rxjs';
+import './drag-and-drop-sort-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./drag-and-drop-sort-input-interaction.component.css'],
 })
 export class InteractiveDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -54,6 +55,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   @Input() allowMultipleItemsInSamePositionWithValue!: string;
   @Input() choicesWithValue!: string;
   // Save solution is null until the solution is set.
+  @Input() lastAnswer!: InteractionAnswer | null;
   @Input() savedSolution!: InteractionAnswer | null;
   choices!: string[];
   choicesValue!: SubtitledHtml[];
@@ -467,7 +469,11 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.maxGroups = this.choices.length;
 
     let savedSolution = (
-      this.savedSolution !== null ? this.savedSolution : []
+      this.lastAnswer !== null && this.lastAnswer !== undefined
+        ? this.lastAnswer
+        : this.savedSolution !== null && this.savedSolution !== undefined
+          ? this.savedSolution
+          : []
     ) as DragAndDropAnswer;
 
     if (this.allowMultipleItemsInSamePosition) {

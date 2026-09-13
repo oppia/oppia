@@ -47,10 +47,17 @@
   margin-bottom: 20px;
   width: 50%;
 }
+.oppia-dropdown-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
 button.oppia-autofocus:focus {
   outline: 0;
 }
-.oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+.oppia-dashboard-language-container-label,
+.oppia-dashboard-topic-container-label,
+.oppia-dashboard-entity-type-container-label {
   align-items: center;
   color: #4a4a4a;
   display: flex;
@@ -232,14 +239,16 @@ button.oppia-autofocus:focus {
   top: 56px;
   z-index: 3;
 }
-.oppia-topic-selector {
+.oppia-topic-selector,
+.oppia-entity-type-selector {
   width: 100%;
 }
 .oppia-language-selector {
   padding-bottom: 10px;
   width: 100%;
 }
-.oppia-dashboard-topic-container {
+.oppia-dashboard-topic-container,
+.oppia-dashboard-entity-type-container {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
@@ -300,14 +309,23 @@ button.oppia-autofocus:focus {
     padding: 0 20px;
     width: 100%;
   }
-  .oppia-dashboard-language-container, .oppia-dashboard-topic-container {
+  .oppia-dropdown-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .oppia-dashboard-language-container,
+  .oppia-dashboard-topic-container,
+  .oppia-dashboard-entity-type-container {
     flex-direction: row;
     justify-content: space-between;
     margin: 0;
     margin-top: 10px;
     width: 100%;
   }
-  .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+  .oppia-dashboard-language-container-label,
+  .oppia-dashboard-topic-container-label,
+  .oppia-dashboard-entity-type-container-label {
     font-size: 18px;
     margin-right: 0;
     width: 175px;
@@ -365,15 +383,19 @@ button.oppia-autofocus:focus {
   .oppia-mascot-avatar-container {
     margin-left: 5px;
   }
-  .oppia-topic-selector {
+  .oppia-topic-selector,
+  .oppia-entity-type-selector {
     width: 90%;
   }
-  .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+  .oppia-dashboard-language-container-label,
+  .oppia-dashboard-topic-container-label,
+  .oppia-dashboard-entity-type-container-label {
     font-size: 16px;
     margin-right: 2vw;
     width: 90px;
   }
-  .oppia-dashboard-topic-container-label {
+  .oppia-dashboard-topic-container-label,
+  .oppia-dashboard-entity-type-container-label {
     margin-right: 0;
   }
   .oppia-mascot-container {

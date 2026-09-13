@@ -16,7 +16,7 @@
  * @fileoverview Component for the progress reminder modal.
  */
 
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -29,7 +29,6 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
   selector: 'oppia-progress-reminder-modal',
   templateUrl: './progress-reminder-modal.component.html',
   styleUrls: ['./progress-reminder-modal.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks,

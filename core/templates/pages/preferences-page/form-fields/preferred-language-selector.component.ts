@@ -18,6 +18,7 @@
 
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import './preferred-language-selector.component.css';
 interface Language {
   id: string;
   text: string;
@@ -27,6 +28,7 @@ interface Language {
 @Component({
   selector: 'oppia-preferred-language-selector',
   templateUrl: './preferred-language-selector.component.html',
+  styleUrls: ['./preferred-language-selector.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

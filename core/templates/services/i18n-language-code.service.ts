@@ -172,6 +172,28 @@ export class I18nLanguageCodeService {
     return this._HACKY_TRANSLATION_KEYS.indexOf(translationKey) !== -1;
   }
 
+  // TODO(#14645): Remove this method when translation service is extended.
+  /**
+   * Decides whether the hardcoded translation bundle should be displayed for
+   * a piece of content. A contributor translation supersedes the bundle,
+   * because it covers every exploration rather than the fixed set the bundle
+   * was built for, and it is the value reviewers accepted most recently.
+   * @param {string} translationKey - The bundle key for the content.
+   * @param {boolean} isTranslatedByBackend - Whether the backend already
+   * returned a contributor translation for this content.
+   * @returns {boolean} - Whether the bundle translation should be displayed.
+   */
+  isHackyTranslationDisplayed(
+    translationKey: string,
+    isTranslatedByBackend: boolean = false
+  ): boolean {
+    return (
+      !isTranslatedByBackend &&
+      this.isHackyTranslationAvailable(translationKey) &&
+      !this.isCurrentLanguageEnglish()
+    );
+  }
+
   get onI18nLanguageCodeChange(): EventEmitter<string> {
     return this.languageCodeChangeEventEmitter;
   }

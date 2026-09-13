@@ -263,12 +263,9 @@ def does_diff_include_ci_config_or_test_files(diff_files: List[bytes]) -> bool:
     """
 
     for file_path in diff_files:
-        if (
-            re.search(rb'ci-test-suite-configs/.*\.json', file_path)
-            or re.search(rb'wdio\.conf\.js', file_path)
-            or re.search(rb'webdriverio', file_path)
-            or re.search(rb'puppeteer-acceptance-tests', file_path)
-        ):
+        if re.search(
+            rb'ci-test-suite-configs/.*\.json', file_path
+        ) or re.search(rb'puppeteer-acceptance-tests', file_path):
             return True
     return False
 

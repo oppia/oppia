@@ -23,10 +23,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import './story-viewer-navbar-pre-logo-action.component.css';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-pre-logo-action',
   templateUrl: './story-viewer-navbar-pre-logo-action.component.html',
+  styleUrls: ['./story-viewer-navbar-pre-logo-action.component.css'],
 })
 export class StoryViewerNavbarPreLogoActionComponent
   implements OnInit, OnDestroy

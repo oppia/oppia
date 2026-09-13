@@ -28,7 +28,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Optional
+from typing import Dict, Optional
 
 
 class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
@@ -61,6 +61,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             response_list=[],
             unread_response_count=0,
             created_on_msecs=0,
+            last_updated_msecs=0,
         )
         create_lesson_feedback_mock = mock.Mock(return_value=feedback)
 
@@ -166,6 +167,103 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['summaries'][0]['id'], feedback.id)
         self.assertIsNone(response['next_cursor'])
         self.assertFalse(response['more'])
+
+    def _create_feedback_with_mixed_statuses(self) -> None:
+        """Creates three feedback entries with open, fixed and compliment
+        statuses for the viewer.
+        """
+        general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Open feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        fixed_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Fixed feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        general_feedback_services.update_lesson_feedback(
+            feedback_id=fixed_feedback.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            exp_id='exp_id',
+            responder_id=self.other_user_id,
+        )
+        compliment_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Compliment feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        general_feedback_services.update_lesson_feedback(
+            feedback_id=compliment_feedback.id,
+            new_status=feconf.STATUS_CHOICES_COMPLIMENT,
+            exp_id='exp_id',
+            responder_id=self.other_user_id,
+        )
+
+    def test_learner_can_list_own_feedback_without_status_filter(self) -> None:
+        self._create_feedback_with_mixed_statuses()
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(feconf.MY_FEEDBACK_URL)
+
+        self.assertEqual(len(response['summaries']), 3)
+
+    def test_learner_can_list_own_feedback_with_single_status_filter(
+        self,
+    ) -> None:
+        self._create_feedback_with_mixed_statuses()
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(
+                '%s?status=%s'
+                % (feconf.MY_FEEDBACK_URL, feconf.STATUS_CHOICES_FIXED)
+            )
+
+        self.assertEqual(len(response['summaries']), 1)
+        self.assertEqual(
+            response['summaries'][0]['status'], feconf.STATUS_CHOICES_FIXED
+        )
+
+    def test_learner_can_list_own_feedback_with_multiple_status_filters(
+        self,
+    ) -> None:
+        self._create_feedback_with_mixed_statuses()
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(
+                '%s?status=%s,%s'
+                % (
+                    feconf.MY_FEEDBACK_URL,
+                    feconf.STATUS_CHOICES_OPEN,
+                    feconf.STATUS_CHOICES_COMPLIMENT,
+                )
+            )
+
+        self.assertEqual(len(response['summaries']), 2)
+        returned_statuses = {
+            summary['status'] for summary in response['summaries']
+        }
+        self.assertEqual(
+            returned_statuses,
+            {feconf.STATUS_CHOICES_OPEN, feconf.STATUS_CHOICES_COMPLIMENT},
+        )
+
+    def test_learner_cannot_list_feedback_with_invalid_status_filter(
+        self,
+    ) -> None:
+        self._create_feedback_with_mixed_statuses()
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(
+                '%s?status=%s,invalid_status'
+                % (feconf.MY_FEEDBACK_URL, feconf.STATUS_CHOICES_OPEN),
+                expected_status_int=400,
+            )
+
+        self.assertIn(
+            'Invalid status filter values',
+            response['error'],
+        )
 
     def test_learner_can_get_own_feedback_detail(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
@@ -329,6 +427,110 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id),
             expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to view feedback.'
+        )
+
+
+class MyFeedbackUnreadCountHandlerTests(test_utils.GenericTestBase):
+    """Tests for MyFeedbackUnreadCountHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.signup('other@example.com', 'otheruser')
+        self.other_user_id = self.get_user_id_from_email('other@example.com')
+
+    def _get_lesson_metadata(
+        self,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': None,
+        }
+
+    def _respond_to_feedback(
+        self,
+        feedback_id: str,
+        responder_id: str,
+    ) -> None:
+        """Appends a creator response to the given feedback entry."""
+        general_feedback_services.update_lesson_feedback(
+            feedback_id=feedback_id,
+            new_status=feconf.STATUS_CHOICES_OPEN,
+            exp_id='exp_id',
+            responder_id=responder_id,
+            reply_text='Creator response.',
+        )
+
+    def test_returns_total_unread_count_across_all_feedback(self) -> None:
+        first_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='First feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        second_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Second feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        # Two responses on the first entry and one on the second.
+        self._respond_to_feedback(first_feedback.id, self.other_user_id)
+        self._respond_to_feedback(first_feedback.id, self.other_user_id)
+        self._respond_to_feedback(second_feedback.id, self.other_user_id)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(feconf.MY_FEEDBACK_UNREAD_COUNT_URL)
+
+        self.assertEqual(response, {'unread_count': 3})
+
+    def test_excludes_other_users_feedback_from_unread_count(self) -> None:
+        other_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        self._respond_to_feedback(other_feedback.id, self.viewer_id)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(feconf.MY_FEEDBACK_UNREAD_COUNT_URL)
+
+        self.assertEqual(response, {'unread_count': 0})
+
+    def test_unread_count_drops_after_viewing_feedback_detail(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        self._respond_to_feedback(feedback.id, self.other_user_id)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            before = self.get_json(feconf.MY_FEEDBACK_UNREAD_COUNT_URL)
+            self.assertEqual(before, {'unread_count': 1})
+
+            self.get_json('%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id))
+
+            after = self.get_json(feconf.MY_FEEDBACK_UNREAD_COUNT_URL)
+
+        self.assertEqual(after, {'unread_count': 0})
+
+    def test_returns_zero_when_learner_has_no_feedback(self) -> None:
+        with self.login_context(self.VIEWER_EMAIL):
+            response = self.get_json(feconf.MY_FEEDBACK_UNREAD_COUNT_URL)
+
+        self.assertEqual(response, {'unread_count': 0})
+
+    def test_logged_out_user_cannot_get_unread_count(self) -> None:
+        response = self.get_json(
+            feconf.MY_FEEDBACK_UNREAD_COUNT_URL, expected_status_int=401
         )
 
         self.assertEqual(
@@ -1174,4 +1376,139 @@ class LessonFeedbackHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'], 'You must be logged in to access this resource.'
+        )
+
+
+class FeedbackStatusCountsHandlerTests(test_utils.GenericTestBase):
+    """Tests for FeedbackStatusCountsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration('exp_id', self.owner_id)
+        self.signup('other@example.com', 'otheruser')
+        self.other_user_id = self.get_user_id_from_email('other@example.com')
+        self.save_new_valid_exploration('exp_id_2', self.other_user_id)
+
+    def _get_lesson_metadata(
+        self,
+        exp_id: str,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': exp_id,
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': None,
+        }
+
+    def _get_empty_counts(self) -> Dict[str, int]:
+        """Returns a counts dict with every status set to zero."""
+        counts: Dict[str, int] = {status: 0 for status in feconf.STATUS_CHOICES}
+        counts['total'] = 0
+        return counts
+
+    def test_returns_status_counts_for_lesson_feedback_and_reports(
+        self,
+    ) -> None:
+        general_feedback_services.create_lesson_feedback(
+            author_id=self.owner_id,
+            feedback_text='First open feedback.',
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+        )
+        fixed_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.owner_id,
+            feedback_text='Feedback to be marked as fixed.',
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+        )
+        general_feedback_services.update_lesson_feedback(
+            feedback_id=fixed_feedback.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            exp_id='exp_id',
+            responder_id=self.owner_id,
+        )
+        # Feedback for a different exploration must not be counted.
+        general_feedback_services.create_lesson_feedback(
+            author_id=self.owner_id,
+            feedback_text='Feedback for another exploration.',
+            lesson_metadata=self._get_lesson_metadata('exp_id_2'),
+        )
+
+        general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+        compliment_report = general_feedback_services.create_platform_report(
+            feedback_text='Great lesson.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+        general_feedback_services.update_platform_feedback_status_for_dashboard(
+            report_id=compliment_report.id,
+            new_status=feconf.STATUS_CHOICES_COMPLIMENT,
+            dashboard=feconf.DESTINATION_CURRICULUM,
+            dashboard_id='exp_id',
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json('/feedbackstatuscounts/exp_id')
+
+        expected_lesson_counts = self._get_empty_counts()
+        expected_lesson_counts[feconf.STATUS_CHOICES_OPEN] = 1
+        expected_lesson_counts[feconf.STATUS_CHOICES_FIXED] = 1
+        expected_lesson_counts['total'] = 2
+        expected_report_counts = self._get_empty_counts()
+        expected_report_counts[feconf.STATUS_CHOICES_OPEN] = 1
+        expected_report_counts[feconf.STATUS_CHOICES_COMPLIMENT] = 1
+        expected_report_counts['total'] = 2
+
+        self.assertEqual(
+            response['lesson_feedback_counts'], expected_lesson_counts
+        )
+        self.assertEqual(
+            response['platform_report_counts'], expected_report_counts
+        )
+
+    def test_returns_zero_counts_when_no_feedback_exists(self) -> None:
+        empty_counts = self._get_empty_counts()
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json('/feedbackstatuscounts/exp_id')
+
+        self.assertEqual(response['lesson_feedback_counts'], empty_counts)
+        self.assertEqual(response['platform_report_counts'], empty_counts)
+
+    def test_logged_out_user_cannot_get_status_counts(self) -> None:
+        response = self.get_json(
+            '/feedbackstatuscounts/exp_id', expected_status_int=401
+        )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+
+    def test_non_editor_cannot_get_status_counts(self) -> None:
+        with self.login_context('other@example.com'):
+            response = self.get_json(
+                '/feedbackstatuscounts/exp_id', expected_status_int=401
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to edit this exploration.',
         )

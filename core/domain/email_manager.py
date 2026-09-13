@@ -721,6 +721,7 @@ def _send_email(
             taskqueue_services.enqueue_task(
                 feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
             )
+            return
 
         email_models.SentEmailModel.create(
             recipient_id,
@@ -3181,6 +3182,7 @@ def send_email_to_new_cd_user(
         logging.error('This app cannot send emails to users.')
         return
 
+    email_body = ''
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
     if category in [

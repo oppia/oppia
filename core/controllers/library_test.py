@@ -34,6 +34,8 @@ from core.domain import (
     rights_domain,
     rights_manager,
     summary_services,
+    translation_domain,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -762,6 +764,43 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             response_dict['activity_list'][0],
         )
 
+    def test_library_group_index_handler_with_display_in_language_code(
+        self,
+    ) -> None:
+        """Test library group index handler with display_in_language_code."""
+        exp_services.load_demo('0')
+        exp_summary = exp_fetchers.get_exploration_summary_by_id('0')
+
+        translated_title = translation_domain.TranslatedContent(
+            'Hindi Welcome Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={
+                'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
+                'display_in_language_code': 'hi',
+            },
+        )
+        self.assertEqual(len(response_dict['activity_list']), 1)
+        self.assertEqual(
+            response_dict['activity_list'][0]['title'], 'Hindi Welcome Title'
+        )
+        self.assertEqual(
+            response_dict['activity_list'][0]['translated_metadata_fields'],
+            ['title'],
+        )
+
     def test_handler_for_top_rated_library_group_page(self) -> None:
         """Test library handler for top rated group page."""
 
@@ -943,6 +982,41 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
+
+        self.logout()
+
+    def test_can_get_translated_exploration_summaries(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(
+            self.PUBLIC_EXP_ID_EDITOR
+        )
+        translated_title = translation_domain.TranslatedContent(
+            'Public Exploration Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.PUBLIC_EXP_ID_EDITOR,
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps([self.PUBLIC_EXP_ID_EDITOR]),
+                'display_in_language_code': 'hi',
+            },
+        )
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(
+            summaries[0]['title'], 'Public Exploration Hindi Title'
+        )
 
         self.logout()
 

@@ -545,4 +545,34 @@ describe('FeedbackDetailPageComponent', () => {
     fixture.detectChanges();
     expect(component.getGithubIssueUrl()).toBe('');
   });
+
+  it('should return null string for getParentFeedbackUrl if detailResponse is PlatformfeedbackDetailresponse', () => {
+    expect(
+      component.getParentFeedbackUrl(mockPlatformFeedbackDetailResponse)
+    ).toBe(null);
+  });
+
+  it('should return null for getParentFeedbackUrl if parent_feedback_id is missing', () => {
+    const lessonFeedback = {
+      ...mockLessonFeedbackDetailresponse,
+      parent_feedback_id: null,
+    };
+
+    expect(component.getParentFeedbackUrl(lessonFeedback)).toBe(null);
+  });
+
+  it('should construct the parent feedback URL for lesson feedback', () => {
+    const lessonFeedback = {
+      ...mockLessonFeedbackDetailresponse,
+      parent_feedback_id: 'parent1',
+      lesson_metadata: {
+        ...mockLessonMetadata,
+        exploration_id: 'exp1',
+      },
+    };
+
+    expect(component.getParentFeedbackUrl(lessonFeedback)).toBe(
+      '/create/exp1#/feedback/lesson_feedback/parent1'
+    );
+  });
 });

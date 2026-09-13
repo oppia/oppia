@@ -17,11 +17,14 @@
  */
 
 import {
+  CertificateAssessmentAttemptData,
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   AvailableCertificateAssessmentOfferingBackendDict,
+  createAssessmentQuestionFromStateData,
 } from './certificate-assessment.model';
+import {StateBackendDict} from 'domain/state/state.model';
 
 describe('Available Certificate Assessment Offering Data Model', () => {
   let backendDict: AvailableCertificateAssessmentOfferingBackendDict;
@@ -162,5 +165,68 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.totalQuestions).toEqual(20);
     expect(offering.timeLimitInMinutes).toEqual(90);
     expect(offering.demonstrates).toEqual(['Learn math']);
+  });
+});
+
+describe('Certificate Assessment Attempt Data Model', () => {
+  it('should correctly create an instance via the constructor', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>Question</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+    const attempt = new CertificateAssessmentAttemptData('attempt_id_1', [
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData},
+    ]);
+
+    expect(attempt.attemptId).toEqual('attempt_id_1');
+    expect(attempt.questions).toEqual([
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData},
+    ]);
+  });
+
+  it('should correctly create an instance from a backend dict', () => {
+    const stateData1 = {
+      content: {content_id: 'content', html: '<p>Question 1</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+    const stateData2 = {
+      content: {content_id: 'content', html: '<p>Question 2</p>'},
+      interaction: {id: 'NumericInput'},
+    } as StateBackendDict;
+    const attempt = CertificateAssessmentAttemptData.createFromBackendDict({
+      attempt_id: 'attempt_id_1',
+      questions: [
+        {
+          question_id: 'q1',
+          question_version: 1,
+          question_state_data: stateData1,
+        },
+        {
+          question_id: 'q2',
+          question_version: 2,
+          question_state_data: stateData2,
+        },
+      ],
+    });
+
+    expect(attempt.attemptId).toEqual('attempt_id_1');
+    expect(attempt.questions).toEqual([
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData1},
+      {questionId: 'q2', questionVersion: 2, questionStateData: stateData2},
+    ]);
+  });
+});
+
+describe('createAssessmentQuestionFromStateData', () => {
+  it('should create an AssessmentQuestion from question state data', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>What is 2+2?</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+
+    const question = createAssessmentQuestionFromStateData('q1', stateData);
+
+    expect(question.id).toBe('q1');
+    expect(question.prompt).toBe('<p>What is 2+2?</p>');
   });
 });

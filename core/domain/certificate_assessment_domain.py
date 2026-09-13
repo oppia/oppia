@@ -32,6 +32,9 @@ MIN_TIME_LIMIT_IN_MINUTES = 5
 MAX_TIME_LIMIT_IN_MINUTES = 60
 MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
+# Minimum time (in minutes) that must elapse between a learner's last
+# attempt start and their next attempt start for the same certificate.
+MIN_TIME_BETWEEN_ATTEMPTS_IN_MINUTES = 10
 
 # Maximum size in bytes of a serialized selected_answer for a certificate
 # assessment. Each response is stored in its own Datastore entity, so this

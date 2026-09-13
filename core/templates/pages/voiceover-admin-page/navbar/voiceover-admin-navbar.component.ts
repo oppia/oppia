@@ -21,10 +21,12 @@ import {Component, OnInit} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
+import './voiceover-admin-navbar.component.css';
 
 @Component({
   selector: 'oppia-voiceover-admin-navbar',
   templateUrl: './voiceover-admin-navbar.component.html',
+  styleUrls: ['./voiceover-admin-navbar.component.css'],
 })
 export class VoiceoverAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

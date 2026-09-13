@@ -2,7 +2,9 @@
   margin: 0 auto;
   max-width: 925px;
   padding-top: 6vh;
+  position: relative;
   width: min(100%, calc(100vw - 32px));
+  z-index: 1;
 }
 
 .certificate-assessment-progress-card {
@@ -86,47 +88,6 @@
   padding: 10px 20px;
 }
 
-.certificate-assessment-options {
-  display: grid;
-  gap: 14px;
-  margin: 20px;
-}
-
-.certificate-assessment-option-row {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  gap: 12px;
-}
-
-.certificate-assessment-radio,
-.certificate-assessment-checkbox {
-  accent-color: #0d47a1;
-  border: 2px solid #0d48a1;
-  height: 16px;
-  width: 16px;
-}
-
-.certificate-assessment-option-text {
-  color: #0d48a1;
-  font-family: 'Roboto', sans-serif;
-  font-size: 15px;
-}
-
-.certificate-assessment-free-response {
-  padding: 10px 20px 15px;
-}
-
-.certificate-assessment-free-response-input {
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  padding: 10px 14px;
-  width: 100%;
-}
-
 .certificate-assessment-actions {
   align-items: center;
   display: flex;
@@ -169,6 +130,10 @@
   height: 16px;
 }
 
+.conversation-skin-interaction-container {
+  padding: 0 30px 10px;
+}
+
 @media screen and (max-width: 959px) {
   .certificate-assessment-conversation-skin {
     width: 100%;
@@ -205,14 +170,6 @@
   .certificate-assessment-prompt-pill {
     margin: 20px 12px 12px 16px;
     min-width: 0;
-  }
-
-  .certificate-assessment-options {
-    margin: 16px 12px;
-  }
-
-  .certificate-assessment-free-response {
-    padding: 10px 12px 15px;
   }
 
   .certificate-assessment-navigation-link,

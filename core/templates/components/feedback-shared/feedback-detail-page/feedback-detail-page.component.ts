@@ -485,4 +485,20 @@ export class FeedbackDetailPageComponent {
     this.replyText = '';
     this.isSendingReply = false;
   }
+
+  getParentFeedbackUrl(
+    feedback: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string | null {
+    if (this.isPlatformFeedbackDetailResponse(feedback)) {
+      return null;
+    }
+    if (!feedback.parent_feedback_id) {
+      return null;
+    }
+
+    return (
+      `/create/${encodeURIComponent(feedback.lesson_metadata.exploration_id)}` +
+      `#/feedback/lesson_feedback/${encodeURIComponent(feedback.parent_feedback_id)}`
+    );
+  }
 }

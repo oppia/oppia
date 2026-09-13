@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the about page.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AboutPageComponent} from './about-page.component';

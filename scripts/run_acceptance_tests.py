@@ -209,7 +209,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         stack.enter_context(
             servers.managed_dev_appserver(
                 app_yaml_path,
-                port=common.GAE_PORT_FOR_E2E_TESTING,
+                port=common.GAE_PORT_FOR_ACCEPTANCE_TESTING,
                 log_level=args.server_log_level,
                 # Automatic restart can be disabled since we don't expect code
                 # changes to happen while the acceptance tests are running.
@@ -247,8 +247,8 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                     # non-unicode strings.
                     line = line.encode('utf-8')  # pragma: no cover
                 output_lines.append(line.rstrip())
-                # Replaces non-ASCII characters with '?'.
-                common.write_stdout_safe(line.decode('ascii', errors='replace'))
+                # Decodes UTF-8 output, replacing invalid byte sequences.
+                common.write_stdout_safe(line.decode('utf-8', errors='replace'))
             # The poll() method returns None while the process is running,
             # otherwise it returns the return code of the process (an int).
             if proc.poll() is not None:

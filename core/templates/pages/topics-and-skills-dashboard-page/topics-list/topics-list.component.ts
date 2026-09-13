@@ -27,10 +27,12 @@ import {AlertsService} from 'services/alerts.service';
 import {DeleteTopicModalComponent} from '../modals/delete-topic-modal.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import constants from 'assets/constants';
+import './topics-list.component.css';
 
 @Component({
   selector: 'oppia-topics-list',
   templateUrl: './topics-list.component.html',
+  styleUrls: ['./topics-list.component.css'],
 })
 export class TopicsListComponent {
   // These properties are initialized using Angular lifecycle hooks

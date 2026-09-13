@@ -25,10 +25,12 @@ import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-ed
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import './create-new-topic-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-topic-modal',
   templateUrl: './create-new-topic-modal.component.html',
+  styleUrls: ['./create-new-topic-modal.component.css'],
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;

@@ -19,7 +19,7 @@ from __future__ import annotations
 import urllib.parse
 
 from core import feconf, utils
-from core.domain import email_manager, general_feedback_domain
+from core.domain import email_manager, exp_services, general_feedback_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, Union, cast
@@ -81,6 +81,7 @@ def _lesson_feedback_model_to_domain(
         response_list=sanitized_responses,
         unread_response_count=model.unread_response_count,
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
+        last_updated_msecs=utils.get_time_in_millisecs(model.last_updated),
     )
 
 
@@ -320,30 +321,52 @@ def get_lesson_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
+    status_filters = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.LessonFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             exploration_id=exploration_id,
-            status_filter=status_filter,
+            status_filter=status_filters,
             date_from=date_from,
             date_to=date_to,
         )
     )
     # Here we use cast because PlatformFeedbackModel.fetch_page() inherits its
     # return annotation from BaseFeedbackModel.fetch_page().
-    summaries = [
+    domain_objects = [
         _lesson_feedback_model_to_domain(
             cast(general_feedback_models.LessonFeedbackModel, model)
-        ).to_summary_dict()
+        )
         for model in model_list
+    ]
+
+    # Batch-fetch exploration titles once per page rather than once per
+    # feedback entry, to avoid an N+1 query pattern.
+    exp_ids = list(
+        {
+            domain_object.lesson_metadata['exploration_id']
+            for domain_object in domain_objects
+        }
+    )
+    exp_titles_and_categories = (
+        exp_services.get_exploration_titles_and_categories(exp_ids)
+    )
+
+    summaries = [
+        domain_object.to_summary_dict(
+            exp_titles_and_categories.get(
+                domain_object.lesson_metadata['exploration_id'], {}
+            ).get('title'),
+        )
+        for domain_object in domain_objects
     ]
     return summaries, next_cursor, more
 
 
 def get_learner_feedback_summaries(
     author_id: str,
-    status_filter: Optional[str] = None,
+    status_filter: Optional[List[str]] = None,
     cursor: Optional[str] = None,
     date_from_msecs: Optional[float] = None,
     date_to_msecs: Optional[float] = None,
@@ -356,8 +379,8 @@ def get_learner_feedback_summaries(
 
     Args:
         author_id: str. The learner user ID.
-        status_filter: Optional[str]. If provided, only return feedback with
-            this status.
+        status_filter: Optional[List[str]]. If provided, only return feedback with
+            these status.
         cursor: Optional[str]. Pagination cursor from a previous response.
         date_from_msecs: Optional[float]. If provided, only return feedback
             created after this time.
@@ -389,15 +412,37 @@ def get_learner_feedback_summaries(
             status_filter=status_filter,
             date_from=date_from,
             date_to=date_to,
+            order_by_last_updated=True,
         )
     )
     # Here we use cast because LessonFeedbackModel.fetch_page() inherits its
     # return annotation from BaseFeedbackModel.fetch_page().
-    summaries = [
+    domain_objects = [
         _lesson_feedback_model_to_domain(
             cast(general_feedback_models.LessonFeedbackModel, model)
-        ).to_summary_dict()
+        )
         for model in model_list
+    ]
+
+    # Batch-fetch exploration titles once per page rather than once per
+    # feedback entry, to avoid an N+1 query pattern.
+    exp_ids = list(
+        {
+            domain_object.lesson_metadata['exploration_id']
+            for domain_object in domain_objects
+        }
+    )
+    exp_titles_and_categories = (
+        exp_services.get_exploration_titles_and_categories(exp_ids)
+    )
+
+    summaries = [
+        domain_object.to_summary_dict(
+            exp_titles_and_categories.get(
+                domain_object.lesson_metadata['exploration_id'], {}
+            ).get('title'),
+        )
+        for domain_object in domain_objects
     ]
     return summaries, next_cursor, more
 
@@ -420,11 +465,29 @@ def get_learner_feedback(
     )
     if model is None or model.author_id != author_id:
         return None
-
-    model.unread_response_count = 0
-    model.update_timestamps()
-    model.put()
+    if model.unread_response_count > 0:
+        model.unread_response_count = 0
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
     return _lesson_feedback_model_to_domain(model)
+
+
+def get_learner_unread_feedback_count(author_id: str) -> int:
+    """Returns the learner's global unread feedback response count.
+
+    The count spans every non-deleted lesson feedback entry authored by the
+    learner, regardless of status or list pagination, so it can be used as a
+    stable total for the My Suggestions tab indicator.
+
+    Args:
+        author_id: str. The learner user ID.
+
+    Returns:
+        int. The total number of unread creator responses.
+    """
+    return general_feedback_models.LessonFeedbackModel.get_total_unread_response_count(
+        author_id=author_id
+    )
 
 
 def _append_lesson_feedback_model_response(
@@ -490,17 +553,22 @@ def update_lesson_feedback(
         raise ValueError('Invalid exploration ID: %s' % exp_id)
     old_status = model.status
     model.status = new_status
+    status_changed_to_fixed = (
+        old_status != new_status and new_status == feconf.STATUS_CHOICES_FIXED
+    )
     if reply_text is not None:
         _append_lesson_feedback_model_response(
             model=model,
             response_text=reply_text,
             responder_id=responder_id,
         )
+    elif status_changed_to_fixed:
+        model.unread_response_count += 1
     model.update_timestamps()
     model.put()
     feedback = _lesson_feedback_model_to_domain(model)
 
-    if old_status != new_status:
+    if status_changed_to_fixed:
         email_manager.send_feedback_status_change_email(
             feedback,
             author_id=model.author_id,
@@ -701,13 +769,14 @@ def get_platform_feedback_summaries(
         if date_to_msecs is not None
         else None
     )
+    status_filters = [status_filter] if status_filter else None
     model_list, next_cursor, more = (
         general_feedback_models.PlatformFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
             destination_dashboard=dashboard_filter,
             exploration_id=exploration_id,
-            status_filter=status_filter,
+            status_filter=status_filters,
             date_from=date_from,
             date_to=date_to,
         )
@@ -721,6 +790,41 @@ def get_platform_feedback_summaries(
         for model in model_list
     ]
     return summaries, next_cursor, more
+
+
+def get_feedback_and_report_status_counts(
+    exp_id: str,
+) -> general_feedback_domain.FeedbackStatusCountsDict:
+    """Returns per-status counts of lesson feedback and platform reports.
+
+    Counts every non-deleted LessonFeedbackModel and PlatformFeedbackModel
+    entry that belongs to the given exploration, grouped by moderation
+    status.
+
+    Args:
+        exp_id: str. The exploration id to retrieve counts for.
+
+    Returns:
+        FeedbackStatusCountsDict. A dict with two keys:
+            lesson_feedback_counts: dict mapping each status choice to the
+                number of lesson feedback entries with that status, plus a
+                'total' key.
+            platform_report_counts: dict mapping each status choice to the
+                number of issue reports with that status, plus a 'total'
+                key.
+    """
+    return {
+        'lesson_feedback_counts': (
+            general_feedback_models.LessonFeedbackModel.get_status_counts(
+                exploration_id=exp_id
+            )
+        ),
+        'platform_report_counts': (
+            general_feedback_models.PlatformFeedbackModel.get_status_counts(
+                exploration_id=exp_id
+            )
+        ),
+    }
 
 
 def _update_platform_feedback_model_status(

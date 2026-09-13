@@ -456,6 +456,21 @@ class StartCertificateAssessmentHandler(
                     self.normalized_payload['certificate_id'], self.user_id
                 )
             )
+        except (
+            certificate_assessment_services.CertificateAssessmentAttemptCooldownException
+        ) as e:
+            # Surface a structured error so the frontend can translate it via
+            # its translate pipes, instead of a hardcoded English string.
+            self.error(429)
+            self.render_json(
+                {
+                    'error': ('I18N_CERTIFICATE_ASSESSMENT_COOLDOWN_ERROR'),
+                    'error_type': 'cooldown',
+                    'remaining_minutes': e.remaining_minutes,
+                    'status_code': 429,
+                }
+            )
+            return
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
         except (
@@ -512,35 +527,6 @@ class SubmitCertificateAssessmentHandler(
             raise self.InvalidInputException(e) from e
         self.render_json(
             {'attempt_id': attempt.attempt_id, 'is_submitted': True}
-        )
-
-
-class CertificateQuestionHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Fetches question state data for an in-progress certificate attempt."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'attempt_id': {'schema': {'type': 'basestring'}},
-        'question_id': {'schema': {'type': 'basestring'}},
-    }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_access_certificate_assessment_attempt
-    def get(self, attempt_id: str, question_id: str) -> None:
-        assert self.user_id is not None
-        try:
-            question_state_data = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                self.user_id, attempt_id, question_id
-            )
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e) from e
-        self.render_json(
-            {
-                'question_id': question_id,
-                'question_state_data': question_state_data,
-            }
         )
 
 

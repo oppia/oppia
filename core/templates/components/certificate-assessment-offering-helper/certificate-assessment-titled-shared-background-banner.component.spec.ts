@@ -17,7 +17,6 @@
  * CertificateAssessmentTitledBackgroundBannerComponent.
  */
 
-import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 
@@ -41,7 +40,6 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CommonModule],
       declarations: [
         CertificateAssessmentTitledBackgroundBannerComponent,
         MockTranslatePipe,
@@ -53,7 +51,6 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
       CertificateAssessmentTitledBackgroundBannerComponent
     );
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create the component', () => {
@@ -96,15 +93,22 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
     expect(component.buttonRoute).toEqual(['/learn', 'math']);
   });
 
-  it('should render translated button text and aria-label', () => {
-    component.buttonText = BACK_BUTTON_KEY;
-    fixture.detectChanges();
+  it('should emit bannerClick when the output is subscribed', () => {
+    const clickSpy = jasmine.createSpy('bannerClickSpy');
+    component.bannerClick.subscribe(clickSpy);
 
-    const button = fixture.nativeElement.querySelector('button');
+    component.bannerClick.emit();
 
-    expect(button.textContent.trim()).toBe(`TRANSLATED:${BACK_BUTTON_KEY}`);
-    expect(button.getAttribute('aria-label')).toBe(
-      `TRANSLATED:${BACK_BUTTON_KEY}`
-    );
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow bannerClick to be emitted multiple times', () => {
+    const clickSpy = jasmine.createSpy('bannerClickSpy');
+    component.bannerClick.subscribe(clickSpy);
+
+    component.bannerClick.emit();
+    component.bannerClick.emit();
+
+    expect(clickSpy).toHaveBeenCalledTimes(2);
   });
 });

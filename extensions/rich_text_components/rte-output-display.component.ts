@@ -268,6 +268,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
+        // Preserve list container structure so ordered list numbering does not
+        // reset for every item after sentence-wrapping traversal.
+        if (currentNodeName === 'OL' || currentNodeName === 'UL') {
+          const listNode = node.cloneNode() as HTMLElement;
+          updatedChildNodes.forEach(child => {
+            listNode.appendChild(child);
+          });
+          return listNode;
+        }
+
         let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);

@@ -766,6 +766,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         updated_cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
 
+        child_task_run_id = None
         for cloud_run in updated_cloud_task_runs:
             if (
                 cloud_run.function_id
@@ -773,6 +774,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             ):
                 child_task_run_id = cloud_run.task_run_id
 
+        assert child_task_run_id is not None
         voiceover_services.regenerate_voiceovers_for_batch_contents(
             self.exploration_id, task_run_id, child_task_run_id
         )
@@ -890,6 +892,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         updated_cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
 
+        child_task_run_id = None
         for cloud_run in updated_cloud_task_runs:
             if (
                 cloud_run.function_id
@@ -897,6 +900,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             ):
                 child_task_run_id = cloud_run.task_run_id
 
+        assert child_task_run_id is not None
         voiceover_services.regenerate_voiceovers_for_batch_contents(
             self.exploration_id, task_run_id, child_task_run_id
         )
@@ -1193,6 +1197,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             key=lambda task_run: task_run.created_on,
         )
         second_iter_child_task_run_ids = []
+        second_iter_parent_task_run_id = None
         for cloud_run in updated_cloud_task_runs:
             if (
                 cloud_run.function_id
@@ -1206,6 +1211,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
                 == 'regenerate_voiceovers_on_exploration_update'
             ):
                 second_iter_parent_task_run_id = cloud_run.task_run_id
+
+        assert second_iter_parent_task_run_id is not None
 
         for child_task_run_id in second_iter_child_task_run_ids:
             voiceover_services.regenerate_voiceovers_for_batch_contents(

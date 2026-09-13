@@ -45,7 +45,7 @@ RESPONSE_LIST: List[general_feedback_domain.LessonFeedbackResponseDict] = [
         'responded_on': 1700000001000.0,
     },
     {
-        'response_text': 'Pushed a fix in v4.',
+        'response_text': 'N' * 110,
         'responded_on': 1700000002000.0,
     },
 ]
@@ -76,6 +76,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
         self.assertEqual(feedback.to_dict(), expected_dict)
@@ -84,9 +85,12 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
         expected_dict: general_feedback_domain.LessonFeedbackSummaryDict = {
             'id': 'feedback_id',
             'feedback_text_preview': f'{"N" * 97}...',
+            'latest_response_preview': f'{"N" * 97}...',
             'status': 'open',
             'source': 'lesson',
+            'lesson_title': 'exp1',
             'unread_response_count': 0,
+            'last_updated_msecs': 1700000000000.0,
         }
 
         feedback = general_feedback_domain.LessonFeedback(
@@ -99,9 +103,10 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
-        self.assertEqual(feedback.to_summary_dict(), expected_dict)
+        self.assertEqual(feedback.to_summary_dict('exp1'), expected_dict)
 
     def test_to_learner_dict(self) -> None:
         expected_dict: general_feedback_domain.LessonFeedbackDict = {
@@ -125,6 +130,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             response_list=RESPONSE_LIST,
             unread_response_count=0,
             created_on_msecs=1700000000000.0,
+            last_updated_msecs=1700000000000.0,
         )
 
         self.assertEqual(feedback.to_learner_dict(), expected_dict)

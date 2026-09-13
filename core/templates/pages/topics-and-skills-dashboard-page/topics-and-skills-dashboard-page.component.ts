@@ -37,6 +37,7 @@ import {
 } from './topics-and-skills-dashboard-page.constants';
 import {TopicsAndSkillsDashboardPageService} from './topics-and-skills-dashboard-page.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './topics-and-skills-dashboard-page.component.css';
 
 type TopicPublishedOptionsKeys =
   keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS;
@@ -52,6 +53,7 @@ type SkillStatusOptionsKeys =
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page',
   templateUrl: './topics-and-skills-dashboard-page.component.html',
+  styleUrls: ['./topics-and-skills-dashboard-page.component.css'],
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();

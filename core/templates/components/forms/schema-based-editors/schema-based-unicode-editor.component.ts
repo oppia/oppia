@@ -16,10 +16,7 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// TODO(#16309): Fix relative imports.
-import '../../../third-party-imports/codemirror.import';
+import 'third-party-imports/codemirror.import';
 import {
   Component,
   EventEmitter,
@@ -81,6 +78,7 @@ export class SchemaBasedUnicodeEditor
         rows: string[];
         placeholder: string;
         coding_mode: string;
+        languageDirection?: string;
       }
     | undefined;
 
@@ -224,6 +222,10 @@ export class SchemaBasedUnicodeEditor
     } else {
       return this.uiConfig.coding_mode;
     }
+  }
+
+  getLanguageDirection(): string {
+    return this.uiConfig?.languageDirection ?? 'auto';
   }
 
   ngOnDestroy(): void {

@@ -152,10 +152,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
-    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
@@ -173,6 +169,10 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -290,7 +290,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
@@ -319,7 +319,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK.value: (
@@ -327,14 +327,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the highlighting of sentences during the '
             'automatic voiceover playback in the exploration player and '
             'editor pages.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
         (
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (

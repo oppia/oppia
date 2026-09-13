@@ -1,15 +1,15 @@
 <oppia-titled-background-banner [title]="'I18N_CERTIFICATE_ASSESSMENT'"
                                 [buttonText]="'I18N_CERTIFICATE_ASSESSMENT_BACK_BUTTON'"
-                                [buttonRoute]="['/learn', 'math', 'certificate-offering-available']">
+                                [buttonRoute]="['/learn', classroomUrlFragment, 'certificate-offering-available']">
 </oppia-titled-background-banner>
 <div class="intro-card-container">
   <div class="intro-card">
-    <h1 class="certificate-title">{{ certificateTitle | titlecase }}</h1>
-    <p class="certificate-description">{{ certificateDescription }}</p>
+    <h1 class="certificate-title">{{ certificateOffering.title | titlecase }}</h1>
+    <p class="certificate-description">{{ certificateOffering.description }}</p>
     <div class="demonstrates-box">
       <p class="demonstrates-heading">{{ demonstratesHeadingI18nKey | translate }}</p>
       <ul class="demonstrates-list">
-        <li *ngFor="let item of demonstratesList">{{ item | titlecase }}</li>
+        <li *ngFor="let item of certificateOffering.demonstrates">{{ item | titlecase }}</li>
       </ul>
     </div>
 
@@ -19,11 +19,22 @@
     </p>
 
     <div class="topics-row">
-      <div class="topic-tile" *ngFor="let topic of recommendedTopics"
-           [ngClass]="topic.colorClass">
-        <div class="topic-tile-info">
-          <p class="topic-name">{{ topic.name | titlecase }}</p>
-          <p class="topic-lessons">{{ topic.lessonCount }} Lessons</p>
+      <div class="topic-tile" *ngFor="let topicSummary of recommendedTopicSummaries">
+        <div class="recommended-topic-card">
+          <img class="recommended-topic-thumbnail"
+               [src]="getTopicThumbnailUrl(topicSummary)"
+               alt="">
+          <div class="recommended-topic-details">
+            <div class="recommended-topic-title">{{ topicSummary.getName() }}</div>
+            <div class="recommended-topic-lessons-count">
+              {{ topicSummary.getTotalPublishedNodeCount() }}
+              <span [innerHTML]="lessonsCountI18nKey | translate: {
+                  lessonCountValue: topicSummary.getTotalPublishedNodeCount(),
+                  messageFormat: true
+                }">
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

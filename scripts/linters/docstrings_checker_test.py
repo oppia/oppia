@@ -70,7 +70,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
 
         temp = node.getattr('func')
         setter_property = docstrings_checker.get_setters_property(temp[0])
-        self.assertEqual(isinstance(setter_property, astroid.FunctionDef), True)
+        self.assertEqual(
+            isinstance(setter_property, astroid.nodes.FunctionDef), True
+        )
 
     def test_get_setters_property_with_setter_no_property(self) -> None:
         testnode2 = astroid.extract_node(
@@ -260,7 +262,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         node_ignores_exception_swap = self.swap(
             utils,
             'node_ignores_exception',
-            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()),
+            lambda _, __: (_ for _ in ()).throw(
+                astroid.exceptions.InferenceError()
+            ),
         )
 
         with node_ignores_exception_swap:

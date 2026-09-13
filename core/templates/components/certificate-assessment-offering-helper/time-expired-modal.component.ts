@@ -19,6 +19,7 @@
 import {Component, Optional} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {CertificateAssessmentPlayerPageConstants} from '../../pages/certificate-assessment-player-page/certificate-assessment-player-page.constants';
 import './time-expired-modal.component.css';
 
 @Component({
@@ -42,9 +43,13 @@ export class TimeExpiredModalComponent {
 
   viewResults(): void {
     if (this.ngbActiveModal) {
-      this.ngbActiveModal.close();
+      this.ngbActiveModal.close(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     } else if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss();
+      this.bottomSheetRef.dismiss(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     }
   }
 }

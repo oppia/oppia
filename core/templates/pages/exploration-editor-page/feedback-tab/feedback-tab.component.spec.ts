@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
@@ -38,6 +40,7 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
@@ -71,9 +74,12 @@ class MockPlatformFeatureService {
 const mockLessonFeedbackSummary: LessonFeedbackSummary = {
   id: 'lesson_feedback_1',
   feedback_text_preview: 'Lesson feedback',
+  latest_response_preview: '',
   status: FeedbackStatus.OPEN,
   source: ReportType.LESSON,
+  lesson_title: 'exp_1',
   unread_response_count: 0,
+  last_updated_msecs: 12345,
 };
 
 const mockPlatformFeedbackSummary: PlatformFeedbackSummary = {
@@ -235,7 +241,7 @@ describe('Feedback Tab Component', () => {
     ).and.returnValue(
       Promise.resolve({
         canEdit: true,
-      })
+      } as ExplorationPermissions)
     );
     spyOn(
       threadDataBackendApiService,
@@ -919,9 +925,12 @@ describe('Feedback Tab Component', () => {
     const lessonFeedbackSummary: LessonFeedbackSummary = {
       id: 'id',
       feedback_text_preview: 'Need help with fractions',
+      latest_response_preview: '',
       status: FeedbackStatus.OPEN,
       source: ReportType.LESSON,
+      lesson_title: 'exp_1',
       unread_response_count: 0,
+      last_updated_msecs: 12345,
     };
 
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =

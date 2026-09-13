@@ -1148,7 +1148,7 @@ class AdminHandler(
                 for i in range(len(story_node_dicts))
             ]
             story.story_contents.add_arc(
-                story_domain.Arc('default_arc', 'Adventure 1', '', node_ids)
+                story_domain.Arc('default_arc', 'Module 1', '', node_ids)
             )
 
             skill_services.save_new_skill(self.user_id, skill_1)
@@ -1197,6 +1197,16 @@ class AdminHandler(
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story
             )
+            opportunity_services.create_translation_opportunity(
+                {
+                    feconf.ENTITY_TYPE_SKILL: [
+                        skill_id_1,
+                        skill_id_2,
+                        skill_id_3,
+                    ]
+                },
+                topic_ids=[topic_id_1],
+            )
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
@@ -1223,6 +1233,10 @@ class AdminHandler(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>'
             )
             skill_services.save_new_skill(self.user_id, skill)
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_SKILL: [skill_id]},
+                topic_ids=['dummyTopicId'],
+            )
             for i in range(15):
                 question_id = question_services.get_new_question_id()
                 question_name = 'Question number %s %s' % (str(i), skill_name)
@@ -1478,7 +1492,7 @@ class AdminHandler(
                             {
                                 'cmd': 'create_arc',
                                 'arc_id': 'default_arc',
-                                'title': 'Adventure 1',
+                                'title': 'Module 1',
                                 'description': '',
                                 'node_ids': existing_node_ids,
                             }
@@ -1621,7 +1635,7 @@ class AdminHandler(
                 ]
                 story.story_contents.add_arc(
                     story_domain.Arc(
-                        'default_arc', 'Adventure 1', '', story_node_ids
+                        'default_arc', 'Module 1', '', story_node_ids
                     )
                 )
                 skill_services.save_new_skill(self.user_id, skill)
@@ -1649,6 +1663,10 @@ class AdminHandler(
             exp_ids_in_story = exploration_ids_to_publish
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story
+            )
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_SKILL: [skill_id]},
+                topic_ids=[topic_id],
             )
 
             topic_services.publish_story(topic_id, story_id, self.user_id)
@@ -2298,7 +2316,7 @@ class AdminHandler(
                         {
                             'cmd': 'create_arc',
                             'arc_id': 'default_arc',
-                            'title': 'Adventure 1',
+                            'title': 'Module 1',
                             'description': '',
                             'node_ids': existing_node_ids,
                         }

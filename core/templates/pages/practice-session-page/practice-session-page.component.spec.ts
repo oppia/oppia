@@ -386,4 +386,32 @@ describe('Practice session page', () => {
       'abbrev-topic/mastery-challenge'
     );
   }));
+
+  it('should append arc mastered markers to dashboard URL for arc sessions', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+    spyOn(urlService, 'getArcIdFromUrl').and.returnValue('1');
+    spyOn(urlService, 'getNodeIdFromPracticeUrl').and.returnValue(null);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    const dashboardActionButton =
+      component.questionPlayerConfig.resultActionButtons.find(
+        (button: {type: string}) => button.type === 'DASHBOARD'
+      );
+    expect(dashboardActionButton?.url).toContain('arc_mastered=true');
+    expect(dashboardActionButton?.url).toContain('arc_id=1');
+  }));
 });
