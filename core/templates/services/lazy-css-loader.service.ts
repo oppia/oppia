@@ -70,6 +70,13 @@ export class LazyCssLoaderService {
     cssHrefs.forEach((cssHref: string) => {
       const linkElement = this.renderer.createElement('link');
       linkElement.rel = 'stylesheet';
+      // The stylesheet is requested with media="print" so the browser fetches
+      // it without blocking first paint, then gets applied to the screen once
+      // it has loaded. This mirrors the async loading used for MathJax.
+      linkElement.media = 'print';
+      linkElement.onload = () => {
+        linkElement.media = 'all';
+      };
       linkElement.href = cssHref;
       this.renderer.appendChild(document.head, linkElement);
     });

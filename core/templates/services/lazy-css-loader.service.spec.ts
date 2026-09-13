@@ -73,6 +73,22 @@ describe('LazyCssLoaderService', () => {
     expect(appendChildSpy.calls.mostRecent().args[0].getAttribute('rel')).toBe(
       'stylesheet'
     );
+    expect(
+      appendChildSpy.calls.mostRecent().args[0].getAttribute('media')
+    ).toBe('print');
+  });
+
+  it('should switch the stylesheet from print to all once it loads', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
+
+    const linkElement = appendChildSpy.calls.mostRecent()
+      .args[0] as HTMLLinkElement;
+    expect(linkElement.getAttribute('media')).toBe('print');
+
+    linkElement.onload(null);
+
+    expect(linkElement.getAttribute('media')).toBe('all');
   });
 
   it('should not reload GUPPY css if already loaded', () => {
