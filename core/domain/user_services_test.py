@@ -139,6 +139,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.record_user_created_an_exploration(
             'nonexistent_user_id_123'
         )
+        self.assertIsNone(
+            user_services.get_user_settings(
+                'nonexistent_user_id_123', strict=False
+            )
+        )
 
     def test_migrate_dashboard_stats_with_valid_schema_exits_gracefully(
         self,
@@ -3101,6 +3106,23 @@ title: Title
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 1
         )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Introduction'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction',
+        )
         self.logout()
 
     def test_update_checkpoint_progress_when_checkpoint_deleted(self) -> None:
@@ -3124,10 +3146,31 @@ title: Title
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 2
         )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction',
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction',
+        )
         self.logout()
 
     def test_clear_checkpoint_progress_for_nonexistent_model(self) -> None:
         user_services.clear_learner_checkpoint_progress('fake_user', 'fake_exp')
+        self.assertIsNone(
+            exp_fetchers.get_exploration_user_data('fake_user', 'fake_exp')
+        )
 
     def test_update_checkpoint_progress_when_checkpoint_exists_in_new_version(
         self,
@@ -3151,6 +3194,24 @@ title: Title
         user_services.update_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID, 'Introduction', 2
         )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction',
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction',
+        )
         self.logout()
 
     def test_sync_checkpoint_no_change_in_new_version(self) -> None:
@@ -3172,6 +3233,24 @@ title: Title
         )
         user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
             self.viewer_id, self.EXP_ID
+        )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction',
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction',
         )
         self.logout()
 
@@ -3200,6 +3279,24 @@ title: Title
             )
             user_services.update_learner_checkpoint_progress(
                 self.viewer_id, self.EXP_ID, 'Introduction', 2
+            )
+            exp_user_data = exp_fetchers.get_exploration_user_data(
+                self.viewer_id, self.EXP_ID
+            )
+            assert exp_user_data is not None
+            self.assertEqual(
+                exp_user_data.furthest_reached_checkpoint_exp_version, 1
+            )
+            self.assertEqual(
+                exp_user_data.furthest_reached_checkpoint_state_name,
+                'Second State',
+            )
+            self.assertEqual(
+                exp_user_data.most_recently_reached_checkpoint_exp_version, 2
+            )
+            self.assertEqual(
+                exp_user_data.most_recently_reached_checkpoint_state_name,
+                'Introduction',
             )
         self.logout()
 
@@ -5012,6 +5109,11 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_remove_contribution_reviewer_with_nonexistent_user(self) -> None:
         """Test that removing a nonexistent contribution reviewer exits gracefully."""
         user_services.remove_contribution_reviewer('nonexistent_user_id_123')
+        self.assertIsNone(
+            user_models.UserContributionRightsModel.get_by_id(
+                'nonexistent_user_id_123'
+            )
+        )
 
     def test_remove_question_submit_rights(self) -> None:
         auth_id = 'someUser'

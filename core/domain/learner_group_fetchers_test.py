@@ -192,16 +192,3 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(permissions_empty, [])
-
-        model.update_timestamps()
-        model.put()
-        permissions = learner_group_fetchers.can_multi_learners_share_progress(
-            ['user_abc'], 'target_group'
-        )
-        self.assertEqual(permissions, [True])
-        permissions_empty = (
-            learner_group_fetchers.can_multi_learners_share_progress(
-                ['user_abc'], 'non_existent_group'
-            )
-        )
-        self.assertEqual(permissions_empty, [])
