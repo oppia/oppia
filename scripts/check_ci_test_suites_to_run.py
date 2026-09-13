@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import collections
 import json
 import os
 import subprocess
@@ -405,7 +406,9 @@ def _validate_shard_page_membership(
         )
 
     duplicate_pages = sorted(
-        {page for page in listed_pages if listed_pages.count(page) > 1}
+        page
+        for page, count in collections.Counter(listed_pages).items()
+        if count > 1
     )
     if duplicate_pages:
         raise ValueError(

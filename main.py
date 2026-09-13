@@ -1620,7 +1620,8 @@ URLS.extend(
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
-            r'/lesson/<exploration_id>', oppia_root.OppiaRootPage
+            r'%s/<exploration_id>' % feconf.LESSON_URL_PREFIX,
+            oppia_root.OppiaRootPage,
         ),
     )
 )

@@ -271,6 +271,17 @@ class AdminHandler(
     # classroom.
     _MAX_DUMMY_TOPICS_PER_CLASSROOM = 100
 
+    # Number of distinct topics each generated dummy classroom is created
+    # with, matching _DUMMY_TOPIC_NAMES and _DUMMY_TOPIC_URL_FRAGMENTS. The
+    # puppeteer lighthouse setup adds thumbnails to these same topics, so keep
+    # the count in sync with lighthouse_setup.js.
+    _NUM_DUMMY_TOPICS_PER_CLASSROOM = 5
+
+    # Stock images written to storage for every generated dummy classroom so
+    # that classroom tiles and banners render during lighthouse runs.
+    _DUMMY_CLASSROOM_THUMBNAIL_IMAGE_PATH = 'core/tests/data/thumbnail.svg'
+    _DUMMY_CLASSROOM_BANNER_IMAGE_PATH = 'core/tests/data/classroom-banner.png'
+
     # Fixed base names and URL fragments for dummy topics. They are cycled
     # through (with an appended lowercase letter suffix) when a request asks to
     # generate topics that can fit into an existing classroom without name or
@@ -2038,7 +2049,9 @@ class AdminHandler(
         """
         thumbnail_image = b''
         with open(
-            'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+            self._DUMMY_CLASSROOM_THUMBNAIL_IMAGE_PATH,
+            'rt',
+            encoding='utf-8',
         ) as svg_file:
             thumbnail_image = svg_file.read().encode('ascii')
         fs_services.save_original_and_compressed_versions_of_image(
@@ -2052,7 +2065,7 @@ class AdminHandler(
 
         banner_image = b''
         with open(
-            'core/tests/data/classroom-banner.png', 'rb', encoding=None
+            self._DUMMY_CLASSROOM_BANNER_IMAGE_PATH, 'rb', encoding=None
         ) as png_file:
             banner_image = png_file.read()
         fs_services.save_original_and_compressed_versions_of_image(
@@ -2090,14 +2103,23 @@ class AdminHandler(
             '[ADMIN] %s generated dummy classroom %s.' % (self.user_id, index)
         )
 
-        topic_ids = [topic_fetchers.get_new_topic_id() for _ in range(5)]
-        skill_ids = [skill_services.get_new_skill_id() for _ in range(5)]
+        topic_ids = [
+            topic_fetchers.get_new_topic_id()
+            for _ in range(self._NUM_DUMMY_TOPICS_PER_CLASSROOM)
+        ]
+        skill_ids = [
+            skill_services.get_new_skill_id()
+            for _ in range(self._NUM_DUMMY_TOPICS_PER_CLASSROOM)
+        ]
         question_id_groups = [
-            [question_services.get_new_question_id() for _ in range(3)]
-            for _ in range(5)
+            [
+                question_services.get_new_question_id()
+                for _ in range(constants.QUESTIONS_PER_TOPIC)
+            ]
+            for _ in range(self._NUM_DUMMY_TOPICS_PER_CLASSROOM)
         ]
 
-        for topic_index in range(5):
+        for topic_index in range(self._NUM_DUMMY_TOPICS_PER_CLASSROOM):
             self._create_and_publish_dummy_topic_components(
                 topic_ids[topic_index],
                 skill_ids[topic_index],
@@ -2110,7 +2132,9 @@ class AdminHandler(
                 ),
                 'Skill%d%s' % (topic_index + 1, suffix),
                 '<p>Dummy Explanation %d</p>' % (topic_index + 1),
-                question_number_offset=3 * topic_index,
+                question_number_offset=(
+                    constants.QUESTIONS_PER_TOPIC * topic_index
+                ),
             )
 
         classroom_id = classroom_config_services.get_new_classroom_id()
@@ -2150,7 +2174,7 @@ class AdminHandler(
         # classroom count, so it is synchronized here to the shared dummy
         # index allocated by the resume scan.
         persisted_classroom = classroom_config_services.get_classroom_by_id(
-            classroom_id
+            classroom_id, strict=True
         )
         persisted_classroom.index = index
         classroom_config_services.update_classroom(persisted_classroom)
@@ -2226,7 +2250,9 @@ class AdminHandler(
         # synchronized to the shared dummy index allocated by the resume scan,
         # since create_new_default_classroom derives it from the total
         # classroom count.
-        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id, strict=True
+        )
         classroom.is_published = True
         classroom.index = index
         classroom.thumbnail_data = classroom_config_domain.ImageData(
@@ -2258,45 +2284,39 @@ class AdminHandler(
         Raises:
             Exception. Cannot generate dummy topics in production.
             Exception. User does not have enough rights to generate data.
-            Exception. The given classroom does not exist.
             Exception. The total number of topics in the classroom would exceed
                 the supported maximum.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
-            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
-                raise Exception(
-                    'User does not have enough rights to generate data.'
-                )
-            classroom = classroom_config_services.get_classroom_by_id(
-                classroom_id, strict=False
-            )
-            if classroom is None:
-                raise Exception(
-                    'Classroom with id \'%s\' does not exist.' % classroom_id
-                )
-            # Reset the per-base suffix counters for this new request so that
-            # each run starts from the first unused suffix again.
-            self._dummy_topic_letter_counts = [0] * len(self._DUMMY_TOPIC_NAMES)
-            # Reject requests that would push the total number of topics in the
-            # classroom beyond the supported maximum before creating any
-            # topics, so the loop below never has to write a huge amount of
-            # data only to fail.
-            if (
-                len(classroom.topic_id_to_prerequisite_topic_ids) + num_topics
-            ) > self._MAX_DUMMY_TOPICS_PER_CLASSROOM:
-                raise Exception(
-                    'Cannot generate more than the supported number of dummy '
-                    'topics per classroom at once.'
-                )
-            generated_topic_ids: List[str] = []
-            for i in range(num_topics):
-                generated_topic_ids.append(
-                    self._create_dummy_topic(i % len(self._DUMMY_TOPIC_NAMES))
-                )
-            self._attach_topics_to_classroom(classroom, generated_topic_ids)
-        else:
+        if not constants.DEV_MODE:
             raise Exception('Cannot generate dummy topics in production.')
+        if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+            raise Exception(
+                'User does not have enough rights to generate data.'
+            )
+        classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id, strict=True
+        )
+        # Reset the per-base suffix counters for this new request so that
+        # each run starts from the first unused suffix again.
+        self._dummy_topic_letter_counts = [0] * len(self._DUMMY_TOPIC_NAMES)
+        # Reject requests that would push the total number of topics in the
+        # classroom beyond the supported maximum before creating any
+        # topics, so the loop below never has to write a huge amount of
+        # data only to fail.
+        if (
+            len(classroom.topic_id_to_prerequisite_topic_ids) + num_topics
+        ) > self._MAX_DUMMY_TOPICS_PER_CLASSROOM:
+            raise Exception(
+                'Cannot generate more than the supported number of dummy '
+                'topics per classroom at once.'
+            )
+        generated_topic_ids: List[str] = []
+        for i in range(num_topics):
+            generated_topic_ids.append(
+                self._create_dummy_topic(i % len(self._DUMMY_TOPIC_NAMES))
+            )
+        self._attach_topics_to_classroom(classroom, generated_topic_ids)
 
     def _create_dummy_topic(self, base_index: int) -> str:
         """Creates, publishes, and returns the ID of a single dummy topic with
@@ -2387,13 +2407,9 @@ class AdminHandler(
                 which the generated topics should be added.
             topic_ids: list(str). The IDs of the generated topics.
         """
-        topic_id_to_prerequisite_topic_ids = (
-            classroom.topic_id_to_prerequisite_topic_ids
-        )
-        for topic_id in topic_ids:
-            topic_id_to_prerequisite_topic_ids.setdefault(topic_id, [])
+        defaults = {topic_id: [] for topic_id in topic_ids}
         classroom.topic_id_to_prerequisite_topic_ids = (
-            topic_id_to_prerequisite_topic_ids
+            defaults | classroom.topic_id_to_prerequisite_topic_ids
         )
         classroom_config_services.update_classroom(classroom)
 

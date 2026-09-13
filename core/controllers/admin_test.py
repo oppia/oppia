@@ -21,6 +21,7 @@ import logging
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
+from core.controllers import admin
 from core.domain import (
     blog_services,
     caching_services,
@@ -35,6 +36,7 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_registry,
     question_fetchers,
+    question_services,
     recommendations_services,
     rights_manager,
     search_services,
@@ -861,6 +863,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 3)
+        # The generated classroom is built from the shared dummy topic and
+        # question counts, so the counts used by the puppeteer lighthouse
+        # setup stay defined in one place.
+        for classroom in classrooms:
+            self.assertEqual(
+                len(classroom.get_topic_ids()),
+                admin.AdminHandler._NUM_DUMMY_TOPICS_PER_CLASSROOM,  # pylint: disable=protected-access
+            )
+            for topic_id in classroom.get_topic_ids():
+                self.assertEqual(
+                    question_services.get_total_question_count_for_skill_ids(
+                        topic_fetchers.get_topic_by_id(
+                            topic_id
+                        ).skill_ids_for_diagnostic_test
+                    ),
+                    constants.QUESTIONS_PER_TOPIC,
+                )
         self.logout()
 
     def test_generate_dummy_classroom_data_with_default_count(self) -> None:
@@ -1299,7 +1318,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        with self.assertRaisesRegex(Exception, 'does not exist'):
+        with self.assertRaisesRegex(Exception, 'not found'):
             self.post_json(
                 '/adminhandler',
                 {
