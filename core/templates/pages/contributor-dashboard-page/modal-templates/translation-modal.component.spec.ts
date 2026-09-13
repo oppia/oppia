@@ -1699,13 +1699,6 @@ describe('Translation Modal Component', () => {
         )
       ).toBe('objective');
       expect(
-        component.getFormattedContentType(
-          'metadata',
-          null,
-          'exploration_category'
-        )
-      ).toBe('category');
-      expect(
         component.getFormattedContentType('metadata', null, 'exploration_tag_0')
       ).toBe('tag');
       expect(component.getFormattedContentType('metadata', null, 'other')).toBe(
