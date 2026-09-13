@@ -330,7 +330,7 @@ describe('MathEquationInputValidationService', () => {
         answerGroups,
         goodDefaultOutcome
       )
-    ).not.toThrow();
+    ).not.toThrowError();
     warnings = validatorService.getAllWarnings(
       currentState,
       customizationArgs,

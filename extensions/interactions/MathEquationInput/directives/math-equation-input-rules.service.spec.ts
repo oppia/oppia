@@ -545,7 +545,7 @@ describe('Math equation input rules service', () => {
     // handled gracefully rather than crashing with an error.
     expect(() =>
       meirs.MatchesExactlyWith('v', {x: 'v=1', y: 'rhs'})
-    ).not.toThrow();
+    ).not.toThrowError();
     expect(meirs.MatchesExactlyWith('v', {x: 'v=1', y: 'rhs'})).toBeFalse();
     expect(meirs.MatchesExactlyWith('v=1', {x: 'v', y: 'rhs'})).toBeFalse();
     expect(
@@ -554,7 +554,7 @@ describe('Math equation input rules service', () => {
 
     expect(() =>
       meirs.MatchesUpToTrivialManipulations('v', {x: 'v=1', y: 'rhs'})
-    ).not.toThrow();
+    ).not.toThrowError();
     expect(
       meirs.MatchesUpToTrivialManipulations('v', {x: 'v=1', y: 'rhs'})
     ).toBeFalse();
@@ -562,7 +562,7 @@ describe('Math equation input rules service', () => {
       meirs.MatchesUpToTrivialManipulations('v=1', {x: 'v', y: 'rhs'})
     ).toBeFalse();
 
-    expect(() => meirs.IsEquivalentTo('v', {x: 'v=1'})).not.toThrow();
+    expect(() => meirs.IsEquivalentTo('v', {x: 'v=1'})).not.toThrowError();
     expect(meirs.IsEquivalentTo('v', {x: 'v=1'})).toBeFalse();
     expect(meirs.IsEquivalentTo('v=1', {x: 'v'})).toBeFalse();
     // Equations with an empty side are also treated as invalid.
