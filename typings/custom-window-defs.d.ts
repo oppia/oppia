@@ -14,5 +14,4 @@ interface Window {
   Base64Binary: Base64Binary;
   dataLayer: object[];
   Guppy: Guppy;
-  webkitAudioContext: typeof AudioContext;
 }

@@ -272,11 +272,11 @@ def mock_load_template(
     filename: str, template_is_aot_compiled: bool = False
 ) -> str:
     """Mock for load_template function. This mock is required for backend tests
-    since we do not have webpack compilation before backend tests. The folder to
-    search templates is webpack_bundles which is generated after webpack
-    compilation. Since this folder will be missing, load_template function will
-    return an error. So, we use a mock for load_template which returns the html
-    file from the source directory instead.
+    since the compiled output may not be available. The compiled output would
+    normally be served from the build directory. Since this folder will be
+    missing during backend tests, load_template function will return an error.
+    So, we use a mock for load_template which returns the html file from the
+    source directory instead.
 
     Args:
         filename: str. The name of the file for which template is to be
@@ -3036,9 +3036,8 @@ version: 1
         expect_errors = expected_status_int >= 400
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url,
@@ -3154,9 +3153,8 @@ version: 1
         response = None
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
 
             if http_method == 'GET':

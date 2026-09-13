@@ -11,7 +11,7 @@
         }
       },
       "root": "",
-      "sourceRoot": "src",
+      "sourceRoot": "",
       "prefix": "app",
       "architect": {
         "build": {
@@ -157,13 +157,26 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
+            "main": "core/templates/combined-tests.spec.ts",
             "polyfills": "core/templates/Polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "karmaConfig": "core/tests/karma.conf.ts",
+            "codeCoverageExclude": [
+              "core/templates/expressions/parser.js",
+              "core/templates/Polyfills.ts"
+            ],
             "assets": [
               "src/favicon.ico",
-              "assets",
+              {
+                "glob": "**/*",
+                "input": "assets/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "extensions/",
+                "output": "/extensions/"
+              },
               {
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
@@ -181,15 +194,34 @@
                 "bundleName": "vendor-styles",
                 "inject": true
               },
+              {
+                "input": "node_modules/charts.css/dist/charts.css",
+                "bundleName": "charts-library",
+                "inject": true
+              },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css"
+              "core/templates/css/shepherd-overrides.css",
+              "node_modules/guppy-dev/build/guppy-default.min.css",
+              "node_modules/cropperjs/dist/cropper.min.css",
+              "node_modules/codemirror/lib/codemirror.css",
+              "node_modules/codemirror/addon/merge/merge.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
             ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            }
           }
         },
         "lint": {

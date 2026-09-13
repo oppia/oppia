@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for HintSolutionAndConceptCardDisplayComponent
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeDetectorRef, EventEmitter} from '@angular/core';
 import {

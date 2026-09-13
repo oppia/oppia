@@ -504,12 +504,18 @@ export class ConversationFlowService {
 
     // We do not store checkpoints progress for iframes hence we do not
     // need to consider redirecting the user to the most recently
-    // reached checkpoint on exploration initial load in that case.
+    // reached checkpoint on exploration initial load in that case. We
+    // also skip the redirect when the lesson is explicitly restarted
+    // from the beginning via the "restart" URL parameter, so that the
+    // learner always starts from the first card.
+    const isRestartingFromBeginning =
+      this.urlService.getUrlParams().restart === '1';
     if (
       !isIframed &&
       !isInEditorPreviewMode &&
       !this.explorationModeService.isInQuestionPlayerMode() &&
-      !this.explorationModeService.isInDiagnosticTestPlayerMode()
+      !this.explorationModeService.isInDiagnosticTestPlayerMode() &&
+      !isRestartingFromBeginning
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();

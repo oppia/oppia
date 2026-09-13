@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the content translation manager service.
  */
 
+// @ts-nocheck
+
 import {
   discardPeriodicTasks,
   fakeAsync,

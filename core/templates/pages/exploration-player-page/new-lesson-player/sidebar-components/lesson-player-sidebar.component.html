@@ -1,8 +1,9 @@
 <div class="oppia-lesson-player-sidebar">
-  <div class="player-desktop-sidebar-menu"
+  <div *ngIf="!mobileMenuVisible"
+       class="player-desktop-sidebar-menu"
        [class.expanded]="sidebarIsExpanded">
     <div class="lesson-player-sidebar-top">
-      <button class="player-sidebar-toggle"
+      <button class="player-sidebar-toggle e2e-test-player-sidebar-toggle"
               (click)="toggleSidebar()"
               [class.expanded]="sidebarIsExpanded">
         <div *ngIf="!sidebarIsExpanded">
@@ -56,17 +57,19 @@
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" aria-label="Report an issue" (click)="showReportAnIssueModal()"
-          *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
-          matTooltip="{{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}"
-          matTooltipPosition="above">
+      <button class="player-sidebar-button e2e-test-lesson-desktop-report-button"
+              aria-label="Report an issue"
+              (click)="showReportAnIssueModal()"
+              *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+              matTooltip="{{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}"
+              matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>
             {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button"
+      <button class="player-sidebar-button e2e-test-lesson-feedback-button"
               [attr.aria-label]="'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate"
               (click)="showSendLessonFeedbackModal()"
               *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
@@ -94,12 +97,14 @@
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </button>
-        <button (click)="showReportAnIssueModal()"
+        <button class="e2e-test-lesson-mobile-report-button"
+                (click)="showReportAnIssueModal()"
                 *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
         </button>
-        <button (click)="showSendLessonFeedbackModal()"
+        <button class="e2e-test-lesson-feedback-button"
+                (click)="showSendLessonFeedbackModal()"
                 *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
           <i class="fa fa-lg fa-comments"></i>
           {{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}

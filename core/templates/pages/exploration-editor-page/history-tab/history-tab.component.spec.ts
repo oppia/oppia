@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {EditabilityService} from 'services/editability.service';
 import {

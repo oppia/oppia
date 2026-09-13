@@ -11,7 +11,7 @@
         <a *ngIf="publicClassroomsCount > 1" href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
         <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
         <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
-        <span *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName()}}</span>
+        <span *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName() | capitalizePipe}}</span>
         <span *ngIf="isHackyClassroomTranslationDisplayed('name')">{{classroomTranslationKeys.name | translate}}</span>
       </div>
       <div class="mobile-breadcrumbs">
@@ -24,7 +24,7 @@
     <div class="classroom-information-container">
       <div class="classroom-text-container">
         <span>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</span>
-        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomData.getName()}}</h1>
+        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomData.getName() | capitalizePipe}}</h1>
         <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomTranslationKeys.name | translate}}</h1>
       </div>
       <div class="classroom-thumbnail-container">

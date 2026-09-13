@@ -21,10 +21,12 @@ import {AppConstants} from 'app.constants';
 import {ClassroomSummaryDict} from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './classroom-card.component.css';
 
 @Component({
   selector: 'oppia-classroom-card',
   templateUrl: './classroom-card.component.html',
+  styleUrls: ['./classroom-card.component.css'],
 })
 export class ClassroomCardComponent {
   // These properties are initialized using Angular lifecycle hooks

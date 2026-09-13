@@ -20,10 +20,12 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import './learner-group-preferences-modal.component.css';
 
 @Component({
   selector: 'oppia-learner-group-preferences-modal',
   templateUrl: './learner-group-preferences-modal.component.html',
+  styleUrls: ['./learner-group-preferences-modal.component.css'],
 })
 export class LearnerGroupPreferencesModalComponent extends ConfirmOrCancelModal {
   learnerGroup!: LearnerGroupData;
