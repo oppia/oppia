@@ -112,7 +112,8 @@ const intEditorField = '.e2e-test-editor-int';
 
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
-const explorationFeedbackTabContentSelector = '.e2e-test-exploration-feedback-card';
+const explorationFeedbackTabContentSelector =
+  '.e2e-test-exploration-feedback-card';
 const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
@@ -1311,7 +1312,9 @@ export class ExplorationEditor extends BaseUser {
 
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
       await this.clickOnElement(feedbackSubjects[expectedThread - 1]);
-      await this.expectElementToBeVisible(explorationFeedbackCardActiveSelector);
+      await this.expectElementToBeVisible(
+        explorationFeedbackCardActiveSelector
+      );
     } else {
       throw new Error(`Expected thread not found: ${expectedThread}`);
     }
@@ -1370,7 +1373,9 @@ export class ExplorationEditor extends BaseUser {
         expectedText: string;
       }) => {
         const elements = document.querySelectorAll(selector);
-        return elements[elementNumber - 1]?.textContent?.trim() === expectedText;
+        return (
+          elements[elementNumber - 1]?.textContent?.trim() === expectedText
+        );
       },
       {
         selector: feedbackStatusSelector,
