@@ -16,7 +16,14 @@
  * @fileoverview Component for the end chapter celebration confetti component.
  */
 
-import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
@@ -26,7 +33,10 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 })
 export class NewEndChapterConfettiComponent implements OnInit {
   @Input() topOffset: string = '40px';
+  @Input() audioIsEnabled: boolean = true;
+  @ViewChild('confettiVideo') confettiVideoRef!: ElementRef<HTMLVideoElement>;
   confettiIsShown: boolean = false;
+  confettiVideoUrl: string = '';
   endChapterCelebratoryAudio = new Audio();
 
   constructor(
@@ -40,11 +50,35 @@ export class NewEndChapterConfettiComponent implements OnInit {
         '/end_chapter_celebratory_tadaa.mp3'
       );
     this.endChapterCelebratoryAudio.load();
+
+    // NOTE: Oppia's UrlInterpolationService does not currently expose a
+    // dedicated getStaticVideoUrl helper, so we reuse getStaticImageUrl to
+    // resolve this webm asset. getStaticImageUrl() always resolves paths
+    // relative to the top-level `assets/images/` directory (not relative
+    // to this component's own folder), so this file MUST physically live
+    // at `assets/images/exploration_player/end_chapter_confetti.webm` in
+    // the repo root for this to resolve correctly. If a getStaticVideoUrl
+    // helper is added
+    // to UrlInterpolationService in the future, this call should be
+    // updated to use it instead.
+    this.confettiVideoUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/exploration_player/end_chapter_confetti.webm'
+    );
   }
 
   animateConfetti(): void {
     this.confettiIsShown = true;
     this.cdRef.detectChanges();
     this.endChapterCelebratoryAudio.play();
+
+    const confettiVideo = this.confettiVideoRef?.nativeElement;
+    if (confettiVideo) {
+      confettiVideo.currentTime = 0;
+      confettiVideo.play();
+      confettiVideo.onended = () => {
+        this.confettiIsShown = false;
+        this.cdRef.detectChanges();
+      };
+    }
   }
 }
