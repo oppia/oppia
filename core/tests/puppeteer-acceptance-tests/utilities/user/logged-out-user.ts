@@ -646,6 +646,35 @@ const metaDescriptionSelector =
   'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
+// New lesson player page.
+const lessonPlayerSideBarToggleButton = '.e2e-test-player-sidebar-toggle';
+const mobileOpenOptionsButton = '.e2e-test-mobile-open-options-button';
+const lessonFeedbackButtonSelector = '.e2e-test-lesson-feedback-button';
+const desktopLessonReportButtonSelector =
+  '.e2e-test-lesson-desktop-report-button';
+const mobileLessonReportButtonSelector =
+  '.e2e-test-lesson-mobile-report-button';
+const feedbackModaltextarea = '.e2e-test-feedback-modal-textarea';
+const feedbackCharacterCount = '.e2e-test-feedback-text-count';
+const lessonSpecificCategoryChips = '.e2e-test-flag-category-chips';
+const screenshotDropZoneSelector = '.e2e-test-screenshot-dropzone-text';
+const reportIssueTypoChipSelector = '.e2e-test-report-issue-typo-chip';
+const photoUploadErrorMessage = '.e2e-test-upload-error';
+const reportIssueConfusingOrIncorrectChipSelector =
+  '.e2e-test-report-issue-confusing-or-incorrect-chip';
+const reportIssueBrokenLayoutChipSelector =
+  '.e2e-test-report-issue-broken-layout-chip';
+const reportIssueOtherChipSelector = '.e2e-test-report-issue-other-chip';
+const technicalLogsSelector = '.e2e-test-technical-logs';
+const technicalLogsLabelSelector = '.e2e-test-technical-logs-label';
+const imageRecieverFeedbackComponentSelector = '.e2e-test-photo-upload-input';
+const reportWebsiteIssueLink = '.e2e-test-report-website-issue-link';
+const feedbackCaptchaContainer = '.e2e-test-feedback-captcha-container';
+const cancelFeedbackUploadButtonSelector =
+  '.e2e-test-cancel-feedback-upload-button';
+const feedbackScreenshotPreviewSelector =
+  '.e2e-test-feedback-screenshot-preview';
+const feedbackModalSubHeader = '.e2e-test-modal-subHeader';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4633,10 +4662,12 @@ export class LoggedOutUser extends BaseUser {
    * Selects and opens a chapter within a story to learn.
    * @param {string} storyName - The name of the story containing the chapter.
    * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {boolean} isNewLessonPlayer - Whether it will be used for new lesson player.
    */
   async selectChapterWithinStoryToLearn(
     storyName: string,
-    chapterName: string
+    chapterName: string,
+    isNewLessonPlayer: boolean = false
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -4669,9 +4700,10 @@ export class LoggedOutUser extends BaseUser {
               await this.waitForElementToBeClickable(chapter);
               await chapter.click();
 
-              await this.expectPageURLToContain(
-                testConstants.URLs.ExplorationPlayer
-              );
+              const urlPrefix = isNewLessonPlayer
+                ? testConstants.URLs.LessonPlayer
+                : testConstants.URLs.ExplorationPlayer;
+              await this.expectPageURLToContain(urlPrefix);
               showMessage(`Chapter ${chapterName} is opened successfully.`);
               return;
             }
@@ -6367,6 +6399,375 @@ export class LoggedOutUser extends BaseUser {
    */
   async playExploration(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  }
+
+  /**
+   * Navigates to and plays an lesson by exploration ID.
+   * @param {string | null} explorationId - The ID of the exploration to play.
+   */
+  async playLesson(explorationId: string | null): Promise<void> {
+    await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
+  }
+
+  /**
+   * Selects a report issue chip in feedback Modal.
+   * @param {string} chipName - The name of the chip to select.
+   */
+  async selectReportIssueChip(chipName: string): Promise<void> {
+    switch (chipName) {
+      case 'typo':
+        await this.clickOnElementWithSelector(reportIssueTypoChipSelector);
+        break;
+      case 'confusing or incorrect answer':
+        await this.clickOnElementWithSelector(
+          reportIssueConfusingOrIncorrectChipSelector
+        );
+        break;
+      case 'broken layout':
+        await this.clickOnElementWithSelector(
+          reportIssueBrokenLayoutChipSelector
+        );
+        break;
+      case 'other':
+        await this.clickOnElementWithSelector(reportIssueOtherChipSelector);
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+  }
+
+  /**
+   * Checks if a report issue chip is selected in feedback Modal.
+   * @param {string} chipName - The name of the chip to check.
+   * @param {boolean} shouldBeSelected - Whether the chip should be selected or not.
+   */
+  async expectReportIssueChipToBeSelected(
+    chipName: string,
+    shouldBeSelected: boolean
+  ): Promise<void> {
+    let chipSelector: string;
+
+    switch (chipName) {
+      case 'typo':
+        chipSelector = reportIssueTypoChipSelector;
+        break;
+      case 'confusing or incorrect answer':
+        chipSelector = reportIssueConfusingOrIncorrectChipSelector;
+        break;
+      case 'broken layout':
+        chipSelector = reportIssueBrokenLayoutChipSelector;
+        break;
+      case 'other':
+        chipSelector = reportIssueOtherChipSelector;
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, expected: boolean) => {
+        const element = document.querySelector(selector);
+        return element?.classList.contains('selected') === expected;
+      },
+      {},
+      chipSelector,
+      shouldBeSelected
+    );
+  }
+
+  /**
+   * Expect the technical log to be present in the feedback modal.
+   */
+  async expectIncludeTechnicalLogToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(technicalLogsSelector, shouldBePresent);
+    if (shouldBePresent) {
+      await this.expectTextContentInElementWithSelectorToBe(
+        technicalLogsLabelSelector,
+        'Include technical error logs to help the team fix this faster (highly recommended).'
+      );
+    }
+  }
+
+  /**
+   * Waits for the Cloudflare Turnstile iframe to finish loading.
+   * This avoids interacting with the captcha before the third-party
+   * iframe has been fully initialized.
+   */
+  private async waitForTurnstileFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const turnstileFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('challenges.cloudflare.com'));
+
+      if (turnstileFrame) {
+        return;
+      }
+
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The Cloudflare Turnstile iframe did not finish loading within the expected time.'
+    );
+  }
+
+  /**
+   * Function to check if the Cloudflare Turnstile captcha is visible in the
+   * feedback modal. Here we don't test the functionality of the captcha, just
+   * its visibility because Turnstile is a third-party service.
+   */
+  async isTurnstileCaptchaVisible(): Promise<void> {
+    const turnstileCaptcha = await this.page.waitForSelector(
+      feedbackCaptchaContainer
+    );
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return false;
+        }
+
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      },
+      {},
+      feedbackCaptchaContainer
+    );
+
+    await this.waitForTurnstileFrameToLoad();
+
+    if (!turnstileCaptcha) {
+      throw new Error(
+        'The Cloudflare Turnstile captcha is not visible in the feedback modal.'
+      );
+    } else {
+      showMessage(
+        'The Cloudflare Turnstile captcha is visible in the feedback modal.'
+      );
+    }
+  }
+
+  /**
+   * Scrolls to the captcha container.
+   */
+  async scrollToCaptchaContainer(): Promise<void> {
+    await this.isTurnstileCaptchaVisible();
+
+    await this.page.evaluate((selector: string) => {
+      const element = document.querySelector(selector);
+      element?.scrollIntoView({block: 'center'});
+    }, feedbackCaptchaContainer);
+    showMessage('Scrolled to captcha container.');
+  }
+
+  /**
+   * Waits until Turnstile has produced a response token. The iframe can be
+   * visible before the token callback runs, especially on mobile headless.
+   */
+  async waitForTurnstileTokenIfPresent(): Promise<void> {
+    const captchaContainerIsPresent = await this.page.evaluate(
+      (selector: string) => document.querySelector(selector) !== null,
+      feedbackCaptchaContainer
+    );
+
+    if (!captchaContainerIsPresent) {
+      return;
+    }
+
+    await this.page.waitForFunction(
+      () => {
+        const responseInput = document.querySelector(
+          '[name="cf-turnstile-response"]'
+        ) as HTMLInputElement | HTMLTextAreaElement | null;
+
+        return Boolean(responseInput?.value);
+      },
+      {timeout: 60000}
+    );
+  }
+
+  /**
+   * Open 'Open Options' in new lesson player page.
+   */
+  async toggleOptionsSidebar(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    if (isMobileViewport) {
+      await this.clickOnElementWithSelector(mobileOpenOptionsButton);
+      return;
+    }
+    await this.clickOnElementWithSelector(lessonPlayerSideBarToggleButton);
+  }
+
+  /**
+   * Open the Send a Lesson feedback modal of new lesson player.
+   * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
+   */
+  async clickLessonFeedbackButton(isUserLoggedIn: boolean): Promise<void> {
+    await this.clickOnElementWithSelector(lessonFeedbackButtonSelector);
+    isUserLoggedIn
+      ? await this.expectModalTitleToBe('Send Feedback to the Lessons Team')
+      : await this.expectModalTitleToBe('Want to chat with our Lessons Team?');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    if (isUserLoggedIn) {
+      await this.expectElementToBeVisible(feedbackModaltextarea);
+    }
+  }
+
+  /**
+   * Open the Report an Issue feedback modal of new lesson player.
+   * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
+   */
+  async clickReportLessonButton(isUserLoggedIn: boolean): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+
+    const selector = isMobileViewport
+      ? mobileLessonReportButtonSelector
+      : desktopLessonReportButtonSelector;
+    await this.clickOnElementWithSelector(selector);
+    await this.expectModalTitleToBe('Report an Issue');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectElementToBeVisible(feedbackModaltextarea);
+    if (!isUserLoggedIn) {
+      await this.scrollToCaptchaContainer();
+      await this.expectElementToBeVisible(feedbackCaptchaContainer);
+      await this.waitForTurnstileFrameToLoad();
+    }
+  }
+
+  /**
+   * Clears the feedback text area.
+   */
+  async clearFeedbackTextArea(): Promise<void> {
+    return await this.clearAllTextFrom(feedbackModaltextarea);
+  }
+
+  /**
+   * Submits the feedback in the text area.
+   * @param feedback - The feedback to submit.
+   */
+  async submitFeedbackInTextArea(feedback: string): Promise<void> {
+    await this.clickOnElementWithSelector(feedbackModaltextarea);
+    await this.typeInInputField(feedbackModaltextarea, feedback);
+  }
+
+  /**
+   * Adds a screenshot to the feedback form.
+   * @param {string} picturePath - The path to the screenshot to add.
+   */
+  async addFeedbackScreenshot(picturePath: string): Promise<void> {
+    await this.expectElementToBeVisible(imageRecieverFeedbackComponentSelector);
+    await this.uploadFile(picturePath);
+  }
+
+  /**
+   * Opens the report a site issue modal from the global footer.
+   */
+  async openReportASiteIssueModalFromGlobalFooter(
+    isUserLoggedIn: boolean
+  ): Promise<void> {
+    await this.scrollToBottomOfPage();
+    await this.expectElementToBeVisible(reportWebsiteIssueLink, true);
+    await this.clickOnElementWithSelector(reportWebsiteIssueLink);
+    await this.expectModalTitleToBe('Report a Website Issue');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectElementToBeVisible(feedbackModaltextarea);
+    if (!isUserLoggedIn) {
+      await this.expectElementToBeVisible(feedbackCaptchaContainer);
+      await this.waitForTurnstileFrameToLoad();
+    }
+  }
+
+  /**
+   * Checks if the photo upload error message is visible.
+   * @param expectedText - The expected text of the error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
+    await this.expectTextContentToContain(
+      photoUploadErrorMessage,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the sub-header of the feedback modal matches the expected text.
+   * @param expectedText - The expected text of the sub-header.
+   */
+  async expectFeedbackModalSubHeaderToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackModalSubHeader);
+    await this.expectTextContentToContain(feedbackModalSubHeader, expectedText);
+  }
+
+  /**
+   * Checks if the feedback textarea placeholder matches the expected text.
+   *
+   * @param expectedPlaceholder - Expected placeholder text of the textarea.
+   */
+  async expectFeedbackTextareaPlaceholderToBe(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      feedbackModaltextarea,
+      expectedPlaceholder
+    );
+
+    await this.expectTextContentToContain(feedbackCharacterCount, '0 / 2500');
+  }
+
+  /**
+   * Checks if the lesson specific category chips are present.
+   * @param shouldBePresent - Whether the lesson specific category chips should be present.
+   */
+  async expectLessonSpecificCategoryChipsToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      lessonSpecificCategoryChips,
+      shouldBePresent
+    );
+  }
+
+  /**
+   * Checks if the screenshot drop zone text matches the expected text.
+   * @param expectedText - The expected text.
+   */
+  async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(screenshotDropZoneSelector);
+    await this.expectTextContentToContain(
+      screenshotDropZoneSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the feedback screenshot preview is present.
+   * @param shouldBePresent - Whether the feedback screenshot preview should be present.
+   */
+  async expectFeedbackScreenshotPreviewToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      feedbackScreenshotPreviewSelector,
+      shouldBePresent
+    );
+    if (shouldBePresent) {
+      await this.expectElementToBeVisible(
+        cancelFeedbackUploadButtonSelector,
+        shouldBePresent
+      );
+    }
   }
 
   /**

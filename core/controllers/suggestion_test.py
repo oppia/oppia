@@ -4745,6 +4745,11 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'content_html': '<p>new content html</p>',
             'translation_html': '<p>new content html in Hindi</p>',
             'data_format': 'html',
+            # Auto-generation metadata fields are always present in
+            # the serialized change_cmd (set to None for manual suggestions).
+            'was_auto_generated': None,
+            'auto_generation_provider': None,
+            'was_edited': None,
         }
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX,
