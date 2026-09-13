@@ -32,6 +32,10 @@ export interface UnicodeSchema {
   type: 'unicode';
   // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
+  // 'ui_config' is optional because it may not be present in the schema.
+  ui_config?: {
+    languageDirection?: string;
+  };
 }
 
 interface HtmlSchema {
