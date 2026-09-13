@@ -541,7 +541,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const mockResponse = {
       provider_mapping: {hi: 'azure'},
       automatic_translation_is_enabled: true,
-      available_providers: [],
+      available_providers: [{id: 'azure', display_name: 'Azure Translator'}],
     };
 
     contributorDashboardAdminBackendApiService
@@ -581,7 +581,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const mockResponse = {
       provider_mapping: mockMapping,
       automatic_translation_is_enabled: true,
-      available_providers: [],
+      available_providers: [{id: 'azure', display_name: 'Azure Translator'}],
     };
     req.flush(mockResponse);
     flushMicrotasks();
