@@ -541,6 +541,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const mockResponse = {
       provider_mapping: {hi: 'azure'},
       automatic_translation_is_enabled: true,
+      available_providers: [],
     };
 
     contributorDashboardAdminBackendApiService
@@ -554,7 +555,9 @@ describe('Contributor dashboard admin backend api service', () => {
     req.flush(mockResponse);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(mockResponse);
+    expect(successHandler).toHaveBeenCalledWith(
+      TranslationAdminConfig.createFromBackendDict(mockResponse)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -608,7 +611,7 @@ describe('Contributor dashboard admin backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to fetch');
+    expect(failHandler).toHaveBeenCalledWith(new Error('Failed to fetch'));
   }));
 
   it('should fail to update the translation configuration', fakeAsync(() => {
@@ -631,6 +634,6 @@ describe('Contributor dashboard admin backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to update');
+    expect(failHandler).toHaveBeenCalledWith(new Error('Failed to update'));
   }));
 });

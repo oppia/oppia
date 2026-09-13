@@ -32,6 +32,7 @@ interface LanguageOption {
 @Component({
   selector: 'oppia-translation-configuration-tab',
   templateUrl: './translation-configuration-tab.component.html',
+  styleUrls: ['./translation-configuration-tab.component.css'],
 })
 export class TranslationConfigurationTabComponent implements OnInit {
   providerMapping: Record<string, string> = {};
