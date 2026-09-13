@@ -29,6 +29,9 @@ describe('End chapter confetti component', function () {
     getStaticAudioUrl(audioPath: string): string {
       return 'audio_url.mp3';
     }
+    getStaticImageUrl(path: string): string {
+      return 'end_chapter_confetti.webm';
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -56,6 +59,14 @@ describe('End chapter confetti component', function () {
     expect(component.endChapterCelebratoryAudio.src).toContain('audio_url.mp3');
   });
 
+  it('should obtain the confetti video URL upon initialization', () => {
+    expect(component.confettiVideoUrl).toBe('');
+
+    component.ngOnInit();
+
+    expect(component.confettiVideoUrl).toContain('end_chapter_confetti.webm');
+  });
+
   it('should animate the confetti and play audio', () => {
     expect(component.confettiIsShown).toBe(false);
 
@@ -65,5 +76,21 @@ describe('End chapter confetti component', function () {
 
     expect(component.confettiIsShown).toBe(true);
     expect(component.endChapterCelebratoryAudio.play).toHaveBeenCalled();
+  });
+
+  it('should play the confetti video and hide it once it ends', () => {
+    fixture.detectChanges();
+    const videoElement = component.confettiVideoRef.nativeElement;
+    spyOn(videoElement, 'play');
+    spyOn(component.endChapterCelebratoryAudio, 'play');
+
+    component.animateConfetti();
+
+    expect(videoElement.play).toHaveBeenCalled();
+    expect(component.confettiIsShown).toBe(true);
+
+    videoElement.onended(new Event('ended'));
+
+    expect(component.confettiIsShown).toBe(false);
   });
 });
