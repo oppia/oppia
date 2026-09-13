@@ -363,7 +363,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(
                 Exception,
-                'No edit state content suggestion found for the given '
+                'Unrecognized suggestion type for the given '
                 'thread_id: %s' % thread_id,
             ):
                 self.get_json(thread_url)
