@@ -173,11 +173,32 @@ describe('TranslationConfigurationTabComponent', () => {
     ).not.toHaveBeenCalled();
   }));
 
+  it('should not add mapping if provider not selected', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+
+    component.selectedLanguage = 'es';
+    component.selectedProvider = '';
+    component.addMapping();
+    tick();
+
+    expect(
+      mockApiService.updateTranslationConfigurationAsync
+    ).not.toHaveBeenCalled();
+  }));
+
   it('should get language name via languageUtilService', () => {
     expect(component.getLanguageName('hi')).toBe('Hindi');
     expect(
       mockLanguageUtilService.getAudioLanguageDescription
     ).toHaveBeenCalledWith('hi');
+  });
+
+  it('should fall back to language code if description is not available', () => {
+    mockLanguageUtilService.getAudioLanguageDescription.and.returnValue(
+      undefined
+    );
+    expect(component.getLanguageName('fr')).toBe('fr');
   });
 
   it('should get provider display name from available providers', fakeAsync(() => {
@@ -224,6 +245,22 @@ describe('TranslationConfigurationTabComponent', () => {
 
     expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
       'Failed to update config.'
+    );
+  }));
+
+  it('should show default warning if error has no message', fakeAsync(() => {
+    mockApiService.updateTranslationConfigurationAsync.and.returnValue(
+      Promise.reject({})
+    );
+
+    component.providerMapping = {hi: 'azure'};
+    component.isAutomaticTranslationEnabled = true;
+
+    component.toggleAutomaticTranslation();
+    tick();
+
+    expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to save configuration.'
     );
   }));
 });

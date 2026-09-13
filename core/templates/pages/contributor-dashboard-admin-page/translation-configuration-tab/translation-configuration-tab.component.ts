@@ -24,6 +24,8 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AlertsService} from 'services/alerts.service';
 
+import './translation-configuration-tab.component.css';
+
 interface LanguageOption {
   code: string;
   name: string;
