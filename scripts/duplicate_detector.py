@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import urllib.request
+import yaml
 
 from core.constants import constants
 
@@ -28,7 +29,31 @@ import sentence_transformers
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
-# Here we use type Any because the parsed JSON object is highly dynamic.
+def _extract_yaml_strings(data: Any, target_keys: Tuple[str, ...]) -> Set[str]:
+    """Recursively extracts strings from specific keys in parsed YAML data."""
+    extracted = set()
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if k in target_keys and isinstance(v, str):
+                if v.strip():
+                    extracted.add(v.strip().lower())
+            elif k in target_keys and isinstance(v, list):
+                for item in v:
+                    if isinstance(item, str):
+                        if item.strip():
+                            extracted.add(item.strip().lower())
+                    elif isinstance(item, dict) and 'label' in item:
+                        label = item['label']
+                        if isinstance(label, str) and label.strip():
+                            extracted.add(label.strip().lower())
+            extracted.update(_extract_yaml_strings(v, target_keys))
+    elif isinstance(data, list):
+        for item in data:
+            extracted.update(_extract_yaml_strings(item, target_keys))
+    return extracted
+
+
+# Here we use type Any because the parsed JSON/YAML object is highly dynamic.
 def _get_template_lines_recursive(path: str) -> Set[str]:
     """Helper function to recursively find and parse template files.
 
@@ -40,7 +65,20 @@ def _get_template_lines_recursive(path: str) -> Set[str]:
     """
     template_lines: Set[str] = set()
     if os.path.isfile(path):
-        if path.endswith('.md') or path.endswith('.yml'):
+        if path.endswith('.yml'):
+            with open(path, 'r', encoding='utf-8') as f:
+                try:
+                    yaml_data = yaml.safe_load(f)
+                    if yaml_data:
+                        # GitHub forms render 'label', 'options', and 'value'
+                        # fields into the Markdown issue body.
+                        extracted = _extract_yaml_strings(
+                            yaml_data, ('label', 'options', 'value')
+                        )
+                        template_lines.update(extracted)
+                except yaml.YAMLError as e:
+                    logging.error('Error parsing YAML %s: %s', path, e)
+        elif path.endswith('.md'):
             with open(path, 'r', encoding='utf-8') as f:
                 for line in f:
                     clean_line = line.strip()
@@ -90,7 +128,11 @@ def clean_text(text: str, template_lines: Set[str]) -> str:
     lines = text.split('\n')
     cleaned_lines = []
     for line in lines:
-        if line.strip().lower() not in template_lines:
+        stripped_line = line.strip()
+        # Strip common markdown list and checkbox artifacts (e.g. "- [x] ", "* ")
+        stripped_line = re.sub(r'^[-*]\s+(\[[ xX]\]\s+)?', '', stripped_line)
+
+        if stripped_line and stripped_line.lower() not in template_lines:
             cleaned_lines.append(line)
     return '\n'.join(cleaned_lines)
 
@@ -275,7 +317,8 @@ def main() -> None:
     repo = os.environ.get('GITHUB_REPOSITORY', '')
     token = os.environ.get('GITHUB_TOKEN', '')
     workspace = os.environ.get('GITHUB_WORKSPACE', '.')
-    threshold = float(os.environ.get('THRESHOLD_SCORE', '0.8'))
+    threshold_str = os.environ.get('THRESHOLD_SCORE', '')
+    threshold = float(threshold_str) if threshold_str else 0.8
 
     logging.info('Extracting boilerplate from templates...')
     template_lines = get_template_lines(workspace)
