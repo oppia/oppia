@@ -70,7 +70,7 @@
               <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
             </a>
-            <div [hidden]="!getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+            <div [hidden]="!getOpenThreadsCount() && !newCreatorFeedbackTabIsEnabled" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
               <span class="oppia-exploration-open-threads-count">
                   {{ getOpenThreadsCount() }}&nbsp;open
               </span>
