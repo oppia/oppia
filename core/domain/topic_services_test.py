@@ -32,7 +32,6 @@ from core.domain import (
     question_services,
     rights_manager,
     skill_domain,
-    skill_fetchers,
     skill_services,
     story_domain,
     story_fetchers,
