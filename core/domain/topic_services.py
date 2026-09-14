@@ -684,13 +684,13 @@ def _apply_study_guide_change(
         )
 
     if change.property_name == study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS:
-        # -> Here we use cast because this 'if'
+        # Here we use cast because this 'if'
         # condition forces change to have type
         # UpdateStudyGuidePropertyCmd.
         update_study_guide_sections_cmd = cast(
             study_guide_domain.UpdateStudyGuidePropertyCmd, change
         )
-        # -> Here we use cast because the command's new_value is known to hold
+        # Here we use cast because the command's new_value is known to hold
         # a list of study guide section dicts.
         new_sections_dict_list: List[
             study_guide_domain.StudyGuideSectionDict
