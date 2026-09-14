@@ -114,7 +114,7 @@ class GetAllOpenIssuesTests(unittest.TestCase):
 
 
 class ExtractYamlStringsTests(unittest.TestCase):
-    """Tests for the _extract_yaml_strings function."""
+    """Tests for the extract_yaml_strings function."""
 
     def test_extract_yaml_strings(self) -> None:
         """Test extraction of strings from parsed YAML data."""
@@ -165,7 +165,7 @@ class ExtractYamlStringsTests(unittest.TestCase):
             ],
         }
 
-        extracted = duplicate_detector._extract_yaml_strings(
+        extracted = duplicate_detector.extract_yaml_strings(
             yaml_data, ('label', 'options', 'value')
         )
 
@@ -255,8 +255,8 @@ class GetTemplateLinesTests(unittest.TestCase):
         mock_isfile.side_effect = isfile_side_effect
         mock_listdir.return_value = ['issue.yml']
 
-        # A valid YAML string that will trigger _extract_yaml_strings
-        file_contents = "name: bug\nbody:\n  - type: input\n    attributes:\n      label: 'Describe the bug'"
+        # A valid YAML string that will trigger extract_yaml_strings
+        file_contents = 'name: bug\nbody:\n  - type: input\n    attributes:\n      label: \'Describe the bug\''
         m = mock.mock_open(read_data=file_contents)
         with mock.patch('builtins.open', m):
             result = duplicate_detector.get_template_lines('/fake')
@@ -284,7 +284,7 @@ class GetTemplateLinesTests(unittest.TestCase):
         mock_isfile.side_effect = isfile_side_effect
         mock_listdir.return_value = ['empty.yml']
 
-        m = mock.mock_open(read_data="")
+        m = mock.mock_open(read_data='')
         with mock.patch('builtins.open', m):
             result = duplicate_detector.get_template_lines('/fake')
             self.assertEqual(result, set())

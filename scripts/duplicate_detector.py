@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 # Here we use type Any because the parsed JSON/YAML object is highly dynamic.
-def _extract_yaml_strings(data: Any, target_keys: Tuple[str, ...]) -> Set[str]:
+def extract_yaml_strings(data: Any, target_keys: Tuple[str, ...]) -> Set[str]:
     """Recursively extracts strings from specific keys in parsed YAML data."""
     extracted = set()
     if isinstance(data, dict):
@@ -47,10 +47,10 @@ def _extract_yaml_strings(data: Any, target_keys: Tuple[str, ...]) -> Set[str]:
                         label = item['label']
                         if isinstance(label, str) and label.strip():
                             extracted.add(label.strip().lower())
-            extracted.update(_extract_yaml_strings(v, target_keys))
+            extracted.update(extract_yaml_strings(v, target_keys))
     elif isinstance(data, list):
         for item in data:
-            extracted.update(_extract_yaml_strings(item, target_keys))
+            extracted.update(extract_yaml_strings(item, target_keys))
     return extracted
 
 
@@ -73,7 +73,7 @@ def _get_template_lines_recursive(path: str) -> Set[str]:
                     if yaml_data:
                         # GitHub forms render 'label', 'options', and 'value'
                         # fields into the Markdown issue body.
-                        extracted = _extract_yaml_strings(
+                        extracted = extract_yaml_strings(
                             yaml_data, ('label', 'options', 'value')
                         )
                         template_lines.update(extracted)
