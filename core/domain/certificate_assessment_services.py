@@ -30,6 +30,7 @@ from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
     classroom_config_services,
+    question_domain,
     question_fetchers,
     question_services,
     skill_fetchers,
@@ -79,6 +80,18 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
+class CertificateAssessmentQuestionDict(TypedDict):
+    """Dict representation of a single question in the start-assessment response.
+
+    The start handler returns every question's pinned state data up-front so
+    that the client can serve questions without further per-question requests.
+    """
+
+    question_id: str
+    question_version: int
+    question_state_data: state_domain.StateDict
+
+
 class CertificateAssessmentAttemptNotReadyException(Exception):
     """Raised when the certificate question pool is no longer valid."""
 
@@ -108,6 +121,7 @@ class CertificateOfferingClassroomSummary(TypedDict):
     certificate_id: str
     title: str
     attempt_status: str
+    attempt_id: Optional[str]
     passed_on_date: Optional[float]
     failed_on_date: Optional[float]
 
@@ -555,7 +569,7 @@ def start_certificate_assessment_attempt(
     certificate_id: str, learner_id: str
 ) -> Tuple[
     certificate_assessment_domain.CertificateAssessmentAttempt,
-    List[Dict[str, Union[str, int]]],
+    List[CertificateAssessmentQuestionDict],
 ]:
     """Starts a new DB-backed certificate assessment attempt.
 
@@ -565,7 +579,8 @@ def start_certificate_assessment_attempt(
 
     Returns:
         tuple(domain.CertificateAssessmentAttempt, list(dict)). The created
-        attempt and the question/version payload for the client.
+        attempt and the pinned question state for every question in the
+        attempt, for the client.
 
     Raises:
         CertificateAssessmentAttemptNotReadyException. If the assessment can no
@@ -577,7 +592,7 @@ def start_certificate_assessment_attempt(
 
     def _start_txn() -> Tuple[
         certificate_assessment_domain.CertificateAssessmentAttempt,
-        List[Dict[str, Union[str, int]]],
+        List[CertificateAssessmentQuestionDict],
     ]:
         most_recent_attempt = (
             _get_most_recent_attempt_for_learner_and_certificate(
@@ -625,18 +640,30 @@ def start_certificate_assessment_attempt(
         )
         attempt = _attempt_model_to_domain(attempt_model)
         attempt.validate()
-        return (
-            attempt,
+        id_version_pairs = [
+            (question_id, version_data['question_versions'][question_id])
+            for question_id, _ in selected_questions
+        ]
+        questions = question_services.get_questions_by_ids_and_versions(
+            id_version_pairs
+        )
+        # Here we use cast because the list comprehension builds plain dicts
+        # which mypy infers as List[Dict[str, object]], while the function
+        # signature expects List[CertificateAssessmentQuestionDict].
+        pinned_questions = cast(
+            List[CertificateAssessmentQuestionDict],
             [
                 {
                     'question_id': question_id,
-                    'question_version': version_data['question_versions'][
-                        question_id
-                    ],
+                    'question_version': version,
+                    'question_state_data': _pin_question_state(question),
                 }
-                for question_id, _ in selected_questions
+                for (question_id, version), question in zip(
+                    id_version_pairs, questions
+                )
             ],
         )
+        return (attempt, pinned_questions)
 
     offering = get_certificate_assessment_offering(certificate_id)
     validation_result = validate_certificate_assessment_offering(
@@ -650,7 +677,6 @@ def start_certificate_assessment_attempt(
             classroom_id=offering.classroom_id,
             topic_ids=offering.topic_ids,
             total_questions=offering.total_questions,
-            time_limit_in_minutes=offering.time_limit_in_minutes,
             demonstrates=offering.demonstrates,
             async_status='Blocked',
         )
@@ -674,10 +700,34 @@ def start_certificate_assessment_attempt(
     return cast(
         Tuple[
             certificate_assessment_domain.CertificateAssessmentAttempt,
-            List[Dict[str, Union[str, int]]],
+            List[CertificateAssessmentQuestionDict],
         ],
         transaction_services.run_in_transaction_wrapper(_start_txn)(),
     )
+
+
+def _pin_question_state(
+    question: question_domain.Question,
+) -> state_domain.StateDict:
+    """Returns pinned question state data with the solution and hints removed.
+
+    The learner receives the full question state (interaction, content, etc.)
+    while the assessment is in progress, but never the solution or hints, so
+    they cannot see the answer before submitting.
+
+    Args:
+        question: Question. The question domain object to pin.
+
+    Returns:
+        dict. The question's state data with its interaction solution and
+        hints removed.
+    """
+    question_state_data = question.question_state_data.to_dict()
+    # Do not leak the solution (including correct_answer) or hints to the
+    # learner while the assessment is still in progress.
+    question_state_data['interaction']['solution'] = None
+    question_state_data['interaction']['hints'] = []
+    return question_state_data
 
 
 def _create_responses_in_attempt_entity_group(
@@ -842,54 +892,6 @@ def submit_certificate_assessment_attempt(
         certificate_assessment_domain.CertificateAssessmentAttempt,
         transaction_services.run_in_transaction_wrapper(_submit_txn)(),
     )
-
-
-def get_question_state_data_for_assessment_attempt(
-    learner_id: str,
-    attempt_id: str,
-    question_id: str,
-) -> state_domain.StateDict:
-    """Returns pinned question state data for an in-progress attempt.
-
-    Args:
-        learner_id: str. The ID of the learner requesting the question.
-        attempt_id: str. The ID of the active assessment attempt.
-        question_id: str. The ID of the question to fetch.
-
-    Returns:
-        dict. The pinned question state data for the requested question, with
-        the interaction solution and hints removed so the learner cannot see
-        the answer before submitting the assessment.
-
-    Raises:
-        utils.ValidationError. If the attempt does not exist, does not belong
-            to the learner, has already been submitted, or does not contain
-            the requested question.
-    """
-    attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
-    if attempt_model.learner_id != learner_id:
-        raise utils.ValidationError(
-            'This attempt does not belong to the current learner.'
-        )
-    if attempt_model.is_submitted:
-        raise utils.ValidationError(
-            'This assessment has already been submitted.'
-        )
-
-    question_version = attempt_model.version_data['question_versions'].get(
-        question_id
-    )
-    if question_version is None:
-        raise utils.ValidationError('Question is not part of this attempt.')
-    question = question_services.get_question_by_id_and_version(
-        question_id, question_version
-    )
-    question_state_data = question.question_state_data.to_dict()
-    # Do not leak the solution (including correct_answer) or hints to the
-    # learner while the assessment is still in progress.
-    question_state_data['interaction']['solution'] = None
-    question_state_data['interaction']['hints'] = []
-    return question_state_data
 
 
 def validate_certificate_assessment_offering(
@@ -1091,9 +1093,6 @@ def _model_to_domain(
         classroom_id=certificate_assessment_offering_model.classroom_id,
         topic_ids=list(certificate_assessment_offering_model.topic_ids),
         total_questions=certificate_assessment_offering_model.total_questions,
-        time_limit_in_minutes=(
-            certificate_assessment_offering_model.time_limit_in_minutes
-        ),
         demonstrates=list(certificate_assessment_offering_model.demonstrates),
         async_status=certificate_assessment_offering_model.async_status,
         version=certificate_assessment_offering_model.version,
@@ -1124,7 +1123,6 @@ def create_certificate_assessment_offering(
     classroom_id: str,
     topic_ids: list[str],
     total_questions: int,
-    time_limit_in_minutes: int,
     demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
@@ -1137,8 +1135,6 @@ def create_certificate_assessment_offering(
         classroom_id: str. The classroom ID associated with the offering.
         topic_ids: list(str). The topic IDs associated with the offering.
         total_questions: int. The total number of questions in the offering.
-        time_limit_in_minutes: int. The time limit for the offering in
-            minutes.
         demonstrates: list(str). The list of skills demonstrated by the
             offering.
         async_status: str. The availability status of the offering.
@@ -1156,7 +1152,6 @@ def create_certificate_assessment_offering(
             classroom_id=classroom_id,
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=async_status,
             version=1,
@@ -1171,7 +1166,6 @@ def create_certificate_assessment_offering(
             classroom_id=classroom_id,
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=async_status,
         )
@@ -1248,7 +1242,6 @@ def update_certificate_assessment_offering(
     classroom_id: str,
     topic_ids: list[str],
     total_questions: int,
-    time_limit_in_minutes: int,
     demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
@@ -1262,8 +1255,6 @@ def update_certificate_assessment_offering(
         classroom_id: str. The classroom ID associated with the offering.
         topic_ids: list(str). The topic IDs associated with the offering.
         total_questions: int. The total number of questions in the offering.
-        time_limit_in_minutes: int. The time limit for the offering in
-            minutes.
         demonstrates: list(str). The list of skills demonstrated by the
             offering.
         async_status: str. The availability status of the offering.
@@ -1291,9 +1282,6 @@ def update_certificate_assessment_offering(
     certificate_assessment_offering_model.classroom_id = classroom_id
     certificate_assessment_offering_model.topic_ids = topic_ids
     certificate_assessment_offering_model.total_questions = total_questions
-    certificate_assessment_offering_model.time_limit_in_minutes = (
-        time_limit_in_minutes
-    )
     certificate_assessment_offering_model.demonstrates = demonstrates
     certificate_assessment_offering_model.async_status = async_status
 
@@ -1313,10 +1301,6 @@ def update_certificate_assessment_offering(
             {
                 'cmd': 'update_total_questions',
                 'new_total_questions': total_questions,
-            },
-            {
-                'cmd': 'update_time_limit_in_minutes',
-                'new_time_limit_in_minutes': time_limit_in_minutes,
             },
             {'cmd': 'update_demonstrates', 'new_demonstrates': demonstrates},
             {'cmd': 'update_async_status', 'new_async_status': async_status},
@@ -1587,6 +1571,9 @@ def get_certificate_offerings_for_classroom(
                 'certificate_id': offering_model.id,
                 'title': offering_model.title,
                 'attempt_status': attempt_status,
+                'attempt_id': (
+                    latest_attempt.id if latest_attempt is not None else None
+                ),
                 'passed_on_date': passed_on_date,
                 'failed_on_date': failed_on_date,
             }
