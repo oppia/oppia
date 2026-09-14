@@ -16,11 +16,11 @@
         <div class="oppia-translation-topic-selector-dropdown-label">{{subject.key}}</div>
         <div class="oppia-translation-topic-selector-dropdown-option oppia-translation-topic-selector-dropdown-option-indented e2e-test-topic-selector-option"
              *ngFor="let option of subject.value"
-             (click)="selectOption(option)"
-             (keydown.enter)="selectOption(option)"
+             (click)="selectOption(option.name)"
+             (keydown.enter)="selectOption(option.name)"
              tabindex="0"
-             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
-          <span>{{option.name}}</span>
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.name === activeTopicName}">
+          <span class="e2e-test-topic-name">{{option.name}}</span>
           <span *ngIf="option.completeness !== null"
                 class="oppia-translation-topic-selector-completeness"
                 [ngClass]="{'oppia-translation-topic-selector-almost-complete' : option.completeness > 90}">
@@ -32,11 +32,11 @@
       <ng-template #noClassroomTopics>
         <div class="oppia-translation-topic-selector-dropdown-option e2e-test-topic-selector-option"
              *ngFor="let option of subject.value"
-             (click)="selectOption(option)"
-             (keydown.enter)="selectOption(option)"
+             (click)="selectOption(option.name)"
+             (keydown.enter)="selectOption(option.name)"
              tabindex="0"
-             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
-          <span>{{option.name}}</span>
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option.name === activeTopicName}">
+          <span class="e2e-test-topic-name">{{option.name}}</span>
           <span *ngIf="option.completeness !== null"
                 class="oppia-translation-topic-selector-completeness"
                 [ngClass]="{'oppia-translation-topic-selector-almost-complete' : option.completeness > 90}">

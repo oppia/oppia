@@ -432,7 +432,9 @@ export class Contributor extends ExplorationEditor {
     let optionElement: ElementHandle<Element> | null = null;
 
     for (const option of optionElements) {
-      const optionText = await option.evaluate(el => el.textContent?.trim());
+      const optionText = await option.evaluate(el =>
+        el.querySelector('.e2e-test-topic-name')?.textContent?.trim()
+      );
       if (optionText === topicName) {
         optionElement = option;
         break;
