@@ -102,6 +102,10 @@ attribution-guide .oppia-cc-icon a.oppia-attribution-link:focus {
   padding-top: 1rem;
 }
 
+.attribution-tooltip-offset.bs-tooltip-bottom {
+  margin-top: 20px;
+}
+
 .oppia-attribution-guide .attribution-print-section {
   padding-top: 2.7rem;
 }

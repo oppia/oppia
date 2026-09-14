@@ -235,6 +235,7 @@ describe('Attribution Guide Component', function () {
   }));
 
   it('should run the copy command without showing a tooltip if the tooltip reference is not found', () => {
+    MockNgbTooltip.open.calls.reset();
     const dummyDivElement = document.createElement('div');
     const dummyTextNode = document.createTextNode('Text to be copied');
     dummyDivElement.className = 'attribution-html-code';
@@ -251,6 +252,7 @@ describe('Attribution Guide Component', function () {
       component.copyAttribution('attribution-html-code')
     ).not.toThrowError();
     expect(document.execCommand).toHaveBeenCalled();
+    expect(MockNgbTooltip.open).not.toHaveBeenCalled();
   });
 
   it('should return early if element is not found', () => {
