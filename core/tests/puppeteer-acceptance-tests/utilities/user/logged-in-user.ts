@@ -55,7 +55,7 @@ const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
-const invalidUsernameErrorContainer = '.oppia-warning-text';
+const invalidUsernameErrorContainer = '.e2e-test-username-warning';
 const optionText = '.mat-option-text';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
@@ -907,12 +907,24 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
-    const invalidUsernameErrorContainerElement = await this.page.$(
+    const isUsernameErrorVisible = await this.page.evaluate(
+      (selector: string) => {
+        const el = document.querySelector(selector);
+        return (
+          el !== null &&
+          window.getComputedStyle(el).display !== 'none' &&
+          window.getComputedStyle(el).visibility !== 'hidden' &&
+          el.textContent !== ''
+        );
+      },
       invalidUsernameErrorContainer
     );
-    if (!invalidUsernameErrorContainerElement) {
+    if (!isUsernameErrorVisible) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
+      await this.clickOnElementWithSelector(
+        '.e2e-test-email-preferences-radio-no'
+      );
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle0'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),

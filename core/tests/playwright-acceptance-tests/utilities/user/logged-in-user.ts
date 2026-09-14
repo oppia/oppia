@@ -2151,12 +2151,15 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
-    const invalidUsernameErrorContainerElement = await this.page.$(
+    const isUsernameErrorVisible = await this.page.isVisible(
       invalidUsernameErrorContainer
     );
-    if (!invalidUsernameErrorContainerElement) {
+    if (!isUsernameErrorVisible) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.expectElementToBeVisible(registerNewUserButton);
+      await this.clickOnElementWithSelector(
+        '.e2e-test-email-preferences-radio-no'
+      );
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),

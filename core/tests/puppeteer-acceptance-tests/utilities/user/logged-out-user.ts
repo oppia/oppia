@@ -5026,7 +5026,11 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
       visible: true,
     });
-    await this.page.click(returnToStoryFromLastStateSelector);
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+      this.page.click(returnToStoryFromLastStateSelector),
+    ]);
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,
@@ -5978,6 +5982,9 @@ export class LoggedOutUser extends BaseUser {
     );
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
     );
     await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
@@ -8661,7 +8668,7 @@ export class LoggedOutUser extends BaseUser {
       );
       if (ogTitle !== expected.ogTitle) {
         throw new Error(
-          `meta property=\"og:title\" mismatch. Expected: "${expected.ogTitle}", Found: "${ogTitle}"`
+          `meta property='og:title' mismatch. Expected: "${expected.ogTitle}", Found: "${ogTitle}"`
         );
       }
     }
@@ -8687,7 +8694,7 @@ export class LoggedOutUser extends BaseUser {
       );
       if (ogDescription !== expected.ogDescription) {
         throw new Error(
-          `meta property=\"og:description\" mismatch. Expected: "${expected.ogDescription}", Found: "${ogDescription}"`
+          `meta property='og:description' mismatch. Expected: "${expected.ogDescription}", Found: "${ogDescription}"`
         );
       }
     }
@@ -8699,7 +8706,7 @@ export class LoggedOutUser extends BaseUser {
       );
       if (appName !== expected.applicationName) {
         throw new Error(
-          `meta name=\"application-name\" mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
+          `meta name='application-name' mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
         );
       }
     }
