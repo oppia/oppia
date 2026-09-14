@@ -255,7 +255,7 @@ class GetTemplateLinesTests(unittest.TestCase):
         mock_isfile.side_effect = isfile_side_effect
         mock_listdir.return_value = ['issue.yml']
 
-        # A valid YAML string that will trigger extract_yaml_strings
+        # A valid YAML string that will trigger extract_yaml_strings.
         file_contents = 'name: bug\nbody:\n  - type: input\n    attributes:\n      label: \'Describe the bug\''
         m = mock.mock_open(read_data=file_contents)
         with mock.patch('builtins.open', m):
