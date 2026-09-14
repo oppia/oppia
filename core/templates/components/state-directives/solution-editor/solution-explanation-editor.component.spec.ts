@@ -147,6 +147,10 @@ describe('Solution explanation editor', () => {
     let solutionDisplayed = stateSolutionService.displayed as Solution;
 
     expect(solutionDisplayed.explanation._html).toBe(updatedHtml);
+
+    component.updateExplanationHtml(null);
+
+    expect(solutionDisplayed.explanation._html).toBe('');
   });
 
   it('should save the explanation', fakeAsync(() => {

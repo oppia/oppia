@@ -53,7 +53,7 @@
       </div>
       <br>
       <oppia-thread-table *ngIf="threadData"
-                          [threads]="$any(threadData)"
+                          [threads]="threadData"
                           (rowClick)="setActiveThread($event)">
       </oppia-thread-table>
 

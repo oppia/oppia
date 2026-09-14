@@ -158,6 +158,10 @@ describe('Add Or Update Solution Modal Component', () => {
       component.updateExplanationHtml('New explanation html');
 
       expect(component.data.explanationHtml).toEqual('New explanation html');
+
+      component.updateExplanationHtml(null);
+
+      expect(component.data.explanationHtml).toEqual('');
     });
 
     it('should update correct answer when submitting current interaction', () => {

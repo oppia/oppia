@@ -75,7 +75,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   }
 
   updateHintContentHtml(value: SchemaDefaultValue): void {
-    this.hint.hintContent._html = String(value);
+    this.hint.hintContent._html = typeof value === 'string' ? value : '';
   }
 
   openHintEditor(): void {

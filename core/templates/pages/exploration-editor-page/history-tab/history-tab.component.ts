@@ -37,8 +37,10 @@ import {
   ExplorationSnapshot,
   VersionTreeService,
 } from './services/version-tree.service';
-import {CompareVersionsService} from './services/compare-versions.service';
-import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {
+  CompareVersionsService,
+  CompareVersionData,
+} from './services/compare-versions.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import './history-tab.component.css';
 
@@ -48,11 +50,6 @@ interface VersionMetadata {
   createdOnMsecsStr: string;
   commitMessage: string;
   tooltipText?: string;
-}
-
-interface Metadata {
-  v1Metadata: ExplorationMetadata;
-  v2Metadata: ExplorationMetadata;
 }
 
 @Component({
@@ -108,7 +105,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   comparisonsAreDisabled: boolean = false;
   compareVersionsButtonIsHidden: boolean = false;
   compareVersions: object = {};
-  diffData: Metadata | object | null = null;
+  diffData: CompareVersionData | null = null;
 
   constructor(
     private checkRevertService: CheckRevertService,
@@ -476,12 +473,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       }
     );
 
-    modalRef.componentInstance.oldMetadata = (
-      this.diffData as Metadata
-    ).v1Metadata;
-    modalRef.componentInstance.newMetadata = (
-      this.diffData as Metadata
-    ).v2Metadata;
+    const diffData = this.diffData as CompareVersionData;
+    modalRef.componentInstance.oldMetadata = diffData.v1Metadata;
+    modalRef.componentInstance.newMetadata = diffData.v2Metadata;
     modalRef.componentInstance.headers = {
       leftPane: this.earlierVersionHeader,
       rightPane: this.laterVersionHeader,

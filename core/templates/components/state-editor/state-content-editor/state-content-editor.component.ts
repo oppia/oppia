@@ -169,7 +169,8 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   updateContentHtml(contentHtml: SchemaDefaultValue): void {
-    this.stateContentService.displayed._html = String(contentHtml);
+    this.stateContentService.displayed._html =
+      typeof contentHtml === 'string' ? contentHtml : '';
   }
 
   ngOnDestroy(): void {

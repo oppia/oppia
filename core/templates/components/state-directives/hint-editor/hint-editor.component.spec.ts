@@ -150,5 +150,8 @@ describe('HintEditorComponent', () => {
 
     component.updateHintContentHtml('html update');
     expect(component.hint.hintContent._html).toBe('html update');
+
+    component.updateHintContentHtml(null);
+    expect(component.hint.hintContent._html).toBe('');
   });
 });

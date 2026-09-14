@@ -82,7 +82,8 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
     if (this.stateSolutionService.displayed === null) {
       throw new Error('Solution is undefined');
     }
-    this.stateSolutionService.displayed.explanation._html = String(value);
+    this.stateSolutionService.displayed.explanation._html =
+      typeof value === 'string' ? value : '';
   }
 
   getSchema(): Schema {

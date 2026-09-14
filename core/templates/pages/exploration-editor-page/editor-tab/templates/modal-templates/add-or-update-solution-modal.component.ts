@@ -134,7 +134,7 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   updateExplanationHtml(value: SchemaDefaultValue): void {
-    this.data.explanationHtml = String(value);
+    this.data.explanationHtml = typeof value === 'string' ? value : '';
   }
 
   isSubmitButtonDisabled(): boolean {

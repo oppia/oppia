@@ -94,7 +94,7 @@ export class AddHintModalComponent
   }
 
   updateLocalHint($event: SchemaDefaultValue): void {
-    const tempHint = String($event);
+    const tempHint = typeof $event === 'string' ? $event : '';
     if (this.tmpHint !== tempHint) {
       this.tmpHint = tempHint;
       this.changeDetectorRef.detectChanges();

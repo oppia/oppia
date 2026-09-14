@@ -170,6 +170,9 @@ describe('StateHintsEditorComponent', () => {
     stateContentService.displayed = _getContent('content', 'old html');
     component.updateContentHtml('new html');
     expect(stateContentService.displayed._html).toBe('new html');
+
+    component.updateContentHtml(null);
+    expect(stateContentService.displayed._html).toBe('');
   });
 
   it('should emit onExternalRteSave before saving content', function () {
