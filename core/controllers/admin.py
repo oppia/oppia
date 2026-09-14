@@ -2010,7 +2010,9 @@ class AdminHandler(
         )
         topic.skill_ids_for_diagnostic_test = [skill_id]
         topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         topic.subtopics = [
             topic_domain.Subtopic(
                 1,

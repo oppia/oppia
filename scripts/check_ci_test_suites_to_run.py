@@ -315,6 +315,12 @@ def get_lighthouse_pages_from_config() -> List[LighthousePageDict]:
 def get_lighthouse_shards_config() -> dict[str, List[str]]:
     """Gets the explicit mapping of Lighthouse shards to their pages.
 
+    Pages are grouped into shards by their data-setup requirements rather
+    than sorted alphabetically: pages that need the same puppeteer setup are
+    kept together so that each shard performs minimal setup. When adding a
+    page, place it in the shard whose setup it needs and keep the existing
+    page order stable.
+
     Returns:
         dict(str, list(str)). Maps each shard name to the names of the pages
         it audits.

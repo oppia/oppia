@@ -457,6 +457,12 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         Lighthouse page entry in lighthouse-pages.json, or is explicitly
         listed in the exclusion set.
 
+        The entries in lighthouse-pages.json and lighthouse-shards.json are
+        intentionally ordered to group pages that share the same puppeteer
+        setup under one shard, which keeps each shard's data setup minimal.
+        This check only requires every route to be covered, so re-sorting the
+        files for alphabetical consistency is neither needed nor desired.
+
         Returns:
             TaskResult. A TaskResult object representing the result of the
             lint check.

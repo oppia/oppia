@@ -425,6 +425,12 @@ def run_lighthouse_checks() -> None:
 def get_lighthouse_pages_config() -> dict[str, str]:
     """Gets the lighthouse pages and their URLs from the config.
 
+    The pages in ``lighthouse-pages.json`` are intentionally grouped by the
+    shard that audits them rather than kept in alphabetical order. Grouping
+    pages that share the same puppeteer setup under one shard keeps each
+    shard's setup steps minimal, so when adding a page, place it next to the
+    pages that run the same setup instead of re-sorting the file.
+
     Returns:
         dict(str, str). The lighthouse page names and their URLs.
     """
@@ -439,6 +445,11 @@ def get_lighthouse_pages_config() -> dict[str, str]:
 
 def get_lighthouse_shards_config() -> dict[str, list[str]]:
     """Gets the lighthouse page names for each shard from the shards config.
+
+    Each shard lists the pages it audits and drives which data setup the
+    puppeteer script performs; pages are grouped per shard by their setup
+    requirements rather than sorted alphabetically, so keep the page order
+    stable when editing this file.
 
     Returns:
         dict(str, list(str)). Maps each shard name to the names of the pages
