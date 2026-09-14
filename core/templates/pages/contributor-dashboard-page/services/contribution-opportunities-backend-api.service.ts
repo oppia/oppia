@@ -17,7 +17,7 @@
  * contributors to contribute.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {
@@ -385,9 +385,9 @@ export class ContributionOpportunitiesBackendApiService {
     languageCode?: string
   ): Promise<TopicNamesPerClassroomDict[]> {
     try {
-      const params: {language_code?: string} = {};
+      let params = new HttpParams();
       if (languageCode) {
-        params.language_code = languageCode;
+        params = params.set('language_code', languageCode);
       }
       const response = await this.http
         .get<TopicNamesPerClassroomBackendDict>(
