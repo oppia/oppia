@@ -87,8 +87,12 @@ def is_email_sending_allowed() -> bool:
     """Returns whether this server is configured to send emails.
 
     This is the single authorized reader of the SERVER_CAN_SEND_EMAILS
-    platform parameter. Callers outside this module should use this
-    predicate instead of reading the parameter directly.
+    platform parameter outside send_mail(). Use it ONLY to surface the
+    capability to a caller or the frontend, or to gate a side effect
+    that does not go through send_mail() (e.g. a bulk-email-provider
+    write). Do NOT use it to decide whether to generate or send an
+    email — send_mail() owns that decision and no-ops delivery on its
+    own when sending is disabled.
 
     Returns:
         bool. Whether the SERVER_CAN_SEND_EMAILS platform parameter is True.
