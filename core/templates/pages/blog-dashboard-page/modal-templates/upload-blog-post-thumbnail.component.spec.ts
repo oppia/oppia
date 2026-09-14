@@ -181,4 +181,9 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.uploadedImage).toEqual(null);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
+  it('should get invalid svg issue url', () => {
+    let svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue_url');
+    expect(componentInstance.getInvalidSvgIssueUrl()).toEqual('issue_url');
+  });
 });
