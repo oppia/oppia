@@ -52,6 +52,7 @@ interface DeleteValue {
 })
 export class StateSolutionEditorComponent implements OnInit {
   // The state property is null until a solution is specified or removed.
+  @Output() onSaveNextContentIdIndex: EventEmitter<number> = new EventEmitter();
   @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
@@ -187,6 +188,7 @@ export class StateSolutionEditorComponent implements OnInit {
         result => {
           this.stateSolutionService.displayed = result.solution;
           this.stateSolutionService.saveDisplayedValue();
+          this.onSaveNextContentIdIndex.emit();
           this.onSaveSolution(this.stateSolutionService.displayed);
           let activeStateName = this.stateEditorService.getActiveStateName();
           if (activeStateName === null) {
