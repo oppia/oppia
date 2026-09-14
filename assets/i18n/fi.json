@@ -302,7 +302,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MAX_LENGTH": "Aiheessa saa olla enintään <[max]> merkkiä.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Aihe on pakollinen.",
   "I18N_FEEDBACK_INSTRUCTION": "Palauteviestissä saa olla enintään <[count]> merkkiä.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonyymi",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Kuvakaappauksen lataaminen epäonnistui. Yritä uudelleen.",
   "I18N_FOOTER_ABOUT": "Tietoja",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "TIETOJA OPPIASTA",

@@ -108,7 +108,6 @@
   "I18N_ERROR_NEXT_STEPS": "An dra wellañ d'ober eo distreiñ da <a href=\"<[homeUrl]>\">pajenn degemer </a> moarvat. Ma c'hoarvez ar gudenn en-dro, koulskoude,ha ma soñjit n'eo ket reizh e c'hallit kelaouiñ ac'hanomp en  hor <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">heuliañ ar c'hudennoù</a>. Hon digarezit evit se.",
   "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE": "Fazi <[statusCode]> | Oppia",
   "I18N_ERROR_PAGE_TITLE_404": "Fazi 404 — Oppia",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Dizanv",
   "I18N_FOOTER_ABOUT": "Diwar-benn",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "Diwar-benn OPPIA",
   "I18N_FOOTER_BLOG": "Blog",

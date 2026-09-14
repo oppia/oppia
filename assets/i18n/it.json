@@ -242,7 +242,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_MESSAGE_MAX_LENGTH": "Il messaggio deve essere lungo al massimo <[max]> caratteri.",
   "I18N_FEEDBACK_CREATE_THREAD_MESSAGE_REQUIRED": "Il messaggio non può essere vuoto.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Crea thread",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonimo",
   "I18N_FOOTER_ABOUT": "Informazioni",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "SU OPPIA",
   "I18N_FOOTER_BLOG": "Blog",

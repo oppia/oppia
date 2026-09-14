@@ -656,7 +656,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "विषय आवश्यक छ।",
   "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "थ्रेड सिर्जना गर्नुहोस्",
   "I18N_FEEDBACK_INSTRUCTION": "प्रतिक्रिया सन्देश बढीमा <[count]> वर्णहरूको हुनुपर्छ।",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "बेनामी",
   "I18N_FEEDBACK_MODAL_HEADER": "यस पाठमा प्रतिक्रिया दिनुहोस्।",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "स्क्रिनसट अपलोड असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।",
   "I18N_FEEDBACK_SUBMITTED_ERROR": "तपाईंको प्रतिक्रिया पेश गर्दा त्रुटि भयो। कृपया फेरि प्रयास गर्नुहोस्।",

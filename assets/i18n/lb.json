@@ -194,7 +194,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MAX_LENGTH": "De Sujet däerf héchstens <[max]> Zeeche laang sinn.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH": "De Sujet muss op d'mannst <[min]> Zeeche laang sinn.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "De Sujet ass obligatoresch.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonym",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "D'Eropluede vum Screenshot huet net geklappt. Probéiert wgl. nach eng Kéier.",
   "I18N_FOOTER_ABOUT": "Iwwer",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "IWWER OPPIA",

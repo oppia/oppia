@@ -88,7 +88,6 @@
   "I18N_ERROR_MESSAGE_500": "Någonting gick riktigt fel. Men det var inte ditt fel. Ett internt fel uppstod.",
   "I18N_ERROR_NEXT_STEPS": "Det bästa att göra nu är förmodligen att återvända till <a href=\"<[homeUrl]>\">hemsidan</a>. Om problemet ändå kvarstår och du tror att det inte bör göra det, berätta det för oss på vår <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">ärendehanterare</a>. Beklagar detta.",
   "I18N_ERROR_PAGE_TITLE_404": "Fel 404 - Oppia",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonym",
   "I18N_FOOTER_ABOUT": "Om",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "OM OPPIA",
   "I18N_FOOTER_BLOG": "Blogg",

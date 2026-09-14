@@ -632,7 +632,6 @@
   "I18N_EXPLORE_OPPIA_CLASSROOM": "Explore as salas de aula da Oppia",
   "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Painel de controle do facilitador | Oppia",
   "I18N_FEEDBACK_INSTRUCTION": "A mensagem de feedback deve ter no máximo <[count]> caracteres.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anônimo",
   "I18N_FOOTER_ABOUT": "Sobre",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "SOBRE O OPPIA",
   "I18N_FOOTER_BLOG": "Blog",

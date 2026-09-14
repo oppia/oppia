@@ -646,7 +646,6 @@
   "I18N_EXPLORE_OPPIA_CLASSROOM": "Découvrez les salles de classe Oppia",
   "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Tableau de bord de l’animateur | Oppia",
   "I18N_FEEDBACK_INSTRUCTION": "Le message de commentaire ne doit pas dépasser <[count]> caractères.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonyme",
   "I18N_FEEDBACK_MODAL_HEADER": "Donner un retour sur cette leçon",
   "I18N_FIRST_HINT_DESCRIPTION": "Besoin d'aide pour résoudre le problème ? Jetez un œil à l'indice.",
   "I18N_FOOTER_ABOUT": "À propos",

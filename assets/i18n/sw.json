@@ -455,7 +455,6 @@
   "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Dashibodi ya Mwezeshaji | Oppia",
   "I18N_FEEDBACK_CAPTCHA_REQUIRED": "Captcha inahitajika ili kuwasilisha maoni.",
   "I18N_FEEDBACK_INSTRUCTION": "Ujumbe wa maoni unapaswa kuwa na herufi zisizozidi <[count]>.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Isiyojulikana",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Imeshindwa kupakia picha ya skrini. Tafadhali jaribu tena.",
   "I18N_FEEDBACK_SUBMITTED_SUCCESS": "Asante! Ripoti yako imetumwa kwa timu ya somo.",
   "I18N_FOOTER_ABOUT": "Kuhusu",

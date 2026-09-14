@@ -705,7 +705,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Predmet je povinný.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Vytvoriť vlákno",
   "I18N_FEEDBACK_INSTRUCTION": "Správa spätnej väzby môže mať najviac <[count]> znakov.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymný",
   "I18N_FEEDBACK_MODAL_HEADER": "Poskytnite spätnú väzbu k tejto lekcii",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Nahratie snímky obrazovky zlyhalo. Skúste to znova.",
   "I18N_FEEDBACK_SUBMITTED_ERROR": "Pri odosielaní vašej spätnej väzby sa vyskytla chyba. Skúste to znova.",

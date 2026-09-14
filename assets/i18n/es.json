@@ -633,7 +633,6 @@
   "I18N_EXPLORE_OPPIA_CLASSROOM": "Explora las aulas de Oppia",
   "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Comparar fracciones",
   "I18N_FEEDBACK_INSTRUCTION": "El mensaje de retroalimentación debe tener como máximo <[count]> caracteres.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anónimo",
   "I18N_FEEDBACK_MODAL_HEADER": "Dar retroalimentación sobre esta lección",
   "I18N_FIRST_HINT_DESCRIPTION": "¿Necesitas ayuda para resolver el problema? Consulta la pista.",
   "I18N_FOOTER_ABOUT": "Acerca de",

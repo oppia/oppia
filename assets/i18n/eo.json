@@ -52,7 +52,6 @@
   "I18N_ERROR_MESSAGE_500": "Io misfunkciegis. Sed ne pro vi. Interna eraro okazis.",
   "I18N_ERROR_NEXT_STEPS": "Verŝajne, vi reiru al la <a href=\"<[homeUrl]>\">ĉefpaĝo</a>. Tamen, se ĉi tiu problemo reokazas, kaj laŭ vi ĝi ne reokazu, bonvolu sciigi nin ĉe nia <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">problemspurilo</a>. Ni bedaŭras pri tio.",
   "I18N_ERROR_PAGE_TITLE_404": "Eraro 404 - Oppia",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonimulo",
   "I18N_FOOTER_ABOUT": "Pri",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "PRI OPPIA",
   "I18N_FOOTER_BLOG": "Rettaglibro",

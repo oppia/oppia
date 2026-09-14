@@ -61,7 +61,6 @@
   "I18N_ERROR_MESSAGE_500": "Qualquer coisa correu muito mal, mas a culpa não é sua. Ocorreu um erro interno.",
   "I18N_ERROR_NEXT_STEPS": "O melhor a fazer agora, provavelmente, é regressar à <a href=\"<[homeUrl]>\">página principal</a>. Contudo, se a situação persistir e acha que isso não é normal, comunique-o no <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">sistema de gestão de incidências</a>, por favor. Lamentamos o incómodo.",
   "I18N_ERROR_PAGE_TITLE_404": "Erro 404 - Oppia",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anónimo",
   "I18N_FIRST_HINT_DESCRIPTION": "Precisa de ajuda extra para resolver o problema? Experimente a dica.",
   "I18N_FOOTER_ABOUT": "Sobre",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "SOBRE OPPIA",

@@ -723,7 +723,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Subject is required.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Create Thread",
   "I18N_FEEDBACK_INSTRUCTION": "Feedback message should be at most <[count]> characters.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymous",
   "I18N_FEEDBACK_MODAL_HEADER": "Give feedback on this lesson",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Screenshot upload failed. Please try again.",
   "I18N_FEEDBACK_SUBMITTED_ERROR": "There was an error submitting your feedback. Please try again.",

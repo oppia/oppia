@@ -708,7 +708,6 @@
   "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Konuya ilişkin bilgi zorunludur.",
   "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Konu Oluştur",
   "I18N_FEEDBACK_INSTRUCTION": "Geri bildirim mesajı, en fazla <[count]> karakter uzunluğunda olmalıdır.",
-  "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonim",
   "I18N_FEEDBACK_MODAL_HEADER": "Bu derse ilişkin geri bildirimde bulun.",
   "I18N_FEEDBACK_SCREENSHOT_UPLOAD_ERROR": "Ekran görüntüsü yükleme başarısız oldu. Lütfen tekrar deneyin.",
   "I18N_FEEDBACK_SUBMITTED_ERROR": "Geri bildiriminiz gönderilirken bir hata oluştu. Lütfen tekrar deneyin.",
