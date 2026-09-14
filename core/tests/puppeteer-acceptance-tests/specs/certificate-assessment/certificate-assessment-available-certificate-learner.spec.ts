@@ -19,11 +19,18 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
+
+// This error arises when the learner tries to access the certificate creator
+// dashboard, which is not allowed for them.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
+]);
 
 // The curriculum creation (topics, skills and questions) plus the certificate
 // publishing is slow, so the whole setup needs a generous timeout.
@@ -217,6 +224,11 @@ describe('Certified learner', function () {
     await learner.submitAssessmentWithUnansweredQuestion(9);
     await learner.expectUnansweredQuestionsModal();
     await learner.clickOnElementWithSelector('.btn-close');
+  });
+
+  it('should not be able to access the certificate creator dashboard', async function () {
+    await learner.goto(testConstants.URLs.CertificateCreatorDashboard, false);
+    await learner.expectErrorPage(401);
   });
 
   afterAll(async function () {

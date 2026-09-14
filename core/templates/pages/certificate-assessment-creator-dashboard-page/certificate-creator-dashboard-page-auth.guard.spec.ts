@@ -17,6 +17,7 @@
  */
 
 import {Location} from '@angular/common';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
@@ -26,8 +27,10 @@ import {
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {AppConstants} from 'app.constants';
+import {UserInfo} from 'domain/user/user-info.model';
 import {CertificateCreatorDashboardPageAuthGuard} from './certificate-creator-dashboard-page-auth.guard';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UserService} from 'services/user.service';
 
 class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
@@ -38,6 +41,7 @@ class MockRouter {
 describe('CertificateCreatorDashboardPageAuthGuard', () => {
   let guard: CertificateCreatorDashboardPageAuthGuard;
   let platformFeatureService: PlatformFeatureService;
+  let userService: UserService;
   let router: Router;
   let location: Location;
 
@@ -54,14 +58,19 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
       }
     );
 
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'getUserInfoAsync',
+    ]);
+
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
         CertificateCreatorDashboardPageAuthGuard,
         {
           provide: PlatformFeatureService,
           useValue: platformFeatureServiceSpy,
         },
+        {provide: UserService, useValue: userServiceSpy},
         {provide: Router, useClass: MockRouter},
         Location,
       ],
@@ -69,13 +78,26 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
 
     guard = TestBed.inject(CertificateCreatorDashboardPageAuthGuard);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    userService = TestBed.inject(UserService);
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
   });
 
-  it('should allow access when certificate assessment is enabled', fakeAsync(() => {
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
+  it('should allow access when certificate assessment is enabled and user is curriculum admin', fakeAsync(() => {
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
+    );
+    const getUserInfoAsyncSpy = spyOn(
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, true, false, false, false, '', '', '', true)
+      )
     );
 
     let canActivateResult: boolean | null = null;
@@ -89,6 +111,7 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
+    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
@@ -116,6 +139,40 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
+    expect(replaceStateSpy).toHaveBeenCalledWith(
+      '/certificate-creator-dashboard'
+    );
+  }));
+
+  it('should redirect to 401 when user is not a curriculum admin', fakeAsync(() => {
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+    const replaceStateSpy = spyOn(location, 'replaceState');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createDefault())
+    );
+
+    let canActivateResult: boolean | null = null;
+    const stateSnapshot = {
+      url: '/certificate-creator-dashboard',
+    } as RouterStateSnapshot;
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), stateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
+
+    tick();
+
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+    ]);
+    expect(window.sessionStorage.getItem('oppia_401_error_message')).toEqual(
+      'You must be a curriculum admin to access this page.'
+    );
     expect(replaceStateSpy).toHaveBeenCalledWith(
       '/certificate-creator-dashboard'
     );

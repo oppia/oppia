@@ -27,6 +27,7 @@ from core.domain import (
     classroom_config_domain,
     classroom_config_services,
     topic_fetchers,
+    user_services,
 )
 from core.platform import models
 from core.storage.certificate_assessment import gae_models
@@ -120,6 +121,40 @@ def _create_certificate_offering() -> (
 
 class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentOfferingHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.curriculum_admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+
+    def test_get_returns_401_for_guest_user(self) -> None:
+        self.logout()
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            expected_status_int=401,
+        )
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+
+    def test_get_returns_401_for_non_curriculum_admin(self) -> None:
+        self.logout()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            expected_status_int=401,
+        )
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access certificate dashboard.',
+        )
 
     def test_get_returns_empty_certificate_offerings(self) -> None:
         response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER)
@@ -222,6 +257,66 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
     test_utils.GenericTestBase
 ):
     """Tests class for CertificateAssessmentOfferingByIdHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
+        handler = certificate_assessment.CertificateAssessmentOfferingByIdHandler.__new__(
+            certificate_assessment.CertificateAssessmentOfferingByIdHandler
+        )
+        handler.user_id = None
+
+        with self.assertRaisesRegex(
+            certificate_assessment.CertificateAssessmentOfferingByIdHandler.NotLoggedInException,
+            '^$',
+        ):
+            getattr(
+                certificate_assessment.CertificateAssessmentOfferingByIdHandler.get,
+                '__wrapped__',
+            )(handler, 'missing_certificate_id')
+
+    def test_get_returns_real_certificate_offering_for_learner(self) -> None:
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Physics Basics',
+            description='Covers Newtonian mechanics.',
+            classroom_id='science_classroom_02',
+            topic_ids=['topic_forces'],
+            total_questions=5,
+            demonstrates=['Problem solving'],
+            async_status='Available',
+        )
+        self.logout()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', created_offering.certificate_id
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'certificate_offering': {
+                    'certificate_id': created_offering.certificate_id,
+                    'title': 'Physics Basics',
+                    'description': 'Covers Newtonian mechanics.',
+                    'classroom_id': 'science_classroom_02',
+                    'topic_ids': ['topic_forces'],
+                    'total_questions': 5,
+                    'demonstrates': ['Problem solving'],
+                    'async_status': 'Available',
+                    'version': 1,
+                    'topic_data': {'topic_forces': 1},
+                }
+            },
+        )
 
     def test_get_returns_real_certificate_offering(self) -> None:
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(
@@ -417,6 +512,44 @@ class ValidateCertificateAssessmentOfferingHandlerUnitTests(
         self.save_new_topic(
             self.topic_id, 'Place Values', abbreviated_name='place_values'
         )
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_post_returns_401_for_guest_user(self) -> None:
+        self.logout()
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 3,
+            },
+            csrf_token=self.get_new_csrf_token(),
+            expected_status_int=401,
+        )
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+
+    def test_post_returns_401_for_non_curriculum_admin(self) -> None:
+        self.logout()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 3,
+            },
+            csrf_token=self.get_new_csrf_token(),
+            expected_status_int=401,
+        )
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access certificate dashboard.',
+        )
 
     def test_post_returns_validation_result_for_valid_offering(self) -> None:
         csrf_token = self.get_new_csrf_token()
@@ -449,6 +582,10 @@ class ValidateCertificateAssessmentOfferingHandlerUnitTests(
             certificate_assessment.ValidateCertificateAssessmentOfferingHandler
         )
         handler.normalized_payload = None
+        handler.user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        handler.user = user_services.get_user_actions_info(handler.user_id)
 
         validation_result = {
             'is_valid': True,

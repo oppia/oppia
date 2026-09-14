@@ -5168,7 +5168,13 @@ def can_access_certificate_dashboard(
         handler: function. The function to be decorated.
 
     Returns:
-        function. The newly decorated function.
+        function. The newly decorated function that now checks if the user has
+        permission to access the certificate dashboard.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            access the certificate dashboard.
     """
 
     # Here we use type Any because this method can accept arbitrary number of
@@ -5178,7 +5184,8 @@ def can_access_certificate_dashboard(
         self: _SelfBaseHandlerType,
         **kwargs: Any,
     ) -> _GenericHandlerFunctionReturnType:
-        """Stub handler for certificate dashboard access checks.
+        """Checks if the user is logged in and can access the certificate
+        dashboard.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -5186,7 +5193,18 @@ def can_access_certificate_dashboard(
         Returns:
             *. The return value of the decorated function.
         """
-        return handler(self, **kwargs)
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+            role_services.ACTION_ACCESS_CERTIFICATE_DASHBOARD
+            in self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access certificate dashboard.'
+        )
 
     return test_can_access_certificate_dashboard
 
