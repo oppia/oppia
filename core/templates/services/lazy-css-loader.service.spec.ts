@@ -60,6 +60,17 @@ describe('LazyCssLoaderService', () => {
       });
   });
 
+  beforeEach(() => {
+    // Other spec files append third-party stylesheet links to the document
+    // head without cleaning them up, so remove any leftovers before each test
+    // to avoid the tests seeing links appended by previous tests.
+    document.head
+      .querySelectorAll('link[href*="third_party_static"]')
+      .forEach((linkElement: {remove: () => void}) => {
+        linkElement.remove();
+      });
+  });
+
   it('should load GUPPY css when not loaded', () => {
     const appendChildSpy = spyOn(document.head, 'appendChild');
     const result = lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
