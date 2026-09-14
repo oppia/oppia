@@ -12,9 +12,6 @@
 
     <ul class="instructions-list">
       <li>
-        {{ timeLimitInstructionI18nKey | translate: { minutes: timeLimitInMinutes } }}
-      </li>
-      <li>
         {{ questionCountInstructionI18nKey | translate: { questions: totalQuestions } }}
       </li>
       <li *ngFor="let instructionKey of staticInstructionI18nKeys">
