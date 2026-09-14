@@ -15,7 +15,6 @@
 /**
  * @fileoverview Tests for LazyCssLoaderService.
  */
-// @ts-nocheck
 
 import {RendererFactory2} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
@@ -78,14 +77,20 @@ describe('LazyCssLoaderService', () => {
     expect(result).toBe(true);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.GUPPY)).toBe(true);
     expect(appendChildSpy).toHaveBeenCalledTimes(1);
-    expect(appendChildSpy.calls.mostRecent().args[0].getAttribute('href')).toBe(
-      '/assets/third_party_static/guppy/guppy-default.min.css'
-    );
-    expect(appendChildSpy.calls.mostRecent().args[0].getAttribute('rel')).toBe(
-      'stylesheet'
-    );
     expect(
-      appendChildSpy.calls.mostRecent().args[0].getAttribute('media')
+      (
+        appendChildSpy.calls.mostRecent().args[0] as HTMLLinkElement
+      ).getAttribute('href')
+    ).toBe('/assets/third_party_static/guppy/guppy-default.min.css');
+    expect(
+      (
+        appendChildSpy.calls.mostRecent().args[0] as HTMLLinkElement
+      ).getAttribute('rel')
+    ).toBe('stylesheet');
+    expect(
+      (
+        appendChildSpy.calls.mostRecent().args[0] as HTMLLinkElement
+      ).getAttribute('media')
     ).toBe('print');
   });
 
@@ -97,7 +102,7 @@ describe('LazyCssLoaderService', () => {
       .args[0] as HTMLLinkElement;
     expect(linkElement.getAttribute('media')).toBe('print');
 
-    linkElement.onload(null);
+    linkElement.onload(new Event('load'));
 
     expect(linkElement.getAttribute('media')).toBe('all');
   });
@@ -119,9 +124,11 @@ describe('LazyCssLoaderService', () => {
     expect(result).toBe(true);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CROPPER)).toBe(true);
     expect(appendChildSpy).toHaveBeenCalledTimes(1);
-    expect(appendChildSpy.calls.mostRecent().args[0].getAttribute('href')).toBe(
-      '/assets/third_party_static/cropper/cropper.min.css'
-    );
+    expect(
+      (
+        appendChildSpy.calls.mostRecent().args[0] as HTMLLinkElement
+      ).getAttribute('href')
+    ).toBe('/assets/third_party_static/cropper/cropper.min.css');
   });
 
   it('should not reload CROPPER css if already loaded', () => {
@@ -141,12 +148,16 @@ describe('LazyCssLoaderService', () => {
     expect(result).toBe(true);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(true);
     expect(appendChildSpy).toHaveBeenCalledTimes(2);
-    expect(appendChildSpy.calls.allArgs()[0][0].getAttribute('href')).toBe(
-      '/assets/third_party_static/codemirror/codemirror.css'
-    );
-    expect(appendChildSpy.calls.allArgs()[1][0].getAttribute('href')).toBe(
-      '/assets/third_party_static/codemirror/merge.css'
-    );
+    expect(
+      (appendChildSpy.calls.allArgs()[0][0] as HTMLLinkElement).getAttribute(
+        'href'
+      )
+    ).toBe('/assets/third_party_static/codemirror/codemirror.css');
+    expect(
+      (appendChildSpy.calls.allArgs()[1][0] as HTMLLinkElement).getAttribute(
+        'href'
+      )
+    ).toBe('/assets/third_party_static/codemirror/merge.css');
   });
 
   it('should not reload CODEMIRROR css if already loaded', () => {
@@ -159,10 +170,40 @@ describe('LazyCssLoaderService', () => {
     expect(appendChildSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('should load both SHEPHERD css and overrides css when not loaded', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    const result = lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
+
+    expect(result).toBe(true);
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.SHEPHERD)).toBe(true);
+    expect(appendChildSpy).toHaveBeenCalledTimes(2);
+    expect(
+      (appendChildSpy.calls.allArgs()[0][0] as HTMLLinkElement).getAttribute(
+        'href'
+      )
+    ).toBe('/assets/third_party_static/shepherd/shepherd.css');
+    expect(
+      (appendChildSpy.calls.allArgs()[1][0] as HTMLLinkElement).getAttribute(
+        'href'
+      )
+    ).toBe('/assets/third_party_static/shepherd/shepherd-overrides.css');
+  });
+
+  it('should not reload SHEPHERD css if already loaded', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
+
+    const result = lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
+
+    expect(result).toBe(false);
+    expect(appendChildSpy).toHaveBeenCalledTimes(2);
+  });
+
   it('should append stylesheet links to the document head', () => {
     lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
     lazyCssLoaderService.loadCss(KNOWN_CSS.CROPPER);
     lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
+    lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
 
     const linkHrefs = Array.from(
       document.head.querySelectorAll('link[href*="third_party_static"]')
@@ -172,6 +213,8 @@ describe('LazyCssLoaderService', () => {
       '/assets/third_party_static/cropper/cropper.min.css',
       '/assets/third_party_static/codemirror/codemirror.css',
       '/assets/third_party_static/codemirror/merge.css',
+      '/assets/third_party_static/shepherd/shepherd.css',
+      '/assets/third_party_static/shepherd/shepherd-overrides.css',
     ]);
   });
 
@@ -179,13 +222,6 @@ describe('LazyCssLoaderService', () => {
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.GUPPY)).toBe(false);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CROPPER)).toBe(false);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(false);
-  });
-
-  it('should return false for unknown css', () => {
-    const appendChildSpy = spyOn(document.head, 'appendChild');
-    const result = lazyCssLoaderService.loadCss(KNOWN_CSS.UNKNOWN);
-
-    expect(result).toBe(false);
-    expect(appendChildSpy).not.toHaveBeenCalled();
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.SHEPHERD)).toBe(false);
   });
 });

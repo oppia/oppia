@@ -85,6 +85,16 @@
                 "output": "/assets/third_party_static/codemirror/"
               },
               {
+                "glob": "shepherd.css",
+                "input": "node_modules/shepherd.js/dist/css/",
+                "output": "/assets/third_party_static/shepherd/"
+              },
+              {
+                "glob": "shepherd-overrides.css",
+                "input": "core/templates/css/",
+                "output": "/assets/third_party_static/shepherd/"
+              },
+              {
                 "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
@@ -118,9 +128,7 @@
               },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css",
-              "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css"
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
@@ -227,9 +235,7 @@
               },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css",
-              "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css"
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"

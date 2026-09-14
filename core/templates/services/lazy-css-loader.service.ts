@@ -22,7 +22,7 @@ export enum KNOWN_CSS {
   GUPPY = 'GUPPY',
   CROPPER = 'CROPPER',
   CODEMIRROR = 'CODEMIRROR',
-  UNKNOWN = 'UNKNOWN',
+  SHEPHERD = 'SHEPHERD',
 }
 
 @Injectable({
@@ -61,6 +61,12 @@ export class LazyCssLoaderService {
         cssHrefs = [
           '/assets/third_party_static/codemirror/codemirror.css',
           '/assets/third_party_static/codemirror/merge.css',
+        ];
+        break;
+      case KNOWN_CSS.SHEPHERD:
+        cssHrefs = [
+          '/assets/third_party_static/shepherd/shepherd.css',
+          '/assets/third_party_static/shepherd/shepherd-overrides.css',
         ];
         break;
       default:

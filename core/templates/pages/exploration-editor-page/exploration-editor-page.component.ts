@@ -713,6 +713,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
     this.lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
 
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(
