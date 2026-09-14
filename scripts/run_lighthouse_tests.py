@@ -41,6 +41,9 @@ APP_YAML_FILENAMES: Final = {
 LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
+LIGHTHOUSE_SHARDS_JSON_FILEPATH = os.path.join(
+    'core', 'tests', 'lighthouse-shards.json'
+)
 
 ENTITY_MATCHER: Final = r'\{\{(.*?)\}\}'
 
@@ -434,6 +437,18 @@ def get_lighthouse_pages_config() -> dict[str, str]:
     return pages
 
 
+def get_lighthouse_shards_config() -> dict[str, list[str]]:
+    """Gets the lighthouse page names for each shard from the shards config.
+
+    Returns:
+        dict(str, list(str)). Maps each shard name to the names of the pages
+        it audits.
+    """
+    with open(LIGHTHOUSE_SHARDS_JSON_FILEPATH, 'r', encoding='utf-8') as f:
+        shards_config = json.load(f)
+        return {name: list(pages) for name, pages in shards_config.items()}
+
+
 def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
     """Injects any entity IDs that a URL needs into the URL.
 
@@ -599,7 +614,12 @@ def main(args: Optional[List[str]] = None) -> None:
             print('Building files in production mode.')
             build.main(args=['--prod_env'])
 
-        set_lighthouse_url_environment_variables(parsed_args.pages, entities)
+        pages_to_run = (
+            ','.join(get_lighthouse_shards_config()[str(parsed_args.shard)])
+            if parsed_args.pages is None
+            else parsed_args.pages
+        )
+        set_lighthouse_url_environment_variables(pages_to_run, entities)
         with managed_lighthouse_appserver(SERVER_MODE_PROD):
             run_lighthouse_checks()
 

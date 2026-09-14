@@ -188,7 +188,6 @@ LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
     'LOGIN',
     'LOGOUT',
     'MAINTENANCE',
-    'SIGNUP',
 }
 
 

@@ -2407,7 +2407,9 @@ class AdminHandler(
                 which the generated topics should be added.
             topic_ids: list(str). The IDs of the generated topics.
         """
-        defaults = {topic_id: [] for topic_id in topic_ids}
+        defaults: Dict[str, list[str]] = {
+            topic_id: [] for topic_id in topic_ids
+        }
         classroom.topic_id_to_prerequisite_topic_ids = (
             defaults | classroom.topic_id_to_prerequisite_topic_ids
         )

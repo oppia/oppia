@@ -119,6 +119,10 @@
     "url": "http://localhost:8181/classroom-admin",
     "page_module": "core/templates/pages/classroom-admin-page/classroom-admin-page.module.ts"
   },
+  "signup": {
+    "url": "http://localhost:8181/signup",
+    "page_module": "core/templates/pages/signup-page/signup-page.module.ts"
+  },
   "classrooms": {
     "url": "http://localhost:8181/learn",
     "page_module": "core/templates/pages/classrooms-page/classrooms-page.module.ts"

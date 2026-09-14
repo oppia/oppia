@@ -1008,15 +1008,13 @@ const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
   // topic/story/skill editors, and the classroom-admin page used to toggle the
-  // diagnostic test, so only the curriculum admin and release coordinator
-  // roles are assigned. Its data generation uses the admin activities tab,
-  // which the CI super-admin user can access without an additional role.
-  await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
-  );
+  // diagnostic test, so the curriculum admin role is assigned. Its data
+  // generation uses the admin activities tab, which the CI super-admin user
+  // can access without an additional role.
+  await logStep('assigning roles', () => setRoles(browser, page, ['ADMIN']));
   // The structures step seeds the staging topic (dummy-topic-one), its story
-  // and subtopic, plus the learner group and technical feedback report. The
-  // staging topic backs the topic/story/practice/subtopic pages.
+  // and subtopic. The staging topic backs the topic/story/practice/subtopic
+  // pages.
   await logStep('generating topic and story data', () =>
     generateDataForTopicAndStoryPlayer(browser, page)
   );

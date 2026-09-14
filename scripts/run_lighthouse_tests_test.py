@@ -132,6 +132,20 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages.json',
         )
+        with open('dummy-lighthouse-shards.json', 'w', encoding='utf-8') as f:
+            f.write(
+                json.dumps(
+                    {
+                        '1': ['splash', 'about'],
+                        '2': ['contact'],
+                    }
+                )
+            )
+        self.lighthouse_shards_json_filepath_swap = self.swap(
+            run_lighthouse_tests,
+            'LIGHTHOUSE_SHARDS_JSON_FILEPATH',
+            'dummy-lighthouse-shards.json',
+        )
         # A config with one URL that references an entity, used to exercise the
         # data-setup path where the puppeteer script must run.
         with open(
@@ -155,11 +169,28 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages-with-entities.json',
         )
+        with open(
+            'dummy-lighthouse-shards-with-entities.json', 'w', encoding='utf-8'
+        ) as f:
+            f.write(
+                json.dumps(
+                    {
+                        '2': ['about', 'topic-editor'],
+                    }
+                )
+            )
+        self.lighthouse_shards_json_filepath_with_entities_swap = self.swap(
+            run_lighthouse_tests,
+            'LIGHTHOUSE_SHARDS_JSON_FILEPATH',
+            'dummy-lighthouse-shards-with-entities.json',
+        )
 
     def tearDown(self) -> None:
         super().tearDown()
         os.remove('dummy-lighthouse-pages.json')
         os.remove('dummy-lighthouse-pages-with-entities.json')
+        os.remove('dummy-lighthouse-shards.json')
+        os.remove('dummy-lighthouse-shards-with-entities.json')
 
     def test_inject_entities_into_url_with_valid_entity(self) -> None:
         entities = {'topic_id': '4'}
@@ -826,6 +857,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ),
         )
 
+        os.environ['ALL_LIGHTHOUSE_URLS'] = (
+            'http://localhost:8181/,'
+            'http://localhost:8181/about,'
+            'http://localhost:8181/contact'
+        )
+        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
+            'http://localhost:8181/, http://localhost:8181/about'
+        )
         with self.print_swap, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks()
 
@@ -871,7 +910,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
-                            with self.lighthouse_pages_json_filepath_swap:
+                            with (
+                                self.lighthouse_pages_json_filepath_swap,
+                                self.lighthouse_shards_json_filepath_swap,
+                            ):
                                 run_lighthouse_tests.main(args=['--shard', '1'])
                                 expected_all_lighthouse_urls = ','.join(
                                     [
@@ -883,6 +925,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 self.assertEqual(
                                     os.environ['ALL_LIGHTHOUSE_URLS'],
                                     expected_all_lighthouse_urls,
+                                )
+                                expected_lighthouse_urls_to_run = ','.join(
+                                    [
+                                        'http://localhost:8181/',
+                                        'http://localhost:8181/about',
+                                    ]
+                                )
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_URLS_TO_RUN'],
+                                    expected_lighthouse_urls_to_run,
                                 )
 
         self.assertIn(
@@ -1127,7 +1179,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with self.swap_redis_server, swap_run_lighthouse_tests:
                             with swap_run_puppeteer_script:
                                 with (
-                                    self.lighthouse_pages_json_filepath_with_entities_swap
+                                    self.lighthouse_pages_json_filepath_with_entities_swap,
+                                    self.lighthouse_shards_json_filepath_with_entities_swap,
                                 ):
                                     run_lighthouse_tests.main(
                                         args=[
