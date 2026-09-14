@@ -26,7 +26,6 @@ interface CertificateSummary {
   certificateId: string;
   title: string;
   topicsLabel: string;
-  timeLabel: string;
   status: string;
 }
 @Component({
@@ -65,7 +64,6 @@ export class CertificateCreatorDashboardPageComponent implements OnInit {
           certificateId: certificateOffering.certificateId,
           title: certificateOffering.title,
           topicsLabel: this.getTopicsLabel(certificateOffering.topicData),
-          timeLabel: `${certificateOffering.timeLimitInMinutes} min`,
           status: certificateOffering.asyncStatus,
         }))
         .sort((first, second) => first.title.localeCompare(second.title));
