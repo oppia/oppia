@@ -294,6 +294,14 @@ const setRole = async function (browser, page, role) {
   }
 };
 
+const selectExplorationInCreationModal = async function (page) {
+  await page.waitForSelector(creationModalSelector, {visible: true});
+  await page.waitForSelector(createExplorationInModalSelector, {
+    visible: true,
+  });
+  await page.click(createExplorationInModalSelector);
+};
+
 const getExplorationEditorUrl = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -303,19 +311,15 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(createButtonSelector);
 
     // The create button opens a creation modal when the user has the
-    // collection-creator role (as the CI admin does). In that case we need to
-    // pick the exploration option to reach the exploration editor, instead of
-    // navigating directly.
+    // collection-creator role. Detect whether the modal appeared and, if so,
+    // select the exploration option via a dedicated helper.
     const isCreationModalVisible = await page
       .waitForSelector(creationModalSelector, {visible: true, timeout: 10000})
       .then(() => true)
       .catch(() => false);
 
     if (isCreationModalVisible) {
-      await page.waitForSelector(createExplorationInModalSelector, {
-        visible: true,
-      });
-      await page.click(createExplorationInModalSelector);
+      await selectExplorationInCreationModal(page);
     }
 
     // Wait for the navigation to the created exploration's editor before
@@ -777,25 +781,22 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       );
     }
 
-    const successMessage = 'Data reloaded successfully.';
-    let statusMessage;
-    let tries = 0;
-    do {
-      if (tries++ > 120) {
-        throw new Error(
-          'Timed out waiting for the all_interactions exploration reload.'
-        );
-      }
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
+    // The admin activities page shows a status message when the reload
+    // finishes. waitForFunction polls the message until it matches and throws
+    // on timeout, which replaces a manual retry loop with the same behavior.
+    await page.waitForFunction(
+      () => {
         const statusMessageElement = document.querySelector(
           '.oppia-status-message-container'
         );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+        return (
+          statusMessageElement &&
+          statusMessageElement.textContent.trim() ===
+            'Data reloaded successfully.'
+        );
+      },
+      {polling: 1000, timeout: 120000}
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -864,31 +865,26 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(topicThumbnailResetButton);
     await page.click(topicThumbnailResetButton);
 
-    // The file input is always in the DOM but CSS-hidden. Wait for the
-    // visible upload label as a sync point, then use the hidden input
-    // directly (uploadFile works on hidden elements via CDP). A reset
-    // click that lands during the preview fade-in can be swallowed, which
-    // leaves the upload UI hidden, so retry the reset when the label does
-    // not appear.
-    let uploadLabelWasFound = false;
-    for (let attempt = 0; attempt < 3 && !uploadLabelWasFound; attempt++) {
-      try {
-        await page.waitForSelector(imageUploadLabel, {
-          visible: true,
-          timeout: 15000,
-        });
-        uploadLabelWasFound = true;
-      } catch (error) {
-        await page.waitForSelector(topicThumbnailResetButton, {
-          visible: true,
-          timeout: 15000,
-        });
-        await page.click(topicThumbnailResetButton);
-      }
-    }
-    if (!uploadLabelWasFound) {
-      throw new Error('The thumbnail upload label was not found after reset.');
-    }
+    // The file input is always in the DOM but CSS-hidden. A reset click that
+    // lands during the preview fade-in can be swallowed, which leaves the
+    // upload UI hidden, so re-trigger the reset from inside waitForFunction
+    // until the upload label becomes visible.
+    await page.waitForFunction(
+      (uploadLabelSelector, resetButtonSelector) => {
+        const uploadLabel = document.querySelector(uploadLabelSelector);
+        if (uploadLabel && uploadLabel.offsetParent !== null) {
+          return true;
+        }
+        const resetButton = document.querySelector(resetButtonSelector);
+        if (resetButton && resetButton.offsetParent !== null) {
+          resetButton.click();
+        }
+        return false;
+      },
+      {polling: 1000, timeout: 45000},
+      imageUploadLabel,
+      topicThumbnailResetButton
+    );
 
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
