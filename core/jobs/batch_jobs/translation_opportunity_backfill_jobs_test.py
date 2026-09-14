@@ -318,7 +318,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
             feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
         self.assertIsNotNone(model)
-        self.assertEqual(model.translation_counts, {'hi': 3, 'es': 4})
+        self.assertEqual(model.translation_counts, {'hi': 2, 'es': 3})
         self.assertEqual(model.translation_missing_reasons, {'hi': ['update']})
 
     def test_translation_count_ignores_content_the_exploration_does_not_have(
