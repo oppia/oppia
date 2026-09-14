@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -29,7 +29,6 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {StateBackendDict} from 'domain/state/state.model';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
@@ -41,7 +40,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let playerStateService: CertificateAssessmentPlayerStateService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
-  let preventPageUnloadEventServiceSpy: jasmine.SpyObj<PreventPageUnloadEventService>;
 
   const mockOffering = new CertificateAssessmentOfferingData(
     'cert-123',
@@ -152,10 +150,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
-    preventPageUnloadEventServiceSpy = jasmine.createSpyObj(
-      'PreventPageUnloadEventService',
-      ['addListener', 'removeListener']
-    );
     const playerStateServiceInstance =
       new CertificateAssessmentPlayerStateService();
     component = new CertificateAssessmentPlayerPageRootComponent(
@@ -165,7 +159,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateServiceInstance,
       {} as ClassroomBackendApiService,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       routerSpy,
       translateServiceSpy
     );
@@ -206,67 +199,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toHaveBeenCalledWith('cert-123');
     expect(component.certificateOffering).toEqual(mockOffering);
     expect(component.isLoading).toBe(false);
-  }));
-
-  it('should register the page-unload guard on initialization', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(preventPageUnloadEventServiceSpy.addListener).toHaveBeenCalledWith(
-      jasmine.any(Function)
-    );
-  }));
-
-  it('should warn on page close only while an attempt is active', fakeAsync(() => {
-    let validationCallback: () => boolean = () => false;
-    preventPageUnloadEventServiceSpy.addListener.and.callFake(
-      (callback: () => boolean) => {
-        validationCallback = callback;
-      }
-    );
-
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(false);
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(true);
-    component.ngOnDestroy();
-  }));
-
-  it('should stop warning once the attempt has been submitted', fakeAsync(() => {
-    let validationCallback: () => boolean = () => false;
-    preventPageUnloadEventServiceSpy.addListener.and.callFake(
-      (callback: () => boolean) => {
-        validationCallback = callback;
-      }
-    );
-    playerStateService.beginNewAttempt(mockAttempt);
-
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(true);
-
-    component.onAssessmentSubmitted([
-      {question_id: 'question_1', is_correct: true},
-    ]);
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(false);
-    component.ngOnDestroy();
-  }));
-
-  it('should remove the page-unload guard on destroy', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-
-    component.ngOnDestroy();
-
-    expect(preventPageUnloadEventServiceSpy.removeListener).toHaveBeenCalled();
   }));
 
   it('should start an attempt and switch to questions when the route is session', fakeAsync(async () => {
@@ -315,7 +247,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -622,7 +553,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -652,7 +582,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
