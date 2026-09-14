@@ -1,28 +1,5 @@
 <ng-container>
-  <mat-card *ngIf="!redesignFeatureFlag" class="oppia-topic-dashboard-card">
-    <a [href]="getTopicLink()"
-       target="{{ openInNewWindow ? '_blank' : '_self' }}"
-       class="oppia-topic-link">
-      <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-        <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
-        <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
-      </div>
-      <div class="oppia-summary-section">
-        <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
-          {{ topicTitle }}
-        </span>
-        <div class="oppia-topic-lessons">
-          {{ totalPublishedNodeCount }}
-          <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
-            lessonCountValue: totalPublishedNodeCount,
-            messageFormat: true
-          }">
-          </span>
-        </div>
-      </div>
-    </a>
-  </mat-card>
-  <a *ngIf="redesignFeatureFlag" class="e2e-test-learner-topic-summary-tile d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+  <a class="e2e-test-learner-topic-summary-tile d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
     <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="h-100 oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
