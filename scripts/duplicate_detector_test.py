@@ -113,6 +113,76 @@ class GetAllOpenIssuesTests(unittest.TestCase):
         mock_request.assert_called()
 
 
+class ExtractYamlStringsTests(unittest.TestCase):
+    """Tests for the _extract_yaml_strings function."""
+
+    def test_extract_yaml_strings(self) -> None:
+        """Test extraction of strings from parsed YAML data."""
+        yaml_data = {
+            'name': 'bug',
+            'body': [
+                {
+                    'type': 'input',
+                    'id': 'bug-description',
+                    'attributes': {
+                        'label': ' Describe the bug ',
+                        'description': 'A clear description.',
+                    },
+                },
+                {
+                    'type': 'dropdown',
+                    'attributes': {
+                        'label': 'Dropdown',
+                        'options': [
+                            ' Option 1 ',
+                            'Option 2',
+                            '   ',
+                            123,
+                            {'foo': 'bar'},
+                            {'label': '   '},
+                            {'label': 123},
+                        ],
+                    },
+                },
+                {
+                    'type': 'checkboxes',
+                    'attributes': {
+                        'label': 'Checkboxes',
+                        'options': [
+                            {'label': ' Checkbox 1 '},
+                            {'label': 'Checkbox 2'},
+                        ],
+                    },
+                },
+                {
+                    'type': 'textarea',
+                    'attributes': {'value': ' Default value ', 'label': ''},
+                },
+                {
+                    'type': 'markdown',
+                    'attributes': {'value': ['This is a list']},
+                },
+            ],
+        }
+
+        extracted = duplicate_detector._extract_yaml_strings(
+            yaml_data, ('label', 'options', 'value')
+        )
+
+        expected = {
+            'describe the bug',
+            'dropdown',
+            'option 1',
+            'option 2',
+            'checkboxes',
+            'checkbox 1',
+            'checkbox 2',
+            'default value',
+            'this is a list',
+        }
+        self.assertEqual(extracted, expected)
+
+
 class GetTemplateLinesTests(unittest.TestCase):
     """Tests for the get_template_lines function."""
 
@@ -163,6 +233,62 @@ class GetTemplateLinesTests(unittest.TestCase):
             result = duplicate_detector.get_template_lines('/fake')
             self.assertIn('this is a template line that is very long.', result)
         mock_isfile.assert_called()
+
+    @mock.patch('os.listdir')
+    @mock.patch('os.path.isdir')
+    @mock.patch('os.path.isfile')
+    def test_get_template_lines_with_valid_yml(
+        self,
+        mock_isfile: mock.MagicMock,
+        mock_isdir: mock.MagicMock,
+        mock_listdir: mock.MagicMock,
+    ) -> None:
+        """Test that get_template_lines successfully parses a valid yml file."""
+
+        def isdir_side_effect(path: str) -> bool:
+            return 'ISSUE_TEMPLATE' in path and not path.endswith('.yml')
+
+        def isfile_side_effect(path: str) -> bool:
+            return path.endswith('.yml')
+
+        mock_isdir.side_effect = isdir_side_effect
+        mock_isfile.side_effect = isfile_side_effect
+        mock_listdir.return_value = ['issue.yml']
+
+        # A valid YAML string that will trigger _extract_yaml_strings
+        file_contents = "name: bug\nbody:\n  - type: input\n    attributes:\n      label: 'Describe the bug'"
+        m = mock.mock_open(read_data=file_contents)
+        with mock.patch('builtins.open', m):
+            result = duplicate_detector.get_template_lines('/fake')
+            self.assertIn('describe the bug', result)
+        mock_isdir.assert_called()
+
+    @mock.patch('os.listdir')
+    @mock.patch('os.path.isdir')
+    @mock.patch('os.path.isfile')
+    def test_get_template_lines_with_empty_yml(
+        self,
+        mock_isfile: mock.MagicMock,
+        mock_isdir: mock.MagicMock,
+        mock_listdir: mock.MagicMock,
+    ) -> None:
+        """Test that get_template_lines handles an empty yml file."""
+
+        def isdir_side_effect(path: str) -> bool:
+            return 'ISSUE_TEMPLATE' in path and not path.endswith('.yml')
+
+        def isfile_side_effect(path: str) -> bool:
+            return path.endswith('.yml')
+
+        mock_isdir.side_effect = isdir_side_effect
+        mock_isfile.side_effect = isfile_side_effect
+        mock_listdir.return_value = ['empty.yml']
+
+        m = mock.mock_open(read_data="")
+        with mock.patch('builtins.open', m):
+            result = duplicate_detector.get_template_lines('/fake')
+            self.assertEqual(result, set())
+        mock_isdir.assert_called()
 
     @mock.patch('os.path.isfile')
     @mock.patch('os.path.isdir', return_value=False)
