@@ -224,9 +224,10 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
-                new_content_id = content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT
+                content_type = _get_content_type_for_content_id(
+                    exploration, duplicate_id
                 )
+                new_content_id = content_id_generator.generate(content_type)
 
                 _replace_content_id_in_state(
                     state, duplicate_id, new_content_id
@@ -253,6 +254,37 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 'fixed_content_ids': fixed_content_ids,
                 'fixed_model': updated_model,
             }
+
+
+def _get_content_type_for_content_id(
+    exploration: exp_domain.Exploration, content_id: str
+) -> translation_domain.ContentType:
+    """Get the content type of a content ID in an exploration.
+
+    Args:
+        exploration: exp_domain.Exploration. The exploration domain object
+            to search for the content ID.
+        content_id: str. The content ID to find the type of.
+
+    Returns:
+        ContentType. The content type of the given content ID.
+
+    Raises:
+        ValueError. The content ID does not exist in any state of the
+            exploration.
+    """
+    for state in exploration.states.values():
+        content_to_type = (
+            state.get_translatable_contents_collection().content_id_to_translatable_content
+        )
+        translatable_content = content_to_type.get(content_id)
+        if translatable_content is not None:
+            return translatable_content.content_type
+
+    raise ValueError(
+        'Content ID "%s" does not exist in exploration "%s".'
+        % (content_id, exploration.id)
+    )
 
 
 def _replace_content_id_in_state(

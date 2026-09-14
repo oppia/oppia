@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -106,6 +107,159 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
     )
 
+    def test_fix_job_preserves_solution_content_type(self) -> None:
+        """Test that the job preserves the original content type when fixing
+        duplicate content IDs, so that a duplicated solution content ID is
+        regenerated as solution_<N>, not content_<N>.
+
+        This reproduces the regression reported in oppia/oppia#27405 where
+        duplicate solution content IDs caused the Android lesson download
+        to fail with 'Translation already recorded'.
+        """
+        intro_state_dict = {
+            'content': {
+                'content_id': 'content_0',
+                'html': '<p>State 1.</p>',
+            },
+            'param_changes': [],
+            'interaction': {
+                'id': 'TextInput',
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_1',
+                            'unicode_str': 'Enter.',
+                        }
+                    },
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False},
+                },
+                'answer_groups': [],
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'default_outcome_2',
+                        'html': '<p>Feedback.</p>',
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                },
+                'confirmed_unclassified_answers': [],
+                'hints': [],
+                'solution': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'Answer',
+                    'explanation': {
+                        'content_id': 'solution_3',
+                        'html': '<p>Explanation.</p>',
+                    },
+                },
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'solicit_answer_details': False,
+            'card_is_checkpoint': True,
+            'inapplicable_skill_misconception_ids': [],
+        }
+        state2_dict = {
+            'content': {
+                'content_id': 'content_4',
+                'html': '<p>State 2.</p>',
+            },
+            'param_changes': [],
+            'interaction': {
+                'id': 'TextInput',
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_5',
+                            'unicode_str': 'Enter.',
+                        }
+                    },
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False},
+                },
+                'answer_groups': [],
+                'default_outcome': {
+                    'dest': 'State2',
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'default_outcome_6',
+                        'html': '<p>Feedback.</p>',
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                },
+                'confirmed_unclassified_answers': [],
+                'hints': [],
+                # Both states share the same solution content ID.
+                'solution': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'Answer',
+                    'explanation': {
+                        'content_id': 'solution_3',
+                        'html': '<p>Explanation.</p>',
+                    },
+                },
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'inapplicable_skill_misconception_ids': [],
+        }
+
+        model = exp_models.ExplorationModel(
+            id='exp_id',
+            title='Test Exploration',
+            category='Test',
+            objective='',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            init_state_name='Introduction',
+            states={
+                'Introduction': intro_state_dict,
+                'State2': state2_dict,
+            },
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=False,
+            edits_allowed=True,
+            next_content_id_index=7,
+        )
+        model.version = 1
+        self.put_multi([model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    "Fixed exploration exp_id (version 1) - regenerated "
+                    "content IDs: ['solution_3 -> solution_7 in State2']"
+                )
+            ]
+        )
+
+        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        intro_updated = updated_exploration.states['Introduction']
+        state2_updated = updated_exploration.states['State2']
+
+        self.assertEqual(
+            intro_updated.interaction.solution.explanation.content_id,
+            'solution_3',
+        )
+        self.assertEqual(
+            state2_updated.interaction.solution.explanation.content_id,
+            'solution_7',
+        )
+
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
 
@@ -115,6 +269,22 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         exp_services.save_new_exploration('owner_id', exploration)
 
         self.assert_job_output_is_empty()
+
+    def test_get_content_type_for_unknown_content_id_raises_error(self) -> None:
+        """Test that the helper raises an error for an unknown content ID."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='Test Exploration', category='Test'
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            'Content ID "unknown_id" does not exist in '
+            'exploration "exp_id".',
+        ):
+            # Here we use pylint disable because the helper is private.
+            delete_duplicate_content_ids_jobs._get_content_type_for_content_id(  # pylint: disable=protected-access
+                exploration, 'unknown_id'
+            )
 
     def test_fix_job_with_duplicates(self) -> None:
         """Test that the job correctly fixes explorations with duplicate
