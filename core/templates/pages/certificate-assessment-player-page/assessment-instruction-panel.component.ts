@@ -26,7 +26,6 @@ import './assessment-instruction-panel.component.css';
 })
 export class AssessmentInstructionPanelComponent {
   @Input() certificateTitle = '';
-  @Input() timeLimitInMinutes = 0;
   @Input() totalQuestions = 0;
   @Output() back = new EventEmitter<void>();
   @Output() startAssessment = new EventEmitter<void>();
@@ -34,7 +33,6 @@ export class AssessmentInstructionPanelComponent {
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_BACK_BUTTON';
   instructionsHeadingI18nKey = 'I18N_ASSESSMENT_INSTRUCTIONS_HEADING';
-  timeLimitInstructionI18nKey = 'I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT';
   questionCountInstructionI18nKey =
     'I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT';
   startAssessmentButtonI18nKey = 'I18N_ASSESSMENT_START_BUTTON';
@@ -42,7 +40,6 @@ export class AssessmentInstructionPanelComponent {
   // Remaining instructions are static text, so no interpolation params
   // are needed for them.
   staticInstructionI18nKeys: string[] = [
-    'I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT',
     'I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME',
     'I18N_ASSESSMENT_INSTRUCTION_NAVIGATION',
     'I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS',

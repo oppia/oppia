@@ -134,7 +134,6 @@ describe('AssessmentIntroductionCardComponent', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       12,
-      60,
       [
         'Understanding of numbers and their relationships',
         'Ability to perform basic arithmetic accurately',
