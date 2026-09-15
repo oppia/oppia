@@ -540,7 +540,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
-    this.activeMenuName = this.navigationService.activeMenuName;
     if (menuName === 'learnMenu') {
       this.updateLearnDropdownOffset();
     } else if (menuName === 'getInvolvedMenu') {
