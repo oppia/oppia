@@ -347,8 +347,8 @@
     },
     {
       "name": "exploration-creator/exploration-feedback",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/exploration-help",

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,20 @@
  * EC. Feedback.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -38,7 +42,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToFeedbackTab();
   });
 
-  it('should be able to give exploration feedback', async function () {
+  test('should be able to give exploration feedback', async function () {
     await explorationEditor.startAFeedbackThread(
       'Test Feedback',
       'Test Feedback'
@@ -56,7 +60,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectFeedbackStatusInList(1, 'Fixed');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
