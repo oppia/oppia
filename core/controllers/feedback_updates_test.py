@@ -274,6 +274,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(messages_summary['author_username'], None)
 
     def test_get_translation_suggestion_summary(self) -> None:
+        """Tests that translation suggestions return a complete summary."""
         self.login(self.EDITOR_EMAIL)
 
         # Get the exploration to find a valid content_id.
