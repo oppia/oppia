@@ -257,7 +257,7 @@ describe('Attribution Guide Component', function () {
 
     const execSpy = spyOn(document, 'execCommand');
 
-    component.copyAttribution('missing-class');
+    component.copyAttribution('missing-class', undefined);
 
     expect(execSpy).not.toHaveBeenCalled();
   });
