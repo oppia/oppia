@@ -7130,7 +7130,7 @@ export default {
         }
       ]
     },
-    "CLASSROOM_ADMIN_PAGE": {
+    "CURRICULUM_ADMIN": {
       "ROUTE": "classroom-admin",
       "TITLE": "Oppia Classroom Admin Panel",
       "META": [
