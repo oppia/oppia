@@ -38,9 +38,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
 
   ngOnInit(): void {
     const helpShortcutDescription = 'Show this help dialog';
-    const searchShortcutDescription = 'Search';
     const skipShortcutDescription = 'Select skip to main content button';
-    const categoryShortcutDescription = 'Select exploration category';
     const continueShortcutDescription = 'Select the continue button';
     const backShortcutDescription = 'Select the back button';
 
@@ -54,9 +52,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     } else {
       this.KEYBOARD_SHORTCUTS = {
         '?': helpShortcutDescription,
-        '/': searchShortcutDescription,
         s: skipShortcutDescription,
-        c: categoryShortcutDescription,
       };
     }
   }

@@ -1340,13 +1340,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', self.target_id)]
         )[0]
 
-        reindexed_ids = []
-
-        def mock_index_explorations(ids: List[str]) -> None:
-            reindexed_ids.extend(ids)
-
-        index_counter = test_utils.CallCounter(mock_index_explorations)
-
         with (
             self.swap(
                 suggestion_registry.SuggestionTranslateContent,
@@ -1363,11 +1356,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'update_translation_opportunity_with_accepted_suggestion',
                 lambda *args: None,
             ),
-            self.swap(
-                exp_services,
-                'index_explorations_given_ids',
-                index_counter,
-            ),
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id,
@@ -1376,12 +1364,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'review message',
             )
 
-        self.assertEqual(index_counter.times_called, 1)
-        self.assertEqual(reindexed_ids, [self.target_id])
-
-    def test_accept_skill_translation_suggestion_does_not_reindex(self) -> None:
-        """Test that accepting a translation suggestion for a skill does not
-        trigger exploration reindexing.
+    def test_accept_skill_translation_suggestion(self) -> None:
+        """Test that accepting a translation suggestion for a skill
+        succeeds.
         """
         skill_id = skill_services.get_new_skill_id()
         skill_description = 'Skill Description'
@@ -1412,13 +1397,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', skill_id)]
         )[0]
 
-        reindexed_ids = []
-
-        def mock_index_explorations(ids: List[str]) -> None:
-            reindexed_ids.extend(ids)
-
-        index_counter = test_utils.CallCounter(mock_index_explorations)
-
         with (
             self.swap(
                 suggestion_registry.SuggestionTranslateContent,
@@ -1435,11 +1413,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'update_translation_opportunity_with_accepted_suggestion',
                 lambda *args: None,
             ),
-            self.swap(
-                exp_services,
-                'index_explorations_given_ids',
-                index_counter,
-            ),
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id,
@@ -1447,9 +1420,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.COMMIT_MESSAGE,
                 'review message',
             )
-
-        self.assertEqual(index_counter.times_called, 0)
-        self.assertEqual(reindexed_ids, [])
 
     def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
         self,

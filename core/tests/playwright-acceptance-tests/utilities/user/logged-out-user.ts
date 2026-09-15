@@ -45,10 +45,6 @@ const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
 const createAccountButton = '.create-account-btn';
 const validityInfoTextSelector = '.guide-text';
 
-const languageFilterDropdownToggler =
-  '.oppia-search-bar-dropdown-toggle-button';
-const unselectedFilterOptionsSelector = '.e2e-test-deselected';
-const selectedFilterOptionsSelector = '.e2e-test-selected';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const previousCardButton = '.e2e-test-back-button';
@@ -67,9 +63,6 @@ const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const closeAttributionModalButton = '.attribution-modal button';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
-const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
-const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
-const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const progressBarSelector = '.oppia-progress-bar';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
 const suggestionSection = '.suggested-for-you-section';
@@ -96,8 +89,8 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 const stateConversationContent = '.e2e-test-conversation-content';
 
-const searchInputSelector = '.e2e-test-search-input';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const mobileLessonCardTitleSelector = '.mobile-exploration-title';
 const fractionInputSelector = '.e2e-test-fraction-input';
 const floatFormInput = '.e2e-test-float-form-input';
 const wrongInputErrorContainerSelector = '.oppia-form-error-container';
@@ -191,7 +184,6 @@ const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
 // Community Library.
 const communityLibraryHeading = '.e2e-test-library-main-header';
 const communityLibraryGroupHeader = '.e2e-test-library-group-header';
-const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
 
 // Home Page Selectors.
 const homePageHeadingSelector =
@@ -1232,95 +1224,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if an exploration has a specific rating.
-   *
-   * @param {number} expectedRating - The expected rating of the exploration.
-   * @param {string} expectedExplorationName - The name of the exploration to check.
-   */
-  async expectLessonsToHaveRating(
-    expectedRating: number,
-    expectedExplorationName: string
-  ): Promise<void> {
-    try {
-      await this.expectElementToBeVisible(lessonCardSelector);
-      const cards = await this.page.$$(lessonCardSelector);
-      for (const card of cards) {
-        await card.waitForSelector(lessonCardTitleSelector);
-        const titleElement = await card.$(lessonCardTitleSelector);
-        if (!titleElement) {
-          throw new Error('Title element not found in lesson card.');
-        }
-        const titleText = await this.getTextContent(titleElement);
-        if (titleText === expectedExplorationName) {
-          await card.waitForSelector(explorationRatingSelector);
-          const ratingElement = await card.$(explorationRatingSelector);
-          if (ratingElement) {
-            const ratingSpan = await ratingElement.$('span:nth-child(2)');
-            if (!ratingSpan) {
-              throw new Error(
-                `Rating span not found for exploration "${expectedExplorationName}".`
-              );
-            }
-            const ratingText = await this.getTextContent(ratingSpan);
-            const rating = parseFloat(ratingText);
-            if (rating !== expectedRating) {
-              throw new Error(
-                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
-              );
-            }
-            return;
-          }
-        }
-      }
-      throw new Error(
-        `Exploration "${expectedExplorationName}" not found in exploration titles.`
-      );
-    } catch (error) {
-      const newError = new Error(
-        `Failed to check rating of exploration: ${error}`
-      );
-      if (error instanceof Error) {
-        newError.stack = error.stack;
-      }
-      throw newError;
-    }
-  }
-
-  /**
-   * Checks if the views of a lesson card matches the expected views.
-   * @param {number} expectedViews - The expected views of the card.
-   * @param {string} explorationName - The name of the exploration.
-   */
-  async expectLessonViewsToBe(
-    expectedViews: number,
-    explorationName: string
-  ): Promise<void> {
-    await this.page.waitForSelector(lessonCardSelector);
-    const cards = await this.page.$$(lessonCardSelector);
-    for (const card of cards) {
-      await card.waitForSelector(lessonCardTitleSelector);
-      const titleElement = await card.$(lessonCardTitleSelector);
-      if (!titleElement) {
-        throw new Error('Title element not found in lesson card.');
-      }
-      const titleText = await this.getTextContent(titleElement);
-      if (titleText === explorationName) {
-        await card.waitForSelector(explorationViewsSelector);
-        const views = await card.$eval(explorationViewsSelector, el =>
-          parseInt(el?.textContent?.trim() ?? '0', 10)
-        );
-
-        if (views !== expectedViews) {
-          throw new Error(
-            `Expected views to be ${expectedViews}, but found ${views}`
-          );
-        }
-        return;
-      }
-    }
-  }
-
-  /**
    * Compares the text content of next button in lesson player.
    * @param {string} buttonText - Expected button text.
    */
@@ -1984,124 +1887,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Filters lessons by multiple categories.
-   * @param {string[]} categoryNames - The names of the categories to filter by.
-   */
-  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
-    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
-    await this.waitForStaticAssetsToLoad();
-
-    await this.expectElementToBeVisible(unselectedFilterOptionsSelector);
-    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
-    let foundMatch = false;
-
-    for (const option of filterOptions) {
-      const optionText = await this.getTextContent(option);
-
-      if (categoryNames.includes(optionText.trim())) {
-        foundMatch = true;
-        await this.clickOnElement(option);
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for categories: ${categoryNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    await this.page.waitForFunction(
-      (categoryNames: string[]) => {
-        // Check if URL contains all the categories. Added %22 to remove false positives.
-        return categoryNames.every(category =>
-          window.location.href.includes(`%22${category}%22`)
-        );
-      },
-      categoryNames,
-      {timeout: 60000}
-    );
-  }
-
-  /**
-   * Filters lessons by multiple languages and deselect the already selected English language.
-   * @param {string[]} languageNames - The names of the languages to filter by.
-   * @param {string} languageToDeselect - The name of the language to deselect. (Default: 'English')
-   */
-  async filterLessonsByLanguage(
-    languageNames: string[],
-    languageToDeselect: string = 'English'
-  ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.waitForPageToFullyLoad();
-    }
-    await this.expectElementToBeVisible(languageFilterDropdownToggler);
-    await this.clickOnElementWithSelector(languageFilterDropdownToggler);
-
-    await this.waitForStaticAssetsToLoad();
-
-    await this.expectElementToBeVisible(selectedFilterOptionsSelector);
-    const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
-    for (const element of selectedElements) {
-      const elementText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        element
-      );
-      // Deselecting the selected language before choosing new filters.
-      if (elementText === languageToDeselect) {
-        await this.clickOnElement(element);
-      }
-    }
-
-    await this.expectElementToBeAttachedInDOM(unselectedFilterOptionsSelector);
-    const deselectedLanguages = await this.page.$$(
-      unselectedFilterOptionsSelector
-    );
-    let foundMatch = false;
-    let englishMatchCount = 0;
-
-    for (const language of deselectedLanguages) {
-      const languageText = await this.page.evaluate(
-        el => el.textContent,
-        language
-      );
-      const trimmedLanguageText = languageText.trim();
-
-      if (trimmedLanguageText === 'English') {
-        englishMatchCount += 1;
-        if (englishMatchCount < 2) {
-          continue;
-        }
-      }
-
-      if (languageNames.includes(trimmedLanguageText)) {
-        foundMatch = true;
-        await this.clickOnElement(language);
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for languages: ${languageNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    const buttonTextContent =
-      languageNames.length === 1
-        ? languageNames[0]
-        : `${languageNames.length} Languages`;
-    await this.expectTextContentToBe(
-      languageFilterDropdownToggler,
-      buttonTextContent
-    );
-  }
-
-  /**
    * Generates attribution
    */
   async generateAttribution(): Promise<void> {
@@ -2405,8 +2190,15 @@ export class LoggedOutUser extends BaseUser {
    */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
-      await this.expectElementToBeVisible(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      // The desktop card renders its title with the
+      // 'e2e-test-exploration-tile-title' class, while the mobile card uses the
+      // 'mobile-exploration-title' class. Pick the selector matching the
+      // current viewport so this helper works on both desktop and mobile.
+      const lessonTitleSelector = this.isViewportAtMobileWidth()
+        ? mobileLessonCardTitleSelector
+        : lessonCardTitleSelector;
+      await this.expectElementToBeVisible(lessonTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonTitleSelector);
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
           this.page.evaluate(el => el.textContent.trim(), result)
@@ -2439,7 +2231,7 @@ export class LoggedOutUser extends BaseUser {
           return fn(element);
         },
         {
-          selector: lessonCardTitleSelector,
+          selector: lessonTitleSelector,
           index: lessonIndex,
           clickableFn: isElementClickable.toString(),
         }
@@ -2452,11 +2244,11 @@ export class LoggedOutUser extends BaseUser {
           ] as HTMLElement;
           element.click();
         },
-        {selector: lessonCardTitleSelector, index: lessonIndex}
+        {selector: lessonTitleSelector, index: lessonIndex}
       );
       await this.waitForStaticAssetsToLoad();
 
-      await this.expectElementToBeVisible(lessonCardTitleSelector, false);
+      await this.expectElementToBeVisible(lessonTitleSelector, false);
       showMessage(`Lesson "${lessonTitle}" opened from search results.`);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -2508,21 +2300,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.expectElementToBeVisible(searchInputSelector);
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.mouse.move(-1, -1); // Move mouse away to prevent hover effects from blocking the search input.
-    }
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: 'load'});
-  }
-
   /**
    * Selects and opens a topic by its name.
    * @param {string} topicName - The name of the topic to select and open.

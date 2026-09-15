@@ -50,7 +50,6 @@ from core.domain import (
     recommendations_services,
     rights_manager,
     role_services,
-    search_services,
     skill_domain,
     skill_fetchers,
     skill_services,
@@ -269,7 +268,6 @@ class AdminHandler(
                         'reload_collection',
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
-                        'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -283,9 +281,6 @@ class AdminHandler(
                         'rollback_exploration_to_safe_state',
                     ],
                 },
-                # TODO(#13331): Remove default_value when it is confirmed that,
-                # for clearing the search indices of exploration & collection
-                # 'action' field must be provided in the payload.
                 'default_value': None,
             },
             'exploration_id': {
@@ -547,10 +542,6 @@ class AdminHandler(
                         ' action is generate_dummy_blog_post.'
                     )
                 self._load_dummy_blog_post(blog_post_title)
-            elif action == 'clear_search_index':
-                search_services.clear_collection_search_index()
-                search_services.clear_exploration_search_index()
-                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
@@ -1304,7 +1295,6 @@ class AdminHandler(
                 'Elvish, language of "Lord of the Rings',
                 'The Science of Superheroes',
             ]
-            exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
@@ -1317,13 +1307,9 @@ class AdminHandler(
                 )
                 exp_services.save_new_exploration(self.user_id, exploration)
                 if i <= num_dummy_exps_to_publish - 1:
-                    exploration_ids_to_publish.append(new_exploration_id)
                     rights_manager.publish_exploration(
                         self.user, new_exploration_id
                     )
-            exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish
-            )
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
@@ -1451,7 +1437,6 @@ class AdminHandler(
                 story = story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
-            exploration_ids_to_publish = []
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)
 
@@ -1466,7 +1451,6 @@ class AdminHandler(
                 exploration_dict['category'] = category
                 exploration = exp_domain.Exploration.from_dict(exploration_dict)
                 exp_services.save_new_exploration(self.user_id, exploration)
-                exploration_ids_to_publish.append(new_exploration_id)
                 rights_manager.publish_exploration(
                     self.user, new_exploration_id
                 )
@@ -1476,9 +1460,6 @@ class AdminHandler(
                     'description': 'Description',
                 }
                 story_node_dicts.append(story_node_dict)
-            exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish
-            )
 
             # Ensure the story has at least one arc before adding nodes.
             if not initial_dummy_opportunites_generation:
@@ -1660,7 +1641,6 @@ class AdminHandler(
             # Generates translation opportunities for the
             # Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            exp_ids_in_story = exploration_ids_to_publish
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story
             )
@@ -2288,8 +2268,6 @@ class AdminHandler(
 
                 exp_ids_to_publish.append(new_exp_id)
                 rights_manager.publish_exploration(self.user, new_exp_id)
-
-            exp_services.index_explorations_given_ids(exp_ids_to_publish)
 
             raw_image = b''
             with open(

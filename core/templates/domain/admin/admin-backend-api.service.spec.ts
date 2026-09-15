@@ -882,38 +882,6 @@ describe('Admin backend api service', () => {
   });
 
   // Test cases for Admin Misc Tab.
-  it('should clear search index when calling clearSearchIndexAsync', fakeAsync(() => {
-    abas.clearSearchIndexAsync().then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fail to clear search index when calling clearSearchIndexAsync', fakeAsync(() => {
-    abas.clearSearchIndexAsync().then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    req.flush(
-      {
-        error: 'Failed to clear search index.',
-      },
-      {
-        status: 500,
-        statusText: 'Internal Server Error',
-      }
-    );
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to clear search index.');
-  }));
-
   it(
     'should regenerate topic related oppurtunities when' +
       'calling regenerateOpportunitiesRelatedToTopicAsync',
