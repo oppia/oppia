@@ -41,10 +41,12 @@ import {
   RecentCommitResponse,
   RecentFeedbackMessages,
 } from './services/moderator-page-backend-api.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 describe('Moderator Page Component', () => {
   let fixture: ComponentFixture<ModeratorPageComponent>;
   let componentInstance: ModeratorPageComponent;
+  let moderatorPageBackendApiService: ModeratorPageBackendApiService;
   let loaderService: LoaderService;
   let datetimeFormatService: DateTimeFormatService;
   let alertsService: AlertsService;
@@ -141,6 +143,9 @@ describe('Moderator Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ModeratorPageComponent);
     componentInstance = fixture.componentInstance;
+    moderatorPageBackendApiService = TestBed.inject(
+      ModeratorPageBackendApiService
+    ) as jasmine.SpyObj<ModeratorPageBackendApiService>;
     loaderService = TestBed.inject(
       LoaderService
     ) as jasmine.SpyObj<LoaderService>;
@@ -282,14 +287,14 @@ describe('Moderator Page Component', () => {
     };
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -325,14 +330,14 @@ describe('Moderator Page Component', () => {
     };
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -368,14 +373,14 @@ describe('Moderator Page Component', () => {
     };
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -411,14 +416,14 @@ describe('Moderator Page Component', () => {
     };
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -443,14 +448,14 @@ describe('Moderator Page Component', () => {
     };
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
