@@ -40,7 +40,9 @@ class PermanentEmailSendingError(Exception):
     pass
 
 
-def _is_email_valid(email_address: str) -> bool:
+# Here we use object because this function validates arbitrary email input.
+# email inputs before processing them as strings.
+def _is_email_valid(email_address: object) -> bool:
     """Determines whether an email address is valid.
 
     Args:
