@@ -39,6 +39,18 @@ interface Data {
   change_cmd: object;
   files?: Record<string, string>;
 }
+
+interface MachineTranslationData {
+  source_text: string;
+  source_language_code: string;
+  target_language_code: string;
+}
+
+interface MachineTranslationResponse {
+  translated_text: string;
+  translation_provider: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -123,5 +135,23 @@ export class TranslateTextBackendApiService {
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
     return this.http.post<void>('/suggestionhandler/', body).toPromise();
+  }
+
+  async getMachineTranslationAsync(
+    sourceText: string,
+    sourceLanguageCode: string,
+    targetLanguageCode: string
+  ): Promise<string> {
+    const postData: MachineTranslationData = {
+      source_text: sourceText,
+      source_language_code: sourceLanguageCode,
+      target_language_code: targetLanguageCode,
+    };
+    return this.http
+      .post<MachineTranslationResponse>('/generate-translation', postData)
+      .toPromise()
+      .then((response: MachineTranslationResponse) => {
+        return response.translated_text;
+      });
   }
 }

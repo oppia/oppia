@@ -175,6 +175,58 @@ describe('TranslateTextBackendApiService', () => {
     }));
   });
 
+  describe('getMachineTranslationAsync', () => {
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let failHandler: (error: HttpErrorResponse) => void;
+
+    beforeEach(() => {
+      successHandler = jasmine.createSpy('success');
+      failHandler = jasmine.createSpy('error');
+    });
+
+    it('should correctly fetch machine translation', fakeAsync(() => {
+      const expectedPayload = {
+        source_text: 'Hello world',
+        source_language_code: 'en',
+        target_language_code: 'hi',
+      };
+      const expectedResponse = {
+        translated_text: 'नमस्ते दुनिया',
+        translation_provider: 'Google',
+      };
+
+      translateTextBackendApiService
+        .getMachineTranslationAsync('Hello world', 'en', 'hi')
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne('/generate-translation');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(expectedPayload);
+      req.flush(expectedResponse);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith('नमस्ते दुनिया');
+    }));
+
+    it('should call the failHandler on error response', fakeAsync(() => {
+      const errorEvent = new ErrorEvent('error');
+      failHandler = (error: HttpErrorResponse) => {
+        expect(error.error).toBe(errorEvent);
+      };
+
+      translateTextBackendApiService
+        .getMachineTranslationAsync('Hello world', 'en', 'hi')
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne('/generate-translation');
+      expect(req.request.method).toEqual('POST');
+      req.error(errorEvent);
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('suggestTranslatedTextAsync', () => {
     class MockReaderObject {
       result = 'data:image/png;base64,imageBlob1';
