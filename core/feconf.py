@@ -697,6 +697,7 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
+EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION = 'community_library_deprecation'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
