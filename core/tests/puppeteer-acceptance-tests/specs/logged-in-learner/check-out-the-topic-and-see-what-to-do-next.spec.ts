@@ -323,11 +323,14 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
+      // The CUJ "Coming Soon Block" step requires clicking/tapping the
+      // grayed-out Coming Soon placeholder card to be blocked - no navigation
+      // occurs - and the card to display the message "This chapter will be
+      // available soon." The click below verifies the blocked navigation and
+      // the assertion right after verifies the displayed message.
       await loggedInLearner.clickComingSoonCardAndExpectNoNavigation(
         '/learn/math/fractions'
       );
-      // The CUJ requires the clicked Coming Soon placeholder card to display
-      // the message "This chapter will be available soon".
       await loggedInLearner.expectComingSoonDescriptionToContain(
         'This chapter will be available soon.'
       );
@@ -359,10 +362,12 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
-      // The CUJ says the helper tooltip appears when clicking the locked button,
-      // but the tooltip auto-dismisses after ~5 seconds, so the test both
-      // hovers (for a deterministic tooltip check) and verifies that a click
-      // does not navigate to the practice session.
+      // The CUJ "Locked Challenge Helper" step requires that, if the story is
+      // not yet completed, clicking the "Take the Mastery Challenge" button
+      // shows a helper tooltip (auto-dismissed after ~5s) instead of
+      // navigating to the practice session. The hover check below provides a
+      // deterministic tooltip assertion, and the click check verifies that no
+      // navigation occurs.
       await loggedInLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
 
       await loggedInLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
@@ -552,7 +557,14 @@ describe('Logged-in Learner', function () {
       // The story has 12 published chapters. The first chapter was completed
       // above, so complete the remaining 11. The Mastery Challenge unlocks
       // only after every published chapter is completed.
-      for (let completedCount = 0; completedCount < 11; completedCount++) {
+      //
+      // The CUJ "Lesson Progression" bullets ("Chapter 13 is marked as
+      // completed" and "Chapter 14 becomes the next active lesson") map to
+      // this fixture's final progression, chapters 11 and 12: each loop
+      // iteration completes a chapter, verifies it is marked as completed with
+      // the ✅ indicator, and verifies the immediately following chapter
+      // becomes the next active lesson.
+      for (let completedCount = 0; completedCount < 10; completedCount++) {
         await loggedInLearner.waitForPageToFullyLoad();
         await loggedInLearner.clickOnActiveChapterStartButton();
         await loggedInLearner.clickOnContinueButtonInInteractionCard();
@@ -561,12 +573,21 @@ describe('Logged-in Learner', function () {
         );
         await loggedInLearner.openTopicPage('math', 'fractions');
         await loggedInLearner.expectCompletedLessonToBeVisible();
+        await loggedInLearner.expectNextChapterToBeActive();
       }
 
-      // The CUJ "Complete Lesson 13 and return to the topic page" requires the
-      // completed chapter (the final published lesson in this fixture) to be
-      // marked as completed with the ✅ indicator, collapse into a compact row,
-      // and display the "Play Again" quick action.
+      // The CUJ "Complete Lesson 13 and return to the topic page" step maps in
+      // this fixture to completing the final published chapter (chapter 12 of
+      // 12; chapters 13-14 are the Coming Soon placeholder and the suppressed
+      // draft). It requires the completed chapter to be marked as completed
+      // with the ✅ indicator, collapse into a compact row, and display the
+      // "Play Again" quick action.
+      await loggedInLearner.waitForPageToFullyLoad();
+      await loggedInLearner.clickOnActiveChapterStartButton();
+      await loggedInLearner.clickOnContinueButtonInInteractionCard();
+      await loggedInLearner.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
       await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectCompletedLessonToBeVisible();
       await loggedInLearner.expectCompletedChapterToBeCollapsed();

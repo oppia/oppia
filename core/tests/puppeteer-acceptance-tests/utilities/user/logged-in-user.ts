@@ -5356,14 +5356,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Selects the later arc's lesson from the navigation dock (which scrolls to
-   * it and expands its card), clicks its Start button to open the skip
-   * confirmation modal, verifies the Cancel and Proceed buttons, and then
-   * dismisses the modal with Cancel.
-   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
-   *   badge for the later arc.
-   */
-  /**
    * Clicks the dock badge at the given index and then the Start button of the
    * selected lesson. Starting a lesson of a later, incomplete adventure
    * triggers the skip confirmation modal.
