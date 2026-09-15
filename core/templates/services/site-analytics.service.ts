@@ -495,6 +495,15 @@ export class SiteAnalyticsService {
     );
   }
 
+  registerDownloadContributorCertificateEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_download_certificate',
+      {
+        contribution_type: contributionType,
+      }
+    );
+  }
+
   registerLessonActiveUse(): void {
     this._sendEventToGoogleAnalytics('active_user_start_and_saw_cards', {});
   }

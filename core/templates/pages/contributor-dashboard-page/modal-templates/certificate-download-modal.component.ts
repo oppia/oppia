@@ -26,6 +26,7 @@ import {
 } from '../services/contribution-and-review-backend-api.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import './certificate-download-modal.component.css';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface CertificateContentData {
   text: string;
@@ -71,7 +72,8 @@ export class CertificateDownloadModalComponent {
 
   constructor(
     private readonly activeModal: NgbActiveModal,
-    private contributionAndReviewService: ContributionAndReviewService
+    private contributionAndReviewService: ContributionAndReviewService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   close(): void {
@@ -132,6 +134,9 @@ export class CertificateDownloadModalComponent {
           return;
         }
         if (response.certificate_data) {
+          this.siteAnalyticsService.registerDownloadContributorCertificateEvent(
+            this.suggestionType
+          );
           this.createCertificate(response.certificate_data, true);
         } else {
           this.errorsFound = true;
@@ -167,6 +172,9 @@ export class CertificateDownloadModalComponent {
           return;
         }
         if (response.certificate_data) {
+          this.siteAnalyticsService.registerDownloadContributorCertificateEvent(
+            this.suggestionType
+          );
           this.createCertificate(response.certificate_data);
         } else {
           this.errorsFound = true;
@@ -364,7 +372,7 @@ export class CertificateDownloadModalComponent {
           linePosition: (linePosition += 40),
         });
         this.fillCertificateContent(ctx, certificateContentData);
-        linePosition += 100;
+        linePosition += dedicationLines.length > 3 ? 60 : 100;
       } else {
         const certificateContentData: CertificateContentData[] = [
           {

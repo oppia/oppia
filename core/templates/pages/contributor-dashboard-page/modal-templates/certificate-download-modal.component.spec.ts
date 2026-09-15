@@ -42,9 +42,13 @@ import {
   ContributorCertificateInfo,
 } from '../services/contribution-and-review-backend-api.service';
 import {HttpErrorResponse} from '@angular/common/http';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
+}
+class MockSiteAnalyticsService {
+  registerDownloadContributorCertificateEvent(contributionType: string): void {}
 }
 
 describe('Contributor Certificate Download Modal Component', () => {
@@ -55,6 +59,7 @@ describe('Contributor Certificate Download Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
+  let siteAnalyticsService: SiteAnalyticsService;
   const certificateData: ContributorCertificateInfo = {
     from_date: '1 Jan 2022',
     to_date: '31 Oct 2022',
@@ -82,6 +87,10 @@ describe('Contributor Certificate Download Modal Component', () => {
         NgbActiveModal,
         AlertsService,
         {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
+        {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef,
         },
@@ -105,6 +114,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     activeModal = TestBed.inject(NgbActiveModal);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     alertsService = TestBed.inject(AlertsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     fixture.detectChanges();
   });
 
@@ -168,6 +178,62 @@ describe('Contributor Certificate Download Modal Component', () => {
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
   });
+
+  it('should register analytics event on successful certificate download', fakeAsync(() => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate').and.stub();
+    const analyticsSpy = spyOn(
+      siteAnalyticsService,
+      'registerDownloadContributorCertificateEvent'
+    );
+
+    component.downloadCertificate();
+    flushMicrotasks();
+
+    expect(analyticsSpy).toHaveBeenCalledWith('translate_content');
+  }));
+
+  it('should register analytics event on successful certificate print', fakeAsync(() => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate').and.stub();
+    const analyticsSpy = spyOn(
+      siteAnalyticsService,
+      'registerDownloadContributorCertificateEvent'
+    );
+
+    component.printCertificate();
+    flushMicrotasks();
+
+    expect(analyticsSpy).toHaveBeenCalledWith('translate_content');
+  }));
+
+  it('should not register analytics event when no certificate data', fakeAsync(() => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(emptyCertificateDataResponse));
+    const analyticsSpy = spyOn(
+      siteAnalyticsService,
+      'registerDownloadContributorCertificateEvent'
+    );
+
+    component.downloadCertificate();
+    flushMicrotasks();
+
+    expect(analyticsSpy).not.toHaveBeenCalled();
+  }));
 
   it('should set max selectable date on both date pickers', () => {
     const dateInputs =

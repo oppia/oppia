@@ -4836,4 +4836,8 @@ def _generate_question_contributor_certificate_data(
         0,
         None,
         certificate_profile_name,
+        # Word-count breakdown is translation-specific; question certificates
+        # measure effort in minutes, so these are not applicable here.
+        translated_word_count=0,
+        reviewed_word_count=0,
     )
