@@ -95,6 +95,7 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
   reviewerOnlyContentCount: number;
+  userIsReviewer?: boolean;
   entityType: string;
 }
 export interface ModifyTranslationOpportunity {
@@ -682,10 +683,6 @@ export class TranslationModalComponent {
             this.closeWithoutUnsavedCheck();
           }
         );
-      }
-      if (!this.moreAvailable) {
-        this.pageContextService.resetImageSaveDestination();
-        this.closeWithoutUnsavedCheck();
       }
     };
 
