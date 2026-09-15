@@ -195,7 +195,7 @@ class LibraryIndexHandler(
             # of any new key on typedDict is prohibited by MyPy.
             summary_dicts_by_category.insert(
                 0,
-                {
+                {  # type: ignore[typeddict-item]
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
                     'header_i18n_id': (
@@ -203,7 +203,7 @@ class LibraryIndexHandler(
                     ),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                    'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
+                    'protractor_id': 'top-rated',
                 },
             )
         if featured_activity_summary_dicts:

@@ -74,18 +74,12 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/learner_progress_services.py',
     'core/jobs/batch_jobs/number_with_units_audit_jobs.py',
     'core/domain/app_feedback_report_services.py',
-    'core/controllers/story_viewer.py',
-    'core/controllers/reader.py',
     'core/jobs/transforms/validation/base_validation.py',
-    'core/controllers/access_validators.py',
-    'scripts/run_typescript_checks_test.py',
-    'scripts/run_frontend_tests_test.py',
     'core/storage/base_model/gae_models_test.py',
     'core/domain/user_services_test.py',
     'core/domain/takeout_service_test.py',
     'core/domain/question_fetchers_test.py',
     'core/domain/event_services_test.py',
-    'core/controllers/reader_test.py',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
