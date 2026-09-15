@@ -18,6 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
+import {AppConstants} from 'app.constants';
 import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -31,6 +32,7 @@ interface AvailableCertificateViewModel {
   title: string;
   status: CertificateAssessmentStatus;
   assessmentRoute: string[];
+  resultRoute: string[];
   passedOnDate?: string;
   failedOnDate?: string;
 }
@@ -96,6 +98,7 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
       assessmentRoute: this.getCertificateAssessmentRoute(
         offering.certificateId
       ),
+      resultRoute: this.getCertificateResultRoute(offering.attemptId),
       passedOnDate:
         offering.passedOnDate === null
           ? undefined
@@ -113,5 +116,15 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
 
   getCertificateAssessmentRoute(certificateId: string): string[] {
     return ['/certificate-assessment', certificateId];
+  }
+
+  getCertificateResultRoute(attemptId: string | null): string[] {
+    if (attemptId === null) {
+      return [];
+    }
+    return [
+      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
+      attemptId,
+    ];
   }
 }

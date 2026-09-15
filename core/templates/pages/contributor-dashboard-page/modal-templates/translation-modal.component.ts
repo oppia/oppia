@@ -67,7 +67,6 @@ const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
 const EXPLORATION_TITLE_CHAR_LIMIT = 36;
 const CONTENT_TYPE_METADATA = 'metadata';
 const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
-const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
 const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill_description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill_explanation';
@@ -306,6 +305,23 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection(),
       },
     };
+
+    const activeLanguageDirection =
+      this.translationLanguageService.getActiveLanguageDirection();
+
+    const unicodeSchema = this.UNICODE_SCHEMA;
+    if (!unicodeSchema.ui_config) {
+      unicodeSchema.ui_config = {};
+    }
+    unicodeSchema.ui_config.languageDirection = activeLanguageDirection;
+
+    const setOfStringsSchemaItems = this.SET_OF_STRINGS_SCHEMA
+      .items as UnicodeSchema;
+    if (!setOfStringsSchemaItems.ui_config) {
+      setOfStringsSchemaItems.ui_config = {};
+    }
+    setOfStringsSchemaItems.ui_config.languageDirection =
+      activeLanguageDirection;
 
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
       if (
@@ -555,9 +571,6 @@ export class TranslationModalComponent {
       }
       if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
         return 'objective';
-      }
-      if (contentId === EXPLORATION_CATEGORY_CONTENT_ID) {
-        return 'category';
       }
       if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
         return 'tag';
