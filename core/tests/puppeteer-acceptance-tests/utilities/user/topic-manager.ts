@@ -5567,10 +5567,10 @@ export class TopicManager extends BaseUser {
     } else {
       await this.page.waitForSelector(markAsReadyToPublishButton);
 
-      // Wait for any toast messages to disappear before clicking the button to avoid click interception
+      // Wait for any toast messages to disappear before clicking the button to avoid click interception.
       await this.page
         .waitForFunction(
-          (toastContainer, toastMessage) => {
+          (toastContainer: string, toastMessage: string) => {
             const toasts = document.querySelectorAll(
               `${toastContainer}, ${toastMessage}`
             );

@@ -4478,7 +4478,7 @@ export class LoggedInUser extends BaseUser {
     for (const chapterName of chapterNames) {
       try {
         await this.page.waitForFunction(
-          (availableSel, chapterSel, name) => {
+          (availableSel: string, chapterSel: string, name: string) => {
             const containers = document.querySelectorAll(availableSel);
             for (const container of containers) {
               const elements = container.querySelectorAll(chapterSel);
