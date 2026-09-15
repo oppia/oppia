@@ -59,6 +59,12 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
 
+// Number of times a translate button click is attempted before giving up, and
+// how long each attempt waits for the translation modal to open. The product of
+// the two is kept at the default 30 second selector timeout.
+const translateButtonClickAttempts = 3;
+const translateModalTimeoutMsecs = 10000;
+
 export class TranslationSubmitter extends BaseUser {
   /**
    * Clicks on the given pagination button.
@@ -142,33 +148,67 @@ export class TranslationSubmitter extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
-    const opportunityItem =
-      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
-        chapterName,
-        storyName
-      );
+    // The opportunity list re-renders whenever the language filter changes, so
+    // the opportunity is re-queried and clicked again if the modal does not
+    // open within the timeout.
+    for (let attempt = 1; attempt <= translateButtonClickAttempts; attempt++) {
+      const opportunityItem =
+        await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
+          chapterName,
+          storyName
+        );
 
-    if (!opportunityItem) {
-      throw new Error(
-        `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+      if (!opportunityItem) {
+        throw new Error(
+          `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+        );
+      }
+
+      // Click on translate button in the opportunity item.
+      const translateButton = await opportunityItem.waitForSelector(
+        opportunityTranslateButtonSelector
       );
+      if (!translateButton) {
+        throw new Error(
+          `Translate button for chapter ${chapterName} and story ${storyName} not found.`
+        );
+      }
+      if (this.isViewportAtMobileWidth()) {
+        // Aligning the button with the bottom of the viewport keeps it clear of
+        // the header so that the clickability check below can pass.
+        await translateButton.evaluate(el => el.scrollIntoView({block: 'end'}));
+        await this.waitForElementToStabilize(translateButton);
+        await this.waitForElementToBeClickable(translateButton);
+        // Puppeteer scrolls a target back to the centre of the viewport before
+        // it dispatches a mouse event, which parks the button underneath the
+        // sticky header again and delivers the click to the header instead.
+        // That scroll happens after the check above, so the click is dispatched
+        // on the element itself where it cannot be intercepted.
+        await translateButton.evaluate(el => (el as HTMLElement).click());
+      } else {
+        await this.clickOnElement(translateButton);
+      }
+
+      // Verify that the translation editor is opened.
+      try {
+        await this.page.waitForSelector(
+          translateTextModalHeaderContainerSelector,
+          {visible: true, timeout: translateModalTimeoutMsecs}
+        );
+        showMessage(
+          `Element ${translateTextModalHeaderContainerSelector} is visible.`
+        );
+        return;
+      } catch (error) {
+        if (attempt === translateButtonClickAttempts) {
+          throw error;
+        }
+        showMessage(
+          `Translation modal did not open for chapter ${chapterName} and ` +
+            `story ${storyName} on attempt ${attempt}. Retrying...`
+        );
+      }
     }
-
-    // Click on translate button in the opportunity item.
-    const translateButton = await opportunityItem.waitForSelector(
-      opportunityTranslateButtonSelector
-    );
-    if (!translateButton) {
-      throw new Error(
-        `Translate button for chapter ${chapterName} and story ${storyName} not found.`
-      );
-    }
-    await translateButton.click();
-
-    // Verify that the translation editor is opened.
-    await this.expectElementToBeVisible(
-      translateTextModalHeaderContainerSelector
-    );
   }
 
   /**
@@ -528,6 +568,188 @@ export class TranslationSubmitter extends BaseUser {
       `${selectedSkillSelector} label`,
       skill
     );
+  }
+
+  // ── Auto-translate helpers ───────────────────────────────────────────────
+
+  /**
+   * Intercepts all requests to the given URL path and returns a synthetic JSON
+   * response. This allows acceptance tests to exercise the auto-translate UI
+   * without a live AI provider.
+   *
+   * @param urlPath - Absolute or partial URL to intercept (e.g.
+   *   '/generate-translation').
+   * @param responseBody - Object that will be JSON-serialised and returned as
+   *   the response body.
+   */
+  async interceptTranslationRequests(
+    urlPath: string,
+    responseBody: object
+  ): Promise<void> {
+    await this.page.setRequestInterception(true);
+    this.page.on('request', request => {
+      if (request.url().includes(urlPath)) {
+        request.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(responseBody),
+        });
+      } else {
+        request.continue();
+      }
+    });
+  }
+
+  /**
+   * Clicks the translate button on the first available translation opportunity
+   * in the translate-text tab. Useful when the exact chapter/story name is not
+   * known in advance.
+   */
+  async clickButtonToStartTranslating(): Promise<void> {
+    await this.expectElementToBeVisible(opportunityTranslateButtonSelector);
+    const button = await this.page.$(opportunityTranslateButtonSelector);
+    if (!button) {
+      throw new Error('No translate button found on the page.');
+    }
+    await this.clickOnElement(button);
+    await this.page.waitForSelector(
+      translateTextModalHeaderContainerSelector,
+      {visible: true, timeout: 15000}
+    );
+  }
+
+  /**
+   * Selects the target language in the contributor dashboard language filter.
+   * @param language - The human-readable language label to select (e.g.
+   *   'español (Spanish)').
+   */
+  async selectLanguage(language: string): Promise<void> {
+    // The language selector element varies by page region; look for the
+    // first matching option that contains the given label.
+    const languageSelectorSelector = '.e2e-test-language-selector';
+    await this.clickOnElementWithSelector(languageSelectorSelector);
+    const optionElements = await this.page.$$(
+      '.e2e-test-language-selector-option'
+    );
+    for (const option of optionElements) {
+      const text = await option.evaluate(el => el.textContent ?? '');
+      if (text.trim().includes(language)) {
+        await option.click();
+        return;
+      }
+    }
+    // Language not found in dropdown; fall back to a direct filter update.
+    await this.page.select(languageSelectorSelector, language);
+  }
+
+  /**
+   * Returns true when the auto-translate button is present and visible in the
+   * translation modal editor section.
+   */
+  async isAutoTranslateButtonVisible(): Promise<boolean> {
+    const selector = '.e2e-test-auto-translate-button';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 5000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Clicks the auto-translate button in the translation modal and waits for
+   * the editor to be populated.
+   */
+  async clickAutoTranslateButton(): Promise<void> {
+    const selector = '.e2e-test-auto-translate-button';
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+    // Wait for the translating spinner to disappear (indicating the request
+    // completed and the editor was updated).
+    await this.page.waitForFunction(
+      (sel: string) => {
+        const btn = document.querySelector(sel);
+        return btn && !btn.textContent?.includes('Translating');
+      },
+      {timeout: 20000},
+      selector
+    );
+  }
+
+  /**
+   * Returns the inner text content of the translation editor area.
+   */
+  async getTranslationEditorContent(): Promise<string> {
+    const editorSelector = '.e2e-test-state-translation-editor';
+    await this.expectElementToBeVisible(editorSelector);
+    return this.page.$eval(
+      editorSelector,
+      (el: Element) => el.innerHTML ?? ''
+    );
+  }
+
+  /**
+   * Returns true when the "AI-generated" badge (without the edited variant)
+   * is visible in the translation modal.
+   */
+  async isAiGeneratedBadgeVisible(): Promise<boolean> {
+    const selector = '.e2e-test-ai-generated-badge';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true when the "AI-generated · edited" badge is visible in the
+   * translation modal.
+   */
+  async isAiEditedBadgeVisible(): Promise<boolean> {
+    const selector = '.e2e-test-ai-edited-badge';
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true when the "Translation is incomplete" error message is shown
+   * in the translation modal.
+   */
+  async isTranslationIncompleteErrorVisible(): Promise<boolean> {
+    const selector = '.oppia-translation-error-section p';
+    try {
+      const el = await this.page.$(selector);
+      if (!el) {
+        return false;
+      }
+      const text = await el.evaluate((e: Element) => e.textContent ?? '');
+      return text.includes('incomplete');
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Types additional text at the end of the current translation editor
+   * content to simulate the contributor editing an AI-generated suggestion.
+   * @param text - The text to append inside the editor.
+   */
+  async editTranslationInEditor(text: string): Promise<void> {
+    const editorBodySelector = '.e2e-test-rte';
+    await this.expectElementToBeVisible(editorBodySelector);
+    await this.page.click(editorBodySelector);
+    // Move the cursor to the end of the existing content.
+    await this.page.keyboard.press('End');
+    await this.page.keyboard.type(text);
+    // Trigger Angular change detection by dispatching an input event.
+    await this.page.$eval(editorBodySelector, (el: Element) => {
+      el.dispatchEvent(new Event('input', {bubbles: true}));
+    });
   }
 }
 

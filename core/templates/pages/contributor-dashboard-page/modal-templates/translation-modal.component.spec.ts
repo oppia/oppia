@@ -100,6 +100,9 @@ class MockPlatformFeatureService {
       EnableTranslationOppsWithNewOppModels: {
         isEnabled: false,
       },
+      EnableAutomaticTranslationSuggestions: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -138,6 +141,7 @@ describe('Translation Modal Component', () => {
     totalCount: 50,
     translationsCount: 20,
     reviewerOnlyContentCount: 0,
+    entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
@@ -239,6 +243,32 @@ describe('Translation Modal Component', () => {
         can_review_questions: false,
       })
     );
+
+    const translateTextBackendApiService = TestBed.inject(TranslateTextBackendApiService);
+    spyOn(
+      translateTextBackendApiService,
+      'getMachineTranslationFeatureStatusAsync'
+    ).and.returnValue(Promise.resolve(true));
+  });
+
+  it('should wrap text with ellipsis when text is too long', () => {
+    expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
+  });
+
+  it('should return empty string for empty input', () => {
+    expect(component.wrapTextWithEllipsis('', 10)).toBe('');
+  });
+
+  it('should return input unchanged for short strings', () => {
+    expect(component.wrapTextWithEllipsis('Hi', 10)).toBe('Hi');
+  });
+
+  it('should return input unchanged when characterCount is less than 3', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 2)).toBe('Hello');
+  });
+
+  it('should return input unchanged when length equals characterCount', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 5)).toBe('Hello');
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -261,6 +291,14 @@ describe('Translation Modal Component', () => {
     component.updateHtml(['new value']);
 
     expect(component.activeWrittenTranslation).toEqual(['new value']);
+  });
+
+  it('should return early when $event is neither string nor array', () => {
+    component.activeWrittenTranslation = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml(null);
+    expect(component.activeWrittenTranslation).toEqual('old');
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
   it('should set validation errors and disable save when translation has missing custom tags', () => {
@@ -440,6 +478,19 @@ describe('Translation Modal Component', () => {
     expect(handler(event)).toBeUndefined();
   });
 
+  it('should reset the image save destination when the modal is destroyed', () => {
+    pageContextService.setImageSaveDestinationToLocalStorage();
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+
+    component.ngOnDestroy();
+
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+  });
+
   describe('when initialized', () => {
     describe('with an rtl language', () => {
       beforeEach(fakeAsync(() => {
@@ -584,6 +635,36 @@ describe('Translation Modal Component', () => {
           type: 'unicode',
         },
       });
+    });
+
+    it('should return activeWrittenTranslation as string when it is a string', () => {
+      component.activeWrittenTranslation = 'test string';
+      expect(component.activeWrittenTranslationAsString).toBe('test string');
+    });
+
+    it('should return first element when activeWrittenTranslation is an array', () => {
+      component.activeWrittenTranslation = ['first', 'second'];
+      expect(component.activeWrittenTranslationAsString).toBe('first');
+    });
+
+    it('should return empty string when activeWrittenTranslation is an empty array', () => {
+      component.activeWrittenTranslation = [];
+      expect(component.activeWrittenTranslationAsString).toBe('');
+    });
+
+    it('should return textToTranslate as string when it is a string', () => {
+      component.textToTranslate = 'test text';
+      expect(component.textToTranslateAsString).toBe('test text');
+    });
+
+    it('should return first element when textToTranslate is an array', () => {
+      component.textToTranslate = ['first', 'second'];
+      expect(component.textToTranslateAsString).toBe('first');
+    });
+
+    it('should return empty string when textToTranslate is an empty array', () => {
+      component.textToTranslate = [];
+      expect(component.textToTranslateAsString).toBe('');
     });
 
     it('should utilize the modify translations opportunity when available', () => {
@@ -1315,6 +1396,7 @@ describe('Translation Modal Component', () => {
               useValue: {
                 setImageSaveDestinationToLocalStorage: () => {},
                 setCustomEntityContext: () => {},
+                resetImageSaveDestination: () => {},
                 getEntityType: () => 'exploration',
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',
@@ -1427,5 +1509,301 @@ describe('Translation Modal Component', () => {
         expect(component.activeModal.close).toHaveBeenCalled();
       }));
     });
+  });
+
+  describe('when validating exploration title length', () => {
+    it('should set hasLengthValidationError if title length exceeds 36 characters', () => {
+      translateTextService.activeContentId = 'exploration_title';
+      component.textToTranslate = 'Original title';
+
+      component.updateHtml(
+        'This translation of the exploration title is way too long and should be rejected'
+      );
+      expect(component.hasLengthValidationError).toBe(true);
+      expect(component.lengthValidationErrorMessage).toBe(
+        'Translation exceeds the allowed character limit. The translation for the above content must be 36 characters or fewer.'
+      );
+      expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
+    it('should not set hasLengthValidationError if title length is 36 characters or fewer', () => {
+      translateTextService.activeContentId = 'exploration_title';
+      component.textToTranslate = 'Original title';
+
+      component.updateHtml('Short title');
+      expect(component.hasLengthValidationError).toBe(false);
+      expect(component.lengthValidationErrorMessage).toBe('');
+      expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+  });
+
+  describe('when getting formatted content type', () => {
+    it('should correctly format content type and content ID', () => {
+      expect(component.getFormattedContentType()).toBe('');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_title')
+      ).toBe('title');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_objective'
+        )
+      ).toBe('objective');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_category'
+        )
+      ).toBe('category');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_tag_0')
+      ).toBe('tag');
+      expect(component.getFormattedContentType('metadata', null, 'other')).toBe(
+        'metadata'
+      );
+      expect(
+        component.getFormattedContentType('interaction', 'TextInput')
+      ).toBe('TextInput interaction');
+      expect(component.getFormattedContentType('ca')).toBe('label');
+      expect(component.getFormattedContentType('rule')).toBe('input rule');
+      expect(component.getFormattedContentType('content')).toBe('content');
+      // A skill's content types are stored under the name of the field they
+      // came from, and are spelled out for the contributor.
+      expect(component.getFormattedContentType('skill_description')).toBe(
+        'skill description'
+      );
+      expect(component.getFormattedContentType('skill_explanation')).toBe(
+        'skill explanation'
+      );
+      expect(component.getFormattedContentType('misconception_feedback')).toBe(
+        'misconception feedback'
+      );
+    });
+  });
+
+  describe('requestAutoTranslation', () => {
+    // Responses from the /generate-translation endpoint for various source
+    // HTML strings, used across multiple tests in this describe block.
+    const MACHINE_TRANSLATION_URL = '/generate-translation';
+
+    const htmlSourceText =
+      '<p>Hello <oppia-noninteractive-math math_content-with-value="{}"></oppia-noninteractive-math></p>';
+    const translatedText =
+      '<p>Hola <oppia-noninteractive-math math_content-with-value="{}"></oppia-noninteractive-math></p>';
+
+    beforeEach(fakeAsync(() => {
+      // Initialise the component with a text-to-translate so the button is
+      // enabled and the language code is set.
+      component.activeDataFormat = 'html';
+      component.activeLanguageCode = 'es';
+      component.textToTranslate = htmlSourceText;
+      component.loadingData = false;
+    }));
+
+    it('should populate the editor with the translated text on success', fakeAsync(() => {
+      component.requestAutoTranslation();
+      tick();
+
+      const req = httpTestingController.expectOne(MACHINE_TRANSLATION_URL);
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual({
+        source_text: htmlSourceText,
+        source_language_code: 'en',
+        target_language_code: 'es',
+      });
+      req.flush({
+        translated_text: translatedText,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      expect(component.activeWrittenTranslation).toEqual(translatedText);
+      expect(component.wasAutoGenerated).toBeTrue();
+      expect(component.autoGenerationProvider).toEqual('azure');
+      expect(component.wasEdited).toBeFalse();
+      expect(component.isAutoTranslating).toBeFalse();
+    }));
+
+    it('should preserve math component tags returned by the backend', fakeAsync(() => {
+      const mathSource =
+        "<p><oppia-noninteractive-math math_content-with-value='{&quot;raw_latex&quot;:&quot;x^2&quot;}'></oppia-noninteractive-math></p>";
+      const mathTranslation =
+        "<p><oppia-noninteractive-math math_content-with-value='{&quot;raw_latex&quot;:&quot;x^2&quot;}'></oppia-noninteractive-math></p>";
+      component.textToTranslate = mathSource;
+
+      component.requestAutoTranslation();
+      tick();
+
+      const req = httpTestingController.expectOne(MACHINE_TRANSLATION_URL);
+      req.flush({
+        translated_text: mathTranslation,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      // The math component tag must survive the round-trip: the translated
+      // HTML should still contain the original oppia-noninteractive-math tag
+      // so that reviewers see correct rendered mathematics.
+      expect(component.activeWrittenTranslation as string).toContain(
+        'oppia-noninteractive-math'
+      );
+    }));
+
+    it('should preserve hyperlink URL attributes returned by the backend', fakeAsync(() => {
+      const linkSource =
+        '<p><oppia-noninteractive-link url-with-value="&amp;quot;https://oppia.org&amp;quot;" text-with-value="&amp;quot;Oppia&amp;quot;"></oppia-noninteractive-link></p>';
+      const linkTranslation =
+        '<p><oppia-noninteractive-link url-with-value="&amp;quot;https://oppia.org&amp;quot;" text-with-value="&amp;quot;Oppia (translated)&amp;quot;"></oppia-noninteractive-link></p>';
+      component.textToTranslate = linkSource;
+
+      component.requestAutoTranslation();
+      tick();
+
+      const req = httpTestingController.expectOne(MACHINE_TRANSLATION_URL);
+      req.flush({
+        translated_text: linkTranslation,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      // The hyperlink URL must be preserved unchanged so that translated
+      // lessons continue to point to the correct resource.
+      expect(component.activeWrittenTranslation as string).toContain(
+        'https://oppia.org'
+      );
+      expect(component.activeWrittenTranslation as string).toContain(
+        'oppia-noninteractive-link'
+      );
+    }));
+
+    it('should show a warning and clear isAutoTranslating on error', fakeAsync(() => {
+      // Access the private alertsService via bracket notation to spy on it.
+      spyOn(component['alertsService'], 'addWarning');
+
+      component.requestAutoTranslation();
+      tick();
+
+      const req = httpTestingController.expectOne(MACHINE_TRANSLATION_URL);
+      req.flush(
+        {error: 'Translation service unavailable.'},
+        {status: 503, statusText: 'Service Unavailable'}
+      );
+      flushMicrotasks();
+
+      expect(component.isAutoTranslating).toBeFalse();
+      expect(component.wasAutoGenerated).toBeFalse();
+      expect(component['alertsService'].addWarning).toHaveBeenCalled();
+    }));
+
+    it('should not fire a request for set-of-strings data format', fakeAsync(() => {
+      component.activeDataFormat = 'set_of_normalized_string';
+
+      component.requestAutoTranslation();
+      tick();
+
+      // No HTTP request should have been made.
+      httpTestingController.expectNone(MACHINE_TRANSLATION_URL);
+    }));
+
+    it('should not fire a second request while one is in flight', fakeAsync(() => {
+      component.requestAutoTranslation();
+      component.requestAutoTranslation(); // Second call while first is pending.
+      tick();
+
+      // Only one request should have been made.
+      httpTestingController.expectOne(MACHINE_TRANSLATION_URL).flush({
+        translated_text: translatedText,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      expect(component.wasAutoGenerated).toBeTrue();
+    }));
+
+    it('should set wasEdited to true when user edits the AI-generated text', fakeAsync(() => {
+      // First auto-translate.
+      component.requestAutoTranslation();
+      tick();
+
+      httpTestingController.expectOne(MACHINE_TRANSLATION_URL).flush({
+        translated_text: translatedText,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      expect(component.wasAutoGenerated).toBeTrue();
+      expect(component.wasEdited).toBeFalse();
+
+      // Simulate contributor editing the AI text in the editor.
+      component.updateHtml('<p>Hola mundo (edited)</p>');
+
+      expect(component.wasEdited).toBeTrue();
+    }));
+
+    it('should reset wasAutoGenerated and wasEdited after clearTranslation', fakeAsync(() => {
+      // Populate auto-translation state.
+      component.requestAutoTranslation();
+      tick();
+
+      httpTestingController.expectOne(MACHINE_TRANSLATION_URL).flush({
+        translated_text: translatedText,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      component.updateHtml('<p>edited</p>');
+      expect(component.wasAutoGenerated).toBeTrue();
+      expect(component.wasEdited).toBeTrue();
+
+      // clearTranslation is private; call it via the public
+      // suggestTranslatedText path which internally calls clearTranslation on
+      // success. We trigger it here by calling it through the service spy.
+      // Directly test the flag reset by invoking the private method.
+      (
+        component as unknown as {clearTranslation: () => void}
+      ).clearTranslation();
+
+      expect(component.wasAutoGenerated).toBeFalse();
+      expect(component.autoGenerationProvider).toEqual('');
+      expect(component.wasEdited).toBeFalse();
+    }));
+
+    it('should pass wasAutoGenerated and provider to suggestTranslatedText on submit', fakeAsync(() => {
+      // Auto-translate first.
+      component.requestAutoTranslation();
+      tick();
+
+      httpTestingController.expectOne(MACHINE_TRANSLATION_URL).flush({
+        translated_text: translatedText,
+        translation_provider: 'azure',
+      });
+      flushMicrotasks();
+
+      const suggestSpy = spyOn(
+        translateTextService,
+        'suggestTranslatedText'
+      ).and.stub();
+
+      component.canTranslatedTextBeSubmitted = () => true;
+      component.uploadingTranslation = false;
+      component.loadingData = false;
+
+      component.suggestTranslatedText();
+      tick();
+
+      expect(suggestSpy).toHaveBeenCalledWith(
+        translatedText,
+        jasmine.any(String), // languageCode
+        jasmine.any(Array), // imagesData
+        'html', // dataFormat
+        true, // wasAutoGenerated
+        'azure', // autoGenerationProvider
+        false, // wasEdited
+        jasmine.any(Function), // successCallback
+        jasmine.any(Function) // errorCallback
+      );
+    }));
   });
 });

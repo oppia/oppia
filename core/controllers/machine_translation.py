@@ -97,6 +97,30 @@ class MachineTranslationGenerateHandler(
         )
 
 
+class MachineTranslationFeatureStatusHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, Any]]
+):
+    """Handler for fetching the global automatic translation status."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_suggest_changes
+    def get(self) -> None:
+        """Handles GET requests to fetch the automatic translation status."""
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException()
+
+        is_enabled = machine_translation_services.is_automatic_translation_enabled()
+        self.render_json({'is_enabled': is_enabled})
+
+
 class TranslationProviderMappingHandler(
     base.BaseHandler[
         # Here we use type Any because the request payload's provider
