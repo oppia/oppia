@@ -273,6 +273,100 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(messages_summary['author_username'], None)
 
+    def test_anonymous_message_after_suggestion_summary(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        new_content = state_domain.SubtitledHtml(
+            'content', '<p>new content html</p>'
+        ).to_dict()
+        change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Welcome!',
+            'new_value': new_content,
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID_1,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.editor_id,
+            None,
+            change_cmd,
+            'score category',
+            thread_id,
+            None,
+        )
+        feedback_services.create_message(
+            thread_id, None, None, None, 'Anonymous follow-up message'
+        )
+
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+        response_dict = self.get_json(thread_url)
+
+        self.assertEqual(
+            response_dict['message_summary_list'][1]['author_username'], None
+        )
+
+    def test_get_translation_suggestion_summary_with_multiple_content_html(
+        self,
+    ) -> None:
+        self.login(self.EDITOR_EMAIL)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
+        content_id = exploration.states['Welcome!'].content.content_id
+        translation_suggestion = suggestion_registry.SuggestionTranslateContent(
+            'exploration.exp1.thread1',
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            'author',
+            'review_id',
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Welcome!',
+                'content_id': content_id,
+                'language_code': 'hi',
+                'content_html': '<p>Original content.</p>',
+                'translation_html': '<p>Translated content.</p>',
+                'data_format': 'html',
+            },
+            'translation.Algebra',
+            'en',
+            False,
+            datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
+            datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
+        )
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ), self.swap_to_always_return(
+            exploration, 'get_content_html', ['<p>One</p>', '<p>Two</p>']
+        ), self.swap_to_always_return(
+            exp_fetchers, 'get_exploration_by_id', exploration
+        ):
+            response_dict = self.get_json(thread_url)
+
+        self.assertEqual(
+            response_dict['message_summary_list'][0]['current_content_html'],
+            '<p>One</p> <p>Two</p>',
+        )
+
     def test_get_translation_suggestion_summary(self) -> None:
         """Tests that translation suggestions return a complete summary."""
         self.login(self.EDITOR_EMAIL)
