@@ -107,6 +107,69 @@ def load_template(filename: str, *, template_is_aot_compiled: bool) -> str:
     return html_text
 
 
+def render_html_response(
+    response: webapp2.Response,
+    filename: str,
+    iframe_restriction: Optional[str] = 'DENY',
+    *,
+    template_is_aot_compiled: bool = False,
+) -> None:
+    """Writes the HTML file contents to the response with the Oppia security
+    and caching headers.
+
+    This helper is shared by BaseHandler.render_template and lightweight
+    handlers which bypass the BaseHandler auth pipeline (e.g. the oppia root
+    page), so that the response headers stay identical regardless of the
+    handler type.
+
+    Args:
+        response: webapp2.Response. The response object to write to.
+        filename: str. The template filepath.
+        iframe_restriction: str or None. Possible values are 'DENY' and
+            'SAMEORIGIN':
+
+            DENY: Strictly prevents the template to load in an iframe.
+            SAMEORIGIN: The template can only be displayed in a frame
+                on the same origin as the page itself.
+        template_is_aot_compiled: bool. False by default. Use
+            True when the template is compiled by angular AoT compiler.
+
+    Raises:
+        Exception. Invalid iframe restriction value.
+    """
+
+    # The 'no-store' must be used to properly invalidate the cache when we
+    # deploy a new version, using only 'no-cache' doesn't work properly.
+    response.cache_control.no_store = True
+    response.cache_control.must_revalidate = True
+    response.headers['Strict-Transport-Security'] = (
+        'max-age=31536000; includeSubDomains'
+    )
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Xss-Protection'] = '1; mode=block'
+    if iframe_restriction is not None:
+        if iframe_restriction == 'SAMEORIGIN':
+            response.headers['Content-Security-Policy'] = (
+                'frame-ancestors \'self\''
+            )
+        elif iframe_restriction == 'DENY':
+            response.headers['Content-Security-Policy'] = (
+                'frame-ancestors \'none\''
+            )
+        else:
+            raise Exception(
+                'Invalid iframe restriction value: %s' % iframe_restriction
+            )
+
+    response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
+    response.pragma = 'no-cache'
+    response.write(
+        load_template(
+            filename, template_is_aot_compiled=template_is_aot_compiled
+        )
+    )
+
+
 class SessionBeginHandler(webapp2.RequestHandler):
     """Handler for creating new authentication sessions."""
 
@@ -731,35 +794,11 @@ class BaseHandler(
             Exception. Invalid iframe restriction value.
         """
 
-        # The 'no-store' must be used to properly invalidate the cache when we
-        # deploy a new version, using only 'no-cache' doesn't work properly.
-        self.response.cache_control.no_store = True
-        self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains'
-        )
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
-        if iframe_restriction is not None:
-            if iframe_restriction == 'SAMEORIGIN':
-                self.response.headers['Content-Security-Policy'] = (
-                    'frame-ancestors \'self\''
-                )
-            elif iframe_restriction == 'DENY':
-                self.response.headers['Content-Security-Policy'] = (
-                    'frame-ancestors \'none\''
-                )
-            else:
-                raise Exception(
-                    'Invalid iframe restriction value: %s' % iframe_restriction
-                )
-
-        self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
-        self.response.pragma = 'no-cache'
-        self.response.write(
-            load_template(
-                filepath, template_is_aot_compiled=template_is_aot_compiled
-            )
+        render_html_response(
+            self.response,
+            filepath,
+            iframe_restriction,
+            template_is_aot_compiled=template_is_aot_compiled,
         )
 
     def _render_exception_json_or_html(

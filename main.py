@@ -1528,8 +1528,18 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+        # Lightweight pages have no user-specific content in the HTML shell, so
+        # they are served by a handler that skips the authentication and user
+        # lookups to minimize the time-to-first-byte.
         URLS.append(
-            get_redirect_route(r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage)
+            get_redirect_route(
+                r'/%s' % page['ROUTE'],
+                (
+                    oppia_root.OppiaLightweightRootPage
+                    if 'LIGHTWEIGHT' in page
+                    else oppia_root.OppiaRootPage
+                ),
+            )
         )
 
 # Manually redirect routes with url fragments to the oppia root page.
