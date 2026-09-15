@@ -82,7 +82,7 @@ export class BarChartComponent implements OnInit, AfterViewInit {
       chartBarElements[i].setAttribute('style', `--size: ${size};`);
     }
     const tableElement = this.elementRef.nativeElement.getElementsByClassName(
-      'bar'
+      'oppia-bar-chart-table'
     )[0] as HTMLElement;
     tableElement.setAttribute('style', `--color: ${this.barsColor};`);
   }
