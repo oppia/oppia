@@ -94,6 +94,7 @@ const chapterEditorBreadcrumbChapterNameSelector =
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
+const toastContainerSelector = '.toast-top-center';
 const toastMessageSelector = '.e2e-test-toast-message';
 const toastWarningContainerSelector = '.e2e-test-toast-warning';
 const closeToastMessageButtonSelector = 'button.e2e-test-close-toast-warning';
@@ -5569,9 +5570,9 @@ export class TopicManager extends BaseUser {
       // Wait for any toast messages to disappear before clicking the button to avoid click interception
       await this.page
         .waitForFunction(
-          () => {
+          (toastContainer, toastMessage) => {
             const toasts = document.querySelectorAll(
-              '.toast-top-center, .e2e-test-toast-message'
+              `${toastContainer}, ${toastMessage}`
             );
             for (const toast of toasts) {
               if (toast && window.getComputedStyle(toast).display !== 'none') {
@@ -5580,7 +5581,9 @@ export class TopicManager extends BaseUser {
             }
             return true;
           },
-          {timeout: 15000}
+          {timeout: 15000},
+          toastContainerSelector,
+          toastMessageSelector
         )
         .catch(() => {});
 
