@@ -204,7 +204,12 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     )
                 else:
                     current_content_html = translate_current_content_html
-                suggestion_html = suggestion.change_cmd.translation_html
+                suggestion_html = (
+                    suggestion_services.get_translation_html_from_suggestion(
+                        suggestion
+                    )
+                )
+
             else:
                 raise Exception(
                     'Unrecognized suggestion type for the given '
