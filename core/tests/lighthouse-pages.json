@@ -113,7 +113,7 @@
   },
   "exploration-player": {
     "url": "http://localhost:8181/explore/{{exploration_id}}",
-    "page_module": "core/templates/pages/exploration-player-page/exploration-player-page.module.ts"
+    "page_module": "core/templates/pages/exploration-player-page/current-lesson-player/exploration-player-page.module.ts"
   },
   "topic-editor": {
     "url": "http://localhost:8181/topic_editor/{{topic_id}}",

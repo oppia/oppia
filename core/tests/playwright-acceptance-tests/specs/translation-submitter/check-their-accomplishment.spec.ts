@@ -19,65 +19,60 @@
  * TS.CD.02 Check their accomplishment.
  */
 
-import {test} from '@playwright/test';
-import testConstants from '../../utilities/common/test-constants';
-import {UserFactory} from '../../utilities/common/user-factory';
-import {
-  Contributor,
-  ContributorFactory,
-} from '../../utilities/user/contributor';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
-import {
-  TranslationSubmitter,
-  TranslationSubmitterFactory,
-} from '../../utilities/user/translation-submitter';
+import testConstants from '../../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {Contributor} from '../../../utilities/user/contributor';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {TranslationReviewer} from '../../../utilities/user/translation-reviewer';
+import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
-test.describe.configure({mode: 'serial'});
-
-test.describe('Translation Submitter', function () {
-  let translationSubmitter: LoggedInUser & Contributor & TranslationSubmitter;
+describe('Translation Submitter V2', function () {
+  let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let translationReviewer: LoggedInUser & Contributor & TranslationReviewer;
+  let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
+  let releaseCoordinator: ReleaseCoordinator;
 
-  test.beforeAll(async function ({browser}) {
-    test.setTimeout(6000000);
-
+  beforeAll(async function () {
     // Create users.
     translationSubmitter = await UserFactory.createNewUser(
       'translator',
-      'translator@example.com',
-      browser,
-      [],
-      undefined,
-      [ContributorFactory, TranslationSubmitterFactory]
+      'translator@example.com'
     );
 
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdm@example.com',
-      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     translationReviewer = await UserFactory.createNewUser(
       'translationReviewer',
       'translationReviewer@example.com',
-      browser,
       [ROLES.TRANSLATION_REVIEWER],
-      'hi',
-      [ContributorFactory]
+      'hi'
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_translation_opps_with_new_opp_models'
     );
 
     // Create a curated exploration.
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards('Fair Share');
 
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -100,8 +95,10 @@ test.describe('Translation Submitter', function () {
 
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
@@ -109,6 +106,9 @@ test.describe('Translation Submitter', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
@@ -116,17 +116,17 @@ test.describe('Translation Submitter', function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / The Picnic'
+      'Fractions / Cutting the Pies'
     );
     await translationReviewer.submitTranslationReview('accept');
     await translationReviewer.submitTranslationReview('accept');
-  });
+  }, 900000);
 
-  test('should be able to verify contribution stats', async function () {
+  it('should be able to verify contribution stats', async function () {
     // Check contribution stats.
     await translationSubmitter.navigateToTabInMyContributions(
       'Contribution Stats'
@@ -135,7 +135,8 @@ test.describe('Translation Submitter', function () {
       'Translation Contributions'
     );
     await translationSubmitter.expectScreenshotToMatch(
-      'translationSubmitterAccomplishment'
+      'translationSubmitterAccomplishment',
+      __dirname
     );
     await translationSubmitter.expectContributionTableToContainRow([
       null, // Date can't be compared as it will be different every time.
@@ -149,10 +150,11 @@ test.describe('Translation Submitter', function () {
     // and only contribution is made today.
   });
 
-  test('should be able to check badges earned', async function () {
+  it('should be able to check badges earned', async function () {
     await translationSubmitter.navigateToTabInMyContributions('Badges');
     await translationSubmitter.expectScreenshotToMatch(
-      'translationSubmitterBadges'
+      'translationSubmitterBadges',
+      __dirname
     );
     await translationSubmitter.expectBadgesToContain(
       '1',
@@ -161,7 +163,7 @@ test.describe('Translation Submitter', function () {
     );
   });
 
-  test.afterAll(async function () {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

@@ -33,10 +33,12 @@ import {LoaderService} from 'services/loader.service';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './diagnostic-test-player.component.css';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
   templateUrl: './diagnostic-test-player.component.html',
+  styleUrls: ['./diagnostic-test-player.component.css'],
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
