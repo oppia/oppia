@@ -114,7 +114,7 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
 class CreateUserStatsModel(beam.DoFn):  # type: ignore[misc]
     """DoFn to create empty user stats model."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, user_settings_model: user_models.UserSettingsModel
     ) -> Iterable[user_models.UserStatsModel]:
         """Creates empty user stats model with id.
@@ -141,7 +141,7 @@ class CreateUserStatsModel(beam.DoFn):  # type: ignore[misc]
 class UpdateWeeklyCreatorStats(beam.DoFn):  # type: ignore[misc]
     """DoFn to update weekly dashboard stats in the user stats model."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, user_stats_model: user_models.UserStatsModel
     ) -> Iterable[user_models.UserStatsModel]:
         """Updates weekly dashboard stats with the current values.

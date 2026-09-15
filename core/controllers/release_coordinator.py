@@ -35,7 +35,7 @@ class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'DELETE': {}}
 
     @acl_decorators.can_manage_memcache
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves statistics about the memory cache."""
         cache_stats = caching_services.get_memory_cache_stats()
         self.render_json(
@@ -47,7 +47,7 @@ class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
 
     @acl_decorators.can_manage_memcache
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Flushes the memory cache."""
         caching_services.flush_memory_caches()
         self.render_json({})
@@ -89,7 +89,7 @@ class UserGroupHandler(
     }
 
     @acl_decorators.can_access_release_coordinator_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Populates the data for user groups."""
         user_groups = user_services.get_all_user_groups()
         user_groups_dict_list = []
@@ -99,7 +99,7 @@ class UserGroupHandler(
         self.render_json({'user_group_dicts': user_groups_dict_list})
 
     @acl_decorators.can_access_release_coordinator_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Performs series of action based on action parameter for user
         groups.
         """
@@ -110,7 +110,7 @@ class UserGroupHandler(
         self.render_json({'user_group_dict': user_group.to_dict()})
 
     @acl_decorators.can_access_release_coordinator_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the specified user group."""
         assert self.normalized_payload is not None
 
@@ -121,7 +121,7 @@ class UserGroupHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_release_coordinator_page
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Performs deletion on the specified user group."""
         assert self.normalized_request is not None
         user_group_id = self.normalized_request['user_group_id']
@@ -184,7 +184,7 @@ class FeatureFlagsHandler(
     }
 
     @acl_decorators.can_access_release_coordinator_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         feature_flags = feature_services.get_all_feature_flags()
         feature_flags_dict = []
@@ -203,7 +203,7 @@ class FeatureFlagsHandler(
         )
 
     @acl_decorators.can_access_release_coordinator_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')

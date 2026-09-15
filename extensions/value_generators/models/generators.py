@@ -31,7 +31,7 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    def generate_value(
+    def generate_value(  # pylint: disable=arguments-differ
         self,
         unused_context_params: Optional[Dict[str, str]],
         value: str,
@@ -58,7 +58,7 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    def generate_value(
+    def generate_value(  # pylint: disable=arguments-differ
         self, unused_context_params: Dict[str, str], list_of_values: List[str]
     ) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))

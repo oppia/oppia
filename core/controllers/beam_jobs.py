@@ -33,7 +33,7 @@ class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_run_any_job
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves a list of Beam jobs."""
         sorted_beam_jobs = sorted(
             beam_job_services.get_beam_jobs(), key=lambda j: j.name
@@ -89,7 +89,7 @@ class BeamJobRunHandler(
     }
 
     @acl_decorators.can_run_any_job
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about beam job runs."""
         sorted_beam_job_runs = sorted(
             beam_job_services.get_beam_job_runs(),
@@ -99,7 +99,7 @@ class BeamJobRunHandler(
         self.render_json({'runs': [r.to_dict() for r in sorted_beam_job_runs]})
 
     @acl_decorators.can_run_any_job
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Runs a specified beam job."""
         assert self.normalized_payload is not None
         job_name = self.normalized_payload['job_name']
@@ -107,7 +107,7 @@ class BeamJobRunHandler(
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Cancels a specified beam job."""
         assert self.normalized_request is not None
         job_id = self.normalized_request['job_id']
@@ -149,7 +149,7 @@ class BeamJobRunResultHandler(
     }
 
     @acl_decorators.can_run_any_job
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves the result of a specified beam job run."""
         assert self.normalized_request is not None
         job_id = self.normalized_request['job_id']
