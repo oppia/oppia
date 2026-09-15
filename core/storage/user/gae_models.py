@@ -2772,8 +2772,9 @@ class UserContributionRightsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserContributionRightsModel.
         """
-        rights_model = cls.get_by_id(user_id)
-
+        rights_model: Optional[UserContributionRightsModel] = cls.get_by_id(
+            user_id
+        )
         if rights_model is None:
             return {}
 
@@ -3111,7 +3112,7 @@ class LearnerGroupUserDetailsDict(TypedDict):
     progress_sharing_is_turned_on: bool
 
 
-class LearnerGroupsUserDataDict(TypedDict):
+class LearnerGroupsUserDataDict(TypedDict, total=False):
     """Dictionary for user data to export."""
 
     invited_to_learner_groups_ids: List[str]
@@ -3179,7 +3180,9 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from LearnerGroupsUserModel.
         """
-        learner_grp_user_model = cls.get_by_id(user_id)
+        learner_grp_user_model: Optional[LearnerGroupsUserModel] = (
+            cls.get_by_id(user_id)
+        )
 
         if learner_grp_user_model is None:
             return {}

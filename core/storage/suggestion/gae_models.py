@@ -1359,9 +1359,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         Returns:
             CommunityContributionStatsModel. The single model instance.
         """
-        community_contribution_stats_model = cls.get_by_id(
-            COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
-        )
+        community_contribution_stats_model: Optional[
+            CommunityContributionStatsModel
+        ] = cls.get_by_id(COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
 
         if community_contribution_stats_model is None:
             community_contribution_stats_model = cls(
