@@ -39,6 +39,10 @@ import 'components/code-mirror/codemirror.component';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {Subscription} from 'rxjs';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
@@ -122,6 +126,7 @@ export class SchemaBasedUnicodeEditor
   constructor(
     private deviceInfoService: DeviceInfoService,
     private focusManagerService: FocusManagerService,
+    private lazyCssLoaderService: LazyCssLoaderService,
     private numberConversionService: NumberConversionService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -150,6 +155,7 @@ export class SchemaBasedUnicodeEditor
 
   ngOnInit(): void {
     if (this.uiConfig && this.uiConfig.coding_mode) {
+      this.lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
       // Flag that is flipped each time the codemirror view is
       // shown. (The codemirror instance needs to be refreshed
       // every time it is unhidden.)
