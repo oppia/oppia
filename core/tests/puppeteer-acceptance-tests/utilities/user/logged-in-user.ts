@@ -3221,24 +3221,12 @@ export class LoggedInUser extends BaseUser {
         };
 
         if (!href) {
-          await Promise.all([
-            this.page.waitForNavigation({
-              waitUntil: 'networkidle2',
-              timeout: 60000,
-            }),
-            button.click(),
-          ]);
+          await button.click();
           await waitForExplorationPlayer();
           return;
         }
 
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: 'networkidle2',
-            timeout: 60000,
-          }),
-          this.page.goto(href),
-        ]);
+        await this.page.goto(href);
         await waitForExplorationPlayer();
         return;
       }
@@ -4486,29 +4474,29 @@ export class LoggedInUser extends BaseUser {
     chapterNames: string[]
   ): Promise<void> {
     await this.page.waitForSelector(availableChapters);
-    const containers = await this.page.$$(availableChapters);
 
     for (const chapterName of chapterNames) {
-      let chapterFound = false;
-
-      for (const container of containers) {
-        const chapterEls = await container.$$(chapterSelector);
-
-        for (const el of chapterEls) {
-          const text = await el.evaluate(node => node.textContent?.trim());
-          if (text && text.includes(chapterName)) {
-            chapterFound = true;
-            showMessage(`Chapter "${chapterName}" found in Available list.`);
-            break;
-          }
-        }
-
-        if (chapterFound) {
-          break;
-        }
-      }
-
-      if (!chapterFound) {
+      try {
+        await this.page.waitForFunction(
+          (availableSel: string, chapterSel: string, name: string) => {
+            const containers = document.querySelectorAll(availableSel);
+            for (const container of containers) {
+              const elements = container.querySelectorAll(chapterSel);
+              for (const el of elements) {
+                if (el.textContent?.trim().includes(name)) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          },
+          {timeout: 15000},
+          availableChapters,
+          chapterSelector,
+          chapterName
+        );
+        showMessage(`Chapter "${chapterName}" found in Available list.`);
+      } catch (error) {
         throw new Error(`Chapter "${chapterName}" not found in Available list`);
       }
     }
