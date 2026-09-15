@@ -102,9 +102,59 @@ describe('LazyCssLoaderService', () => {
       .args[0] as HTMLLinkElement;
     expect(linkElement.getAttribute('media')).toBe('print');
 
-    linkElement.onload(new Event('load'));
+    linkElement.onload?.(new Event('load'));
 
     expect(linkElement.getAttribute('media')).toBe('all');
+  });
+
+  it('should allow a css group to be retried after it fails to load', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
+
+    const linkElement = appendChildSpy.calls.mostRecent()
+      .args[0] as HTMLLinkElement;
+    linkElement.onerror?.(new Event('error'));
+
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.GUPPY)).toBe(false);
+
+    const result = lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
+
+    expect(result).toBe(true);
+    expect(appendChildSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('should keep a group retryable until every stylesheet in it loads', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
+    const linkElements = appendChildSpy.calls
+      .allArgs()
+      .map(args => args[0] as HTMLLinkElement);
+
+    linkElements[0].onload?.(new Event('load'));
+
+    // The group is still being loaded until the second link loads.
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(true);
+    expect(lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR)).toBe(false);
+
+    linkElements[1].onerror?.(new Event('error'));
+
+    // A failed group can now be retried.
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(false);
+    expect(lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR)).toBe(true);
+  });
+
+  it('should mark a group as loaded only after every link loads', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
+    const linkElements = appendChildSpy.calls
+      .allArgs()
+      .map(args => args[0] as HTMLLinkElement);
+
+    linkElements[0].onload?.(new Event('load'));
+    linkElements[1].onload?.(new Event('load'));
+
+    expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(true);
+    expect(lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR)).toBe(false);
   });
 
   it('should not reload GUPPY css if already loaded', () => {
@@ -223,5 +273,13 @@ describe('LazyCssLoaderService', () => {
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CROPPER)).toBe(false);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.CODEMIRROR)).toBe(false);
     expect(lazyCssLoaderService.hasCssLoaded(KNOWN_CSS.SHEPHERD)).toBe(false);
+  });
+
+  it('should return false for unknown css', () => {
+    const appendChildSpy = spyOn(document.head, 'appendChild');
+    const result = lazyCssLoaderService.loadCss(KNOWN_CSS.UNKNOWN);
+
+    expect(result).toBe(false);
+    expect(appendChildSpy).not.toHaveBeenCalled();
   });
 });

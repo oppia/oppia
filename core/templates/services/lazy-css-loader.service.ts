@@ -23,14 +23,19 @@ export enum KNOWN_CSS {
   CROPPER = 'CROPPER',
   CODEMIRROR = 'CODEMIRROR',
   SHEPHERD = 'SHEPHERD',
+  UNKNOWN = 'UNKNOWN',
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class LazyCssLoaderService {
-  // Set of CSS files that have already been loaded.
+  // Set of CSS groups that have finished loading successfully.
   private fullyLoadedCss: Set<string> = new Set<string>();
+  // Set of CSS groups whose stylesheet requests are still in flight. This is
+  // kept separate from fullyLoadedCss so that a failed request can be retried
+  // rather than being permanently deduplicated away.
+  private cssGroupsCurrentlyLoading: Set<string> = new Set<string>();
   private renderer: Renderer2;
 
   constructor(rendererFactory: RendererFactory2) {
@@ -38,11 +43,13 @@ export class LazyCssLoaderService {
   }
 
   hasCssLoaded(css: KNOWN_CSS): boolean {
-    return this.fullyLoadedCss.has(css);
+    return (
+      this.fullyLoadedCss.has(css) || this.cssGroupsCurrentlyLoading.has(css)
+    );
   }
 
   loadCss(css: KNOWN_CSS): boolean {
-    // If the css is already loaded, it does not load again.
+    // If the css is already loaded or is being loaded, it does not load again.
     if (this.hasCssLoaded(css)) {
       return false;
     }
@@ -73,6 +80,9 @@ export class LazyCssLoaderService {
         return false;
     }
 
+    this.cssGroupsCurrentlyLoading.add(css);
+    let linksStillLoading = cssHrefs.length;
+    let loadHasFailed = false;
     cssHrefs.forEach((cssHref: string) => {
       const linkElement = this.renderer.createElement('link');
       linkElement.rel = 'stylesheet';
@@ -82,12 +92,24 @@ export class LazyCssLoaderService {
       linkElement.media = 'print';
       linkElement.onload = () => {
         linkElement.media = 'all';
+        linksStillLoading -= 1;
+        // The whole group is marked as loaded only once every stylesheet has
+        // loaded, so that a partially loaded group can still be retried.
+        if (!loadHasFailed && linksStillLoading === 0) {
+          this.cssGroupsCurrentlyLoading.delete(css);
+          this.fullyLoadedCss.add(css);
+        }
+      };
+      linkElement.onerror = () => {
+        // If any stylesheet in the group fails to load, clear the in-flight
+        // marker so a later call can retry loading the entire group.
+        loadHasFailed = true;
+        this.cssGroupsCurrentlyLoading.delete(css);
       };
       linkElement.href = cssHref;
       this.renderer.appendChild(document.head, linkElement);
     });
 
-    this.fullyLoadedCss.add(css);
     return true;
   }
 }
