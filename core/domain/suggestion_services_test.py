@@ -9684,7 +9684,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def _calculate_translation_contribution_hours(
         self, numer_of_words: int
-    ) -> str:
+    ) -> float:
         """Provides translatoin contribution hours when number of translated
         words are provided. We calculate the time taken to translate
         a word according to the following document.
