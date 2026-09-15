@@ -12,7 +12,7 @@
 .oppia-new-player-content {
   background-color: #cadbda;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   min-height: calc(100vh - 96px);
 }
 
@@ -24,7 +24,6 @@
 }
 
 .conversation-wrapper {
-  align-items: flex-end;
   display: flex;
   flex: 1;
   z-index: 0;

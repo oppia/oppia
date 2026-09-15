@@ -90,7 +90,7 @@ describe('Schema based float editor component', function () {
       checkRequireNonnegativeInput: true,
     };
     component.ngOnInit();
-    tick(50);
+    tick();
 
     expect(component.hasLoaded).toBe(true);
     expect(component.userIsCurrentlyTyping).toBe(false);

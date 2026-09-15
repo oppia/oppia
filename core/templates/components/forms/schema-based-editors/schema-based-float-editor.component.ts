@@ -162,11 +162,9 @@ export class SchemaBasedFloatEditorComponent
     if (checkRequireNonnegativeInput) {
       this.minValue = 0;
     }
-    // So that focus is applied after all the functions in
-    // main thread have executed.
     setTimeout(() => {
       this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
-    }, 50);
+    }, 0);
     // This timeout prevents the red 'invalid input' warning message from
     // flashing at the outset.
     setTimeout(() => {
