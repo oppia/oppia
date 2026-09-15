@@ -8484,62 +8484,90 @@ export class ExplorationEditor extends BaseUser {
     expectedOpenFeedback: string,
     expectedViews: string
   ): Promise<void> {
-    await this.waitForNetworkIdle({idleTime: 1000});
+    // The rating/feedback/views on a creator-dashboard grid tile come from the
+    // exploration summary, which the backend regenerates asynchronously. The
+    // tile computes avgRating once in ngOnInit and never re-fetches it, so if
+    // the dashboard rendered before the summary had propagated, the tile stays
+    // on 'N/A' for the whole page load and waitForFunction can never match — it
+    // just burns the full timeout (see #26578). Reload to fetch a fresh summary
+    // and retry instead of polling a value that is frozen at load time.
+    const maxAttempts = 4;
+    const perAttemptTimeoutMsecs = 10000;
+    let card: ElementHandle<Element> | null = null;
 
-    await this.page.waitForSelector(explorationGridCardTitleSelector, {
-      visible: true,
-    });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await this.waitForNetworkIdle({idleTime: 1000});
 
-    const titles = await this.page.$$(explorationGridCardTitleSelector);
-    const titleElement = titles[index];
+      await this.page.waitForSelector(explorationGridCardTitleSelector, {
+        visible: true,
+      });
 
-    if (!titleElement) {
-      throw new Error(`Card at index ${index} not found.`);
+      const titles = await this.page.$$(explorationGridCardTitleSelector);
+      const titleElement = titles[index];
+
+      if (!titleElement) {
+        throw new Error(`Card at index ${index} not found.`);
+      }
+
+      const cardHandle = await titleElement.evaluateHandle(
+        (element, cardSelector) => element.closest(cardSelector),
+        explorationGridSelector
+      );
+      card = cardHandle.asElement();
+
+      if (!card) {
+        throw new Error(`Card at index ${index} not found.`);
+      }
+
+      try {
+        await this.page.waitForFunction(
+          (
+            cardElement: Element,
+            ratingSelector: string,
+            feedbackSelector: string,
+            viewsSelector: string,
+            expectedRatingText: string,
+            expectedFeedbackText: string,
+            expectedViewsText: string
+          ) => {
+            const getStatisticText = (selector: string): string => {
+              return (
+                (
+                  cardElement.querySelector(selector) as HTMLElement | null
+                )?.textContent?.trim() || ''
+              );
+            };
+
+            return (
+              getStatisticText(ratingSelector) === expectedRatingText &&
+              getStatisticText(feedbackSelector) === expectedFeedbackText &&
+              getStatisticText(viewsSelector) === expectedViewsText
+            );
+          },
+          {timeout: perAttemptTimeoutMsecs},
+          card,
+          explorationGridRatingSelector,
+          explorationGridFeedbackSelector,
+          explorationGridViewsSelector,
+          expectedRating,
+          expectedOpenFeedback,
+          expectedViews
+        );
+        break;
+      } catch {
+        // Stale summary — reload to force a fresh fetch, then retry. On the
+        // final attempt, fall through to the descriptive checks below so the
+        // error names the value we actually saw (e.g. 'N/A') instead of a
+        // bare timeout.
+        if (attempt < maxAttempts) {
+          await this.page.reload();
+        }
+      }
     }
-
-    const cardHandle = await titleElement.evaluateHandle(
-      (element, cardSelector) => element.closest(cardSelector),
-      explorationGridSelector
-    );
-    const card = cardHandle.asElement();
 
     if (!card) {
       throw new Error(`Card at index ${index} not found.`);
     }
-
-    await this.page.waitForFunction(
-      (
-        cardElement: Element,
-        ratingSelector: string,
-        feedbackSelector: string,
-        viewsSelector: string,
-        expectedRatingText: string,
-        expectedFeedbackText: string,
-        expectedViewsText: string
-      ) => {
-        const getStatisticText = (selector: string): string => {
-          return (
-            (
-              cardElement.querySelector(selector) as HTMLElement | null
-            )?.textContent?.trim() || ''
-          );
-        };
-
-        return (
-          getStatisticText(ratingSelector) === expectedRatingText &&
-          getStatisticText(feedbackSelector) === expectedFeedbackText &&
-          getStatisticText(viewsSelector) === expectedViewsText
-        );
-      },
-      {},
-      card,
-      explorationGridRatingSelector,
-      explorationGridFeedbackSelector,
-      explorationGridViewsSelector,
-      expectedRating,
-      expectedOpenFeedback,
-      expectedViews
-    );
 
     const cardDetails = await this.page.evaluate(
       (
