@@ -1348,7 +1348,10 @@ class TranslatableTopicNamesPerClassroomHandler(
         if language_code is not None:
             for topics in topics_per_classroom.values():
                 topics.sort(
-                    key=lambda topic: topic['completeness'] or 0, reverse=True
+                    key=lambda topic: (
+                        -(topic['completeness'] or 0),
+                        topic['name'].lower(),
+                    )
                 )
         self.values = {
             'topic_names_per_classroom': [
