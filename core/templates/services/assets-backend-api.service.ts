@@ -58,17 +58,28 @@ export class AssetsBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {
     let urlPrefix = '/assetsdevhandler';
+    // In emulator mode, profile images are served by AssetDevHandler, which
+    // requires an '<asset_type>' path segment (see main.py's assetsdevhandler
+    // route). In production, images are fetched directly from the GCS
+    // bucket, whose object paths have no such segment (see
+    // user_services.update_profile_picture_data_url).
+    let profileImagePngUrlTemplate =
+      urlPrefix + '/user/<username>/assets/image/profile_picture.png';
+    let profileImageWebpUrlTemplate =
+      urlPrefix + '/user/<username>/assets/image/profile_picture.webp';
     if (!AssetsBackendApiService.EMULATOR_MODE) {
       urlPrefix =
         'https://storage.googleapis.com/' +
         AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME;
+      profileImagePngUrlTemplate =
+        urlPrefix + '/user/<username>/assets/profile_picture.png';
+      profileImageWebpUrlTemplate =
+        urlPrefix + '/user/<username>/assets/profile_picture.webp';
     }
     this.downloadUrlTemplate =
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>';
-    this.profileImagePngUrlTemplate =
-      urlPrefix + '/user/<username>/assets/profile_picture.png';
-    this.profileImageWebpUrlTemplate =
-      urlPrefix + '/user/<username>/assets/profile_picture.webp';
+    this.profileImagePngUrlTemplate = profileImagePngUrlTemplate;
+    this.profileImageWebpUrlTemplate = profileImageWebpUrlTemplate;
   }
 
   static get EMULATOR_MODE(): boolean {
