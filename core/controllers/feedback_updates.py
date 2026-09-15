@@ -171,17 +171,31 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             if isinstance(
                 suggestion, suggestion_registry.SuggestionEditStateContent
             ):
-                current_content_html = exploration.states[
-                    suggestion.change_cmd.state_name
-                ].content.html
+                try:
+                    current_content_html = exploration.states[
+                        suggestion.change_cmd.state_name
+                    ].content.html
+                except KeyError:
+                    # The suggestion's target state may have been renamed or
+                    # deleted since the suggestion was created, so leave the
+                    # current content empty and still return the thread.
+                    current_content_html = ''
                 suggestion_html = suggestion.change_cmd.new_value['html']
             elif isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             ):
-                translate_current_content_html = exploration.get_content_html(
-                    suggestion.change_cmd.state_name,
-                    suggestion.change_cmd.content_id,
-                )
+                try:
+                    translate_current_content_html = (
+                        exploration.get_content_html(
+                            suggestion.change_cmd.state_name,
+                            suggestion.change_cmd.content_id,
+                        )
+                    )
+                except ValueError:
+                    # The suggestion's target state or content may no longer
+                    # exist, so leave the current content empty and still
+                    # return the thread.
+                    translate_current_content_html = ''
                 # translate_current_content_html can be str or List[str],
                 # but SuggestionSummaryDict expects str. Convert to str if needed.
                 if isinstance(translate_current_content_html, list):

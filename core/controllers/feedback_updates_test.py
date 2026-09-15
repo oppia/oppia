@@ -335,6 +335,116 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             )
             self.assertEqual(suggestion_summary['author_username'], 'editor')
 
+    def test_current_content_html_empty_for_stale_edit_state_suggestion(
+        self,
+    ) -> None:
+        """Tests that a suggestion whose target state no longer exists does
+        not break the feedback thread summary.
+        """
+        self.login(self.EDITOR_EMAIL)
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+
+        new_content = state_domain.SubtitledHtml(
+            'content', '<p>new content html</p>'
+        ).to_dict()
+        change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            # This state does not exist, which simulates a target that was
+            # renamed or deleted after the suggestion was created.
+            'state_name': 'Deleted state',
+            'new_value': new_content,
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID_1,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.editor_id,
+            None,
+            change_cmd,
+            'score category',
+            thread_id,
+            None,
+        )
+
+        response_dict = self.get_json(thread_url)
+        suggestion_summary = response_dict['message_summary_list'][0]
+
+        self.assertEqual(suggestion_summary['current_content_html'], '')
+        self.assertEqual(
+            suggestion_summary['suggestion_html'], '<p>new content html</p>'
+        )
+        self.logout()
+
+    def test_current_content_html_empty_for_stale_translation_suggestion(
+        self,
+    ) -> None:
+        """Tests that a translation suggestion whose target state no longer
+        exists does not break the feedback thread summary.
+        """
+        self.login(self.EDITOR_EMAIL)
+
+        # Get the exploration to find a valid content_id.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
+        content_id = exploration.states['Welcome!'].content.content_id
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            # This state does not exist, which simulates a target that was
+            # renamed or deleted after the suggestion was created.
+            'state_name': 'Deleted state',
+            'content_id': content_id,
+            'language_code': 'hi',
+            'content_html': '<p>Original content.</p>',
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html',
+        }
+        translation_suggestion = suggestion_registry.SuggestionTranslateContent(
+            'exploration.exp1.thread1',
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            'author',
+            'review_id',
+            change_dict,
+            'translation.Algebra',
+            'en',
+            False,
+            datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
+            datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
+        )
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ):
+            response_dict = self.get_json(thread_url)
+            suggestion_summary = response_dict['message_summary_list'][0]
+
+        self.assertEqual(suggestion_summary['current_content_html'], '')
+        self.assertEqual(
+            suggestion_summary['suggestion_html'],
+            '<p>This is translated html.</p>',
+        )
+        self.logout()
+
     def test_raises_error_for_unsupported_suggestion_type(self) -> None:
         """Test that an error is raised when a suggestion type that is not
         SuggestionEditStateContent or SuggestionTranslateContent is provided.

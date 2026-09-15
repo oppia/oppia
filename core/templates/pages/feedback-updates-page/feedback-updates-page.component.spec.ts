@@ -897,6 +897,9 @@ describe('Feedback updates page', () => {
       component.showSuggestionModal(null, null, null);
 
       expect(ngbModalOpenSpy).toHaveBeenCalled();
+      expect(modalRef.componentInstance.newContent).toBeNull();
+      expect(modalRef.componentInstance.oldContent).toBeNull();
+      expect(modalRef.componentInstance.description).toBeNull();
     });
 
     it('should open bottom sheet with suggestion review modal when window is narrow', () => {
