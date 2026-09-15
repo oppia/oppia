@@ -29,6 +29,8 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {StateBackendDict} from 'domain/state/state.model';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
@@ -158,7 +160,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiServiceSpy,
       playerStateServiceInstance,
       {} as ClassroomBackendApiService,
+      {} as InternetConnectivityService,
       {} as PageHeadService,
+      {} as PreventPageUnloadEventService,
       routerSpy,
       translateServiceSpy
     );
@@ -246,7 +250,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      {} as InternetConnectivityService,
       {} as PageHeadService,
+      {} as PreventPageUnloadEventService,
       router,
       translateService
     );
@@ -552,7 +558,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      {} as InternetConnectivityService,
       {} as PageHeadService,
+      {} as PreventPageUnloadEventService,
       router,
       translateService
     );
@@ -581,7 +589,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
+      {} as InternetConnectivityService,
       {} as PageHeadService,
+      {} as PreventPageUnloadEventService,
       router,
       translateService
     );
