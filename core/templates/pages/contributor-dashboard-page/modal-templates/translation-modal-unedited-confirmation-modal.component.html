@@ -1,0 +1,9 @@
+<div class="modal-body">
+  <p [innerHTML]="'I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BODY' | translate">
+    Are you sure this auto-generated translation needs no edits?
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-cancel-unedited-save-button" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-confirm-unedited-save-button" (click)="confirm()">Yes, save</button>
+</div>

@@ -58,6 +58,7 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
+const autoTranslateButtonSelector = '.e2e-test-auto-translate-button';
 
 // Number of times a translate button click is attempted before giving up, and
 // how long each attempt waits for the translation modal to open. The product of
@@ -568,6 +569,10 @@ export class TranslationSubmitter extends BaseUser {
       `${selectedSkillSelector} label`,
       skill
     );
+  }
+
+  async clickOnAutoTranslateButton(): Promise<void> {
+    await this.clickOnElementWithSelector(autoTranslateButtonSelector);
   }
 }
 
