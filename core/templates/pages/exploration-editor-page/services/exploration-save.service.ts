@@ -297,7 +297,7 @@ export class ExplorationSaveService {
         // If the exploration is not private, warnings should be fixed before
         // it can be saved.
         this.alertsService.addWarning(
-          this.explorationWarningsService.getWarnings()[0] as string
+          this.explorationWarningsService.getWarnings()[0].message
         );
         return;
       }

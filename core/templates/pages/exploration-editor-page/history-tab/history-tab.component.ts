@@ -18,6 +18,7 @@
 
 import {Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {PageEvent} from '@angular/material/paginator';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import {CheckRevertExplorationModalComponent} from './modal-templates/check-revert-exploration-modal.component';
@@ -36,8 +37,10 @@ import {
   ExplorationSnapshot,
   VersionTreeService,
 } from './services/version-tree.service';
-import {CompareVersionsService} from './services/compare-versions.service';
-import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {
+  CompareVersionsService,
+  CompareVersionData,
+} from './services/compare-versions.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import './history-tab.component.css';
 
@@ -46,11 +49,7 @@ interface VersionMetadata {
   committerId: string;
   createdOnMsecsStr: string;
   commitMessage: string;
-}
-
-interface Metadata {
-  v1Metadata: ExplorationMetadata;
-  v2Metadata: ExplorationMetadata;
+  tooltipText?: string;
 }
 
 @Component({
@@ -61,8 +60,8 @@ interface Metadata {
 export class HistoryTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion: string | null = null;
-  secondVersion: string | null = null;
+  firstVersion: VersionMetadata | null = null;
+  secondVersion: VersionMetadata | null = null;
   hideHistoryGraph: boolean = true;
   selectedVersionsArray: number[] = [];
   filteredVersionMetadata: VersionMetadata[] = [];
@@ -106,7 +105,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   comparisonsAreDisabled: boolean = false;
   compareVersionsButtonIsHidden: boolean = false;
   compareVersions: object = {};
-  diffData: Metadata | object | null = null;
+  diffData: CompareVersionData | null = null;
 
   constructor(
     private checkRevertService: CheckRevertService,
@@ -222,6 +221,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
                   ),
                 commitMessage: this.explorationSnapshots[i].commit_message,
                 versionNumber: this.explorationSnapshots[i].version_number,
+                tooltipText: this.dateTimeFormatService.getDateTimeInWords(
+                  this.explorationSnapshots[i].created_on_ms
+                ),
               };
               this.versionCheckboxArray.push({
                 vnum: this.explorationSnapshots[i].version_number,
@@ -417,12 +419,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  paginator(value: {
-    previousPageIndex: number;
-    pageIndex: number;
-    pageSize: number;
-    length: number;
-  }): void {
+  paginator(value: PageEvent): void {
     this.displayedCurrentPageNumber = value.pageIndex + 1;
 
     if (value.pageSize !== this.VERSIONS_PER_PAGE) {
@@ -476,12 +473,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       }
     );
 
-    modalRef.componentInstance.oldMetadata = (
-      this.diffData as Metadata
-    ).v1Metadata;
-    modalRef.componentInstance.newMetadata = (
-      this.diffData as Metadata
-    ).v2Metadata;
+    const diffData = this.diffData as CompareVersionData;
+    modalRef.componentInstance.oldMetadata = diffData.v1Metadata;
+    modalRef.componentInstance.newMetadata = diffData.v2Metadata;
     modalRef.componentInstance.headers = {
       leftPane: this.earlierVersionHeader,
       rightPane: this.laterVersionHeader,
@@ -530,8 +524,8 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     this.explorationVersionMetadata = null;
     this.versionCheckboxArray = [];
     this.username = '';
-    this.firstVersion = '';
-    this.secondVersion = '';
+    this.firstVersion = null;
+    this.secondVersion = null;
 
     this.displayedCurrentPageNumber = this.currentPage + 1;
     this.versionNumbersToDisplay = 0;

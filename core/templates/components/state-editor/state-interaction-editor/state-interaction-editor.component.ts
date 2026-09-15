@@ -115,6 +115,10 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
+  get isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
   getCurrentInteractionName(): string {
     return this.stateInteractionIdService.savedMemento
       ? INTERACTION_SPECS[this.stateInteractionIdService.savedMemento].name

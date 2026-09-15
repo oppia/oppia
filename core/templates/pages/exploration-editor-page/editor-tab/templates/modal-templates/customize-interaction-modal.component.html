@@ -3,7 +3,7 @@
        [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
     <h3 *ngIf="!stateInteractionIdService.displayed"
         tabindex="0"
-        [oppiaFocusOn]="chooseInteractionHeader"
+        [oppiaFocusOn]="'chooseInteractionHeader'"
         class="e2e-test-modal-header">
       Choose Interaction
     </h3>
@@ -64,7 +64,7 @@
       </div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="customizationArgSpec.schema"
-                           [(ngModel)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
+                           [(ngModel)]="customizationArgs[customizationArgSpec.name].value">
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'"
            tabindex="0"

@@ -393,4 +393,16 @@ describe('StateHintsEditorComponent', () => {
 
     expect(alertsService.clearWarnings).toHaveBeenCalledTimes(1);
   });
+
+  it('should expose hint properties from the injected services', () => {
+    spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(2);
+    spyOn(editabilityService, 'isEditableOutsideTutorialMode').and.returnValue(
+      false
+    );
+
+    expect(component.displayedHints).toEqual(stateHintsService.displayed);
+    expect(component.activeHintIndex).toBe(2);
+    expect(component.isEditable).toBe(true);
+    expect(component.isEditableOutsideTutorialMode).toBe(false);
+  });
 });

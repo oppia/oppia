@@ -609,7 +609,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   generateAriaLabelForWarnings(): string {
-    const warnings = this.getWarnings() as {message: string}[];
+    const warnings = this.getWarnings();
     const warningLabels = warnings
       .map(
         (warning, index) => 'Warning ' + (index + 1) + ': ' + warning.message
@@ -627,7 +627,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     return this.explorationWarningsService.countWarnings();
   }
 
-  getWarnings(): object[] | string[] {
+  getWarnings(): {type: string; message: string}[] {
     return this.explorationWarningsService.getWarnings();
   }
 

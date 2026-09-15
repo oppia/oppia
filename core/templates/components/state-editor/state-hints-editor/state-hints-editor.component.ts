@@ -74,6 +74,24 @@ export class StateHintsEditorComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
+  // These getters are used by the component template to access the hint
+  // properties while keeping the injected services private.
+  get displayedHints(): Hint[] {
+    return this.stateHintsService.displayed;
+  }
+
+  get activeHintIndex(): number | null {
+    return this.stateHintsService.getActiveHintIndex();
+  }
+
+  get isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
+  get isEditableOutsideTutorialMode(): boolean {
+    return this.editabilityService.isEditableOutsideTutorialMode();
+  }
+
   drop(event: CdkDragSortEvent<Hint[]>): void {
     moveItemInArray(
       this.stateHintsService.displayed,

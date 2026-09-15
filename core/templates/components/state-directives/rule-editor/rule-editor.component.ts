@@ -42,7 +42,9 @@ import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defa
 import INTERACTION_SPECS from '../../../../../extensions/interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import './rule-editor.component.css';
 
 interface SelectItem {
@@ -79,6 +81,8 @@ export class RuleEditorComponent
   ruleDescriptionFragments!: RuleDescriptionFragment[];
   currentInteractionId!: InteractionSpecsKey;
   ruleDescriptionChoices!: Choice[];
+  ruleDescriptionChoiceList: {id: string; val: string}[] = [];
+  ruleEditorInitArgs!: SchemaDefaultValue;
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
   // The 'unknown' type is used here because the record can contain any type of value.
@@ -221,6 +225,18 @@ export class RuleEditorComponent
     this.ruleDescriptionFragments = [];
     this.ngZone.run(() => {
       this.ruleDescriptionFragments = result;
+      // The rule description choices are only present when answer choices
+      // are available, so default to an empty list when they are not.
+      this.ruleDescriptionChoiceList = this.ruleDescriptionChoices
+        ? this.ruleDescriptionChoices.map(choice => ({
+            id: choice.id,
+            val:
+              typeof choice.val === 'string' ? choice.val : String(choice.val),
+          }))
+        : [];
+      this.ruleEditorInitArgs = {
+        choices: this.ruleDescriptionChoices || [],
+      } as unknown as SchemaDefaultValue;
     }, 10);
 
     return ruleDescription;
@@ -230,6 +246,31 @@ export class RuleEditorComponent
     this.rule.inputs[item.varName] = selection;
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  getFirstRuleDescriptionChoiceText(): string {
+    const firstChoice = this.ruleDescriptionChoices[0];
+    return typeof firstChoice.val === 'string'
+      ? firstChoice.val
+      : String(firstChoice.val);
+  }
+
+  getRuleInputAsString(item: SelectItem): string {
+    return String(this.rule.inputs[item.varName]);
+  }
+
+  // The rule input value can be of any type of the interaction rule inputs,
+  // which is only determined at runtime, so a type assertion is used here to
+  // match the type accepted by the object editor.
+  getRuleInputValue(item: SelectItem): SchemaDefaultValue {
+    return this.rule.inputs[item.varName] as unknown as SchemaDefaultValue;
+  }
+
+  // The new value is emitted by the object editor as a schema default value,
+  // so a type assertion is used here to match the interaction rule input type.
+  setRuleInputValue(newValue: SchemaDefaultValue, item: SelectItem): void {
+    this.rule.inputs[item.varName] =
+      newValue as unknown as InteractionRuleInputs;
   }
 
   onSelectNewRuleType(newRuleType: string): void {

@@ -176,7 +176,7 @@
                id="label-target-suggestion-questions-to-generate">
 
         <label for="label-target-skill-selection" class="form-label">Select skill for suggestion questions</label>
-        <select id="label-target-skill-selection" class="form-select" (change)="selectedOption=$event.target.value">
+        <select id="label-target-skill-selection" class="form-select" (change)="selectedOption=$any($event.target).value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let skill of skillList; let i = index" [value]="i">{{skill.description}}</option>
         </select>
@@ -206,7 +206,7 @@
                id="label-stories-to-generate">
 
         <label for="label-target-topic-selection" class="form-label">Select topic for stories</label>
-        <select id="label-target-topic-selection" class="form-select" (change)="selectedTopicForStory=$event.target.value">
+        <select id="label-target-topic-selection" class="form-select" (change)="selectedTopicForStory=$any($event.target).value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let topic of topicList; let i = index" [value]="i">{{topic.name}}</option>
         </select>
@@ -236,7 +236,7 @@
                id="label-target-chapters-to-generate">
 
         <label for="label-target-story-selection" class="form-label">Select story for chapters</label>
-        <select id="label-target-story-selection" class="form-select" (change)="selectedStoryForChapter=$event.target.value">
+        <select id="label-target-story-selection" class="form-select" (change)="selectedStoryForChapter=$any($event.target).value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let story of storyList; let i = index" [value]="i">{{story.getTitle()}}</option>
         </select>

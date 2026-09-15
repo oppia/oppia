@@ -8,13 +8,11 @@
   </p>
   <oppia-exploration-title-editor *ngIf="requireTitleToBeSpecified"
                                   [labelText]="'Add a title: what should your exploration be called?'"
-                                  [titleEditorClass]="'e2e-test-exploration-title-input-modal'"
-                                  [formStyle]="{'font-weight':'normal'}">
+                                   [titleEditorClass]="'e2e-test-exploration-title-input-modal'">
   </oppia-exploration-title-editor>
   <oppia-exploration-objective-editor *ngIf="requireObjectiveToBeSpecified"
                                       [labelText]="'Add a goal: what does the exploration help people to do?'"
-                                      [objectiveEditorClass]="'e2e-test-exploration-objective-input-modal'"
-                                      [formStyle]="{'font-weight': 'normal'}">
+                                       [objectiveEditorClass]="'e2e-test-exploration-objective-input-modal'">
   </oppia-exploration-objective-editor>
   <p *ngIf="requireCategoryToBeSpecified">
     <mat-form-field class="e2e-test-exploration-category-metadata-modal" appearance="fill">

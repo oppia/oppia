@@ -635,6 +635,14 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.updateLessonFeedbackReply(replyText);
   }
 
+  onCreatorFeedbackGithubTransfer(githubIssueUrl: string): void {
+    // This mirrors the behavior of the technical feedback dashboard, which
+    // marks the feedback as transferred to GitHub and opens the issue URL in
+    // a new tab.
+    this.onCreatorFeedbackStatusChange(FeedbackStatus.TRANSFERRED_TO_GITHUB);
+    this.windowRef.nativeWindow.open(githubIssueUrl, '_blank', 'noopener');
+  }
+
   getDisplayedCreatorFeedbackSummaries():
     | PlatformFeedbackSummary[]
     | LessonFeedbackSummary[] {

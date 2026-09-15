@@ -56,6 +56,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   cardIsHovered: boolean = false;
   openInNewWindow: boolean = false;
   statusIsPublished!: boolean;
+  storyCompleted: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -158,6 +159,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyProgress = Math.floor(
         (completedNodesCount / totalStoryNodesCount) * 100
       );
+      this.storyCompleted = this.storyProgress === 100;
     }
   }
 

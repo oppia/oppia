@@ -1177,6 +1177,22 @@ describe('Feedback Tab Component', () => {
     );
   }));
 
+  it('should transfer feedback to GitHub and update status', () => {
+    spyOn(component, 'onCreatorFeedbackStatusChange');
+    spyOn(windowRef.nativeWindow, 'open');
+
+    component.onCreatorFeedbackGithubTransfer('https://github.com/test/issue');
+
+    expect(component.onCreatorFeedbackStatusChange).toHaveBeenCalledWith(
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
+    );
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      'https://github.com/test/issue',
+      '_blank',
+      'noopener'
+    );
+  });
+
   it('should update report feedback status', fakeAsync(() => {
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
       CreatorFeedbackType.REPORT;
