@@ -13,7 +13,7 @@
          attr.height="{{getImageHeight()}}"
          (mousedown)="onSvgMouseDown($event)"
          (mousemove)="onSvgMouseMove($event)"
-         (mouseup)="onSvgMouseUp($event)">
+         (mouseup)="onSvgMouseUp()">
       <image [attr.href]="getPreviewUrl(value.imagePath)"
              xlink:href=""
              x="0"
@@ -38,7 +38,7 @@
             (mouseover)="onMouseoverRegion(idx)"
             (mouseout)="onMouseoutRegion(idx)"
             (mousemove)="onMouseMoveRegion(idx)"
-            (mousedown)="onMousedownRegion(idx)">
+            (mousedown)="onMousedownRegion()">
       </rect>
       <a *ngFor="let labeledRegion of value.labeledRegions; let idx = index"
          (click)="deleteRegion(idx)"
@@ -66,7 +66,7 @@
            [attr.style]="getRegionLabelEditorStyle()"
            (mouseup)="regionLabelEditorMouseUp()"
            [(ngModel)]="value.labeledRegions[selectedRegion].label"
-           (ngModelChange)="regionLabelSetter()">
+           (ngModelChange)="regionLabelSetter($event)">
 
     <div class="text-danger oppia-error-text">{{errorText}}</div>
     <button type="button" class="btn btn-danger" (click)="resetEditor()">Clear Image and Regions</button>
