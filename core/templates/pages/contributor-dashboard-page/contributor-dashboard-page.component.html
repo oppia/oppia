@@ -104,6 +104,7 @@
                   <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                   <translation-topic-selector class="oppia-topic-selector"
                                               [activeTopicName]="topicName"
+                                              [activeLanguageCode]="languageCode"
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
@@ -151,6 +152,7 @@
                   <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                   <translation-topic-selector class="oppia-topic-selector"
                                               [activeTopicName]="topicName"
+                                              [activeLanguageCode]="languageCode"
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>

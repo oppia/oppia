@@ -19,6 +19,8 @@
 import {
   Component,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   Input,
   Output,
   EventEmitter,
@@ -31,6 +33,7 @@ import {AppConstants} from 'app.constants';
 import './translation-topic-selector.component.css';
 import {
   ContributionOpportunitiesBackendApiService,
+  TranslatableTopic,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 
@@ -39,34 +42,48 @@ import {
   templateUrl: './translation-topic-selector.component.html',
   styleUrls: ['./translation-topic-selector.component.css'],
 })
-export class TranslationTopicSelectorComponent implements OnInit {
+export class TranslationTopicSelectorComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeTopicName!: string;
+  @Input() activeLanguageCode!: string;
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
 
   options!: string[];
   dropdownShown = false;
-  topicsPerClassroomMap: Record<string, string[]> = {};
+  topicsPerClassroomMap: Record<string, TranslatableTopic[]> = {};
 
   constructor(
     private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService
   ) {}
 
   ngOnInit(): void {
-    this.contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesPerClassroomAsync()
-      .then(topicsPerClassroom => {
-        topicsPerClassroom.forEach(({classroom, topics}) => {
-          this.topicsPerClassroomMap[classroom] = topics;
-        });
-      });
+    this.fetchTopics();
 
     // Set initial value for activeTopicName to "ALL".
     this.activeTopicName = AppConstants.TOPIC_SENTINEL_NAME_ALL;
     this.setActiveTopicName.emit(this.activeTopicName);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Refetch when the language changes so percentages/sort update.
+    // Skip the first change; ngOnInit already does the initial fetch.
+    if (changes.activeLanguageCode && !changes.activeLanguageCode.firstChange) {
+      this.fetchTopics();
+    }
+  }
+
+  fetchTopics(): void {
+    this.contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicNamesPerClassroomAsync(this.activeLanguageCode)
+      .then(topicsPerClassroom => {
+        this.topicsPerClassroomMap = {};
+        topicsPerClassroom.forEach(({classroom, topics}) => {
+          this.topicsPerClassroomMap[classroom] = topics;
+        });
+      });
   }
 
   toggleDropdown(): void {
