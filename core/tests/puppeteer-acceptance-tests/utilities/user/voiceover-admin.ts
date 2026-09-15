@@ -29,9 +29,6 @@ const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
 
-const errorToastMessage = 'div.e2e-test-toast-warning-message';
-const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
-
 const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
@@ -51,7 +48,6 @@ const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
 const enableAutogenerationOptionSelector =
   '.e2e-test-autogeneration-option-selector';
 
-const toastWarningContainer = '.e2e-test-toast-warning';
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
@@ -299,37 +295,6 @@ export class VoiceoverAdmin extends BaseUser {
     await this.dismissWelcomeModal(false);
     await this.navigateToExplorationSettingsTab();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
-  }
-
-  /**
-   * Function to expect to see error toast message
-   * @param expectedErrorMessage - expected error message.
-   */
-  async expectToSeeErrorToastMessage(
-    expectedErrorMessage: string
-  ): Promise<void> {
-    await this.page.waitForSelector(errorToastMessage);
-    const errorMessage = await this.page.$eval(
-      errorToastMessage,
-      element => (element as HTMLElement).innerText
-    );
-    if (errorMessage !== expectedErrorMessage) {
-      throw new Error(
-        `Expected error message to be ${expectedErrorMessage} but got ${errorMessage}`
-      );
-    } else {
-      showMessage(`Toast Error Message: ${errorMessage}`);
-    }
-  }
-
-  /**
-   * Function to close toast message.
-   */
-  async closeToastMessage(): Promise<void> {
-    await this.expectElementToBeVisible(toastWarningContainer);
-    await this.clickOnElementWithSelector(closeToastMessageButton);
-
-    await this.expectElementToBeVisible(toastWarningContainer, false);
   }
 
   /**
